@@ -7,6 +7,12 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwa
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import jakarta.validation.Valid;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
  * OTA 固件管理 Service 接口
  *
@@ -30,12 +36,30 @@ public interface IotOtaFirmwareService {
     void updateOtaFirmware(@Valid IotOtaFirmwareUpdateReqVO updateReqVO);
 
     /**
-     * 根据 ID 获取 OTA 固件信息
+     * 获取 OTA 固件信息
      *
-     * @param id OTA 固件编号
+     * @param id 固件编号
      * @return 固件信息
      */
     IotOtaFirmwareDO getOtaFirmware(Long id);
+
+    /**
+     * 获取 OTA 固件信息列表
+     *
+     * @param ids 固件编号集合
+     * @return 固件信息列表
+     */
+    List<IotOtaFirmwareDO> getOtaFirmwareList(Collection<Long> ids);
+
+    /**
+     * 获取 OTA 固件信息 Map
+     *
+     * @param ids 固件编号集合
+     * @return 固件信息 Map
+     */
+    default Map<Long, IotOtaFirmwareDO> getOtaFirmwareMap(Collection<Long> ids) {
+        return convertMap(getOtaFirmwareList(ids), IotOtaFirmwareDO::getId);
+    }
 
     /**
      * 分页查询 OTA 固件信息
@@ -46,10 +70,10 @@ public interface IotOtaFirmwareService {
     PageResult<IotOtaFirmwareDO> getOtaFirmwarePage(@Valid IotOtaFirmwarePageReqVO pageReqVO);
 
     /**
-     * 验证物联网 OTA 固件是否存在
+     * 验证 OTA 固件是否存在
      *
-     * @param id 物联网 OTA 固件编号
-     * @return OTA 固件
+     * @param id  固件编号
+     * @return 固件信息
      */
     IotOtaFirmwareDO validateFirmwareExists(Long id);
 

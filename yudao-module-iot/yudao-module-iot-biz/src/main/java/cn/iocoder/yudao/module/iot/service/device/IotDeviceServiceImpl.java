@@ -264,8 +264,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public List<IotDeviceDO> getDeviceListByDeviceType(@Nullable Integer deviceType) {
-        return deviceMapper.selectListByDeviceType(deviceType);
+    public List<IotDeviceDO> getDeviceListByCondition(@Nullable Integer deviceType, @Nullable Long productId) {
+        return deviceMapper.selectListByCondition(deviceType, productId);
     }
 
     @Override
@@ -470,14 +470,19 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     public List<IotDeviceDO> validateDeviceListExists(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
+        List<IotDeviceDO> devices = getDeviceList(ids);
         if (devices.size() != ids.size()) {
             throw exception(DEVICE_NOT_EXISTS);
         }
         return devices;
+    }
+
+    @Override
+    public List<IotDeviceDO> getDeviceList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return deviceMapper.selectByIds(ids);
     }
 
     private IotDeviceServiceImpl getSelf() {

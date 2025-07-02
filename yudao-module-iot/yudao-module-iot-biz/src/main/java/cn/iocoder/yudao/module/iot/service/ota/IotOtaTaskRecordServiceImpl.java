@@ -42,7 +42,7 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
     }
 
     @Override
-    public Map<Integer, Long> getOtaTaskRecordStatusCountMap(Long firmwareId, Long taskId) {
+    public Map<Integer, Long> getOtaTaskRecordStatusStatistics(Long firmwareId, Long taskId) {
         // 按照 status 枚举，初始化 countMap 为 0
         Map<Integer, Long> countMap = convertMap(Arrays.asList(IotOtaTaskRecordStatusEnum.values()),
                 IotOtaTaskRecordStatusEnum::getStatus, iotOtaTaskRecordStatusEnum -> 0L);

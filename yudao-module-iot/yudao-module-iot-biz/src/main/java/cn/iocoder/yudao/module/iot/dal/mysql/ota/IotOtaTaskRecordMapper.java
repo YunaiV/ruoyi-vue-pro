@@ -23,7 +23,8 @@ public interface IotOtaTaskRecordMapper extends BaseMapperX<IotOtaTaskRecordDO> 
 
     default PageResult<IotOtaTaskRecordDO> selectPage(IotOtaTaskRecordPageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<IotOtaTaskRecordDO>()
-                .eqIfPresent(IotOtaTaskRecordDO::getTaskId, pageReqVO.getTaskId()));
+                .eqIfPresent(IotOtaTaskRecordDO::getTaskId, pageReqVO.getTaskId())
+                .eqIfPresent(IotOtaTaskRecordDO::getStatus, pageReqVO.getStatus()));
     }
 
     default void updateByTaskIdAndStatus(Long taskId, Integer fromStatus, IotOtaTaskRecordDO updateRecord) {

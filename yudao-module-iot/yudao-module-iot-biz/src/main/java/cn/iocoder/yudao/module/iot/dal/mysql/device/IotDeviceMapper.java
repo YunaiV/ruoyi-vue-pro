@@ -52,9 +52,11 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         return selectCount(IotDeviceDO::getProductId, productId);
     }
 
-    default List<IotDeviceDO> selectListByDeviceType(@Nullable Integer deviceType) {
+    default List<IotDeviceDO> selectListByCondition(@Nullable Integer deviceType,
+                                                    @Nullable Long productId) {
         return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
-                .geIfPresent(IotDeviceDO::getDeviceType, deviceType));
+                .eqIfPresent(IotDeviceDO::getDeviceType, deviceType)
+                .eqIfPresent(IotDeviceDO::getProductId, productId));
     }
 
     default List<IotDeviceDO> selectListByState(Integer state) {

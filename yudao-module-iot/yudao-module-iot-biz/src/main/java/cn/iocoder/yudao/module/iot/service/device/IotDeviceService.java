@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * IoT 设备 Service 接口
  *
@@ -138,12 +140,14 @@ public interface IotDeviceService {
     PageResult<IotDeviceDO> getDevicePage(IotDevicePageReqVO pageReqVO);
 
     /**
-     * 基于设备类型，获得设备列表
+     * 根据条件，获得设备列表
      *
      * @param deviceType 设备类型
+     * @param productId 产品编号
      * @return 设备列表
      */
-    List<IotDeviceDO> getDeviceListByDeviceType(@Nullable Integer deviceType);
+    List<IotDeviceDO> getDeviceListByCondition(@Nullable Integer deviceType,
+                                               @Nullable Long productId);
 
     /**
      * 获得状态，获得设备列表
@@ -240,5 +244,23 @@ public interface IotDeviceService {
      * @param ids 设备编号数组
      */
     List<IotDeviceDO> validateDeviceListExists(Collection<Long> ids);
+
+    /**
+     * 获得设备列表
+     *
+     * @param ids 设备编号数组
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceList(Collection<Long> ids);
+
+    /**
+     * 获得设备 Map
+     *
+     * @param ids 设备编号数组
+     * @return 设备 Map
+     */
+    default Map<Long, IotDeviceDO> getDeviceMap(Collection<Long> ids) {
+        return convertMap(getDeviceList(ids), IotDeviceDO::getId);
+    }
 
 }

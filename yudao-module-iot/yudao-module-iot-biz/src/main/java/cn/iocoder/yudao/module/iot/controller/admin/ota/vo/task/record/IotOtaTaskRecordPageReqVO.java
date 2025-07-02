@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskRecordStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -11,7 +13,8 @@ public class IotOtaTaskRecordPageReqVO extends PageParam {
     @Schema(description = "升级任务编号", example = "1024")
     private Long taskId;
 
-    @Schema(description = "设备标识", example = "摄像头A1-1")
-    private String deviceName;
+    @Schema(description = "升级记录状态", example = "5")
+    @InEnum(IotOtaTaskRecordStatusEnum.class)
+    private Integer status;
 
 }

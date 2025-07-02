@@ -31,7 +31,7 @@ public interface IotOtaTaskRecordService {
      * @param taskId     任务编号
      * @return 状态统计 Map，key 为状态码，value 为对应状态的升级记录数量
      */
-    Map<Integer, Long> getOtaTaskRecordStatusCountMap(Long firmwareId, Long taskId);
+    Map<Integer, Long> getOtaTaskRecordStatusStatistics(Long firmwareId, Long taskId);
 
     /**
      * 获取 OTA 升级记录

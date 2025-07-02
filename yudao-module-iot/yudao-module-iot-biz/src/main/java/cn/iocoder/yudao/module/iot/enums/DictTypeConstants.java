@@ -18,5 +18,6 @@ public class DictTypeConstants {
 
     public static final String OTA_TASK_DEVICE_SCOPE = "iot_ota_task_device_scope";
     public static final String OTA_TASK_STATUS = "iot_ota_task_status";
+    public static final String OTA_TASK_RECORD_STATUS = "iot_ota_task_record_status";
 
 }
