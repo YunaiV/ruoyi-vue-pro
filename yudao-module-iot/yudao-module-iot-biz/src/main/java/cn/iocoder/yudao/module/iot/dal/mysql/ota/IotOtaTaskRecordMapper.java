@@ -40,6 +40,13 @@ public interface IotOtaTaskRecordMapper extends BaseMapperX<IotOtaTaskRecordDO> 
                 .in(IotOtaTaskRecordDO::getStatus, statuses));
     }
 
+    default int updateByIdAndStatus(Long id, Integer status,
+                                    IotOtaTaskRecordDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<IotOtaTaskRecordDO>()
+                .eq(IotOtaTaskRecordDO::getId, id)
+                .eq(IotOtaTaskRecordDO::getStatus, status));
+    }
+
     default int updateByIdAndStatus(Long id, Collection<Integer> whereStatuses,
                                     IotOtaTaskRecordDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<IotOtaTaskRecordDO>()
@@ -58,6 +65,10 @@ public interface IotOtaTaskRecordMapper extends BaseMapperX<IotOtaTaskRecordDO> 
         return selectList(new LambdaQueryWrapperX<IotOtaTaskRecordDO>()
                 .inIfPresent(IotOtaTaskRecordDO::getDeviceId, deviceIds)
                 .inIfPresent(IotOtaTaskRecordDO::getStatus, statuses));
+    }
+
+    default List<IotOtaTaskRecordDO> selectListByStatus(Integer status) {
+        return selectList(IotOtaTaskRecordDO::getStatus, status);
     }
 
 }

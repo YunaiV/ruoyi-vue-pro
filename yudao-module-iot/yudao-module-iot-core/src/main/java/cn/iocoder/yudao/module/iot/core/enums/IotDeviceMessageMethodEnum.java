@@ -42,6 +42,10 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     CONFIG_PUSH("thing.config.push", "配置推送", true),
 
+    // ========== OTA 固件 ==========
+
+    OTA_UPGRADE("thing.ota.upgrade", "OTA 推送固定信息", false),
+    OTA_PROGRESS("thing.ota.progress", "OTA 上报升级进度", true),
     ;
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)

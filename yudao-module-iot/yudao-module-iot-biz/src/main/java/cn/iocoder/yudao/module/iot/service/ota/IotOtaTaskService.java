@@ -46,7 +46,7 @@ public interface IotOtaTaskService {
 
     /**
      * 更新 OTA 任务状态为已结束
-     * 
+     *
      * @param id 任务编号
      */
     void updateOtaTaskStatusEnd(Long id);

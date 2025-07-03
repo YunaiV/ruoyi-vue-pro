@@ -140,4 +140,12 @@ public class IotDeviceMessage {
                 MapUtil.of("state", IotDeviceStateEnum.OFFLINE.getState()));
     }
 
+    public static IotDeviceMessage buildOtaUpgrade(String version, String fileUrl, Long fileSize,
+                                                   String fileDigestAlgorithm, String fileDigestValue) {
+        return requestOf(IotDeviceMessageMethodEnum.OTA_UPGRADE.getMethod(), MapUtil.builder()
+                .put("version", version).put("fileUrl", fileUrl).put("fileSize", fileSize)
+                .put("fileDigestAlgorithm", fileDigestAlgorithm).put("fileDigestValue", fileDigestValue)
+                .build());
+    }
+
 }

@@ -2,12 +2,18 @@ package cn.iocoder.yudao.module.iot.service.ota;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaTaskRecordMapper;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskRecordStatusEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +39,10 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
 
     @Resource
     private IotOtaTaskService otaTaskService;
+    @Resource
+    private IotDeviceMessageService deviceMessageService;
+    @Resource
+    private IotDeviceService deviceService;
 
     @Override
     public void createOtaTaskRecordList(List<IotDeviceDO> devices, Long firmwareId, Long taskId) {
@@ -86,12 +96,17 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
         Collection<Long> ids = convertSet(records, IotOtaTaskRecordDO::getId);
         otaTaskRecordMapper.updateListByIdAndStatus(ids, IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES,
                 IotOtaTaskRecordDO.builder().status(IotOtaTaskRecordStatusEnum.CANCELED.getStatus())
-                        .description(IotOtaTaskRecordDO.DESCRIPTION_CANCEL_BY_RECORD).build());
+                        .description(IotOtaTaskRecordDO.DESCRIPTION_CANCEL_BY_TASK).build());
     }
 
     @Override
     public List<IotOtaTaskRecordDO> getOtaTaskRecordListByDeviceIdAndStatus(Set<Long> deviceIds, Set<Integer> statuses) {
         return otaTaskRecordMapper.selectListByDeviceIdAndStatus(deviceIds, statuses);
+    }
+
+    @Override
+    public List<IotOtaTaskRecordDO> getOtaRecordListByStatus(Integer status) {
+        return otaTaskRecordMapper.selectListByStatus(status);
     }
 
     @Override
@@ -109,6 +124,30 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
 
         // 3. 检查并更新任务状态
         checkAndUpdateOtaTaskStatus(record.getTaskId());
+    }
+
+    @Override
+    public boolean pushOtaTaskRecord(IotOtaTaskRecordDO record, IotOtaFirmwareDO fireware, IotDeviceDO device) {
+        try {
+            // 1. 推送 OTA 任务记录
+            IotDeviceMessage message = IotDeviceMessage.buildOtaUpgrade(
+                    fireware.getVersion(), fireware.getFileUrl(), fireware.getFileSize(),
+                    fireware.getFileDigestAlgorithm(), fireware.getFileDigestValue());
+            deviceMessageService.sendDeviceMessage(message, device);
+
+            // 2. 更新 OTA 升级记录状态为进行中
+            int updateCount = otaTaskRecordMapper.updateByIdAndStatus(
+                    record.getId(), IotOtaTaskRecordStatusEnum.PENDING.getStatus(),
+                    IotOtaTaskRecordDO.builder().status(IotOtaTaskRecordStatusEnum.PUSHED.getStatus())
+                            .description(StrUtil.format("已推送，设备消息编号({})", message.getId())).build());
+            Assert.isTrue(updateCount == 1, "更新设备记录({})状态失败", record.getId());
+            return true;
+        } catch (Exception ex) {
+            log.error("[pushOtaTaskRecord][推送 OTA 任务记录({}) 失败]", record.getId(), ex);
+            otaTaskRecordMapper.updateById(IotOtaTaskRecordDO.builder().id(record.getId())
+                    .description(StrUtil.format("推送失败，错误信息({})", ex.getMessage())).build());
+            return false;
+        }
     }
 
     private IotOtaTaskRecordDO validateUpgradeRecordExists(Long id) {
