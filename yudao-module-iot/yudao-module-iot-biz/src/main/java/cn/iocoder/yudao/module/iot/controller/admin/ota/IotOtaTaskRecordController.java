@@ -22,6 +22,7 @@ import org.dromara.hutool.core.collection.CollUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,6 +89,15 @@ public class IotOtaTaskRecordController {
     public CommonResult<IotOtaTaskRecordRespVO> getOtaTaskRecord(@RequestParam("id") Long id) {
         IotOtaTaskRecordDO upgradeRecord = otaTaskRecordService.getOtaTaskRecord(id);
         return success(BeanUtils.toBean(upgradeRecord, IotOtaTaskRecordRespVO.class));
+    }
+
+    @PutMapping("/cancel")
+    @Operation(summary = "取消 OTA 升级记录")
+    @PreAuthorize("@ss.hasPermission('iot:ota-task-record:cancel')")
+    @Parameter(name = "id", description = "升级记录编号", required = true, example = "1024")
+    public CommonResult<Boolean> cancelOtaTaskRecord(@RequestParam("id") Long id) {
+        otaTaskRecordService.cancelOtaTaskRecord(id);
+        return success(true);
     }
 
 }

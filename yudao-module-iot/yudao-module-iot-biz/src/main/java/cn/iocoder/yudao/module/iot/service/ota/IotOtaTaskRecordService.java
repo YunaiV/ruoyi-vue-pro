@@ -65,4 +65,11 @@ public interface IotOtaTaskRecordService {
      */
     List<IotOtaTaskRecordDO> getOtaTaskRecordListByDeviceIdAndStatus(Set<Long> deviceIds, Set<Integer> statuses);
 
+    /**
+     * 取消 OTA 升级记录
+     *
+     * @param id 记录编号
+     */
+    void cancelOtaTaskRecord(Long id);
+
 }

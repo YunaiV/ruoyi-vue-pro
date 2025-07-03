@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -27,10 +28,30 @@ public interface IotOtaTaskRecordMapper extends BaseMapperX<IotOtaTaskRecordDO> 
                 .eqIfPresent(IotOtaTaskRecordDO::getStatus, pageReqVO.getStatus()));
     }
 
-    default void updateByTaskIdAndStatus(Long taskId, Integer fromStatus, IotOtaTaskRecordDO updateRecord) {
-        update(updateRecord, new LambdaUpdateWrapper<IotOtaTaskRecordDO>()
+    default List<IotOtaTaskRecordDO> selectListByTaskIdAndStatus(Long taskId, Collection<Integer> statuses) {
+        return selectList(new LambdaQueryWrapperX<IotOtaTaskRecordDO>()
+               .eq(IotOtaTaskRecordDO::getTaskId, taskId)
+               .in(IotOtaTaskRecordDO::getStatus, statuses));
+    }
+
+    default Long selectCountByTaskIdAndStatus(Long taskId, Collection<Integer> statuses) {
+        return selectCount(new LambdaQueryWrapperX<IotOtaTaskRecordDO>()
                 .eq(IotOtaTaskRecordDO::getTaskId, taskId)
-                .eq(IotOtaTaskRecordDO::getStatus, fromStatus));
+                .in(IotOtaTaskRecordDO::getStatus, statuses));
+    }
+
+    default int updateByIdAndStatus(Long id, Collection<Integer> whereStatuses,
+                                    IotOtaTaskRecordDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<IotOtaTaskRecordDO>()
+                .eq(IotOtaTaskRecordDO::getId, id)
+                .in(IotOtaTaskRecordDO::getStatus, whereStatuses));
+    }
+
+    default void updateListByIdAndStatus(Collection<Long> ids, Collection<Integer> whereStatuses,
+                                         IotOtaTaskRecordDO updateObj) {
+        update(updateObj, new LambdaUpdateWrapper<IotOtaTaskRecordDO>()
+                .in(IotOtaTaskRecordDO::getId, ids)
+                .in(IotOtaTaskRecordDO::getStatus, whereStatuses));
     }
 
     default List<IotOtaTaskRecordDO> selectListByDeviceIdAndStatus(Set<Long> deviceIds, Set<Integer> statuses) {

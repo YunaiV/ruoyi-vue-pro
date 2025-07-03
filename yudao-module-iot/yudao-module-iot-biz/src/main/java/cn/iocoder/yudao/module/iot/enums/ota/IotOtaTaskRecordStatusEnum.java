@@ -32,8 +32,7 @@ public enum IotOtaTaskRecordStatusEnum implements ArrayValuable<Integer> {
     public static final Set<Integer> IN_PROCESS_STATUSES = SetUtils.asSet(
             PENDING.getStatus(),
             PUSHED.getStatus(),
-            UPGRADING.getStatus(),
-            SUCCESS.getStatus());
+            UPGRADING.getStatus());
 
     public static final List<Integer> PRIORITY_STATUSES = Arrays.asList(
             SUCCESS.getStatus(),

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.ota;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
@@ -12,14 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_TASK_RECORD_NOT_EXISTS;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_TASK_RECORD_CANCEL_FAIL_STATUS_ERROR;
 
 /**
  * OTA 升级任务记录 Service 实现类
@@ -31,6 +30,9 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
 
     @Resource
     private IotOtaTaskRecordMapper otaTaskRecordMapper;
+
+    @Resource
+    private IotOtaTaskService otaTaskService;
 
     @Override
     public void createOtaTaskRecordList(List<IotDeviceDO> devices, Long firmwareId, Long taskId) {
@@ -75,19 +77,38 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
 
     @Override
     public void cancelTaskRecordListByTaskId(Long taskId) {
-        // 设置取消记录的描述
-        IotOtaTaskRecordDO updateRecord = IotOtaTaskRecordDO.builder()
-                .status(IotOtaTaskRecordStatusEnum.CANCELED.getStatus())
-                .description("管理员取消升级任务")
-                .build();
-
-        otaTaskRecordMapper.updateByTaskIdAndStatus(
-                taskId, IotOtaTaskRecordStatusEnum.PENDING.getStatus(), updateRecord);
+        List<IotOtaTaskRecordDO> records = otaTaskRecordMapper.selectListByTaskIdAndStatus(
+                taskId, IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES);
+        if (CollUtil.isEmpty(records)) {
+            return;
+        }
+        // 批量更新
+        Collection<Long> ids = convertSet(records, IotOtaTaskRecordDO::getId);
+        otaTaskRecordMapper.updateListByIdAndStatus(ids, IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES,
+                IotOtaTaskRecordDO.builder().status(IotOtaTaskRecordStatusEnum.CANCELED.getStatus())
+                        .description(IotOtaTaskRecordDO.DESCRIPTION_CANCEL_BY_RECORD).build());
     }
 
     @Override
     public List<IotOtaTaskRecordDO> getOtaTaskRecordListByDeviceIdAndStatus(Set<Long> deviceIds, Set<Integer> statuses) {
         return otaTaskRecordMapper.selectListByDeviceIdAndStatus(deviceIds, statuses);
+    }
+
+    @Override
+    public void cancelOtaTaskRecord(Long id) {
+        // 1. 校验记录是否存在
+        IotOtaTaskRecordDO record = validateUpgradeRecordExists(id);
+
+        // 2. 更新记录状态为取消
+        int updateCount = otaTaskRecordMapper.updateByIdAndStatus(record.getId(), IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES,
+                IotOtaTaskRecordDO.builder().id(id).status(IotOtaTaskRecordStatusEnum.CANCELED.getStatus())
+                .description(IotOtaTaskRecordDO.DESCRIPTION_CANCEL_BY_RECORD).build());
+        if (updateCount == 0) {
+            throw exception(OTA_TASK_RECORD_CANCEL_FAIL_STATUS_ERROR);
+        }
+
+        // 3. 检查并更新任务状态
+        checkAndUpdateOtaTaskStatus(record.getTaskId());
     }
 
     private IotOtaTaskRecordDO validateUpgradeRecordExists(Long id) {
@@ -96,6 +117,22 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
             throw exception(OTA_TASK_RECORD_NOT_EXISTS);
         }
         return upgradeRecord;
+    }
+
+    /**
+     * 检查并更新任务状态
+     * 如果任务下没有进行中的记录，则将任务状态更新为已结束
+     */
+    private void checkAndUpdateOtaTaskStatus(Long taskId) {
+        // 如果还有进行中的记录，直接返回
+        Long inProcessCount = otaTaskRecordMapper.selectCountByTaskIdAndStatus(
+                taskId, IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES);
+        if (inProcessCount > 0) {
+            return;
+        }
+
+        // 没有进行中的记录，将任务状态更新为已结束
+        otaTaskService.updateOtaTaskStatusEnd(taskId);
     }
 
 }

@@ -99,7 +99,16 @@ public class IotOtaTaskServiceImpl implements IotOtaTaskService {
 
     @Override
     public PageResult<IotOtaTaskDO> getOtaTaskPage(IotOtaTaskPageReqVO pageReqVO) {
-        return otaTaskMapper.selectUpgradeTaskPage(pageReqVO);
+        return otaTaskMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void updateOtaTaskStatusEnd(Long taskId) {
+        int updateCount = otaTaskMapper.updateByIdAndStatus(taskId, IotOtaTaskStatusEnum.IN_PROGRESS.getStatus(),
+                new IotOtaTaskDO().setStatus(IotOtaTaskStatusEnum.END.getStatus()));
+        if (updateCount == 0) {
+            log.warn("[updateOtaTaskStatusEnd][任务({})不存在或状态不是进行中，无法更新]", taskId);
+        }
     }
 
     private List<IotDeviceDO> validateOtaTaskDeviceScope(IotOtaTaskCreateReqVO createReqVO, Long productId) {

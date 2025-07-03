@@ -57,9 +57,10 @@ public interface ErrorCodeConstants {
     ErrorCode OTA_TASK_CREATE_FAIL_DEVICE_EMPTY = new ErrorCode(1_050_008_103, "创建 OTA 任务失败，原因：没有可升级的设备");
     ErrorCode OTA_TASK_CANCEL_FAIL_STATUS_END = new ErrorCode(1_050_008_104, "取消 OTA 任务失败，原因：任务状态不是进行中");
 
-    // ========== OTA 升级任务相关 1-050-008-100 ==========
+    // ========== OTA 升级任务记录相关 1-050-008-200 ==========
 
     ErrorCode OTA_TASK_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_200, "升级记录不存在");
+    ErrorCode OTA_TASK_RECORD_CANCEL_FAIL_STATUS_ERROR = new ErrorCode(1_050_008_201, "取消 OTA 升级记录失败，原因：记录状态不是进行中");
 
     // ========== IoT 数据流转规则 1-050-010-000 ==========
     ErrorCode DATA_RULE_NOT_EXISTS = new ErrorCode(1_050_010_000, "数据流转规则不存在");

@@ -25,6 +25,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IotOtaTaskRecordDO extends BaseDO {
 
+    public static final String DESCRIPTION_CANCEL_BY_TASK = "管理员手动取消升级任务（批量）";
+
+    public static final String DESCRIPTION_CANCEL_BY_RECORD = "管理员手动取消升级记录（单个）";
+
+    /**
+     * 升级记录编号
+     */
     @TableId
     private Long id;
 
