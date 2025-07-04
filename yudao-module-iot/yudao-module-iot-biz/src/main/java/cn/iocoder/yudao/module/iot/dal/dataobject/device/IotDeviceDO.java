@@ -131,6 +131,12 @@ public class IotDeviceDO extends TenantBaseDO {
 
     // TODO @芋艿：【待定 002】：1）设备维护的时候，设置位置？类似 tl？；2）设备上传的时候，设置位置，类似 it？
     /**
+     * 定位方式
+     * <p>
+     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum}
+     */
+    private Integer locationType;
+    /**
      * 设备位置的纬度
      */
     private BigDecimal latitude;

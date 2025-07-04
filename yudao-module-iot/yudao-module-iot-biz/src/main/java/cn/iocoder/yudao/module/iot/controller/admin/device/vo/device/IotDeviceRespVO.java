@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -81,6 +85,17 @@ public class IotDeviceRespVO {
 
     @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
     private String config;
+
+    @Schema(description = "定位方式", example = "2")
+    @ExcelProperty(value = "定位方式", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.LOACTION_TYPE)
+    private Integer locationType;
+
+    @Schema(description = "设备位置的纬度", example = "45.000000")
+    private BigDecimal latitude;
+
+    @Schema(description = "设备位置的经度", example = "45.000000")
+    private BigDecimal longitude;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
