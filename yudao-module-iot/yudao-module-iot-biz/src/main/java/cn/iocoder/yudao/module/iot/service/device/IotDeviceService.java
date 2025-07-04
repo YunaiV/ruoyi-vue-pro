@@ -263,4 +263,12 @@ public interface IotDeviceService {
         return convertMap(getDeviceList(ids), IotDeviceDO::getId);
     }
 
+    /**
+     * 更新设备固件版本
+     *
+     * @param deviceId 设备编号
+     * @param firmwareId 固件编号
+     */
+    void updateDeviceFirmware(Long deviceId, Long firmwareId);
+
 }

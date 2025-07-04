@@ -30,10 +30,12 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     PROPERTY_SET("thing.property.set", "属性设置", false),
 
     // ========== 设备事件 ==========
+    // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
 
     EVENT_POST("thing.event.post", "事件上报", true),
 
     // ========== 设备服务调用 ==========
+    // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
 
     SERVICE_INVOKE("thing.service.invoke", "服务调用", false),
 
@@ -43,9 +45,10 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     CONFIG_PUSH("thing.config.push", "配置推送", true),
 
     // ========== OTA 固件 ==========
+    // 可参考：https://help.aliyun.com/zh/iot/user-guide/perform-ota-updates
 
-    OTA_UPGRADE("thing.ota.upgrade", "OTA 推送固定信息", false),
-    OTA_PROGRESS("thing.ota.progress", "OTA 上报升级进度", true),
+    OTA_UPGRADE("thing.ota.upgrade", "OTA 固定信息推送", false),
+    OTA_PROGRESS("thing.ota.progress", "OTA 升级进度上报", true),
     ;
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)
@@ -54,7 +57,10 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     /**
      * 不进行 reply 回复的方法集合
      */
-    public static final Set<String> REPLY_DISABLED = Set.of(STATE_UPDATE.getMethod());
+    public static final Set<String> REPLY_DISABLED = Set.of(
+            STATE_UPDATE.getMethod(),
+            OTA_PROGRESS.getMethod() // 参考阿里云，OTA 升级进度上报，不进行回复
+    );
 
     private final String method;
 

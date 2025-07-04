@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.ota;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
@@ -17,14 +18,14 @@ import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageServic
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_TASK_RECORD_NOT_EXISTS;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_TASK_RECORD_CANCEL_FAIL_STATUS_ERROR;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
 /**
  * OTA 升级任务记录 Service 实现类
@@ -37,6 +38,8 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
     @Resource
     private IotOtaTaskRecordMapper otaTaskRecordMapper;
 
+    @Resource
+    private IotOtaFirmwareService otaFirmwareService;
     @Resource
     private IotOtaTaskService otaTaskService;
     @Resource
@@ -156,6 +159,57 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
             throw exception(OTA_TASK_RECORD_NOT_EXISTS);
         }
         return upgradeRecord;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @SuppressWarnings("unchecked")
+    public void updateOtaRecordProgress(IotDeviceDO device, IotDeviceMessage message) {
+        // 1.1 参数解析
+        Map<String, Object> params = (Map<String, Object>) message.getParams();
+        String version = MapUtil.getStr(params, "version");
+        Assert.notBlank(version, "version 不能为空");
+        Integer status = MapUtil.getInt(params, "status");
+        Assert.notNull(status, "status 不能为空");
+        Assert.notNull(IotOtaTaskRecordStatusEnum.of(status), "status 状态不正确");
+        String description = MapUtil.getStr(params, "description");
+        Integer progress = MapUtil.getInt(params, "progress");
+        Assert.notNull(progress, "progress 不能为空");
+        Assert.isTrue(progress >= 0 && progress <= 100, "progress 必须在 0-100 之间");
+        // 1.2 查询 OTA 升级记录
+        List<IotOtaTaskRecordDO> records = otaTaskRecordMapper.selectListByDeviceIdAndStatus(
+                device.getId(), IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES);
+        if (CollUtil.isEmpty(records)) {
+            throw exception(OTA_TASK_RECORD_UPDATE_PROGRESS_FAIL_NO_EXISTS);
+        }
+        if (records.size() > 1) {
+            log.warn("[updateOtaRecordProgress][message({}) 对应升级记录过多({})]", message, records);
+        }
+        IotOtaTaskRecordDO record = CollUtil.getFirst(records);
+        // 1.3 查询 OTA 固件
+        IotOtaFirmwareDO firmware = otaFirmwareService.getOtaFirmwareByProductIdAndVersion(
+                device.getProductId(), version);
+        if (firmware == null) {
+            throw exception(OTA_FIRMWARE_NOT_EXISTS);
+        }
+
+        // 2. 更新 OTA 升级记录状态
+        int updateCount = otaTaskRecordMapper.updateByIdAndStatus(
+                record.getId(), IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES,
+                IotOtaTaskRecordDO.builder().status(status).description(description).progress(progress).build());
+        if (updateCount == 0) {
+            throw exception(OTA_TASK_RECORD_UPDATE_PROGRESS_FAIL_NO_EXISTS);
+        }
+
+        // 3. 如果升级成功，则更新设备固件版本
+        if (IotOtaTaskRecordStatusEnum.SUCCESS.getStatus().equals(status)) {
+            deviceService.updateDeviceFirmware(device.getId(), firmware.getId());
+        }
+
+        // 4. 如果状态是“已结束”（非进行中），则更新任务状态
+        if (!IotOtaTaskRecordStatusEnum.IN_PROCESS_STATUSES.contains(status)) {
+            checkAndUpdateOtaTaskStatus(record.getTaskId());
+        }
     }
 
     /**

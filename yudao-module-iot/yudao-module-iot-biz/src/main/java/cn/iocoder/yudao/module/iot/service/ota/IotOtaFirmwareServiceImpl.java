@@ -21,10 +21,8 @@ import java.io.ByteArrayInputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE;
 
@@ -79,6 +77,11 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
     @Override
     public IotOtaFirmwareDO getOtaFirmware(Long id) {
         return otaFirmwareMapper.selectById(id);
+    }
+
+    @Override
+    public IotOtaFirmwareDO getOtaFirmwareByProductIdAndVersion(Long productId, String version) {
+        return otaFirmwareMapper.selectByProductIdAndVersion(productId, version);
     }
 
     @Override

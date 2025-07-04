@@ -67,6 +67,12 @@ public interface IotOtaTaskRecordMapper extends BaseMapperX<IotOtaTaskRecordDO> 
                 .inIfPresent(IotOtaTaskRecordDO::getStatus, statuses));
     }
 
+    default List<IotOtaTaskRecordDO> selectListByDeviceIdAndStatus(Long deviceId, Set<Integer> statuses) {
+        return selectList(new LambdaQueryWrapperX<IotOtaTaskRecordDO>()
+                .eqIfPresent(IotOtaTaskRecordDO::getDeviceId, deviceId)
+                .inIfPresent(IotOtaTaskRecordDO::getStatus, statuses));
+    }
+
     default List<IotOtaTaskRecordDO> selectListByStatus(Integer status) {
         return selectList(IotOtaTaskRecordDO::getStatus, status);
     }

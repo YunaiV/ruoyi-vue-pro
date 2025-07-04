@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.enums.ota;
 
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import lombok.Getter;
@@ -47,6 +48,10 @@ public enum IotOtaTaskRecordStatusEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    public static IotOtaTaskRecordStatusEnum of(Integer status) {
+        return ArrayUtil.firstMatch(o -> o.getStatus().equals(status), values());
     }
 
 }

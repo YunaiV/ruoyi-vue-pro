@@ -22,11 +22,13 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceMessageMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.ota.IotOtaTaskRecordService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Objects;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -54,6 +56,9 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     private IotDeviceService deviceService;
     @Resource
     private IotDevicePropertyService devicePropertyService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotOtaTaskRecordService otaTaskRecordService;
 
     @Resource
     private IotDeviceMessageMapper deviceMessageMapper;
@@ -189,6 +194,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // 属性上报
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
             devicePropertyService.saveDeviceProperty(device, message);
+            return null;
+        }
+
+        // OTA 上报升级进度
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.OTA_PROGRESS.getMethod())) {
+            otaTaskRecordService.updateOtaRecordProgress(device, message);
             return null;
         }
 

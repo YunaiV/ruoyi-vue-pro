@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwa
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import jakarta.validation.Valid;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * OTA 固件管理 Service 接口
@@ -42,6 +42,15 @@ public interface IotOtaFirmwareService {
      * @return 固件信息
      */
     IotOtaFirmwareDO getOtaFirmware(Long id);
+
+    /**
+     * 根据产品、版本号，获取 OTA 固件信息
+     *
+     * @param productId 产品编号
+     * @param version 版本号
+     * @return OTA 固件信息
+     */
+    IotOtaFirmwareDO getOtaFirmwareByProductIdAndVersion(Long productId, String version);
 
     /**
      * 获取 OTA 固件信息列表
