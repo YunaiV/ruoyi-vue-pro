@@ -127,6 +127,7 @@ public class IotEmqxUpstreamProtocol {
         // 1. 连接 MQTT Broker
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean success = new AtomicBoolean(false);
+        // TODO @haohao：要不要加 MqttClientOptions 参数？1）setCleanSession true；2）setMaxInflightQueue 10000；3）setKeepAliveInterval 60；4）setSsl/setTrustAll
         mqttClient.connect(port, host, connectResult -> {
             if (connectResult.succeeded()) {
                 log.info("[connectMqttSync][MQTT 客户端连接成功, host: {}, port: {}]", host, port);

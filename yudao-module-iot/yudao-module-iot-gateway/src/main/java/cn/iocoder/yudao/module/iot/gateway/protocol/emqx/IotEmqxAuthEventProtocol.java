@@ -70,6 +70,7 @@ public class IotEmqxAuthEventProtocol {
         IotEmqxAuthEventHandler handler = new IotEmqxAuthEventHandler(serverId);
         router.post(IotMqttTopicUtils.MQTT_AUTH_PATH).handler(handler::handleAuth);
         router.post(IotMqttTopicUtils.MQTT_EVENT_PATH).handler(handler::handleEvent);
+        // TODO @haohao：/mqtt/acl 需要处理么？
 
         // 3. 启动 HTTP 服务器
         try {

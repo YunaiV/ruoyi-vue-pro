@@ -98,6 +98,21 @@ public class IotGatewayProperties {
          */
         private Integer serverPort;
 
+        /**
+         * 是否开启 SSL
+         */
+        @NotNull(message = "是否开启 SSL 不能为空")
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL 证书路径
+         */
+        private String sslKeyPath;
+        /**
+         * SSL 证书路径
+         */
+        private String sslCertPath;
+
     }
 
     @Data

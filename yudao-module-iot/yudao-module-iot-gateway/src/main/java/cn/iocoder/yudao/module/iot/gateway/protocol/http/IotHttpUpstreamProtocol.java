@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpUpstreamH
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.annotation.PostConstruct;
@@ -49,10 +51,17 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
         router.post(IotHttpUpstreamHandler.PATH).handler(upstreamHandler);
 
         // 启动 HTTP 服务器
+        HttpServerOptions options = new HttpServerOptions()
+                .setPort(httpProperties.getServerPort());
+        if (Boolean.TRUE.equals(httpProperties.getSslEnabled())) {
+            PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions().setKeyPath(httpProperties.getSslKeyPath())
+                    .setCertPath(httpProperties.getSslCertPath());
+            options = options.setSsl(true).setKeyCertOptions(pemKeyCertOptions);
+        }
         try {
-            httpServer = vertx.createHttpServer()
+            httpServer = vertx.createHttpServer(options)
                     .requestHandler(router)
-                    .listen(httpProperties.getServerPort())
+                    .listen()
                     .result();
             log.info("[start][IoT 网关 HTTP 协议启动成功，端口：{}]", httpProperties.getServerPort());
         } catch (Exception e) {
