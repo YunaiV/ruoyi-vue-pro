@@ -62,9 +62,8 @@ public class Kd100ExpressQueryRespDTO {
         private String timeStr;
 
         @JsonProperty("time")
-        public void parseTime(String timeStr) {
-            this.time = LocalDateTime.parse(timeStr, DateTimeFormatter.ofPattern(FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND));
-        }
+        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         private LocalDateTime time;
         /**
          * 轨迹描述
