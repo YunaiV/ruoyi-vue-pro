@@ -8,6 +8,7 @@ spring:
 
 # rocketmq 配置项，对应 RocketMQProperties 配置类
 rocketmq:
+  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
   # Producer 配置项
   producer:
     group: ${spring.application.name}_PRODUCER # 生产者分组
@@ -16,14 +17,20 @@ rocketmq:
 
 yudao:
   iot:
+    # 消息总线配置
+    message-bus:
+      type: redis # 消息总线的类型
+
     # 网关配置
     gateway:
       # 设备 RPC 配置
       rpc:
+        url: http://127.0.0.1:48080 # 主程序 API 地址
         connect-timeout: 30s
         read-timeout: 30s
       # 设备 Token 配置
       token:
+        secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
         expiration: 7d
 
       # 协议配置
@@ -33,23 +40,28 @@ yudao:
         # ====================================
         http:
           enabled: true
+          server-port: 8092
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
           enabled: false
-          mqtt-ssl: false
+          http-port: 8090                       # MQTT HTTP 服务端口
+          mqtt-host: 127.0.0.1                  # MQTT Broker 地址
+          mqtt-port: 1883                       # MQTT Broker 端口
+          mqtt-username: admin                  # MQTT 用户名
+          mqtt-password: public                 # MQTT 密码
+          mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
+          mqtt-ssl: false                       # 是否开启 SSL
           mqtt-topics:
-            - "/sys/#"                         # 系统主题
+            - "/sys/#"                          # 系统主题
         # ====================================
         # 针对引入的 TCP 组件的配置
         # ====================================
         tcp:
-          enabled: false
-
-    # 消息总线配置
-    message-bus:
-      type: redis # 消息总线的类型
+          enabled: true
+          server-port: 8093
+          server-host: 0.0.0.0
 
 --- #################### 日志相关配置 ####################
 
@@ -63,6 +75,11 @@ logging:
     org.springframework.boot: INFO
     # RocketMQ 日志
     org.apache.rocketmq: WARN
+    # MQTT 客户端日志
+    # io.vertx.mqtt: DEBUG
+    # 开发环境详细日志
+    cn.iocoder.yudao.module.iot.gateway.protocol.emqx: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     # 根日志级别
     root: INFO
 
