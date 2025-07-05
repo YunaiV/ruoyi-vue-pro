@@ -14,9 +14,10 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum IotLocationTypeEnum implements ArrayValuable<Integer> {
-    MANUAL(0, "手动定位"),
-    IP(1, "IP定位"),
-    MODULE(2, "定位模块定位");
+
+    IP(1, "IP 定位"),
+    DEVICE(2, "设备上报"),
+    MANUAL(3, "手动定位");
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotLocationTypeEnum::getType).toArray(Integer[]::new);
 
@@ -33,4 +34,5 @@ public enum IotLocationTypeEnum implements ArrayValuable<Integer> {
     public Integer[] array() {
         return ARRAYS;
     }
+
 }

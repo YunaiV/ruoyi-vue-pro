@@ -63,7 +63,7 @@ public class IotProductRespVO {
 
     @Schema(description = "定位方式", example = "2")
     @ExcelProperty(value = "定位方式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.LOACTION_TYPE)
+    @DictFormat(DictTypeConstants.LOCATION_TYPE)
     private Integer locationType;
 
     @Schema(description = "数据格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")

@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
-import cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -88,7 +86,7 @@ public class IotDeviceRespVO {
 
     @Schema(description = "定位方式", example = "2")
     @ExcelProperty(value = "定位方式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.LOACTION_TYPE)
+    @DictFormat(DictTypeConstants.LOCATION_TYPE)
     private Integer locationType;
 
     @Schema(description = "设备位置的纬度", example = "45.000000")

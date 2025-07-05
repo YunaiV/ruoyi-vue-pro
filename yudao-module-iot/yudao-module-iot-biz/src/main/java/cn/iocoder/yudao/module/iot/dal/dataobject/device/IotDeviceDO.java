@@ -129,7 +129,6 @@ public class IotDeviceDO extends TenantBaseDO {
     // TODO @haohao：是不是要枚举哈
     private String authType;
 
-    // TODO @芋艿：【待定 002】：1）设备维护的时候，设置位置？类似 tl？；2）设备上传的时候，设置位置，类似 it？
     /**
      * 定位方式
      * <p>
