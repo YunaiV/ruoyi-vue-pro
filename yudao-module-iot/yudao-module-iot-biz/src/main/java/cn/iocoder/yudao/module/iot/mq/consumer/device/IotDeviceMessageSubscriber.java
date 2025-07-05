@@ -67,6 +67,7 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
             IotDeviceDO device = deviceService.validateDeviceExistsFromCache(message.getDeviceId());
             devicePropertyService.updateDeviceReportTimeAsync(device.getId(), LocalDateTime.now());
             // 1.2 更新设备的连接 server
+            // TODO 芋艿：HTTP 网关的上行消息，不应该更新 serverId，会覆盖掉 MQTT 等长连接的 serverId，导致下行消息无法发送。
             devicePropertyService.updateDeviceServerIdAsync(device.getId(), message.getServerId());
 
             // 2. 未上线的设备，强制上线

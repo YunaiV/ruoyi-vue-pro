@@ -46,6 +46,7 @@ public class IotOtaUpgradeJob implements JobHandler {
             return null;
         }
 
+        // TODO 芋艿：可以优化成批量获取 原因是：1. N+1 问题；2. offline 的设备无需查询
         // 2. 遍历推送记录
         int successCount = 0;
         int failureCount = 0;
@@ -54,6 +55,10 @@ public class IotOtaUpgradeJob implements JobHandler {
             try {
                 // 2.1 设备如果不在线，直接跳过
                 IotDeviceDO device = deviceService.getDeviceFromCache(record.getDeviceId());
+                // TODO 芋艿：【优化】当前逻辑跳过了离线的设备，但未充分利用 MQTT 的离线消息能力。
+                // 1. MQTT 协议本身支持持久化会话（Clean Session=false）和 QoS > 0 的消息，允许 broker 为离线设备缓存消息。
+                // 2. 对于 OTA 升级这类非实时性强的任务，即使设备当前离线，也应该可以推送升级指令。设备在下次上线时即可收到。
+                // 3. 后续可以考虑：增加一个“允许离线推送”的选项。如果开启，即使设备状态为 OFFLINE，也应尝试推送消息，依赖 MQTT Broker 的能力进行离线缓存。
                 if (device == null || IotDeviceStateEnum.isNotOnline(device.getState())) {
                     continue;
                 }

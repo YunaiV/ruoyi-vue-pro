@@ -117,6 +117,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // 2.2 情况二：发送下行消息
         // 如果是下行消息，需要校验 serverId 存在
+        // TODO 芋艿：【设计】下行消息需要区分 PUSH 和 PULL 模型
+        // 1. PUSH 模型：适用于 MQTT 等长连接协议。通过 serverId 将消息路由到指定网关，实时推送。
+        // 2. PULL 模型：适用于 HTTP 等短连接协议。设备无固定 serverId，无法主动推送。
+        // 解决方案：
+        // 当 serverId 不存在时，将下行消息存入“待拉取消息表”（例如 iot_device_pull_message）。
+        // 设备端通过定时轮询一个新增的 API（例如 /iot/message/pull）来拉取属于自己的消息。
         if (StrUtil.isEmpty(serverId)) {
             serverId = devicePropertyService.getDeviceServerId(device.getId());
             if (StrUtil.isEmpty(serverId)) {
