@@ -71,6 +71,7 @@ public class IotEmqxAuthEventProtocol {
         router.post(IotMqttTopicUtils.MQTT_AUTH_PATH).handler(handler::handleAuth);
         router.post(IotMqttTopicUtils.MQTT_EVENT_PATH).handler(handler::handleEvent);
         // TODO @haohao：/mqtt/acl 需要处理么？
+        // TODO @芋艿：已在 EMQX 处理，如果是“设备直连”模式需要处理
 
         // 3. 启动 HTTP 服务器
         try {

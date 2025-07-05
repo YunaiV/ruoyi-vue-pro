@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.emqx;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router.IotEmqxUpstreamHandler;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.JksOptions;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import jakarta.annotation.PostConstruct;
@@ -127,7 +130,6 @@ public class IotEmqxUpstreamProtocol {
         // 1. 连接 MQTT Broker
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean success = new AtomicBoolean(false);
-        // TODO @haohao：要不要加 MqttClientOptions 参数？1）setCleanSession true；2）setMaxInflightQueue 10000；3）setKeepAliveInterval 60；4）setSsl/setTrustAll
         mqttClient.connect(port, host, connectResult -> {
             if (connectResult.succeeded()) {
                 log.info("[connectMqttSync][MQTT 客户端连接成功, host: {}, port: {}]", host, port);
@@ -252,11 +254,53 @@ public class IotEmqxUpstreamProtocol {
      * 创建 MQTT 客户端
      */
     private void createMqttClient() {
-        MqttClientOptions options = new MqttClientOptions()
+        // 1. 创建基础配置
+        MqttClientOptions options = (MqttClientOptions) new MqttClientOptions()
                 .setClientId(emqxProperties.getMqttClientId())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
-                .setSsl(emqxProperties.getMqttSsl());
+                .setSsl(emqxProperties.getMqttSsl())
+                .setCleanSession(emqxProperties.getCleanSession())
+                .setKeepAliveInterval(emqxProperties.getKeepAliveIntervalSeconds())
+                .setMaxInflightQueue(emqxProperties.getMaxInflightQueue())
+                .setConnectTimeout(emqxProperties.getConnectTimeoutSeconds() * 1000) // Vert.x 需要毫秒
+                .setTrustAll(emqxProperties.getTrustAll());
+
+        // 2. 配置遗嘱消息
+        IotGatewayProperties.EmqxProperties.Will will = emqxProperties.getWill();
+        if (will.isEnabled()) {
+            Assert.notBlank(will.getTopic(), "遗嘱消息主题(will.topic)不能为空");
+            Assert.notNull(will.getPayload(), "遗嘱消息内容(will.payload)不能为空");
+            options.setWillFlag(true)
+                    .setWillTopic(will.getTopic())
+                    .setWillMessageBytes(Buffer.buffer(will.getPayload()))
+                    .setWillQoS(will.getQos())
+                    .setWillRetain(will.isRetain());
+        }
+
+        // 3. 配置高级 SSL/TLS (仅在启用 SSL 且不信任所有证书时生效)
+        if (Boolean.TRUE.equals(emqxProperties.getMqttSsl()) && !Boolean.TRUE.equals(emqxProperties.getTrustAll())) {
+            IotGatewayProperties.EmqxProperties.Ssl sslOptions = emqxProperties.getSslOptions();
+            // 配置信任库 (用于验证服务端证书)
+            if (StrUtil.isNotBlank(sslOptions.getTrustStorePath())) {
+                options.setTrustStoreOptions(new JksOptions()
+                        .setPath(sslOptions.getTrustStorePath())
+                        .setPassword(sslOptions.getTrustStorePassword()));
+            }
+            // 配置密钥库 (用于客户端双向认证)
+            if (StrUtil.isNotBlank(sslOptions.getKeyStorePath())) {
+                options.setKeyStoreOptions(new JksOptions()
+                        .setPath(sslOptions.getKeyStorePath())
+                        .setPassword(sslOptions.getKeyStorePassword()));
+            }
+        }
+
+        // 4. 安全警告日志
+        if (Boolean.TRUE.equals(emqxProperties.getTrustAll())) {
+            log.warn("[createMqttClient][安全警告：当前配置信任所有 SSL 证书（trustAll=true），这在生产环境中存在严重安全风险！]");
+        }
+
+        // 5. 创建客户端实例
         this.mqttClient = MqttClient.create(vertx, options);
     }
 

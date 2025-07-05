@@ -55,13 +55,32 @@ yudao:
           mqtt-ssl: false                       # 是否开启 SSL
           mqtt-topics:
             - "/sys/#"                          # 系统主题
+          clean-session: true                   # 是否启用 Clean Session (默认: true)
+          keep-alive-interval-seconds: 60       # 心跳间隔，单位秒 (默认: 60)
+          max-inflight-queue: 10000             # 最大飞行消息队列，单位：条
+          connect-timeout-seconds: 10           # 连接超时，单位：秒
+          # 是否信任所有 SSL 证书 (默认: false)。警告：生产环境必须为 false！
+          # 仅在开发环境或内网测试时，如果使用了自签名证书，可以临时设置为 true
+          trust-all: true # 在 dev 环境可以设为 true
+          # 遗嘱消息配置 (用于网关异常下线时通知其他系统)
+          will:
+            enabled: true # 生产环境强烈建议开启
+            topic: "gateway/status/${yudao.iot.gateway.emqx.mqtt-client-id}" # 遗嘱消息主题
+            payload: "offline" # 遗嘱消息负载
+            qos: 1 # 遗嘱消息 QoS
+            retain: true # 遗嘱消息是否保留
+          # 高级 SSL/TLS 配置 (当 trust-all: false 且 mqtt-ssl: true 时生效)
+          ssl-options:
+            key-store-path: "classpath:certs/client.jks" # 客户端证书库路径
+            key-store-password: "your-keystore-password" # 客户端证书库密码
+            trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
+            trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
         # ====================================
         # 针对引入的 TCP 组件的配置
         # ====================================
         tcp:
           enabled: true
           server-port: 8093
-          server-host: 0.0.0.0
 
 --- #################### 日志相关配置 ####################
 
