@@ -47,7 +47,10 @@ public enum IotRuleSceneTriggerTypeEnum implements ArrayValuable<Integer> {
      */
     DEVICE_SERVICE_INVOKE(4),
 
-    TIMER(100) // 定时触发
+    /**
+     * 定时触发
+     */
+    TIMER(100)
 
     ;
 
