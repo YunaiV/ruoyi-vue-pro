@@ -54,7 +54,7 @@ public class IotTcpUpstreamProtocol {
         });
 
         // 3. 启动 TCP 服务器
-        netServer.listen(tcpProperties.getServerPort(), "0.0.0.0")
+        netServer.listen(tcpProperties.getServerPort())
                 .onSuccess(server -> log.info("[start][IoT 网关 TCP 服务启动成功，端口：{}]", server.actualPort()))
                 .onFailure(e -> log.error("[start][IoT 网关 TCP 服务启动失败]", e));
     }

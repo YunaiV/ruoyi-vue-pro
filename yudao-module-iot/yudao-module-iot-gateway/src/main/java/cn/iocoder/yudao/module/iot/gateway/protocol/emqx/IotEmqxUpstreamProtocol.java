@@ -254,7 +254,7 @@ public class IotEmqxUpstreamProtocol {
      * 创建 MQTT 客户端
      */
     private void createMqttClient() {
-        // 1. 创建基础配置
+        // 1.1 创建基础配置
         MqttClientOptions options = (MqttClientOptions) new MqttClientOptions()
                 .setClientId(emqxProperties.getMqttClientId())
                 .setUsername(emqxProperties.getMqttUsername())
@@ -265,8 +265,7 @@ public class IotEmqxUpstreamProtocol {
                 .setMaxInflightQueue(emqxProperties.getMaxInflightQueue())
                 .setConnectTimeout(emqxProperties.getConnectTimeoutSeconds() * 1000) // Vert.x 需要毫秒
                 .setTrustAll(emqxProperties.getTrustAll());
-
-        // 2. 配置遗嘱消息
+        // 1.2 配置遗嘱消息
         IotGatewayProperties.EmqxProperties.Will will = emqxProperties.getWill();
         if (will.isEnabled()) {
             Assert.notBlank(will.getTopic(), "遗嘱消息主题(will.topic)不能为空");
@@ -277,30 +276,26 @@ public class IotEmqxUpstreamProtocol {
                     .setWillQoS(will.getQos())
                     .setWillRetain(will.isRetain());
         }
-
-        // 3. 配置高级 SSL/TLS (仅在启用 SSL 且不信任所有证书时生效)
+        // 1.3 配置高级 SSL/TLS (仅在启用 SSL 且不信任所有证书时生效)
         if (Boolean.TRUE.equals(emqxProperties.getMqttSsl()) && !Boolean.TRUE.equals(emqxProperties.getTrustAll())) {
             IotGatewayProperties.EmqxProperties.Ssl sslOptions = emqxProperties.getSslOptions();
-            // 配置信任库 (用于验证服务端证书)
             if (StrUtil.isNotBlank(sslOptions.getTrustStorePath())) {
                 options.setTrustStoreOptions(new JksOptions()
                         .setPath(sslOptions.getTrustStorePath())
                         .setPassword(sslOptions.getTrustStorePassword()));
             }
-            // 配置密钥库 (用于客户端双向认证)
             if (StrUtil.isNotBlank(sslOptions.getKeyStorePath())) {
                 options.setKeyStoreOptions(new JksOptions()
                         .setPath(sslOptions.getKeyStorePath())
                         .setPassword(sslOptions.getKeyStorePassword()));
             }
         }
-
-        // 4. 安全警告日志
+        // 1.4 安全警告日志
         if (Boolean.TRUE.equals(emqxProperties.getTrustAll())) {
             log.warn("[createMqttClient][安全警告：当前配置信任所有 SSL 证书（trustAll=true），这在生产环境中存在严重安全风险！]");
         }
 
-        // 5. 创建客户端实例
+        // 2. 创建客户端实例
         this.mqttClient = MqttClient.create(vertx, options);
     }
 

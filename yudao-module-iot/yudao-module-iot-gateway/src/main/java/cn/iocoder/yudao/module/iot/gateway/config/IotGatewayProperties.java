@@ -247,6 +247,7 @@ public class IotGatewayProperties {
          */
         @Data
         public static class Will {
+
             /**
              * 是否启用遗嘱消息
              */
@@ -267,6 +268,7 @@ public class IotGatewayProperties {
              * 遗嘱消息是否作为保留消息发布
              */
             private boolean retain = true;
+
         }
 
         /**
@@ -274,6 +276,7 @@ public class IotGatewayProperties {
          */
         @Data
         public static class Ssl {
+
             /**
              * 密钥库（KeyStore）路径，例如：classpath:certs/client.jks
              * 包含客户端自己的证书和私钥，用于向服务端证明身份（双向认证）。
@@ -292,6 +295,7 @@ public class IotGatewayProperties {
              * 信任库密码
              */
             private String trustStorePassword;
+
         }
 
     }
