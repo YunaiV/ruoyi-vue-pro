@@ -89,6 +89,13 @@
                                 <version>${lombok.version}</version>
                             </path>
                             <path>
+                                <!-- 确保 Lombok 生成的 getter/setter 方法能被 MapStruct 正确识别，
+                                     避免出现 No property named “xxx" exists 的编译错误 -->
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>0.2.0</version>
+                            </path>
+                            <path>
                                 <groupId>org.mapstruct</groupId>
                                 <artifactId>mapstruct-processor</artifactId>
                                 <version>${mapstruct.version}</version>
