@@ -76,7 +76,7 @@
         <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.0.0</jimureport.version>
+        <jimureport.version>2.1.0</jimureport.version>
         <jimubi.version>1.9.5</jimubi.version>
         <weixin-java.version>4.7.5.B</weixin-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
