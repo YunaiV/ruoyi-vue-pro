@@ -74,7 +74,8 @@
         <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>1.9.4</jimureport.version>
+        <jimureport.version>2.0.0</jimureport.version>
+        <jimubi.version>1.9.5</jimubi.version>
         <weixin-java.version>4.7.5.B</weixin-java.version>
     </properties>
 
@@ -603,7 +604,7 @@
             <dependency>
                 <groupId>org.jeecgframework.jimureport</groupId>
                 <artifactId>jimubi-spring-boot3-starter</artifactId>
-                <version>${jimureport.version}</version>
+                <version>${jimubi.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.github.jsqlparser</groupId>
