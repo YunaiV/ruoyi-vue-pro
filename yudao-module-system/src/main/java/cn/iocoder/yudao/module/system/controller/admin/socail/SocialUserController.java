@@ -38,7 +38,8 @@ public class SocialUserController {
     @PostMapping("/bind")
     @Operation(summary = "社交绑定，使用 code 授权码")
     public CommonResult<Boolean> socialBind(@RequestBody @Valid SocialUserBindReqVO reqVO) {
-        socialUserService.bindSocialUser(BeanUtils.toBean(reqVO, SocialUserBindReqDTO.class)
+        socialUserService.bindSocialUser(new SocialUserBindReqDTO().setSocialType(reqVO.getType())
+                        .setCode(reqVO.getCode()).setState(reqVO.getState())
                         .setUserId(getLoginUserId()).setUserType(UserTypeEnum.ADMIN.getValue()));
         return CommonResult.success(true);
     }

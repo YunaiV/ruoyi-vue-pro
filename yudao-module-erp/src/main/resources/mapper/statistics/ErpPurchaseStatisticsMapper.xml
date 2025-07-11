@@ -10,7 +10,9 @@
                <if test="endTime != null">
                    AND in_time &lt; #{endTime}
                </if>
-               AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getRequiredTenantId()}
+               <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+                   AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+               </if>
                AND deleted = 0) -
             (SELECT IFNULL(SUM(total_price), 0)
                 FROM erp_purchase_return
@@ -18,7 +20,9 @@
                 <if test="endTime != null">
                     AND return_time &lt; #{endTime}
                 </if>
-                AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getRequiredTenantId()}
+                <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+                    AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+                </if>
                 AND deleted = 0)
     </select>
 

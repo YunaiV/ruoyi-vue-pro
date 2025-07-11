@@ -25,6 +25,9 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
+import cn.iocoder.yudao.module.promotion.api.combination.CombinationRecordApi;
+import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationRecordRespDTO;
+import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStatusEnum;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
@@ -121,6 +124,8 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     public SocialClientApi socialClientApi;
     @Resource
     public PayRefundApi payRefundApi;
+    @Resource
+    private CombinationRecordApi combinationRecordApi;
 
     @Resource
     private TradeOrderProperties tradeOrderProperties;
@@ -774,6 +779,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         }
         if (ObjUtil.notEqual(DeliveryTypeEnum.PICK_UP.getType(), order.getDeliveryType())) {
             throw exception(ORDER_RECEIVE_FAIL_DELIVERY_TYPE_NOT_PICK_UP);
+        }
+        // 情况一：如果是拼团订单，则校验拼团是否成功
+        if (TradeOrderTypeEnum.isCombination(order.getType())) {
+            CombinationRecordRespDTO combinationRecord = combinationRecordApi.getCombinationRecordByOrderId(
+                    order.getUserId(), order.getId());
+            if (!CombinationRecordStatusEnum.isSuccess(combinationRecord.getStatus())) {
+                throw exception(ORDER_PICK_UP_FAIL_COMBINATION_NOT_SUCCESS);
+            }
         }
         DeliveryPickUpStoreDO deliveryPickUpStore = pickUpStoreService.getDeliveryPickUpStore(order.getPickUpStoreId());
         if (deliveryPickUpStore == null
