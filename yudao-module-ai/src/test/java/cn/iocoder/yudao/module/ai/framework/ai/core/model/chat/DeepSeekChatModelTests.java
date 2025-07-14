@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -8,9 +7,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -23,18 +22,15 @@ import java.util.List;
  */
 public class DeepSeekChatModelTests {
 
-    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
-                    .baseUrl(DeepSeekChatModel.BASE_URL)
-                    .apiKey("sk-e52047409b144d97b791a6a46a2d") // apiKey
+    private final DeepSeekChatModel chatModel = DeepSeekChatModel.builder()
+            .deepSeekApi(DeepSeekApi.builder()
+                    .apiKey("sk-eaf4172a057344dd9bc64b1f806b6axx") // apiKey
                     .build())
-            .defaultOptions(OpenAiChatOptions.builder()
+            .defaultOptions(DeepSeekChatOptions.builder()
                     .model("deepseek-chat") // 模型
                     .temperature(0.7)
                     .build())
             .build();
-
-    private final DeepSeekChatModel chatModel = new DeepSeekChatModel(openAiChatModel);
 
     @Test
     @Disabled

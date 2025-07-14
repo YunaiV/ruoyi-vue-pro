@@ -5,7 +5,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -51,33 +50,6 @@ public class AiAutoConfiguration {
     }
 
     // ========== 各种 AI Client 创建 ==========
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.deepseek.enable", havingValue = "true")
-    public DeepSeekChatModel deepSeekChatModel(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.DeepSeekProperties properties = yudaoAiProperties.getDeepseek();
-        return buildDeepSeekChatModel(properties);
-    }
-
-    public DeepSeekChatModel buildDeepSeekChatModel(YudaoAiProperties.DeepSeekProperties properties) {
-        if (StrUtil.isEmpty(properties.getModel())) {
-            properties.setModel(DeepSeekChatModel.MODEL_DEFAULT);
-        }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(DeepSeekChatModel.BASE_URL)
-                        .apiKey(properties.getApiKey())
-                        .build())
-                .defaultOptions(OpenAiChatOptions.builder()
-                        .model(properties.getModel())
-                        .temperature(properties.getTemperature())
-                        .maxTokens(properties.getMaxTokens())
-                        .topP(properties.getTopP())
-                        .build())
-                .toolCallingManager(getToolCallingManager())
-                .build();
-        return new DeepSeekChatModel(openAiChatModel);
-    }
 
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.doubao.enable", havingValue = "true")
