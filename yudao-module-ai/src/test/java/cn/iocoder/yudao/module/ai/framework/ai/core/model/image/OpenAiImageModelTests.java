@@ -18,7 +18,7 @@ public class OpenAiImageModelTests {
 
     private final OpenAiImageModel imageModel = new OpenAiImageModel(OpenAiImageApi.builder()
             .baseUrl("https://api.holdai.top") // apiKey
-            .apiKey("sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17")
+            .apiKey("sk-PytRecQlmjEteoa2RRN6cGnwslo72UUPLQVNEMS6K9yjbmpD")
             .build());
 
     @Test
@@ -26,8 +26,8 @@ public class OpenAiImageModelTests {
     public void testCall() {
         // 准备参数
         ImageOptions options = OpenAiImageOptions.builder()
-                .withModel(OpenAiImageApi.ImageModel.DALL_E_2.getValue()) // 这个模型比较便宜
-                .withHeight(256).withWidth(256)
+                .model(OpenAiImageApi.ImageModel.DALL_E_2.getValue()) // 这个模型比较便宜
+                .height(256).width(256)
                 .build();
         ImagePrompt prompt = new ImagePrompt("中国长城!", options);
 

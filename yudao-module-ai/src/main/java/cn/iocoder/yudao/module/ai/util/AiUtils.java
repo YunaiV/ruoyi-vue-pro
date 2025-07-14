@@ -2,18 +2,18 @@ package cn.iocoder.yudao.module.ai.util;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import org.springaicommunity.moonshot.MoonshotChatOptions;
+import org.springaicommunity.qianfan.QianFanChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
-import org.springframework.ai.moonshot.MoonshotChatOptions;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 
 import java.util.Collections;
@@ -43,18 +43,18 @@ public class AiUtils {
         switch (platform) {
             case TONG_YI:
                 return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens)
-                        .withFunctions(toolNames).withToolContext(toolContext).build();
+                        .withToolNames(toolNames).withToolContext(toolContext).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case ZHI_PU:
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .functions(toolNames).toolContext(toolContext).build();
+                        .toolNames(toolNames).toolContext(toolContext).build();
             case MINI_MAX:
                 return MiniMaxChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .functions(toolNames).toolContext(toolContext).build();
+                        .toolNames(toolNames).toolContext(toolContext).build();
             case MOONSHOT:
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .functions(toolNames).toolContext(toolContext).build();
+                        .toolNames(toolNames).toolContext(toolContext).build();
             case OPENAI:
             case DEEP_SEEK: // 复用 OpenAI 客户端
             case DOU_BAO: // 复用 OpenAI 客户端
