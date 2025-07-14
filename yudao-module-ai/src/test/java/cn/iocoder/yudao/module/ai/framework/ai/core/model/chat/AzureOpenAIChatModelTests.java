@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.AzureKeyCredential;
-import com.azure.core.util.ClientOptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
@@ -17,7 +16,7 @@ import reactor.core.publisher.Flux;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatProperties.DEFAULT_DEPLOYMENT_NAME;
+import static org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiChatProperties.DEFAULT_DEPLOYMENT_NAME;
 
 /**
  * {@link AzureOpenAiChatModel} 集成测试
@@ -29,10 +28,13 @@ public class AzureOpenAIChatModelTests {
     // TODO @芋艿：晚点在调整
     private final OpenAIClientBuilder openAiApi = new OpenAIClientBuilder()
             .endpoint("https://eastusprejade.openai.azure.com")
-            .credential(new AzureKeyCredential("xxx"))
-            .clientOptions((new ClientOptions()).setApplicationId("spring-ai"));
-    private final AzureOpenAiChatModel chatModel = new AzureOpenAiChatModel(openAiApi,
-            AzureOpenAiChatOptions.builder().deploymentName(DEFAULT_DEPLOYMENT_NAME).build());
+            .credential(new AzureKeyCredential("xxx"));
+    private final AzureOpenAiChatModel chatModel = AzureOpenAiChatModel.builder()
+            .openAIClientBuilder(openAiApi)
+            .defaultOptions(AzureOpenAiChatOptions.builder()
+                    .deploymentName(DEFAULT_DEPLOYMENT_NAME)
+                    .build())
+            .build();
 
     @Test
     @Disabled
