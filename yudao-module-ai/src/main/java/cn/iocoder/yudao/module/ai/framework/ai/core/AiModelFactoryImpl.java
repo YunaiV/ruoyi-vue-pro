@@ -357,7 +357,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link QianFanChatAutoConfiguration} 的 qianFanChatModel 方法
      */
     private static QianFanChatModel buildYiYanChatModel(String key) {
-        // TODO @芋艿：未测试
+        // TODO spring ai qianfan 有 bug，无法使用 https://github.com/spring-ai-community/qianfan/issues/6
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
         String appKey = keys.get(0);
@@ -370,7 +370,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link QianFanEmbeddingAutoConfiguration} 的 qianFanImageModel 方法
      */
     private QianFanImageModel buildQianFanImageModel(String key) {
-        // TODO @芋艿：未测试
+        // TODO spring ai qianfan 有 bug，无法使用 https://github.com/spring-ai-community/qianfan/issues/6
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "YiYanChatClient 的密钥需要 (appKey|secretKey) 格式");
         String appKey = keys.get(0);
@@ -525,7 +525,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 创建 SiliconFlowImageModel 对象
      */
     private SiliconFlowImageModel buildSiliconFlowImageModel(String apiToken, String url) {
-        // TODO @芋艿：未测试
         url = StrUtil.blankToDefault(url, SiliconFlowApiConstants.DEFAULT_BASE_URL);
         SiliconFlowImageApi openAiApi = new SiliconFlowImageApi(url, apiToken);
         return new SiliconFlowImageModel(openAiApi);
@@ -535,9 +534,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OllamaChatAutoConfiguration} 的 ollamaChatModel 方法
      */
     private static OllamaChatModel buildOllamaChatModel(String url) {
-        // TODO @芋艿：未测试
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(url).build();
-        return OllamaChatModel.builder().ollamaApi(ollamaApi).toolCallingManager(getToolCallingManager()).build();
+        return OllamaChatModel.builder()
+                .ollamaApi(ollamaApi)
+                .toolCallingManager(getToolCallingManager())
+                .build();
     }
 
     /**
@@ -596,7 +597,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private OllamaEmbeddingModel buildOllamaEmbeddingModel(String url, String model) {
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(url).build();
         OllamaOptions ollamaOptions = OllamaOptions.builder().model(model).build();
-        return OllamaEmbeddingModel.builder().ollamaApi(ollamaApi).defaultOptions(ollamaOptions).build();
+        return OllamaEmbeddingModel.builder()
+                .ollamaApi(ollamaApi)
+                .defaultOptions(ollamaOptions)
+                .build();
     }
 
     /**
