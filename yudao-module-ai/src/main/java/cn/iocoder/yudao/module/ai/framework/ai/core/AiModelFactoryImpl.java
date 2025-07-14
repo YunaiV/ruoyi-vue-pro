@@ -690,10 +690,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
                                                    Map<String, Class<?>> metadataFields) {
         // 创建 JedisPooled 对象
         RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
-        JedisPooled jedisPooled = new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
+        JedisPooled jedisPooled = new JedisPooled(redisProperties.getHost(), redisProperties.getPort(),
+                redisProperties.getUsername(), redisProperties.getPassword());
         // 创建 RedisVectorStoreProperties 对象
-        // TODO @芋艿：index-name 可能影响索引名；
-        RedisVectorStoreAutoConfiguration configuration = new RedisVectorStoreAutoConfiguration();
         RedisVectorStoreProperties properties = SpringUtil.getBean(RedisVectorStoreProperties.class);
         RedisVectorStore redisVectorStore = RedisVectorStore.builder(jedisPooled, embeddingModel)
                 .indexName(properties.getIndexName()).prefix(properties.getPrefix())
