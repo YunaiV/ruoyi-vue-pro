@@ -56,7 +56,7 @@ public class TradePointActivityPriceCalculator implements TradePriceCalculator {
 
         Assert.isTrue(param.getItems().size() == 1, "积分商城兑换商品时，只允许选择一个商品");
         // 2. 校验是否可以参与积分商城活动
-        TradePriceCalculateRespBO.OrderItem orderItem = result.getItems().get(0);
+        TradePriceCalculateRespBO.OrderItem orderItem = result.getItems().getFirst();
         PointValidateJoinRespDTO activity = validateJoinPointActivity(
                 param.getUserId(), param.getPointActivityId(),
                 orderItem.getSkuId(), orderItem.getCount());
