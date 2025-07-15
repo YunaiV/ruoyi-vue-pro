@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     /**
      * 编解码器
      */
-    private final Map<String, IotAlinkDeviceMessageCodec> codes;
+    private final Map<String, IotDeviceMessageCodec> codes;
 
     @Resource
     private IotDeviceService deviceService;
@@ -39,8 +39,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Resource
     private IotDeviceMessageProducer deviceMessageProducer;
 
-    public IotDeviceMessageServiceImpl(List<IotAlinkDeviceMessageCodec> codes) {
-        this.codes = CollectionUtils.convertMap(codes, IotAlinkDeviceMessageCodec::type);
+    public IotDeviceMessageServiceImpl(List<IotDeviceMessageCodec> codes) {
+        this.codes = CollectionUtils.convertMap(codes, IotDeviceMessageCodec::type);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             throw exception(DEVICE_NOT_EXISTS, productKey, deviceName);
         }
         // 1.2 获取编解码器
-        IotAlinkDeviceMessageCodec codec = codes.get(device.getCodecType());
+        IotDeviceMessageCodec codec = codes.get(device.getCodecType());
         if (codec == null) {
             throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", device.getCodecType()));
         }
@@ -70,7 +70,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             throw exception(DEVICE_NOT_EXISTS, productKey, deviceName);
         }
         // 1.2 获取编解码器
-        IotAlinkDeviceMessageCodec codec = codes.get(device.getCodecType());
+        IotDeviceMessageCodec codec = codes.get(device.getCodecType());
         if (codec == null) {
             throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", device.getCodecType()));
         }

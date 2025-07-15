@@ -7,10 +7,9 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConnectionManager;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router.IotTcpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.TcpDeviceConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
@@ -85,26 +84,33 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class TcpProtocolConfiguration {
 
-        // TODO @haohao：close
-        @Bean
+        @Bean(destroyMethod = "close")
         public Vertx tcpVertx() {
             return Vertx.vertx();
         }
 
         @Bean
-        public IotTcpUpstreamProtocol iotTcpUpstreamProtocol(Vertx tcpVertx, IotGatewayProperties gatewayProperties,
-                                                             IotTcpConnectionManager connectionManager,
-                                                             IotDeviceMessageService messageService,
-                                                             IotDeviceService deviceService, IotDeviceCommonApi deviceApi) {
-            return new IotTcpUpstreamProtocol(tcpVertx, gatewayProperties, connectionManager,
-                    messageService, deviceService, deviceApi);
+        public TcpDeviceConnectionManager tcpDeviceConnectionManager() {
+            return new TcpDeviceConnectionManager();
         }
 
         @Bean
-        public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol tcpUpstreamProtocol,
-                                                                     IotMessageBus messageBus,
-                                                                     IotTcpDownstreamHandler downstreamHandler) {
-            return new IotTcpDownstreamSubscriber(tcpUpstreamProtocol, messageBus, downstreamHandler);
+        public IotTcpUpstreamProtocol iotTcpUpstreamProtocol(IotGatewayProperties gatewayProperties,
+                                                             TcpDeviceConnectionManager connectionManager,
+                                                             IotDeviceService deviceService,
+                                                             IotDeviceMessageService messageService,
+                                                             IotDeviceCommonApi deviceApi,
+                                                             Vertx tcpVertx) {
+            return new IotTcpUpstreamProtocol(gatewayProperties.getProtocol().getTcp(), connectionManager,
+                    deviceService, messageService, deviceApi, tcpVertx);
+        }
+
+        @Bean
+        public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocolHandler,
+                                                                     TcpDeviceConnectionManager connectionManager,
+                                                                     IotDeviceMessageService messageService,
+                                                                     IotMessageBus messageBus) {
+            return new IotTcpDownstreamSubscriber(protocolHandler, connectionManager, messageService, messageBus);
         }
 
     }

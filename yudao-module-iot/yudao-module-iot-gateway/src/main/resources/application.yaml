@@ -79,8 +79,13 @@ yudao:
         # 针对引入的 TCP 组件的配置
         # ====================================
         tcp:
-          enabled: true
-          server-port: 8093
+          enabled: false
+          port: 8091
+          keep-alive-timeout-ms: 30000
+          max-connections: 1000
+          ssl-enabled: false
+          ssl-cert-path: "classpath:certs/client.jks"
+          ssl-key-path: "classpath:certs/client.jks"
 
 --- #################### 日志相关配置 ####################
 

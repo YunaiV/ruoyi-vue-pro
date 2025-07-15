@@ -116,22 +116,6 @@ public class IotGatewayProperties {
     }
 
     @Data
-    public static class TcpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务端口（默认：8093）
-         */
-        private Integer serverPort = 8093;
-
-    }
-
-    @Data
     public static class EmqxProperties {
 
         /**
@@ -297,6 +281,47 @@ public class IotGatewayProperties {
             private String trustStorePassword;
 
         }
+
+    }
+
+    @Data
+    public static class TcpProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务器端口
+         */
+        private Integer port = 8091;
+
+        /**
+         * 心跳超时时间（毫秒）
+         */
+        private Long keepAliveTimeoutMs = 30000L;
+
+        /**
+         * 最大连接数
+         */
+        private Integer maxConnections = 1000;
+
+        /**
+         * 是否启用SSL
+         */
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL证书路径
+         */
+        private String sslCertPath;
+
+        /**
+         * SSL私钥路径
+         */
+        private String sslKeyPath;
 
     }
 
