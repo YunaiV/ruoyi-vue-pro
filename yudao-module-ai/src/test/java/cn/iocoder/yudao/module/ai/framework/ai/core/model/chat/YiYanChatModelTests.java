@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.qianfan.QianFanChatModel;
+import org.springaicommunity.qianfan.QianFanChatOptions;
+import org.springaicommunity.qianfan.api.QianFanApi;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.qianfan.QianFanChatModel;
-import org.springframework.ai.qianfan.QianFanChatOptions;
-import org.springframework.ai.qianfan.api.QianFanApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ import java.util.List;
 public class YiYanChatModelTests {
 
     private final QianFanChatModel chatModel = new QianFanChatModel(
-            new QianFanApi("qS8k8dYr2nXunagK4SSU8Xjj", "pHGbx51ql2f0hOyabQvSZezahVC3hh3e"), // 密钥
+            new QianFanApi("DGnyzREuaY7av7c38bOM9Ji2", "9aR8myflEOPDrEeLhoXv0FdqANOAyIZW"), // 密钥
             QianFanChatOptions.builder()
-                    .model(QianFanApi.ChatModel.ERNIE_4_0_8K_Preview.getValue())
+                    .model("ERNIE-4.5-8K-Preview")
                     .build()
     );
 

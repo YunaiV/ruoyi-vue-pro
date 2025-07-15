@@ -22,14 +22,17 @@ import java.util.List;
  */
 public class TongYiChatModelTests {
 
-    private final DashScopeChatModel chatModel = new DashScopeChatModel(
-            new DashScopeApi("sk-7d903764249848cfa912733146da12d1"),
-            DashScopeChatOptions.builder()
+    private final DashScopeChatModel chatModel = DashScopeChatModel.builder()
+            .dashScopeApi(DashScopeApi.builder()
+                    .apiKey("sk-47aa124781be4bfb95244cc62f63f7d0")
+                    .build())
+            .defaultOptions( DashScopeChatOptions.builder()
                     .withModel("qwen1.5-72b-chat") // 模型
 //                    .withModel("deepseek-r1") // 模型（deepseek-r1）
 //                    .withModel("deepseek-v3") // 模型（deepseek-v3）
 //                    .withModel("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
-                    .build());
+                    .build())
+            .build();
 
     @Test
     @Disabled

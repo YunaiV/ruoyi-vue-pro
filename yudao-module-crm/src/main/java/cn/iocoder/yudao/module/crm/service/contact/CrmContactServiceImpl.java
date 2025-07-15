@@ -114,6 +114,7 @@ public class CrmContactServiceImpl implements CrmContactService {
         contactMapper.updateById(updateObj);
 
         // 3. 记录操作日志
+        updateReqVO.setOwnerUserId(oldContact.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContact, CrmContactSaveReqVO.class));
         LogRecordContext.putVariable("contactName", oldContact.getName());
     }

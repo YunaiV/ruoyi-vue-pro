@@ -31,9 +31,13 @@ import java.util.List;
 public class CouponTemplateDO extends BaseDO {
 
     /**
-     * 不限制领取数量
+     * 领取数量 - 不限制
      */
-    public static final Integer TIME_LIMIT_COUNT_MAX = -1;
+    public static final Integer TAKE_LIMIT_COUNT_MAX = -1;
+    /**
+     * 发放数量 - 不限制
+     */
+    public static final Integer TOTAL_COUNT_MAX = -1;
 
     // ========== 基本信息 BEGIN ==========
     /**

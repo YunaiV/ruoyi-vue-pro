@@ -92,19 +92,20 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
             success = CRM_CLUE_UPDATE_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#updateReq.id", level = CrmPermissionLevelEnum.OWNER)
-    public void updateClue(CrmClueSaveReqVO updateReq) {
-        Assert.notNull(updateReq.getId(), "线索编号不能为空");
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.OWNER)
+    public void updateClue(CrmClueSaveReqVO updateReqVO) {
+        Assert.notNull(updateReqVO.getId(), "线索编号不能为空");
         // 1.1 校验线索是否存在
-        CrmClueDO oldClue = validateClueExists(updateReq.getId());
+        CrmClueDO oldClue = validateClueExists(updateReqVO.getId());
         // 1.2 校验关联数据
-        validateRelationDataExists(updateReq);
+        validateRelationDataExists(updateReqVO);
 
         // 2. 更新线索
-        CrmClueDO updateObj = BeanUtils.toBean(updateReq, CrmClueDO.class);
+        CrmClueDO updateObj = BeanUtils.toBean(updateReqVO, CrmClueDO.class);
         clueMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
+        updateReqVO.setOwnerUserId(oldClue.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldClue, CrmCustomerSaveReqVO.class));
         LogRecordContext.putVariable("clueName", oldClue.getName());
     }

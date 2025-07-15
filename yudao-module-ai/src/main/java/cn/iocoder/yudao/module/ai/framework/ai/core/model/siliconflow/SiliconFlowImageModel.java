@@ -89,7 +89,7 @@ public class SiliconFlowImageModel implements ImageModel {
 		var observationContext = ImageModelObservationContext.builder()
 			.imagePrompt(imagePrompt)
 			.provider(SiliconFlowApiConstants.PROVIDER_NAME)
-			.requestOptions(imagePrompt.getOptions())
+            .imagePrompt(imagePrompt)
 			.build();
 
 		return ImageModelObservationDocumentation.IMAGE_MODEL_OPERATION

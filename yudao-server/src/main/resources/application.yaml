@@ -150,7 +150,7 @@ spring:
     vectorstore: # 向量存储
       redis:
         initialize-schema: true
-        index: knowledge_index # Redis 中向量索引的名称：用于存储和检索向量数据的索引标识符，所有相关的向量搜索操作都会基于这个索引进行
+        index-name: knowledge_index # Redis 中向量索引的名称：用于存储和检索向量数据的索引标识符，所有相关的向量搜索操作都会基于这个索引进行
         prefix: "knowledge_segment:" # Redis 中存储向量数据的键名前缀：这个前缀会添加到每个存储在 Redis 中的向量数据键名前，每个 document 都是一个 hash 结构
       qdrant:
         initialize-schema: true
@@ -188,13 +188,14 @@ spring:
       api-key: xxxx
     moonshot: # 月之暗灭（KIMI）
       api-key: sk-abc
+    deepseek: # DeepSeek
+      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
+      chat:
+        options:
+          model: deepseek-chat
 
 yudao:
   ai:
-    deep-seek: # DeepSeek
-      enable: true
-      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
-      model: deepseek-chat
     doubao: # 字节豆包
       enable: true
       api-key: 5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272

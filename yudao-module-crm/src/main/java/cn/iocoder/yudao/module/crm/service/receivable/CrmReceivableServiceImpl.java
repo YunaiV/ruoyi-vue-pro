@@ -162,14 +162,14 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         Assert.notNull(updateReqVO.getId(), "回款编号不能为空");
         updateReqVO.setOwnerUserId(null).setCustomerId(null).setContractId(null).setPlanId(null); // 不允许修改的字段
         // 1.1 校验存在
-        CrmReceivableDO receivable = validateReceivableExists(updateReqVO.getId());
-        updateReqVO.setOwnerUserId(receivable.getOwnerUserId()).setCustomerId(receivable.getCustomerId())
-                .setContractId(receivable.getContractId()).setPlanId(receivable.getPlanId()); // 设置已存在的值
+        CrmReceivableDO oldReceivable = validateReceivableExists(updateReqVO.getId());
+        updateReqVO.setOwnerUserId(oldReceivable.getOwnerUserId()).setCustomerId(oldReceivable.getCustomerId())
+                .setContractId(oldReceivable.getContractId()).setPlanId(oldReceivable.getPlanId()); // 设置已存在的值
         // 1.2 校验可回款金额超过上限
         validateReceivablePriceExceedsLimit(updateReqVO);
 
         // 1.3 只有草稿、审批中，可以编辑；
-        if (!ObjectUtils.equalsAny(receivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
+        if (!ObjectUtils.equalsAny(oldReceivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
             throw exception(RECEIVABLE_UPDATE_FAIL_EDITING_PROHIBITED);
         }
@@ -179,9 +179,10 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         receivableMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable("receivable", receivable);
-        LogRecordContext.putVariable("period", getReceivablePeriod(receivable.getPlanId()));
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(receivable, CrmReceivableSaveReqVO.class));
+        updateReqVO.setOwnerUserId(oldReceivable.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
+        LogRecordContext.putVariable("oldReceivable", oldReceivable);
+        LogRecordContext.putVariable("period", getReceivablePeriod(oldReceivable.getPlanId()));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldReceivable, CrmReceivableSaveReqVO.class));
     }
 
     private Integer getReceivablePeriod(Long planId) {

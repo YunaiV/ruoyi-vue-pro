@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
  * 优惠劵模板 Service 实现类
@@ -60,7 +59,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
         CouponTemplateDO couponTemplate = validateCouponTemplateExists(updateReqVO.getId());
         // 校验发放数量不能过小（仅在 CouponTakeTypeEnum.USER 用户领取时）
         if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeType())
-                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
+                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TAKE_LIMIT_COUNT_MAX) // 非不限制
                 && updateReqVO.getTotalCount() < couponTemplate.getTakeCount()) {
             throw exception(COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL, couponTemplate.getTakeCount());
         }
@@ -116,7 +115,10 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
 
     @Override
     public void updateCouponTemplateTakeCount(Long id, int incrCount) {
-        couponTemplateMapper.updateTakeCount(id, incrCount);
+        int updateCount = couponTemplateMapper.updateTakeCount(id, incrCount);
+        if (updateCount == 0) {
+            throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
+        }
     }
 
     @Override
