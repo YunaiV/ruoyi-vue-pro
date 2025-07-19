@@ -119,7 +119,6 @@ public class OAuth2OpenController {
                 grantType, scopes, redirectUri);
 
         // 2. 根据授权模式，获取访问令牌
-        // 2. 根据授权模式，获取访问令牌
         OAuth2AccessTokenDO accessTokenDO;
         switch (grantTypeEnum) {
             case AUTHORIZATION_CODE:
