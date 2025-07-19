@@ -54,6 +54,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
 
     static {
         // 初始化方法映射
+        // TODO @haohao：有没可能去掉这个 code 到 method 的映射哈？
         initializeMethodMappings();
     }
 
@@ -75,6 +76,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
      * 负载字段名
      */
     public static class PayloadField {
+
         public static final String TIMESTAMP = "timestamp";
         public static final String MESSAGE_ID = "msgId";
         public static final String DEVICE_ID = "deviceId";
@@ -82,12 +84,14 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
         public static final String DATA = "data";
         public static final String CODE = "code";
         public static final String MESSAGE = "message";
+
     }
 
     /**
      * 消息方法映射
      */
     public static class MessageMethod {
+
         public static final String PROPERTY_POST = "thing.property.post";
         public static final String PROPERTY_SET = "thing.property.set";
         public static final String PROPERTY_GET = "thing.property.get";
@@ -97,6 +101,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
         public static final String OTA_UPGRADE = "thing.ota.upgrade";
         public static final String STATE_ONLINE = "thing.state.online";
         public static final String STATE_OFFLINE = "thing.state.offline";
+
     }
 
     // ==================== 初始化方法 ====================
@@ -139,9 +144,9 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
 
             // 3. 构建 TCP 数据包
             TcpDataPackage dataPackage = TcpDataPackage.builder()
-                    .addr("") // 地址在发送时由调用方设置
+                    .addr("")
                     .code(code)
-                    .mid((short) 0) // 消息序号在发送时由调用方设置
+                    .mid((short) 0)
                     .payload(payload)
                     .build();
 
@@ -154,9 +159,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
                 log.debug("[encode][TCP 消息编码成功] 方法: {}, 数据长度: {}",
                         message.getMethod(), result.length);
             }
-
             return result;
-
         } catch (Exception e) {
             log.error("[encode][TCP 消息编码失败] 消息: {}", message, e);
             throw new TcpCodecException("TCP 消息编码失败", e);
@@ -175,13 +178,10 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
             // 1. 解码 TCP 数据包
             Buffer buffer = Buffer.buffer(bytes);
             TcpDataPackage dataPackage = TcpDataDecoder.decode(buffer);
-
             // 2. 获取消息方法
             String method = getMethodByCodeSafely(dataPackage.getCode());
-
             // 3. 解析负载数据
             Object params = parsePayloadOptimized(dataPackage.getPayload());
-
             // 4. 构建 IoT 设备消息
             IotDeviceMessage message = IotDeviceMessage.requestOf(method, params);
 
@@ -190,9 +190,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
                 log.debug("[decode][TCP 消息解码成功] 方法: {}, 功能码: {}",
                         method, dataPackage.getCode());
             }
-
             return message;
-
         } catch (Exception e) {
             log.error("[decode][TCP 消息解码失败] 数据长度: {}, 数据内容: {}",
                     bytes.length, truncateData(bytes, 100), e);
@@ -226,8 +224,8 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
         if (Objects.isNull(bytes) || bytes.length == 0) {
             throw new IllegalArgumentException("待解码数据不能为空");
         }
-        if (bytes.length > 1024 * 1024) { // 1MB 限制
-            throw new IllegalArgumentException("数据包过大，超过1MB限制");
+        if (bytes.length > 1024 * 1024) {
+            throw new IllegalArgumentException("数据包过大，超过 1MB 限制");
         }
     }
 
@@ -236,9 +234,10 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     private short getCodeByMethodSafely(String method) {
         Short code = METHOD_TO_CODE_MAP.get(method);
+        // 默认为数据上报
         if (code == null) {
             log.warn("[getCodeByMethodSafely][未知的消息方法: {}，使用默认功能码]", method);
-            return TcpDataPackage.CODE_DATA_UP; // 默认为数据上报
+            return TcpDataPackage.CODE_DATA_UP;
         }
         return code;
     }
@@ -260,6 +259,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     private String buildPayloadOptimized(IotDeviceMessage message) {
         // 使用缓存键
+        // TODO @haohao：是不是不用缓存哈？
         String cacheKey = message.getMethod() + "_" + message.getRequestId();
         JSONObject cachedPayload = jsonCache.get(cacheKey);
 
@@ -271,7 +271,6 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
 
         // 创建新的负载
         JSONObject payload = new JSONObject();
-
         // 添加基础字段
         addToPayloadIfNotNull(payload, PayloadField.MESSAGE_ID, message.getRequestId());
         addToPayloadIfNotNull(payload, PayloadField.DEVICE_ID, message.getDeviceId());
@@ -279,7 +278,6 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
         addToPayloadIfNotNull(payload, PayloadField.DATA, message.getData());
         addToPayloadIfNotNull(payload, PayloadField.CODE, message.getCode());
         addToPayloadIfNotEmpty(payload, PayloadField.MESSAGE, message.getMsg());
-
         // 添加时间戳
         payload.set(PayloadField.TIMESTAMP, System.currentTimeMillis());
 
@@ -317,7 +315,6 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
             }
 
             return jsonObject.containsKey(PayloadField.PARAMS) ? jsonObject.get(PayloadField.PARAMS) : jsonObject;
-
         } catch (JSONException e) {
             log.warn("[parsePayloadOptimized][负载解析为JSON失败，返回原始字符串] 负载: {}", payload);
             return payload;
@@ -379,6 +376,7 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
      * TCP 编解码异常
      */
     public static class TcpCodecException extends RuntimeException {
+
         public TcpCodecException(String message) {
             super(message);
         }
@@ -386,5 +384,6 @@ public class IotTcpDeviceMessageCodec implements IotDeviceMessageCodec {
         public TcpCodecException(String message, Throwable cause) {
             super(message, cause);
         }
+
     }
 }

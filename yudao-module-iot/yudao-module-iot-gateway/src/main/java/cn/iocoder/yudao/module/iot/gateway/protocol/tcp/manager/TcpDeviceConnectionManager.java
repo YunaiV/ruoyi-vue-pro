@@ -16,8 +16,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 参考 EMQX 设计理念：
  * 1. 高性能连接管理
  * 2. 连接池和资源管理
- * 3. 流量控制
- * 4. 监控统计
+ * 3. 流量控制 TODO @haohao：这个要不先去掉
+ * 4. 监控统计 TODO @haohao：这个要不先去掉
  * 5. 自动清理和容错
  *
  * @author 芋道源码
@@ -106,6 +106,7 @@ public class TcpDeviceConnectionManager {
      * 添加设备客户端
      */
     public boolean addClient(String deviceAddr, TcpDeviceClient client) {
+        // TODO @haohao：这个要不去掉；目前看着没做 result 的处理；
         if (clientMap.size() >= MAX_CONNECTIONS) {
             log.warn("[addClient][连接数已达上限({})，拒绝新连接: {}]", MAX_CONNECTIONS, deviceAddr);
             return false;
@@ -130,14 +131,13 @@ public class TcpDeviceConnectionManager {
                 socketToAddrMap.put(client.getSocket(), deviceAddr);
             }
 
-            // 如果客户端已设置设备ID，更新映射
+            // 如果客户端已设置设备 ID，更新映射
             if (client.getDeviceId() != null) {
                 deviceIdToAddrMap.put(client.getDeviceId(), deviceAddr);
             }
 
             totalConnections.incrementAndGet();
             return true;
-
         } finally {
             writeLock.unlock();
         }
@@ -196,7 +196,7 @@ public class TcpDeviceConnectionManager {
     }
 
     /**
-     * 通过设备ID获取客户端
+     * 通过设备 ID 获取客户端
      */
     public TcpDeviceClient getClientByDeviceId(Long deviceId) {
         readLock.lock();
@@ -207,6 +207,8 @@ public class TcpDeviceConnectionManager {
             readLock.unlock();
         }
     }
+
+    // TODO @haohao：getClientBySocket、isDeviceOnline、sendMessage、sendMessageByDeviceId、broadcastMessage 用不到的方法，要不先暂时不提供？保持简洁、更容易理解哈。
 
     /**
      * 通过网络连接获取客户端
@@ -230,7 +232,7 @@ public class TcpDeviceConnectionManager {
     }
 
     /**
-     * 设置设备ID映射
+     * 设置设备 ID 映射
      */
     public void setDeviceIdMapping(String deviceAddr, Long deviceId) {
         writeLock.lock();
@@ -349,12 +351,12 @@ public class TcpDeviceConnectionManager {
         }
     }
 
+    // TODO @haohao：心跳超时，需要 close 么？
     /**
      * 心跳检查任务
      */
     private void checkHeartbeat() {
         try {
-            long currentTime = System.currentTimeMillis();
             int offlineCount = 0;
 
             readLock.lock();
@@ -369,7 +371,7 @@ public class TcpDeviceConnectionManager {
             }
 
             if (offlineCount > 0) {
-                log.info("[checkHeartbeat][发现{}个离线设备，将在清理任务中处理]", offlineCount);
+                log.info("[checkHeartbeat][发现 {} 个离线设备，将在清理任务中处理]", offlineCount);
             }
         } catch (Exception e) {
             log.error("[checkHeartbeat][心跳检查任务异常]", e);
@@ -424,14 +426,14 @@ public class TcpDeviceConnectionManager {
     private void logStatistics() {
         try {
             long totalConn = totalConnections.get();
-            long totalDisconn = totalDisconnections.get();
+            long totalDisconnections = this.totalDisconnections.get();
             long totalMsg = totalMessages.get();
             long totalFailedMsg = totalFailedMessages.get();
             long totalBytesValue = totalBytes.get();
 
             log.info("[logStatistics][连接统计] 总连接: {}, 总断开: {}, 当前在线: {}, 认证设备: {}, " +
                             "总消息: {}, 失败消息: {}, 总字节: {}",
-                    totalConn, totalDisconn, getOnlineCount(), getAuthenticatedCount(),
+                    totalConn, totalDisconnections, getOnlineCount(), getAuthenticatedCount(),
                     totalMsg, totalFailedMsg, totalBytesValue);
         } catch (Exception e) {
             log.error("[logStatistics][统计日志任务异常]", e);
@@ -500,4 +502,5 @@ public class TcpDeviceConnectionManager {
                         ? (double) (totalMessages.get() - totalFailedMessages.get()) / totalMessages.get() * 100
                         : 0.0);
     }
+
 }

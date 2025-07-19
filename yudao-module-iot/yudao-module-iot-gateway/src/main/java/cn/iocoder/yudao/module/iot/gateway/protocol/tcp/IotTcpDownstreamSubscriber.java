@@ -108,16 +108,14 @@ public class IotTcpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
             processedMessages.incrementAndGet();
 
             if (log.isDebugEnabled()) {
-                log.debug("[onMessage][收到下行消息] 设备ID: {}, 方法: {}, 消息ID: {}",
+                log.debug("[onMessage][收到下行消息] 设备 ID: {}, 方法: {}, 消息ID: {}",
                         message.getDeviceId(), message.getMethod(), message.getId());
             }
-
             // 参数校验
             if (message.getDeviceId() == null) {
-                log.warn("[onMessage][下行消息设备ID为空，跳过处理] 消息: {}", message);
+                log.warn("[onMessage][下行消息设备 ID 为空，跳过处理] 消息: {}", message);
                 return;
             }
-
             // 检查连接状态
             if (connectionManager.getClientByDeviceId(message.getDeviceId()) == null) {
                 log.warn("[onMessage][设备({})离线，跳过下行消息] 方法: {}",
@@ -130,17 +128,19 @@ public class IotTcpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
 
             // 性能监控
             long processTime = System.currentTimeMillis() - startTime;
-            if (processTime > 1000) { // 超过1秒的慢消息
+            // TODO @haohao：1000 搞成静态变量；
+            if (processTime > 1000) { // 超过 1 秒的慢消息
                 log.warn("[onMessage][慢消息处理] 设备ID: {}, 方法: {}, 耗时: {}ms",
                         message.getDeviceId(), message.getMethod(), processTime);
             }
-
         } catch (Exception e) {
             failedMessages.incrementAndGet();
             log.error("[onMessage][处理下行消息失败] 设备ID: {}, 方法: {}, 消息: {}",
                     message.getDeviceId(), message.getMethod(), message, e);
         }
     }
+
+    // TODO @haohao：多余的要不先清理掉；
 
     /**
      * 获取订阅者统计信息
@@ -160,4 +160,5 @@ public class IotTcpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
     public boolean isHealthy() {
         return initialized.get() && downstreamHandler != null;
     }
+
 }

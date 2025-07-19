@@ -39,6 +39,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
     private final IotGatewayProperties.TcpProperties tcpConfig;
 
+    // TODO @haohao：可以把 TcpDeviceConnectionManager 能力放大一点：1）handle 里的 client 初始化，可以拿到 TcpDeviceConnectionManager 里；2）handleDeviceRegister 也是；
     private final TcpDeviceConnectionManager connectionManager;
 
     private final IotDeviceService deviceService;
@@ -53,26 +54,25 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     public void handle(NetSocket socket) {
         log.info("[handle][收到设备连接: {}]", socket.remoteAddress());
 
-        // 创建客户端ID和设备客户端
+        // 创建客户端 ID 和设备客户端
+        // TODO @haohao：clientid 给 TcpDeviceClient 生成会简洁一点；减少 upsteramhanlder 的非核心逻辑；
         String clientId = IdUtil.simpleUUID() + "_" + socket.remoteAddress();
         TcpDeviceClient client = new TcpDeviceClient(clientId, tcpConfig.getKeepAliveTimeoutMs());
 
         try {
             // 设置连接异常和关闭处理
             socket.exceptionHandler(ex -> {
+                // TODO @haohao：这里的日志，可能把 clientid 都打上？因为 address 会重复么？
                 log.error("[handle][连接({})异常]", socket.remoteAddress(), ex);
                 handleConnectionClose(client);
             });
-
             socket.closeHandler(v -> {
                 log.info("[handle][连接({})关闭]", socket.remoteAddress());
                 handleConnectionClose(client);
             });
-
-            // 设置网络连接
             client.setSocket(socket);
 
-            // 创建数据解析器
+            // 设置解析器
             RecordParser parser = TcpDataReader.createParser(buffer -> {
                 try {
                     handleDataPackage(client, buffer);
@@ -80,13 +80,12 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                     log.error("[handle][处理数据包异常]", e);
                 }
             });
-
-            // 设置解析器
             client.setParser(parser);
 
+            // TODO @haohao：socket.remoteAddress()) 打印进去
             log.info("[handle][设备连接处理器初始化完成: {}]", clientId);
-
         } catch (Exception e) {
+            // TODO @haohao：socket.remoteAddress()) 打印进去
             log.error("[handle][初始化连接处理器失败]", e);
             client.shutdown();
         }
@@ -102,12 +101,12 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         try {
             // 解码数据包
             TcpDataPackage dataPackage = TcpDataDecoder.decode(buffer);
-
             log.info("[handleDataPackage][接收数据包] 设备地址: {}, 功能码: {}, 消息序号: {}",
                     dataPackage.getAddr(), dataPackage.getCodeDescription(), dataPackage.getMid());
 
             // 根据功能码处理不同类型的消息
             switch (dataPackage.getCode()) {
+                // TODO @haohao：【重要】code 要不要改成 opCode。这样和 data 里的 code 好区分；
                 case TcpDataPackage.CODE_REGISTER:
                     handleDeviceRegister(client, dataPackage);
                     break;
@@ -124,8 +123,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                     log.warn("[handleDataPackage][未知功能码: {}]", dataPackage.getCode());
                     break;
             }
-
         } catch (Exception e) {
+            // TODO @haohao：最好有 client 标识；
             log.error("[handleDataPackage][处理数据包失败]", e);
         }
     }
@@ -140,7 +139,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         try {
             String deviceAddr = dataPackage.getAddr();
             String productKey = dataPackage.getPayload();
-
             log.info("[handleDeviceRegister][设备注册] 设备地址: {}, 产品密钥: {}", deviceAddr, productKey);
 
             // 获取设备信息
@@ -152,6 +150,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             }
 
             // 更新客户端信息
+            // TODO @haohao：一个 set 方法，统一处理掉会好点哈；
             client.setProductKey(productKey);
             client.setDeviceName(deviceAddr);
             client.setDeviceId(device.getId());
@@ -169,7 +168,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             sendRegisterReply(client, dataPackage, true);
 
             log.info("[handleDeviceRegister][设备注册成功] 设备地址: {}, 设备ID: {}", deviceAddr, device.getId());
-
         } catch (Exception e) {
             log.error("[handleDeviceRegister][设备注册失败]", e);
             sendRegisterReply(client, dataPackage, false);
@@ -185,7 +183,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     private void handleHeartbeat(TcpDeviceClient client, TcpDataPackage dataPackage) {
         try {
             String deviceAddr = dataPackage.getAddr();
-
             log.debug("[handleHeartbeat][收到心跳] 设备地址: {}", deviceAddr);
 
             // 更新心跳时间
@@ -230,7 +227,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
                 // 3. 发送解码后的消息
                 messageService.sendDeviceMessage(message, client.getProductKey(), client.getDeviceName(), serverId);
-
             } catch (Exception e) {
                 log.warn("[handleDataUp][使用编解码器解码失败，降级使用原始解析] 错误: {}", e.getMessage());
 
@@ -242,7 +238,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
             // 发送数据上报回复
             sendDataUpReply(client, dataPackage);
-
         } catch (Exception e) {
             log.error("[handleDataUp][处理数据上报失败]", e);
         }
@@ -279,11 +274,11 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
                 // 3. 发送解码后的消息
                 messageService.sendDeviceMessage(message, client.getProductKey(), client.getDeviceName(), serverId);
-
             } catch (Exception e) {
                 log.warn("[handleEventUp][使用编解码器解码失败，降级使用原始解析] 错误: {}", e.getMessage());
 
                 // 降级处理：使用原始方式解析数据
+                // TODO @芋艿：降级处理逻辑；
                 JSONObject eventJson = JSONUtil.parseObj(payload);
                 IotDeviceMessage message = IotDeviceMessage.requestOf("thing.event.post", eventJson);
                 messageService.sendDeviceMessage(message, client.getProductKey(), client.getDeviceName(), serverId);
@@ -291,7 +286,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
             // 发送事件上报回复
             sendEventUpReply(client, dataPackage);
-
         } catch (Exception e) {
             log.error("[handleEventUp][处理事件上报失败]", e);
         }
@@ -329,13 +323,13 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                     .addr(dataPackage.getAddr())
                     .code(TcpDataPackage.CODE_DATA_UP)
                     .mid(dataPackage.getMid())
-                    .payload("0") // 0表示成功
+                    .payload("0") // 0 表示成功 TODO @haohao：最好枚举到 TcpDataPackage 里？
                     .build();
 
             io.vertx.core.buffer.Buffer replyBuffer = TcpDataEncoder.encode(replyPackage);
             client.sendMessage(replyBuffer);
-
         } catch (Exception e) {
+            // TODO @haohao：可以有个 client id
             log.error("[sendDataUpReply][发送数据上报回复失败]", e);
         }
     }
@@ -352,12 +346,11 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                     .addr(dataPackage.getAddr())
                     .code(TcpDataPackage.CODE_EVENT_UP)
                     .mid(dataPackage.getMid())
-                    .payload("0") // 0表示成功
+                    .payload("0") // 0 表示成功
                     .build();
 
             io.vertx.core.buffer.Buffer replyBuffer = TcpDataEncoder.encode(replyPackage);
             client.sendMessage(replyBuffer);
-
         } catch (Exception e) {
             log.error("[sendEventUpReply][发送事件上报回复失败]", e);
         }
@@ -385,7 +378,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             }
 
             log.info("[handleConnectionClose][处理连接关闭完成] 设备地址: {}", deviceAddr);
-
         } catch (Exception e) {
             log.error("[handleConnectionClose][处理连接关闭失败]", e);
         }

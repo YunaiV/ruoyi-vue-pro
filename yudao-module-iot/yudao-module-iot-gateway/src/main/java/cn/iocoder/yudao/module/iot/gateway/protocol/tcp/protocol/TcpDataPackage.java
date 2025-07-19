@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
  * TCP 数据包协议定义
  * <p>
  * 数据包格式：
- * 包头(4字节长度) | 设备地址长度(2字节) | 设备地址(不定长) | 功能码(2字节) | 消息序号(2字节) | 包体(不定长)
+ * 包头(4 字节长度) | 设备地址长度(2 字节) | 设备地址(不定长) | 功能码(2 字节) | 消息序号(2 字节) | 包体(不定长)
  *
  * @author 芋道源码
  */
@@ -29,10 +29,12 @@ public class TcpDataPackage {
      * 注册回复
      */
     public static final short CODE_REGISTER_REPLY = 11;
+    // TODO @haohao：【重要】一般心跳，服务端会回复一条；回复要搞独立的 code 码，还是继续用原来的，因为 requestId 可以映射；
     /**
      * 心跳
      */
     public static final short CODE_HEARTBEAT = 20;
+    // TODO @haohao：【重要】下面的，是不是融合成消息上行（client -> server），消息下行（server -> client）；然后把 method 放到 body 里？
     /**
      * 数据上报
      */
@@ -60,6 +62,8 @@ public class TcpDataPackage {
 
     // ==================== 数据包字段 ====================
 
+    // TODO @haohao：设备 addrLength、addr 是不是非必要呀？
+
     /**
      * 设备地址长度
      */
@@ -86,6 +90,8 @@ public class TcpDataPackage {
     private String payload;
 
     // ==================== 辅助方法 ====================
+
+    // TODO @haohao：用不到的方法，可以清理掉哈；
 
     /**
      * 是否为注册消息
@@ -123,6 +129,7 @@ public class TcpDataPackage {
                 code == CODE_PROPERTY_SET || code == CODE_PROPERTY_GET;
     }
 
+    // TODO @haohao：这个是不是去掉呀？多了一些维护成本；
     /**
      * 获取功能码描述
      */

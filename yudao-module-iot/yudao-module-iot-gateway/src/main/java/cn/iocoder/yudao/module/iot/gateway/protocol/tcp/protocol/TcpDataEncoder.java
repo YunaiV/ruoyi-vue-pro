@@ -27,11 +27,9 @@ public class TcpDataEncoder {
         if (dataPackage == null) {
             throw new IllegalArgumentException("数据包对象不能为空");
         }
-
         if (dataPackage.getAddr() == null || dataPackage.getAddr().isEmpty()) {
             throw new IllegalArgumentException("设备地址不能为空");
         }
-
         if (dataPackage.getPayload() == null) {
             dataPackage.setPayload("");
         }
@@ -39,34 +37,27 @@ public class TcpDataEncoder {
         try {
             Buffer buffer = Buffer.buffer();
 
-            // 1. 计算包体长度（除了包头4字节）
+            // 1. 计算包体长度（除了包头 4 字节）
             int payloadLength = dataPackage.getPayload().getBytes().length;
             int totalLength = 2 + dataPackage.getAddr().length() + 2 + 2 + payloadLength;
 
-            // 2. 写入包头：总长度（4字节）
+            // 2.1 写入包头：总长度（4 字节）
             buffer.appendInt(totalLength);
-
-            // 3. 写入设备地址长度（2字节）
+            // 2.2 写入设备地址长度（2 字节）
             buffer.appendShort((short) dataPackage.getAddr().length());
-
-            // 4. 写入设备地址（不定长）
+            // 2.3 写入设备地址（不定长）
             buffer.appendBytes(dataPackage.getAddr().getBytes());
-
-            // 5. 写入功能码（2字节）
+            // 2.4 写入功能码（2 字节）
             buffer.appendShort(dataPackage.getCode());
-
-            // 6. 写入消息序号（2字节）
+            // 2.5 写入消息序号（2 字节）
             buffer.appendShort(dataPackage.getMid());
-
-            // 7. 写入包体数据（不定长）
+            // 2.6 写入包体数据（不定长）
             buffer.appendBytes(dataPackage.getPayload().getBytes());
 
             log.debug("[encode][编码成功] 设备地址: {}, 功能码: {}, 消息序号: {}, 总长度: {}",
                     dataPackage.getAddr(), dataPackage.getCodeDescription(),
                     dataPackage.getMid(), buffer.length());
-
             return buffer;
-
         } catch (Exception e) {
             log.error("[encode][编码失败] 数据包: {}", dataPackage, e);
             throw new IllegalArgumentException("数据包编码失败: " + e.getMessage(), e);
@@ -82,15 +73,14 @@ public class TcpDataEncoder {
      * @return 编码后的数据包
      */
     public static Buffer createRegisterReply(String addr, short mid, boolean success) {
-        String payload = success ? "0" : "1"; // 0表示成功，1表示失败
-
+        // TODO @haohao：payload 默认成功、失败，最好讴有个枚举
+        String payload = success ? "0" : "1"; // 0 表示成功，1 表示失败
         TcpDataPackage dataPackage = TcpDataPackage.builder()
                 .addr(addr)
                 .code(TcpDataPackage.CODE_REGISTER_REPLY)
                 .mid(mid)
                 .payload(payload)
                 .build();
-
         return encode(dataPackage);
     }
 
@@ -109,7 +99,6 @@ public class TcpDataEncoder {
                 .mid(mid)
                 .payload(data)
                 .build();
-
         return encode(dataPackage);
     }
 
@@ -128,7 +117,6 @@ public class TcpDataEncoder {
                 .mid(mid)
                 .payload(serviceData)
                 .build();
-
         return encode(dataPackage);
     }
 
@@ -147,7 +135,6 @@ public class TcpDataEncoder {
                 .mid(mid)
                 .payload(propertyData)
                 .build();
-
         return encode(dataPackage);
     }
 
@@ -166,7 +153,7 @@ public class TcpDataEncoder {
                 .mid(mid)
                 .payload(propertyNames)
                 .build();
-
         return encode(dataPackage);
     }
+
 }

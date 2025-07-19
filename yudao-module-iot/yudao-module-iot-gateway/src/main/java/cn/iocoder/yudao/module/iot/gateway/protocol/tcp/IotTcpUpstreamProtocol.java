@@ -92,6 +92,7 @@ public class IotTcpUpstreamProtocol {
      * 启动 TCP 服务器
      */
     private void startTcpServer() {
+        // TODO @haohao：同类的，最好使用相同序号前缀，一个方法看起来有段落感。包括同类可以去掉之间的空格。例如说这里的，1. 2. 3. 4. 是初始化；5. 6. 是管理启动
         // 1. 创建服务器选项
         NetServerOptions options = new NetServerOptions()
                 .setPort(tcpProperties.getPort())

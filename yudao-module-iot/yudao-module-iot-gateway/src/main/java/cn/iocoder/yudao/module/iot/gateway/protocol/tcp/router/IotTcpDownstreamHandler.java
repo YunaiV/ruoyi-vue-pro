@@ -55,6 +55,7 @@ public class IotTcpDownstreamHandler {
             }
 
             // 2. 根据消息方法处理不同类型的下行消息
+            // TODO @芋艿、@haohao：看看有没什么办法，减少这样的编码。拓展新消息类型，成本高；
             switch (message.getMethod()) {
                 case "thing.property.set":
                     handlePropertySet(client, message);
@@ -75,8 +76,8 @@ public class IotTcpDownstreamHandler {
                     log.warn("[handle][未知的下行消息方法: {}]", message.getMethod());
                     break;
             }
-
         } catch (Exception e) {
+            // TODO @haohao：最好消息的内容，打印下；
             log.error("[handle][处理下行消息失败]", e);
         }
     }
@@ -104,7 +105,6 @@ public class IotTcpDownstreamHandler {
                 log.debug("[handlePropertySet][属性设置消息已发送(降级)] 设备地址: {}, 消息序号: {}",
                         client.getDeviceAddr(), mid);
             });
-
         } catch (Exception e) {
             log.error("[handlePropertySet][属性设置失败]", e);
         }
@@ -133,7 +133,6 @@ public class IotTcpDownstreamHandler {
                 log.debug("[handlePropertyGet][属性获取消息已发送(降级)] 设备地址: {}, 消息序号: {}",
                         client.getDeviceAddr(), mid);
             });
-
         } catch (Exception e) {
             log.error("[handlePropertyGet][属性获取失败]", e);
         }
@@ -162,7 +161,6 @@ public class IotTcpDownstreamHandler {
 
             log.debug("[handleServiceInvoke][服务调用消息已发送] 设备地址: {}, 消息序号: {}",
                     client.getDeviceAddr(), mid);
-
         } catch (Exception e) {
             log.error("[handleServiceInvoke][服务调用失败]", e);
         }
@@ -191,7 +189,6 @@ public class IotTcpDownstreamHandler {
 
             log.debug("[handleConfigPush][配置推送消息已发送] 设备地址: {}, 消息序号: {}",
                     client.getDeviceAddr(), mid);
-
         } catch (Exception e) {
             log.error("[handleConfigPush][配置推送失败]", e);
         }
@@ -262,6 +259,7 @@ public class IotTcpDownstreamHandler {
         }
     }
 
+    // TODO @haohao：用不到的，要不暂时不提供；
     /**
      * 批量发送下行消息
      *
@@ -287,7 +285,6 @@ public class IotTcpDownstreamHandler {
                 // 处理单个设备消息
                 handle(copyMessage);
             }
-
         } catch (Exception e) {
             log.error("[broadcastMessage][批量发送消息失败]", e);
         }
@@ -341,7 +338,6 @@ public class IotTcpDownstreamHandler {
 
             log.debug("[{}][消息已发送] 设备地址: {}, 消息序号: {}",
                     methodName, client.getDeviceAddr(), dataPackage.getMid());
-
         } catch (Exception e) {
             log.warn("[{}][使用编解码器编码失败，降级使用原始编码] 错误: {}",
                     methodName, e.getMessage());
@@ -353,6 +349,7 @@ public class IotTcpDownstreamHandler {
         }
     }
 
+    // TODO @haohao：看看这个要不要删除掉
     /**
      * 获取连接统计信息
      *

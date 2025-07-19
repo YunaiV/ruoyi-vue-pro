@@ -10,9 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * TCP 设备客户端
+ * TCP 设备客户端：封装设备连接的基本信息和操作
  * <p>
- * 封装设备连接的基本信息和操作。
  * 该类中的状态变更（如 authenticated, closed）使用 AtomicBoolean 保证原子性。
  * 对 socket 的操作应在 Vert.x Event Loop 线程中执行，以避免并发问题。
  *
@@ -48,7 +47,7 @@ public class TcpDeviceClient {
     private RecordParser parser;
 
     @Getter
-    private final long keepAliveTimeoutMs; // 改为 final，通过构造函数注入
+    private final long keepAliveTimeoutMs;
 
     private volatile long lastKeepAliveTime;
 
@@ -58,7 +57,7 @@ public class TcpDeviceClient {
     /**
      * 构造函数
      *
-     * @param clientId           客户端ID，全局唯一
+     * @param clientId           客户端 ID，全局唯一
      * @param keepAliveTimeoutMs 心跳超时时间（毫秒），从配置中读取
      */
     public TcpDeviceClient(String clientId, long keepAliveTimeoutMs) {
@@ -69,19 +68,19 @@ public class TcpDeviceClient {
 
     /**
      * 绑定网络套接字，并设置相关处理器。
-     * 此方法应在 Vert.x Event Loop 线程中调用。
+     * 此方法应在 Vert.x Event Loop 线程中调用
      *
      * @param socket 网络套接字
      */
     public void setSocket(NetSocket socket) {
         // 无需 synchronized，Vert.x 保证了同一个 socket 的事件在同一个 Event Loop 中处理
         if (this.socket != null && this.socket != socket) {
-            log.warn("[setSocket][客户端({})] 正在用新的 socket 替换旧的，旧 socket 将被关闭。", clientId);
+            log.warn("[setSocket][客户端({}) 正在用新的 socket 替换旧的，旧 socket 将被关闭]", clientId);
             this.socket.close();
         }
-
         this.socket = socket;
 
+        // 注册处理器
         if (socket != null) {
             // 1. 设置关闭处理器
             socket.closeHandler(v -> {
@@ -103,22 +102,22 @@ public class TcpDeviceClient {
                 if (parser != null) {
                     parser.handle(buffer);
                 } else {
-                    log.warn("[setSocket][设备客户端({})] 未设置解析器(parser)，原始数据被忽略: {}", clientId, buffer.toString());
+                    log.warn("[setSocket][设备客户端({}) 未设置解析器(parser)，原始数据被忽略: {}]", clientId, buffer.toString());
                 }
             });
         }
     }
 
     /**
-     * 更新心跳时间，表示设备仍然活跃。
+     * 更新心跳时间，表示设备仍然活跃
      */
     public void keepAlive() {
         this.lastKeepAliveTime = System.currentTimeMillis();
     }
 
     /**
-     * 检查连接是否在线。
-     * 判断标准：未被主动关闭、socket 存在、且在心跳超时时间内。
+     * 检查连接是否在线
+     * 判断标准：未被主动关闭、socket 存在、且在心跳超时时间内
      *
      * @return 是否在线
      */
@@ -130,6 +129,8 @@ public class TcpDeviceClient {
         return idleTime < keepAliveTimeoutMs;
     }
 
+    // TODO @haohao：1）是不是简化下：productKey 和 deviceName 非空，就认为是已认证；2）如果是的话，productKey 和 deviceName 搞成一个设置方法？setAuthenticated（productKey、deviceName）
+
     public boolean isAuthenticated() {
         return authenticated.get();
     }
@@ -139,7 +140,7 @@ public class TcpDeviceClient {
     }
 
     /**
-     * 向设备发送消息。
+     * 向设备发送消息
      *
      * @param buffer 消息内容
      */
@@ -151,18 +152,22 @@ public class TcpDeviceClient {
 
         // Vert.x 的 write 是异步的，不会阻塞
         socket.write(buffer, result -> {
-            if (result.succeeded()) {
-                log.debug("[sendMessage][设备客户端({})发送消息成功]", clientId);
-                // 发送成功也更新心跳，表示连接活跃
-                keepAlive();
-            } else {
+            // 发送失败可能意味着连接已断开，主动关闭
+            if (!result.succeeded()) {
                 log.error("[sendMessage][设备客户端({})发送消息失败]", clientId, result.cause());
-                // 发送失败可能意味着连接已断开，主动关闭
                 shutdown();
+                return;
             }
+
+            // 发送成功也更新心跳，表示连接活跃
+            if (log.isDebugEnabled()) {
+                log.debug("[sendMessage][设备客户端({})发送消息成功]", clientId);
+            }
+            keepAlive();
         });
     }
 
+    // TODO @haohao：是不是叫 close 好点？或者问问大模型
     /**
      * 关闭客户端连接并清理资源。
      * 这是一个幂等操作，可以被多次安全调用。
@@ -200,10 +205,6 @@ public class TcpDeviceClient {
         return "disconnected";
     }
 
-    public long getLastKeepAliveTime() {
-        return lastKeepAliveTime;
-    }
-
     @Override
     public String toString() {
         return "TcpDeviceClient{" +
@@ -215,4 +216,5 @@ public class TcpDeviceClient {
                 ", connection=" + getConnectionInfo() +
                 '}';
     }
+
 }
