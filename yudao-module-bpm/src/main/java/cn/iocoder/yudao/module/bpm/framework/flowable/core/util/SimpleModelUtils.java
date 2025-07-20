@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
@@ -17,13 +16,14 @@ import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener
 import cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.Process;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
 
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static java.util.Arrays.asList;
@@ -684,15 +684,18 @@ public class SimpleModelUtils {
             if (conditionGroups == null || CollUtil.isEmpty(conditionGroups.getConditions())) {
                 return null;
             }
-            List<String> strConditionGroups = CollectionUtils.convertList(conditionGroups.getConditions(), item -> {
+            List<String> strConditionGroups = convertList(conditionGroups.getConditions(), item -> {
                 if (CollUtil.isEmpty(item.getRules())) {
                     return "";
                 }
                 // 构造规则表达式
-                List<String> list = CollectionUtils.convertList(item.getRules(), (rule) -> {
+                List<String> list = convertList(item.getRules(), (rule) -> {
                     String rightSide = NumberUtil.isNumber(rule.getRightSide()) ? rule.getRightSide()
                             : "\"" + rule.getRightSide() + "\""; // 如果非数值类型加引号
-                    return String.format(" %s %s var:convertByType(%s,%s)", rule.getLeftSide(), rule.getOpCode(), rule.getLeftSide(), rightSide);
+                    return String.format(" vars:getOrDefault(%s, null) %s var:convertByType(%s,%s) ",
+                            rule.getLeftSide(), // 左侧：读取变量
+                            rule.getOpCode(), // 中间：操作符，比较
+                            rule.getLeftSide(), rightSide); // 右侧：转换变量，VariableConvertByTypeExpressionFunction
                 });
                 // 构造条件组的表达式
                 Boolean and = item.getAnd();
