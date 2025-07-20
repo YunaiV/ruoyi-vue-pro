@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import com.google.common.collect.ImmutableSet;
@@ -58,17 +59,20 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
 
     @Override
     protected void taskCreated(FlowableEngineEntityEvent event) {
-        taskService.processTaskCreated((Task) event.getEntity());
+        Task entity = (Task) event.getEntity();
+        FlowableUtils.execute(entity.getTenantId(), () -> taskService.processTaskCreated(entity));
     }
 
     @Override
     protected void taskAssigned(FlowableEngineEntityEvent event) {
-        taskService.processTaskAssigned((Task) event.getEntity());
+        Task entity = (Task) event.getEntity();
+        FlowableUtils.execute(entity.getTenantId(), () -> taskService.processTaskAssigned(entity));
     }
 
     @Override
     protected void taskCompleted(FlowableEngineEntityEvent event) {
-        taskService.processTaskCompleted((Task) event.getEntity());
+        Task entity = (Task) event.getEntity();
+        FlowableUtils.execute(entity.getTenantId(), () -> taskService.processTaskCompleted(entity));
     }
 
     @Override
