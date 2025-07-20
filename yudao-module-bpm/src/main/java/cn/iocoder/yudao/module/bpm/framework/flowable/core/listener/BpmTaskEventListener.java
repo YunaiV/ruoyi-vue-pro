@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
@@ -98,6 +99,23 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
         String processDefinitionId = event.getProcessDefinitionId();
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processDefinitionId);
         Job entity = (Job) event.getEntity();
+        // 特殊 from https://t.zsxq.com/h6oWr ：当 elementId 为空时，尝试从 JobHandlerConfiguration 中解析 JSON 获取
+        String elementId = entity.getElementId();
+        if (elementId == null && entity.getJobHandlerConfiguration() != null) {
+            try {
+                String handlerConfig = entity.getJobHandlerConfiguration();
+                if (handlerConfig.startsWith("{") && handlerConfig.contains("activityId")) {
+                    elementId = new JSONObject(handlerConfig).getStr("activityId");
+                }
+            } catch (Exception e) {
+                log.error("[timerFired][解析 entity({}) 失败]", entity, e);
+                return;
+            }
+        }
+        if (elementId == null) {
+            log.error("[timerFired][解析 entity({}) elementId 为空，跳过处理]", entity);
+            return;
+        }
         FlowElement element = BpmnModelUtils.getFlowElementById(bpmnModel, entity.getElementId());
         if (!(element instanceof BoundaryEvent)) {
             return;
