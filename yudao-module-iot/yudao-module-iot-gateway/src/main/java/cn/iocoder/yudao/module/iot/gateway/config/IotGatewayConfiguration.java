@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.config;
 
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpCodecManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxAuthEventProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.TcpDeviceConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
@@ -90,27 +90,21 @@ public class IotGatewayConfiguration {
         }
 
         @Bean
-        public TcpDeviceConnectionManager tcpDeviceConnectionManager() {
-            return new TcpDeviceConnectionManager();
-        }
-
-        @Bean
         public IotTcpUpstreamProtocol iotTcpUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                             TcpDeviceConnectionManager connectionManager,
                                                              IotDeviceService deviceService,
                                                              IotDeviceMessageService messageService,
                                                              IotDeviceCommonApi deviceApi,
+                                                             IotTcpCodecManager codecManager,
                                                              Vertx tcpVertx) {
-            return new IotTcpUpstreamProtocol(gatewayProperties.getProtocol().getTcp(), connectionManager,
-                    deviceService, messageService, deviceApi, tcpVertx);
+            return new IotTcpUpstreamProtocol(gatewayProperties.getProtocol().getTcp(),
+                    deviceService, messageService, deviceApi, codecManager, tcpVertx);
         }
 
         @Bean
         public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocolHandler,
-                                                                     TcpDeviceConnectionManager connectionManager,
                                                                      IotDeviceMessageService messageService,
                                                                      IotMessageBus messageBus) {
-            return new IotTcpDownstreamSubscriber(protocolHandler, connectionManager, messageService, messageBus);
+            return new IotTcpDownstreamSubscriber(protocolHandler, messageService, messageBus);
         }
 
     }
