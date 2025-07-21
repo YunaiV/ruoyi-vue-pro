@@ -74,6 +74,7 @@ public interface ErrorCodeConstants {
     ErrorCode CATEGORY_NOT_EXISTS = new ErrorCode(1_009_012_000, "流程分类不存在");
     ErrorCode CATEGORY_NAME_DUPLICATE = new ErrorCode(1_009_012_001, "流程分类名字【{}】重复");
     ErrorCode CATEGORY_CODE_DUPLICATE = new ErrorCode(1_009_012_002, "流程分类编码【{}】重复");
+    ErrorCode CATEGORY_DELETE_FAIL_MODEL_USED = new ErrorCode(1_009_012_003, "删除失败，流程分类【{}】已被流程模型使用，请先删除对应的流程模型");
 
     // ========== BPM 流程监听器 1-009-013-000 ==========
     ErrorCode PROCESS_LISTENER_NOT_EXISTS = new ErrorCode(1_009_013_000, "流程监听器不存在");
