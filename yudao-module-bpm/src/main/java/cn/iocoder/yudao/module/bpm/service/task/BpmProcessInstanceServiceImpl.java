@@ -244,7 +244,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (historicProcessInstance == null) {
             throw exception(ErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS);
         }
-        // 1.3 校验BpmnModel
+        // 1.3 校验 BpmnModel
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(task.getProcessDefinitionId());
         if (bpmnModel == null) {
             return null;
@@ -449,7 +449,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                         .setNodeType(BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType()).setStatus(processInstanceStatus)
                         .setStartTime(DateUtils.of(activity.getStartTime()))
                         .setEndTime(DateUtils.of(activity.getEndTime()))
-                        .setProcessInstanceId(activity.getProcessInstanceId());
+                        .setProcessInstanceId(activity.getCalledProcessInstanceId());
                 approvalNodes.add(callActivity);
             }
         });
@@ -521,7 +521,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 activityNode.setCandidateUserIds(CollUtil.sub(candidateUserIds, index + 1, candidateUserIds.size()));
             }
             if (BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType().equals(activityNode.getNodeType())) {
-                activityNode.setProcessInstanceId(firstActivity.getProcessInstanceId());
+                activityNode.setProcessInstanceId(firstActivity.getCalledProcessInstanceId());
             }
             return activityNode;
         });
