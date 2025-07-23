@@ -174,7 +174,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 #end
     },
     toolbarConfig: {
-      refresh: { code: 'query' },
+      refresh: true,
       search: true,
     },
   } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,

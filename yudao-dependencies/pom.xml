@@ -27,9 +27,9 @@
         <!-- DB 相关 -->
         <druid.version>1.2.24</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <mybatis-plus-join.version>1.5.4</mybatis-plus-join.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
-        <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
         <easy-trans.version>3.0.6</easy-trans.version>
         <redisson.version>3.41.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
