@@ -898,7 +898,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
-            runExecutionIds.add(task.getExecutionId());
+            if (task.getExecutionId() != null) {
+                runExecutionIds.add(task.getExecutionId());
+            }
 
             // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
             if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
