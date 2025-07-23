@@ -96,7 +96,7 @@ spring:
 
 # VO 转换（数据翻译）相关
 easy-trans:
-  is-enable-global: true # 启用全局翻译（拦截所有 SpringMVC ResponseBody 进行自动翻译 )。如果对于性能要求很高可关闭此配置，或通过 @IgnoreTrans 忽略某个接口
+  is-enable-global: false # 【默认禁用，对性能确认压力大】启用全局翻译（拦截所有 SpringMVC ResponseBody 进行自动翻译 )。如果对于性能要求很高可关闭此配置，或通过 @IgnoreTrans 忽略某个接口
 
 --- #################### 验证码相关配置 ####################
 
