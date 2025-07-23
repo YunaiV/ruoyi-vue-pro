@@ -30,6 +30,7 @@ public class IotTcpUpstreamProtocol {
 
     private final IotDeviceMessageService messageService;
 
+    // TODO @haohao：不用的变量，可以删除；
     private final IotDeviceCommonApi deviceApi;
 
     private final IotTcpCodecManager codecManager;
@@ -58,6 +59,7 @@ public class IotTcpUpstreamProtocol {
 
     @PostConstruct
     public void start() {
+        // TODO @haohao：类似下面 62 到 75 是处理 options 的，因为中间写了注释，其实可以不用空行；然后 77 到 91 可以中间空喊去掉，更紧凑一点；
         // 创建服务器选项
         NetServerOptions options = new NetServerOptions()
                 .setPort(tcpProperties.getPort())

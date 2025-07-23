@@ -10,11 +10,12 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+// TODO @haohao：设备地址(变长) 是不是非必要哈？因为认证后，不需要每次都带呀。
 /**
  * TCP 二进制格式 {@link IotDeviceMessage} 编解码器
  *
  * 使用自定义二进制协议格式：
- * 包头(4字节) | 地址长度(2字节) | 设备地址(变长) | 功能码(2字节) | 消息序号(2字节) | 包体数据(变长)
+ * 包头(4 字节) | 地址长度(2 字节) | 设备地址(变长) | 功能码(2 字节) | 消息序号(2 字节) | 包体数据(变长)
  *
  * @author 芋道源码
  */
@@ -27,6 +28,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     public static final String TYPE = "TCP_BINARY";
 
+    // TODO @haohao：这个注释不太对。
     // ==================== 常量定义 ====================
 
     @Override
@@ -67,10 +69,11 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
             TcpDataPackage dataPackage = decodeTcpDataPackage(Buffer.buffer(bytes));
 
             // 2. 根据功能码确定方法
+            // TODO @haohao：会不会有事件上报哈。
             String method = (dataPackage.getCode() == TcpDataPackage.CODE_HEARTBEAT) ?
                 MessageMethod.STATE_ONLINE : MessageMethod.PROPERTY_POST;
 
-            // 3. 解析负载数据和请求ID
+            // 3. 解析负载数据和请求 ID
             PayloadInfo payloadInfo = parsePayloadInfo(dataPackage.getPayload());
 
             // 4. 构建 IoT 设备消息（设置完整的必要参数）
@@ -78,13 +81,16 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
                 payloadInfo.getRequestId(), method, payloadInfo.getParams());
 
             // 5. 设置设备相关信息
+            // TODO @haohao：serverId 不是这里解析的哈。
             Long deviceId = parseDeviceId(dataPackage.getAddr());
             message.setDeviceId(deviceId);
 
-            // 6. 设置TCP协议相关信息
+            // 6. 设置 TCP 协议相关信息
+            // TODO @haohao：serverId 不是这里解析的哈。
             message.setServerId(generateServerId(dataPackage));
 
-            // 7. 设置租户ID（TODO: 后续可以从设备信息中获取）
+            // 7. 设置租户 ID（TODO: 后续可以从设备信息中获取）
+            // TODO @haohao：租户 id 不是这里解析的哈。
             // message.setTenantId(getTenantIdByDeviceId(deviceId));
 
             if (log.isDebugEnabled()) {
@@ -104,6 +110,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         return TYPE;
     }
 
+    // TODO @haohao：这种简单解析，中间不用空格哈。
     /**
      * 构建完整负载
      */
@@ -130,12 +137,10 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         return payload.toString();
     }
 
-
-
     // ==================== 编解码方法 ====================
 
     /**
-     * 解析负载信息（包含requestId和params）
+     * 解析负载信息（包含 requestId 和 params）
      */
     private PayloadInfo parsePayloadInfo(String payload) {
         if (StrUtil.isEmpty(payload)) {
@@ -143,6 +148,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         }
 
         try {
+            // TODO @haohao：使用 jsonUtils
             JSONObject jsonObject = JSONUtil.parseObj(payload);
             String requestId = jsonObject.getStr(PayloadField.REQUEST_ID);
             if (StrUtil.isEmpty(requestId)) {
@@ -185,7 +191,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      * @return 服务ID
      */
     private String generateServerId(TcpDataPackage dataPackage) {
-        // 使用协议类型 + 设备地址 + 消息序号生成唯一的服务ID
+        // 使用协议类型 + 设备地址 + 消息序号生成唯一的服务 ID
         return String.format("tcp_%s_%d", dataPackage.getAddr(), dataPackage.getMid());
     }
 
@@ -300,23 +306,28 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      * 消息方法常量
      */
     public static class MessageMethod {
+
         public static final String PROPERTY_POST = "thing.property.post";  // 数据上报
         public static final String STATE_ONLINE = "thing.state.online";    // 心跳
+
     }
 
     /**
      * 负载字段名
      */
     private static class PayloadField {
+
         public static final String METHOD = "method";
         public static final String PARAMS = "params";
         public static final String TIMESTAMP = "timestamp";
         public static final String REQUEST_ID = "requestId";
         public static final String MESSAGE_ID = "msgId";
+
     }
 
     // ==================== TCP 数据包编解码方法 ====================
 
+    // TODO @haohao：lombok 简化
     /**
      * 负载信息类
      */
@@ -361,11 +372,13 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
     // ==================== 自定义异常 ====================
 
+    // TODO @haohao：可以搞个全局的；
     /**
      * TCP 编解码异常
      */
     public static class TcpCodecException extends RuntimeException {
 
+        // TODO @haohao：非必要构造方法，可以去掉哈。
         public TcpCodecException(String message) {
             super(message);
         }

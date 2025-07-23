@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,11 +23,12 @@ public class IotTcpDownstreamHandler {
 
     private final IotDeviceMessageService messageService;
 
-    private final IotTcpDeviceMessageCodec codec;
+    // TODO @haohao：代码没提交全，有报错。
+//    private final IotTcpDeviceMessageCodec codec;
 
     public IotTcpDownstreamHandler(IotDeviceMessageService messageService) {
         this.messageService = messageService;
-        this.codec = new IotTcpDeviceMessageCodec();
+//        this.codec = new IotTcpDeviceMessageCodec();
     }
 
     /**
@@ -42,7 +42,8 @@ public class IotTcpDownstreamHandler {
                     message.getDeviceId(), message.getMethod(), message.getId());
 
             // 编码消息用于日志记录和验证
-            byte[] encodedMessage = codec.encode(message);
+            byte[] encodedMessage = null;
+//                    codec.encode(message);
             log.debug("[handle][消息编码成功] 设备ID: {}, 编码后长度: {} 字节",
                     message.getDeviceId(), encodedMessage.length);
 

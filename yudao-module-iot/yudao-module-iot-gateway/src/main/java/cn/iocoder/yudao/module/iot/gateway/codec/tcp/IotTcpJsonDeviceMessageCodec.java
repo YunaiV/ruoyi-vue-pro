@@ -12,16 +12,16 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 
 /**
- * TCP JSON格式 {@link IotDeviceMessage} 编解码器
- * 
- * 采用纯JSON格式传输，参考EMQX和HTTP模块的数据格式
- * 
+ * TCP JSON 格式 {@link IotDeviceMessage} 编解码器
+ *
+ * 采用纯 JSON 格式传输，参考 EMQX 和 HTTP 模块的数据格式
+ *
  * JSON消息格式：
  * {
- *   "id": "消息ID",
+ *   "id": "消息 ID",
  *   "method": "消息方法",
- *   "deviceId": "设备ID", 
- *   "productKey": "产品Key",
+ *   "deviceId": "设备 ID",
+ *   "productKey": "产品 Key",
  *   "deviceName": "设备名称",
  *   "params": {...},
  *   "timestamp": 时间戳
@@ -35,6 +35,7 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
 
     public static final String TYPE = "TCP_JSON";
 
+    // TODO @haohao：变量不太对；
     // ==================== 常量定义 ====================
 
     @Override
@@ -77,14 +78,15 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
         }
 
         try {
-            // 转换为JSON字符串
+            // 转换为 JSON 字符串
             String jsonString = new String(bytes, StandardCharsets.UTF_8);
 
             if (log.isDebugEnabled()) {
                 log.debug("[decode][开始解码] JSON长度: {}字节, 内容: {}", bytes.length, jsonString);
             }
 
-            // 解析JSON消息
+            // 解析 JSON 消息
+            // TODO @haohao：JsonUtils
             JSONObject jsonMessage = JSONUtil.parseObj(jsonString);
 
             // 构建IoT设备消息
@@ -129,7 +131,7 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
     }
 
     /**
-     * 构建JSON消息
+     * 构建 JSON 消息
      */
     private JSONObject buildJsonMessage(IotDeviceMessage message) {
         JSONObject jsonMessage = new JSONObject();
@@ -189,7 +191,7 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
             message.setMsg(msg);
         }
 
-        // 设置服务ID（基于JSON格式）
+        // 设置服务 ID（基于 JSON 格式）
         message.setServerId(generateServerId(jsonMessage));
 
         return message;
@@ -216,22 +218,26 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
                 StrUtil.isNotEmpty(id) ? id.substring(0, Math.min(8, id.length())) : "noId");
     }
 
+    // TODO @haohao：注释格式不对；
     /**
      * 消息方法常量
      */
     public static class MessageMethod {
+
         public static final String PROPERTY_POST = "thing.property.post";  // 数据上报
         public static final String STATE_ONLINE = "thing.state.online";    // 心跳
         public static final String EVENT_POST = "thing.event.post";        // 事件上报
         public static final String PROPERTY_SET = "thing.property.set";    // 属性设置
         public static final String PROPERTY_GET = "thing.property.get";    // 属性获取
         public static final String SERVICE_INVOKE = "thing.service.invoke"; // 服务调用
+
     }
 
     /**
      * JSON字段名（参考EMQX和HTTP模块格式）
      */
     private static class JsonField {
+
         public static final String ID = "id";
         public static final String METHOD = "method";
         public static final String DEVICE_ID = "deviceId";
@@ -241,5 +247,6 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
         public static final String TIMESTAMP = "timestamp";
         public static final String CODE = "code";
         public static final String MESSAGE = "message";
+
     }
 }
