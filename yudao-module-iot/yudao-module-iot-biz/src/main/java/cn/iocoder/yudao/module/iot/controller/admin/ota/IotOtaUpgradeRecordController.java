@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOta
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaUpgradeRecordService;
+import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,6 +49,7 @@ public class IotOtaUpgradeRecordController {
     @GetMapping("/page")
     @Operation(summary = "获得升级记录分页")
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
+    @TransMethodResult
     public CommonResult<PageResult<IotOtaUpgradeRecordRespVO>> getUpgradeRecordPage(
             @Valid IotOtaUpgradeRecordPageReqVO pageReqVO) {
         PageResult<IotOtaUpgradeRecordDO> pageResult = upgradeRecordService.getUpgradeRecordPage(pageReqVO);
@@ -58,6 +60,7 @@ public class IotOtaUpgradeRecordController {
     @Operation(summary = "获得升级记录")
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
     @Parameter(name = "id", description = "升级记录编号", required = true, example = "1024")
+    @TransMethodResult
     public CommonResult<IotOtaUpgradeRecordRespVO> getUpgradeRecord(@RequestParam("id") Long id) {
         IotOtaUpgradeRecordDO upgradeRecord = upgradeRecordService.getUpgradeRecord(id);
         return success(BeanUtils.toBean(upgradeRecord, IotOtaUpgradeRecordRespVO.class));

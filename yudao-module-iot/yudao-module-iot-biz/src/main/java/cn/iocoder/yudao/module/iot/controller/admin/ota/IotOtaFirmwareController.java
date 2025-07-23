@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwa
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaFirmwareService;
+import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,6 +48,7 @@ public class IotOtaFirmwareController {
     @GetMapping("/get")
     @Operation(summary = "获得 OTA 固件")
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:query')")
+    @TransMethodResult
     public CommonResult<IotOtaFirmwareRespVO> getOtaFirmware(@RequestParam("id") Long id) {
         IotOtaFirmwareDO otaFirmware = otaFirmwareService.getOtaFirmware(id);
         return success(BeanUtils.toBean(otaFirmware, IotOtaFirmwareRespVO.class));
