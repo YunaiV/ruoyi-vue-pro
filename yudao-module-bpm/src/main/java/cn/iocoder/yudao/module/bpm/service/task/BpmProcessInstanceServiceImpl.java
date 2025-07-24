@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -66,6 +67,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNode;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
@@ -263,7 +265,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 3. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
-        List<ActivityNode> nextActivityNodes = convertList(nextFlowNodes, node -> new ActivityNode().setId(node.getId())
+        // 仅仅获取 UserTask 节点  TODO：如果网关节点和网关节点相连，获取下个 UserTask. 貌似有点不准。
+        List<FlowNode> nextUserTaskList = CollectionUtils.filterList(nextFlowNodes, node -> node instanceof UserTask);
+        List<ActivityNode> nextActivityNodes = convertList(nextUserTaskList, node -> new ActivityNode().setId(node.getId())
                 .setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
                 .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                 .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
