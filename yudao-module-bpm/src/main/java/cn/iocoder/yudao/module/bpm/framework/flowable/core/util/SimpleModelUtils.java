@@ -239,13 +239,13 @@ public class SimpleModelUtils {
                 // 3.1 分支有后续节点。即分支 1: A->B->C->D 的情况
                 if (isValidNode(conditionChildNode)) {
                     // 3.1.1 建立与后续的节点的连线。例如说，建立 A->B 的连线
-                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), conditionChildNode.getId(), item);
+                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), conditionChildNode.getId(), nodeType, item);
                     process.addFlowElement(sequenceFlow);
                     // 3.1.2 递归调用后续节点连线。例如说，建立 B->C->D 的连线
                     traverseNodeToBuildSequenceFlow(process, conditionChildNode, branchEndNodeId);
                 } else {
                     // 3.2 分支没有后续节点。例如说，建立 A->D 的连线
-                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), branchEndNodeId, item);
+                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), branchEndNodeId, nodeType, item);
                     process.addFlowElement(sequenceFlow);
                 }
             }
@@ -591,17 +591,22 @@ public class SimpleModelUtils {
 
     private static class ParallelBranchNodeConvert implements NodeConvert {
 
+        /**
+         * 并行分支使用包容网关。需要设置所有出口条件表达式的值为 true.
+         * 参见: {@link ConditionNodeConvert#buildSequenceFlow}
+         */
         @Override
-        public List<ParallelGateway> convertList(BpmSimpleModelNodeVO node) {
-            ParallelGateway parallelGateway = new ParallelGateway();
-            parallelGateway.setId(node.getId());
+        public List<InclusiveGateway> convertList(BpmSimpleModelNodeVO node) {
+
+            InclusiveGateway inclusiveGateway = new InclusiveGateway();
+            inclusiveGateway.setId(node.getId());
             // TODO @jason：setName
 
-            // 并行聚合网关由程序创建，前端不需要传入
-            ParallelGateway joinParallelGateway = new ParallelGateway();
+            // 合并网关 由程序创建，前端不需要传入
+            InclusiveGateway joinParallelGateway = new InclusiveGateway();
             joinParallelGateway.setId(buildGatewayJoinId(node.getId()));
             // TODO @jason：setName
-            return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
+            return CollUtil.newArrayList(inclusiveGateway, joinParallelGateway);
         }
 
         @Override
@@ -652,8 +657,14 @@ public class SimpleModelUtils {
         }
 
         public static SequenceFlow buildSequenceFlow(String sourceId, String targetId,
-                                                     BpmSimpleModelNodeVO node) {
-            String conditionExpression = buildConditionExpression(node.getConditionSetting());
+                                                     BpmSimpleModelNodeTypeEnum nodeType, BpmSimpleModelNodeVO node) {
+            String conditionExpression;
+            // 并行分支，使用包容网关实现，强制设置条件表达式为 true
+            if (BpmSimpleModelNodeTypeEnum.PARALLEL_BRANCH_NODE == nodeType) {
+                conditionExpression ="${true}";
+            } else {
+                conditionExpression = buildConditionExpression(node.getConditionSetting());
+            }
             return buildBpmnSequenceFlow(sourceId, targetId, node.getId(), node.getName(), conditionExpression);
         }
     }
@@ -662,7 +673,6 @@ public class SimpleModelUtils {
      * 构造条件表达式
      */
     public static String buildConditionExpression(BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {
-        // 并行网关不需要设置条件
         if (conditionSetting == null) {
             return null;
         }
