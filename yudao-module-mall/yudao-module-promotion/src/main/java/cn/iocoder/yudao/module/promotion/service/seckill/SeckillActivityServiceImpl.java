@@ -303,7 +303,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             throw exception(SECKILL_JOIN_ACTIVITY_TIME_ERROR);
         }
         SeckillConfigDO config = seckillConfigService.getCurrentSeckillConfig();
-        if (config == null || !CollectionUtil.contains(activity.getConfigIds(), config.getId())) {
+        if (config == null
+                || !CollectionUtil.contains(activity.getConfigIds(), config.getId())
+                || !LocalDateTimeUtils.isBetween(config.getStartTime(), config.getEndTime())) {
             throw exception(SECKILL_JOIN_ACTIVITY_TIME_ERROR);
         }
         // 1.3 超过单次购买限制

@@ -478,7 +478,11 @@ public class BpmnModelUtils {
      */
     public static FlowElement getFlowElementById(BpmnModel model, String flowElementId) {
         Process process = model.getMainProcess();
-        return process.getFlowElement(flowElementId);
+        FlowElement flowElement = process.getFlowElement(flowElementId);
+        if (flowElement != null) {
+            return flowElement;
+        }
+        return model.getFlowElement(flowElementId);
     }
 
     /**

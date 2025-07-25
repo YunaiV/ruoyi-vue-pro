@@ -230,10 +230,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
-        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
-            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
-        }
+//        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
+//            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
+//            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
+//        }
         // 执行查询
         long count = taskQuery.count();
         if (count == 0) {
@@ -244,6 +244,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 特殊：强制移除自动完成的“发起人”节点
         // 补充说明：由于 taskQuery 无法方面的过滤，所以暂时通过内存过滤
         tasks.removeIf(task -> task.getTaskDefinitionKey().equals(START_USER_NODE_ID));
+        // TODO @芋艿：https://t.zsxq.com/MNzqp 【flowable bug】：taskCreatedAfter、taskCreatedBefore 拼接的是 OR
+        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
+            tasks.removeIf(task -> task.getCreateTime() == null
+                    || task.getCreateTime().before(DateUtils.of(pageVO.getCreateTime()[0]))
+                    || task.getCreateTime().after(DateUtils.of(pageVO.getCreateTime()[1])));
+        }
         return new PageResult<>(tasks, count);
     }
 
@@ -259,16 +265,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotEmpty(pageVO.getCategory())) {
             taskQuery.taskCategory(pageVO.getCategory());
         }
-        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
-            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
-        }
+//        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
+//            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
+//            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
+//        }
         // 执行查询
         long count = taskQuery.count();
         if (count == 0) {
             return PageResult.empty();
         }
         List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        // TODO @芋艿：https://t.zsxq.com/MNzqp 【flowable bug】：taskCreatedAfter、taskCreatedBefore 拼接的是 OR
+        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
+            tasks.removeIf(task -> task.getCreateTime() == null
+                    || task.getCreateTime().before(DateUtils.of(pageVO.getCreateTime()[0]))
+                    || task.getCreateTime().after(DateUtils.of(pageVO.getCreateTime()[1])));
+        }
         return new PageResult<>(tasks, count);
     }
 
@@ -886,7 +898,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
-            runExecutionIds.add(task.getExecutionId());
+            if (task.getExecutionId() != null) {
+                runExecutionIds.add(task.getExecutionId());
+            }
 
             // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
             if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
@@ -1367,7 +1381,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
-                        || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
+                            || BooleanUtil.isTrue(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
                         && ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                     getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
