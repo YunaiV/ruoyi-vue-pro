@@ -33,14 +33,16 @@ spring:
         initial-size: 5 # 初始连接数
         min-idle: 10 # 最小连接池数量
         max-active: 20 # 最大连接池数量
-        max-wait: 600000 # 配置获取连接等待超时的时间，单位：毫秒
-        time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒
-        min-evictable-idle-time-millis: 300000 # 配置一个连接在池中最小生存的时间，单位：毫秒
-        max-evictable-idle-time-millis: 900000 # 配置一个连接在池中最大生存的时间，单位：毫秒
-        validation-query: SELECT 1 # 配置检测连接是否有效
+        max-wait: 60000 # 配置获取连接等待超时的时间，单位：毫秒（1 分钟）
+        time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒（1 分钟）
+        min-evictable-idle-time-millis: 600000 # 配置一个连接在池中最小生存的时间，单位：毫秒（10 分钟）
+        max-evictable-idle-time-millis: 1800000 # 配置一个连接在池中最大生存的时间，单位：毫秒（30 分钟）
+        validation-query: SELECT 1 FROM DUAL # 配置检测连接是否有效
         test-while-idle: true
         test-on-borrow: false
         test-on-return: false
+        pool-prepared-statements: true # 是否开启 PreparedStatement 缓存
+        max-pool-prepared-statement-per-connection-size: 20 # 每个连接缓存的 PreparedStatement 数量
       primary: master
       datasource:
         master:
