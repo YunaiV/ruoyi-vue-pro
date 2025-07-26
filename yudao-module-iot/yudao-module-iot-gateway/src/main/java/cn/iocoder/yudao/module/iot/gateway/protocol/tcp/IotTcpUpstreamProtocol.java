@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
-import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpCodecManager;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpSessionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router.IotTcpUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
@@ -30,10 +29,7 @@ public class IotTcpUpstreamProtocol {
 
     private final IotDeviceMessageService messageService;
 
-    // TODO @haohao：不用的变量，可以删除；
-    private final IotDeviceCommonApi deviceApi;
-
-    private final IotTcpCodecManager codecManager;
+    private final IotTcpSessionManager sessionManager;
 
     private final Vertx vertx;
 
@@ -45,28 +41,24 @@ public class IotTcpUpstreamProtocol {
     public IotTcpUpstreamProtocol(IotGatewayProperties.TcpProperties tcpProperties,
             IotDeviceService deviceService,
             IotDeviceMessageService messageService,
-            IotDeviceCommonApi deviceApi,
-            IotTcpCodecManager codecManager,
+                                  IotTcpSessionManager sessionManager,
             Vertx vertx) {
         this.tcpProperties = tcpProperties;
         this.deviceService = deviceService;
         this.messageService = messageService;
-        this.deviceApi = deviceApi;
-        this.codecManager = codecManager;
+        this.sessionManager = sessionManager;
         this.vertx = vertx;
         this.serverId = IotDeviceMessageUtils.generateServerId(tcpProperties.getPort());
     }
 
     @PostConstruct
     public void start() {
-        // TODO @haohao：类似下面 62 到 75 是处理 options 的，因为中间写了注释，其实可以不用空行；然后 77 到 91 可以中间空喊去掉，更紧凑一点；
         // 创建服务器选项
         NetServerOptions options = new NetServerOptions()
                 .setPort(tcpProperties.getPort())
                 .setTcpKeepAlive(true)
                 .setTcpNoDelay(true)
                 .setReuseAddress(true);
-
         // 配置 SSL（如果启用）
         if (Boolean.TRUE.equals(tcpProperties.getSslEnabled())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
@@ -78,7 +70,8 @@ public class IotTcpUpstreamProtocol {
         // 创建服务器并设置连接处理器
         netServer = vertx.createNetServer(options);
         netServer.connectHandler(socket -> {
-            IotTcpUpstreamHandler handler = new IotTcpUpstreamHandler(this, messageService, codecManager);
+            IotTcpUpstreamHandler handler = new IotTcpUpstreamHandler(this, messageService, deviceService,
+                    sessionManager);
             handler.handle(socket);
         });
 

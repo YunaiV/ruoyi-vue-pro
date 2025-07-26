@@ -2,42 +2,37 @@ package cn.iocoder.yudao.module.iot.gateway.codec.tcp;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO @haohao：这种写成单测，会好点
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * TCP二进制格式数据包示例
+ * TCP 二进制格式数据包单元测试
  *
- * 演示如何使用二进制协议创建和解析TCP上报数据包和心跳包
+ * 测试二进制协议创建和解析 TCP 上报数据包和心跳包
  *
  * 二进制协议格式：
- * 包头(4字节) | 地址长度(2字节) | 设备地址(变长) | 功能码(2字节) | 消息序号(2字节) | 包体数据(变长)
+ * 包头(4 字节) | 功能码(2 字节) | 消息序号(2 字节) | 包体数据(变长)
  *
  * @author 芋道源码
  */
 @Slf4j
-public class TcpBinaryDataPacketExamples {
+class TcpBinaryDataPacketExamplesTest {
 
-    public static void main(String[] args) {
-        IotTcpBinaryDeviceMessageCodec codec = new IotTcpBinaryDeviceMessageCodec();
+    private IotTcpBinaryDeviceMessageCodec codec;
 
-        // 1. 数据上报包示例
-        demonstrateDataReport(codec);
-
-        // 2. 心跳包示例
-        demonstrateHeartbeat(codec);
-
-        // 3. 复杂数据上报示例
-        demonstrateComplexDataReport(codec);
+    @BeforeEach
+    void setUp() {
+        codec = new IotTcpBinaryDeviceMessageCodec();
     }
 
-    /**
-     * 演示二进制格式数据上报包
-     */
-    private static void demonstrateDataReport(IotTcpBinaryDeviceMessageCodec codec) {
-        log.info("=== 二进制格式数据上报包示例 ===");
+    @Test
+    void testDataReport() {
+        log.info("=== 二进制格式数据上报包测试 ===");
 
         // 创建传感器数据
         Map<String, Object> sensorData = new HashMap<>();
@@ -57,22 +52,23 @@ public class TcpBinaryDataPacketExamples {
 
         // 解码验证
         IotDeviceMessage decoded = codec.decode(packet);
-        log.info("解码后消息ID: {}", decoded.getId());
-        log.info("解码后请求ID: {}", decoded.getRequestId());
+        log.info("解码后消息 ID: {}", decoded.getId());
+        log.info("解码后请求 ID: {}", decoded.getRequestId());
         log.info("解码后方法: {}", decoded.getMethod());
-        log.info("解码后设备ID: {}", decoded.getDeviceId());
-        log.info("解码后服务ID: {}", decoded.getServerId());
-        log.info("解码后上报时间: {}", decoded.getReportTime());
+        log.info("解码后设备 ID: {}", decoded.getDeviceId());
+        log.info("解码后服务 ID: {}", decoded.getServerId());
         log.info("解码后参数: {}", decoded.getParams());
 
-        System.out.println();
+        // 断言验证
+        assertNotNull(decoded.getId());
+        assertEquals("thing.property.post", decoded.getMethod());
+        assertNotNull(decoded.getParams());
+        assertTrue(decoded.getParams() instanceof Map);
     }
 
-    /**
-     * 演示二进制格式心跳包
-     */
-    private static void demonstrateHeartbeat(IotTcpBinaryDeviceMessageCodec codec) {
-        log.info("=== 二进制格式心跳包示例 ===");
+    @Test
+    void testHeartbeat() {
+        log.info("=== 二进制格式心跳包测试 ===");
 
         // 创建心跳消息
         IotDeviceMessage heartbeat = IotDeviceMessage.requestOf("thing.state.online", null);
@@ -85,21 +81,21 @@ public class TcpBinaryDataPacketExamples {
 
         // 解码验证
         IotDeviceMessage decoded = codec.decode(packet);
-        log.info("解码后消息ID: {}", decoded.getId());
-        log.info("解码后请求ID: {}", decoded.getRequestId());
+        log.info("解码后消息 ID: {}", decoded.getId());
+        log.info("解码后请求 ID: {}", decoded.getRequestId());
         log.info("解码后方法: {}", decoded.getMethod());
-        log.info("解码后设备ID: {}", decoded.getDeviceId());
-        log.info("解码后服务ID: {}", decoded.getServerId());
+        log.info("解码后设备 ID: {}", decoded.getDeviceId());
+        log.info("解码后服务 ID: {}", decoded.getServerId());
         log.info("解码后参数: {}", decoded.getParams());
 
-        System.out.println();
+        // 断言验证
+        assertNotNull(decoded.getId());
+        assertEquals("thing.state.online", decoded.getMethod());
     }
 
-    /**
-     * 演示二进制格式复杂数据上报
-     */
-    private static void demonstrateComplexDataReport(IotTcpBinaryDeviceMessageCodec codec) {
-        log.info("=== 二进制格式复杂数据上报示例 ===");
+    @Test
+    void testComplexDataReport() {
+        log.info("=== 二进制格式复杂数据上报测试 ===");
 
         // 创建复杂设备数据
         Map<String, Object> deviceData = new HashMap<>();
@@ -111,7 +107,7 @@ public class TcpBinaryDataPacketExamples {
         environment.put("co2", 420);
         deviceData.put("environment", environment);
 
-        // GPS数据
+        // GPS 数据
         Map<String, Object> location = new HashMap<>();
         location.put("latitude", 39.9042);
         location.put("longitude", 116.4074);
@@ -136,18 +132,48 @@ public class TcpBinaryDataPacketExamples {
 
         // 解码验证
         IotDeviceMessage decoded = codec.decode(packet);
-        log.info("解码后消息ID: {}", decoded.getId());
-        log.info("解码后请求ID: {}", decoded.getRequestId());
+        log.info("解码后消息 ID: {}", decoded.getId());
+        log.info("解码后请求 ID: {}", decoded.getRequestId());
         log.info("解码后方法: {}", decoded.getMethod());
-        log.info("解码后设备ID: {}", decoded.getDeviceId());
-        log.info("解码后服务ID: {}", decoded.getServerId());
+        log.info("解码后设备 ID: {}", decoded.getDeviceId());
+        log.info("解码后服务 ID: {}", decoded.getServerId());
         log.info("解码后参数: {}", decoded.getParams());
 
-        System.out.println();
+        // 断言验证
+        assertNotNull(decoded.getId());
+        assertEquals("thing.property.post", decoded.getMethod());
+        assertNotNull(decoded.getParams());
     }
+
+    @Test
+    void testPacketStructureAnalysis() {
+        log.info("=== 数据包结构分析测试 ===");
+
+        // 创建测试数据
+        Map<String, Object> sensorData = new HashMap<>();
+        sensorData.put("temperature", 25.5);
+        sensorData.put("humidity", 60.2);
+
+        IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.post", sensorData);
+        message.setDeviceId(123456L);
+
+        // 编码
+        byte[] packet = codec.encode(message);
+
+        // 分析数据包结构
+        analyzePacketStructure(packet);
+
+        // 断言验证
+        assertTrue(packet.length >= 8, "数据包长度应该至少为 8 字节");
+    }
+
+    // ==================== 内部辅助方法 ====================
 
     /**
      * 字节数组转十六进制字符串
+     *
+     * @param bytes 字节数组
+     * @return 十六进制字符串
      */
     private static String bytesToHex(byte[] bytes) {
         StringBuilder result = new StringBuilder();
@@ -159,8 +185,10 @@ public class TcpBinaryDataPacketExamples {
 
     /**
      * 演示数据包结构分析
+     *
+     * @param packet 数据包
      */
-    public static void analyzePacketStructure(byte[] packet) {
+    private static void analyzePacketStructure(byte[] packet) {
         if (packet.length < 8) {
             log.error("数据包长度不足");
             return;
@@ -168,30 +196,20 @@ public class TcpBinaryDataPacketExamples {
 
         int index = 0;
 
-        // 解析包头(4字节) - 后续数据长度
+        // 解析包头(4 字节) - 后续数据长度
         int totalLength = ((packet[index] & 0xFF) << 24) |
-                         ((packet[index + 1] & 0xFF) << 16) |
-                         ((packet[index + 2] & 0xFF) << 8) |
-                         (packet[index + 3] & 0xFF);
+                ((packet[index + 1] & 0xFF) << 16) |
+                ((packet[index + 2] & 0xFF) << 8) |
+                (packet[index + 3] & 0xFF);
         index += 4;
         log.info("包头 - 后续数据长度: {} 字节", totalLength);
 
-        // 解析设备地址长度(2字节)
-        int addrLength = ((packet[index] & 0xFF) << 8) | (packet[index + 1] & 0xFF);
-        index += 2;
-        log.info("设备地址长度: {} 字节", addrLength);
-
-        // 解析设备地址
-        String deviceAddr = new String(packet, index, addrLength);
-        index += addrLength;
-        log.info("设备地址: {}", deviceAddr);
-
-        // 解析功能码(2字节)
+        // 解析功能码(2 字节)
         int functionCode = ((packet[index] & 0xFF) << 8) | (packet[index + 1] & 0xFF);
         index += 2;
         log.info("功能码: {} ({})", functionCode, getFunctionCodeName(functionCode));
 
-        // 解析消息序号(2字节)
+        // 解析消息序号(2 字节)
         int messageId = ((packet[index] & 0xFF) << 8) | (packet[index + 1] & 0xFF);
         index += 2;
         log.info("消息序号: {}", messageId);
@@ -205,16 +223,19 @@ public class TcpBinaryDataPacketExamples {
 
     /**
      * 获取功能码名称
+     *
+     * @param code 功能码
+     * @return 功能码名称
      */
     private static String getFunctionCodeName(int code) {
-        switch (code) {
-            case 10: return "设备注册";
-            case 11: return "注册回复";
-            case 20: return "心跳请求";
-            case 21: return "心跳回复";
-            case 30: return "消息上行";
-            case 40: return "消息下行";
-            default: return "未知功能码";
-        }
+        return switch (code) {
+            case 10 -> "设备注册";
+            case 11 -> "注册回复";
+            case 20 -> "心跳请求";
+            case 21 -> "心跳回复";
+            case 30 -> "消息上行";
+            case 40 -> "消息下行";
+            default -> "未知功能码";
+        };
     }
 }

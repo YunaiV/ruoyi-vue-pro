@@ -1,13 +1,14 @@
-# TCP JSON格式协议说明
+# TCP JSON 格式协议说明
 
 ## 1. 协议概述
 
-TCP JSON格式协议采用纯JSON格式进行数据传输，参考了EMQX和HTTP模块的数据格式设计，具有以下优势：
+TCP JSON 格式协议采用纯 JSON 格式进行数据传输，参考了 EMQX 和 HTTP 模块的数据格式设计，具有以下优势：
 
-- **标准化**：使用标准JSON格式，易于解析和处理
+- **标准化**：使用标准 JSON 格式，易于解析和处理
 - **可读性**：人类可读，便于调试和维护
 - **扩展性**：可以轻松添加新字段，向后兼容
-- **统一性**：与HTTP模块保持一致的数据格式
+- **统一性**：与 HTTP 模块保持一致的数据格式
+- **简化性**：相比二进制协议，实现更简单，调试更容易
 
 ## 2. 消息格式
 
@@ -17,29 +18,112 @@ TCP JSON格式协议采用纯JSON格式进行数据传输，参考了EMQX和HTTP
 {
   "id": "消息唯一标识",
   "method": "消息方法",
-  "deviceId": "设备ID",
+  "deviceId": 设备ID,
   "params": {
     // 消息参数
   },
-  "timestamp": 时间戳
+  "timestamp": 时间戳,
+  "code": 响应码,
+  "message": "响应消息"
 }
 ```
 
 ### 2.2 字段说明
 
-| 字段名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| id | String | 是 | 消息唯一标识，UUID格式 |
-| method | String | 是 | 消息方法，如 thing.property.post |
-| deviceId | Long | 是 | 设备ID |
-| params | Object | 否 | 消息参数，具体内容根据method而定 |
-| timestamp | Long | 是 | 时间戳（毫秒） |
-| code | Integer | 否 | 响应码（下行消息使用） |
-| message | String | 否 | 响应消息（下行消息使用） |
+| 字段名       | 类型      | 必填 | 说明                                  |
+|-----------|---------|----|-------------------------------------|
+| id        | String  | 是  | 消息唯一标识，如果为空会自动生成 UUID               |
+| method    | String  | 是  | 消息方法，如 `auth`、`thing.property.post` |
+| deviceId  | Long    | 否  | 设备 ID                               |
+| params    | Object  | 否  | 消息参数，具体内容根据 method 而定               |
+| timestamp | Long    | 是  | 时间戳（毫秒），自动生成                        |
+| code      | Integer | 否  | 响应码（下行消息使用）                         |
+| message   | String  | 否  | 响应消息（下行消息使用）                        |
 
 ## 3. 消息类型
 
-### 3.1 数据上报 (thing.property.post)
+### 3.1 设备认证 (auth)
+
+设备连接后首先需要进行认证，认证成功后才能进行其他操作。
+
+#### 3.1.1 认证请求格式
+
+**示例：**
+
+```json
+{
+  "id": "auth_8ac6a1db91e64aa9996143fdbac2cbfe",
+  "method": "auth",
+  "params": {
+    "clientId": "device_001",
+    "username": "productKey_deviceName",
+    "password": "设备密码"
+  },
+  "timestamp": 1753111026437
+}
+```
+
+**字段说明：**
+| 字段名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| clientId | String | 是 | 客户端唯一标识 |
+| username | String | 是 | 设备用户名，格式为 `productKey_deviceName` |
+| password | String | 是 | 设备密码 |
+
+#### 3.1.2 认证响应格式
+
+**认证成功响应：**
+
+```json
+{
+  "id": "auth_response_8ac6a1db91e64aa9996143fdbac2cbfe",
+  "requestId": "auth_8ac6a1db91e64aa9996143fdbac2cbfe",
+  "method": "auth",
+  "data": {
+    "success": true,
+    "message": "认证成功"
+  },
+  "code": 0,
+  "msg": "认证成功"
+}
+```
+
+**认证失败响应：**
+
+```json
+{
+  "id": "auth_response_8ac6a1db91e64aa9996143fdbac2cbfe",
+  "requestId": "auth_8ac6a1db91e64aa9996143fdbac2cbfe",
+  "method": "auth",
+  "data": {
+    "success": false,
+    "message": "认证失败：用户名或密码错误"
+  },
+  "code": 401,
+  "msg": "认证失败：用户名或密码错误"
+}
+```
+
+#### 3.1.3 认证流程
+
+1. **设备连接** → 建立 TCP 连接
+2. **发送认证请求** → 发送包含认证信息的 JSON 消息
+3. **服务器验证** → 验证 clientId、username、password
+4. **生成 Token** → 认证成功后生成 JWT Token（内部使用）
+5. **设备上线** → 发送设备上线消息到消息总线
+6. **返回响应** → 返回认证结果
+7. **会话注册** → 注册设备会话，允许后续业务操作
+
+#### 3.1.4 认证错误码
+
+| 错误码 | 说明    | 处理建议         |
+|-----|-------|--------------|
+| 401 | 认证失败  | 检查用户名、密码是否正确 |
+| 400 | 参数错误  | 检查认证参数是否完整   |
+| 404 | 设备不存在 | 检查设备是否已注册    |
+| 500 | 服务器错误 | 联系管理员        |
+
+### 3.2 数据上报 (thing.property.post)
 
 设备向服务器上报属性数据。
 
@@ -48,7 +132,7 @@ TCP JSON格式协议采用纯JSON格式进行数据传输，参考了EMQX和HTTP
 {
   "id": "8ac6a1db91e64aa9996143fdbac2cbfe",
   "method": "thing.property.post",
-  "deviceId": 123456,
+  "deviceId": 8,
   "params": {
     "temperature": 25.5,
     "humidity": 60.2,
@@ -59,7 +143,7 @@ TCP JSON格式协议采用纯JSON格式进行数据传输，参考了EMQX和HTTP
 }
 ```
 
-### 3.2 心跳 (thing.state.online)
+### 3.3 心跳 (thing.state.update)
 
 设备向服务器发送心跳保活。
 
@@ -67,220 +151,161 @@ TCP JSON格式协议采用纯JSON格式进行数据传输，参考了EMQX和HTTP
 ```json
 {
   "id": "7db8c4e6408b40f8b2549ddd94f6bb02",
-  "method": "thing.state.online",
-  "deviceId": 123456,
+  "method": "thing.state.update",
+  "deviceId": 8,
+  "params": {
+    "state": "1"
+  },
   "timestamp": 1753111026467
 }
 ```
 
-### 3.3 事件上报 (thing.event.post)
+### 3.4 消息方法常量
 
-设备向服务器上报事件信息。
+支持的消息方法：
 
-**示例：**
-```json
-{
-  "id": "9e7d72731b854916b1baa5088bd6a907",
-  "method": "thing.event.post",
-  "deviceId": 123456,
-  "params": {
-    "eventType": "alarm",
-    "level": "warning",
-    "description": "温度过高",
-    "value": 45.8
-  },
-  "timestamp": 1753111026468
-}
-```
+- `auth` - 设备认证
+- `thing.property.post` - 数据上报
+- `thing.state.update` - 心跳
 
-### 3.4 属性设置 (thing.property.set)
+## 4. 协议特点
 
-服务器向设备下发属性设置指令。
+### 4.1 优势
 
-**示例：**
-```json
-{
-  "id": "cmd_001",
-  "method": "thing.property.set",
-  "deviceId": 123456,
-  "params": {
-    "targetTemperature": 22.0,
-    "mode": "auto"
-  },
-  "timestamp": 1753111026469
-}
-```
+- **简单易用**：纯 JSON 格式，无需复杂的二进制解析
+- **调试友好**：可以直接查看消息内容
+- **扩展性强**：可以轻松添加新字段
+- **标准化**：与 EMQX 等主流平台格式兼容
+- **错误处理**：提供详细的错误信息和异常处理
+- **安全性**：支持设备认证机制
 
-### 3.5 服务调用 (thing.service.invoke)
+### 4.2 与二进制协议对比
 
-服务器向设备调用服务。
+| 特性    | 二进制协议 | JSON 协议  |
+|-------|-------|----------|
+| 可读性   | 差     | 优秀       |
+| 调试难度  | 高     | 低        |
+| 扩展性   | 差     | 优秀       |
+| 解析复杂度 | 高     | 低        |
+| 数据大小  | 小     | 稍大       |
+| 标准化程度 | 低     | 高        |
+| 实现复杂度 | 高     | 低        |
+| 安全性   | 一般    | 优秀（支持认证） |
 
-**示例：**
-```json
-{
-  "id": "service_001",
-  "method": "thing.service.invoke",
-  "deviceId": 123456,
-  "params": {
-    "service": "restart",
-    "args": {
-      "delay": 5
-    }
-  },
-  "timestamp": 1753111026470
-}
-```
+### 4.3 适用场景
 
-## 4. 复杂数据示例
-
-### 4.1 多传感器综合数据
-
-```json
-{
-  "id": "complex_001",
-  "method": "thing.property.post",
-  "deviceId": 789012,
-  "params": {
-    "environment": {
-      "temperature": 23.8,
-      "humidity": 55.0,
-      "co2": 420,
-      "pm25": 35
-    },
-    "location": {
-      "latitude": 39.9042,
-      "longitude": 116.4074,
-      "altitude": 43.5,
-      "speed": 0.0
-    },
-    "status": {
-      "battery": 78,
-      "signal": -65,
-      "online": true,
-      "version": "1.2.3"
-    }
-  },
-  "timestamp": 1753111026471
-}
-```
-
-## 5. 与EMQX格式的兼容性
-
-本协议设计参考了EMQX的消息格式，具有良好的兼容性：
-
-### 5.1 EMQX标准格式
-
-```json
-{
-  "id": "msg_001",
-  "method": "thing.property.post",
-  "deviceId": 123456,
-  "params": {
-    "temperature": 25.5,
-    "humidity": 60.2
-  },
-  "timestamp": 1642781234567
-}
-```
-
-### 5.2 兼容性说明
-
-- ✅ **字段名称**：与EMQX保持一致
-- ✅ **数据类型**：完全兼容
-- ✅ **消息结构**：结构相同
-- ✅ **扩展字段**：支持自定义扩展
-
-## 6. 使用示例
-
-### 6.1 Java编码示例
-
-```java
-// 创建编解码器
-IotTcpJsonDeviceMessageCodec codec = new IotTcpJsonDeviceMessageCodec();
-
-// 创建数据上报消息
-Map<String, Object> sensorData = Map.of(
-    "temperature", 25.5,
-    "humidity", 60.2
-);
-IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.post", sensorData);
-message.setDeviceId(123456L);
-
-// 编码为字节数组
-byte[] jsonBytes = codec.encode(message);
-
-// 解码
-IotDeviceMessage decoded = codec.decode(jsonBytes);
-```
-
-### 6.2 便捷方法示例
-
-```java
-// 快速编码数据上报
-byte[] dataPacket = codec.encodeDataReport(sensorData, 123456L, "product_key", "device_name");
-
-// 快速编码心跳
-byte[] heartbeatPacket = codec.encodeHeartbeat(123456L, "product_key", "device_name");
-
-// 快速编码事件
-byte[] eventPacket = codec.encodeEventReport(eventData, 123456L, "product_key", "device_name");
-```
-
-## 7. 协议优势
-
-### 7.1 与原TCP二进制协议对比
-
-| 特性 | 二进制协议 | JSON协议 |
-|------|------------|----------|
-| 可读性 | 差 | 优秀 |
-| 调试难度 | 高 | 低 |
-| 扩展性 | 差 | 优秀 |
-| 解析复杂度 | 高 | 低 |
-| 数据大小 | 小 | 稍大 |
-| 标准化程度 | 低 | 高 |
-
-### 7.2 适用场景
-
-- ✅ **开发调试**：JSON格式便于查看和调试
-- ✅ **快速集成**：标准JSON格式，集成简单
+- ✅ **开发调试**：JSON 格式便于查看和调试
+- ✅ **快速集成**：标准 JSON 格式，集成简单
 - ✅ **协议扩展**：可以轻松添加新字段
-- ✅ **多语言支持**：JSON格式支持所有主流语言
-- ✅ **云平台对接**：与主流IoT云平台格式兼容
+- ✅ **多语言支持**：JSON 格式支持所有主流语言
+- ✅ **云平台对接**：与主流 IoT 云平台格式兼容
+- ✅ **安全要求**：支持设备认证和访问控制
 
-## 8. 最佳实践
+## 5. 最佳实践
 
-### 8.1 消息设计建议
+### 5.1 认证最佳实践
+
+1. **连接即认证**：设备连接后立即进行认证
+2. **重连机制**：连接断开后重新认证
+3. **错误重试**：认证失败时适当重试
+4. **安全传输**：使用 TLS 加密传输敏感信息
+
+### 5.2 消息设计
 
 1. **保持简洁**：避免过深的嵌套结构
 2. **字段命名**：使用驼峰命名法，保持一致性
 3. **数据类型**：使用合适的数据类型，避免字符串表示数字
 4. **时间戳**：统一使用毫秒级时间戳
 
-### 8.2 性能优化
+### 5.3 错误处理
 
-1. **批量上报**：可以在params中包含多个数据点
-2. **压缩传输**：对于大数据量可以考虑gzip压缩
-3. **缓存机制**：客户端可以缓存消息，批量发送
+1. **参数验证**：确保必要字段存在且有效
+2. **异常捕获**：正确处理编码解码异常
+3. **日志记录**：记录详细的调试信息
+4. **认证失败**：认证失败时及时关闭连接
 
-### 8.3 错误处理
+### 5.4 性能优化
 
-1. **格式验证**：确保JSON格式正确
-2. **字段检查**：验证必填字段是否存在
-3. **异常处理**：提供详细的错误信息
+1. **批量上报**：可以在 params 中包含多个数据点
+2. **连接复用**：保持 TCP 连接，避免频繁建立连接
+3. **消息缓存**：客户端可以缓存消息，批量发送
+4. **心跳间隔**：合理设置心跳间隔，避免过于频繁
 
-## 9. 迁移指南
+## 6. 配置说明
 
-### 9.1 从二进制协议迁移
+### 6.1 启用 JSON 协议
 
-1. **保持兼容**：可以同时支持两种协议
-2. **逐步迁移**：按设备类型逐步迁移
-3. **测试验证**：充分测试新协议的稳定性
+在配置文件中设置：
 
-### 9.2 配置变更
-
-```java
-// 在设备配置中指定编解码器类型
-device.setCodecType("TCP_JSON");
+```yaml
+yudao:
+  iot:
+    gateway:
+      protocol:
+        tcp:
+          enabled: true
+          port: 8091
+          default-protocol: "JSON"  # 使用 JSON 协议
 ```
 
-这样就完成了TCP协议向JSON格式的升级，提供了更好的可读性、扩展性和兼容性。
+### 6.2 认证配置
+
+```yaml
+yudao:
+  iot:
+    gateway:
+      token:
+        secret: "your-secret-key"  # JWT 密钥
+        expiration: "24h"          # Token 过期时间
+```
+
+## 7. 调试和监控
+
+### 7.1 日志级别
+
+```yaml
+logging:
+  level:
+    cn.iocoder.yudao.module.iot.gateway.protocol.tcp: DEBUG
+```
+
+### 7.2 调试信息
+
+编解码器会输出详细的调试日志：
+
+- 认证过程：显示认证请求和响应
+- 编码成功：显示方法、长度、内容
+- 解码过程：显示原始数据、解析结果
+- 错误信息：详细的异常堆栈
+
+### 7.3 监控指标
+
+- 认证成功率
+- 消息处理数量
+- 编解码成功率
+- 处理延迟
+- 错误率
+- 在线设备数量
+
+## 8. 安全考虑
+
+### 8.1 认证安全
+
+1. **密码强度**：使用强密码策略
+2. **Token 过期**：设置合理的 Token 过期时间
+3. **连接限制**：限制单个设备的并发连接数
+4. **IP 白名单**：可选的 IP 访问控制
+
+### 8.2 传输安全
+
+1. **TLS 加密**：使用 TLS 1.2+ 加密传输
+2. **证书验证**：验证服务器证书
+3. **密钥管理**：安全存储和管理密钥
+
+### 8.3 数据安全
+
+1. **敏感信息**：不在日志中记录密码等敏感信息
+2. **数据验证**：验证所有输入数据
+3. **访问控制**：基于 Token 的访问控制
+
+这样就完成了 TCP JSON 格式协议的完整说明，包括认证流程的详细说明，与实际代码实现完全一致。

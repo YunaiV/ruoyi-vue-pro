@@ -1,20 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router;
 
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpSessionManager;
+import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * IoT 网关 TCP 下行消息处理器
- * <p>
- * 负责处理从业务系统发送到设备的下行消息，包括：
- * 1. 属性设置
- * 2. 服务调用
- * 3. 属性获取
- * 4. 配置下发
- * 5. OTA 升级
- * <p>
- * 注意：由于移除了连接管理器，此处理器主要负责消息的编码和日志记录
  *
  * @author 芋道源码
  */
@@ -23,12 +17,15 @@ public class IotTcpDownstreamHandler {
 
     private final IotDeviceMessageService messageService;
 
-    // TODO @haohao：代码没提交全，有报错。
-//    private final IotTcpDeviceMessageCodec codec;
+    private final IotDeviceService deviceService;
 
-    public IotTcpDownstreamHandler(IotDeviceMessageService messageService) {
+    private final IotTcpSessionManager sessionManager;
+
+    public IotTcpDownstreamHandler(IotDeviceMessageService messageService,
+                                   IotDeviceService deviceService, IotTcpSessionManager sessionManager) {
         this.messageService = messageService;
-//        this.codec = new IotTcpDeviceMessageCodec();
+        this.deviceService = deviceService;
+        this.sessionManager = sessionManager;
     }
 
     /**
@@ -38,23 +35,38 @@ public class IotTcpDownstreamHandler {
      */
     public void handle(IotDeviceMessage message) {
         try {
-            log.info("[handle][处理下行消息] 设备ID: {}, 方法: {}, 消息ID: {}",
+            log.info("[handle][处理下行消息] 设备 ID: {}, 方法: {}, 消息 ID: {}",
                     message.getDeviceId(), message.getMethod(), message.getId());
 
-            // 编码消息用于日志记录和验证
-            byte[] encodedMessage = null;
-//                    codec.encode(message);
-            log.debug("[handle][消息编码成功] 设备ID: {}, 编码后长度: {} 字节",
-                    message.getDeviceId(), encodedMessage.length);
+            // 1. 获取设备信息
+            IotDeviceRespDTO device = deviceService.getDeviceFromCache(message.getDeviceId());
+            if (device == null) {
+                log.error("[handle][设备不存在] 设备 ID: {}", message.getDeviceId());
+                return;
+            }
 
-            // 记录下行消息处理
-            log.info("[handle][下行消息处理完成] 设备ID: {}, 方法: {}, 消息内容: {}",
-                    message.getDeviceId(), message.getMethod(), message.getParams());
+            // 2. 检查设备是否在线
+            if (!sessionManager.isDeviceOnline(message.getDeviceId())) {
+                log.warn("[handle][设备不在线] 设备 ID: {}", message.getDeviceId());
+                return;
+            }
+
+            // 3. 编码消息
+            byte[] bytes = messageService.encodeDeviceMessage(message, device.getCodecType());
+
+            // 4. 发送消息到设备
+            boolean success = sessionManager.sendToDevice(message.getDeviceId(), bytes);
+            if (success) {
+                log.info("[handle][下行消息发送成功] 设备 ID: {}, 方法: {}, 消息 ID: {}, 数据长度: {} 字节",
+                        message.getDeviceId(), message.getMethod(), message.getId(), bytes.length);
+            } else {
+                log.error("[handle][下行消息发送失败] 设备 ID: {}, 方法: {}, 消息 ID: {}",
+                        message.getDeviceId(), message.getMethod(), message.getId());
+            }
 
         } catch (Exception e) {
-            log.error("[handle][处理下行消息失败] 设备ID: {}, 方法: {}, 消息内容: {}",
+            log.error("[handle][处理下行消息失败] 设备 ID: {}, 方法: {}, 消息内容: {}",
                     message.getDeviceId(), message.getMethod(), message.getParams(), e);
         }
     }
-
 }

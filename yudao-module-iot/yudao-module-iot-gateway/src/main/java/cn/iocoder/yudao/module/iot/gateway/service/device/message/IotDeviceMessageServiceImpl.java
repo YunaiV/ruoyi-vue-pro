@@ -62,6 +62,19 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     }
 
     @Override
+    public byte[] encodeDeviceMessage(IotDeviceMessage message,
+                                      String codecType) {
+        // 1. 获取编解码器
+        IotDeviceMessageCodec codec = codes.get(codecType);
+        if (codec == null) {
+            throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", codecType));
+        }
+
+        // 2. 编码消息
+        return codec.encode(message);
+    }
+
+    @Override
     public IotDeviceMessage decodeDeviceMessage(byte[] bytes,
                                                 String productKey, String deviceName) {
         // 1.1 获取设备信息
@@ -73,6 +86,18 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         IotDeviceMessageCodec codec = codes.get(device.getCodecType());
         if (codec == null) {
             throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", device.getCodecType()));
+        }
+
+        // 2. 解码消息
+        return codec.decode(bytes);
+    }
+
+    @Override
+    public IotDeviceMessage decodeDeviceMessage(byte[] bytes, String codecType) {
+        // 1. 获取编解码器
+        IotDeviceMessageCodec codec = codes.get(codecType);
+        if (codec == null) {
+            throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", codecType));
         }
 
         // 2. 解码消息
