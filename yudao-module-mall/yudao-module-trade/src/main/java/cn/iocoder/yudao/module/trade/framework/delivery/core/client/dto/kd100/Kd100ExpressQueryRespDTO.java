@@ -59,7 +59,6 @@ public class Kd100ExpressQueryRespDTO {
         /**
          * 轨迹发生时间
          */
-        @JsonProperty("time")
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         private LocalDateTime time;
