@@ -85,10 +85,15 @@ public class BpmCallActivityListener implements ExecutionListener {
             // 2.2 使用表单值，并兜底字符串转 Long 失败时使用主流程发起人
             try {
                 FlowableUtils.setAuthenticatedUserId(Long.parseLong(formFieldValue));
-            } catch (Exception e) {
-                log.error("[notify][监听器：{}，子流程监听器设置流程的发起人字符串转 Long 失败，字符串：{}]",
-                        DELEGATE_EXPRESSION, formFieldValue);
-                FlowableUtils.setAuthenticatedUserId(Long.parseLong(processInstance.getStartUserId()));
+            } catch (NumberFormatException ex) {
+                try {
+                    List<Long> formFieldValues = JsonUtils.parseArray(formFieldValue, Long.class);
+                    FlowableUtils.setAuthenticatedUserId(formFieldValues.get(0));
+                } catch (Exception e) {
+                    log.error("[notify][监听器：{}，子流程监听器设置流程的发起人字符串转 Long 失败，字符串：{}]",
+                            DELEGATE_EXPRESSION, formFieldValue);
+                    FlowableUtils.setAuthenticatedUserId(Long.parseLong(processInstance.getStartUserId()));
+                }
             }
         }
     }

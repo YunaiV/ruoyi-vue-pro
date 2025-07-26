@@ -18,10 +18,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.CallActivity;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.*;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -132,7 +129,7 @@ public class BpmTaskCandidateInvoker {
                                               Long startUserId, String processDefinitionId, Map<String, Object> processVariables) {
         // 如果是 CallActivity 子流程，不进行计算候选人
         FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, activityId);
-        if (flowElement instanceof CallActivity) {
+        if (flowElement instanceof CallActivity || flowElement instanceof SubProcess) {
             return new HashSet<>();
         }
         // 审批类型非人工审核时，不进行计算候选人。原因是：后续会自动通过、不通过

@@ -16,6 +16,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @Component
+@Deprecated // 仅仅是表达式的示例，建议使用 BpmTaskCandidateStartUserStrategy 替代
 public class BpmTaskAssignStartUserExpression {
 
     @Resource

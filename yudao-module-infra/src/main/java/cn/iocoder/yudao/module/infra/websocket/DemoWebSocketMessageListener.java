@@ -6,10 +6,9 @@ import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.util.WebSocketFrameworkUtils;
 import cn.iocoder.yudao.module.infra.websocket.message.DemoReceiveMessage;
 import cn.iocoder.yudao.module.infra.websocket.message.DemoSendMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
-
-import javax.annotation.Resource;
 
 /**
  * WebSocket 示例：单发消息
@@ -19,7 +18,8 @@ import javax.annotation.Resource;
 @Component
 public class DemoWebSocketMessageListener implements WebSocketMessageListener<DemoSendMessage> {
 
-    @Resource
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
+    @Autowired(required = false) // 由于 yudao.websocket.enable 配置项，可以关闭 WebSocket 的功能，所以这里只能不强制注入
     private WebSocketMessageSender webSocketMessageSender;
 
     @Override

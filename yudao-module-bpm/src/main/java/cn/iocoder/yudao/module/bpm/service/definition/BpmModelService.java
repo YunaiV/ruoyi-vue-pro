@@ -25,6 +25,14 @@ public interface BpmModelService {
     List<Model> getModelList(String name);
 
     /**
+     * 根据分类编码获得流程模型数量
+     *
+     * @param category 分类编码
+     * @return 流程模型数量
+     */
+    Long getModelCountByCategory(String category);
+
+    /**
      * 创建流程模型
      *
      * @param modelVO 创建信息

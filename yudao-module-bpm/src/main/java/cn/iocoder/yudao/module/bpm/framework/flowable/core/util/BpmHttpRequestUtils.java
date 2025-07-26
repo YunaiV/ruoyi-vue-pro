@@ -108,7 +108,9 @@ public class BpmHttpRequestUtils {
         Map<String, Object> processVariables = processInstance.getProcessVariables();
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         addHttpRequestParam(body, bodySettings, processVariables);
-        body.add("processInstanceId", processInstance.getId());
+        if (!body.containsKey("processInstanceId")) { // 避免重复添加
+            body.add("processInstanceId", processInstance.getId());
+        }
         return body;
     }
 

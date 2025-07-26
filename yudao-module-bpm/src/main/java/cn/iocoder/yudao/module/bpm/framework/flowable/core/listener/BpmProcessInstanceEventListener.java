@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import com.google.common.collect.ImmutableSet;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
@@ -37,18 +38,26 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     @Override
     protected void processCreated(FlowableEngineEntityEvent event) {
-        processInstanceService.processProcessInstanceCreated((ProcessInstance)event.getEntity());
+        ProcessInstance processInstance = (ProcessInstance) event.getEntity();
+        FlowableUtils.execute(processInstance.getTenantId(),
+                () -> processInstanceService.processProcessInstanceCreated(processInstance));
     }
 
     @Override
     protected void processCompleted(FlowableEngineEntityEvent event) {
-        processInstanceService.processProcessInstanceCompleted((ProcessInstance)event.getEntity());
+        ProcessInstance processInstance = (ProcessInstance) event.getEntity();
+        FlowableUtils.execute(processInstance.getTenantId(),
+                () -> processInstanceService.processProcessInstanceCompleted(processInstance));
     }
 
-    @Override // 特殊情况：当跳转到 EndEvent 流程实例未结束, 会执行 deleteProcessInstance 方法
+    @Override
     protected void processCancelled(FlowableCancelledEvent event) {
+        // 特殊情况：当跳转到 EndEvent 流程实例未结束, 会执行 deleteProcessInstance 方法
         ProcessInstance processInstance = processInstanceService.getProcessInstance(event.getProcessInstanceId());
-        processInstanceService.processProcessInstanceCompleted(processInstance);
+        if (processInstance != null) {
+            FlowableUtils.execute(processInstance.getTenantId(),
+                    () -> processInstanceService.processProcessInstanceCompleted(processInstance));
+        }
     }
 
 }
