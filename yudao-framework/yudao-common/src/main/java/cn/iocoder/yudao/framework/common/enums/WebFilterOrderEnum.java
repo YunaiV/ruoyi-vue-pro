@@ -13,6 +13,8 @@ public interface WebFilterOrderEnum {
 
     int TRACE_FILTER = CORS_FILTER + 1;
 
+    int ENCRYPT_FILTER = CORS_FILTER + 2;
+
     int REQUEST_BODY_CACHE_FILTER = Integer.MIN_VALUE + 500;
 
     // OrderedRequestContextFilter 默认为 -105，用于国际化上下文等等
