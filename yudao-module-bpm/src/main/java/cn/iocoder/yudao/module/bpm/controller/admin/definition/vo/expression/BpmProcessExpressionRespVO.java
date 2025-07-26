@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.expression;
 
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
