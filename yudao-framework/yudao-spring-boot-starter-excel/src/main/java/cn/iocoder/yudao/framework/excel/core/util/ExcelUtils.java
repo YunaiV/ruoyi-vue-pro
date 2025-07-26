@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.excel.core.util;
 
-import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import cn.iocoder.yudao.framework.excel.core.handler.SelectSheetWriteHandler;
-import cn.idev.excel.EasyExcel;
+import cn.idev.excel.FastExcelFactory;
 import cn.idev.excel.converters.longconverter.LongStringConverter;
-import cn.idev.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
+import cn.iocoder.yudao.framework.excel.core.handler.ColumnWidthMatchStyleStrategy;
+import cn.iocoder.yudao.framework.excel.core.handler.SelectSheetWriteHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,9 +32,9 @@ public class ExcelUtils {
     public static <T> void write(HttpServletResponse response, String filename, String sheetName,
                                  Class<T> head, List<T> data) throws IOException {
         // 输出 Excel
-        EasyExcel.write(response.getOutputStream(), head)
+        FastExcelFactory.write(response.getOutputStream(), head)
                 .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
-                .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()) // 基于 column 长度，自动适配。最大 255 宽度
+                .registerWriteHandler(new ColumnWidthMatchStyleStrategy()) // 基于 column 长度，自动适配。最大 255 宽度
                 .registerWriteHandler(new SelectSheetWriteHandler(head)) // 基于固定 sheet 实现下拉框
                 .registerConverter(new LongStringConverter()) // 避免 Long 类型丢失精度
                 .sheet(sheetName).doWrite(data);
@@ -44,7 +44,7 @@ public class ExcelUtils {
     }
 
     public static <T> List<T> read(MultipartFile file, Class<T> head) throws IOException {
-        return EasyExcel.read(file.getInputStream(), head, null)
+        return FastExcelFactory.read(file.getInputStream(), head, null)
                 .autoCloseStream(false)  // 不要自动关闭，交给 Servlet 自己处理
                 .doReadAllSync();
     }
