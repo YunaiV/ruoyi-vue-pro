@@ -138,6 +138,7 @@ watch(
   () => props.${subJoinColumn.javaField},
   (val: number) => {
     if (!val) {
+      list.value = [] // 清空列表
       return
     }
     queryParams.${subJoinColumn.javaField} = val

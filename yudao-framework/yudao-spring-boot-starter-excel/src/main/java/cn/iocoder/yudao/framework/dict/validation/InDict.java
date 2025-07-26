@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 public @interface InDict {
 
     /**
-     * 数据字典type
+     * 数据字典 type
      */
     String type();
 

@@ -353,6 +353,7 @@ const handleDelete = async (id: number) => {
     // 发起删除
     await ${simpleClassName}Api.delete${simpleClassName}(id)
     message.success(t('common.delSuccess'))
+    currentRow.value = {}
     // 刷新列表
     await getList()
   } catch {}

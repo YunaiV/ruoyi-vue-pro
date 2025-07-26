@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.dict.validation;
 
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -24,10 +24,11 @@ public class InDictValidator implements ConstraintValidator<InDict, Object> {
         }
         // 校验通过
         final List<String> values = DictFrameworkUtils.getDictDataValueList(dictType);
-        boolean match = values.stream().anyMatch(v -> v.equalsIgnoreCase(value.toString()));
+        boolean match = values.stream().anyMatch(v -> StrUtil.equalsIgnoreCase(v, value.toString()));
         if (match) {
             return true;
         }
+
         // 校验不通过，自定义提示语句
         context.disableDefaultConstraintViolation(); // 禁用默认的 message 的值
         context.buildConstraintViolationWithTemplate(
