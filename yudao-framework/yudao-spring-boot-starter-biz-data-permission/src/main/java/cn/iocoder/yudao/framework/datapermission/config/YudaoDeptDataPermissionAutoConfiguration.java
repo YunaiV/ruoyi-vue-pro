@@ -18,7 +18,7 @@ import java.util.List;
  */
 @AutoConfiguration
 @ConditionalOnClass(LoginUser.class)
-@ConditionalOnBean(value = {PermissionCommonApi.class, DeptDataPermissionRuleCustomizer.class})
+@ConditionalOnBean(value = {DeptDataPermissionRuleCustomizer.class})
 public class YudaoDeptDataPermissionAutoConfiguration {
 
     @Bean
