@@ -23,7 +23,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
      * 1. 排除 Spring Boot Admin 相关请求，避免客户端连接中断导致的异常。
      *    例如说：<a href="https://github.com/YunaiV/ruoyi-vue-pro/issues/795">795 ISSUE</a>
      */
-    private static final String[] IGNORE_URIS = {"/admin", "/actuator"};
+    private static final String[] IGNORE_URIS = {"/admin/", "/actuator/"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,7 +35,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         // 1. 校验是否为排除的 URL
         String requestURI = request.getRequestURI();
-        if (StrUtil.containsAny(requestURI, IGNORE_URIS)) {
+        if (StrUtil.startWithAny(requestURI, IGNORE_URIS)) {
             return true;
         }
 
