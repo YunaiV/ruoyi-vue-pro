@@ -92,6 +92,7 @@
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
+            <optional>true</optional>
         </dependency>
 
         <!-- 三方云服务相关 -->

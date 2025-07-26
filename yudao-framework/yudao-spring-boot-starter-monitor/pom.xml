@@ -71,7 +71,8 @@
 
         <dependency>
             <groupId>de.codecentric</groupId>
-            <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
+            <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Client 客户端 -->
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
