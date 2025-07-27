@@ -3,14 +3,13 @@ package cn.iocoder.yudao.module.pay.convert.order;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
-import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -68,7 +67,5 @@ public interface PayOrderConvert {
 
     @Mapping(source = "order.status", target = "status")
     PayOrderSubmitRespVO convert(PayOrderDO order, cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO respDTO);
-
-    AppPayOrderSubmitRespVO convert3(PayOrderSubmitRespVO bean);
 
 }

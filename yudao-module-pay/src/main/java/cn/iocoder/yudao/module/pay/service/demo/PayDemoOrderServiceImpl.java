@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.pay.service.demo;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -90,6 +91,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 2.1 创建支付单
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setUserIp(getClientIP()) // 支付应用
+                .setUserId(userId).setUserType(UserTypeEnum.ADMIN.getValue()) // 用户信息
                 .setMerchantOrderId(demoOrder.getId().toString()) // 业务的订单编号
                 .setSubject(spuName).setBody("").setPrice(price) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
@@ -189,6 +191,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 2.2 创建退款单
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setUserIp(getClientIP()) // 支付应用
+                .setUserId(order.getUserId()).setUserType(UserTypeEnum.ADMIN.getValue()) // 用户信息
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 .setMerchantRefundId(refundId)
                 .setReason("想退钱").setPrice(order.getPrice()));// 价格信息
