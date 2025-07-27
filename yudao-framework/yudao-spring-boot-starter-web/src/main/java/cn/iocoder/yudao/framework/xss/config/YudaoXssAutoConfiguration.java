@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.xss.core.clean.JsoupXssCleaner;
 import cn.iocoder.yudao.framework.xss.core.clean.XssCleaner;
 import cn.iocoder.yudao.framework.xss.core.filter.XssFilter;
 import cn.iocoder.yudao.framework.xss.core.json.XssStringJsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,13 +41,13 @@ public class YudaoXssAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     @ConditionalOnMissingBean(name = "xssJacksonCustomizer")
-    @ConditionalOnBean(ObjectMapper.class)
     @ConditionalOnProperty(value = "yudao.xss.enable", havingValue = "true")
     public Jackson2ObjectMapperBuilderCustomizer xssJacksonCustomizer(XssProperties properties,
                                                                       PathMatcher pathMatcher,
                                                                       XssCleaner xssCleaner) {
         // 在反序列化时进行 xss 过滤，可以替换使用 XssStringJsonSerializer，在序列化时进行处理
-        return builder -> builder.deserializerByType(String.class, new XssStringJsonDeserializer(properties, pathMatcher, xssCleaner));
+        return builder ->
+                builder.deserializerByType(String.class, new XssStringJsonDeserializer(properties, pathMatcher, xssCleaner));
     }
 
     /**
