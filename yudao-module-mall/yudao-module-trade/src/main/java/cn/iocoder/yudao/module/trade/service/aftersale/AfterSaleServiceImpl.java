@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
@@ -362,6 +363,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     private void createPayRefund(String userIp, AfterSaleDO afterSale) {
         // 创建退款单
         PayRefundCreateReqDTO createReqDTO = AfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties)
+                .setUserId(afterSale.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
                 .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));
         Long payRefundId = payRefundApi.createRefund(createReqDTO);
 

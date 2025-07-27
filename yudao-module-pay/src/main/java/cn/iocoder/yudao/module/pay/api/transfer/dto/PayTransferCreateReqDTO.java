@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.pay.api.transfer.dto;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,22 +29,22 @@ public class PayTransferCreateReqDTO {
     private String appKey;
 
     /**
-     * 转账渠道
-     */
-    @NotEmpty(message = "转账渠道不能为空")
-    private String channelCode;
-
-    /**
-     * 转账渠道的额外参数
-     */
-    private Map<String, String> channelExtras;
-
-    /**
      * 用户 IP
      */
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
+    /**
+     * 用户编号
+     */
+    private Long userId;
+    /**
+     * 用户类型
+     */
+    @InEnum(UserTypeEnum.class)
+    private Integer userType;
+
+    // ========== 商户相关字段 ==========
     /**
      * 商户转账单编号
      */
@@ -74,6 +76,17 @@ public class PayTransferCreateReqDTO {
      * 收款人姓名
      */
     private String userName;
+
+    /**
+     * 转账渠道
+     */
+    @NotEmpty(message = "转账渠道不能为空")
+    private String channelCode;
+
+    /**
+     * 转账渠道的额外参数
+     */
+    private Map<String, String> channelExtras;
 
     /**
      * 【微信】现金营销场景

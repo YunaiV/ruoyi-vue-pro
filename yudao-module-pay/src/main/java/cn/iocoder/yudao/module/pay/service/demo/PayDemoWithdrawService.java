@@ -26,9 +26,10 @@ public interface PayDemoWithdrawService {
      * 提现单转账
      *
      * @param id 提现单编号
+     * @param userId 用户编号
      * @return 转账编号
      */
-    Long transferDemoWithdraw(Long id);
+    Long transferDemoWithdraw(Long id, Long userId);
 
     /**
      * 获得示例提现单分页

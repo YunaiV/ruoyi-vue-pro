@@ -15,6 +15,13 @@ import java.util.concurrent.Executors;
 public class CacheUtils {
 
     /**
+     * 异步刷新的 LoadingCache 最大缓存数量
+     *
+     * @see <a href="">本地缓存 CacheUtils 工具类建议</a>
+     */
+    private static final Integer CACHE_MAX_SIZE = 10000;
+
+    /**
      * 构建异步刷新的 LoadingCache 对象
      *
      * 注意：如果你的缓存和 ThreadLocal 有关系，要么自己处理 ThreadLocal 的传递，要么使用 {@link #buildCache(Duration, CacheLoader)} 方法
@@ -29,6 +36,7 @@ public class CacheUtils {
      */
     public static <K, V> LoadingCache<K, V> buildAsyncReloadingCache(Duration duration, CacheLoader<K, V> loader) {
         return CacheBuilder.newBuilder()
+                .maximumSize(CACHE_MAX_SIZE)
                 // 只阻塞当前数据加载线程，其他线程返回旧值
                 .refreshAfterWrite(duration)
                 // 通过 asyncReloading 实现全异步加载，包括 refreshAfterWrite 被阻塞的加载线程
@@ -43,7 +51,11 @@ public class CacheUtils {
      * @return LoadingCache 对象
      */
     public static <K, V> LoadingCache<K, V> buildCache(Duration duration, CacheLoader<K, V> loader) {
-        return CacheBuilder.newBuilder().refreshAfterWrite(duration).build(loader);
+        return CacheBuilder.newBuilder()
+                .maximumSize(CACHE_MAX_SIZE)
+                // 只阻塞当前数据加载线程，其他线程返回旧值
+                .refreshAfterWrite(duration)
+                .build(loader);
     }
 
 }

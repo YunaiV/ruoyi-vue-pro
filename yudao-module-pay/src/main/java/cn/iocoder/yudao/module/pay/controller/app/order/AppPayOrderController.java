@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.pay.controller.app.order;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitRespVO;
-import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
@@ -52,6 +52,15 @@ public class AppPayOrderController {
     public CommonResult<PayOrderRespVO> getOrder(@RequestParam("id") Long id,
                                                  @RequestParam(value = "sync", required = false) Boolean sync) {
         PayOrderDO order = payOrderService.getOrder(id);
+        if (order== null) {
+            return success(null);
+        }
+        // 重要：校验订单是否是当前用户，避免越权
+        if (order.getUserId() != null // 特殊：早期订单未存储 userId，所以忽略
+                && ObjUtil.notEqual(order.getUserId(), getLoginUserId())) {
+            return success(null);
+        }
+
         // sync 仅在等待支付
         if (Boolean.TRUE.equals(sync) && PayOrderStatusEnum.isWaiting(order.getStatus())) {
             payOrderService.syncOrderQuietly(order.getId());
@@ -75,7 +84,7 @@ public class AppPayOrderController {
 
         // 2. 提交支付
         PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
-        return success(PayOrderConvert.INSTANCE.convert3(respVO));
+        return success(BeanUtils.toBean(respVO, AppPayOrderSubmitRespVO.class));
     }
 
 }

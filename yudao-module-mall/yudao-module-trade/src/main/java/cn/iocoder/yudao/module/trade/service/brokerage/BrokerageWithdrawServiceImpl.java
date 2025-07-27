@@ -151,6 +151,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                 .setAppKey(tradeOrderProperties.getPayAppKey()).setChannelCode(channelCode)
                 .setMerchantTransferId(withdraw.getId().toString()).setSubject("佣金提现").setPrice(withdraw.getPrice())
                 .setUserAccount(userAccount).setUserName(userName).setUserIp(getClientIP())
+                .setUserId(withdraw.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue()) // 用户信息
                 .setChannelExtras(channelExtras);
         // 1.3 发起请求
         PayTransferCreateRespDTO transferRespDTO = payTransferApi.createTransfer(transferReqDTO);

@@ -20,6 +20,7 @@ import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 示例提现订单") // 目的：演示转账功能
 @RestController
@@ -41,7 +42,7 @@ public class PayDemoWithdrawController {
     @Operation(summary = "提现单转账")
     @Parameter(name = "id", required = true, description = "提现单编号", example = "1024")
     public CommonResult<Long> transferDemoWithdraw(@RequestParam("id") Long id) {
-        Long payTransferId = demoWithdrawService.transferDemoWithdraw(id);
+        Long payTransferId = demoWithdrawService.transferDemoWithdraw(id, getLoginUserId());
         return success(payTransferId);
     }
 

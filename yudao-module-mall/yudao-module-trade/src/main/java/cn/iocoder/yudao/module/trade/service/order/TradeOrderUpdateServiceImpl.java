@@ -952,6 +952,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey())  // 支付应用
                 .setUserIp(NetUtil.getLocalhostStr()) // 使用本机 IP，因为是服务器发起退款的
+                .setUserId(order.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue()) // 用户信息
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
                 // 特殊：因为订单支持 AfterSale 单个售后退款，也支持整单退款，所以需要通过 order- 进行下区分
                 //      具体可见 AfterSaleController 的 updateAfterSaleRefunded 方法

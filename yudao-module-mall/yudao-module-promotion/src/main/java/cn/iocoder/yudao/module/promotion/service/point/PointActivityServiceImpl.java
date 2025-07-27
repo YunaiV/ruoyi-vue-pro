@@ -222,6 +222,7 @@ public class PointActivityServiceImpl implements PointActivityService {
         if (spu == null) {
             throw exception(SPU_NOT_EXISTS);
         }
+        products.forEach(product -> product.setSpuId(spuId));
 
         // 2. 校验商品 sku 都存在
         List<ProductSkuRespDTO> skus = productSkuApi.getSkuListBySpuId(singletonList(spuId));

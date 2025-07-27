@@ -64,8 +64,6 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     private PayWalletService payWalletService;
     @Resource
     private PayOrderService payOrderService;
-//    @Resource
-//    private PayRefundService payRefundService;
     @Resource
     private PayWalletRechargePackageService payWalletRechargePackageService;
 
@@ -99,6 +97,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         // 2.1 创建支付单
         Long payOrderId = payOrderService.createOrder(new PayOrderCreateReqDTO()
                 .setAppKey(payProperties.getWalletPayAppKey()).setUserIp(userIp)
+                .setUserId(userId).setUserType(userType) // 用户信息
                 .setMerchantOrderId(recharge.getId().toString()) // 业务的订单编号
                 .setSubject(WALLET_RECHARGE_ORDER_SUBJECT).setBody("")
                 .setPrice(recharge.getPayPrice())
@@ -209,6 +208,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         String refundId = walletRechargeId + "-refund";
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppKey(payProperties.getWalletPayAppKey()).setUserIp(userIp)
+                .setUserId(wallet.getUserId()).setUserType(wallet.getUserType()) // 用户信息
                 .setMerchantOrderId(walletRechargeId)
                 .setMerchantRefundId(refundId)
                 .setReason("想退钱").setPrice(walletRecharge.getPayPrice()));

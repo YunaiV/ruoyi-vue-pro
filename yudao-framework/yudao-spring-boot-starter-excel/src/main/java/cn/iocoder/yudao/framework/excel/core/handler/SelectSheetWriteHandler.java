@@ -86,7 +86,7 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
 
     /**
      * 判断字段是否是静态的、最终的、 transient 的
-     * 原因：EasyExcel 默认是忽略 static final 或 transient 的字段，所以需要判断
+     * 原因：FastExcel 默认是忽略 static final 或 transient 的字段，所以需要判断
      *
      * @param field 字段
      * @return 是否是静态的、最终的、transient 的
