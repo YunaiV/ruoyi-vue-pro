@@ -236,8 +236,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public Long getDeviceMessageCount(LocalDateTime createTime) {
-        return deviceMessageMapper
-                .selectCountByCreateTime(createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
+        return deviceMessageMapper.selectCountByCreateTime(
+                createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
     }
 
     @Override

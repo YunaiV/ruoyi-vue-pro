@@ -21,6 +21,7 @@ public class IotTcpDownstreamHandler {
 
     private final IotTcpSessionManager sessionManager;
 
+    // TODO @haohao：这个可以使用 lombok 简化构造方法
     public IotTcpDownstreamHandler(IotDeviceMessageService messageService,
                                    IotDeviceService deviceService, IotTcpSessionManager sessionManager) {
         this.messageService = messageService;
@@ -38,6 +39,7 @@ public class IotTcpDownstreamHandler {
             log.info("[handle][处理下行消息] 设备 ID: {}, 方法: {}, 消息 ID: {}",
                     message.getDeviceId(), message.getMethod(), message.getId());
 
+            // TODO @haohao 1. 和 2. 可以合成 1.1 1.2 并且中间可以不空行；
             // 1. 获取设备信息
             IotDeviceRespDTO device = deviceService.getDeviceFromCache(message.getDeviceId());
             if (device == null) {
@@ -62,11 +64,12 @@ public class IotTcpDownstreamHandler {
             } else {
                 log.error("[handle][下行消息发送失败] 设备 ID: {}, 方法: {}, 消息 ID: {}",
                         message.getDeviceId(), message.getMethod(), message.getId());
-            }
+            } // TODO @haohao：下面这个空行，可以考虑去掉的哈。
 
         } catch (Exception e) {
             log.error("[handle][处理下行消息失败] 设备 ID: {}, 方法: {}, 消息内容: {}",
                     message.getDeviceId(), message.getMethod(), message.getParams(), e);
         }
     }
+
 }

@@ -12,15 +12,14 @@ import org.springframework.stereotype.Component;
 /**
  * TCP JSON 格式 {@link IotDeviceMessage} 编解码器
  *
- * 采用纯 JSON 格式传输
- *
- * JSON 消息格式：
+ * 采用纯 JSON 格式传输，格式如下：
  * {
- * "id": "消息 ID",
- * "method": "消息方法",
- * "deviceId": "设备 ID",
- * "params": {...},
- * "timestamp": 时间戳
+ *      "id": "消息 ID",
+ *      "method": "消息方法",
+ *      "deviceId": "设备 ID",
+ *      "params": {...},
+ *      "timestamp": 时间戳
+ *      // TODO @haohao：貌似少了 code、msg、timestamp
  * }
  *
  * @author 芋道源码
@@ -45,6 +44,7 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
          */
         private String method;
 
+        // TODO @haohao：这个字段，是不是没用到呀？感觉应该也不在消息列哈？
         /**
          * 设备 ID
          */
@@ -84,14 +84,9 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
 
     @Override
     public byte[] encode(IotDeviceMessage message) {
-        TcpJsonMessage tcpJsonMessage = new TcpJsonMessage(
-                message.getRequestId(),
-                message.getMethod(),
+        TcpJsonMessage tcpJsonMessage = new TcpJsonMessage(message.getRequestId(), message.getMethod(),
                 message.getDeviceId(),
-                message.getParams(),
-                message.getData(),
-                message.getCode(),
-                message.getMsg(),
+                message.getParams(), message.getData(), message.getCode(), message.getMsg(),
                 System.currentTimeMillis());
         return JsonUtils.toJsonByte(tcpJsonMessage);
     }
@@ -102,13 +97,9 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
         TcpJsonMessage tcpJsonMessage = JsonUtils.parseObject(bytes, TcpJsonMessage.class);
         Assert.notNull(tcpJsonMessage, "消息不能为空");
         Assert.notBlank(tcpJsonMessage.getMethod(), "消息方法不能为空");
-        IotDeviceMessage iotDeviceMessage = IotDeviceMessage.of(
-                tcpJsonMessage.getId(),
-                tcpJsonMessage.getMethod(),
-                tcpJsonMessage.getParams(),
-                tcpJsonMessage.getData(),
-                tcpJsonMessage.getCode(),
-                tcpJsonMessage.getMsg());
+        // TODO @haohao：这个我已经改了哈。一些属性，可以放在一行，好理解一点~
+        IotDeviceMessage iotDeviceMessage = IotDeviceMessage.of(tcpJsonMessage.getId(), tcpJsonMessage.getMethod(),
+                tcpJsonMessage.getParams(), tcpJsonMessage.getData(), tcpJsonMessage.getCode(), tcpJsonMessage.getMsg());
         iotDeviceMessage.setDeviceId(tcpJsonMessage.getDeviceId());
         return iotDeviceMessage;
     }

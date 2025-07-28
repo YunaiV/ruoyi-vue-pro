@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class IotAlinkDeviceMessageCodec implements IotDeviceMessageCodec {
 
+    private static final String TYPE = "Alink";
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -63,6 +65,11 @@ public class IotAlinkDeviceMessageCodec implements IotDeviceMessageCodec {
     }
 
     @Override
+    public String type() {
+        return TYPE;
+    }
+
+    @Override
     public byte[] encode(IotDeviceMessage message) {
         AlinkMessage alinkMessage = new AlinkMessage(message.getRequestId(), AlinkMessage.VERSION_1,
                 message.getMethod(), message.getParams(), message.getData(), message.getCode(), message.getMsg());
@@ -77,11 +84,6 @@ public class IotAlinkDeviceMessageCodec implements IotDeviceMessageCodec {
         Assert.equals(alinkMessage.getVersion(), AlinkMessage.VERSION_1, "消息版本号必须是 1.0");
         return IotDeviceMessage.of(alinkMessage.getId(), alinkMessage.getMethod(), alinkMessage.getParams(),
                 alinkMessage.getData(), alinkMessage.getCode(), alinkMessage.getMsg());
-    }
-
-    @Override
-    public String type() {
-        return "Alink";
     }
 
 }

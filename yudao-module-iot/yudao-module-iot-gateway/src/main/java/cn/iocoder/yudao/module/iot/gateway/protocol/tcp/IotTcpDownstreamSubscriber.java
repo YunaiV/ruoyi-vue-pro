@@ -27,10 +27,12 @@ public class IotTcpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
 
     private final IotTcpUpstreamProtocol protocol;
 
+    // todo @haohao：不用的变量，可以去掉哈
     private final IotDeviceService deviceService;
 
     private final IotTcpSessionManager sessionManager;
 
+    // TODO @haohao：lombok 简化
     public IotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocol,
             IotDeviceMessageService messageService,
                                       IotDeviceService deviceService,

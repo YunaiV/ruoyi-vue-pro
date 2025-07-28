@@ -11,17 +11,29 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+// TODO @haohao：【重要】是不是二进制更彻底哈？
+// 包头(4 字节)
+// 消息 ID string；nvarchar（length + string）
+// version（可选，不要干脆）
+// method string；nvarchar；为什么不要 opcode？因为 IotTcpJsonDeviceMessageCodec 里面，实际已经没 opcode 了
+// reply bit；0 请求，1 响应
+// 请求时：
+//      params；nvarchar；json 处理
+// 响应时：
+//      code
+//      msg nvarchar
+//      data；nvarchar；json 处理
 /**
  * TCP 二进制格式 {@link IotDeviceMessage} 编解码器
  *
- * 使用自定义二进制协议格式：
- * 包头(4 字节) | 功能码(2 字节) | 消息序号(2 字节) | 包体数据(变长)
+ * 使用自定义二进制协议格式：包头(4 字节) | 功能码(2 字节) | 消息序号(2 字节) | 包体数据(变长)
  *
  * @author 芋道源码
  */
 @Component
 public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
+    // TODO @haohao：是不是叫 TCP_Binary 好点哈？
     public static final String TYPE = "TCP_BINARY";
 
     @Data
@@ -34,11 +46,13 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
          */
         private Short code;
 
+        // TODO @haohao：这个和 AlinkMessage 里面，是一个东西哇？
         /**
          * 消息序号
          */
         private Short mid;
 
+        // TODO @haohao：这个字段，是不是没用到呀？感觉应该也不在消息列哈？
         /**
          * 设备 ID
          */
@@ -59,6 +73,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
          */
         private Object data;
 
+        // TODO @haohao：这个可以改成 code 哇？更好理解一点；
         /**
          * 响应错误码
          */
@@ -68,6 +83,8 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
          * 响应提示
          */
         private String msg;
+
+        // TODO @haohao：TcpBinaryMessage 和 TcpJsonMessage 保持一致哈？
 
     }
 
@@ -83,13 +100,14 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
         try {
             // 1. 确定功能码
-            short code = MessageMethod.STATE_ONLINE.equals(message.getMethod()) ? TcpDataPackage.CODE_HEARTBEAT
-                    : TcpDataPackage.CODE_MESSAGE_UP;
+            short code = MessageMethod.STATE_ONLINE.equals(message.getMethod())
+                    ? TcpDataPackage.CODE_HEARTBEAT : TcpDataPackage.CODE_MESSAGE_UP;
 
             // 2. 构建负载数据
             String payload = buildPayload(message);
 
             // 3. 构建 TCP 数据包
+            // TODO @haohao：这个和 AlinkMessage.id 是不是一致的哈？
             short mid = (short) (System.currentTimeMillis() % Short.MAX_VALUE);
             TcpDataPackage dataPackage = new TcpDataPackage(code, mid, payload);
 
@@ -101,7 +119,6 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
     public IotDeviceMessage decode(byte[] bytes) {
         Assert.notNull(bytes, "待解码数据不能为空");
         Assert.isTrue(bytes.length > 0, "待解码数据不能为空");
@@ -188,21 +205,20 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         Assert.notNull(dataPackage, "数据包对象不能为空");
         Assert.notNull(dataPackage.getPayload(), "负载不能为空");
 
-        Buffer buffer = Buffer.buffer();
-
         // 1. 计算包体长度（除了包头 4 字节）
         int payloadLength = dataPackage.getPayload().getBytes().length;
         int totalLength = 2 + 2 + payloadLength;
 
-        // 2. 写入包头：总长度（4 字节）
+        // 2. 写入数据
+        Buffer buffer = Buffer.buffer();
+        // 2.1 写入包头：总长度（4 字节）
         buffer.appendInt(totalLength);
-        // 3. 写入功能码（2 字节）
+        // 2.2 写入功能码（2 字节）
         buffer.appendShort(dataPackage.getCode());
-        // 4. 写入消息序号（2 字节）
+        // 2.3 写入消息序号（2 字节）
         buffer.appendShort(dataPackage.getMid());
-        // 5. 写入包体数据（不定长）
+        // 2.4 写入包体数据（不定长）
         buffer.appendBytes(dataPackage.getPayload().getBytes());
-
         return buffer;
     }
 
@@ -216,18 +232,14 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         Assert.isTrue(buffer.length() >= 8, "数据包长度不足");
 
         int index = 0;
-
         // 1. 跳过包头（4 字节）
         index += 4;
-
         // 2. 获取功能码（2 字节）
         short code = buffer.getShort(index);
         index += 2;
-
         // 3. 获取消息序号（2 字节）
         short mid = buffer.getShort(index);
         index += 2;
-
         // 4. 获取包体数据
         String payload = "";
         if (index < buffer.length()) {
@@ -239,14 +251,17 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
     // ==================== 内部类 ====================
 
+    // TODO @haohao：会不会存在 reply 的时候，有 data、msg、code 参数哈。
     /**
      * 负载信息类
      */
     @Data
     @AllArgsConstructor
     private static class PayloadInfo {
+
         private String requestId;
         private Object params;
+
     }
 
     /**
@@ -255,6 +270,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
     @Data
     @AllArgsConstructor
     private static class TcpDataPackage {
+
         // 功能码定义
         public static final short CODE_REGISTER = 10;
         public static final short CODE_REGISTER_REPLY = 11;
@@ -263,9 +279,11 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         public static final short CODE_MESSAGE_UP = 30;
         public static final short CODE_MESSAGE_DOWN = 40;
 
+        // TODO @haohao：要不改成 opCode
         private short code;
         private short mid;
         private String payload;
+
     }
 
     // ==================== 常量定义 ====================
@@ -274,12 +292,15 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      * 消息方法常量
      */
     public static class MessageMethod {
+
         public static final String PROPERTY_POST = "thing.property.post"; // 数据上报
         public static final String STATE_ONLINE = "thing.state.online"; // 心跳
+
     }
 
     // ==================== 自定义异常 ====================
 
+    // TODO @haohao：全局异常搞个。看着可以服用哈。
     /**
      * TCP 编解码异常
      */
@@ -288,4 +309,5 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
             super(message, cause);
         }
     }
+
 }

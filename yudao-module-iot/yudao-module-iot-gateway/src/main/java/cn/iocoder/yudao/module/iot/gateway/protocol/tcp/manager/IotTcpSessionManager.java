@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO @haohao：IotTcpSessionManager、IotTcpAuthManager 是不是融合哈？
 /**
  * IoT 网关 TCP 会话管理器
  * <p>

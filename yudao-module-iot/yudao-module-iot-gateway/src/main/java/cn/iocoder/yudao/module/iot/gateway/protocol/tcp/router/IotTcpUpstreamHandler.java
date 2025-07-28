@@ -8,6 +8,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
@@ -28,8 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
+    // TODO @haohao：这两个变量，可以复用 IotTcpBinaryDeviceMessageCodec 的 TYPE
     private static final String CODEC_TYPE_JSON = "TCP_JSON";
     private static final String CODEC_TYPE_BINARY = "TCP_BINARY";
+
     private static final String AUTH_METHOD = "auth";
 
     private final IotDeviceMessageService deviceMessageService;
@@ -89,6 +92,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                 return;
             }
 
+            // TODO @haohao：2. 和 3. 可以合并成 2.1 2.2 ，都是异常的情况。然后 3. 可以 return 直接；
             // 2. 获取设备信息
             IotDeviceRespDTO device = deviceService.getDeviceFromCache(messageInfo.message.getDeviceId());
             if (device == null) {
@@ -114,12 +118,13 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     private void handleAuthRequest(String clientId, IotDeviceMessage message, NetSocket socket, String codecType) {
         try {
             // 1. 验证认证请求
+            // TODO @haohao：ObjUtil.notEquals。减少取反
             if (!AUTH_METHOD.equals(message.getMethod())) {
                 sendError(socket, message.getRequestId(), "请先进行认证", codecType);
                 return;
             }
 
-            // 2. 解析认证参数
+            // 2. 解析认证参数 // TODO @haohao：1. 和 2. 可以合并成 1.1 1.2 都是参数校验
             AuthParams authParams = parseAuthParams(message.getParams());
             if (authParams == null) {
                 sendError(socket, message.getRequestId(), "认证参数不完整", codecType);
@@ -127,6 +132,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             }
 
             // 3. 执行认证流程
+            // TODO @haohao：成功失败、都大哥日志，会不会更好哈？
             if (performAuthentication(authParams, socket, message.getRequestId(), codecType)) {
                 log.info("[handleAuthRequest][认证成功] 客户端 ID: {}, username: {}", clientId, authParams.username);
             }
@@ -157,6 +163,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     /**
      * 解码消息
      */
+    // TODO @haohao：是不是还是直接管理后台配置协议，然后直接使用就好啦。暂时不考虑动态解析哈。保持一致，降低理解成本哈。
     private MessageInfo decodeMessage(Buffer buffer) {
         try {
             String rawData = buffer.toString();
@@ -172,6 +179,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     /**
      * 执行认证
      */
+    // TODO @haohao：下面的 1. 2. 可以合并下，本质也是校验哈。
     private boolean performAuthentication(AuthParams authParams, NetSocket socket, String requestId, String codecType) {
         // 1. 执行认证
         if (!authenticateDevice(authParams)) {
@@ -202,7 +210,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         deviceMessageService.sendDeviceMessage(onlineMessage, deviceInfo.getProductKey(), deviceInfo.getDeviceName(),
                 serverId);
         sendSuccess(socket, requestId, "认证成功", codecType);
-
         return true;
     }
 
@@ -252,8 +259,9 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * 判断是否为 JSON 格式
      */
     private boolean isJsonFormat(String data) {
-        if (StrUtil.isBlank(data))
+        if (StrUtil.isBlank(data)) {
             return false;
+        }
         String trimmed = data.trim();
         return (trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"));
     }
@@ -262,15 +270,14 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * 解析认证参数
      */
     private AuthParams parseAuthParams(Object params) {
-        if (params == null)
+        if (params == null) {
             return null;
-
+        }
         JSONObject paramsJson = params instanceof JSONObject ? (JSONObject) params
                 : JSONUtil.parseObj(params.toString());
         String clientId = paramsJson.getStr("clientId");
         String username = paramsJson.getStr("username");
         String password = paramsJson.getStr("password");
-
         return StrUtil.hasBlank(clientId, username, password) ? null : new AuthParams(clientId, username, password);
     }
 
@@ -278,11 +285,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * 认证设备
      */
     private boolean authenticateDevice(AuthParams authParams) {
-        CommonResult<Boolean> result = deviceApi
-                .authDevice(new cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO()
-                        .setClientId(authParams.clientId)
-                        .setUsername(authParams.username)
-                        .setPassword(authParams.password));
+        CommonResult<Boolean> result = deviceApi.authDevice(new IotDeviceAuthReqDTO()
+                .setClientId(authParams.clientId).setUsername(authParams.username).setPassword(authParams.password));
         return result.isSuccess() && result.getData();
     }
 
@@ -291,6 +295,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      */
     private void registerAuthInfo(NetSocket socket, IotDeviceRespDTO device, IotDeviceAuthUtils.DeviceInfo deviceInfo,
                                   String token, String clientId) {
+        // TODO @haohao：可以链式调用；
         IotTcpAuthManager.AuthInfo auth = new IotTcpAuthManager.AuthInfo();
         auth.setDeviceId(device.getId());
         auth.setProductKey(deviceInfo.getProductKey());
@@ -316,6 +321,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         sendResponse(socket, true, message, requestId, codecType);
     }
 
+    // TODO @haohao：使用 lombok，方便 jdk8 兼容
+
     /**
      * 认证参数
      */
@@ -327,4 +334,5 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      */
     private record MessageInfo(IotDeviceMessage message, String codecType) {
     }
+
 }

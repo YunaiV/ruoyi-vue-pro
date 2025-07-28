@@ -24,6 +24,7 @@ public class IotTcpAuthManager {
      */
     private final Map<NetSocket, AuthInfo> authStatusMap = new ConcurrentHashMap<>();
 
+    // TODO @haohao：得考虑，一个设备连接多次？
     /**
      * 设备 ID -> NetSocket 的映射（用于快速查找）
      */
@@ -37,6 +38,7 @@ public class IotTcpAuthManager {
      */
     public void registerAuth(NetSocket socket, AuthInfo authInfo) {
         // 如果设备已有其他连接，先清理旧连接
+        // TODO @haohao：是不是允许同时连接？就像 mqtt 应该也允许重复连接哈？
         NetSocket oldSocket = deviceSocketMap.get(authInfo.getDeviceId());
         if (oldSocket != null && oldSocket != socket) {
             log.info("[registerAuth][设备已有其他连接，清理旧连接] 设备 ID: {}, 旧连接: {}",
@@ -66,6 +68,7 @@ public class IotTcpAuthManager {
         }
     }
 
+    // TODO @haohao：建议暂时没用的方法，可以删除掉；整体聚焦！
     /**
      * 注销设备认证信息
      *
@@ -158,6 +161,7 @@ public class IotTcpAuthManager {
         int count = authStatusMap.size();
         authStatusMap.clear();
         deviceSocketMap.clear();
+        // TODO @haohao：第一个括号是方法，第二个括号是明细日志；其它日志，也可以检查下哈。
         log.info("[clearAll][清理所有认证信息] 清理数量: {}", count);
     }
 
@@ -166,6 +170,7 @@ public class IotTcpAuthManager {
      */
     @Data
     public static class AuthInfo {
+
         /**
          * 设备编号
          */
@@ -181,6 +186,7 @@ public class IotTcpAuthManager {
          */
         private String deviceName;
 
+        // TODO @haohao：令牌不要存储，万一有安全问题哈；
         /**
          * 认证令牌
          */
@@ -190,5 +196,7 @@ public class IotTcpAuthManager {
          * 客户端 ID
          */
         private String clientId;
+
     }
+
 }
