@@ -471,8 +471,6 @@ public class SimpleModelUtils {
             return userTask;
         }
 
-
-
         private void addUserTaskListener(BpmSimpleModelNodeVO node, UserTask userTask) {
             List<FlowableListener> flowableListeners = new ArrayList<>(3);
             if (node.getTaskCreateListener() != null
@@ -1021,7 +1019,7 @@ public class SimpleModelUtils {
     }
 
     /**
-     * 根据跳过表达式，判断是否跳过此节点。
+     * 根据跳过表达式，判断是否跳过此节点
      */
     public static boolean isSkipNode(BpmSimpleModelNodeVO currentNode, Map<String, Object> variables) {
         if (StrUtil.isEmpty(currentNode.getSkipExpression())) {

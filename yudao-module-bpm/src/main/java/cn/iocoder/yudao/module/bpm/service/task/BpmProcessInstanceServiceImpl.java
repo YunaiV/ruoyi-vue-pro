@@ -462,13 +462,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         return approvalNodes;
     }
 
-
     /**
      *  获取结束节点的状态
      */
     private Integer getEndActivityNodeStatus(HistoricTaskInstance task) {
         Integer status = FlowableUtils.getTaskStatus(task);
-        return status == null ? BpmTaskStatusEnum.SKIP.getStatus() : status;  // 结束节点未获取到状态，为跳过状态
+        if (status != null) {
+            return status;
+        }
+        // 结束节点未获取到状态，为跳过状态。可见 bpmn 或者 simple 的 skipExpression
+        return BpmTaskStatusEnum.SKIP.getStatus();
     }
 
     /**

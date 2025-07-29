@@ -171,15 +171,15 @@ public class GlobalExceptionHandler {
     /**
      * 处理 SpringMVC 请求参数类型错误
      *
-     * 例如说，接口上设置了 @RequestBody实体中 xx 属性类型为 Integer，结果传递 xx 参数类型为 String
+     * 例如说，接口上设置了 @RequestBody 实体中 xx 属性类型为 Integer，结果传递 xx 参数类型为 String
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public CommonResult<?> methodArgumentTypeInvalidFormatExceptionHandler(HttpMessageNotReadableException ex) {
         log.warn("[methodArgumentTypeInvalidFormatExceptionHandler]", ex);
-        if(ex.getCause() instanceof InvalidFormatException) {
+        if (ex.getCause() instanceof InvalidFormatException) {
             InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
             return CommonResult.error(BAD_REQUEST.getCode(), String.format("请求参数类型错误:%s", invalidFormatException.getValue()));
-        }else {
+        } else {
             return defaultExceptionHandler(ServletUtils.getRequest(), ex);
         }
     }
