@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpSessionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
@@ -92,19 +92,19 @@ public class IotGatewayConfiguration {
         public IotTcpUpstreamProtocol iotTcpUpstreamProtocol(IotGatewayProperties gatewayProperties,
                                                              IotDeviceService deviceService,
                                                              IotDeviceMessageService messageService,
-                                                             IotTcpSessionManager sessionManager,
+                                                             IotTcpConnectionManager connectionManager,
                                                              Vertx tcpVertx) {
             return new IotTcpUpstreamProtocol(gatewayProperties.getProtocol().getTcp(),
-                    deviceService, messageService, sessionManager, tcpVertx);
+                    deviceService, messageService, connectionManager, tcpVertx);
         }
 
         @Bean
         public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocolHandler,
                                                                      IotDeviceMessageService messageService,
                                                                      IotDeviceService deviceService,
-                                                                     IotTcpSessionManager sessionManager,
+                                                                     IotTcpConnectionManager connectionManager,
                                                                      IotMessageBus messageBus) {
-            return new IotTcpDownstreamSubscriber(protocolHandler, messageService, deviceService, sessionManager,
+            return new IotTcpDownstreamSubscriber(protocolHandler, messageService, deviceService, connectionManager,
                     messageBus);
         }
 

@@ -4,6 +4,15 @@ spring:
   profiles:
     active: local # 默认激活本地开发环境
 
+  # Redis 配置
+  data:
+    redis:
+      host: 127.0.0.1 # Redis 服务器地址
+      port: 6379 # Redis 服务器端口
+      database: 0 # Redis 数据库索引
+      # password: # Redis 密码，如果有的话
+      timeout: 30000ms # 连接超时时间
+
 --- #################### 消息队列相关 ####################
 
 # rocketmq 配置项，对应 RocketMQProperties 配置类
@@ -45,7 +54,7 @@ yudao:
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
-          enabled: false
+          enabled: true
           http-port: 8090                       # MQTT HTTP 服务端口
           mqtt-host: 127.0.0.1                  # MQTT Broker 地址
           mqtt-port: 1883                       # MQTT Broker 端口

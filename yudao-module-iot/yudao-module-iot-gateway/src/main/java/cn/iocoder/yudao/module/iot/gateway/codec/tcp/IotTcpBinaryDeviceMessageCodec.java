@@ -8,85 +8,71 @@ import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
 import io.vertx.core.buffer.Buffer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-// TODO @haohao：【重要】是不是二进制更彻底哈？
-// 包头(4 字节)
-// 消息 ID string；nvarchar（length + string）
-// version（可选，不要干脆）
-// method string；nvarchar；为什么不要 opcode？因为 IotTcpJsonDeviceMessageCodec 里面，实际已经没 opcode 了
-// reply bit；0 请求，1 响应
-// 请求时：
-//      params；nvarchar；json 处理
-// 响应时：
-//      code
-//      msg nvarchar
-//      data；nvarchar；json 处理
+import java.nio.charset.StandardCharsets;
+
 /**
  * TCP 二进制格式 {@link IotDeviceMessage} 编解码器
+ * <p>
+ * 二进制协议格式（所有数值使用大端序）：
  *
- * 使用自定义二进制协议格式：包头(4 字节) | 功能码(2 字节) | 消息序号(2 字节) | 包体数据(变长)
+ * <pre>
+ * +--------+--------+--------+--------+--------+--------+--------+--------+
+ * | 魔术字 | 版本号 | 消息类型| 消息标志|         消息长度(4字节)          |
+ * +--------+--------+--------+--------+--------+--------+--------+--------+
+ * |           消息 ID 长度(2字节)        |      消息 ID (变长字符串)         |
+ * +--------+--------+--------+--------+--------+--------+--------+--------+
+ * |           方法名长度(2字节)        |      方法名(变长字符串)         |
+ * +--------+--------+--------+--------+--------+--------+--------+--------+
+ * |                        消息体数据(变长)                              |
+ * +--------+--------+--------+--------+--------+--------+--------+--------+
+ * </pre>
+ * <p>
+ * 消息体格式：
+ * - 请求消息：params 数据(JSON)
+ * - 响应消息：code (4字节) + msg 长度(2字节) + msg 字符串 + data 数据(JSON)
+ * <p>
+ * 注意：deviceId 不包含在协议中，由服务器根据连接上下文自动设置
  *
  * @author 芋道源码
  */
+@Slf4j
 @Component
 public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
-    // TODO @haohao：是不是叫 TCP_Binary 好点哈？
     public static final String TYPE = "TCP_BINARY";
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class TcpBinaryMessage {
+    // ==================== 协议常量 ====================
 
-        /**
-         * 功能码
-         */
-        private Short code;
+    /**
+     * 协议魔术字，用于协议识别
+     */
+    private static final byte MAGIC_NUMBER = (byte) 0x7E;
 
-        // TODO @haohao：这个和 AlinkMessage 里面，是一个东西哇？
-        /**
-         * 消息序号
-         */
-        private Short mid;
+    /**
+     * 协议版本号
+     */
+    private static final byte PROTOCOL_VERSION = (byte) 0x01;
 
-        // TODO @haohao：这个字段，是不是没用到呀？感觉应该也不在消息列哈？
-        /**
-         * 设备 ID
-         */
-        private Long deviceId;
-
-        /**
-         * 请求方法
-         */
-        private String method;
-
-        /**
-         * 请求参数
-         */
-        private Object params;
-
-        /**
-         * 响应结果
-         */
-        private Object data;
-
-        // TODO @haohao：这个可以改成 code 哇？更好理解一点；
-        /**
-         * 响应错误码
-         */
-        private Integer responseCode;
-
-        /**
-         * 响应提示
-         */
-        private String msg;
-
-        // TODO @haohao：TcpBinaryMessage 和 TcpJsonMessage 保持一致哈？
-
+    /**
+     * 消息类型常量
+     */
+    public static class MessageType {
+        public static final byte REQUEST = 0x01; // 请求消息
+        public static final byte RESPONSE = 0x02; // 响应消息
     }
+
+    /**
+     * 协议头部固定长度（魔术字 + 版本号 + 消息类型 + 消息标志 + 消息长度）
+     */
+    private static final int HEADER_FIXED_LENGTH = 8;
+
+    /**
+     * 最小消息长度（头部 + 消息ID长度 + 方法名长度）
+     */
+    private static final int MIN_MESSAGE_LENGTH = HEADER_FIXED_LENGTH + 4;
 
     @Override
     public String type() {
@@ -99,215 +85,270 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         Assert.notBlank(message.getMethod(), "消息方法不能为空");
 
         try {
-            // 1. 确定功能码
-            short code = MessageMethod.STATE_ONLINE.equals(message.getMethod())
-                    ? TcpDataPackage.CODE_HEARTBEAT : TcpDataPackage.CODE_MESSAGE_UP;
+            // 1. 确定消息类型
+            byte messageType = determineMessageType(message);
 
-            // 2. 构建负载数据
-            String payload = buildPayload(message);
+            // 2. 构建消息体
+            byte[] bodyData = buildMessageBody(message, messageType);
 
-            // 3. 构建 TCP 数据包
-            // TODO @haohao：这个和 AlinkMessage.id 是不是一致的哈？
-            short mid = (short) (System.currentTimeMillis() % Short.MAX_VALUE);
-            TcpDataPackage dataPackage = new TcpDataPackage(code, mid, payload);
+            // 3. 构建完整消息（不包含deviceId，由连接上下文管理）
+            return buildCompleteMessage(message, messageType, bodyData);
 
-            // 4. 编码为字节流
-            return encodeTcpDataPackage(dataPackage).getBytes();
         } catch (Exception e) {
-            throw new TcpCodecException("TCP 消息编码失败", e);
+            log.error("[encode][TCP 二进制消息编码失败，消息: {}]", message, e);
+            throw new RuntimeException("TCP 二进制消息编码失败: " + e.getMessage(), e);
         }
     }
 
     @Override
     public IotDeviceMessage decode(byte[] bytes) {
         Assert.notNull(bytes, "待解码数据不能为空");
-        Assert.isTrue(bytes.length > 0, "待解码数据不能为空");
+        Assert.isTrue(bytes.length >= MIN_MESSAGE_LENGTH, "数据包长度不足");
 
         try {
-            // 1. 解码 TCP 数据包
-            TcpDataPackage dataPackage = decodeTcpDataPackage(Buffer.buffer(bytes));
+            Buffer buffer = Buffer.buffer(bytes);
 
-            // 2. 根据功能码确定方法
-            String method = (dataPackage.getCode() == TcpDataPackage.CODE_HEARTBEAT) ? MessageMethod.STATE_ONLINE
-                    : MessageMethod.PROPERTY_POST;
+            // 1. 解析协议头部
+            ProtocolHeader header = parseProtocolHeader(buffer);
 
-            // 3. 解析负载数据
-            PayloadInfo payloadInfo = parsePayloadInfo(dataPackage.getPayload());
+            // 2. 解析消息内容（不包含deviceId，由上层连接管理器设置）
+            return parseMessageContent(buffer, header);
 
-            // 4. 构建 IoT 设备消息
-            return IotDeviceMessage.of(
-                    payloadInfo.getRequestId(),
-                    method,
-                    payloadInfo.getParams(),
-                    null,
-                    null,
-                    null);
         } catch (Exception e) {
-            throw new TcpCodecException("TCP 消息解码失败", e);
+            log.error("[decode][TCP 二进制消息解码失败，数据长度: {}]", bytes.length, e);
+            throw new RuntimeException("TCP 二进制消息解码失败: " + e.getMessage(), e);
         }
     }
 
-    // ==================== 内部辅助方法 ====================
+    // ==================== 编码相关方法 ====================
 
     /**
-     * 构建负载数据
-     *
-     * @param message 设备消息
-     * @return 负载字符串
+     * 确定消息类型
+     * 优化后的判断逻辑：有响应字段就是响应消息，否则就是请求消息
      */
-    private String buildPayload(IotDeviceMessage message) {
-        TcpBinaryMessage tcpBinaryMessage = new TcpBinaryMessage(
-                null, // code 在数据包中单独处理
-                null, // mid 在数据包中单独处理
-                message.getDeviceId(),
-                message.getMethod(),
-                message.getParams(),
-                message.getData(),
-                message.getCode(),
-                message.getMsg());
-        return JsonUtils.toJsonString(tcpBinaryMessage);
+    private byte determineMessageType(IotDeviceMessage message) {
+        // 判断是否为响应消息：有响应码或响应消息时为响应
+        if (message.getCode() != null || StrUtil.isNotBlank(message.getMsg())) {
+            return MessageType.RESPONSE;
+        }
+        // 默认为请求消息
+        return MessageType.REQUEST;
     }
 
     /**
-     * 解析负载信息
-     *
-     * @param payload 负载字符串
-     * @return 负载信息
+     * 构建消息体
      */
-    private PayloadInfo parsePayloadInfo(String payload) {
-        if (StrUtil.isBlank(payload)) {
-            return new PayloadInfo(null, null);
-        }
+    private byte[] buildMessageBody(IotDeviceMessage message, byte messageType) {
+        Buffer bodyBuffer = Buffer.buffer();
 
-        try {
-            TcpBinaryMessage tcpBinaryMessage = JsonUtils.parseObject(payload, TcpBinaryMessage.class);
-            if (tcpBinaryMessage != null) {
-                return new PayloadInfo(
-                        StrUtil.isNotEmpty(tcpBinaryMessage.getMethod())
-                                ? tcpBinaryMessage.getMethod() + "_" + System.currentTimeMillis()
-                                : null,
-                        tcpBinaryMessage.getParams());
+        if (messageType == MessageType.RESPONSE) {
+            // 响应消息：code + msg长度 + msg + data
+            bodyBuffer.appendInt(message.getCode() != null ? message.getCode() : 0);
+
+            String msg = message.getMsg() != null ? message.getMsg() : "";
+            byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+            bodyBuffer.appendShort((short) msgBytes.length);
+            bodyBuffer.appendBytes(msgBytes);
+
+            if (message.getData() != null) {
+                bodyBuffer.appendBytes(JsonUtils.toJsonByte(message.getData()));
             }
-        } catch (Exception e) {
-            // 如果解析失败，返回默认值
-            return new PayloadInfo("unknown_" + System.currentTimeMillis(), null);
+        } else {
+            // 请求消息：包含 params 或 data
+            Object payload = message.getParams() != null ? message.getParams() : message.getData();
+            if (payload != null) {
+                bodyBuffer.appendBytes(JsonUtils.toJsonByte(payload));
+            }
         }
-        return null;
+
+        return bodyBuffer.getBytes();
     }
 
     /**
-     * 编码 TCP 数据包
-     *
-     * @param dataPackage 数据包对象
-     * @return 编码后的字节流
+     * 构建完整消息
      */
-    private Buffer encodeTcpDataPackage(TcpDataPackage dataPackage) {
-        Assert.notNull(dataPackage, "数据包对象不能为空");
-        Assert.notNull(dataPackage.getPayload(), "负载不能为空");
-
-        // 1. 计算包体长度（除了包头 4 字节）
-        int payloadLength = dataPackage.getPayload().getBytes().length;
-        int totalLength = 2 + 2 + payloadLength;
-
-        // 2. 写入数据
+    private byte[] buildCompleteMessage(IotDeviceMessage message, byte messageType, byte[] bodyData) {
         Buffer buffer = Buffer.buffer();
-        // 2.1 写入包头：总长度（4 字节）
-        buffer.appendInt(totalLength);
-        // 2.2 写入功能码（2 字节）
-        buffer.appendShort(dataPackage.getCode());
-        // 2.3 写入消息序号（2 字节）
-        buffer.appendShort(dataPackage.getMid());
-        // 2.4 写入包体数据（不定长）
-        buffer.appendBytes(dataPackage.getPayload().getBytes());
-        return buffer;
+
+        // 1. 写入协议头部
+        buffer.appendByte(MAGIC_NUMBER);
+        buffer.appendByte(PROTOCOL_VERSION);
+        buffer.appendByte(messageType);
+        buffer.appendByte((byte) 0x00); // 消息标志，预留字段
+
+        // 2. 预留消息长度位置
+        int lengthPosition = buffer.length();
+        buffer.appendInt(0);
+
+        // 3. 写入消息ID
+        String messageId = StrUtil.isNotBlank(message.getRequestId()) ? message.getRequestId()
+                : generateMessageId(message.getMethod());
+        byte[] messageIdBytes = messageId.getBytes(StandardCharsets.UTF_8);
+        buffer.appendShort((short) messageIdBytes.length);
+        buffer.appendBytes(messageIdBytes);
+
+        // 4. 写入方法名
+        byte[] methodBytes = message.getMethod().getBytes(StandardCharsets.UTF_8);
+        buffer.appendShort((short) methodBytes.length);
+        buffer.appendBytes(methodBytes);
+
+        // 5. 写入消息体
+        buffer.appendBytes(bodyData);
+
+        // 6. 更新消息长度
+        buffer.setInt(lengthPosition, buffer.length());
+
+        return buffer.getBytes();
     }
 
     /**
-     * 解码 TCP 数据包
-     *
-     * @param buffer 数据缓冲区
-     * @return 解码后的数据包
+     * 生成消息 ID
      */
-    private TcpDataPackage decodeTcpDataPackage(Buffer buffer) {
-        Assert.isTrue(buffer.length() >= 8, "数据包长度不足");
+    private String generateMessageId(String method) {
+        return method + "_" + System.currentTimeMillis() + "_" + (int) (Math.random() * 1000);
+    }
 
+    // ==================== 解码相关方法 ====================
+
+    /**
+     * 解析协议头部
+     */
+    private ProtocolHeader parseProtocolHeader(Buffer buffer) {
         int index = 0;
-        // 1. 跳过包头（4 字节）
+
+        // 1. 验证魔术字
+        byte magic = buffer.getByte(index++);
+        Assert.isTrue(magic == MAGIC_NUMBER, "无效的协议魔术字: " + magic);
+
+        // 2. 验证版本号
+        byte version = buffer.getByte(index++);
+        Assert.isTrue(version == PROTOCOL_VERSION, "不支持的协议版本: " + version);
+
+        // 3. 读取消息类型
+        byte messageType = buffer.getByte(index++);
+        Assert.isTrue(isValidMessageType(messageType), "无效的消息类型: " + messageType);
+
+        // 4. 读取消息标志（暂时跳过）
+        byte messageFlags = buffer.getByte(index++);
+
+        // 5. 读取消息长度
+        int messageLength = buffer.getInt(index);
         index += 4;
-        // 2. 获取功能码（2 字节）
-        short code = buffer.getShort(index);
+
+        Assert.isTrue(messageLength == buffer.length(), "消息长度不匹配，期望: " + messageLength + ", 实际: " + buffer.length());
+
+        return new ProtocolHeader(magic, version, messageType, messageFlags, messageLength, index);
+    }
+
+    /**
+     * 解析消息内容
+     */
+    private IotDeviceMessage parseMessageContent(Buffer buffer, ProtocolHeader header) {
+        int index = header.getNextIndex();
+
+        // 1. 读取消息ID
+        short messageIdLength = buffer.getShort(index);
         index += 2;
-        // 3. 获取消息序号（2 字节）
-        short mid = buffer.getShort(index);
+        String messageId = buffer.getString(index, index + messageIdLength, StandardCharsets.UTF_8.name());
+        index += messageIdLength;
+
+        // 2. 读取方法名
+        short methodLength = buffer.getShort(index);
         index += 2;
-        // 4. 获取包体数据
-        String payload = "";
-        if (index < buffer.length()) {
-            payload = buffer.getString(index, buffer.length());
+        String method = buffer.getString(index, index + methodLength, StandardCharsets.UTF_8.name());
+        index += methodLength;
+
+        // 3. 解析消息体
+        return parseMessageBody(buffer, index, header.getMessageType(), messageId, method);
+    }
+
+    /**
+     * 解析消息体
+     */
+    private IotDeviceMessage parseMessageBody(Buffer buffer, int startIndex, byte messageType,
+                                              String messageId, String method) {
+        if (startIndex >= buffer.length()) {
+            // 空消息体
+            return IotDeviceMessage.of(messageId, method, null, null, null, null);
         }
 
-        return new TcpDataPackage(code, mid, payload);
+        if (messageType == MessageType.RESPONSE) {
+            // 响应消息：解析 code + msg + data
+            return parseResponseMessage(buffer, startIndex, messageId, method);
+        } else {
+            // 请求消息：解析 payload（可能是 params 或 data）
+            Object payload = parseJsonData(buffer, startIndex, buffer.length());
+            return IotDeviceMessage.of(messageId, method, payload, null, null, null);
+        }
+    }
+
+    /**
+     * 解析响应消息
+     */
+    private IotDeviceMessage parseResponseMessage(Buffer buffer, int startIndex, String messageId, String method) {
+        int index = startIndex;
+
+        // 1. 读取响应码
+        Integer code = buffer.getInt(index);
+        index += 4;
+
+        // 2. 读取响应消息
+        short msgLength = buffer.getShort(index);
+        index += 2;
+        String msg = msgLength > 0 ? buffer.getString(index, index + msgLength, StandardCharsets.UTF_8.name()) : null;
+        index += msgLength;
+
+        // 3. 读取响应数据
+        Object data = null;
+        if (index < buffer.length()) {
+            data = parseJsonData(buffer, index, buffer.length());
+        }
+
+        return IotDeviceMessage.of(messageId, method, null, data, code, msg);
+    }
+
+    /**
+     * 解析JSON数据
+     */
+    private Object parseJsonData(Buffer buffer, int startIndex, int endIndex) {
+        if (startIndex >= endIndex) {
+            return null;
+        }
+
+        try {
+            String jsonStr = buffer.getString(startIndex, endIndex, StandardCharsets.UTF_8.name());
+            if (StrUtil.isBlank(jsonStr)) {
+                return null;
+            }
+            return JsonUtils.parseObject(jsonStr, Object.class);
+        } catch (Exception e) {
+            log.warn("[parseJsonData][JSON 解析失败，返回原始字符串]", e);
+            return buffer.getString(startIndex, endIndex, StandardCharsets.UTF_8.name());
+        }
+    }
+
+    // ==================== 辅助方法 ====================
+
+    /**
+     * 验证消息类型是否有效
+     */
+    private boolean isValidMessageType(byte messageType) {
+        return messageType == MessageType.REQUEST || messageType == MessageType.RESPONSE;
     }
 
     // ==================== 内部类 ====================
 
-    // TODO @haohao：会不会存在 reply 的时候，有 data、msg、code 参数哈。
     /**
-     * 负载信息类
+     * 协议头部信息
      */
     @Data
     @AllArgsConstructor
-    private static class PayloadInfo {
-
-        private String requestId;
-        private Object params;
-
+    private static class ProtocolHeader {
+        private byte magic;
+        private byte version;
+        private byte messageType;
+        private byte messageFlags;
+        private int messageLength;
+        private int nextIndex; // 指向消息内容开始位置
     }
-
-    /**
-     * TCP 数据包内部类
-     */
-    @Data
-    @AllArgsConstructor
-    private static class TcpDataPackage {
-
-        // 功能码定义
-        public static final short CODE_REGISTER = 10;
-        public static final short CODE_REGISTER_REPLY = 11;
-        public static final short CODE_HEARTBEAT = 20;
-        public static final short CODE_HEARTBEAT_REPLY = 21;
-        public static final short CODE_MESSAGE_UP = 30;
-        public static final short CODE_MESSAGE_DOWN = 40;
-
-        // TODO @haohao：要不改成 opCode
-        private short code;
-        private short mid;
-        private String payload;
-
-    }
-
-    // ==================== 常量定义 ====================
-
-    /**
-     * 消息方法常量
-     */
-    public static class MessageMethod {
-
-        public static final String PROPERTY_POST = "thing.property.post"; // 数据上报
-        public static final String STATE_ONLINE = "thing.state.online"; // 心跳
-
-    }
-
-    // ==================== 自定义异常 ====================
-
-    // TODO @haohao：全局异常搞个。看着可以服用哈。
-    /**
-     * TCP 编解码异常
-     */
-    public static class TcpCodecException extends RuntimeException {
-        public TcpCodecException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
-
 }

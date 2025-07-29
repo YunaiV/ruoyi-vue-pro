@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpSessionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router.IotTcpUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
@@ -29,24 +29,24 @@ public class IotTcpUpstreamProtocol {
 
     private final IotDeviceMessageService messageService;
 
-    private final IotTcpSessionManager sessionManager;
+    private final IotTcpConnectionManager connectionManager;
 
     private final Vertx vertx;
 
     @Getter
     private final String serverId;
 
-    private NetServer netServer;
+    private NetServer tcpServer;
 
     public IotTcpUpstreamProtocol(IotGatewayProperties.TcpProperties tcpProperties,
             IotDeviceService deviceService,
             IotDeviceMessageService messageService,
-                                  IotTcpSessionManager sessionManager,
+                                  IotTcpConnectionManager connectionManager,
             Vertx vertx) {
         this.tcpProperties = tcpProperties;
         this.deviceService = deviceService;
         this.messageService = messageService;
-        this.sessionManager = sessionManager;
+        this.connectionManager = connectionManager;
         this.vertx = vertx;
         this.serverId = IotDeviceMessageUtils.generateServerId(tcpProperties.getPort());
     }
@@ -68,16 +68,16 @@ public class IotTcpUpstreamProtocol {
         }
 
         // 创建服务器并设置连接处理器
-        netServer = vertx.createNetServer(options);
-        netServer.connectHandler(socket -> {
+        tcpServer = vertx.createNetServer(options);
+        tcpServer.connectHandler(socket -> {
             IotTcpUpstreamHandler handler = new IotTcpUpstreamHandler(this, messageService, deviceService,
-                    sessionManager);
+                    connectionManager);
             handler.handle(socket);
         });
 
         // 启动服务器
         try {
-            netServer.listen().result();
+            tcpServer.listen().result();
             log.info("[start][IoT 网关 TCP 协议启动成功，端口：{}]", tcpProperties.getPort());
         } catch (Exception e) {
             log.error("[start][IoT 网关 TCP 协议启动失败]", e);
@@ -87,9 +87,9 @@ public class IotTcpUpstreamProtocol {
 
     @PreDestroy
     public void stop() {
-        if (netServer != null) {
+        if (tcpServer != null) {
             try {
-                netServer.close().result();
+                tcpServer.close().result();
                 log.info("[stop][IoT 网关 TCP 协议已停止]");
             } catch (Exception e) {
                 log.error("[stop][IoT 网关 TCP 协议停止失败]", e);

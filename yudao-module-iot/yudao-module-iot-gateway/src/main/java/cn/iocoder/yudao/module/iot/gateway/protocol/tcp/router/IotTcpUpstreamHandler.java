@@ -12,50 +12,48 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpJsonDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpAuthManager;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpSessionManager;
-import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * TCP 上行消息处理器
+ *
+ * @author 芋道源码
  */
 @Slf4j
 public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
-    // TODO @haohao：这两个变量，可以复用 IotTcpBinaryDeviceMessageCodec 的 TYPE
-    private static final String CODEC_TYPE_JSON = "TCP_JSON";
-    private static final String CODEC_TYPE_BINARY = "TCP_BINARY";
-
+    private static final String CODEC_TYPE_JSON = IotTcpJsonDeviceMessageCodec.TYPE;
+    private static final String CODEC_TYPE_BINARY = IotTcpBinaryDeviceMessageCodec.TYPE;
     private static final String AUTH_METHOD = "auth";
 
     private final IotDeviceMessageService deviceMessageService;
 
     private final IotDeviceService deviceService;
 
-    private final IotTcpSessionManager sessionManager;
-
-    private final IotTcpAuthManager authManager;
-
-    private final IotDeviceTokenService deviceTokenService;
+    private final IotTcpConnectionManager connectionManager;
 
     private final IotDeviceCommonApi deviceApi;
 
     private final String serverId;
 
     public IotTcpUpstreamHandler(IotTcpUpstreamProtocol protocol, IotDeviceMessageService deviceMessageService,
-                                 IotDeviceService deviceService, IotTcpSessionManager sessionManager) {
+            IotDeviceService deviceService, IotTcpConnectionManager connectionManager) {
         this.deviceMessageService = deviceMessageService;
         this.deviceService = deviceService;
-        this.sessionManager = sessionManager;
-        this.authManager = SpringUtil.getBean(IotTcpAuthManager.class);
-        this.deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
+        this.connectionManager = connectionManager;
         this.deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
         this.serverId = protocol.getServerId();
     }
@@ -63,207 +61,313 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     @Override
     public void handle(NetSocket socket) {
         String clientId = IdUtil.simpleUUID();
-        log.info("[handle][收到设备连接] 客户端 ID: {}, 地址: {}", clientId, socket.remoteAddress());
+        log.debug("[handle][设备连接，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
 
         // 设置异常和关闭处理器
         socket.exceptionHandler(ex -> {
-            log.error("[handle][连接异常] 客户端 ID: {}, 地址: {}", clientId, socket.remoteAddress(), ex);
-            cleanupSession(socket);
+            log.warn("[handle][连接异常，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
+            cleanupConnection(socket);
         });
 
         socket.closeHandler(v -> {
-            log.info("[handle][连接关闭] 客户端 ID: {}, 地址: {}", clientId, socket.remoteAddress());
-            cleanupSession(socket);
+            log.debug("[handle][连接关闭，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
+            cleanupConnection(socket);
         });
 
-        socket.handler(buffer -> handleDataPackage(clientId, buffer, socket));
+        socket.handler(buffer -> processMessage(clientId, buffer, socket));
     }
 
-    private void handleDataPackage(String clientId, Buffer buffer, NetSocket socket) {
+    /**
+     * 处理消息
+     */
+    private void processMessage(String clientId, Buffer buffer, NetSocket socket) {
         try {
+            // 1. 数据包基础检查
             if (buffer.length() == 0) {
-                log.warn("[handleDataPackage][数据包为空] 客户端 ID: {}", clientId);
                 return;
             }
 
-            // 1. 解码消息
+            // 2. 解码消息
             MessageInfo messageInfo = decodeMessage(buffer);
             if (messageInfo == null) {
                 return;
             }
 
-            // TODO @haohao：2. 和 3. 可以合并成 2.1 2.2 ，都是异常的情况。然后 3. 可以 return 直接；
-            // 2. 获取设备信息
-            IotDeviceRespDTO device = deviceService.getDeviceFromCache(messageInfo.message.getDeviceId());
-            if (device == null) {
-                sendError(socket, messageInfo.message.getRequestId(), "设备不存在", messageInfo.codecType);
-                return;
+            // 3. 根据消息类型路由处理
+            if (isAuthRequest(messageInfo.message)) {
+                // 认证请求：无需检查认证状态
+                handleAuthenticationRequest(clientId, messageInfo, socket);
+            } else {
+                // 业务消息：需要检查认证状态
+                handleBusinessRequest(clientId, messageInfo, socket);
             }
 
-            // 3. 处理消息
-            if (!authManager.isAuthenticated(socket)) {
-                handleAuthRequest(clientId, messageInfo.message, socket, messageInfo.codecType);
-            } else {
-                IotTcpAuthManager.AuthInfo authInfo = authManager.getAuthInfo(socket);
-                handleBusinessMessage(clientId, messageInfo.message, authInfo);
-            }
         } catch (Exception e) {
-            log.error("[handleDataPackage][处理数据包失败] 客户端 ID: {}, 错误: {}", clientId, e.getMessage(), e);
+            log.error("[processMessage][处理消息失败，客户端 ID: {}]", clientId, e);
         }
     }
 
     /**
      * 处理认证请求
      */
-    private void handleAuthRequest(String clientId, IotDeviceMessage message, NetSocket socket, String codecType) {
+    private void handleAuthenticationRequest(String clientId, MessageInfo messageInfo, NetSocket socket) {
         try {
-            // 1. 验证认证请求
-            // TODO @haohao：ObjUtil.notEquals。减少取反
-            if (!AUTH_METHOD.equals(message.getMethod())) {
-                sendError(socket, message.getRequestId(), "请先进行认证", codecType);
-                return;
-            }
+            IotDeviceMessage message = messageInfo.message;
 
-            // 2. 解析认证参数 // TODO @haohao：1. 和 2. 可以合并成 1.1 1.2 都是参数校验
+            // 1. 解析认证参数
             AuthParams authParams = parseAuthParams(message.getParams());
             if (authParams == null) {
-                sendError(socket, message.getRequestId(), "认证参数不完整", codecType);
+                sendError(socket, message.getRequestId(), "认证参数不完整", messageInfo.codecType);
                 return;
             }
 
-            // 3. 执行认证流程
-            // TODO @haohao：成功失败、都大哥日志，会不会更好哈？
-            if (performAuthentication(authParams, socket, message.getRequestId(), codecType)) {
-                log.info("[handleAuthRequest][认证成功] 客户端 ID: {}, username: {}", clientId, authParams.username);
+            // 2. 执行认证
+            if (!authenticateDevice(authParams)) {
+                log.warn("[handleAuthenticationRequest][认证失败，客户端 ID: {}，username: {}]",
+                        clientId, authParams.username);
+                sendError(socket, message.getRequestId(), "认证失败", messageInfo.codecType);
+                return;
             }
+
+            // 3. 解析设备信息
+            IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(authParams.username);
+            if (deviceInfo == null) {
+                sendError(socket, message.getRequestId(), "解析设备信息失败", messageInfo.codecType);
+                return;
+            }
+
+            // 4. 获取设备信息
+            IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceInfo.getProductKey(),
+                    deviceInfo.getDeviceName());
+            if (device == null) {
+                sendError(socket, message.getRequestId(), "设备不存在", messageInfo.codecType);
+                return;
+            }
+
+            // 5. 注册连接并发送成功响应
+            registerConnection(socket, device, deviceInfo, authParams.clientId);
+            sendOnlineMessage(deviceInfo);
+            sendSuccess(socket, message.getRequestId(), "认证成功", messageInfo.codecType);
+
+            log.info("[handleAuthenticationRequest][认证成功，设备 ID: {}，设备名: {}]",
+                    device.getId(), deviceInfo.getDeviceName());
+
         } catch (Exception e) {
-            log.error("[handleAuthRequest][认证处理异常] 客户端 ID: {}", clientId, e);
-            sendError(socket, message.getRequestId(), "认证处理异常: " + e.getMessage(), codecType);
+            log.error("[handleAuthenticationRequest][认证处理异常，客户端 ID: {}]", clientId, e);
+            sendError(socket, messageInfo.message.getRequestId(), "认证处理异常", messageInfo.codecType);
+        }
+    }
+
+    /**
+     * 处理业务请求
+     */
+    private void handleBusinessRequest(String clientId, MessageInfo messageInfo, NetSocket socket) {
+        try {
+            // 1. 检查认证状态
+            if (connectionManager.isNotAuthenticated(socket)) {
+                log.warn("[handleBusinessRequest][设备未认证，客户端 ID: {}]", clientId);
+                sendError(socket, messageInfo.message.getRequestId(), "请先进行认证", messageInfo.codecType);
+                return;
+            }
+
+            // 2. 获取认证信息并处理业务消息
+            IotTcpConnectionManager.AuthInfo authInfo = connectionManager.getAuthInfo(socket);
+            processBusinessMessage(clientId, messageInfo.message, authInfo);
+
+        } catch (Exception e) {
+            log.error("[handleBusinessRequest][业务请求处理异常，客户端 ID: {}]", clientId, e);
         }
     }
 
     /**
      * 处理业务消息
      */
-    private void handleBusinessMessage(String clientId, IotDeviceMessage message,
-                                       IotTcpAuthManager.AuthInfo authInfo) {
+    private void processBusinessMessage(String clientId, IotDeviceMessage message,
+            IotTcpConnectionManager.AuthInfo authInfo) {
         try {
             message.setDeviceId(authInfo.getDeviceId());
             message.setServerId(serverId);
 
-            deviceMessageService.sendDeviceMessage(message, authInfo.getProductKey(), authInfo.getDeviceName(),
-                    serverId);
-            log.info("[handleBusinessMessage][业务消息处理完成] 客户端 ID: {}, 消息 ID: {}, 设备 ID: {}, 方法: {}",
-                    clientId, message.getId(), message.getDeviceId(), message.getMethod());
+            // 发送到消息总线
+            deviceMessageService.sendDeviceMessage(message, authInfo.getProductKey(),
+                    authInfo.getDeviceName(), serverId);
+
         } catch (Exception e) {
-            log.error("[handleBusinessMessage][处理业务消息失败] 客户端 ID: {}, 错误: {}", clientId, e.getMessage(), e);
+            log.error("[processBusinessMessage][业务消息处理失败，客户端 ID: {}，消息 ID: {}]",
+                    clientId, message.getId(), e);
         }
     }
 
     /**
      * 解码消息
      */
-    // TODO @haohao：是不是还是直接管理后台配置协议，然后直接使用就好啦。暂时不考虑动态解析哈。保持一致，降低理解成本哈。
     private MessageInfo decodeMessage(Buffer buffer) {
+        if (buffer == null || buffer.length() == 0) {
+            return null;
+        }
+
+        // 1. 快速检测消息格式类型
+        String codecType = detectMessageFormat(buffer);
+
         try {
-            String rawData = buffer.toString();
-            String codecType = isJsonFormat(rawData) ? CODEC_TYPE_JSON : CODEC_TYPE_BINARY;
+            // 2. 使用检测到的格式进行解码
             IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(buffer.getBytes(), codecType);
-            return message != null ? new MessageInfo(message, codecType) : null;
+
+            if (message == null) {
+                return null;
+            }
+
+            return new MessageInfo(message, codecType);
+
         } catch (Exception e) {
-            log.debug("[decodeMessage][消息解码失败] 错误: {}", e.getMessage());
+            log.warn("[decodeMessage][消息解码失败，格式: {}，数据长度: {}，错误: {}]",
+                    codecType, buffer.length(), e.getMessage());
             return null;
         }
     }
 
     /**
-     * 执行认证
+     * 检测消息格式类型
+     * 优化性能：避免不必要的字符串转换
      */
-    // TODO @haohao：下面的 1. 2. 可以合并下，本质也是校验哈。
-    private boolean performAuthentication(AuthParams authParams, NetSocket socket, String requestId, String codecType) {
-        // 1. 执行认证
-        if (!authenticateDevice(authParams)) {
-            sendError(socket, requestId, "认证失败", codecType);
-            return false;
+    private String detectMessageFormat(Buffer buffer) {
+        if (buffer.length() == 0) {
+            return CODEC_TYPE_JSON; // 默认使用 JSON
         }
 
-        // 2. 获取设备信息
-        IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.parseUsername(authParams.username);
-        if (deviceInfo == null) {
-            sendError(socket, requestId, "解析设备信息失败", codecType);
-            return false;
+        // 1. 优先检测二进制格式（检查魔术字节 0x7E）
+        if (isBinaryFormat(buffer)) {
+            return CODEC_TYPE_BINARY;
         }
 
-        IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceInfo.getProductKey(),
-                deviceInfo.getDeviceName());
-        if (device == null) {
-            sendError(socket, requestId, "设备不存在", codecType);
-            return false;
+        // 2. 检测 JSON 格式（检查前几个有效字符）
+        if (isJsonFormat(buffer)) {
+            return CODEC_TYPE_JSON;
         }
 
-        // 3. 注册认证信息
-        String token = deviceTokenService.createToken(deviceInfo.getProductKey(), deviceInfo.getDeviceName());
-        registerAuthInfo(socket, device, deviceInfo, token, authParams.clientId);
-
-        // 4. 发送上线消息和成功响应
-        IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
-        deviceMessageService.sendDeviceMessage(onlineMessage, deviceInfo.getProductKey(), deviceInfo.getDeviceName(),
-                serverId);
-        sendSuccess(socket, requestId, "认证成功", codecType);
-        return true;
+        // 3. 默认尝试 JSON 格式
+        return CODEC_TYPE_JSON;
     }
 
     /**
-     * 发送响应
+     * 检测二进制格式
+     * 通过检查魔术字节快速识别，避免完整字符串转换
+     */
+    private boolean isBinaryFormat(Buffer buffer) {
+        // 二进制协议最小长度检查
+        if (buffer.length() < 8) {
+            return false;
+        }
+
+        try {
+            // 检查魔术字节 0x7E（二进制协议的第一个字节）
+            byte firstByte = buffer.getByte(0);
+            return firstByte == (byte) 0x7E;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 检测 JSON 格式
+     * 只检查前几个有效字符，避免完整字符串转换
+     */
+    private boolean isJsonFormat(Buffer buffer) {
+        try {
+            // 检查前 64 个字节或整个缓冲区（取较小值）
+            int checkLength = Math.min(buffer.length(), 64);
+            String prefix = buffer.getString(0, checkLength, StandardCharsets.UTF_8.name());
+
+            if (StrUtil.isBlank(prefix)) {
+                return false;
+            }
+
+            String trimmed = prefix.trim();
+            // JSON 格式必须以 { 或 [ 开头
+            return trimmed.startsWith("{") || trimmed.startsWith("[");
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 注册连接信息
+     */
+    private void registerConnection(NetSocket socket, IotDeviceRespDTO device,
+            IotDeviceAuthUtils.DeviceInfo deviceInfo, String clientId) {
+        // 创建认证信息
+        IotTcpConnectionManager.AuthInfo authInfo = new IotTcpConnectionManager.AuthInfo()
+                .setDeviceId(device.getId())
+                .setProductKey(deviceInfo.getProductKey())
+                .setDeviceName(deviceInfo.getDeviceName())
+                .setClientId(clientId);
+
+        // 注册连接
+        connectionManager.registerConnection(socket, device.getId(), authInfo);
+    }
+
+    /**
+     * 发送设备上线消息
+     */
+    private void sendOnlineMessage(IotDeviceAuthUtils.DeviceInfo deviceInfo) {
+        try {
+            IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
+            deviceMessageService.sendDeviceMessage(onlineMessage, deviceInfo.getProductKey(),
+                    deviceInfo.getDeviceName(), serverId);
+        } catch (Exception e) {
+            log.error("[sendOnlineMessage][发送上线消息失败，设备: {}]", deviceInfo.getDeviceName(), e);
+        }
+    }
+
+    /**
+     * 清理连接
+     */
+    private void cleanupConnection(NetSocket socket) {
+        try {
+            // 发送离线消息（如果已认证）
+            IotTcpConnectionManager.AuthInfo authInfo = connectionManager.getAuthInfo(socket);
+            if (authInfo != null) {
+                IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
+                deviceMessageService.sendDeviceMessage(offlineMessage, authInfo.getProductKey(),
+                        authInfo.getDeviceName(), serverId);
+            }
+
+            // 注销连接
+            connectionManager.unregisterConnection(socket);
+        } catch (Exception e) {
+            log.error("[cleanupConnection][清理连接失败]", e);
+        }
+    }
+
+    /**
+     * 发送响应消息
      */
     private void sendResponse(NetSocket socket, boolean success, String message, String requestId, String codecType) {
         try {
-            Object responseData = buildResponseData(success, message);
+            Object responseData = MapUtil.builder()
+                    .put("success", success)
+                    .put("message", message)
+                    .build();
+
             IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, AUTH_METHOD, responseData,
                     success ? 0 : 401, message);
+
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, codecType);
             socket.write(Buffer.buffer(encodedData));
-            log.debug("[sendResponse][发送响应] success: {}, message: {}, requestId: {}", success, message, requestId);
+
         } catch (Exception e) {
-            log.error("[sendResponse][发送响应失败] requestId: {}", requestId, e);
+            log.error("[sendResponse][发送响应失败，requestId: {}]", requestId, e);
         }
     }
 
-    /**
-     * 构建响应数据（不返回 token）
-     */
-    private Object buildResponseData(boolean success, String message) {
-        return MapUtil.builder()
-                .put("success", success)
-                .put("message", message)
-                .build();
-    }
+    // ==================== 辅助方法 ====================
 
     /**
-     * 清理会话
+     * 判断是否为认证请求
      */
-    private void cleanupSession(NetSocket socket) {
-        // 如果已认证，发送离线消息
-        IotTcpAuthManager.AuthInfo authInfo = authManager.getAuthInfo(socket);
-        if (authInfo != null) {
-            // 发送离线消息
-            IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
-            deviceMessageService.sendDeviceMessage(offlineMessage, authInfo.getProductKey(), authInfo.getDeviceName(),
-                    serverId);
-        }
-        sessionManager.unregisterSession(socket);
-        authManager.unregisterAuth(socket);
-    }
-
-    /**
-     * 判断是否为 JSON 格式
-     */
-    private boolean isJsonFormat(String data) {
-        if (StrUtil.isBlank(data)) {
-            return false;
-        }
-        String trimmed = data.trim();
-        return (trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"));
+    private boolean isAuthRequest(IotDeviceMessage message) {
+        return AUTH_METHOD.equals(message.getMethod());
     }
 
     /**
@@ -273,38 +377,37 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         if (params == null) {
             return null;
         }
-        JSONObject paramsJson = params instanceof JSONObject ? (JSONObject) params
-                : JSONUtil.parseObj(params.toString());
-        String clientId = paramsJson.getStr("clientId");
-        String username = paramsJson.getStr("username");
-        String password = paramsJson.getStr("password");
-        return StrUtil.hasBlank(clientId, username, password) ? null : new AuthParams(clientId, username, password);
+
+        try {
+            JSONObject paramsJson = params instanceof JSONObject ? (JSONObject) params
+                    : JSONUtil.parseObj(params.toString());
+
+            String clientId = paramsJson.getStr("clientId");
+            String username = paramsJson.getStr("username");
+            String password = paramsJson.getStr("password");
+
+            return StrUtil.hasBlank(clientId, username, password) ? null
+                    : new AuthParams(clientId, username, password);
+        } catch (Exception e) {
+            log.warn("[parseAuthParams][解析认证参数失败]", e);
+            return null;
+        }
     }
 
     /**
      * 认证设备
      */
     private boolean authenticateDevice(AuthParams authParams) {
-        CommonResult<Boolean> result = deviceApi.authDevice(new IotDeviceAuthReqDTO()
-                .setClientId(authParams.clientId).setUsername(authParams.username).setPassword(authParams.password));
-        return result.isSuccess() && result.getData();
-    }
-
-    /**
-     * 注册认证信息
-     */
-    private void registerAuthInfo(NetSocket socket, IotDeviceRespDTO device, IotDeviceAuthUtils.DeviceInfo deviceInfo,
-                                  String token, String clientId) {
-        // TODO @haohao：可以链式调用；
-        IotTcpAuthManager.AuthInfo auth = new IotTcpAuthManager.AuthInfo();
-        auth.setDeviceId(device.getId());
-        auth.setProductKey(deviceInfo.getProductKey());
-        auth.setDeviceName(deviceInfo.getDeviceName());
-        auth.setToken(token);
-        auth.setClientId(clientId);
-
-        authManager.registerAuth(socket, auth);
-        sessionManager.registerSession(device.getId(), socket);
+        try {
+            CommonResult<Boolean> result = deviceApi.authDevice(new IotDeviceAuthReqDTO()
+                    .setClientId(authParams.clientId)
+                    .setUsername(authParams.username)
+                    .setPassword(authParams.password));
+            return result.isSuccess() && Boolean.TRUE.equals(result.getData());
+        } catch (Exception e) {
+            log.error("[authenticateDevice][设备认证异常，username: {}]", authParams.username, e);
+            return false;
+        }
     }
 
     /**
@@ -315,24 +418,32 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     }
 
     /**
-     * 发送成功响应（不返回 token）
+     * 发送成功响应
      */
     private void sendSuccess(NetSocket socket, String requestId, String message, String codecType) {
         sendResponse(socket, true, message, requestId, codecType);
     }
 
-    // TODO @haohao：使用 lombok，方便 jdk8 兼容
+    // ==================== 内部类 ====================
 
     /**
      * 认证参数
      */
-    private record AuthParams(String clientId, String username, String password) {
+    @Data
+    @AllArgsConstructor
+    private static class AuthParams {
+        private final String clientId;
+        private final String username;
+        private final String password;
     }
 
     /**
      * 消息信息
      */
-    private record MessageInfo(IotDeviceMessage message, String codecType) {
+    @Data
+    @AllArgsConstructor
+    private static class MessageInfo {
+        private final IotDeviceMessage message;
+        private final String codecType;
     }
-
 }

@@ -4,13 +4,13 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpSessionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router.IotTcpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * IoT 网关 TCP 下游订阅者：接收下行给设备的消息
@@ -18,37 +18,28 @@ import org.springframework.stereotype.Component;
  * @author 芋道源码
  */
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class IotTcpDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
-
-    private final IotTcpDownstreamHandler downstreamHandler;
-
-    private final IotMessageBus messageBus;
 
     private final IotTcpUpstreamProtocol protocol;
 
-    // todo @haohao：不用的变量，可以去掉哈
+    private final IotDeviceMessageService messageService;
+
     private final IotDeviceService deviceService;
 
-    private final IotTcpSessionManager sessionManager;
+    private final IotTcpConnectionManager connectionManager;
 
-    // TODO @haohao：lombok 简化
-    public IotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocol,
-            IotDeviceMessageService messageService,
-                                      IotDeviceService deviceService,
-                                      IotTcpSessionManager sessionManager,
-            IotMessageBus messageBus) {
-        this.protocol = protocol;
-        this.messageBus = messageBus;
-        this.deviceService = deviceService;
-        this.sessionManager = sessionManager;
-        this.downstreamHandler = new IotTcpDownstreamHandler(messageService, deviceService, sessionManager);
-    }
+    private final IotMessageBus messageBus;
+
+    private IotTcpDownstreamHandler downstreamHandler;
 
     @PostConstruct
     public void init() {
+        // 初始化下游处理器
+        this.downstreamHandler = new IotTcpDownstreamHandler(messageService, deviceService, connectionManager);
+
         messageBus.register(this);
-        log.info("[init][TCP 下游订阅者初始化完成] 服务器 ID: {}, Topic: {}",
+        log.info("[init][TCP 下游订阅者初始化完成，服务器 ID: {}，Topic: {}]",
                 protocol.getServerId(), getTopic());
     }
 
@@ -68,8 +59,9 @@ public class IotTcpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
         try {
             downstreamHandler.handle(message);
         } catch (Exception e) {
-            log.error("[onMessage][处理下行消息失败] 设备 ID: {}, 方法: {}, 消息 ID: {}",
+            log.error("[onMessage][处理下行消息失败，设备 ID: {}，方法: {}，消息 ID: {}]",
                     message.getDeviceId(), message.getMethod(), message.getId(), e);
         }
     }
+
 }
