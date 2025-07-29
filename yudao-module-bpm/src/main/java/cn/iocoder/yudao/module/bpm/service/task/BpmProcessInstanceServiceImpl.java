@@ -265,7 +265,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 3. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
-        // 仅仅获取 UserTask 节点  TODO：如果网关节点和网关节点相连，获取下个 UserTask. 貌似有点不准。
+        // 仅仅获取 UserTask 节点  TODO add from jason：如果网关节点和网关节点相连，获取下个 UserTask. 貌似有点不准。
         List<FlowNode> nextUserTaskList = CollectionUtils.filterList(nextFlowNodes, node -> node instanceof UserTask);
         List<ActivityNode> nextActivityNodes = convertList(nextUserTaskList, node -> new ActivityNode().setId(node.getId())
                 .setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
