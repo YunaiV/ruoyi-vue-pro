@@ -398,7 +398,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                             ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
                             : ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
                             BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
-                    .setStatus(FlowableUtils.getTaskStatus(task))
+                    .setStatus(getEndActivityNodeStatus(task))
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(task.getCreateTime())).setEndTime(DateUtils.of(task.getEndTime()))
                     .setTasks(singletonList(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task)));
@@ -460,6 +460,18 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 按照时间排序
         approvalNodes.sort(Comparator.comparing(ActivityNode::getStartTime));
         return approvalNodes;
+    }
+
+    /**
+     *  获取结束节点的状态
+     */
+    private Integer getEndActivityNodeStatus(HistoricTaskInstance task) {
+        Integer status = FlowableUtils.getTaskStatus(task);
+        if (status != null) {
+            return status;
+        }
+        // 结束节点未获取到状态，为跳过状态。可见 bpmn 或者 simple 的 skipExpression
+        return BpmTaskStatusEnum.SKIP.getStatus();
     }
 
     /**
@@ -565,10 +577,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (runActivityIds.contains(node.getId())) {
             return null;
         }
-
+        Integer status = BpmTaskStatusEnum.NOT_START.getStatus();
+        // 如果节点被跳过。设置状态为跳过
+        if (SimpleModelUtils.isSkipNode(node, processVariables)) {
+            status = BpmTaskStatusEnum.SKIP.getStatus();
+        }
         ActivityNode activityNode = new ActivityNode().setId(node.getId()).setName(node.getName())
                 .setNodeType(node.getType()).setCandidateStrategy(node.getCandidateStrategy())
-                .setStatus(BpmTaskStatusEnum.NOT_START.getStatus());
+                .setStatus(status);
 
         // 1. 开始节点/审批节点
         if (ObjectUtils.equalsAny(node.getType(),
@@ -608,8 +624,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (runActivityIds.contains(node.getId())) {
             return null;
         }
+        Integer status = BpmTaskStatusEnum.NOT_START.getStatus();
+        // 如果节点被跳过，状态设置为跳过
+        if(BpmnModelUtils.isSkipNode(node, processVariables)){
+            status = BpmTaskStatusEnum.SKIP.getStatus();
+        }
         ActivityNode activityNode = new ActivityNode().setId(node.getId())
-                .setStatus(BpmTaskStatusEnum.NOT_START.getStatus());
+                .setStatus(status);
 
         // 1. 开始节点
         if (node instanceof StartEvent) {

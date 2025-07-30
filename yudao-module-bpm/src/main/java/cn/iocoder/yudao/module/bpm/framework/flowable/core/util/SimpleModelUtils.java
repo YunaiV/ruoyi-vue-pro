@@ -464,6 +464,10 @@ public class SimpleModelUtils {
             addReasonRequire(node.getReasonRequire(), userTask);
             // 节点类型
             addNodeType(node.getType(), userTask);
+            // 添加跳过表达式
+            if (StrUtil.isNotEmpty(node.getSkipExpression())) {
+                userTask.setSkipExpression(node.getSkipExpression());
+            }
             return userTask;
         }
 
@@ -968,7 +972,7 @@ public class SimpleModelUtils {
                 || nodeType == BpmSimpleModelNodeTypeEnum.COPY_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.CHILD_PROCESS
                 || nodeType == BpmSimpleModelNodeTypeEnum.END_NODE) {
-            // 添加元素
+            // 添加此节点
             resultNodes.add(currentNode);
         }
 
@@ -1012,6 +1016,16 @@ public class SimpleModelUtils {
 
         // 遍历子节点
         simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
+    }
+
+    /**
+     * 根据跳过表达式，判断是否跳过此节点
+     */
+    public static boolean isSkipNode(BpmSimpleModelNodeVO currentNode, Map<String, Object> variables) {
+        if (StrUtil.isEmpty(currentNode.getSkipExpression())) {
+            return false;
+        }
+        return BpmnModelUtils.evalConditionExpress(variables, currentNode.getSkipExpression());
     }
 
     public static boolean evalConditionExpress(Map<String, Object> variables, BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {
