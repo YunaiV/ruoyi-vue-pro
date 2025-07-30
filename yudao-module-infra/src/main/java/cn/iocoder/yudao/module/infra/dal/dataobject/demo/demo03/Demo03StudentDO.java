@@ -35,7 +35,7 @@ public class Demo03StudentDO extends BaseDO {
     /**
      * 性别
      *
-     * 枚举 {@link TODO system_user_sex 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.module.system.enums.common.SexEnum}
      */
     private Integer sex;
     /**
