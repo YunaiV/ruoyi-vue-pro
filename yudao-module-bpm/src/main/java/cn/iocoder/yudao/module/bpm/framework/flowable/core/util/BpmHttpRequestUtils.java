@@ -6,15 +6,15 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTANCE_HTTP_TRIGGER_CALL_ERROR;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTANCE_HTTP_CALL_ERROR;
 
 /**
  * 工作流发起 HTTP 请求工具类
@@ -42,7 +42,6 @@ public class BpmHttpRequestUtils {
                                              List<BpmSimpleModelNodeVO.HttpRequestParam> bodyParams,
                                              Boolean handleResponse,
                                              List<KeyValue<String, String>> response) {
-        RestTemplate restTemplate = SpringUtils.getBean(RestTemplate.class);
         BpmProcessInstanceService processInstanceService = SpringUtils.getBean(BpmProcessInstanceService.class);
 
         // 1.1 设置请求头
@@ -51,6 +50,7 @@ public class BpmHttpRequestUtils {
         MultiValueMap<String, String> body = buildHttpBody(processInstance, bodyParams);
 
         // 2. 发起请求
+        RestTemplate restTemplate = SpringUtils.getBean(RestTemplate.class);
         ResponseEntity<String> responseEntity = sendHttpRequest(url, headers, body, restTemplate);
 
         // 3. 处理返回
@@ -78,27 +78,55 @@ public class BpmHttpRequestUtils {
         }
     }
 
+    public static void executeBpmHttpRequest(BpmProcessInstanceStatusEvent event,
+                                             String url) {
+        // 1.1 设置请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (TenantContextHolder.getTenantId() != null) {
+            headers.add(HEADER_TENANT_ID, String.valueOf(TenantContextHolder.getTenantId()));
+        } else {
+            BpmProcessInstanceService processInstanceService = SpringUtils.getBean(BpmProcessInstanceService.class);
+            ProcessInstance processInstance = processInstanceService.getProcessInstance(event.getId());
+            if (processInstance != null) {
+                headers.add(HEADER_TENANT_ID, String.valueOf(TenantContextHolder.getTenantId()));
+            }
+        }
+        // 1.2 设置请求体
+//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//        body.add("id", event.getId());
+//        body.add("processDefinitionKey", event.getProcessDefinitionKey());
+//        body.add("status", event.getStatus().toString());
+//        if (StrUtil.isNotEmpty(event.getBusinessKey())) {
+//            body.add("businessKey", event.getBusinessKey());
+//        }
+
+        // 2. 发起请求
+        RestTemplate restTemplate = SpringUtils.getBean(RestTemplate.class);
+        sendHttpRequest(url, headers, event, restTemplate);
+    }
+
     public static ResponseEntity<String> sendHttpRequest(String url,
                                                          MultiValueMap<String, String> headers,
-                                                         MultiValueMap<String, String> body,
+                                                         Object body,
                                                          RestTemplate restTemplate) {
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+        HttpEntity<Object> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            log.info("[sendHttpRequest][HTTP 触发器，请求头：{}，请求体：{}，响应结果：{}]", headers, body, responseEntity);
+            log.info("[sendHttpRequest][HTTP 请求，请求头：{}，请求体：{}，响应结果：{}]", headers, body, responseEntity);
         } catch (RestClientException e) {
-            log.error("[sendHttpRequest][HTTP 触发器，请求头：{}，请求体：{}，请求出错：{}]", headers, body, e.getMessage());
-            throw exception(PROCESS_INSTANCE_HTTP_TRIGGER_CALL_ERROR);
+            log.error("[sendHttpRequest][HTTP 请求，请求头：{}，请求体：{}，请求出错：{}]", headers, body, e.getMessage());
+            throw exception(PROCESS_INSTANCE_HTTP_CALL_ERROR);
         }
         return responseEntity;
     }
 
     public static MultiValueMap<String, String> buildHttpHeaders(ProcessInstance processInstance,
                                                                  List<BpmSimpleModelNodeVO.HttpRequestParam> headerSettings) {
-        Map<String, Object> processVariables = processInstance.getProcessVariables();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add(HEADER_TENANT_ID, processInstance.getTenantId());
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
         addHttpRequestParam(headers, headerSettings, processVariables);
         return headers;
     }

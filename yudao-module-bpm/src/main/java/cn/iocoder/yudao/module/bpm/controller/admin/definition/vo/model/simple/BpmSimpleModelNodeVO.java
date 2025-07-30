@@ -71,6 +71,9 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "是否填写审批意见", example = "false")
     private Boolean reasonRequire;
 
+    @Schema(description = "跳过表达式", example = "{true}")
+    private String skipExpression;  // 用于审批节点
+
     /**
      * 审批节点拒绝处理
      */
