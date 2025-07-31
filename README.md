@@ -262,146 +262,160 @@
 | | 延迟节点 | 执行到该节点，审批等待一段时间再执行，支持固定时长、固定日期等 | ✅ |
 | **扩展设置** | 拓展设置 | 流程前置/后置通知，节点前置、后置通知，流程报表，自动审批去重等 | ✅ |
 
-### 支付系统
+### 💰 支付系统
 
-|     | 功能   | 描述                        |
-|-----|------|---------------------------|
-| 🚀  | 应用信息 | 配置商户的应用信息，对接支付宝、微信等多个支付渠道 |
-| 🚀  | 支付订单 | 查看用户发起的支付宝、微信等的【支付】订单     |
-| 🚀  | 退款订单 | 查看用户发起的支付宝、微信等的【退款】订单     |
-| 🚀  | 回调通知 | 查看支付回调业务的【支付】【退款】的通知结果    |
-| 🚀  | 接入示例 | 提供接入支付系统的【支付】【退款】的功能实战    |
+| 功能模块 | 功能名称 | 描述 | 特色标记 |
+|---------|---------|------|----------|
+| **应用配置** | 应用信息 | 配置商户的应用信息，对接支付宝、微信等多个支付渠道 | 🚀 |
+| **订单管理** | 支付订单 | 查看用户发起的支付宝、微信等的【支付】订单 | 🚀 |
+| | 退款订单 | 查看用户发起的支付宝、微信等的【退款】订单 | 🚀 |
+| **通知管理** | 回调通知 | 查看支付回调业务的【支付】【退款】的通知结果 | 🚀 |
+| **开发支持** | 接入示例 | 提供接入支付系统的【支付】【退款】的功能实战 | 🚀 |
 
-### 基础设施
+### 🏗️ 基础设施
 
-|     | 功能        | 描述                                           |
-|-----|-----------|----------------------------------------------|
-| 🚀  | 代码生成      | 前后端代码的生成（Java、Vue、SQL、单元测试），支持 CRUD 下载       |
-| 🚀  | 系统接口      | 基于 Swagger 自动生成相关的 RESTful API 接口文档          |
-| 🚀  | 数据库文档     | 基于 Screw 自动生成数据库文档，支持导出 Word、HTML、MD 格式      |
-|     | 表单构建      | 拖动表单元素生成相应的 HTML 代码，支持导出 JSON、Vue 文件         |
-| 🚀  | 配置管理      | 对系统动态配置常用参数，支持 SpringBoot 加载                 |
-| ⭐️  | 定时任务      | 在线（添加、修改、删除)任务调度包含执行结果日志                     |
-| 🚀  | 文件服务      | 支持将文件存储到 S3（MinIO、阿里云、腾讯云、七牛云）、本地、FTP、数据库等   | 
-| 🚀  | WebSocket | 提供 WebSocket 接入示例，支持一对一、一对多发送方式              | 
-| 🚀  | API 日志    | 包括 RESTful API 访问日志、异常日志两部分，方便排查 API 相关的问题   |
-|     | MySQL 监控  | 监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈              |
-|     | Redis 监控  | 监控 Redis 数据库的使用情况，使用的 Redis Key 管理           |
-| 🚀  | 消息队列      | 基于 Redis 实现消息队列，Stream 提供集群消费，Pub/Sub 提供广播消费 |
-| 🚀  | Java 监控   | 基于 Spring Boot Admin 实现 Java 应用的监控           |
-| 🚀  | 链路追踪      | 接入 SkyWalking 组件，实现链路追踪                      |
-| 🚀  | 日志中心      | 接入 SkyWalking 组件，实现日志中心                      |
-| 🚀  | 服务保障      | 基于 Redis 实现分布式锁、幂等、限流功能，满足高并发场景              |
-| 🚀  | 日志服务      | 轻量级日志中心，查看远程服务器的日志                           |
-| 🚀  | 单元测试      | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等    |
+| 功能分类 | 功能名称 | 描述 | 特色标记 |
+|---------|---------|------|----------|
+| **开发工具** | 代码生成 | 前后端代码的生成（Java、Vue、SQL、单元测试），支持 CRUD 下载 | 🚀 |
+| | 系统接口 | 基于 Swagger 自动生成相关的 RESTful API 接口文档 | 🚀 |
+| | 数据库文档 | 基于 Screw 自动生成数据库文档，支持导出 Word、HTML、MD 格式 | 🚀 |
+| | 表单构建 | 拖动表单元素生成相应的 HTML 代码，支持导出 JSON、Vue 文件 | - |
+| **系统管理** | 配置管理 | 对系统动态配置常用参数，支持 SpringBoot 加载 | 🚀 |
+| | 定时任务 | 在线（添加、修改、删除)任务调度包含执行结果日志 | ⭐️ |
+| **文件服务** | 文件服务 | 支持将文件存储到 S3（MinIO、阿里云、腾讯云、七牛云）、本地、FTP、数据库等 | 🚀 |
+| **通信服务** | WebSocket | 提供 WebSocket 接入示例，支持一对一、一对多发送方式 | 🚀 |
+| | 消息队列 | 基于 Redis 实现消息队列，Stream 提供集群消费，Pub/Sub 提供广播消费 | 🚀 |
+| **日志管理** | API 日志 | 包括 RESTful API 访问日志、异常日志两部分，方便排查 API 相关的问题 | 🚀 |
+| | 日志服务 | 轻量级日志中心，查看远程服务器的日志 | 🚀 |
+| **监控管理** | MySQL 监控 | 监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈 | - |
+| | Redis 监控 | 监控 Redis 数据库的使用情况，使用的 Redis Key 管理 | - |
+| | Java 监控 | 基于 Spring Boot Admin 实现 Java 应用的监控 | 🚀 |
+| **链路追踪** | 链路追踪 | 接入 SkyWalking 组件，实现链路追踪 | 🚀 |
+| | 日志中心 | 接入 SkyWalking 组件，实现日志中心 | 🚀 |
+| **服务保障** | 服务保障 | 基于 Redis 实现分布式锁、幂等、限流功能，满足高并发场景 | 🚀 |
+| **质量保证** | 单元测试 | 基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等 | 🚀 |
 
-![功能图](/.image/common/infra-feature.png)
+<p align="center">
+ <img src="/.image/common/infra-feature.png" alt="基础设施功能图" style="max-width: 100%; height: auto;">
+</p>
 
-### 数据报表
+### 📊 数据报表
 
-|     | 功能    | 描述                 |
-|-----|-------|--------------------|
-| 🚀  | 报表设计器 | 支持数据报表、图形报表、打印设计等  |
-| 🚀  | 大屏设计器 | 拖拽生成数据大屏，内置几十种图表组件 |
+| 功能模块 | 功能名称 | 描述 | 特色标记 |
+|---------|---------|------|----------|
+| **报表设计** | 报表设计器 | 支持数据报表、图形报表、打印设计等 | 🚀 |
+| **大屏展示** | 大屏设计器 | 拖拽生成数据大屏，内置几十种图表组件 | 🚀 |
 
-### 微信公众号
+### 🔔 微信公众号
 
-|     | 功能     | 描述                            |
-|-----|--------|-------------------------------|
-| 🚀  | 账号管理   | 配置接入的微信公众号，可支持多个公众号           |
-| 🚀  | 数据统计   | 统计公众号的用户增减、累计用户、消息概况、接口分析等数据  |
-| 🚀  | 粉丝管理   | 查看已关注、取关的粉丝列表，可对粉丝进行同步、打标签等操作 |
-| 🚀  | 消息管理   | 查看粉丝发送的消息列表，可主动回复粉丝消息         |
-| 🚀  | 自动回复   | 自动回复粉丝发送的消息，支持关注回复、消息回复、关键字回复 |
-| 🚀  | 标签管理   | 对公众号的标签进行创建、查询、修改、删除等操作       |
-| 🚀  | 菜单管理   | 自定义公众号的菜单，也可以从公众号同步菜单         |
-| 🚀  | 素材管理   | 管理公众号的图片、语音、视频等素材，支持在线播放语音、视频 |
-| 🚀  | 图文草稿箱  | 新增常用的图文素材到草稿箱，可发布到公众号         |
-| 🚀  | 图文发表记录 | 查看已发布成功的图文素材，支持删除操作           |
+| 功能分类 | 功能名称 | 描述 | 特色标记 |
+|---------|---------|------|----------|
+| **账号管理** | 账号管理 | 配置接入的微信公众号，可支持多个公众号 | 🚀 |
+| **数据分析** | 数据统计 | 统计公众号的用户增减、累计用户、消息概况、接口分析等数据 | 🚀 |
+| **用户管理** | 粉丝管理 | 查看已关注、取关的粉丝列表，可对粉丝进行同步、打标签等操作 | 🚀 |
+| | 标签管理 | 对公众号的标签进行创建、查询、修改、删除等操作 | 🚀 |
+| **消息互动** | 消息管理 | 查看粉丝发送的消息列表，可主动回复粉丝消息 | 🚀 |
+| | 自动回复 | 自动回复粉丝发送的消息，支持关注回复、消息回复、关键字回复 | 🚀 |
+| **内容管理** | 菜单管理 | 自定义公众号的菜单，也可以从公众号同步菜单 | 🚀 |
+| | 素材管理 | 管理公众号的图片、语音、视频等素材，支持在线播放语音、视频 | 🚀 |
+| | 图文草稿箱 | 新增常用的图文素材到草稿箱，可发布到公众号 | 🚀 |
+| | 图文发表记录 | 查看已发布成功的图文素材，支持删除操作 | 🚀 |
 
-### 商城系统
+### 🛒 商城系统
 
-演示地址：<https://doc.iocoder.cn/mall-preview/>
+> 🌟 **演示地址**：[doc.iocoder.cn/mall-preview/](https://doc.iocoder.cn/mall-preview/)
 
-![功能图](/.image/common/mall-feature.png)
+<p align="center">
+ <img src="/.image/common/mall-feature.png" alt="商城功能图" style="max-width: 100%; height: auto;">
+</p>
 
-![功能图](/.image/common/mall-preview.png)
+<p align="center">
+ <img src="/.image/common/mall-preview.png" alt="商城预览图" style="max-width: 100%; height: auto;">
+</p>
 
-### 会员中心
+### 👥 会员中心
 
-|     | 功能   | 描述                               |
-|-----|------|----------------------------------|
-| 🚀  | 会员管理 | 会员是 C 端的消费者，该功能用于会员的搜索与管理        |
-| 🚀  | 会员标签 | 对会员的标签进行创建、查询、修改、删除等操作           |
-| 🚀  | 会员等级 | 对会员的等级、成长值进行管理，可用于订单折扣等会员权益      |
-| 🚀  | 会员分组 | 对会员进行分组，用于用户画像、内容推送等运营手段         |
-| 🚀  | 积分签到 | 回馈给签到、消费等行为的积分，会员可订单抵现、积分兑换等途径消耗 |
+| 功能模块 | 功能名称 | 描述 | 特色标记 |
+|---------|---------|------|----------|
+| **会员管理** | 会员管理 | 会员是 C 端的消费者，该功能用于会员的搜索与管理 | 🚀 |
+| | 会员标签 | 对会员的标签进行创建、查询、修改、删除等操作 | 🚀 |
+| | 会员分组 | 对会员进行分组，用于用户画像、内容推送等运营手段 | 🚀 |
+| **会员权益** | 会员等级 | 对会员的等级、成长值进行管理，可用于订单折扣等会员权益 | 🚀 |
+| | 积分签到 | 回馈给签到、消费等行为的积分，会员可订单抵现、积分兑换等途径消耗 | 🚀 |
 
-### ERP 系统
+### 📋 ERP 系统
 
-演示地址：<https://doc.iocoder.cn/erp-preview/>
+> 🌟 **演示地址**：[doc.iocoder.cn/erp-preview/](https://doc.iocoder.cn/erp-preview/)
 
-![功能图](/.image/common/erp-feature.png)
+<p align="center">
+ <img src="/.image/common/erp-feature.png" alt="ERP功能图" style="max-width: 100%; height: auto;">
+</p>
 
-### CRM 系统
+### 🤝 CRM 系统
 
-演示地址：<https://doc.iocoder.cn/crm-preview/>
+> 🌟 **演示地址**：[doc.iocoder.cn/crm-preview/](https://doc.iocoder.cn/crm-preview/)
 
-![功能图](/.image/common/crm-feature.png)
+<p align="center">
+ <img src="/.image/common/crm-feature.png" alt="CRM功能图" style="max-width: 100%; height: auto;">
+</p>
 
-### AI 大模型
+### 🤖 AI 大模型
 
-演示地址：<https://doc.iocoder.cn/ai-preview/>
+> 🌟 **演示地址**：[doc.iocoder.cn/ai-preview/](https://doc.iocoder.cn/ai-preview/)
 
-![功能图](/.image/common/ai-feature.png)
+<p align="center">
+ <img src="/.image/common/ai-feature.png" alt="AI功能图" style="max-width: 100%; height: auto;">
+</p>
 
-![功能图](/.image/common/ai-preview.gif)
+<p align="center">
+ <img src="/.image/common/ai-preview.gif" alt="AI预览动图" style="max-width: 100%; height: auto;">
+</p>
 
 ## 🐨 技术栈
 
-### 模块
+### 📦 模块结构
 
-| 项目                    | 说明                 |
-|-----------------------|--------------------|
-| `yudao-dependencies`  | Maven 依赖版本管理       |
-| `yudao-framework`     | Java 框架拓展          |
-| `yudao-server`        | 管理后台 + 用户 APP 的服务端 |
-| `yudao-module-system` | 系统功能的 Module 模块    |
-| `yudao-module-member` | 会员中心的 Module 模块    |
-| `yudao-module-infra`  | 基础设施的 Module 模块    |
-| `yudao-module-bpm`    | 工作流程的 Module 模块    |
-| `yudao-module-pay`    | 支付系统的 Module 模块    |
-| `yudao-module-mall`   | 商城系统的 Module 模块    |
-| `yudao-module-erp`    | ERP 系统的 Module 模块  |
-| `yudao-module-crm`    | CRM 系统的 Module 模块  |
-| `yudao-module-ai`     | AI 大模型的 Module 模块  |
-| `yudao-module-mp`     | 微信公众号的 Module 模块   |
-| `yudao-module-report` | 大屏报表 Module 模块     |
+| 项目模块 | 说明 | 职责范围 |
+|---------|------|----------|
+| `yudao-dependencies` | Maven 依赖版本管理 | 统一管理项目依赖版本 |
+| `yudao-framework` | Java 框架拓展 | 基础框架功能扩展 |
+| `yudao-server` | 管理后台 + 用户 APP 的服务端 | 核心服务启动入口 |
+| `yudao-module-system` | 系统功能的 Module 模块 | 用户、角色、权限等基础功能 |
+| `yudao-module-member` | 会员中心的 Module 模块 | 会员管理相关功能 |
+| `yudao-module-infra` | 基础设施的 Module 模块 | 代码生成、文件管理等 |
+| `yudao-module-bpm` | 工作流程的 Module 模块 | 工作流引擎相关功能 |
+| `yudao-module-pay` | 支付系统的 Module 模块 | 支付、退款相关功能 |
+| `yudao-module-mall` | 商城系统的 Module 模块 | 电商业务相关功能 |
+| `yudao-module-erp` | ERP 系统的 Module 模块 | 企业资源管理功能 |
+| `yudao-module-crm` | CRM 系统的 Module 模块 | 客户关系管理功能 |
+| `yudao-module-ai` | AI 大模型的 Module 模块 | AI 智能应用功能 |
+| `yudao-module-mp` | 微信公众号的 Module 模块 | 微信生态相关功能 |
+| `yudao-module-report` | 大屏报表 Module 模块 | 数据可视化相关功能 |
 
-### 框架
+### 🔧 核心框架
 
-| 框架                                                                                          | 说明               | 版本             | 学习指南                                                           |
-|---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
-| [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.23         | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.7          | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
-| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1          | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0 /7.0 |                                                                |
-| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.32.0         | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24         | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.11         | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5          | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
-| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://doc.iocoder.cn/bpm/)                              |
-| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
-| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0          | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
-| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
-| [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.13.5         |                                                                |
-| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.3          | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
-| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.34        | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
-| [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2          | -                                                              |
-| [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.8.0          | -                                                              |
+| 框架分类 | 框架名称 | 版本 | 说明 | 学习指南 |
+|---------|---------|------|------|----------|
+| **应用框架** | [Spring Boot](https://spring.io/projects/spring-boot) | 2.7.18 | 应用开发框架 | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
+| **数据库** | [MySQL](https://www.mysql.com/cn/) | 5.7 / 8.0+ | 数据库服务器 | - |
+| **连接池** | [Druid](https://github.com/alibaba/druid) | 1.2.23 | JDBC 连接池、监控组件 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| **ORM框架** | [MyBatis Plus](https://mp.baomidou.com/) | 3.5.7 | MyBatis 增强工具包 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| **数据源** | [Dynamic Datasource](https://dynamic-datasource.com/) | 3.6.1 | 动态数据源 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| **缓存** | [Redis](https://redis.io/) | 5.0 / 6.0 /7.0 | key-value 数据库 | - |
+| **Redis客户端** | [Redisson](https://github.com/redisson/redisson) | 3.32.0 | Redis 客户端 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
+| **Web框架** | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | 5.3.24 | MVC 框架 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
+| **安全框架** | [Spring Security](https://github.com/spring-projects/spring-security) | 5.7.11 | Spring 安全框架 | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| **参数校验** | [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 6.2.5 | 参数校验组件 | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
+| **工作流** | [Flowable](https://github.com/flowable/flowable-engine) | 6.8.0 | 工作流引擎 | [文档](https://doc.iocoder.cn/bpm/) |
+| **任务调度** | [Quartz](https://github.com/quartz-scheduler) | 2.3.2 | 任务调度组件 | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
+| **API文档** | [Springdoc](https://springdoc.org/) | 1.7.0 | Swagger 文档 | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
+| **链路追踪** | [SkyWalking](https://skywalking.apache.org/) | 8.12.0 | 分布式应用追踪系统 | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao) |
+| **应用监控** | [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) | 2.7.10 | Spring Boot 监控平台 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
+| **JSON处理** | [Jackson](https://github.com/FasterXML/jackson) | 2.13.5 | JSON 工具库 | - |
+| **对象转换** | [MapStruct](https://mapstruct.org/) | 1.6.3 | Java Bean 转换 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
+| **代码简化** | [Lombok](https://projectlombok.org/) | 1.18.34 | 消除冗长的 Java 代码 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
+| **单元测试** | [JUnit](https://junit.org/junit5/) | 5.8.2 | Java 单元测试框架 | - |
+| **Mock框架** | [Mockito](https://github.com/mockito/mockito) | 4.8.0 | Java Mock 框架 | - |
 
 ## 🐷 演示图
 
