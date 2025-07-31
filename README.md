@@ -1,63 +1,102 @@
+# 芋道 ruoyi-vue-pro
+
 <p align="center">
- <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-blue.svg" alt="Downloads">
- <img src="https://img.shields.io/badge/Vue-3.2-blue.svg" alt="Downloads">
- <img src="https://img.shields.io/github/license/YunaiV/ruoyi-vue-pro"/>
+ <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-blue.svg" alt="Spring Boot">
+ <img src="https://img.shields.io/badge/Vue-3.2-blue.svg" alt="Vue">
+ <img src="https://img.shields.io/github/license/YunaiV/ruoyi-vue-pro" alt="License">
+ <img src="https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro?style=social" alt="GitHub stars">
 </p>
 
-**严肃声明：现在、未来都不会有商业版本，所有代码全部开源!！**
+<p align="center">
+ <strong>🔥 严肃声明：现在、未来都不会有商业版本，所有代码全部开源！</strong>
+</p>
 
-**「我喜欢写代码，乐此不疲」**  
-**「我喜欢做开源，以此为乐」**
+<p align="center">
+ <em>「我喜欢写代码，乐此不疲」</em><br>
+ <em>「我喜欢做开源，以此为乐」</em>
+</p>
 
-我 🐶 在上海艰苦奋斗，早中晚在 top3 大厂认真搬砖，夜里为开源做贡献。
+---
 
-如果这个项目让你有所收获，记得 Star 关注哦，这对我是非常不错的鼓励与支持。
+## 📋 目录
+
+- [🐶 新手必读](#-新手必读)
+- [🐰 版本说明](#-版本说明)
+- [🐯 平台简介](#-平台简介)
+- [🐳 项目关系](#-项目关系)
+- [😎 开源协议](#-开源协议)
+- [🤝 项目外包](#-项目外包)
+- [🐼 内置功能](#-内置功能)
+- [🐨 技术栈](#-技术栈)
+- [🐷 演示图](#-演示图)
+
+---
+
+💡 **如果这个项目让你有所收获，记得 Star ⭐ 关注哦，这对我们是非常重要的鼓励与支持！**
 
 ## 🐶 新手必读
 
-* 演示地址【Vue3 + element-plus】：<http://dashboard-vue3.yudao.iocoder.cn>
-* 演示地址【Vue3 + vben(ant-design-vue)】：<http://dashboard-vben.yudao.iocoder.cn>
-* 演示地址【Vue2 + element-ui】：<http://dashboard.yudao.iocoder.cn>
-* 启动文档：<https://doc.iocoder.cn/quick-start/>
-* 视频教程：<https://doc.iocoder.cn/video/>
+### 🌐 演示地址
+
+| 版本 | 地址 | 说明 |
+|-----|------|------|
+| Vue3 + element-plus | [dashboard-vue3.yudao.iocoder.cn](http://dashboard-vue3.yudao.iocoder.cn) | 最新推荐版本 |
+| Vue3 + vben(ant-design-vue) | [dashboard-vben.yudao.iocoder.cn](http://dashboard-vben.yudao.iocoder.cn) | 企业级UI组件 |
+| Vue2 + element-ui | [dashboard.yudao.iocoder.cn](http://dashboard.yudao.iocoder.cn) | 经典稳定版本 |
+
+### 📚 学习资源
+
+- 📖 **启动文档**：[doc.iocoder.cn/quick-start](https://doc.iocoder.cn/quick-start/)
+- 🎥 **视频教程**：[doc.iocoder.cn/video](https://doc.iocoder.cn/video/)
+
+> 💡 **提示**：首次使用建议先查看启动文档，5分钟即可完成项目部署！
 
 ## 🐰 版本说明
 
-| 版本                                                                  | JDK 8 + Spring Boot 2.7                                                   | JDK 17/21 + Spring Boot 3.2                                                           |
-|---------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
-| 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   |
+### 📦 版本对比
 
-* 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
-* 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
+| 版本类型 | JDK 8 + Spring Boot 2.7 | JDK 17/21 + Spring Boot 3.2 |
+|---------|-------------------------|------------------------------|
+| **完整版** [ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
+| **精简版** [yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支 |
 
-可参考 [《迁移文档》](https://doc.iocoder.cn/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
+### 🔍 版本特性
+
+- **🎯 完整版**：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
+- **⚡ 精简版**：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
+
+> 📝 **迁移指南**：可参考 [《迁移文档》](https://doc.iocoder.cn/migrate-module/)，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
 
 ## 🐯 平台简介
 
 **芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
 
-> 有任何问题，或者想要的功能，可以在 _Issues_ 中提给艿艿。
->
-> 😜 给项目点点 Star 吧，这对我们真的很重要！
+<p align="center">
+ <img src="/.image/common/ruoyi-vue-pro-architecture.png" alt="架构图" style="max-width: 100%; height: auto;">
+</p>
 
-![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
+### 🏗️ 架构特色
 
-* Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17/21 + Spring Boot 3.2
-* 管理后台的电脑端：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
-* 管理后台的移动端：采用 `uni-app` 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
-* 后端采用 Spring Boot 多模块架构、MySQL + MyBatis Plus、Redis + Redisson
-* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
-* 消息队列可使用 Event、Redis、RabbitMQ、Kafka、RocketMQ 等
-* 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统，支持 SSO 单点登录
-* 支持加载动态权限菜单，按钮级别权限控制，Redis 缓存提升性能
-* 支持 SaaS 多租户，可自定义每个租户的权限，提供透明化的多租户底层封装
-* 工作流使用 Flowable，支持动态表单、在线设计流程、会签 / 或签、多种任务分配方式
-* 高效率开发，使用代码生成器可以一键生成 Java、Vue 前后端代码、SQL 脚本、接口文档，支持单表、树表、主子表
-* 实时通信，采用 Spring WebSocket 实现，内置 Token 身份校验，支持 WebSocket 集群
-* 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款
-* 集成阿里云、腾讯云等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
-* 集成报表设计器、大屏设计器，通过拖拽即可生成酷炫的报表与大屏
+- **🔧 后端架构**：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17/21 + Spring Boot 3.2
+- **💻 管理后台**：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
+- **📱 移动端**：采用 `uni-app` 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
+
+### 🛠️ 技术亮点
+
+- **🏢 多模块架构**：Spring Boot 多模块架构、MySQL + MyBatis Plus、Redis + Redisson
+- **🗄️ 数据库支持**：MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
+- **📨 消息队列**：Event、Redis、RabbitMQ、Kafka、RocketMQ 等
+- **🔐 权限认证**：Spring Security & Token & Redis，支持多终端、多种用户的认证系统，支持 SSO 单点登录
+- **🏗️ SaaS 多租户**：可自定义每个租户的权限，提供透明化的多租户底层封装
+- **⚡ 高效开发**：代码生成器可一键生成 Java、Vue 前后端代码、SQL 脚本、接口文档
+- **🔄 工作流程**：Flowable 引擎，支持动态表单、在线设计流程、会签/或签、多种任务分配方式
+- **💬 实时通信**：Spring WebSocket 实现，内置 Token 身份校验，支持 WebSocket 集群
+- **💰 支付集成**：集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款
+- **☁️ 云服务集成**：集成阿里云、腾讯云等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
+- **📊 报表大屏**：集成报表设计器、大屏设计器，通过拖拽即可生成酷炫的报表与大屏
+
+> 💬 **问题反馈**：有任何问题，或者想要的功能，可以在 _Issues_ 中提给艿艿。  
+> 😜 **给项目点点 Star 吧**，这对我们真的很重要！
 
 ##  🐳 项目关系
 
