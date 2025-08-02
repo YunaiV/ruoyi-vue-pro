@@ -15,13 +15,13 @@ import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientFactor
 import cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClient;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig;
 import cn.iocoder.yudao.module.infra.framework.file.core.enums.FileStorageEnum;
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -53,9 +53,9 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FileConfigMapper fileConfigMapper;
 
-    @MockitoBean
+    @MockBean
     private Validator validator;
-    @MockitoBean
+    @MockBean
     private FileClientFactory fileClientFactory;
 
     @Test

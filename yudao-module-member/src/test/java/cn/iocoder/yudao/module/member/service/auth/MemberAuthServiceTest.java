@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
-import jakarta.annotation.Resource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -36,17 +36,17 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private MemberAuthServiceImpl authService;
 
-    @MockitoBean
+    @MockBean
     private MemberUserService userService;
-    @MockitoBean
+    @MockBean
     private SmsCodeApi smsCodeApi;
-    @MockitoBean
+    @MockBean
     private LoginLogApi loginLogApi;
-    @MockitoBean
+    @MockBean
     private OAuth2TokenCommonApi oauth2TokenApi;
-    @MockitoBean
+    @MockBean
     private SocialUserApi socialUserApi;
-    @MockitoBean
+    @MockBean
     private PasswordEncoder passwordEncoder;
 
     @Resource

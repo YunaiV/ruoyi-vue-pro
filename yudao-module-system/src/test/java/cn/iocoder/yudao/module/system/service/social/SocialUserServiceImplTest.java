@@ -13,8 +13,8 @@ import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import me.zhyd.oauth.model.AuthUser;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -50,7 +50,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
     @Resource
     private SocialUserBindMapper socialUserBindMapper;
 
-    @MockitoBean
+    @MockBean
     private SocialClientService socialClientService;
 
     @Test

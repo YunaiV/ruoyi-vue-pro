@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import java.math.RoundingMode;
@@ -58,15 +58,15 @@ public class ProductSpuServiceImplTest extends BaseDbUnitTest {
     @Resource
     private ProductSpuMapper productSpuMapper;
 
-    @MockitoBean
+    @MockBean
     private ProductSkuServiceImpl productSkuService;
-    @MockitoBean
+    @MockBean
     private ProductCategoryServiceImpl categoryService;
-    @MockitoBean
+    @MockBean
     private ProductBrandServiceImpl brandService;
-    @MockitoBean
+    @MockBean
     private ProductPropertyService productPropertyService;
-    @MockitoBean
+    @MockBean
     private ProductPropertyValueService productPropertyValueService;
 
     public String generateNo() {

@@ -10,12 +10,13 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.job.JobMapper;
 import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
 import cn.iocoder.yudao.module.infra.job.job.JobLogCleanJob;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.quartz.SchedulerException;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -35,10 +36,10 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     private JobServiceImpl jobService;
     @Resource
     private JobMapper jobMapper;
-    @MockitoBean
+    @MockBean
     private SchedulerManager schedulerManager;
 
-    @MockitoBean
+    @MockBean
     private JobLogCleanJob jobLogCleanJob;
 
     @Test

@@ -16,12 +16,12 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -48,13 +48,13 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     @Resource
     private UserRoleMapper userRoleMapper;
 
-    @MockitoBean
+    @MockBean
     private RoleService roleService;
-    @MockitoBean
+    @MockBean
     private MenuService menuService;
-    @MockitoBean
+    @MockBean
     private DeptService deptService;
-    @MockitoBean
+    @MockBean
     private AdminUserService userService;
 
     @Test

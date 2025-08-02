@@ -16,11 +16,11 @@ import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -45,9 +45,9 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private SmsTemplateMapper smsTemplateMapper;
 
-    @MockitoBean
+    @MockBean
     private SmsChannelService smsChannelService;
-    @MockitoBean
+    @MockBean
     private SmsClient smsClient;
 
     @Test

@@ -23,8 +23,8 @@ import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.service.CaptchaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import javax.validation.Validation;
@@ -46,21 +46,21 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
     @Resource
     private AdminAuthServiceImpl authService;
 
-    @MockitoBean
+    @MockBean
     private AdminUserService userService;
-    @MockitoBean
+    @MockBean
     private CaptchaService captchaService;
-    @MockitoBean
+    @MockBean
     private LoginLogService loginLogService;
-    @MockitoBean
+    @MockBean
     private SocialUserService socialUserService;
-    @MockitoBean
+    @MockBean
     private SmsCodeApi smsCodeApi;
-    @MockitoBean
+    @MockBean
     private OAuth2TokenService oauth2TokenService;
-    @MockitoBean
+    @MockBean
     private MemberService memberService;
-    @MockitoBean
+    @MockBean
     private Validator validator;
 
     @BeforeEach

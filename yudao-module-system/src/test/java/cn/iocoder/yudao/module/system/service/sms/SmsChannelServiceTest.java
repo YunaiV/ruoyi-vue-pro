@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -40,9 +40,9 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
     @Resource
     private SmsChannelMapper smsChannelMapper;
 
-    @MockitoBean
+    @MockBean
     private SmsClientFactory smsClientFactory;
-    @MockitoBean
+    @MockBean
     private SmsTemplateService smsTemplateService;
 
     @Test

@@ -7,12 +7,12 @@ import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.Broker
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.math.RoundingMode;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -39,9 +39,9 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BrokerageRecordMapper brokerageRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private TradeConfigService tradeConfigService;
-    @MockitoBean
+    @MockBean
     private BrokerageUserService brokerageUserService;
 
     @Test

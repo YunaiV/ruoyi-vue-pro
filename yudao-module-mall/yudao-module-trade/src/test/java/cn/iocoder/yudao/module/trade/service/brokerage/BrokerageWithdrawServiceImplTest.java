@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageWithdrawMapper
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
@@ -37,14 +37,14 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BrokerageWithdrawMapper brokerageWithdrawMapper;
 
-    @MockitoBean
+    @MockBean
     private BrokerageRecordService brokerageRecordService;
-    @MockitoBean
+    @MockBean
     private BrokerageUserService brokerageUserService;
-    @MockitoBean
+    @MockBean
     private TradeConfigService tradeConfigService;
 
-    @MockitoBean
+    @MockBean
     private NotifyMessageSendApi notifyMessageSendApi;
 
     @Resource

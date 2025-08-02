@@ -27,9 +27,9 @@ import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 
@@ -56,18 +56,18 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
     @Resource
     private SocialClientMapper socialClientMapper;
 
-    @MockitoBean
+    @MockBean
     private AuthRequestFactory authRequestFactory;
 
-    @MockitoBean
+    @MockBean
     private WxMpService wxMpService;
-    @MockitoBean
+    @MockBean
     private WxMpProperties wxMpProperties;
-    @MockitoBean
+    @MockBean
     private StringRedisTemplate stringRedisTemplate;
-    @MockitoBean
+    @MockBean
     private WxMaService wxMaService;
-    @MockitoBean
+    @MockBean
     private WxMaProperties wxMaProperties;
 
     @Test

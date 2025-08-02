@@ -11,12 +11,12 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -46,9 +46,9 @@ public class PayAppServiceTest extends BaseDbUnitTest {
     @Resource
     private PayAppMapper appMapper;
 
-    @MockitoBean
+    @MockBean
     private PayOrderService orderService;
-    @MockitoBean
+    @MockBean
     private PayRefundService refundService;
 
     @Test

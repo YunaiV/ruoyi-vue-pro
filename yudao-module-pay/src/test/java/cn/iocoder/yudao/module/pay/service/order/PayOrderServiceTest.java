@@ -28,8 +28,8 @@ import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -65,13 +65,13 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private PayOrderExtensionMapper orderExtensionMapper;
 
-    @MockitoBean
+    @MockBean
     private PayProperties properties;
-    @MockitoBean
+    @MockBean
     private PayAppService appService;
-    @MockitoBean
+    @MockBean
     private PayChannelService channelService;
-    @MockitoBean
+    @MockBean
     private PayNotifyService notifyService;
 
     @BeforeEach

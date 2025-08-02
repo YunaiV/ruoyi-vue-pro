@@ -9,10 +9,11 @@ import cn.iocoder.yudao.module.member.controller.admin.group.vo.MemberGroupUpdat
 import cn.iocoder.yudao.module.member.dal.dataobject.group.MemberGroupDO;
 import cn.iocoder.yudao.module.member.dal.mysql.group.MemberGroupMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -41,7 +42,7 @@ public class MemberGroupServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MemberGroupMapper groupMapper;
 
-    @MockitoBean
+    @MockBean
     private MemberUserService memberUserService;
 
     @Test

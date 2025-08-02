@@ -20,12 +20,12 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderStatusEnum;
 import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -54,15 +54,15 @@ public class AfterSaleServiceTest extends BaseDbUnitTest {
     @Resource
     private AfterSaleLogMapper tradeAfterSaleLogMapper;
 
-    @MockitoBean
+    @MockBean
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
 
-    @MockitoBean
+    @MockBean
     private PayRefundApi payRefundApi;
 
-    @MockitoBean
+    @MockBean
     private TradeOrderProperties tradeOrderProperties;
 
     @Test

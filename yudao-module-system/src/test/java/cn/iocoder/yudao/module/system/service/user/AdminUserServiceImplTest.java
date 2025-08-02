@@ -30,9 +30,9 @@ import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -68,19 +68,19 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     @Resource
     private UserPostMapper userPostMapper;
 
-    @MockitoBean
+    @MockBean
     private DeptService deptService;
-    @MockitoBean
+    @MockBean
     private PostService postService;
-    @MockitoBean
+    @MockBean
     private PermissionService permissionService;
-    @MockitoBean
+    @MockBean
     private PasswordEncoder passwordEncoder;
-    @MockitoBean
+    @MockBean
     private TenantService tenantService;
-    @MockitoBean
+    @MockBean
     private FileApi fileApi;
-    @MockitoBean
+    @MockBean
     private ConfigApi configApi;
 
     @BeforeEach
