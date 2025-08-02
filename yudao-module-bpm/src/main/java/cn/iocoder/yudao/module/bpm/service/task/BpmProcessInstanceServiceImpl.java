@@ -220,11 +220,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
                 processVariables, activities);
-        // 3.3 如果是发起动作，activityId 为开始节点，不校验审批人自选节点
-        if (ObjUtil.equals(reqVO.getActivityId(), BpmnModelConstants.START_USER_NODE_ID)) {
-            simulateActivityNodes.removeIf(node ->
-                    BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy().equals(node.getCandidateStrategy()));
-        }
 
         // 4. 拼接最终数据
         return buildApprovalDetail(reqVO, bpmnModel, processDefinition, processDefinitionInfo, historicProcessInstance,
