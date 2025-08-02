@@ -67,7 +67,6 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNode;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
@@ -415,7 +414,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         endActivities.forEach(activity -> {
             // StartEvent：只处理 BPMN 的场景。因为，SIMPLE 情况下，已经有 START_USER_NODE 节点
             if (ELEMENT_EVENT_START.equals(activity.getActivityType())
-                    && BpmModelTypeEnum.BPMN.getType().equals(processDefinitionInfo.getModelType())) {
+                    && BpmModelTypeEnum.BPMN.getType().equals(processDefinitionInfo.getModelType())
+                    && !CollUtil.contains(activities, // 特殊：如果已经存在用户手动创建的 START_USER_NODE_ID 节点，则忽略 StartEvent
+                    historicActivity -> historicActivity.getActivityId().equals(START_USER_NODE_ID))) {
                 ActivityNodeTask startTask = new ActivityNodeTask().setId(BpmnModelConstants.START_USER_NODE_ID)
                         .setAssignee(startUserId).setStatus(BpmTaskStatusEnum.APPROVE.getStatus());
                 ActivityNode startNode = new ActivityNode().setId(startTask.getId())
@@ -555,7 +556,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 情况一：BPMN 设计器
         if (Objects.equals(BpmModelTypeEnum.BPMN.getType(), processDefinitionInfo.getModelType())) {
             List<FlowElement> flowElements = BpmnModelUtils.simulateProcess(bpmnModel, processVariables);
-            return convertList(flowElements, flowElement -> buildNotRunApproveNodeForBpmn(startUserId, bpmnModel,
+            return convertList(flowElements, flowElement -> buildNotRunApproveNodeForBpmn(
+                    startUserId, bpmnModel, flowElements,
                     processDefinitionInfo, processVariables, flowElement, runActivityIds));
         }
         // 情况二：SIMPLE 设计器
@@ -563,7 +565,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             BpmSimpleModelNodeVO simpleModel = JsonUtils.parseObject(processDefinitionInfo.getSimpleModel(),
                     BpmSimpleModelNodeVO.class);
             List<BpmSimpleModelNodeVO> simpleNodes = SimpleModelUtils.simulateProcess(simpleModel, processVariables);
-            return convertList(simpleNodes, simpleNode -> buildNotRunApproveNodeForSimple(startUserId, bpmnModel,
+            return convertList(simpleNodes, simpleNode -> buildNotRunApproveNodeForSimple(
+                    startUserId, bpmnModel,
                     processDefinitionInfo, processVariables, simpleNode, runActivityIds));
         }
         throw new IllegalArgumentException("未知设计器类型：" + processDefinitionInfo.getModelType());
@@ -618,8 +621,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         return null;
     }
 
-    private ActivityNode buildNotRunApproveNodeForBpmn(Long startUserId, BpmnModel bpmnModel,
-                                                       BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
+    private ActivityNode buildNotRunApproveNodeForBpmn(Long startUserId, BpmnModel bpmnModel, List<FlowElement> flowElements,
+                                                       BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                       Map<String, Object> processVariables,
                                                        FlowElement node, Set<String> runActivityIds) {
         if (runActivityIds.contains(node.getId())) {
             return null;
@@ -634,6 +638,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 1. 开始节点
         if (node instanceof StartEvent) {
+            if (CollUtil.contains(flowElements, // 特殊：如果已经存在用户手动创建的 START_USER_NODE_ID 节点，则忽略 StartEvent
+                    flowElement -> flowElement.getId().equals(START_USER_NODE_ID))) {
+                return null;
+            }
             return activityNode.setName(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getName())
                     .setNodeType(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType());
         }
