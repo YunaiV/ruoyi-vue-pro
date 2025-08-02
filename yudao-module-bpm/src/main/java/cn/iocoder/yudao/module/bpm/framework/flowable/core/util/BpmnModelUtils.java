@@ -852,7 +852,7 @@ public class BpmnModelUtils {
         } else if (flowNode instanceof ScriptTask) {
             skipExpression = ((ScriptTask) flowNode).getSkipExpression();
         }
-        
+
         if (StrUtil.isEmpty(skipExpression)) {
             return false;
         }
@@ -910,6 +910,7 @@ public class BpmnModelUtils {
 
     /**
      * 查找起始节点下一个用户任务列表列表
+     *
      * @param source 起始节点
      * @return 结果
      */

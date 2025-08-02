@@ -40,9 +40,10 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.*;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.engine.*;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
@@ -61,7 +62,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -1180,61 +1180,54 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void withdrawTask(Long userId, String taskId) {
-        // 1.查询本人已办任务
+        // 1.1 查询本人已办任务
         HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery()
                 .taskId(taskId).taskAssignee(userId.toString()).finished().singleResult();
-        if (ObjectUtil.isNull(taskInstance)) {
+        if (ObjUtil.isNull(taskInstance)) {
             throw exception(TASK_WITHDRAW_FAIL_TASK_NOT_EXISTS);
         }
-        // 2.校验流程是否结束
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(taskInstance.getProcessInstanceId())
-                .active()
-                .singleResult();
-        if (ObjectUtil.isNull(processInstance)) {
+        // 1.2 校验流程是否结束
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(taskInstance.getProcessInstanceId());
+        if (ObjUtil.isNull(processInstance)) {
             throw exception(TASK_WITHDRAW_FAIL_PROCESS_NOT_RUNNING);
         }
-        // 3.判断此流程是否允许撤回
-        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService
-                .getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
-        if (ObjectUtil.isNull(processDefinitionInfo) || !Boolean.TRUE.equals(processDefinitionInfo.getAllowWithdrawTask())) {
+        // 1.3 判断此流程是否允许撤回
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(
+                processInstance.getProcessDefinitionId());
+        if (ObjUtil.isNull(processDefinitionInfo) || !Boolean.TRUE.equals(processDefinitionInfo.getAllowWithdrawTask())) {
             throw exception(TASK_WITHDRAW_FAIL_NOT_ALLOW);
         }
-        // 4.判断此任务下一节点是否满足撤回
+        // 1.4 判断下一个节点是否被审批过，如果是则无法撤回
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(taskInstance.getProcessDefinitionId());
         UserTask userTask = (UserTask) BpmnModelUtils.getFlowElementById(bpmnModel, taskInstance.getTaskDefinitionKey());
-        List<UserTask> nextUserTaskList = BpmnModelUtils.getNextUserTasks(userTask);
-        List<String> nextUserTaskKeys = nextUserTaskList.stream().map(UserTask::getId).toList();
+        List<String> nextUserTaskKeys = convertList(BpmnModelUtils.getNextUserTasks(userTask), UserTask::getId);
         if (CollUtil.isEmpty(nextUserTaskKeys)) {
             throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         }
+        // TODO @芋艿：是否选择升级flowable版本解决taskCreatedAfter、taskCreatedBefore问题，升级7.1.0可以；包括 todo 和 done 那边的查询哇？？？
         long nextUserTaskFinishedCount = historyService.createHistoricTaskInstanceQuery()
-                .processInstanceId(processInstance.getProcessInstanceId())
-                .taskDefinitionKeys(nextUserTaskKeys)
-                .taskCreatedAfter(taskInstance.getEndTime()) // TODO @芋艿：是否选择升级flowable版本解决taskCreatedAfter、taskCreatedBefore问题，升级7.1.0可以
-                .finished()
-                .count();
+                .processInstanceId(processInstance.getProcessInstanceId()).taskDefinitionKeys(nextUserTaskKeys)
+                .taskCreatedAfter(taskInstance.getEndTime()).finished().count();
         if (nextUserTaskFinishedCount > 0) {
             throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         }
-        // 5.获取需要撤回的运行任务
-        List<Task> runningTaskList = taskService.createTaskQuery()
-                .processInstanceId(processInstance.getProcessInstanceId())
-                .taskDefinitionKeys(nextUserTaskKeys)
-                .active().list();
-        if (CollUtil.isEmpty(runningTaskList)) {
+        // 1.5 获取需要撤回的运行任务
+        List<Task> runningTasks = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId())
+                .taskDefinitionKeys(nextUserTaskKeys).active().list();
+        if (CollUtil.isEmpty(runningTasks)) {
             throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         }
+
+        // 2.1 取消当前任务
         List<String> withdrawExecutionIds = new ArrayList<>();
-        for (Task task : runningTaskList) {
+        for (Task task : runningTasks) {
             // 标记撤回任务为取消
-            // TODO @芋艿：是否需要添加被撤回状态？
             taskService.addComment(task.getId(), taskInstance.getProcessInstanceId(), BpmCommentTypeEnum.CANCEL.getType(),
                     BpmCommentTypeEnum.CANCEL.formatComment("前一节点撤回"));
             updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), BpmReasonEnum.CANCEL_BY_WITHDRAW.getReason());
             withdrawExecutionIds.add(task.getExecutionId());
         }
-        // 6.执行撤回操作
+        // 2.2 执行撤回操作
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstance.getProcessInstanceId())
                 .moveExecutionsToSingleActivityId(withdrawExecutionIds, taskInstance.getTaskDefinitionKey())

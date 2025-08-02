@@ -72,6 +72,9 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "允许撤销审批中的申请", example = "true")
     private Boolean allowCancelRunningProcess;
 
+    @Schema(description = "允许允许审批人撤回任务", example = "false")
+    private Boolean allowWithdrawTask;
+
     @Schema(description = "流程 ID 规则", example = "{}")
     private ProcessIdRule processIdRule;
 
@@ -96,9 +99,6 @@ public class BpmModelMetaInfoVO {
 
     @Schema(description = "任务后置通知设置", example = "{}")
     private HttpRequestSetting taskAfterTriggerSetting;
-
-    @Schema(description = "允许允许审批人撤回任务", example = "false")
-    private Boolean allowWithdrawTask;
 
     @Schema(description = "流程 ID 规则")
     @Data
