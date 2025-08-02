@@ -316,7 +316,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         }
         // 插入
 #end
-        ${subClassNameVar}.clean() // 清理掉创建、更新时间等相关属性值
+        ${subClassNameVar}.clean(); // 清理掉创建、更新时间等相关属性值
         ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
         return ${subClassNameVar}.getId();
     }

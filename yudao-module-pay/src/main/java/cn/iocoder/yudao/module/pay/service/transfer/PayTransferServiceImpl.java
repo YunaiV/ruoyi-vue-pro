@@ -264,9 +264,6 @@ public class PayTransferServiceImpl implements PayTransferService {
         }
         int count = 0;
         for (PayTransferDO transfer : list) {
-            if (!transfer.getId().equals(54L)) {
-                continue;
-            }
             count += syncTransfer(transfer) ? 1 : 0;
         }
         return count;

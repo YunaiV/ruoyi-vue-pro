@@ -17,6 +17,7 @@ uv run --with simple-ddl-parser convertor.py dm8 > ../dm/ruoyi-vue-pro-dm8.sql
 import argparse
 import pathlib
 import re
+import sys
 import time
 from abc import ABC, abstractmethod
 from typing import Dict, Generator, Optional, Tuple, Union
@@ -293,8 +294,10 @@ class Convertor(ABC):
 
         # 将parse失败的脚本打印出来
         if error_scripts:
+            print("!!! 以下内容无法正常解析", file=sys.stderr)
             for script in error_scripts:
-                print(script)
+                # print to stderr
+                print(script, file=sys.stderr)
 
 
 class PostgreSQLConvertor(Convertor):

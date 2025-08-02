@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
  * 异步任务 Configuration
@@ -21,13 +22,20 @@ public class YudaoAsyncAutoConfiguration {
 
             @Override
             public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-                if (!(bean instanceof ThreadPoolTaskExecutor)) {
-                    return bean;
+                // 处理 ThreadPoolTaskExecutor
+                if (bean instanceof ThreadPoolTaskExecutor) {
+                    ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) bean;
+                    executor.setTaskDecorator(TtlRunnable::get);
+                    return executor;
                 }
-                // 修改提交的任务，接入 TransmittableThreadLocal
-                ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) bean;
-                executor.setTaskDecorator(TtlRunnable::get);
-                return executor;
+                // 处理 SimpleAsyncTaskExecutor
+                // 参考 https://t.zsxq.com/CBoks 增加
+                if (bean instanceof SimpleAsyncTaskExecutor) {
+                    SimpleAsyncTaskExecutor executor = (SimpleAsyncTaskExecutor) bean;
+                    executor.setTaskDecorator(TtlRunnable::get);
+                    return executor;
+                }
+                return bean;
             }
 
         };

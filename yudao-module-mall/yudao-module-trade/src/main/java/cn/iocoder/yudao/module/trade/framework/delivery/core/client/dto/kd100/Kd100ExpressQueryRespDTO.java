@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kd100;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -59,8 +61,8 @@ public class Kd100ExpressQueryRespDTO {
          * 轨迹发生时间
          */
         @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         private LocalDateTime time;
-
         /**
          * 轨迹描述
          */

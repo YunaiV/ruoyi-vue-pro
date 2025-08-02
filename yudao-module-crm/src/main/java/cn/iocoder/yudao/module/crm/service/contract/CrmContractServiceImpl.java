@@ -140,9 +140,9 @@ public class CrmContractServiceImpl implements CrmContractService {
         Assert.notNull(updateReqVO.getId(), "合同编号不能为空");
         updateReqVO.setOwnerUserId(null); // 不允许更新的字段
         // 1.1 校验存在
-        CrmContractDO contract = validateContractExists(updateReqVO.getId());
+        CrmContractDO oldContract = validateContractExists(updateReqVO.getId());
         // 1.2 只有草稿、审批中，可以编辑；
-        if (!ObjectUtils.equalsAny(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
+        if (!ObjectUtils.equalsAny(oldContract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus(),
                 CrmAuditStatusEnum.PROCESS.getStatus())) {
             throw exception(CONTRACT_UPDATE_FAIL_NOT_DRAFT);
         }
@@ -159,8 +159,9 @@ public class CrmContractServiceImpl implements CrmContractService {
         updateContractProduct(updateReqVO.getId(), contractProducts);
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(contract, CrmContractSaveReqVO.class));
-        LogRecordContext.putVariable("contractName", contract.getName());
+        updateReqVO.setOwnerUserId(oldContract.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldContract, CrmContractSaveReqVO.class));
+        LogRecordContext.putVariable("contractName", oldContract.getName());
     }
 
     private void updateContractProduct(Long id, List<CrmContractProductDO> newList) {

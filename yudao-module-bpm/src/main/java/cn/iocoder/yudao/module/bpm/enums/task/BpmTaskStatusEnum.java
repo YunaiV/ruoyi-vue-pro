@@ -14,6 +14,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmTaskStatusEnum {
 
+    SKIP(-2, "跳过"),
     NOT_START(-1, "未开始"),
     RUNNING(1, "审批中"),
     APPROVE(2, "审批通过"),

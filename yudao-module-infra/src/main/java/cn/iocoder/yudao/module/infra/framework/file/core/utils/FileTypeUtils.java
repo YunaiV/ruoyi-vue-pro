@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.infra.framework.file.core.utils;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -86,8 +85,8 @@ public class FileTypeUtils {
         response.setContentType(contentType);
         // 针对 video 的特殊处理，解决视频地址在移动端播放的兼容性问题
         if (StrUtil.containsIgnoreCase(contentType, "video")) {
-            response.setHeader("Content-Length", String.valueOf(content.length - 1));
-            response.setHeader("Content-Range", String.valueOf(content.length - 1));
+            response.setHeader("Content-Length", String.valueOf(content.length));
+            response.setHeader("Content-Range", "bytes 0-" + (content.length - 1) + "/" + content.length);
             response.setHeader("Accept-Ranges", "bytes");
         }
         // 输出附件

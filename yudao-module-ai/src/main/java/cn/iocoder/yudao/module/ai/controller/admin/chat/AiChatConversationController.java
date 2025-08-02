@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatCo
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatMessageService;
+import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,6 +55,7 @@ public class AiChatConversationController {
 
     @GetMapping("/my-list")
     @Operation(summary = "获得【我的】聊天对话列表")
+    @TransMethodResult
     public CommonResult<List<AiChatConversationRespVO>> getChatConversationMyList() {
         List<AiChatConversationDO> list = chatConversationService.getChatConversationListByUserId(getLoginUserId());
         return success(BeanUtils.toBean(list, AiChatConversationRespVO.class));
@@ -62,6 +64,7 @@ public class AiChatConversationController {
     @GetMapping("/get-my")
     @Operation(summary = "获得【我的】聊天对话")
     @Parameter(name = "id", required = true, description = "对话编号", example = "1024")
+    @TransMethodResult
     public CommonResult<AiChatConversationRespVO> getChatConversationMy(@RequestParam("id") Long id) {
         AiChatConversationDO conversation = chatConversationService.getChatConversation(id);
         if (conversation != null && ObjUtil.notEqual(conversation.getUserId(), getLoginUserId())) {
@@ -90,6 +93,7 @@ public class AiChatConversationController {
     @GetMapping("/page")
     @Operation(summary = "获得对话分页", description = "用于【对话管理】菜单")
     @PreAuthorize("@ss.hasPermission('ai:chat-conversation:query')")
+    @TransMethodResult
     public CommonResult<PageResult<AiChatConversationRespVO>> getChatConversationPage(AiChatConversationPageReqVO pageReqVO) {
         PageResult<AiChatConversationDO> pageResult = chatConversationService.getChatConversationPage(pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {

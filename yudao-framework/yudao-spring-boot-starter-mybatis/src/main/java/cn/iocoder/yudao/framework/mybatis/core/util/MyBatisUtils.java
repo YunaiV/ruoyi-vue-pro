@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.mybatis.core.util;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.func.Func1;
 import cn.hutool.core.lang.func.LambdaUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -20,7 +22,6 @@ import net.sf.jsqlparser.schema.Table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * MyBatis 工具类
@@ -37,13 +38,25 @@ public class MyBatisUtils {
         // 页码 + 数量
         Page<T> page = new Page<>(pageParam.getPageNo(), pageParam.getPageSize());
         // 排序字段
-        if (!CollectionUtil.isEmpty(sortingFields)) {
-            page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder())
-                            ? OrderItem.asc(StrUtil.toUnderlineCase(sortingField.getField()))
-                            : OrderItem.desc(StrUtil.toUnderlineCase(sortingField.getField())))
-                    .collect(Collectors.toList()));
+        if (CollUtil.isNotEmpty(sortingFields)) {
+            for (SortingField sortingField : sortingFields) {
+                page.addOrder(new OrderItem().setAsc(SortingField.ORDER_ASC.equals(sortingField.getOrder()))
+                        .setColumn(StrUtil.toUnderlineCase(sortingField.getField())));
+            }
         }
         return page;
+    }
+
+    public static <T> void addOrder(Wrapper<T> wrapper, Collection<SortingField> sortingFields) {
+        if (CollUtil.isEmpty(sortingFields)) {
+            return;
+        }
+        QueryWrapper<T> query = (QueryWrapper<T>) wrapper;
+        for (SortingField sortingField : sortingFields) {
+            query.orderBy(true,
+                    SortingField.ORDER_ASC.equals(sortingField.getOrder()),
+                    StrUtil.toUnderlineCase(sortingField.getField()));
+        }
     }
 
     /**

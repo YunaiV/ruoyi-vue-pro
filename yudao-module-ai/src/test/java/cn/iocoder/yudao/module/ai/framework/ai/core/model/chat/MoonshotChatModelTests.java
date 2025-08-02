@@ -2,14 +2,14 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.moonshot.MoonshotChatModel;
+import org.springaicommunity.moonshot.MoonshotChatOptions;
+import org.springaicommunity.moonshot.api.MoonshotApi;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.moonshot.MoonshotChatModel;
-import org.springframework.ai.moonshot.MoonshotChatOptions;
-import org.springframework.ai.moonshot.api.MoonshotApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -22,11 +22,15 @@ import java.util.List;
  */
 public class MoonshotChatModelTests {
 
-    private final MoonshotChatModel chatModel = new MoonshotChatModel(
-            new MoonshotApi("sk-aHYYV1SARscItye5QQRRNbXij4fy65Ee7pNZlC9gsSQnUKXA"), // 密钥
-            MoonshotChatOptions.builder()
-                    .model("moonshot-v1-8k") // 模型
-                    .build());
+    private final MoonshotChatModel chatModel = MoonshotChatModel.builder()
+            .moonshotApi(MoonshotApi.builder()
+                    .apiKey("sk-aHYYV1SARscItye5QQRRNbXij4fy65Ee7pNZlC9gsSQnUKXA") // 密钥
+                    .build())
+            .defaultOptions(MoonshotChatOptions.builder()
+                    .model("kimi-k2-0711-preview") // 模型
+                    .build())
+            .build();
+
     @Test
     @Disabled
     public void testCall() {

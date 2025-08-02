@@ -104,6 +104,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         receivablePlanMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
+        updateReqVO.setOwnerUserId(oldReceivablePlan.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldReceivablePlan, CrmReceivablePlanSaveReqVO.class));
         LogRecordContext.putVariable("receivablePlan", oldReceivablePlan);
     }

@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleS
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
+import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +36,7 @@ public class AiChatRoleController {
 
     @GetMapping("/my-page")
     @Operation(summary = "获得【我的】聊天角色分页")
+    @TransMethodResult
     public CommonResult<PageResult<AiChatRoleRespVO>> getChatRoleMyPage(@Valid AiChatRolePageReqVO pageReqVO) {
         PageResult<AiChatRoleDO> pageResult = chatRoleService.getChatRoleMyPage(pageReqVO, getLoginUserId());
         return success(BeanUtils.toBean(pageResult, AiChatRoleRespVO.class));
@@ -43,6 +45,7 @@ public class AiChatRoleController {
     @GetMapping("/get-my")
     @Operation(summary = "获得【我的】聊天角色")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @TransMethodResult
     public CommonResult<AiChatRoleRespVO> getChatRoleMy(@RequestParam("id") Long id) {
         AiChatRoleDO chatRole = chatRoleService.getChatRole(id);
         if (ObjUtil.notEqual(chatRole.getUserId(), getLoginUserId())) {
@@ -108,6 +111,7 @@ public class AiChatRoleController {
     @Operation(summary = "获得聊天角色")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('ai:chat-role:query')")
+    @TransMethodResult
     public CommonResult<AiChatRoleRespVO> getChatRole(@RequestParam("id") Long id) {
         AiChatRoleDO chatRole = chatRoleService.getChatRole(id);
         return success(BeanUtils.toBean(chatRole, AiChatRoleRespVO.class));

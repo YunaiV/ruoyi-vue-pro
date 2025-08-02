@@ -76,8 +76,8 @@
     <select id="selectListByPayTimeBetweenAndGroupByMonth"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
         SELECT DATE_FORMAT(pay_time, '%Y-%m') AS date,
-               COUNT(1)                       AS orderPayCount,
-               SUM(pay_price)                 AS orderPayPrice
+               COUNT(1)                       AS order_pay_count,
+               SUM(pay_price)                 AS order_pay_price
         FROM trade_order
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
@@ -95,8 +95,8 @@
 
     <select id="selectPaySummaryByPayStatusAndPayTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO">
-        SELECT IFNULL(SUM(pay_price), 0) AS orderPayPrice,
-               COUNT(1)                  AS orderPayCount
+        SELECT IFNULL(SUM(pay_price), 0) AS order_pay_price,
+               COUNT(1)                  AS order_pay_count
         FROM trade_order
         WHERE pay_status = #{payStatus}
           AND pay_time BETWEEN #{beginTime} AND #{endTime}

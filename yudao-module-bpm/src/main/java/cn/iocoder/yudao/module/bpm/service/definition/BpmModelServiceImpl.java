@@ -89,6 +89,14 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
+    public Long getModelCountByCategory(String category) {
+        return repositoryService.createModelQuery()
+                .modelCategory(category)
+                .modelTenantId(FlowableUtils.getTenantId())
+                .count();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public String createModel(@Valid BpmModelSaveReqVO createReqVO) {
         if (!ValidationUtils.isXmlNCName(createReqVO.getKey())) {

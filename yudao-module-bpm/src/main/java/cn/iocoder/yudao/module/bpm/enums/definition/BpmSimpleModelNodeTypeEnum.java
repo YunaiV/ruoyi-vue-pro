@@ -35,7 +35,7 @@ public enum BpmSimpleModelNodeTypeEnum implements ArrayValuable<Integer> {
     // 50 ~ 条件分支
     CONDITION_NODE(50, "条件", "sequenceFlow"), // 用于构建流转条件的表达式
     CONDITION_BRANCH_NODE(51, "条件分支", "exclusiveGateway"),
-    PARALLEL_BRANCH_NODE(52, "并行分支", "parallelGateway"),
+    PARALLEL_BRANCH_NODE(52, "并行分支", "inclusiveGateway"), // 并行分支使用包容网关实现，条件表达式结果设置为 true
     INCLUSIVE_BRANCH_NODE(53, "包容分支", "inclusiveGateway"),
     ROUTER_BRANCH_NODE(54, "路由分支", "exclusiveGateway")
     ;

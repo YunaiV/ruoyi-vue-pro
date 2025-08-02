@@ -73,7 +73,7 @@ public class BpmApprovalDetailRespVO {
         private List<UserSimpleBaseVO> candidateUsers; // 只包含未生成 ApprovalTaskInfo 的用户列表
 
         @Schema(description = "流程编号", example = "8761d8e0-0922-11f0-bd37-00ff1db677bf")
-        private String processInstanceId; // 当且仅当，该节点是子流程节点时，才会有值（CallActivity 的 processInstanceId 字段）
+        private String processInstanceId; // 当且仅当，该节点是子流程节点时，才会有值（CallActivity 的 calledProcessInstanceId 字段）
 
     }
 
