@@ -219,4 +219,9 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting taskAfterTriggerSetting;
 
+    /**
+     * 是否允许审批人撤回任务
+     */
+    private Boolean allowWithdrawTask;
+
 }
