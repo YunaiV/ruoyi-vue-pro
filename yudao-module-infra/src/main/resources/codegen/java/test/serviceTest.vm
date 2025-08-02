@@ -2,7 +2,6 @@ package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import ${jakartaPackage}.annotation.Resource;
 

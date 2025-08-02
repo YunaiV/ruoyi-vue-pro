@@ -4,24 +4,24 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
+import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientConfig;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientFactory;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClient;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig;
 import cn.iocoder.yudao.module.infra.framework.file.core.enums.FileStorageEnum;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
-import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
-import lombok.Data;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
+import lombok.Data;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -53,9 +53,9 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FileConfigMapper fileConfigMapper;
 
-    @MockBean
+    @MockitoBean
     private Validator validator;
-    @MockBean
+    @MockitoBean
     private FileClientFactory fileClientFactory;
 
     @Test

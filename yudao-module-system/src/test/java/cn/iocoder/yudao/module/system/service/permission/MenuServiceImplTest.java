@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -40,9 +40,9 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MenuMapper menuMapper;
 
-    @MockBean
+    @MockitoBean
     private PermissionService permissionService;
-    @MockBean
+    @MockitoBean
     private TenantService tenantService;
 
     @Test
