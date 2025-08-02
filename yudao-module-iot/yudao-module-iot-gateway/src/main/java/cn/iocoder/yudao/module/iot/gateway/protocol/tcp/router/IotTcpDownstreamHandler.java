@@ -47,7 +47,6 @@ public class IotTcpDownstreamHandler {
             byte[] bytes = deviceMessageService.encodeDeviceMessage(message, deviceInfo.getProductKey(),
                     deviceInfo.getDeviceName());
             boolean success = connectionManager.sendToDevice(message.getDeviceId(), bytes);
-
             if (success) {
                 log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",
                         message.getDeviceId(), message.getMethod(), message.getId(), bytes.length);

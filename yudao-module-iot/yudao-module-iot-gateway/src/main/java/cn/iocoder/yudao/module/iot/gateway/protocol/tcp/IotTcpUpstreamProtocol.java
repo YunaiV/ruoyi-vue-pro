@@ -39,10 +39,10 @@ public class IotTcpUpstreamProtocol {
     private NetServer tcpServer;
 
     public IotTcpUpstreamProtocol(IotGatewayProperties.TcpProperties tcpProperties,
-            IotDeviceService deviceService,
-            IotDeviceMessageService messageService,
+                                  IotDeviceService deviceService,
+                                  IotDeviceMessageService messageService,
                                   IotTcpConnectionManager connectionManager,
-            Vertx vertx) {
+                                  Vertx vertx) {
         this.tcpProperties = tcpProperties;
         this.deviceService = deviceService;
         this.messageService = messageService;

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager;
 
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -62,9 +61,9 @@ public class IotTcpConnectionManager {
                 .setDeviceId(deviceId)
                 .setAuthInfo(authInfo)
                 .setAuthenticated(true);
-
         connectionMap.put(socket, connectionInfo);
         deviceSocketMap.put(deviceId, socket);
+        // TODO @haohao：socketDeviceMap 和 connectionMap 会重复哇？connectionMap.get(socket).getDeviceId
         socketDeviceMap.put(socket, deviceId);
 
         log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
@@ -79,7 +78,6 @@ public class IotTcpConnectionManager {
     public void unregisterConnection(NetSocket socket) {
         ConnectionInfo connectionInfo = connectionMap.remove(socket);
         Long deviceId = socketDeviceMap.remove(socket);
-
         if (connectionInfo != null && deviceId != null) {
             deviceSocketMap.remove(deviceId);
             log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
@@ -87,6 +85,7 @@ public class IotTcpConnectionManager {
         }
     }
 
+    // TODO @haohao：用不到，要不暂时清理哈。
     /**
      * 注销设备连接（通过设备 ID）
      *
@@ -160,26 +159,30 @@ public class IotTcpConnectionManager {
         }
     }
 
+    // TODO @haohao：ConnectionInfo 和 AuthInfo 是不是可以融合哈？
+
     /**
      * 连接信息
      */
     @Data
-    @Accessors(chain = true)
     public static class ConnectionInfo {
+
         private Long deviceId;
         private AuthInfo authInfo;
         private boolean authenticated;
+
     }
 
     /**
      * 认证信息
      */
     @Data
-    @Accessors(chain = true)
     public static class AuthInfo {
+
         private Long deviceId;
         private String productKey;
         private String deviceName;
         private String clientId;
+
     }
 }

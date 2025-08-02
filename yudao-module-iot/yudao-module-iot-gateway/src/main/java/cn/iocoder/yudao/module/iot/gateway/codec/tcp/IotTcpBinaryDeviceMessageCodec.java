@@ -20,11 +20,11 @@ import java.nio.charset.StandardCharsets;
  *
  * <pre>
  * +--------+--------+--------+--------+--------+--------+--------+--------+
- * | 魔术字 | 版本号 | 消息类型| 消息标志|         消息长度(4字节)          |
+ * | 魔术字 | 版本号 | 消息类型| 消息标志|         消息长度(4 字节)          |
  * +--------+--------+--------+--------+--------+--------+--------+--------+
- * |           消息 ID 长度(2字节)        |      消息 ID (变长字符串)         |
+ * |           消息 ID 长度(2 字节)        |      消息 ID (变长字符串)         |
  * +--------+--------+--------+--------+--------+--------+--------+--------+
- * |           方法名长度(2字节)        |      方法名(变长字符串)         |
+ * |           方法名长度(2 字节)        |      方法名(变长字符串)         |
  * +--------+--------+--------+--------+--------+--------+--------+--------+
  * |                        消息体数据(变长)                              |
  * +--------+--------+--------+--------+--------+--------+--------+--------+
@@ -56,12 +56,21 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     private static final byte PROTOCOL_VERSION = (byte) 0x01;
 
+    // TODO @haohao：这个要不直接静态枚举，不用 MessageType
     /**
      * 消息类型常量
      */
     public static class MessageType {
-        public static final byte REQUEST = 0x01; // 请求消息
-        public static final byte RESPONSE = 0x02; // 响应消息
+
+        /**
+         * 请求消息
+         */
+        public static final byte REQUEST = 0x01;
+        /**
+         * 响应消息
+         */
+        public static final byte RESPONSE = 0x02;
+
     }
 
     /**
@@ -83,17 +92,13 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
     public byte[] encode(IotDeviceMessage message) {
         Assert.notNull(message, "消息不能为空");
         Assert.notBlank(message.getMethod(), "消息方法不能为空");
-
         try {
             // 1. 确定消息类型
             byte messageType = determineMessageType(message);
-
             // 2. 构建消息体
             byte[] bodyData = buildMessageBody(message, messageType);
-
             // 3. 构建完整消息（不包含deviceId，由连接上下文管理）
             return buildCompleteMessage(message, messageType, bodyData);
-
         } catch (Exception e) {
             log.error("[encode][TCP 二进制消息编码失败，消息: {}]", message, e);
             throw new RuntimeException("TCP 二进制消息编码失败: " + e.getMessage(), e);
@@ -104,16 +109,12 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
     public IotDeviceMessage decode(byte[] bytes) {
         Assert.notNull(bytes, "待解码数据不能为空");
         Assert.isTrue(bytes.length >= MIN_MESSAGE_LENGTH, "数据包长度不足");
-
         try {
             Buffer buffer = Buffer.buffer(bytes);
-
             // 1. 解析协议头部
             ProtocolHeader header = parseProtocolHeader(buffer);
-
             // 2. 解析消息内容（不包含deviceId，由上层连接管理器设置）
             return parseMessageContent(buffer, header);
-
         } catch (Exception e) {
             log.error("[decode][TCP 二进制消息解码失败，数据长度: {}]", bytes.length, e);
             throw new RuntimeException("TCP 二进制消息解码失败: " + e.getMessage(), e);
@@ -128,6 +129,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     private byte determineMessageType(IotDeviceMessage message) {
         // 判断是否为响应消息：有响应码或响应消息时为响应
+        // TODO @haohao：感觉只判断 code 更稳妥点？msg 有可能空。。。
         if (message.getCode() != null || StrUtil.isNotBlank(message.getMsg())) {
             return MessageType.RESPONSE;
         }
@@ -140,27 +142,26 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     private byte[] buildMessageBody(IotDeviceMessage message, byte messageType) {
         Buffer bodyBuffer = Buffer.buffer();
-
         if (messageType == MessageType.RESPONSE) {
-            // 响应消息：code + msg长度 + msg + data
+            // code
             bodyBuffer.appendInt(message.getCode() != null ? message.getCode() : 0);
-
+            // msg
             String msg = message.getMsg() != null ? message.getMsg() : "";
             byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
             bodyBuffer.appendShort((short) msgBytes.length);
             bodyBuffer.appendBytes(msgBytes);
-
+            // data
             if (message.getData() != null) {
                 bodyBuffer.appendBytes(JsonUtils.toJsonByte(message.getData()));
             }
         } else {
-            // 请求消息：包含 params 或 data
+            // params
+            // TODO @haohao：请求是不是只处理 message.getParams() 哈？
             Object payload = message.getParams() != null ? message.getParams() : message.getData();
             if (payload != null) {
                 bodyBuffer.appendBytes(JsonUtils.toJsonByte(payload));
             }
         }
-
         return bodyBuffer.getBytes();
     }
 
@@ -169,35 +170,30 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
      */
     private byte[] buildCompleteMessage(IotDeviceMessage message, byte messageType, byte[] bodyData) {
         Buffer buffer = Buffer.buffer();
-
         // 1. 写入协议头部
         buffer.appendByte(MAGIC_NUMBER);
         buffer.appendByte(PROTOCOL_VERSION);
         buffer.appendByte(messageType);
-        buffer.appendByte((byte) 0x00); // 消息标志，预留字段
-
-        // 2. 预留消息长度位置
+        buffer.appendByte((byte) 0x00); // 消息标志，预留字段 TODO @haohao：这个标识的作用是啥呀？
+        // 2. 预留消息长度位置（在 6. 更新消息长度）
         int lengthPosition = buffer.length();
         buffer.appendInt(0);
-
-        // 3. 写入消息ID
+        // 3. 写入消息 ID
         String messageId = StrUtil.isNotBlank(message.getRequestId()) ? message.getRequestId()
+                // TODO @haohao：复用 IotDeviceMessageUtils 的 generateMessageId 哇？
                 : generateMessageId(message.getMethod());
+        // TODO @haohao：StrUtil.utf8Bytes()
         byte[] messageIdBytes = messageId.getBytes(StandardCharsets.UTF_8);
         buffer.appendShort((short) messageIdBytes.length);
         buffer.appendBytes(messageIdBytes);
-
         // 4. 写入方法名
         byte[] methodBytes = message.getMethod().getBytes(StandardCharsets.UTF_8);
         buffer.appendShort((short) methodBytes.length);
         buffer.appendBytes(methodBytes);
-
         // 5. 写入消息体
         buffer.appendBytes(bodyData);
-
         // 6. 更新消息长度
         buffer.setInt(lengthPosition, buffer.length());
-
         return buffer.getBytes();
     }
 
@@ -210,16 +206,15 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
     // ==================== 解码相关方法 ====================
 
+    // TODO @haohao：是不是把 parseProtocolHeader、parseMessageContent 合并？
     /**
      * 解析协议头部
      */
     private ProtocolHeader parseProtocolHeader(Buffer buffer) {
         int index = 0;
-
         // 1. 验证魔术字
         byte magic = buffer.getByte(index++);
         Assert.isTrue(magic == MAGIC_NUMBER, "无效的协议魔术字: " + magic);
-
         // 2. 验证版本号
         byte version = buffer.getByte(index++);
         Assert.isTrue(version == PROTOCOL_VERSION, "不支持的协议版本: " + version);
@@ -227,7 +222,6 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         // 3. 读取消息类型
         byte messageType = buffer.getByte(index++);
         Assert.isTrue(isValidMessageType(messageType), "无效的消息类型: " + messageType);
-
         // 4. 读取消息标志（暂时跳过）
         byte messageFlags = buffer.getByte(index++);
 
@@ -235,7 +229,8 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         int messageLength = buffer.getInt(index);
         index += 4;
 
-        Assert.isTrue(messageLength == buffer.length(), "消息长度不匹配，期望: " + messageLength + ", 实际: " + buffer.length());
+        Assert.isTrue(messageLength == buffer.length(),
+                "消息长度不匹配，期望: " + messageLength + ", 实际: " + buffer.length());
 
         return new ProtocolHeader(magic, version, messageType, messageFlags, messageLength, index);
     }
@@ -246,7 +241,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
     private IotDeviceMessage parseMessageContent(Buffer buffer, ProtocolHeader header) {
         int index = header.getNextIndex();
 
-        // 1. 读取消息ID
+        // 1. 读取消息 ID
         short messageIdLength = buffer.getShort(index);
         index += 2;
         String messageId = buffer.getString(index, index + messageIdLength, StandardCharsets.UTF_8.name());
@@ -314,12 +309,8 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
         if (startIndex >= endIndex) {
             return null;
         }
-
         try {
             String jsonStr = buffer.getString(startIndex, endIndex, StandardCharsets.UTF_8.name());
-            if (StrUtil.isBlank(jsonStr)) {
-                return null;
-            }
             return JsonUtils.parseObject(jsonStr, Object.class);
         } catch (Exception e) {
             log.warn("[parseJsonData][JSON 解析失败，返回原始字符串]", e);
@@ -329,6 +320,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
     // ==================== 辅助方法 ====================
 
+    // TODO @haohao：这个貌似只用一次，可以考虑不抽小方法哈；
     /**
      * 验证消息类型是否有效
      */
@@ -344,11 +336,16 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
     @Data
     @AllArgsConstructor
     private static class ProtocolHeader {
+
         private byte magic;
         private byte version;
         private byte messageType;
         private byte messageFlags;
         private int messageLength;
-        private int nextIndex; // 指向消息内容开始位置
+        /**
+         * 指向消息内容开始位置
+         */
+        private int nextIndex;
+
     }
 }
