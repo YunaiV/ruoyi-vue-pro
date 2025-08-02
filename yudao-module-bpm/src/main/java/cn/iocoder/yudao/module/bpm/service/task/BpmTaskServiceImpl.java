@@ -40,10 +40,9 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.*;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
@@ -62,6 +61,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -196,7 +196,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 获得用户指定 processInstanceId 流程编号下的首个“待办”（未审批、且可审核）的任务
      *
-     * @param userId 用户编号
+     * @param userId            用户编号
      * @param processInstanceId 流程编号
      * @return 任务
      */
@@ -599,15 +599,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     /**
      * 校验选择的下一个节点的审批人，是否合法
-     *
+     * <p>
      * 1. 是否有漏选：没有选择审批人
      * 2. 是否有多选：非下一个节点
      *
      * @param taskDefinitionKey 当前任务节点标识
-     * @param variables 流程变量
-     * @param bpmnModel 流程模型
-     * @param nextAssignees 下一个节点审批人集合（参数）
-     * @param processInstance 流程实例
+     * @param variables         流程变量
+     * @param bpmnModel         流程模型
+     * @param nextAssignees     下一个节点审批人集合（参数）
+     * @param processInstance   流程实例
      */
     @SuppressWarnings("unchecked")
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
@@ -659,7 +659,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     approveUserSelectAssignees = new HashMap<>();
                 }
                 approveUserSelectAssignees.put(nextFlowNode.getId(), assignees);
-                Map<String,List<Long>> existingApproveUserSelectAssignees = (Map<String,List<Long>>) variables.get(
+                Map<String, List<Long>> existingApproveUserSelectAssignees = (Map<String, List<Long>>) variables.get(
                         BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES);
                 if (CollUtil.isNotEmpty(existingApproveUserSelectAssignees)) {
                     approveUserSelectAssignees.putAll(existingApproveUserSelectAssignees);
@@ -1177,6 +1177,70 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         processInstanceCopyService.createProcessInstanceCopy(reqVO.getCopyUserIds(), reqVO.getReason(), reqVO.getId());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void withdrawTask(Long userId, String taskId) {
+        // 1.查询本人已办任务
+        HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery()
+                .taskId(taskId).taskAssignee(userId.toString()).finished().singleResult();
+        if (ObjectUtil.isNull(taskInstance)) {
+            throw exception(TASK_WITHDRAW_FAIL_TASK_NOT_EXISTS);
+        }
+        // 2.校验流程是否结束
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(taskInstance.getProcessInstanceId())
+                .active()
+                .singleResult();
+        if (ObjectUtil.isNull(processInstance)) {
+            throw exception(TASK_WITHDRAW_FAIL_PROCESS_NOT_RUNNING);
+        }
+        // 3.判断此流程是否允许撤回
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService
+                .getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
+        if (ObjectUtil.isNull(processDefinitionInfo) || !Boolean.TRUE.equals(processDefinitionInfo.getAllowWithdrawTask())) {
+            throw exception(TASK_WITHDRAW_FAIL_NOT_ALLOW);
+        }
+        // 4.判断此任务下一节点是否满足撤回
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(taskInstance.getProcessDefinitionId());
+        UserTask userTask = (UserTask) BpmnModelUtils.getFlowElementById(bpmnModel, taskInstance.getTaskDefinitionKey());
+        List<UserTask> nextUserTaskList = BpmnModelUtils.getNextUserTasks(userTask);
+        List<String> nextUserTaskKeys = nextUserTaskList.stream().map(UserTask::getId).toList();
+        if (CollUtil.isEmpty(nextUserTaskKeys)) {
+            throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
+        }
+        long nextUserTaskFinishedCount = historyService.createHistoricTaskInstanceQuery()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .taskDefinitionKeys(nextUserTaskKeys)
+                .taskCreatedAfter(taskInstance.getEndTime()) // TODO @芋艿：是否选择升级flowable版本解决taskCreatedAfter、taskCreatedBefore问题，升级7.1.0可以
+                .finished()
+                .count();
+        if (nextUserTaskFinishedCount > 0) {
+            throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
+        }
+        // 5.获取需要撤回的运行任务
+        List<Task> runningTaskList = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .taskDefinitionKeys(nextUserTaskKeys)
+                .active().list();
+        if (CollUtil.isEmpty(runningTaskList)) {
+            throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
+        }
+        List<String> withdrawExecutionIds = new ArrayList<>();
+        for (Task task : runningTaskList) {
+            // 标记撤回任务为取消
+            // TODO @芋艿：是否需要添加被撤回状态？
+            taskService.addComment(task.getId(), taskInstance.getProcessInstanceId(), BpmCommentTypeEnum.CANCEL.getType(),
+                    BpmCommentTypeEnum.CANCEL.formatComment("前一节点撤回"));
+            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), BpmReasonEnum.CANCEL_BY_WITHDRAW.getReason());
+            withdrawExecutionIds.add(task.getExecutionId());
+        }
+        // 6.执行撤回操作
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .moveExecutionsToSingleActivityId(withdrawExecutionIds, taskInstance.getTaskDefinitionKey())
+                .changeState();
+    }
+
     /**
      * 校验任务是否能被减签
      *
@@ -1223,7 +1287,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 2. 任务前置通知
-        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskBeforeTriggerSetting())){
+        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskBeforeTriggerSetting())) {
             BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskBeforeTriggerSetting();
             BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
                     setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
@@ -1350,7 +1414,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.APPROVE.getStatus())
                             .finished();
                     if (BpmAutoApproveTypeEnum.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())
-                        && sameAssigneeQuery.count() > 0) {
+                            && sameAssigneeQuery.count() > 0) {
                         getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                 .setReason(BpmAutoApproveTypeEnum.APPROVE_ALL.getName()));
                         return;
@@ -1362,7 +1426,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             return;
                         }
                         List<String> sourceTaskIds = convertList(BpmnModelUtils.getElementIncomingFlows( // 获取所有上一个节点
-                                BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey())),
+                                        BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey())),
                                 SequenceFlow::getSourceRef);
                         if (sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds).count() > 0) {
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
@@ -1387,7 +1451,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
-                            || BooleanUtil.isTrue(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
+                        || BooleanUtil.isTrue(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
                         && ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                     getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
@@ -1456,7 +1520,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 任务后置通知
-        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskAfterTriggerSetting())){
+        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskAfterTriggerSetting())) {
             BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskAfterTriggerSetting();
             BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
                     setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
