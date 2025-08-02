@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePage
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -36,7 +36,7 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private DictTypeMapper dictTypeMapper;
-    @MockBean
+    @MockitoBean
     private DictDataService dictDataService;
 
     @Test

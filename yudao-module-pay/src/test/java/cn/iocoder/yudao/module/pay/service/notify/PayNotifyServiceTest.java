@@ -18,15 +18,15 @@ import cn.iocoder.yudao.module.pay.framework.job.config.PayJobConfiguration;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundServiceImpl;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.List;
 
@@ -54,9 +54,9 @@ public class PayNotifyServiceTest extends BaseDbUnitTest {
     @Resource
     private PayNotifyServiceImpl notifyService;
 
-    @MockBean
+    @MockitoBean
     private PayOrderService orderService;
-    @MockBean
+    @MockitoBean
     private PayRefundService refundService;
 
     @Resource
@@ -64,7 +64,7 @@ public class PayNotifyServiceTest extends BaseDbUnitTest {
     @Resource
     private PayNotifyLogMapper notifyLogMapper;
 
-    @MockBean
+    @MockitoBean
     private RedissonClient redissonClient;
 
     @Test

@@ -5,12 +5,12 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
+import jakarta.annotation.Resource;
 import org.apache.ibatis.type.JdbcType;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -24,7 +24,7 @@ public class DatabaseTableServiceImplTest extends BaseDbUnitTest {
     @Resource
     private DatabaseTableServiceImpl databaseTableService;
 
-    @MockBean
+    @MockitoBean
     private DataSourceConfigService dataSourceConfigService;
 
     @Test

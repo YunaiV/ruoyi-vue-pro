@@ -17,9 +17,9 @@ import cn.iocoder.yudao.module.product.service.sku.ProductSkuService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -48,9 +48,9 @@ public class ProductCommentServiceImplTest extends BaseDbUnitTest {
     @Lazy
     private ProductCommentServiceImpl productCommentService;
 
-    @MockBean
+    @MockitoBean
     private ProductSpuService productSpuService;
-    @MockBean
+    @MockitoBean
     private ProductSkuService productSkuService;
 
     public String generateNo() {
