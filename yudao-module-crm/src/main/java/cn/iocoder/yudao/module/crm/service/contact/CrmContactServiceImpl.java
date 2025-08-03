@@ -159,10 +159,10 @@ public class CrmContactServiceImpl implements CrmContactService {
         // 2. 删除联系人
         contactMapper.deleteById(id);
 
-        // 4.1 删除数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CONTACT.getType(), id);
-        // 4.2 删除商机关联
+        // 4.1 删除商机关联
         contactBusinessService.deleteContactBusinessByContactId(id);
+        // 4.2 删除数据权限
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_CONTACT.getType(), id);
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("contactName", contact.getName());

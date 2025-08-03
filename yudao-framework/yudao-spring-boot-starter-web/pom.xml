@@ -53,7 +53,13 @@
             <scope>provided</scope> <!-- 设置为 provided，主要是 GlobalExceptionHandler 使用 -->
         </dependency>
 
-        <!-- xss -->
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+        </dependency>
+
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
