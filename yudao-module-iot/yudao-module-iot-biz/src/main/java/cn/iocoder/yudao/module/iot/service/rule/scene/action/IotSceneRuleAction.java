@@ -24,7 +24,7 @@ public interface IotSceneRuleAction {
      */
     void execute(@Nullable IotDeviceMessage message,
                  IotRuleSceneDO rule,
-                 IotRuleSceneDO.ActionConfig actionConfig) throws Exception;
+                 IotRuleSceneDO.Action actionConfig) throws Exception;
 
     /**
      * 获得类型

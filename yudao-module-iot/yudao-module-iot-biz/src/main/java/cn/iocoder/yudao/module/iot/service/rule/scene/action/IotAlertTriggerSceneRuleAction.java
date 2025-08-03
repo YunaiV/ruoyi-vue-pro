@@ -40,7 +40,7 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
 
     @Override
     public void execute(@Nullable IotDeviceMessage message,
-                        IotRuleSceneDO rule, IotRuleSceneDO.ActionConfig actionConfig) throws Exception {
+                        IotRuleSceneDO rule, IotRuleSceneDO.Action actionConfig) throws Exception {
         List<IotAlertConfigDO> alertConfigs = alertConfigService.getAlertConfigListBySceneRuleIdAndStatus(
                 rule.getId(), CommonStatusEnum.ENABLE.getStatus());
         if (CollUtil.isEmpty(alertConfigs)) {

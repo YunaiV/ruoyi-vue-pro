@@ -31,10 +31,10 @@ public class IotRuleSceneSaveReqVO {
 
     @Schema(description = "触发器数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "触发器数组不能为空")
-    private List<IotRuleSceneDO.TriggerConfig> triggers;
+    private List<IotRuleSceneDO.Trigger> triggers;
 
     @Schema(description = "执行器数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "执行器数组不能为空")
-    private List<IotRuleSceneDO.ActionConfig> actions;
+    private List<IotRuleSceneDO.Action> actions;
 
 }

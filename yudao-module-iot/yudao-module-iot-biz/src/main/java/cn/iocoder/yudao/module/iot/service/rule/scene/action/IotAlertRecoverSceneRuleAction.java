@@ -30,7 +30,7 @@ public class IotAlertRecoverSceneRuleAction implements IotSceneRuleAction {
 
     @Override
     public void execute(IotDeviceMessage message,
-                        IotRuleSceneDO rule, IotRuleSceneDO.ActionConfig actionConfig) throws Exception {
+                        IotRuleSceneDO rule, IotRuleSceneDO.Action actionConfig) throws Exception {
         Long deviceId = message != null ? message.getDeviceId() : null;
         List<IotAlertRecordDO> alertRecords = alertRecordService.getAlertRecordListBySceneRuleId(
                 rule.getId(), deviceId, false);
