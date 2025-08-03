@@ -22,7 +22,7 @@ public class YudaoServerApplication {
         // 如果你碰到启动的问题，请认真阅读 https://doc.iocoder.cn/quick-start/ 文章
 
         SpringApplication.run(YudaoServerApplication.class, args);
-//        new SpringApplicationBuilder(YudaoServerApplication.class)
+//        new SpringApplicationBuilder(YudaoServerApplication.class)jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTim
 //                .applicationStartup(new BufferingApplicationStartup(20480))
 //                .run(args);
 

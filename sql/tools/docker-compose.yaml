@@ -21,7 +21,7 @@ services:
         volumes:
             - mysql:/var/lib/mysql/
             # 注入初始化脚本
-            - ./mysql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/init.sql:ro
+            - ./mysql/yudao-system-base.sql:/docker-entrypoint-initdb.d/init.sql:ro
         command:
             --default-authentication-plugin=mysql_native_password
             --character-set-server=utf8mb4
@@ -42,7 +42,7 @@ services:
             - postgres:/var/lib/postgresql/data
             # 注入初始化脚本
             - ../postgresql/quartz.sql:/docker-entrypoint-initdb.d/quartz.sql:ro
-            - ../postgresql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/ruoyi-vue-pro.sql:ro
+            - ../postgresql/yudao-system-base.sql:/docker-entrypoint-initdb.d/yudao-system-base.sql:ro
 
     oracle:
         image: gvenzl/oracle-xe:18-slim-faststart
@@ -53,7 +53,7 @@ services:
         ports:
             - "1521:1521"
         volumes:
-            - ../oracle/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../oracle/yudao-system-base.sql:/tmp/schema.sql:ro
             # 创建app用户: ROOT/123456@//localhost/XEPDB1
             - ./oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
             - ./oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
@@ -67,7 +67,7 @@ services:
       ports:
         - "1521:1521"
       volumes:
-        - ../oracle/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+        - ../oracle/yudao-system-base.sql:/tmp/schema.sql:ro
         # 创建app用户: ROOT/123456@//localhost/XEPDB1
         - ./oracle/1_create_user.sql:/docker-entrypoint-initdb.d/1_create_user.sql:ro
         - ./oracle/2_create_schema.sh:/docker-entrypoint-initdb.d/2_create_schema.sh:ro
@@ -83,7 +83,7 @@ services:
             - "1433:1433"
         volumes:
             - sqlserver:/var/opt/mssql
-            - ../sqlserver/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../sqlserver/yudao-system-base.sql:/tmp/schema.sql:ro
             # docker compose exec sqlserver bash /tmp/create_schema.sh
             - ./sqlserver/create_schema.sh:/tmp/create_schema.sh:ro
 
@@ -117,7 +117,7 @@ services:
             - "54321:54321"
         volumes:
             - kingbase:/home/kingbase/userdata
-            - ../kingbase/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../kingbase/yudao-system-base.sql:/tmp/schema.sql:ro
 
     opengauss:
         image: opengauss/opengauss:5.0.0
@@ -130,5 +130,5 @@ services:
             - "5432:5432"
         volumes:
             - opengauss:/var/lib/opengauss
-            - ../opengauss/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../opengauss/yudao-system-base.sql:/tmp/schema.sql:ro
             # docker compose exec opengauss bash -c '/usr/local/opengauss/bin/gsql -U $GS_USERNAME -W $GS_PASSWORD -d postgres -f /tmp/schema.sql'
