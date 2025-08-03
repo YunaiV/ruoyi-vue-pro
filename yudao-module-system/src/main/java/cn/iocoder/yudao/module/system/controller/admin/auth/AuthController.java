@@ -127,6 +127,8 @@ public class AuthController {
     @PostMapping("/sms-login")
     @PermitAll
     @Operation(summary = "使用短信验证码登录")
+    // 可按需开启限流：https://github.com/YunaiV/ruoyi-vue-pro/issues/851
+    // @RateLimiter(time = 60, count = 6, keyResolver = ExpressionRateLimiterKeyResolver.class, keyArg = "#reqVO.mobile")
     public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
         return success(authService.smsLogin(reqVO));
     }

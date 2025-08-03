@@ -24,6 +24,7 @@ import static java.util.Collections.emptySet;
  * @author 芋道源码
  */
 @Component
+@Deprecated // 仅仅是表达式的示例，建议使用 BpmTaskCandidateStartUserDeptLeaderStrategy 替代
 public class BpmTaskAssignLeaderExpression {
 
     @Resource

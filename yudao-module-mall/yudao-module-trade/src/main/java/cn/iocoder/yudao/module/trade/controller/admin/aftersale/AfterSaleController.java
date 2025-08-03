@@ -141,9 +141,8 @@ public class AfterSaleController {
     public CommonResult<Boolean> updateAfterSaleRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
         log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
         if (StrUtil.startWithAny(notifyReqDTO.getMerchantRefundId(), "order-")) {
-            tradeOrderUpdateService.updatePaidOrderRefunded(
-                    Long.parseLong(notifyReqDTO.getMerchantRefundId()),
-                    notifyReqDTO.getPayRefundId());
+            Long orderId = Long.parseLong(StrUtil.subAfter(notifyReqDTO.getMerchantRefundId(), "order-", true));
+            tradeOrderUpdateService.updatePaidOrderRefunded(orderId, notifyReqDTO.getPayRefundId());
         } else {
             afterSaleService.updateAfterSaleRefunded(
                     Long.parseLong(notifyReqDTO.getMerchantRefundId()),

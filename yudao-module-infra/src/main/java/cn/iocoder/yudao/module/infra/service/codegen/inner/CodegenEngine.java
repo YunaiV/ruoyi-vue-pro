@@ -139,85 +139,85 @@ public class CodegenEngine {
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // VUE3_VBEN2_ANTD_SCHEMA
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${classNameVar}.data.ts"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/${classNameVar}.data.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Modal.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Modal.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // VUE3_VBEN5_ANTD_SCHEMA
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             // VUE3_VBEN5_ANTD
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_GENERAL.getType(), vue3Vben5AntdGeneralTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             // VUE3_VBEN5_EP_SCHEMA
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/data.ts"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_SCHEMA.getType(), vue3Vben5EpSchemaTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             // VUE3_VBEN5_EP
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/index.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/form.vue"),
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("api/api.ts"),
-                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .build();
 
     @Resource
@@ -611,6 +611,11 @@ public class CodegenEngine {
 
     private static String vue3FilePath(String path) {
         return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3VbenFilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-vben/" + // 顶级目录
                 "src/" + path;
     }
 

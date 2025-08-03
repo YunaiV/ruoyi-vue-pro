@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.image;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.qianfan.QianFanImageModel;
+import org.springaicommunity.qianfan.QianFanImageOptions;
+import org.springaicommunity.qianfan.api.QianFanImageApi;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.ai.qianfan.QianFanImageModel;
-import org.springframework.ai.qianfan.QianFanImageOptions;
-import org.springframework.ai.qianfan.api.QianFanImageApi;
 
 import static cn.iocoder.yudao.module.ai.framework.ai.core.model.image.StabilityAiImageModelTests.viewImage;
 

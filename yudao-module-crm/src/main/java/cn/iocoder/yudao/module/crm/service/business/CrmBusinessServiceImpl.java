@@ -142,6 +142,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         updateBusinessProduct(updateObj.getId(), businessProducts);
 
         // 3. 记录操作日志上下文
+        updateReqVO.setOwnerUserId(oldBusiness.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldBusiness, CrmBusinessSaveReqVO.class));
         LogRecordContext.putVariable("businessName", oldBusiness.getName());
     }

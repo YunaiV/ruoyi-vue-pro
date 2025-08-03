@@ -9,9 +9,6 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
-import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageOptions;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
@@ -24,17 +21,20 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageOptions;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springaicommunity.qianfan.QianFanImageOptions;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.qianfan.QianFanImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiImageOptions;
 import org.springframework.scheduling.annotation.Async;
@@ -140,10 +140,10 @@ public class AiImageServiceImpl implements AiImageService {
     private static ImageOptions buildImageOptions(AiImageDrawReqVO draw, AiModelDO model) {
         if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.OPENAI.getPlatform())) {
             // https://platform.openai.com/docs/api-reference/images/create
-            return OpenAiImageOptions.builder().withModel(model.getModel())
-                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
-                    .withStyle(MapUtil.getStr(draw.getOptions(), "style")) // 风格
-                    .withResponseFormat("b64_json")
+            return OpenAiImageOptions.builder().model(model.getModel())
+                    .height(draw.getHeight()).width(draw.getWidth())
+                    .style(MapUtil.getStr(draw.getOptions(), "style")) // 风格
+                    .responseFormat("b64_json")
                     .build();
         } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform())) {
             // https://docs.siliconflow.cn/cn/api-reference/images/images-generations

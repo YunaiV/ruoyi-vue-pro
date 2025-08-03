@@ -5,7 +5,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -14,10 +13,6 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlo
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientProperties;
-import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreProperties;
-import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreProperties;
-import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.model.tool.ToolCallingManager;
@@ -26,6 +21,10 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
+import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClientProperties;
+import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreProperties;
+import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreProperties;
+import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -51,33 +50,6 @@ public class AiAutoConfiguration {
     }
 
     // ========== 各种 AI Client 创建 ==========
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.deepseek.enable", havingValue = "true")
-    public DeepSeekChatModel deepSeekChatModel(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.DeepSeekProperties properties = yudaoAiProperties.getDeepseek();
-        return buildDeepSeekChatModel(properties);
-    }
-
-    public DeepSeekChatModel buildDeepSeekChatModel(YudaoAiProperties.DeepSeekProperties properties) {
-        if (StrUtil.isEmpty(properties.getModel())) {
-            properties.setModel(DeepSeekChatModel.MODEL_DEFAULT);
-        }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(DeepSeekChatModel.BASE_URL)
-                        .apiKey(properties.getApiKey())
-                        .build())
-                .defaultOptions(OpenAiChatOptions.builder()
-                        .model(properties.getModel())
-                        .temperature(properties.getTemperature())
-                        .maxTokens(properties.getMaxTokens())
-                        .topP(properties.getTopP())
-                        .build())
-                .toolCallingManager(getToolCallingManager())
-                .build();
-        return new DeepSeekChatModel(openAiChatModel);
-    }
 
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.doubao.enable", havingValue = "true")

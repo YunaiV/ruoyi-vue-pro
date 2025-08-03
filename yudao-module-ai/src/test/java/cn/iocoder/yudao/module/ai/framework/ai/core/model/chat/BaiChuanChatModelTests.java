@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -35,7 +34,7 @@ public class BaiChuanChatModelTests {
                     .build())
             .build();
 
-    private final DeepSeekChatModel chatModel = new DeepSeekChatModel(openAiChatModel);
+    private final BaiChuanChatModel chatModel = new BaiChuanChatModel(openAiChatModel);
 
     @Test
     @Disabled

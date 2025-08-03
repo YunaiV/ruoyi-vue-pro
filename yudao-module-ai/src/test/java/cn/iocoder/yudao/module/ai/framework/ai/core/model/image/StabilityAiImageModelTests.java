@@ -31,8 +31,8 @@ public class StabilityAiImageModelTests {
     public void testCall() {
         // 准备参数
         ImageOptions options = OpenAiImageOptions.builder()
-                .withModel("stable-diffusion-v1-6")
-                .withHeight(320).withWidth(320)
+                .model("stable-diffusion-v1-6")
+                .height(320).width(320)
                 .build();
         ImagePrompt prompt = new ImagePrompt("great wall", options);
 

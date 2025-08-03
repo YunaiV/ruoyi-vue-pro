@@ -47,6 +47,13 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-mqtt</artifactId>
         </dependency>
+
+        <!-- 测试相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

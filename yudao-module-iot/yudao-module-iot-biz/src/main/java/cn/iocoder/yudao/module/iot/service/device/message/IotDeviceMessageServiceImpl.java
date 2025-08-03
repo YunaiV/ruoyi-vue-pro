@@ -236,7 +236,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public Long getDeviceMessageCount(LocalDateTime createTime) {
-        return deviceMessageMapper.selectCountByCreateTime(createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
+        return deviceMessageMapper.selectCountByCreateTime(
+                createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
     }
 
     @Override
@@ -244,10 +245,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             IotStatisticsDeviceMessageReqVO reqVO) {
         // 1. 按小时统计，获取分项统计数据
         List<Map<String, Object>> countList = deviceMessageMapper.selectDeviceMessageCountGroupByDate(
-                LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[0]), LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[1]));
+                LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[0]),
+                LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[1]));
 
         // 2. 按照日期间隔，合并数据
-        List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
+        List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1],
+                reqVO.getInterval());
         return convertList(timeRanges, times -> {
             Integer upstreamCount = countList.stream()
                     .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], (Timestamp) vo.get("time")))

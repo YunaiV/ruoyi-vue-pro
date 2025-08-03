@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
@@ -17,13 +16,14 @@ import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener
 import cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.Process;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
 
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static java.util.Arrays.asList;
@@ -239,13 +239,13 @@ public class SimpleModelUtils {
                 // 3.1 分支有后续节点。即分支 1: A->B->C->D 的情况
                 if (isValidNode(conditionChildNode)) {
                     // 3.1.1 建立与后续的节点的连线。例如说，建立 A->B 的连线
-                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), conditionChildNode.getId(), item);
+                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), conditionChildNode.getId(), nodeType, item);
                     process.addFlowElement(sequenceFlow);
                     // 3.1.2 递归调用后续节点连线。例如说，建立 B->C->D 的连线
                     traverseNodeToBuildSequenceFlow(process, conditionChildNode, branchEndNodeId);
                 } else {
                     // 3.2 分支没有后续节点。例如说，建立 A->D 的连线
-                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), branchEndNodeId, item);
+                    SequenceFlow sequenceFlow = ConditionNodeConvert.buildSequenceFlow(node.getId(), branchEndNodeId, nodeType, item);
                     process.addFlowElement(sequenceFlow);
                 }
             }
@@ -464,6 +464,10 @@ public class SimpleModelUtils {
             addReasonRequire(node.getReasonRequire(), userTask);
             // 节点类型
             addNodeType(node.getType(), userTask);
+            // 添加跳过表达式
+            if (StrUtil.isNotEmpty(node.getSkipExpression())) {
+                userTask.setSkipExpression(node.getSkipExpression());
+            }
             return userTask;
         }
 
@@ -591,17 +595,23 @@ public class SimpleModelUtils {
 
     private static class ParallelBranchNodeConvert implements NodeConvert {
 
+        /**
+         * 并行分支使用包容网关。需要设置所有出口条件表达式的值为 true 。原因是，解决 https://t.zsxq.com/m6GXh 反馈问题
+         *
+         * @see {@link ConditionNodeConvert#buildSequenceFlow}
+         */
         @Override
-        public List<ParallelGateway> convertList(BpmSimpleModelNodeVO node) {
-            ParallelGateway parallelGateway = new ParallelGateway();
-            parallelGateway.setId(node.getId());
+        public List<InclusiveGateway> convertList(BpmSimpleModelNodeVO node) {
+
+            InclusiveGateway inclusiveGateway = new InclusiveGateway();
+            inclusiveGateway.setId(node.getId());
             // TODO @jason：setName
 
-            // 并行聚合网关由程序创建，前端不需要传入
-            ParallelGateway joinParallelGateway = new ParallelGateway();
+            // 合并网关 由程序创建，前端不需要传入
+            InclusiveGateway joinParallelGateway = new InclusiveGateway();
             joinParallelGateway.setId(buildGatewayJoinId(node.getId()));
             // TODO @jason：setName
-            return CollUtil.newArrayList(parallelGateway, joinParallelGateway);
+            return CollUtil.newArrayList(inclusiveGateway, joinParallelGateway);
         }
 
         @Override
@@ -652,8 +662,14 @@ public class SimpleModelUtils {
         }
 
         public static SequenceFlow buildSequenceFlow(String sourceId, String targetId,
-                                                     BpmSimpleModelNodeVO node) {
-            String conditionExpression = buildConditionExpression(node.getConditionSetting());
+                                                     BpmSimpleModelNodeTypeEnum nodeType, BpmSimpleModelNodeVO node) {
+            String conditionExpression;
+            // 并行分支，使用包容网关实现，强制设置条件表达式为 true
+            if (BpmSimpleModelNodeTypeEnum.PARALLEL_BRANCH_NODE == nodeType) {
+                conditionExpression ="${true}";
+            } else {
+                conditionExpression = buildConditionExpression(node.getConditionSetting());
+            }
             return buildBpmnSequenceFlow(sourceId, targetId, node.getId(), node.getName(), conditionExpression);
         }
     }
@@ -662,7 +678,6 @@ public class SimpleModelUtils {
      * 构造条件表达式
      */
     public static String buildConditionExpression(BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {
-        // 并行网关不需要设置条件
         if (conditionSetting == null) {
             return null;
         }
@@ -684,15 +699,18 @@ public class SimpleModelUtils {
             if (conditionGroups == null || CollUtil.isEmpty(conditionGroups.getConditions())) {
                 return null;
             }
-            List<String> strConditionGroups = CollectionUtils.convertList(conditionGroups.getConditions(), item -> {
+            List<String> strConditionGroups = convertList(conditionGroups.getConditions(), item -> {
                 if (CollUtil.isEmpty(item.getRules())) {
                     return "";
                 }
                 // 构造规则表达式
-                List<String> list = CollectionUtils.convertList(item.getRules(), (rule) -> {
+                List<String> list = convertList(item.getRules(), (rule) -> {
                     String rightSide = NumberUtil.isNumber(rule.getRightSide()) ? rule.getRightSide()
                             : "\"" + rule.getRightSide() + "\""; // 如果非数值类型加引号
-                    return String.format(" %s %s var:convertByType(%s,%s)", rule.getLeftSide(), rule.getOpCode(), rule.getLeftSide(), rightSide);
+                    return String.format(" vars:getOrDefault(%s, null) %s var:convertByType(%s,%s) ",
+                            rule.getLeftSide(), // 左侧：读取变量
+                            rule.getOpCode(), // 中间：操作符，比较
+                            rule.getLeftSide(), rightSide); // 右侧：转换变量，VariableConvertByTypeExpressionFunction
                 });
                 // 构造条件组的表达式
                 Boolean and = item.getAnd();
@@ -954,7 +972,7 @@ public class SimpleModelUtils {
                 || nodeType == BpmSimpleModelNodeTypeEnum.COPY_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.CHILD_PROCESS
                 || nodeType == BpmSimpleModelNodeTypeEnum.END_NODE) {
-            // 添加元素
+            // 添加此节点
             resultNodes.add(currentNode);
         }
 
@@ -998,6 +1016,16 @@ public class SimpleModelUtils {
 
         // 遍历子节点
         simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
+    }
+
+    /**
+     * 根据跳过表达式，判断是否跳过此节点
+     */
+    public static boolean isSkipNode(BpmSimpleModelNodeVO currentNode, Map<String, Object> variables) {
+        if (StrUtil.isEmpty(currentNode.getSkipExpression())) {
+            return false;
+        }
+        return BpmnModelUtils.evalConditionExpress(variables, currentNode.getSkipExpression());
     }
 
     public static boolean evalConditionExpress(Map<String, Object> variables, BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {

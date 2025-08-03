@@ -34,6 +34,9 @@ public class BpmCategoryServiceImpl implements BpmCategoryService {
     @Resource
     private BpmCategoryMapper bpmCategoryMapper;
 
+    @Resource
+    private BpmModelService modelService;
+
     @Override
     public Long createCategory(BpmCategorySaveReqVO createReqVO) {
         // 校验唯一
@@ -77,15 +80,22 @@ public class BpmCategoryServiceImpl implements BpmCategoryService {
     @Override
     public void deleteCategory(Long id) {
         // 校验存在
-        validateCategoryExists(id);
+        BpmCategoryDO category = validateCategoryExists(id);
+        // 校验是否被流程模型使用
+        Long count = modelService.getModelCountByCategory(category.getCode());
+        if (count > 0) {
+            throw exception(CATEGORY_DELETE_FAIL_MODEL_USED, category.getName());
+        }
         // 删除
         bpmCategoryMapper.deleteById(id);
     }
 
-    private void validateCategoryExists(Long id) {
-        if (bpmCategoryMapper.selectById(id) == null) {
+    private BpmCategoryDO validateCategoryExists(Long id) {
+        BpmCategoryDO category = bpmCategoryMapper.selectById(id);
+        if (category == null) {
             throw exception(CATEGORY_NOT_EXISTS);
         }
+        return category;
     }
 
     @Override

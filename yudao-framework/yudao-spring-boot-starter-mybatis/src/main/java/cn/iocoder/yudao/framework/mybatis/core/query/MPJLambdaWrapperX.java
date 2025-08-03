@@ -118,7 +118,6 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
 
     @Override
     public <X> MPJLambdaWrapperX<T> orderByDesc(SFunction<X, ?> column) {
-        //noinspection unchecked
         super.orderByDesc(true, column);
         return this;
     }
@@ -208,7 +207,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
-    public <S, X> MPJLambdaWrapperX<T> selectCount(SFunction<S, ?> column, String alias) {
+    public <S> MPJLambdaWrapperX<T> selectCount(SFunction<S, ?> column, String alias) {
         super.selectCount(column, alias);
         return this;
     }
@@ -226,7 +225,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
-    public <S, X> MPJLambdaWrapperX<T> selectSum(SFunction<S, ?> column, String alias) {
+    public <S> MPJLambdaWrapperX<T> selectSum(SFunction<S, ?> column, String alias) {
         super.selectSum(column, alias);
         return this;
     }
@@ -244,7 +243,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
-    public <S, X> MPJLambdaWrapperX<T> selectMax(SFunction<S, ?> column, String alias) {
+    public <S> MPJLambdaWrapperX<T> selectMax(SFunction<S, ?> column, String alias) {
         super.selectMax(column, alias);
         return this;
     }
@@ -262,7 +261,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
-    public <S, X> MPJLambdaWrapperX<T> selectMin(SFunction<S, ?> column, String alias) {
+    public <S> MPJLambdaWrapperX<T> selectMin(SFunction<S, ?> column, String alias) {
         super.selectMin(column, alias);
         return this;
     }
@@ -280,7 +279,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
-    public <S, X> MPJLambdaWrapperX<T> selectAvg(SFunction<S, ?> column, String alias) {
+    public <S> MPJLambdaWrapperX<T> selectAvg(SFunction<S, ?> column, String alias) {
         super.selectAvg(column, alias);
         return this;
     }
@@ -298,7 +297,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
-    public <S, X> MPJLambdaWrapperX<T> selectLen(SFunction<S, ?> column, String alias) {
+    public <S> MPJLambdaWrapperX<T> selectLen(SFunction<S, ?> column, String alias) {
         super.selectLen(column, alias);
         return this;
     }
