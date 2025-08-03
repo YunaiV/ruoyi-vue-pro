@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * IoT 插件实例心跳 Request DTO

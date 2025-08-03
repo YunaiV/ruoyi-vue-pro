@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.member.controller.admin.user.vo.MemberUserUpdateR
 import cn.iocoder.yudao.module.member.controller.app.user.vo.*;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

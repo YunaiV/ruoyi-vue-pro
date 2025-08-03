@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
-import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Set;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate.BEAN_NAME;

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveServiceImpl;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * OA 请假单的结果的监听器实现类

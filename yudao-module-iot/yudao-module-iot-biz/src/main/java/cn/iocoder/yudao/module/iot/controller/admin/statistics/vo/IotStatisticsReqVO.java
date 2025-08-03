@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.statistics.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - IoT 统计 Request VO")
 @Data

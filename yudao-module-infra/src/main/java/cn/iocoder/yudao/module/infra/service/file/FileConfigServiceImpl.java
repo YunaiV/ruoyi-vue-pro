@@ -16,8 +16,8 @@ import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientFactor
 import cn.iocoder.yudao.module.infra.framework.file.core.enums.FileStorageEnum;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
+import javax.annotation.Resource;
+import javax.validation.Validator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

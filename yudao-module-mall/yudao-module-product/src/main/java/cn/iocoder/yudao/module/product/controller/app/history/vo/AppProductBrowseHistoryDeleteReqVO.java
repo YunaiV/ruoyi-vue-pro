@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.product.controller.app.history.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Schema(description = "用户 APP - 删除商品浏览记录的 Request VO")

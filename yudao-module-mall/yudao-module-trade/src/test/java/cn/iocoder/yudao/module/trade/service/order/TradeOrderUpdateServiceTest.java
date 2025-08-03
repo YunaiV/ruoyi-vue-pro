@@ -31,13 +31,13 @@ import cn.iocoder.yudao.module.trade.service.message.TradeMessageServiceImpl;
 import cn.iocoder.yudao.module.trade.service.order.handler.TradeOrderHandler;
 import cn.iocoder.yudao.module.trade.service.price.TradePriceServiceImpl;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;

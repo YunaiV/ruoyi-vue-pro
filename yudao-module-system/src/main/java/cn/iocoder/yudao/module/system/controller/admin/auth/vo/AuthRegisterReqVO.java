@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - Register Request VO")
 @Data

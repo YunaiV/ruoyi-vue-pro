@@ -10,11 +10,11 @@ import cn.iocoder.yudao.module.infra.controller.admin.logger.vo.apierrorlog.ApiE
 import cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiErrorLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.logger.ApiErrorLogMapper;
 import cn.iocoder.yudao.module.infra.enums.logger.ApiErrorLogProcessStatusEnum;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

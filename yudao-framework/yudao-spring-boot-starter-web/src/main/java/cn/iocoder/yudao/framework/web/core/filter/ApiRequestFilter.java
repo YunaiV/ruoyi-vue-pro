@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.web.config.WebProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 过滤 /admin-api、/app-api 等 API 请求的过滤器

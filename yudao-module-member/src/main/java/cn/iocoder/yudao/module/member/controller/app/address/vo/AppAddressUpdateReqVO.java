@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 
 @Schema(description = "用户 APP - 用户收件地址更新 Request VO")
 @Data

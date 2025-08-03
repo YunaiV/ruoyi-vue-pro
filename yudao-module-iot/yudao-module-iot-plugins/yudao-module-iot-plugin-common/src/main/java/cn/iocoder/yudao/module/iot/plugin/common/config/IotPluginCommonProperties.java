@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.plugin.common.config;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.Duration;
 
 /**

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.withdraw.PayDemoWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoWithdrawDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 示例提现单 Service 接口

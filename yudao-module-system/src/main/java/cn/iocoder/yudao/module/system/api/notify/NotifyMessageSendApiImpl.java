@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDT
 import cn.iocoder.yudao.module.system.service.notify.NotifySendService;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * 站内信发送 API 实现类

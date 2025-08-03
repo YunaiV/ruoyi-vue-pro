@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfi
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginConfigMapper;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPluginManager;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

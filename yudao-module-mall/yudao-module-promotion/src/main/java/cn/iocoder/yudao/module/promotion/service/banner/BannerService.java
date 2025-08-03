@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.promotion.controller.admin.banner.vo.BannerPageRe
 import cn.iocoder.yudao.module.promotion.controller.admin.banner.vo.BannerUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.banner.BannerDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.List;
 
 /**

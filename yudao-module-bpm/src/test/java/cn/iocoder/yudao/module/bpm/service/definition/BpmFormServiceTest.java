@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmFormFieldRespDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

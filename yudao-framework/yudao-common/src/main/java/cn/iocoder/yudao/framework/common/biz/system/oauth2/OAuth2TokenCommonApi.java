@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessToken
 import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenRespDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * OAuth2.0 Token API 接口

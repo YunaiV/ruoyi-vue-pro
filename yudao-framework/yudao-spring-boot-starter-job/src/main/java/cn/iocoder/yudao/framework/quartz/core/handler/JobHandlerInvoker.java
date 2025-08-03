@@ -13,8 +13,9 @@ import org.quartz.PersistJobDataAfterExecution;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;
 

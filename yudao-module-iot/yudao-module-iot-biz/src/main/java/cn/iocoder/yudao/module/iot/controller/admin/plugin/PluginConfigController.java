@@ -3,21 +3,18 @@ package cn.iocoder.yudao.module.iot.controller.admin.plugin;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfigImportReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfigPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfigRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfigSaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfigStatusReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.service.plugin.IotPluginConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 

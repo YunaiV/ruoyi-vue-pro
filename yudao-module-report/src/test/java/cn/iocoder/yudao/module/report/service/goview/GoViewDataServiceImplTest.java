@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

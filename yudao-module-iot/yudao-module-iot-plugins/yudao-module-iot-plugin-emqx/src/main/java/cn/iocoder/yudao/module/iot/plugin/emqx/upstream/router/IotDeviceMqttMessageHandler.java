@@ -255,7 +255,8 @@ public class IotDeviceMqttMessageHandler {
             Object valueObj = entry.getValue();
 
             // 如果是复杂结构（包含value和time）
-            if (valueObj instanceof JSONObject valueJson) {
+            if (valueObj instanceof JSONObject) {
+                JSONObject valueJson = (JSONObject) valueObj;
                 properties.put(key, valueJson.getOrDefault("value", valueObj));
             } else {
                 properties.put(key, valueObj);

@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class BpmFormUpdateTrigger implements BpmTrigger {
     @Override
     public void execute(String processInstanceId, String param) {
         // 1. 解析更新流程表单配置
-        List<FormTriggerSetting> settings = JsonUtils.parseObject(param, new TypeReference<>() {});
+        List<FormTriggerSetting> settings = JsonUtils.parseObject(param, new TypeReference<List<FormTriggerSetting>>() {});
         if (CollUtil.isEmpty(settings)) {
             log.error("[execute][流程({}) 更新流程表单触发器配置为空]", processInstanceId);
             return;

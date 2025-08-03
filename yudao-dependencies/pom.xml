@@ -14,13 +14,16 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2025.08-SNAPSHOT</revision>
+        <revision>2025.08-jdk8-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.4.5</spring.boot.version>
+        <spring.framework.version>5.3.39</spring.framework.version>
+        <spring.security.version>5.8.16</spring.security.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.8.3</springdoc.version>
-        <knife4j.version>4.6.0</knife4j.version>
+        <springdoc.version>1.8.0</springdoc.version>
+        <knife4j.version>4.5.0</knife4j.version>
+        <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <druid.version>1.2.24</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
@@ -38,30 +41,29 @@
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>9.0.0</skywalking.version>
-        <spring-boot-admin.version>3.4.5</spring-boot-admin.version>
+        <skywalking.version>8.12.0</skywalking.version>
+        <spring-boot-admin.version>2.7.15</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
-        <podam.version>8.0.2.RELEASE</podam.version>
+        <podam.version>7.2.11.RELEASE</podam.version> <!-- Spring Boot 2.X 最多使用 7.2.11 版本 -->
         <jedis-mock.version>1.1.8</jedis-mock.version>
-        <mockito-inline.version>5.2.0</mockito-inline.version>
+        <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <flowable.version>7.0.1</flowable.version>
+        <flowable.version>6.8.0</flowable.version>
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.18.3</jsoup.version>
         <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.35</hutool-5.version>
-        <hutool-6.version>6.0.0-M19</hutool-6.version>
+        <hutool.version>5.8.35</hutool.version>
         <fastexcel.version>1.2.0</fastexcel.version>
-        <velocity.version>2.4.1</velocity.version>
+        <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.8-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>3.1.0</tika-core.version>
+        <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.1.118.Final</netty.version>
@@ -72,9 +74,11 @@
         <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.0.0</jimureport.version>
+        <jimureport.version>2.1.0</jimureport.version>
         <jimubi.version>1.9.5</jimubi.version>
         <weixin-java.version>4.7.5.B</weixin-java.version>
+        <!-- 专属于 JDK8 安全漏洞升级 -->
+        <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
     </properties>
 
     <dependencyManagement>
@@ -84,6 +88,20 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
                 <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId> <!-- JDK8 版本独有：保证 Spring Framework 尽量高 -->
+                <version>${spring.framework.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-bom</artifactId> <!-- JDK8 版本独有：保证 Spring Security 尽量高 -->
+                <version>${spring.security.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -151,13 +169,13 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
-                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
 
@@ -170,7 +188,7 @@
 
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
             <dependency>
@@ -181,12 +199,12 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <artifactId>mybatis-plus-jsqlparser-4.9</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
@@ -196,7 +214,7 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId> <!-- 多数据源 -->
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
                 <version>${dynamic-datasource.version}</version>
             </dependency>
             <dependency>
@@ -246,7 +264,17 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-actuator</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.redisson</groupId>
+                        <!-- 使用 redisson-spring-data-27 替代，解决 Tuple NoClassDefFoundError 报错 -->
+                        <artifactId>redisson-spring-data-34</artifactId>
+                    </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-data-27</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
             <dependency>
@@ -469,12 +497,7 @@
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
-                <version>${hutool-5.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dromara.hutool</groupId>
-                <artifactId>hutool-extra</artifactId>
-                <version>${hutool-6.version}</version>
+                <version>${hutool.version}</version>
             </dependency>
 
             <dependency>
@@ -587,12 +610,12 @@
             <!-- 积木报表-->
             <dependency>
                 <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimureport-spring-boot3-starter-fastjson2</artifactId>
+                <artifactId>jimureport-spring-boot-starter</artifactId>
                 <version>${jimureport.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimubi-spring-boot3-starter</artifactId>
+                <artifactId>jimubi-spring-boot-starter</artifactId>
                 <version>${jimubi.version}</version>
                 <exclusions>
                     <exclusion>
@@ -637,6 +660,18 @@
                 <groupId>org.eclipse.paho</groupId>
                 <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
                 <version>${mqtt.version}</version>
+            </dependency>
+
+            <!-- 专属于 JDK8 安全漏洞升级 -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

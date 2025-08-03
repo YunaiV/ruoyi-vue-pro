@@ -4,9 +4,9 @@ import cn.hutool.core.util.BooleanUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import java.util.Objects;
 
 @Schema(description = "管理后台 - CRM 合同配置 Request VO")

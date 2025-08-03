@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.iot.mq.producer.device;
 
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * IoT 设备相关消息的 Producer

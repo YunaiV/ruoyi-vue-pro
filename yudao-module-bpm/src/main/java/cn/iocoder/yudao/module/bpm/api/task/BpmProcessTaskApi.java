@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.api.task;
 
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * 流程任务 Api 接口

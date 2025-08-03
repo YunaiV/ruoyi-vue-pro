@@ -12,10 +12,11 @@ import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaOrderUploadShippin
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
 import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 同步订单状态到微信小程序的 {@link TradeOrderHandler} 实现类

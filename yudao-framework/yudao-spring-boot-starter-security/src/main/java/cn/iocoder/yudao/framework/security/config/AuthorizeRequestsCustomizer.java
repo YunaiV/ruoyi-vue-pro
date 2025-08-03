@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.framework.security.config;
 
 import cn.iocoder.yudao.framework.web.config.WebProperties;
-import jakarta.annotation.Resource;
 import org.springframework.core.Ordered;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+
+import javax.annotation.Resource;
 
 /**
  * 自定义的 URL 的安全配置

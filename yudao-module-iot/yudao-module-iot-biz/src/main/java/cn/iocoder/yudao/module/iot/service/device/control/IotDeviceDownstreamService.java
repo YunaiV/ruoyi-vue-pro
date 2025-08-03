@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.iot.service.device.control;
 
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * IoT 设备下行 Service 接口

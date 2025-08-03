@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.system.api.social.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * 获取小程序码 Request DTO

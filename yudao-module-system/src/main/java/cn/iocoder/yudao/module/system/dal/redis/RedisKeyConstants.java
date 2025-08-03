@@ -36,7 +36,7 @@ public interface RedisKeyConstants {
     /**
      * 拥有指定菜单的角色编号的缓存
      * <p>
-     * KEY 格式：user_role_ids:{menuId}
+     * KEY 格式：menu_role_ids:{menuId}
      * VALUE 数据类型：String 角色编号集合
      */
     String MENU_ROLE_ID_LIST = "menu_role_ids";

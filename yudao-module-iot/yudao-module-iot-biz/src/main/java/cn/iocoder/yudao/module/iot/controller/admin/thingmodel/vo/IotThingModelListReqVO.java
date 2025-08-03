@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - IoT 产品物模型 List Request VO")
 @Data

@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.promotion.convert.diy.DiyPageConvert;
 import cn.iocoder.yudao.module.promotion.convert.diy.DiyTemplateConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyTemplateDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.diy.DiyTemplateMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;

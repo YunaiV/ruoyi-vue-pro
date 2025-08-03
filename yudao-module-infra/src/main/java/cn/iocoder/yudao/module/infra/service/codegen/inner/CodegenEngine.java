@@ -37,12 +37,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.hutool.core.map.MapUtil.getStr;

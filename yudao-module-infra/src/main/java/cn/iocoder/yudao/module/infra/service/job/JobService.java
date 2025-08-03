@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.quartz.SchedulerException;
 
 import java.util.List;

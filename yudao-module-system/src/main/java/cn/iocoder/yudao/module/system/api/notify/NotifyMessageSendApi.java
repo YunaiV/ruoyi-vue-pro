@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.api.notify;
 
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * 站内信发送 API 接口

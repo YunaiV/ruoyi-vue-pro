@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.system.framework.operatelog.core.SexParseFunction
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.*;
 import java.util.Set;
 
 @Schema(description = "管理后台 - 用户创建/修改 Request VO")

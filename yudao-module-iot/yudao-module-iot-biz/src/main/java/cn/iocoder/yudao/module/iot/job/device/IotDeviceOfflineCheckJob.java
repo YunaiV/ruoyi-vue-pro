@@ -9,11 +9,11 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStat
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
-import jakarta.annotation.Resource;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;

@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.Deliver
 import cn.iocoder.yudao.module.trade.convert.delivery.DeliveryPickUpStoreConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.delivery.DeliveryPickUpStoreMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

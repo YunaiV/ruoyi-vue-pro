@@ -10,6 +10,9 @@ spring:
       - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
       - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
   # 数据源配置项
+  autoconfigure:
+    exclude:
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure # 排除 Druid 的自动配置，使用 dynamic-datasource-spring-boot-starter 配置多数据源
   datasource:
     druid: # Druid 【监控】相关的全局配置
       web-stat-filter:
@@ -57,11 +60,10 @@ spring:
           password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
-  data:
-    redis:
-      host: 400-infra.server.iocoder.cn # 地址
-      port: 6379 # 端口
-      database: 1 # 数据库索引
+  redis:
+    host: 400-infra.server.iocoder.cn # 地址
+    port: 6379 # 端口
+    database: 1 # 数据库索引
 #    password: 123456 # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################

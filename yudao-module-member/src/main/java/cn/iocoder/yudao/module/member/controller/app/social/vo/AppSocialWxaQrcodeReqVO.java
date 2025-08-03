@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.member.controller.app.social.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 
 @Schema(description = "用户 APP - 获得获取小程序码 Request VO")

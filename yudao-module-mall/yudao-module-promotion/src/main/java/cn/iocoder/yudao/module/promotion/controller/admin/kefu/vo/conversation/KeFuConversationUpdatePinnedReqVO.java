@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.conversation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 客服会话置顶 Request VO")
 @Data

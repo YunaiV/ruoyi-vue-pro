@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.inner.Demo03CourseInnerMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.inner.Demo03GradeInnerMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.inner.Demo03StudentInnerMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

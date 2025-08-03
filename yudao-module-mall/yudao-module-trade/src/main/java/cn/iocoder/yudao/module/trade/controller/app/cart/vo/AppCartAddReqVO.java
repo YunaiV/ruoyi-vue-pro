@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.trade.controller.app.cart.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "用户 App - 购物车添加购物项 Request VO")
 @Data

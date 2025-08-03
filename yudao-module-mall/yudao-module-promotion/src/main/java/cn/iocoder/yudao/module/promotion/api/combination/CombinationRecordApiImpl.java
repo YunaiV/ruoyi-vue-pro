@@ -8,9 +8,10 @@ import cn.iocoder.yudao.module.promotion.api.combination.dto.CombinationValidate
 import cn.iocoder.yudao.module.promotion.convert.combination.CombinationActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.combination.CombinationRecordDO;
 import cn.iocoder.yudao.module.promotion.service.combination.CombinationRecordService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
 
 /**
  * 拼团活动 API 实现类

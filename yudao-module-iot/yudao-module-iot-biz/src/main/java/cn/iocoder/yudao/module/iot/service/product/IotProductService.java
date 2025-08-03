@@ -4,9 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 

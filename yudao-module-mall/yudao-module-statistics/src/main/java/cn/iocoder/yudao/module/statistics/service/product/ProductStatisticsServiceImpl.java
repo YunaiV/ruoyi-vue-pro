@@ -15,11 +15,11 @@ import cn.iocoder.yudao.module.statistics.dal.dataobject.product.ProductStatisti
 import cn.iocoder.yudao.module.statistics.dal.mysql.product.ProductStatisticsMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;

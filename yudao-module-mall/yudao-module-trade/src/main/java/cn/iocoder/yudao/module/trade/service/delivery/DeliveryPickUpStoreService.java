@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.delivery.vo.pickup.*;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryPickUpStoreDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 

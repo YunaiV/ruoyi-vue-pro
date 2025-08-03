@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.iot.dal.redis.device;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
-import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Set;
 

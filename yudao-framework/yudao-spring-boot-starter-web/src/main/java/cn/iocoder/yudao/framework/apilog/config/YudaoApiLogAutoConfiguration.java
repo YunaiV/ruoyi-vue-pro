@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.biz.infra.logger.ApiAccessLogCommonApi;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.config.YudaoWebAutoConfiguration;
-import jakarta.servlet.Filter;
+import javax.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

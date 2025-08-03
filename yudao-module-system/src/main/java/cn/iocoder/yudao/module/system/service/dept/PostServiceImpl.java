@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqV
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

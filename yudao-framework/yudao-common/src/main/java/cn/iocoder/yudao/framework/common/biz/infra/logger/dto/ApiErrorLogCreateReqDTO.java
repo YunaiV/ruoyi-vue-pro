@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.common.biz.infra.logger.dto;
 
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**

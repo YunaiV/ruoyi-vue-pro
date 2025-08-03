@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.notify.NotifyTemplateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 

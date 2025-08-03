@@ -16,13 +16,13 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -260,9 +260,10 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
     private IotDeviceMessage otaUpgrade(IotDeviceDownstreamReqVO downstreamReqVO,
                                         IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
-        if (!(downstreamReqVO.getData() instanceof Map<?, ?> data)) {
+        if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
             throw new ServiceException(BAD_REQUEST.getCode(), "data 不是 Map 类型");
         }
+        Map<?, ?> data = (Map<?,?>) downstreamReqVO.getData();
 
         // 2. 发送请求
         String url = String.format("ota/%s/%s/upgrade",

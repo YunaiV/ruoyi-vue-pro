@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - 加签任务的删除（减签） Request VO")
 @Data

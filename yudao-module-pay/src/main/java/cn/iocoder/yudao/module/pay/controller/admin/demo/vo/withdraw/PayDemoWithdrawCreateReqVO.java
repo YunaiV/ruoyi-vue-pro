@@ -4,8 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.pay.enums.demo.PayDemoWithdrawTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 示例提现单创建 Request VO")
 @Data

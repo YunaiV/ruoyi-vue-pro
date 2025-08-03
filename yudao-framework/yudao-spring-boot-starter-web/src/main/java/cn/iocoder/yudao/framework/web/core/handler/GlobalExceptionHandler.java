@@ -5,7 +5,6 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.iocoder.yudao.framework.common.biz.infra.logger.ApiErrorLogCommonApi;
 import cn.iocoder.yudao.framework.common.biz.infra.logger.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -17,10 +16,6 @@ import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -37,8 +32,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -95,9 +93,6 @@ public class GlobalExceptionHandler {
         }
         if (ex instanceof NoHandlerFoundException) {
             return noHandlerFoundExceptionHandler((NoHandlerFoundException) ex);
-        }
-        if (ex instanceof NoResourceFoundException) {
-            return noResourceFoundExceptionHandler(request, (NoResourceFoundException) ex);
         }
         if (ex instanceof HttpRequestMethodNotSupportedException) {
             return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
@@ -224,15 +219,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理 SpringMVC 请求地址不存在
-     */
-    @ExceptionHandler(NoResourceFoundException.class)
-    private CommonResult<?> noResourceFoundExceptionHandler(HttpServletRequest req, NoResourceFoundException ex) {
-        log.warn("[noResourceFoundExceptionHandler]", ex);
-        return CommonResult.error(NOT_FOUND.getCode(), String.format("请求地址不存在:%s", ex.getResourcePath()));
-    }
-
-    /**
      * 处理 SpringMVC 请求方法不正确
      *
      * 例如说，A 接口的方法为 GET 方式，结果请求方法为 POST 方式，导致不匹配
@@ -344,12 +330,12 @@ public class GlobalExceptionHandler {
         errorLog.setApplicationName(applicationName);
         errorLog.setRequestUrl(request.getRequestURI());
         Map<String, Object> requestParams = MapUtil.<String, Object>builder()
-                .put("query", JakartaServletUtil.getParamMap(request))
-                .put("body", JakartaServletUtil.getBody(request)).build();
+                .put("query", ServletUtils.getParamMap(request))
+                .put("body", ServletUtils.getBody(request)).build();
         errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
         errorLog.setRequestMethod(request.getMethod());
         errorLog.setUserAgent(ServletUtils.getUserAgent(request));
-        errorLog.setUserIp(JakartaServletUtil.getClientIP(request));
+        errorLog.setUserIp(ServletUtils.getClientIP(request));
         errorLog.setExceptionTime(LocalDateTime.now());
     }
 

@@ -16,7 +16,6 @@ import io.vertx.mqtt.MqttClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * IoT 设备下行服务端，接收来自 device 设备的请求，转发给 server 服务器
@@ -108,7 +107,7 @@ public class IotDeviceUpstreamServer {
 
         // 3. 等待所有服务启动完成
         CompletableFuture.allOf(httpFuture, mqttFuture)
-                .orTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS) // TODO @芋艿：JDK8 不兼容
+//                .orTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS) // TODO @芋艿：JDK8 不兼容
                 .whenComplete((result, error) -> {
                     if (error != null) {
                         log.error("[start][服务启动失败]", error);

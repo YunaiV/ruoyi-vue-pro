@@ -11,7 +11,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;

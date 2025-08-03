@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Schema(description = "管理后台 - 商品 SPU 新增/更新 Request VO")

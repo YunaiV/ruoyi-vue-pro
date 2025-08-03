@@ -9,10 +9,11 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.category.BpmCategoryMapper;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -34,7 +35,7 @@ public class BpmCategoryServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BpmCategoryServiceImpl categoryService;
 
-    @MockitoBean
+    @MockBean
     private BpmModelService modelService;
 
     @Resource

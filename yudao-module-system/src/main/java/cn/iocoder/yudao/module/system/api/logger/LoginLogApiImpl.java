@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 
 /**
  * 登录日志的 API 实现类
