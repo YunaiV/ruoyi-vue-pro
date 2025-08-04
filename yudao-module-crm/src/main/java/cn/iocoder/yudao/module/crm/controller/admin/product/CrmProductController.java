@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.enums.product.CrmProductStatusEnum;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,6 +71,7 @@ public class CrmProductController {
     @Operation(summary = "获得产品")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
+    @TransMethodResult
     public CommonResult<CrmProductRespVO> getProduct(@RequestParam("id") Long id) {
         CrmProductDO product = productService.getProduct(id);
         return success(BeanUtils.toBean(product, CrmProductRespVO.class));
@@ -86,6 +88,7 @@ public class CrmProductController {
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('crm:product:query')")
+    @TransMethodResult
     public CommonResult<PageResult<CrmProductRespVO>> getProductPage(@Valid CrmProductPageReqVO pageVO) {
         PageResult<CrmProductDO> pageResult = productService.getProductPage(pageVO);
         return success(BeanUtils.toBean(pageResult, CrmProductRespVO.class));

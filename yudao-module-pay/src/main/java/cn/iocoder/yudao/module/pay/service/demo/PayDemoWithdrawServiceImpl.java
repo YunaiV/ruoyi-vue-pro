@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.demo;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -60,7 +61,7 @@ public class PayDemoWithdrawServiceImpl implements PayDemoWithdrawService {
     }
 
     @Override
-    public Long transferDemoWithdraw(Long id) {
+    public Long transferDemoWithdraw(Long id, Long userId) {
         // 1.1 校验提现单
         PayDemoWithdrawDO withdraw = validateDemoWithdrawCanTransfer(id);
         // 1.2 特殊：如果是转账失败的情况，需要充值下
@@ -76,6 +77,7 @@ public class PayDemoWithdrawServiceImpl implements PayDemoWithdrawService {
         // 2.1 创建支付单
         PayTransferCreateReqDTO transferReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setChannelCode(withdraw.getTransferChannelCode()).setUserIp(getClientIP()) // 支付应用
+                .setUserId(userId).setUserType(UserTypeEnum.ADMIN.getValue()) // 用户信息
                 .setMerchantTransferId(String.valueOf(withdraw.getId())) // 业务的订单编号
                 .setSubject(withdraw.getSubject()).setPrice(withdraw.getPrice()) // 价格信息
                 .setUserAccount(withdraw.getUserAccount()).setUserName(withdraw.getUserName()); // 收款信息

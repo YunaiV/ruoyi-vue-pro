@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.biz.system.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.common.biz.system.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -16,12 +16,12 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import jakarta.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -48,13 +48,13 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     @Resource
     private UserRoleMapper userRoleMapper;
 
-    @MockBean
+    @MockitoBean
     private RoleService roleService;
-    @MockBean
+    @MockitoBean
     private MenuService menuService;
-    @MockBean
+    @MockitoBean
     private DeptService deptService;
-    @MockBean
+    @MockitoBean
     private AdminUserService userService;
 
     @Test

@@ -7,44 +7,35 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import lombok.Setter;
-import org.flowable.bpmn.model.Activity;
-import org.flowable.bpmn.model.CallActivity;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.*;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
-import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * 自定义的【并行】的【多个】流程任务的 assignee 负责人的分配
- * 第一步，基于分配规则，计算出分配任务的【多个】候选人们。
- * 第二步，将【多个】任务候选人们，设置到 DelegateExecution 的 collectionVariable 变量中，以便 BpmUserTaskActivityBehavior 使用它
+ * 自定义的【串行】的【多个】流程任务的 assignee 负责人的分配
  *
- * @author kemengkai
- * @since 2022-04-21 16:57
+ * 本质上，实现和 {@link BpmParallelMultiInstanceBehavior} 一样，只是继承的类不一样
+ *
+ * @author 芋道源码
  */
 @Setter
-public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehavior {
+public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceBehavior {
 
     private BpmTaskCandidateInvoker taskCandidateInvoker;
 
-    public BpmParallelMultiInstanceBehavior(Activity activity,
-                                            AbstractBpmnActivityBehavior innerActivityBehavior) {
+    public BpmSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
         super(activity, innerActivityBehavior);
     }
 
     /**
-     * 重写该方法，主要实现两个功能：
-     * 1. 忽略原有的 collectionVariable、collectionElementVariable 表达式，而是采用自己定义的
-     * 2. 获得任务的处理人，并设置到 collectionVariable 中，用于 BpmUserTaskActivityBehavior 从中可以获取任务的处理人
+     * 逻辑和 {@link BpmParallelMultiInstanceBehavior#resolveNrOfInstances(DelegateExecution)} 类似
      *
-     * 注意，多个任务实例，每个任务实例对应一个处理人，所以返回的数量就是任务处理人的数量
-     *
-     * @param execution 执行任务
-     * @return 数量
+     * 差异的点：是在【第二步】的时候，需要返回 LinkedHashSet 集合！因为它需要有序！
      */
     @Override
     protected int resolveNrOfInstances(DelegateExecution execution) {
@@ -58,8 +49,9 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
             super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
 
             // 第二步，获取任务的所有处理人
+            // 不使用 execution.getVariable 原因：目前依次审批任务回退后 collectionVariable 变量没有清理， 如果重新进入该任务不会重新分配审批人
             @SuppressWarnings("unchecked")
-            Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
+            Set<Long> assigneeUserIds = (Set<Long>) execution.getVariableLocal(super.collectionVariable, Set.class);
             if (assigneeUserIds == null) {
                 assigneeUserIds = taskCandidateInvoker.calculateUsersByTask(execution);
                 if (CollUtil.isEmpty(assigneeUserIds)) {
@@ -86,6 +78,21 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         }
 
         return super.resolveNrOfInstances(execution);
+    }
+
+    @Override
+    protected void executeOriginalBehavior(DelegateExecution execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
+        // 参见 https://t.zsxq.com/53Meo 情况
+        if (execution.getCurrentFlowElement() instanceof CallActivity
+                || execution.getCurrentFlowElement() instanceof SubProcess) {
+            super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
+            return;
+        }
+        // 参见 https://gitee.com/zhijiantianya/yudao-cloud/issues/IC239F
+        super.collectionExpression = null;
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
+        super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
     }
 
 }

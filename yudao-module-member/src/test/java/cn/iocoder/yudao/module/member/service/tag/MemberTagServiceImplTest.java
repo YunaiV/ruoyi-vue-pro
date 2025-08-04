@@ -8,11 +8,10 @@ import cn.iocoder.yudao.module.member.controller.admin.tag.vo.MemberTagUpdateReq
 import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.mysql.tag.MemberTagMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -39,7 +38,7 @@ public class MemberTagServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MemberTagMapper tagMapper;
 
-    @MockBean
+    @MockitoBean
     private MemberUserService memberUserService;
 
     @Test

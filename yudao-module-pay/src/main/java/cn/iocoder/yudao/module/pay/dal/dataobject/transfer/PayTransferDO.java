@@ -30,7 +30,6 @@ public class PayTransferDO extends BaseDO {
      */
     @TableId
     private Long id;
-
     /**
      * 转账单号
      */
@@ -42,20 +41,27 @@ public class PayTransferDO extends BaseDO {
      * 关联 {@link PayAppDO#getId()}
      */
     private Long appId;
-
     /**
      * 转账渠道编号
      *
      * 关联 {@link PayChannelDO#getId()}
      */
     private Long channelId;
-
     /**
      * 转账渠道编码
      *
      * 枚举 {@link PayChannelEnum}
      */
     private String channelCode;
+
+    /**
+     * 用户编号
+     */
+    private Long userId;
+    /**
+     * 用户类型
+     */
+    private Integer userType;
 
     // ========== 商户相关字段 ==========
     /**

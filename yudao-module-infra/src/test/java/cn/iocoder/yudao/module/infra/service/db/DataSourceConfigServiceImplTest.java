@@ -11,14 +11,14 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
 import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.stubbing.Answer;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -46,10 +46,10 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     @Resource
     private DataSourceConfigMapper dataSourceConfigMapper;
 
-    @MockBean
+    @MockitoBean
     private AES aes;
 
-    @MockBean
+    @MockitoBean
     private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     @BeforeEach

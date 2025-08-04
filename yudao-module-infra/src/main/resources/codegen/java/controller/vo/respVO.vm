@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 #end
 #end
 ## 处理 Excel 导出
-import com.alibaba.excel.annotation.*;
+import cn.idev.excel.annotation.*;
 #foreach ($column in $columns)
 #if ("$!column.dictType" != "")## 有设置数据字典
 import ${DictFormatClassName};

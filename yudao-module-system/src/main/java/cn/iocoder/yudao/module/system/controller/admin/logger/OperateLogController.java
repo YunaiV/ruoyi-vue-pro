@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.Oper
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
+import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -40,6 +41,7 @@ public class OperateLogController {
     @GetMapping("/page")
     @Operation(summary = "查看操作日志分页列表")
     @PreAuthorize("@ss.hasPermission('system:operate-log:query')")
+    @TransMethodResult
     public CommonResult<PageResult<OperateLogRespVO>> pageOperateLog(@Valid OperateLogPageReqVO pageReqVO) {
         PageResult<OperateLogDO> pageResult = operateLogService.getOperateLogPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperateLogRespVO.class));

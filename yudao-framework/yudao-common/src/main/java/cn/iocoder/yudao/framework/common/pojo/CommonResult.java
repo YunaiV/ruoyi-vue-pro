@@ -26,15 +26,15 @@ public class CommonResult<T> implements Serializable {
      */
     private Integer code;
     /**
-     * 返回数据
-     */
-    private T data;
-    /**
      * 错误提示，用户可阅读
      *
      * @see ErrorCode#getMsg() ()
      */
     private String msg;
+    /**
+     * 返回数据
+     */
+    private T data;
 
     /**
      * 将传入的 result 对象，转换成另外一个泛型结果的对象
