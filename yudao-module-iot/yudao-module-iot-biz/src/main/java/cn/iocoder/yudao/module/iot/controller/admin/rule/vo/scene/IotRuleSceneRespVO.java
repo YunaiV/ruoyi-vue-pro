@@ -24,10 +24,10 @@ public class IotRuleSceneRespVO {
     private Integer status;
 
     @Schema(description = "触发器数组", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<IotRuleSceneDO.TriggerConfig> triggers;
+    private List<IotRuleSceneDO.Trigger> triggers;
 
     @Schema(description = "执行器数组", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<IotRuleSceneDO.ActionConfig> actions;
+    private List<IotRuleSceneDO.Action> actions;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

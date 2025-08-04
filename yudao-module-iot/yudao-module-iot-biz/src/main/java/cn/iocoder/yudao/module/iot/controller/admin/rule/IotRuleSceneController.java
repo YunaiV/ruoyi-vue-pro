@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneUpdateStatusReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,14 @@ public class IotRuleSceneController {
     @PreAuthorize("@ss.hasPermission('iot:rule-scene:update')")
     public CommonResult<Boolean> updateRuleScene(@Valid @RequestBody IotRuleSceneSaveReqVO updateReqVO) {
         ruleSceneService.updateRuleScene(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-status")
+    @Operation(summary = "更新场景联动状态")
+    @PreAuthorize("@ss.hasPermission('iot:rule-scene:update')")
+    public CommonResult<Boolean> updateRuleSceneStatus(@Valid @RequestBody IotRuleSceneUpdateStatusReqVO updateReqVO) {
+        ruleSceneService.updateRuleSceneStatus(updateReqVO.getId(), updateReqVO.getStatus());
         return success(true);
     }
 
