@@ -51,7 +51,14 @@ public class MailLogDO extends BaseDO implements Serializable {
      * 接收邮箱地址
      */
     private String toMail;
-
+    /**
+     * 接收邮箱地址
+     */
+    private String ccMail;
+    /**
+     * 接收邮箱地址
+     */
+    private String bccMail;
     /**
      * 邮箱账号编号
      *

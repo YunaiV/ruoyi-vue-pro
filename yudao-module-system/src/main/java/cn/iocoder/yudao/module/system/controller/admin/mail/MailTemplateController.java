@@ -91,7 +91,7 @@ public class MailTemplateController {
     @Operation(summary = "发送短信")
     @PreAuthorize("@ss.hasPermission('system:mail-template:send-mail')")
     public CommonResult<Long> sendMail(@Valid @RequestBody MailTemplateSendReqVO sendReqVO) {
-        return success(mailSendService.sendSingleMailToAdmin(sendReqVO.getMail(), getLoginUserId(),
+        return success(mailSendService.sendMultipleMailToAdmin(sendReqVO.getToMails(), sendReqVO.getCcMails(), sendReqVO.getBccMails(), getLoginUserId(),
                 sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
 

@@ -2,12 +2,9 @@ package cn.iocoder.yudao.module.system.controller.admin.mail.vo.log;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - 邮件日志 Response VO")
 @Data
@@ -22,8 +19,14 @@ public class MailLogRespVO {
     @Schema(description = "用户类型，参见 UserTypeEnum 枚举", example = "2")
     private Byte userType;
 
-    @Schema(description = "接收邮箱地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "76854@qq.com")
+    @Schema(description = "接收邮箱地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "user1@example.com, user2@example.com")
     private String toMail;
+
+    @Schema(description = "抄送邮箱地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "user3@example.com, user4@example.com")
+    private String ccMail;
+
+    @Schema(description = "密送邮箱地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "user5@example.com, user6@example.com")
+    private String bccMail;
 
     @Schema(description = "邮箱账号编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18107")
     private Long accountId;
