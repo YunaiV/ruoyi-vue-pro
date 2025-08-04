@@ -94,6 +94,15 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     }
 
     @Override
+    public void updateRuleSceneStatus(Long id, Integer status) {
+        // 校验存在
+        validateRuleSceneExists(id);
+        // 更新状态
+        IotRuleSceneDO updateObj = new IotRuleSceneDO().setId(id).setStatus(status);
+        ruleSceneMapper.updateById(updateObj);
+    }
+
+    @Override
     public void deleteRuleScene(Long id) {
         // 校验存在
         validateRuleSceneExists(id);

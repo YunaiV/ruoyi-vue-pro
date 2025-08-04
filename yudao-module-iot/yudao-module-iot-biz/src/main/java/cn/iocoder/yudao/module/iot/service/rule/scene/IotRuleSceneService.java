@@ -34,6 +34,14 @@ public interface IotRuleSceneService {
     void updateRuleScene(@Valid IotRuleSceneSaveReqVO updateReqVO);
 
     /**
+     * 更新场景联动状态
+     *
+     * @param id     场景联动编号
+     * @param status 状态
+     */
+    void updateRuleSceneStatus(Long id, Integer status);
+
+    /**
      * 删除场景联动
      *
      * @param id 编号
