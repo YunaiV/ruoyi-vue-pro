@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.framework.captcha.core;
 
-import com.anji.captcha.model.common.CaptchaTypeEnum;
 import com.anji.captcha.model.common.RepCodeEnum;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.model.vo.CaptchaVO;
@@ -10,12 +9,12 @@ import com.anji.captcha.util.AESUtil;
 import com.anji.captcha.util.ImageUtils;
 import com.anji.captcha.util.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.RandomUtil;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Properties;
-import java.util.Random;
 
 /**
  * 图片文字验证码
@@ -25,11 +24,18 @@ import java.util.Random;
  */
 public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
 
+    /**
+     * 验证码的基础字符
+     */
+    private static final String CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    /**
+     * 验证码长度
+     */
+    private static final Integer LENGTH = 4;
+
     private static final int WIDTH = 120;
     private static final int HEIGHT = 40;
     private static final int LINES = 10;
-    private static final Random RANDOM = new Random();
-    private static final String CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
     @Override
     public void init(Properties config) {
@@ -44,18 +50,14 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
     @Override
     public String captchaType() {
         return "pictureWord";
-//        return CaptchaTypeEnum.PICTURE_WORD.getCodeValue();
     }
 
     @Override
     public ResponseModel get(CaptchaVO captchaVO) {
-        String text = generateRandomText(4);
-
+        String text = generateRandomText(LENGTH);
         CaptchaVO imageData = getImageData(text);
-
-        // pointJson不传到前端,只做后端校验,测试时放开
+        // pointJson 不传到前端，只做后端校验，测试时放开
 //        imageData.setPointJson(text);
-
         return ResponseModel.successData(imageData);
     }
 
@@ -75,22 +77,22 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
         String codeValue = CaptchaServiceFactory.getCache(cacheType).get(codeKey);
         String code = getCodeByCodeValue(codeValue);
         String secretKey = getSecretKeyByCodeValue(codeValue);
-        //验证码只用一次，即刻失效
+        // 验证码只用一次，即刻失效
         CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
 
-        // 用户输入的验证码(CaptchaVO中没有预留字段,暂时用pointJson,无需加解密)
+        // 用户输入的验证码(CaptchaVO 中 没有预留字段，暂时用 pointJson 无需加解密)
         String userCode = captchaVO.getPointJson();
         if (!StringUtils.equalsIgnoreCase(code, userCode)) {
             afterValidateFail(captchaVO);
             return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_COORDINATE_ERROR);
         }
 
-        //校验成功，将信息存入缓存
+        // 校验成功，将信息存入缓存
         String value;
         try {
             value = AESUtil.aesEncrypt(captchaVO.getToken().concat("---").concat(userCode), secretKey);
         } catch (Exception e) {
-            logger.error("AES加密失败", e);
+            logger.error("AES 加密失败", e);
             afterValidateFail(captchaVO);
             return ResponseModel.errorMsg(e.getMessage());
         }
@@ -112,7 +114,7 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
             if (!CaptchaServiceFactory.getCache(cacheType).exists(codeKey)) {
                 return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_INVALID);
             }
-            //二次校验取值后，即刻失效
+            // 二次校验取值后，即刻失效
             CaptchaServiceFactory.getCache(cacheType).delete(codeKey);
         } catch (Exception e) {
             logger.error("验证码解析失败", e);
@@ -130,42 +132,35 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
         // 设置背景色
         g.setColor(getRandomColor(200, 250));
         g.fillRect(0, 0, WIDTH, HEIGHT);
-
         // 绘制干扰线
         for (int i = 0; i < LINES; i++) {
             g.setColor(getRandomColor(100, 200));
-            int x1 = RANDOM.nextInt(WIDTH);
-            int y1 = RANDOM.nextInt(HEIGHT);
-            int x2 = RANDOM.nextInt(WIDTH);
-            int y2 = RANDOM.nextInt(HEIGHT);
+            int x1 = RandomUtil.randomInt(WIDTH);
+            int y1 = RandomUtil.randomInt(HEIGHT);
+            int x2 = RandomUtil.randomInt(WIDTH);
+            int y2 = RandomUtil.randomInt(HEIGHT);
             g.drawLine(x1, y1, x2, y2);
         }
-
         // 设置字体
         g.setFont(new Font("Arial", Font.BOLD, 24));
-
         // 绘制验证码文本
         for (int i = 0; i < text.length(); i++) {
             g.setColor(getRandomColor(20, 130));
-
             // 文字旋转
             AffineTransform affineTransform = new AffineTransform();
             int x = 20 + i * 20;
-            int y = 24 + RANDOM.nextInt(8);
+            int y = 24 + RandomUtil.randomInt(8);
             // 旋转范围 -45 ~ 45
-            affineTransform.setToRotation(Math.toRadians(RandomUtils.getRandomInt(-45, 45)), x, y);
+            affineTransform.setToRotation(Math.toRadians(RandomUtil.randomInt(-45, 45)), x, y);
             g.setTransform(affineTransform);
-
             g.drawString(text.charAt(i) + "", x, y);
         }
-
         // 添加噪点
         for (int i = 0; i < 100; i++) {
-            int x = RANDOM.nextInt(WIDTH);
-            int y = RANDOM.nextInt(HEIGHT);
+            int x = RandomUtil.randomInt(WIDTH);
+            int y = RandomUtil.randomInt(HEIGHT);
             image.setRGB(x, y, getRandomColor(0, 255).getRGB());
         }
-
         g.dispose();
 
         String secretKey = null;
@@ -177,7 +172,7 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
         dataVO.setOriginalImageBase64(ImageUtils.getImageToBase64Str(image).replaceAll("\r|\n", ""));
         dataVO.setToken(RandomUtils.getUUID());
 //        dataVO.setSecretKey(secretKey);
-        //将坐标信息存入redis中
+        // 将坐标信息存入 redis 中
         String codeKey = String.format(REDIS_CAPTCHA_KEY, dataVO.getToken());
         CaptchaServiceFactory.getCache(cacheType).set(codeKey, getCodeValue(text, secretKey), EXPIRESIN_SECONDS);
         return dataVO;
@@ -196,14 +191,11 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
     }
 
     private Color getRandomColor(int min, int max) {
-        if (min > max) {
-            int temp = min;
-            min = max;
-            max = temp;
-        }
-        int r = min + RANDOM.nextInt(max - min);
-        int g = min + RANDOM.nextInt(max - min);
-        int b = min + RANDOM.nextInt(max - min);
+        int minVal = Math.min(min, max);
+        int maxVal = Math.max(min, max);
+        int r = RandomUtil.randomInt(minVal, maxVal);
+        int g = RandomUtil.randomInt(minVal, maxVal);
+        int b = RandomUtil.randomInt(minVal, maxVal);
         return new Color(r, g, b);
     }
 
@@ -212,16 +204,9 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
      *
      * @param length 长度
      * @return {@link String}
-     * @author Rex
-     * @since 2025/6/26 15:20
      */
     public static String generateRandomText(int length) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            int index = RANDOM.nextInt(CHARACTERS.length());
-            sb.append(CHARACTERS.charAt(index));
-        }
-        return sb.toString();
+        return RandomUtil.randomString(CHARACTERS, length);
     }
 
 }
