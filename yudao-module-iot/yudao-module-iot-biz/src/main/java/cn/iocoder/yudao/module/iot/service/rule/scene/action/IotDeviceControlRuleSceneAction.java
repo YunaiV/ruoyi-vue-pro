@@ -23,6 +23,7 @@ public class IotDeviceControlRuleSceneAction implements IotSceneRuleAction {
     @Resource
     private IotDeviceMessageService deviceMessageService;
 
+    // TODO @puhui999：这里
     @Override
     public void execute(IotDeviceMessage message,
                         IotRuleSceneDO rule, IotRuleSceneDO.Action actionConfig) {

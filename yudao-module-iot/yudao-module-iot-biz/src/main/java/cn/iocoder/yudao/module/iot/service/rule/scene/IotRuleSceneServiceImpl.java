@@ -77,10 +77,8 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
 
     @Override
     public Long createRuleScene(IotRuleSceneSaveReqVO createReqVO) {
-        // 插入
         IotRuleSceneDO ruleScene = BeanUtils.toBean(createReqVO, IotRuleSceneDO.class);
         ruleSceneMapper.insert(ruleScene);
-        // 返回
         return ruleScene.getId();
     }
 
@@ -147,45 +145,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     @Override
     @TenantIgnore // 忽略租户隔离：因为 IotRuleSceneMessageHandler 调用时，一般未传递租户，所以需要忽略
     public List<IotRuleSceneDO> getRuleSceneListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
-        // TODO @芋艿：测试代码示例（使用新结构），可根据需要启用
-        if (false) {
-            // 创建测试规则场景
-            IotRuleSceneDO ruleScene = new IotRuleSceneDO();
-            ruleScene.setId(1L);
-            ruleScene.setName("测试场景");
-            ruleScene.setStatus(CommonStatusEnum.ENABLE.getStatus());
-
-            // 创建触发器
-            IotRuleSceneDO.Trigger trigger = new IotRuleSceneDO.Trigger();
-            trigger.setType(IotRuleSceneTriggerTypeEnum.DEVICE_PROPERTY_POST.getType());
-            trigger.setProductId(1L); // 假设产品ID为1
-            trigger.setDeviceId(1L);  // 假设设备ID为1
-            trigger.setIdentifier("temperature"); // 温度属性
-            trigger.setOperator(IotRuleSceneConditionOperatorEnum.GREATER_THAN.getOperator());
-            trigger.setValue("25"); // 温度大于25度
-
-            // 创建条件分组
-            IotRuleSceneDO.TriggerCondition condition = new IotRuleSceneDO.TriggerCondition();
-            condition.setType(IotRuleSceneConditionTypeEnum.DEVICE_PROPERTY.getType());
-            condition.setIdentifier("temperature");
-            condition.setOperator(IotRuleSceneConditionOperatorEnum.GREATER_THAN.getOperator());
-            condition.setParam("25");
-
-            trigger.setConditionGroups(ListUtil.toList(Collections.singleton(ListUtil.toList(condition))));
-            ruleScene.setTriggers(ListUtil.toList(trigger));
-
-            // 创建动作
-            IotRuleSceneDO.Action action = new IotRuleSceneDO.Action();
-            action.setType(IotRuleSceneActionTypeEnum.DEVICE_PROPERTY_SET.getType());
-            action.setProductId(1L);
-            action.setDeviceId(1L);
-            action.setParams(MapUtil.of("fan", "on")); // 打开风扇
-
-            ruleScene.setActions(ListUtil.toList(action));
-
-            return ListUtil.toList(ruleScene);
-        }
-
+        // TODO @puhui999：一些注释，看看要不要优化下；
         // 注意：旧的测试代码已删除，因为使用了废弃的数据结构
         // 如需测试，请使用上面的新结构测试代码示例
         List<IotRuleSceneDO> list = ruleSceneMapper.selectList();
@@ -471,13 +431,13 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 return false;
             }
 
-            // 2. 构建 Spring 表达式的变量
+            // 2.1 构建 Spring 表达式的变量
             Map<String, Object> springExpressionVariables = MapUtil.<String, Object>builder()
                     .put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, sourceValue)
                     .build();
-
-            // 3. 根据操作符类型处理参数值
+            // 2.2 根据操作符类型处理参数值
             if (StrUtil.isNotBlank(paramValue)) {
+                // TODO @puhui999：这里是不是在 IotRuleSceneConditionOperatorEnum 加个属性；
                 if (operatorEnum == IotRuleSceneConditionOperatorEnum.IN
                         || operatorEnum == IotRuleSceneConditionOperatorEnum.NOT_IN
                         || operatorEnum == IotRuleSceneConditionOperatorEnum.BETWEEN
@@ -493,7 +453,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 }
             }
 
-            // 4. 计算 Spring 表达式
+            // 3. 计算 Spring 表达式
             return (Boolean) SpringExpressionUtils.parseExpression(operatorEnum.getSpringExpression(), springExpressionVariables);
         } catch (Exception e) {
             log.error("[evaluateCondition][条件评估异常] sourceValue: {}, operator: {}, paramValue: {}",

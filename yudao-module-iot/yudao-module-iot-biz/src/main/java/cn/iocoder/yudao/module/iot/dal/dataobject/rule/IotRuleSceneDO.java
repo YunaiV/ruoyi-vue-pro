@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+// TODO @puhui999：名字改成 IotSceneRuleDO
 /**
  * IoT 场景联动规则 DO
  *
