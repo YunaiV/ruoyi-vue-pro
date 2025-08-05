@@ -28,46 +28,33 @@ public class IotTcpConnectionManager {
     private final Map<NetSocket, ConnectionInfo> connectionMap = new ConcurrentHashMap<>();
 
     /**
-     * 设备 ID -> NetSocket 的映射（用于快速查找）
+     * 设备 ID -> NetSocket 的映射
      */
     private final Map<Long, NetSocket> deviceSocketMap = new ConcurrentHashMap<>();
 
     /**
-     * NetSocket -> 设备 ID 的映射（用于连接断开时清理）
-     */
-    private final Map<NetSocket, Long> socketDeviceMap = new ConcurrentHashMap<>();
-
-    /**
      * 注册设备连接（包含认证信息）
      *
-     * @param socket   TCP 连接
-     * @param deviceId 设备 ID
-     * @param authInfo 认证信息
+     * @param socket         TCP 连接
+     * @param deviceId       设备 ID
+     * @param connectionInfo 连接信息
      */
-    public void registerConnection(NetSocket socket, Long deviceId, AuthInfo authInfo) {
+    public void registerConnection(NetSocket socket, Long deviceId, ConnectionInfo connectionInfo) {
         // 如果设备已有其他连接，先清理旧连接
         NetSocket oldSocket = deviceSocketMap.get(deviceId);
         if (oldSocket != null && oldSocket != socket) {
             log.info("[registerConnection][设备已有其他连接，断开旧连接，设备 ID: {}，旧连接: {}]",
                     deviceId, oldSocket.remoteAddress());
             oldSocket.close();
-            // 清理所有相关映射
+            // 清理旧连接的映射
             connectionMap.remove(oldSocket);
-            socketDeviceMap.remove(oldSocket);
         }
 
-        // 注册新连接 - 更新所有映射关系
-        ConnectionInfo connectionInfo = new ConnectionInfo()
-                .setDeviceId(deviceId)
-                .setAuthInfo(authInfo)
-                .setAuthenticated(true);
         connectionMap.put(socket, connectionInfo);
         deviceSocketMap.put(deviceId, socket);
-        // TODO @haohao：socketDeviceMap 和 connectionMap 会重复哇？connectionMap.get(socket).getDeviceId
-        socketDeviceMap.put(socket, deviceId);
 
         log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
-                deviceId, socket.remoteAddress(), authInfo.getProductKey(), authInfo.getDeviceName());
+                deviceId, socket.remoteAddress(), connectionInfo.getProductKey(), connectionInfo.getDeviceName());
     }
 
     /**
@@ -77,26 +64,11 @@ public class IotTcpConnectionManager {
      */
     public void unregisterConnection(NetSocket socket) {
         ConnectionInfo connectionInfo = connectionMap.remove(socket);
-        Long deviceId = socketDeviceMap.remove(socket);
-        if (connectionInfo != null && deviceId != null) {
+        if (connectionInfo != null) {
+            Long deviceId = connectionInfo.getDeviceId();
             deviceSocketMap.remove(deviceId);
             log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
                     deviceId, socket.remoteAddress());
-        }
-    }
-
-    // TODO @haohao：用不到，要不暂时清理哈。
-    /**
-     * 注销设备连接（通过设备 ID）
-     *
-     * @param deviceId 设备 ID
-     */
-    public void unregisterConnection(Long deviceId) {
-        NetSocket socket = deviceSocketMap.remove(deviceId);
-        if (socket != null) {
-            connectionMap.remove(socket);
-            socketDeviceMap.remove(socket);
-            log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, socket.remoteAddress());
         }
     }
 
@@ -116,11 +88,10 @@ public class IotTcpConnectionManager {
     }
 
     /**
-     * 获取连接的认证信息
+     * 获取连接信息
      */
-    public AuthInfo getAuthInfo(NetSocket socket) {
-        ConnectionInfo info = connectionMap.get(socket);
-        return info != null ? info.getAuthInfo() : null;
+    public ConnectionInfo getConnectionInfo(NetSocket socket) {
+        return connectionMap.get(socket);
     }
 
     /**
@@ -159,30 +130,34 @@ public class IotTcpConnectionManager {
         }
     }
 
-    // TODO @haohao：ConnectionInfo 和 AuthInfo 是不是可以融合哈？
-
     /**
-     * 连接信息
+     * 连接信息（包含认证信息）
      */
     @Data
     public static class ConnectionInfo {
-
+        /**
+         * 设备 ID
+         */
         private Long deviceId;
-        private AuthInfo authInfo;
-        private boolean authenticated;
-
-    }
-
-    /**
-     * 认证信息
-     */
-    @Data
-    public static class AuthInfo {
-
-        private Long deviceId;
+        /**
+         * 产品 Key
+         */
         private String productKey;
+        /**
+         * 设备名称
+         */
         private String deviceName;
+        /**
+         * 客户端 ID
+         */
         private String clientId;
-
+        /**
+         * 消息编解码类型（认证后确定）
+         */
+        private String codecType;
+        /**
+         * 是否已认证
+         */
+        private boolean authenticated;
     }
 }
