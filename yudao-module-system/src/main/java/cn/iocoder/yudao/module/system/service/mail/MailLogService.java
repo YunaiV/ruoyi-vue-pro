@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -36,23 +37,6 @@ public interface MailLogService {
     /**
      * 创建邮件日志
      *
-     * @param userId 用户编码
-     * @param userType 用户类型
-     * @param toMail 收件人邮件
-     * @param account 邮件账号信息
-     * @param template      模版信息
-     * @param templateContent 模版内容
-     * @param templateParams 模版参数
-     * @param isSend        是否发送成功
-     * @return 日志编号
-     */
-    Long createMailLog(Long userId, Integer userType, String toMail,
-                       MailAccountDO account, MailTemplateDO template ,
-                       String templateContent, Map<String, Object> templateParams, Boolean isSend);
-
-    /**
-     * 创建邮件日志
-     *
      * @param userId          用户编码
      * @param userType        用户类型
      * @param toMails         收件人邮件
@@ -65,7 +49,8 @@ public interface MailLogService {
      * @param isSend          是否发送成功
      * @return 日志编号
      */
-    Long createMailLog(Long userId, Integer userType, List<String> toMails, List<String> ccMails, List<String> bccMails,
+    Long createMailLog(Long userId, Integer userType,
+                       Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
                        MailAccountDO account, MailTemplateDO template,
                        String templateContent, Map<String, Object> templateParams, Boolean isSend);
 

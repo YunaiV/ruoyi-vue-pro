@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
 
+import java.util.Collection;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -28,21 +29,6 @@ public class MailProducer {
      * 发送 {@link MailSendMessage} 消息
      *
      * @param sendLogId 发送日志编码
-     * @param mail      接收邮件地址
-     * @param accountId 邮件账号编号
-     * @param nickname  邮件发件人
-     * @param title     邮件标题
-     * @param content   邮件内容
-     */
-    public void sendMailSendMessage(Long sendLogId, String mail, Long accountId,
-                                    String nickname, String title, String content) {
-        sendMailSendMessage(sendLogId, singletonList(mail), null, null, accountId, nickname, title, content);
-    }
-
-    /**
-     * 发送 {@link MailSendMessage} 消息
-     *
-     * @param sendLogId 发送日志编码
      * @param toMails   接收邮件地址
      * @param ccMails   抄送邮件地址
      * @param bccMails  密送邮件地址
@@ -51,7 +37,8 @@ public class MailProducer {
      * @param title     邮件标题
      * @param content   邮件内容
      */
-    public void sendMailSendMessage(Long sendLogId, List<String> toMails, List<String> ccMails, List<String> bccMails,
+    public void sendMailSendMessage(Long sendLogId,
+                                    Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
                                     Long accountId, String nickname, String title, String content) {
         MailSendMessage message = new MailSendMessage()
                 .setLogId(sendLogId)
