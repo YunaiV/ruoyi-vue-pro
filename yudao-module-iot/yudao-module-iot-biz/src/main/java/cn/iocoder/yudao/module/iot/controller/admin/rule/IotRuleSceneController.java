@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -89,12 +88,6 @@ public class IotRuleSceneController {
         List<IotSceneRuleDO> list = ruleSceneService.getRuleSceneListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, scene -> // 只返回 id、name 字段
                 new IotRuleSceneRespVO().setId(scene.getId()).setName(scene.getName())));
-    }
-
-    @GetMapping("/test")
-    @PermitAll
-    public void test() {
-        ruleSceneService.test();
     }
 
 }

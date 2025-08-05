@@ -103,9 +103,4 @@ public interface IotRuleSceneService {
      */
     void executeRuleSceneByTimer(Long id);
 
-    /**
-     * TODO 芋艿：测试方法，需要删除
-     */
-    void test();
-
 }

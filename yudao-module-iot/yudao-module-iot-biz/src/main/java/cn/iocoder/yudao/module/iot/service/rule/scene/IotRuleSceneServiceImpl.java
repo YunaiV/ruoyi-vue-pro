@@ -27,18 +27,11 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
-import cn.iocoder.yudao.module.iot.job.rule.IotRuleSceneJob;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
 import jakarta.annotation.Resource;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerKey;
-import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -554,52 +547,6 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 });
             });
         });
-    }
-
-    @Override
-    @SneakyThrows
-    public void test() {
-        // TODO @芋艿：测试思路代码，记得删除！！！
-        // 1. Job 类：IotRuleSceneJob DONE
-        // 2. 参数：id DONE
-        // 3. jobHandlerName：IotRuleSceneJob + id DONE
-
-        // 新增：addJob
-        // 修改：不存在 addJob、存在 updateJob
-        // 有 + 禁用：1）存在、停止；2）不存在：不处理；TODO 测试：直接暂停，是否可以？？？（结论：可以）pauseJob
-        // 有 + 开启：1）存在，更新；2）不存在，新增；结论：使用 save(addOrUpdateJob)
-        // 无 + 禁用、开启：1）存在，删除；TODO 测试：直接删除？？？（结论：可以）deleteJob
-
-        //
-        if (false) {
-            Long id = 1L;
-            Map<String, Object> jobDataMap = IotRuleSceneJob.buildJobDataMap(id);
-            schedulerManager.addOrUpdateJob(IotRuleSceneJob.class,
-                    IotRuleSceneJob.buildJobName(id),
-                    "0/10 * * * * ?",
-                    jobDataMap);
-        }
-        if (false) {
-            Long id = 1L;
-            schedulerManager.pauseJob(IotRuleSceneJob.buildJobName(id));
-        }
-        if (true) {
-            Long id = 1L;
-            schedulerManager.deleteJob(IotRuleSceneJob.buildJobName(id));
-        }
-    }
-
-    public static void main2(String[] args) throws SchedulerException {
-//        System.out.println(QuartzJobBean.class);
-        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-        scheduler.start();
-
-        String jobHandlerName = "123";
-        // 暂停 Trigger 对象
-        scheduler.pauseTrigger(new TriggerKey(jobHandlerName));
-        // 取消并删除 Job 调度
-        scheduler.unscheduleJob(new TriggerKey(jobHandlerName));
-        scheduler.deleteJob(new JobKey(jobHandlerName));
     }
 
 }
