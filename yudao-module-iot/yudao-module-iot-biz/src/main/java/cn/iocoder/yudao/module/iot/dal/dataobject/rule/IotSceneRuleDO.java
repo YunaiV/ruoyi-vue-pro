@@ -231,7 +231,7 @@ public class IotSceneRuleDO extends TenantBaseDO {
          *
          * 一般来说，对应 {@link IotDeviceMessage#getParams()} 请求参数
          */
-        private Object params;
+        private String params;
 
         /**
          * 告警配置编号
