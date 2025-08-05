@@ -106,7 +106,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
         // 3. 记录操作日志上下文
         updateReqVO.setOwnerUserId(oldClue.getOwnerUserId()); // 避免操作日志出现“删除负责人”的情况
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldClue, CrmCustomerSaveReqVO.class));
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldClue, CrmClueSaveReqVO.class));
         LogRecordContext.putVariable("clueName", oldClue.getName());
     }
 
