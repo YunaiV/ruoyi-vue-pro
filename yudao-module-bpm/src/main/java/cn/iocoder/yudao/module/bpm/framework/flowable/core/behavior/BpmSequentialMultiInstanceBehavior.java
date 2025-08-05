@@ -7,10 +7,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import lombok.Setter;
-import org.flowable.bpmn.model.Activity;
-import org.flowable.bpmn.model.CallActivity;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.*;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
@@ -85,6 +82,12 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
 
     @Override
     protected void executeOriginalBehavior(DelegateExecution execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
+        // 参见 https://t.zsxq.com/53Meo 情况
+        if (execution.getCurrentFlowElement() instanceof CallActivity
+            || execution.getCurrentFlowElement() instanceof SubProcess) {
+            super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
+            return;
+        }
         // 参见 https://gitee.com/zhijiantianya/yudao-cloud/issues/IC239F
         super.collectionExpression = null;
         super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
