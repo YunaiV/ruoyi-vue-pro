@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,19 +15,19 @@ import java.util.List;
  * @author HUIHUI
  */
 @Mapper
-public interface IotRuleSceneMapper extends BaseMapperX<IotRuleSceneDO> {
+public interface IotRuleSceneMapper extends BaseMapperX<IotSceneRuleDO> {
 
-    default PageResult<IotRuleSceneDO> selectPage(IotRuleScenePageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<IotRuleSceneDO>()
-                .likeIfPresent(IotRuleSceneDO::getName, reqVO.getName())
-                .likeIfPresent(IotRuleSceneDO::getDescription, reqVO.getDescription())
-                .eqIfPresent(IotRuleSceneDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(IotRuleSceneDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(IotRuleSceneDO::getId));
+    default PageResult<IotSceneRuleDO> selectPage(IotRuleScenePageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<IotSceneRuleDO>()
+                .likeIfPresent(IotSceneRuleDO::getName, reqVO.getName())
+                .likeIfPresent(IotSceneRuleDO::getDescription, reqVO.getDescription())
+                .eqIfPresent(IotSceneRuleDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(IotSceneRuleDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(IotSceneRuleDO::getId));
     }
 
-    default List<IotRuleSceneDO> selectListByStatus(Integer status) {
-        return selectList(IotRuleSceneDO::getStatus, status);
+    default List<IotSceneRuleDO> selectListByStatus(Integer status) {
+        return selectList(IotSceneRuleDO::getStatus, status);
     }
 
 }

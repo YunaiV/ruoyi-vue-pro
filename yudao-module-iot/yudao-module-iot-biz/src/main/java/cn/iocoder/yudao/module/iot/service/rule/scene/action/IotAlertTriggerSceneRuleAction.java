@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertConfigService;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertRecordService;
@@ -40,7 +40,7 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
 
     @Override
     public void execute(@Nullable IotDeviceMessage message,
-                        IotRuleSceneDO rule, IotRuleSceneDO.Action actionConfig) throws Exception {
+                        IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig) throws Exception {
         List<IotAlertConfigDO> alertConfigs = alertConfigService.getAlertConfigListBySceneRuleIdAndStatus(
                 rule.getId(), CommonStatusEnum.ENABLE.getStatus());
         if (CollUtil.isEmpty(alertConfigs)) {

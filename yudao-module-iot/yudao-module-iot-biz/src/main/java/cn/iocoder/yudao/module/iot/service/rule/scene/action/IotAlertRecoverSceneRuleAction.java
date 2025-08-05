@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertRecordDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertRecordService;
 import jakarta.annotation.Resource;
@@ -30,7 +30,7 @@ public class IotAlertRecoverSceneRuleAction implements IotSceneRuleAction {
 
     @Override
     public void execute(IotDeviceMessage message,
-                        IotRuleSceneDO rule, IotRuleSceneDO.Action actionConfig) throws Exception {
+                        IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig) throws Exception {
         Long deviceId = message != null ? message.getDeviceId() : null;
         List<IotAlertRecordDO> alertRecords = alertRecordService.getAlertRecordListBySceneRuleId(
                 rule.getId(), deviceId, false);
