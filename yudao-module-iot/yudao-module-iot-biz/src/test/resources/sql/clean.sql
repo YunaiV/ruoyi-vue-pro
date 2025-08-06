@@ -1,3 +1,4 @@
+-- TODO @puhui999：sql 格式
 -- IoT 模块测试数据清理脚本
 DELETE
 FROM "iot_scene_rule";

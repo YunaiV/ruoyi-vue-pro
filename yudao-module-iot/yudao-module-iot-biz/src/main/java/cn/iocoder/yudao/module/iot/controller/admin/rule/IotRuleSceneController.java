@@ -24,6 +24,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
+// TODO @puhui999：SceneRule 方法名，类名等；
 @Tag(name = "管理后台 - IoT 场景联动")
 @RestController
 @RequestMapping("/iot/rule-scene")
