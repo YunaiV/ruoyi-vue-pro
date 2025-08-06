@@ -135,6 +135,7 @@ public class IotTcpConnectionManager {
      */
     @Data
     public static class ConnectionInfo {
+
         /**
          * 设备 ID
          */
@@ -147,6 +148,7 @@ public class IotTcpConnectionManager {
          * 设备名称
          */
         private String deviceName;
+
         /**
          * 客户端 ID
          */
@@ -155,9 +157,12 @@ public class IotTcpConnectionManager {
          * 消息编解码类型（认证后确定）
          */
         private String codecType;
+        // TODO @haohao：有没可能不要 authenticated 字段，通过 deviceId 或者其他的？进一步简化，想的是哈。
         /**
          * 是否已认证
          */
         private boolean authenticated;
+
     }
+
 }

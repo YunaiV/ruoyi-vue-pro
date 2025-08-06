@@ -175,6 +175,7 @@ public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
             }
         } else {
             // 请求消息只处理 params 参数
+            // TODO @haohao：如果为空，是不是得写个长度 0 哈？
             if (message.getParams() != null) {
                 bodyBuffer.appendBytes(JsonUtils.toJsonByte(message.getParams()));
             }
