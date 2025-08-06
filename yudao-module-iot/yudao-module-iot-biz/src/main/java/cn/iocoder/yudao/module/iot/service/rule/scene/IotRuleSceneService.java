@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import jakarta.validation.Valid;
 
@@ -54,7 +54,7 @@ public interface IotRuleSceneService {
      * @param id 编号
      * @return 场景联动
      */
-    IotRuleSceneDO getRuleScene(Long id);
+    IotSceneRuleDO getRuleScene(Long id);
 
     /**
      * 获得场景联动分页
@@ -62,7 +62,7 @@ public interface IotRuleSceneService {
      * @param pageReqVO 分页查询
      * @return 场景联动分页
      */
-    PageResult<IotRuleSceneDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO);
+    PageResult<IotSceneRuleDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO);
 
     /**
      * 校验规则场景联动规则编号们是否存在。如下情况，视为无效：
@@ -78,7 +78,7 @@ public interface IotRuleSceneService {
      * @param status 状态
      * @return 场景联动列表
      */
-    List<IotRuleSceneDO> getRuleSceneListByStatus(Integer status);
+    List<IotSceneRuleDO> getRuleSceneListByStatus(Integer status);
 
     /**
      * 【缓存】获得指定设备的场景列表
@@ -87,7 +87,7 @@ public interface IotRuleSceneService {
      * @param deviceName 设备名称
      * @return 场景列表
      */
-    List<IotRuleSceneDO> getRuleSceneListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
+    List<IotSceneRuleDO> getRuleSceneListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
 
     /**
      * 基于 {@link IotRuleSceneTriggerTypeEnum#DEVICE} 场景，执行规则场景
@@ -102,10 +102,5 @@ public interface IotRuleSceneService {
      * @param id 场景联动规则编号
      */
     void executeRuleSceneByTimer(Long id);
-
-    /**
-     * TODO 芋艿：测试方法，需要删除
-     */
-    void test();
 
 }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -24,10 +24,10 @@ public class IotRuleSceneRespVO {
     private Integer status;
 
     @Schema(description = "触发器数组", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<IotRuleSceneDO.Trigger> triggers;
+    private List<IotSceneRuleDO.Trigger> triggers;
 
     @Schema(description = "执行器数组", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<IotRuleSceneDO.Action> actions;
+    private List<IotSceneRuleDO.Action> actions;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

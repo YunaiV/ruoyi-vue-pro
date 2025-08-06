@@ -8,13 +8,12 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePa
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneUpdateStatusReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -71,7 +70,7 @@ public class IotRuleSceneController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:rule-scene:query')")
     public CommonResult<IotRuleSceneRespVO> getRuleScene(@RequestParam("id") Long id) {
-        IotRuleSceneDO ruleScene = ruleSceneService.getRuleScene(id);
+        IotSceneRuleDO ruleScene = ruleSceneService.getRuleScene(id);
         return success(BeanUtils.toBean(ruleScene, IotRuleSceneRespVO.class));
     }
 
@@ -79,22 +78,16 @@ public class IotRuleSceneController {
     @Operation(summary = "获得场景联动分页")
     @PreAuthorize("@ss.hasPermission('iot:rule-scene:query')")
     public CommonResult<PageResult<IotRuleSceneRespVO>> getRuleScenePage(@Valid IotRuleScenePageReqVO pageReqVO) {
-        PageResult<IotRuleSceneDO> pageResult = ruleSceneService.getRuleScenePage(pageReqVO);
+        PageResult<IotSceneRuleDO> pageResult = ruleSceneService.getRuleScenePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotRuleSceneRespVO.class));
     }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获取场景联动的精简信息列表", description = "主要用于前端的下拉选项")
     public CommonResult<List<IotRuleSceneRespVO>> getRuleSceneSimpleList() {
-        List<IotRuleSceneDO> list = ruleSceneService.getRuleSceneListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<IotSceneRuleDO> list = ruleSceneService.getRuleSceneListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, scene -> // 只返回 id、name 字段
                 new IotRuleSceneRespVO().setId(scene.getId()).setName(scene.getName())));
-    }
-
-    @GetMapping("/test")
-    @PermitAll
-    public void test() {
-        ruleSceneService.test();
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 
 import javax.annotation.Nullable;
@@ -23,8 +23,8 @@ public interface IotSceneRuleAction {
      * @param actionConfig  执行配置（实际对应规则里的哪条执行配置）
      */
     void execute(@Nullable IotDeviceMessage message,
-                 IotRuleSceneDO rule,
-                 IotRuleSceneDO.Action actionConfig) throws Exception;
+                 IotSceneRuleDO rule,
+                 IotSceneRuleDO.Action actionConfig) throws Exception;
 
     /**
      * 获得类型

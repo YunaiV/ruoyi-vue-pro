@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.iot.enums.alert.IotAlertReceiveTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -61,7 +61,7 @@ public class IotAlertConfigDO extends BaseDO {
     /**
      * 关联的场景联动规则编号数组
      *
-     * 关联 {@link IotRuleSceneDO#getId()}
+     * 关联 {@link IotSceneRuleDO#getId()}
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> sceneRuleIds;

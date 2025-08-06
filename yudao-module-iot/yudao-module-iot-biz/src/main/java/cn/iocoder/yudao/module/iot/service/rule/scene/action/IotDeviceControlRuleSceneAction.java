@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
@@ -26,8 +26,8 @@ public class IotDeviceControlRuleSceneAction implements IotSceneRuleAction {
     // TODO @puhui999：这里
     @Override
     public void execute(IotDeviceMessage message,
-                        IotRuleSceneDO rule, IotRuleSceneDO.Action actionConfig) {
-        //IotRuleSceneDO.ActionDeviceControl control = actionConfig.getDeviceControl();
+                        IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig) {
+        //IotSceneRuleDO.ActionDeviceControl control = actionConfig.getDeviceControl();
         //Assert.notNull(control, "设备控制配置不能为空");
         //// 遍历每个设备，下发消息
         //control.getDeviceNames().forEach(deviceName -> {

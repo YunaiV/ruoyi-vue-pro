@@ -23,19 +23,18 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-// TODO @puhui999：名字改成 IotSceneRuleDO
 /**
  * IoT 场景联动规则 DO
  *
  * @author 芋道源码
  */
-@TableName(value = "iot_rule_scene", autoResultMap = true)
-@KeySequence("iot_rule_scene_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "iot_scene_rule", autoResultMap = true)
+@KeySequence("iot_scene_rule_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotRuleSceneDO extends TenantBaseDO {
+public class IotSceneRuleDO extends TenantBaseDO {
 
     /**
      * 场景联动编号
@@ -219,12 +218,20 @@ public class IotRuleSceneDO extends TenantBaseDO {
          * 关联 {@link IotDeviceDO#getId()}
          */
         private Long deviceId;
+
+        /**
+         * 标识符（服务）
+         * <p>
+         * 关联 {@link IotThingModelDO#getIdentifier()}
+         */
+        private String identifier;
+
         /**
          * 请求参数
          *
          * 一般来说，对应 {@link IotDeviceMessage#getParams()} 请求参数
          */
-        private Object params;
+        private String params;
 
         /**
          * 告警配置编号
