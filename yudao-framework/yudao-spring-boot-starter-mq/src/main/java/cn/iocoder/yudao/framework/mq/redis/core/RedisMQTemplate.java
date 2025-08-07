@@ -19,15 +19,15 @@ import java.util.List;
  *
  * @author 芋道源码
  */
+@Getter
 @AllArgsConstructor
 public class RedisMQTemplate {
 
-    @Getter
     private final RedisTemplate<String, ?> redisTemplate;
+    private final String consumerName;
     /**
      * 拦截器数组
      */
-    @Getter
     private final List<RedisMessageInterceptor> interceptors = new ArrayList<>();
 
     /**
