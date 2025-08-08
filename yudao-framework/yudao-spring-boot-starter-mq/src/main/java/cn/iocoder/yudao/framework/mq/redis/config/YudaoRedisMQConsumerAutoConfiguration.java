@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.framework.mq.redis.config;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.thread.NamedThreadFactory;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
-import cn.iocoder.yudao.framework.mq.redis.core.job.RedisPendingMessageResendJob;
+import cn.iocoder.yudao.framework.mq.redis.core.job.RedisBadMessageJob;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisStreamMessageCleanupJob;
 import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
@@ -30,6 +30,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Redis 消息队列 Consumer 配置类
@@ -63,15 +65,15 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     }
 
     /**
-     * 创建 Redis Stream 重新消费的任务
+     * 创建 Redis Stream 坏消息检查任务
      */
     @Bean
-    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
-    public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractRedisStreamMessageListener<?>> listeners,
-                                                                     RedisMQTemplate redisTemplate,
-                                                                     @Value("${spring.application.name}") String groupName,
-                                                                     RedissonClient redissonClient) {
-        return new RedisPendingMessageResendJob(listeners, redisTemplate, groupName, redissonClient);
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis Stream 监听
+    public RedisBadMessageJob redisBadMessageJob(List<AbstractRedisStreamMessageListener<?>> listeners,
+                                                 RedisMQTemplate redisTemplate,
+                                                 @Value("${spring.application.name}") String groupName,
+                                                 RedissonClient redissonClient) {
+        return new RedisBadMessageJob(listeners, redisTemplate, groupName, redissonClient);
     }
 
     /**
@@ -86,14 +88,23 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     }
 
     /**
+     * 消费者执行时所用的线程池
+     */
+    @Bean
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class)
+    public Executor redisMessageListenerExecutor() {
+        return Executors.newCachedThreadPool(new NamedThreadFactory("redis-consumer-", false));
+    }
+
+    /**
      * 创建 Redis Stream 集群消费的容器
      *
      * 基础知识：<a href="https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html">Redis Stream 的 xreadgroup 命令</a>
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
-    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis Stream 监听
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
-            RedisMQTemplate redisMQTemplate, List<AbstractRedisStreamMessageListener<?>> listeners) {
+            RedisMQTemplate redisMQTemplate, Executor redisMessageListenerExecutor, List<AbstractRedisStreamMessageListener<?>> listeners) {
         RedisTemplate<String, ?> redisTemplate = redisMQTemplate.getRedisTemplate();
         checkRedisVersion(redisTemplate);
         // 第一步，创建 StreamMessageListenerContainer 容器
@@ -102,13 +113,13 @@ public class YudaoRedisMQConsumerAutoConfiguration {
                 StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
                         .batchSize(10) // 一次性最多拉取多少条消息
                         .targetType(String.class) // 目标类型。统一使用 String，通过自己封装的 AbstractStreamMessageListener 去反序列化
+                        .executor(redisMessageListenerExecutor) // 自定义消费者线程池
                         .build();
         // 创建 container 对象
         StreamMessageListenerContainer<String, ObjectRecord<String, String>> container =
                 StreamMessageListenerContainer.create(redisMQTemplate.getRedisTemplate().getRequiredConnectionFactory(), containerOptions);
 
         // 第二步，注册监听器，消费对应的 Stream 主题
-        String consumerName = buildConsumerName();
         listeners.parallelStream().forEach(listener -> {
             log.info("[redisStreamMessageListenerContainer][开始注册 StreamKey({}) 对应的监听器({})]",
                     listener.getStreamKey(), listener.getClass().getName());
@@ -120,15 +131,10 @@ public class YudaoRedisMQConsumerAutoConfiguration {
             // 设置 listener 对应的 redisTemplate
             listener.setRedisMQTemplate(redisMQTemplate);
             // 创建 Consumer 对象
-            Consumer consumer = Consumer.from(listener.getGroup(), consumerName);
-            // 设置 Consumer 消费进度，以最小消费进度为准
-            StreamOffset<String> streamOffset = StreamOffset.create(listener.getStreamKey(), ReadOffset.lastConsumed());
-            // 设置 Consumer 监听
-            StreamMessageListenerContainer.StreamReadRequestBuilder<String> builder = StreamMessageListenerContainer.StreamReadRequest
-                    .builder(streamOffset).consumer(consumer)
-                    .autoAcknowledge(false) // 不自动 ack
-                    .cancelOnError(throwable -> false); // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
-            container.register(builder.build(), listener);
+            Consumer consumer = Consumer.from(listener.getGroup(), redisMQTemplate.getConsumerName());
+            // 服务启动时从未被 ACK 的消息开始消费
+            // 意味着消息要么被 ACK，要么一直重试消费，要么被 claim 转移给坏消息消费者
+            container.register(read(listener.getStreamKey(), consumer, lastAck()), listener);
             log.info("[redisStreamMessageListenerContainer][完成注册 StreamKey({}) 对应的监听器({})]",
                     listener.getStreamKey(), listener.getClass().getName());
         });
@@ -136,13 +142,22 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     }
 
     /**
-     * 构建消费者名字，使用本地 IP + 进程编号的方式。
-     * 参考自 RocketMQ clientId 的实现
-     *
-     * @return 消费者名字
+     * Read pending of the consumer.
      */
-    private static String buildConsumerName() {
-        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+    private static ReadOffset lastAck() {
+        return ReadOffset.from("0");
+    }
+
+    private static StreamMessageListenerContainer.StreamReadRequest<String> read(
+            String streamKey, Consumer consumer, ReadOffset readOffset) {
+        // 设置 Consumer 消费起始
+        StreamOffset<String> streamOffset = StreamOffset.create(streamKey, readOffset);
+        // 设置 Consumer 监听
+        StreamMessageListenerContainer.StreamReadRequestBuilder<String> builder = StreamMessageListenerContainer.StreamReadRequest
+                .builder(streamOffset).consumer(consumer)
+                .autoAcknowledge(false) // 不自动 ACK
+                .cancelOnError(throwable -> false); // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
+        return builder.build();
     }
 
     /**

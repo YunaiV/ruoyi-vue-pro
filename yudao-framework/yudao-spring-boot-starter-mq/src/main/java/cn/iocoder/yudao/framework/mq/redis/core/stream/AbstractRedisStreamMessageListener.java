@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mq.redis.core.message.AbstractRedisMessage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.stream.StreamListener;
@@ -22,6 +23,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
+@Slf4j
 public abstract class AbstractRedisStreamMessageListener<T extends AbstractRedisStreamMessage>
         implements StreamListener<String, ObjectRecord<String, String>> {
 
@@ -64,10 +66,10 @@ public abstract class AbstractRedisStreamMessageListener<T extends AbstractRedis
             // ack 消息消费完成
             redisMQTemplate.getRedisTemplate().opsForStream().acknowledge(group, message);
             // TODO 芋艿：需要额外考虑以下几个点：
-            // 1. 处理异常的情况
-            // 2. 发送日志；以及事务的结合
-            // 3. 消费日志；以及通用的幂等性
-            // 4. 消费失败的重试，https://zhuanlan.zhihu.com/p/60501638
+            // 1. 发送日志；以及事务的结合
+            // 2. 消费日志；以及通用的幂等性
+        } catch (Throwable throwable) {
+            log.error("[Redis Stream 消息队列 消费异常] msgId={}", message.getId(), throwable);
         } finally {
             consumeMessageAfter(messageObj);
         }
