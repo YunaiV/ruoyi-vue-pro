@@ -255,9 +255,6 @@ public class MenuServiceImpl implements MenuService {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的菜单
-        if (id == null) {
-            throw exception(MENU_NAME_DUPLICATE);
-        }
         if (!menu.getId().equals(id)) {
             throw exception(MENU_NAME_DUPLICATE);
         }
