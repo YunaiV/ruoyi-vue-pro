@@ -102,6 +102,7 @@ async function handleDeleteBatch() {
   });
   try {
     await delete${simpleClassName}List(checkedIds.value);
+    checkedIds.value = [];
     message.success({
       content: $t('ui.actionMessage.deleteSuccess'),
       key: 'action_key_msg',
