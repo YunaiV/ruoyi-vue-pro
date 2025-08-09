@@ -353,7 +353,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         } else if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
             // 由于 rsaCertCheckV1 的第二个参数是 path，所以不能这么调用！！！通过阅读源码，发现可以采用如下方式！
             X509Certificate cert = AntCertificationUtil.getCertFromContent(config.getAlipayPublicCertContent());
-            String publicKey = Base64.encodeBase64String(cert.getEncoded());
+            String publicKey = Base64.encodeBase64String(cert.getPublicKey().getEncoded());
             verify = AlipaySignature.rsaCheckV1(params, publicKey,
                     StandardCharsets.UTF_8.name(), config.getSignType());
         } else {
