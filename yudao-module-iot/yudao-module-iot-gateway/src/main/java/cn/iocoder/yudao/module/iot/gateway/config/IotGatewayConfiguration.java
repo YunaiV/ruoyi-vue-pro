@@ -6,6 +6,10 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
@@ -49,7 +53,7 @@ public class IotGatewayConfiguration {
     @Configuration
     @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.emqx", name = "enabled", havingValue = "true")
     @Slf4j
-    public static class MqttProtocolConfiguration {
+    public static class EmqxProtocolConfiguration {
 
         @Bean(destroyMethod = "close")
         public Vertx emqxVertx() {
@@ -106,6 +110,44 @@ public class IotGatewayConfiguration {
                                                                      IotMessageBus messageBus) {
             return new IotTcpDownstreamSubscriber(protocolHandler, messageService, deviceService, connectionManager,
                     messageBus);
+        }
+
+    }
+
+    /**
+     * IoT 网关 MQTT 协议配置类
+     */
+    @Configuration
+    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.mqtt", name = "enabled", havingValue = "true")
+    @Slf4j
+    public static class MqttProtocolConfiguration {
+
+        @Bean(destroyMethod = "close")
+        public Vertx mqttVertx() {
+            return Vertx.vertx();
+        }
+
+        @Bean
+        public IotMqttUpstreamProtocol iotMqttUpstreamProtocol(IotGatewayProperties gatewayProperties,
+                                                               IotDeviceService deviceService,
+                                                               IotDeviceMessageService messageService,
+                                                               IotMqttConnectionManager connectionManager,
+                                                               Vertx mqttVertx) {
+            return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getMqtt(),
+                    deviceService, messageService, connectionManager, mqttVertx);
+        }
+
+        @Bean
+        public IotMqttDownstreamHandler iotMqttDownstreamHandler(IotDeviceMessageService messageService,
+                                                                 IotMqttConnectionManager connectionManager) {
+            return new IotMqttDownstreamHandler(messageService, connectionManager);
+        }
+
+        @Bean
+        public IotMqttDownstreamSubscriber iotMqttDownstreamSubscriber(IotMqttUpstreamProtocol mqttUpstreamProtocol,
+                                                                       IotMqttDownstreamHandler downstreamHandler,
+                                                                       IotMessageBus messageBus) {
+            return new IotMqttDownstreamSubscriber(mqttUpstreamProtocol, downstreamHandler, messageBus);
         }
 
     }

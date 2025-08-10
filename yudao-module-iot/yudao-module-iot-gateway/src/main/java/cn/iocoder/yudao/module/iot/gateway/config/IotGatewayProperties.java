@@ -83,6 +83,11 @@ public class IotGatewayProperties {
          */
         private TcpProperties tcp;
 
+        /**
+         * MQTT 组件配置
+         */
+        private MqttProperties mqtt;
+
     }
 
     @Data
@@ -322,6 +327,85 @@ public class IotGatewayProperties {
          * SSL私钥路径
          */
         private String sslKeyPath;
+
+    }
+
+    @Data
+    public static class MqttProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务器端口
+         */
+        private Integer port = 1883;
+
+        /**
+         * 最大消息大小（字节）
+         */
+        private Integer maxMessageSize = 8192;
+
+        /**
+         * 连接超时时间（秒）
+         */
+        private Integer connectTimeoutSeconds = 60;
+
+        /**
+         * 保持连接超时时间（秒）
+         */
+        private Integer keepAliveTimeoutSeconds = 300;
+
+        /**
+         * 是否启用 SSL
+         */
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL 配置
+         */
+        private SslOptions sslOptions = new SslOptions();
+
+        /**
+         * SSL 配置选项
+         */
+        @Data
+        public static class SslOptions {
+
+            /**
+             * 密钥证书选项
+             */
+            private io.vertx.core.net.KeyCertOptions keyCertOptions;
+
+            /**
+             * 信任选项
+             */
+            private io.vertx.core.net.TrustOptions trustOptions;
+
+            /**
+             * SSL 证书路径
+             */
+            private String certPath;
+
+            /**
+             * SSL 私钥路径
+             */
+            private String keyPath;
+
+            /**
+             * 信任存储路径
+             */
+            private String trustStorePath;
+
+            /**
+             * 信任存储密码
+             */
+            private String trustStorePassword;
+
+        }
 
     }
 
