@@ -15,17 +15,17 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRulePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRuleSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotRuleSceneMapper;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionOperatorEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
@@ -53,13 +53,13 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.RULE_SCENE_NO
 @Service
 @Validated
 @Slf4j
-public class IotRuleSceneServiceImpl implements IotRuleSceneService {
+public class IotSceneRuleServiceImpl implements IotSceneRuleService {
 
     @Resource
-    private IotRuleSceneMapper ruleSceneMapper;
+    private IotSceneRuleMapper sceneRuleMapper;
 
     @Resource
-    private List<IotSceneRuleAction> ruleSceneActions;
+    private List<IotSceneRuleAction> sceneRuleActions;
 
     @Resource(name = "iotSchedulerManager")
     private IotSchedulerManager schedulerManager;
@@ -71,90 +71,90 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     private IotDeviceService deviceService;
 
     @Override
-    public Long createRuleScene(IotRuleSceneSaveReqVO createReqVO) {
-        IotSceneRuleDO ruleScene = BeanUtils.toBean(createReqVO, IotSceneRuleDO.class);
-        ruleSceneMapper.insert(ruleScene);
-        return ruleScene.getId();
+    public Long createSceneRule(IotSceneRuleSaveReqVO createReqVO) {
+        IotSceneRuleDO sceneRule = BeanUtils.toBean(createReqVO, IotSceneRuleDO.class);
+        sceneRuleMapper.insert(sceneRule);
+        return sceneRule.getId();
     }
 
     @Override
-    public void updateRuleScene(IotRuleSceneSaveReqVO updateReqVO) {
+    public void updateSceneRule(IotSceneRuleSaveReqVO updateReqVO) {
         // 校验存在
-        validateRuleSceneExists(updateReqVO.getId());
+        validateSceneRuleExists(updateReqVO.getId());
         // 更新
         IotSceneRuleDO updateObj = BeanUtils.toBean(updateReqVO, IotSceneRuleDO.class);
-        ruleSceneMapper.updateById(updateObj);
+        sceneRuleMapper.updateById(updateObj);
     }
 
     @Override
-    public void updateRuleSceneStatus(Long id, Integer status) {
+    public void updateSceneRuleStatus(Long id, Integer status) {
         // 校验存在
-        validateRuleSceneExists(id);
+        validateSceneRuleExists(id);
         // 更新状态
         IotSceneRuleDO updateObj = new IotSceneRuleDO().setId(id).setStatus(status);
-        ruleSceneMapper.updateById(updateObj);
+        sceneRuleMapper.updateById(updateObj);
     }
 
     @Override
-    public void deleteRuleScene(Long id) {
+    public void deleteSceneRule(Long id) {
         // 校验存在
-        validateRuleSceneExists(id);
+        validateSceneRuleExists(id);
         // 删除
-        ruleSceneMapper.deleteById(id);
+        sceneRuleMapper.deleteById(id);
     }
 
-    private void validateRuleSceneExists(Long id) {
-        if (ruleSceneMapper.selectById(id) == null) {
+    private void validateSceneRuleExists(Long id) {
+        if (sceneRuleMapper.selectById(id) == null) {
             throw exception(RULE_SCENE_NOT_EXISTS);
         }
     }
 
     @Override
-    public IotSceneRuleDO getRuleScene(Long id) {
-        return ruleSceneMapper.selectById(id);
+    public IotSceneRuleDO getSceneRule(Long id) {
+        return sceneRuleMapper.selectById(id);
     }
 
     @Override
-    public PageResult<IotSceneRuleDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO) {
-        return ruleSceneMapper.selectPage(pageReqVO);
+    public PageResult<IotSceneRuleDO> getSceneRulePage(IotSceneRulePageReqVO pageReqVO) {
+        return sceneRuleMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public void validateRuleSceneList(Collection<Long> ids) {
+    public void validateSceneRuleList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
         // 批量查询存在的规则场景
-        List<IotSceneRuleDO> existingScenes = ruleSceneMapper.selectByIds(ids);
+        List<IotSceneRuleDO> existingScenes = sceneRuleMapper.selectByIds(ids);
         if (existingScenes.size() != ids.size()) {
             throw exception(RULE_SCENE_NOT_EXISTS);
         }
     }
 
     @Override
-    public List<IotSceneRuleDO> getRuleSceneListByStatus(Integer status) {
-        return ruleSceneMapper.selectListByStatus(status);
+    public List<IotSceneRuleDO> getSceneRuleListByStatus(Integer status) {
+        return sceneRuleMapper.selectListByStatus(status);
     }
 
     // TODO 芋艿，缓存待实现
     @Override
-    @TenantIgnore // 忽略租户隔离：因为 IotRuleSceneMessageHandler 调用时，一般未传递租户，所以需要忽略
-    public List<IotSceneRuleDO> getRuleSceneListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
+    @TenantIgnore // 忽略租户隔离：因为 IotSceneRuleMessageHandler 调用时，一般未传递租户，所以需要忽略
+    public List<IotSceneRuleDO> getSceneRuleListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
         // TODO @puhui999：一些注释，看看要不要优化下；
         // 注意：旧的测试代码已删除，因为使用了废弃的数据结构
         // 如需测试，请使用上面的新结构测试代码示例
-        List<IotSceneRuleDO> list = ruleSceneMapper.selectList();
+        List<IotSceneRuleDO> list = sceneRuleMapper.selectList();
         // 只返回启用状态的规则场景
         List<IotSceneRuleDO> enabledList = filterList(list,
-                ruleScene -> CommonStatusEnum.ENABLE.getStatus().equals(ruleScene.getStatus()));
+                sceneRule -> CommonStatusEnum.ENABLE.getStatus().equals(sceneRule.getStatus()));
 
         // 根据 productKey 和 deviceName 进行匹配
-        return filterList(enabledList, ruleScene -> {
-            if (CollUtil.isEmpty(ruleScene.getTriggers())) {
+        return filterList(enabledList, sceneRule -> {
+            if (CollUtil.isEmpty(sceneRule.getTriggers())) {
                 return false;
             }
 
-            for (IotSceneRuleDO.Trigger trigger : ruleScene.getTriggers()) {
+            for (IotSceneRuleDO.Trigger trigger : sceneRule.getTriggers()) {
                 // 检查触发器是否匹配指定的产品和设备
                 if (isMatchProductAndDevice(trigger, productKey, deviceName)) {
                     return true;
@@ -210,43 +210,43 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     }
 
     @Override
-    public void executeRuleSceneByDevice(IotDeviceMessage message) {
+    public void executeSceneRuleByDevice(IotDeviceMessage message) {
         // TODO @芋艿：这里的 tenantId，通过设备获取；
         TenantUtils.execute(message.getTenantId(), () -> {
             // 1. 获得设备匹配的规则场景
-            List<IotSceneRuleDO> ruleScenes = getMatchedRuleSceneListByMessage(message);
-            if (CollUtil.isEmpty(ruleScenes)) {
+            List<IotSceneRuleDO> sceneRules = getMatchedSceneRuleListByMessage(message);
+            if (CollUtil.isEmpty(sceneRules)) {
                 return;
             }
 
             // 2. 执行规则场景
-            executeRuleSceneAction(message, ruleScenes);
+            executeSceneRuleAction(message, sceneRules);
         });
     }
 
     @Override
-    public void executeRuleSceneByTimer(Long id) {
+    public void executeSceneRuleByTimer(Long id) {
         // 1.1 获得规则场景
-        IotSceneRuleDO scene = TenantUtils.executeIgnore(() -> ruleSceneMapper.selectById(id));
+        IotSceneRuleDO scene = TenantUtils.executeIgnore(() -> sceneRuleMapper.selectById(id));
         if (scene == null) {
-            log.error("[executeRuleSceneByTimer][规则场景({}) 不存在]", id);
+            log.error("[executeSceneRuleByTimer][规则场景({}) 不存在]", id);
             return;
         }
         if (CommonStatusEnum.isDisable(scene.getStatus())) {
-            log.info("[executeRuleSceneByTimer][规则场景({}) 已被禁用]", id);
+            log.info("[executeSceneRuleByTimer][规则场景({}) 已被禁用]", id);
             return;
         }
         // 1.2 判断是否有定时触发器，避免脏数据
         IotSceneRuleDO.Trigger config = CollUtil.findOne(scene.getTriggers(),
-                trigger -> ObjUtil.equals(trigger.getType(), IotRuleSceneTriggerTypeEnum.TIMER.getType()));
+                trigger -> ObjUtil.equals(trigger.getType(), IotSceneRuleTriggerTypeEnum.TIMER.getType()));
         if (config == null) {
-            log.error("[executeRuleSceneByTimer][规则场景({}) 不存在定时触发器]", scene);
+            log.error("[executeSceneRuleByTimer][规则场景({}) 不存在定时触发器]", scene);
             return;
         }
 
         // 2. 执行规则场景
         TenantUtils.execute(scene.getTenantId(),
-                () -> executeRuleSceneAction(null, ListUtil.toList(scene)));
+                () -> executeSceneRuleAction(null, ListUtil.toList(scene)));
     }
 
     /**
@@ -255,36 +255,36 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
      * @param message 设备消息
      * @return 规则场景列表
      */
-    private List<IotSceneRuleDO> getMatchedRuleSceneListByMessage(IotDeviceMessage message) {
+    private List<IotSceneRuleDO> getMatchedSceneRuleListByMessage(IotDeviceMessage message) {
         // 1. 匹配设备
         // TODO @芋艿：可能需要 getSelf(); 缓存
         // 1.1 通过 deviceId 获取设备信息
         IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
         if (device == null) {
-            log.warn("[getMatchedRuleSceneListByMessage][设备({}) 不存在]", message.getDeviceId());
+            log.warn("[getMatchedSceneRuleListByMessage][设备({}) 不存在]", message.getDeviceId());
             return List.of();
         }
 
         // 1.2 通过 productId 获取产品信息
         IotProductDO product = productService.getProductFromCache(device.getProductId());
         if (product == null) {
-            log.warn("[getMatchedRuleSceneListByMessage][产品({}) 不存在]", device.getProductId());
+            log.warn("[getMatchedSceneRuleListByMessage][产品({}) 不存在]", device.getProductId());
             return List.of();
         }
 
         // 1.3 获取匹配的规则场景
-        List<IotSceneRuleDO> ruleScenes = getRuleSceneListByProductKeyAndDeviceNameFromCache(
+        List<IotSceneRuleDO> sceneRules = getSceneRuleListByProductKeyAndDeviceNameFromCache(
                 product.getProductKey(), device.getDeviceName());
-        if (CollUtil.isEmpty(ruleScenes)) {
-            return ruleScenes;
+        if (CollUtil.isEmpty(sceneRules)) {
+            return sceneRules;
         }
 
         // 2. 匹配 trigger 触发器的条件
-        return filterList(ruleScenes, ruleScene -> {
-            for (IotSceneRuleDO.Trigger trigger : ruleScene.getTriggers()) {
+        return filterList(sceneRules, sceneRule -> {
+            for (IotSceneRuleDO.Trigger trigger : sceneRule.getTriggers()) {
                 // 2.1 检查触发器类型，根据新的枚举值进行匹配
                 // TODO @芋艿：需要根据新的触发器类型枚举进行适配
-                // 原来使用 IotRuleSceneTriggerTypeEnum.DEVICE，新结构可能有不同的类型
+                // 原来使用 IotSceneRuleTriggerTypeEnum.DEVICE，新结构可能有不同的类型
 
                 // 2.2 条件分组为空，说明没有匹配的条件，因此不匹配
                 if (CollUtil.isEmpty(trigger.getConditionGroups())) {
@@ -303,7 +303,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                     for (IotSceneRuleDO.TriggerCondition condition : conditionGroup) {
                         // TODO @芋艿：这里需要实现具体的条件匹配逻辑
                         // 根据新的 TriggerCondition 结构进行匹配
-                        if (!isTriggerConditionMatched(message, condition, ruleScene, trigger)) {
+                        if (!isTriggerConditionMatched(message, condition, sceneRule, trigger)) {
                             allConditionsMatched = false;
                             break;
                         }
@@ -316,7 +316,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 }
 
                 if (anyGroupMatched) {
-                    log.info("[getMatchedRuleSceneList][消息({}) 匹配到规则场景编号({}) 的触发器({})]", message, ruleScene.getId(), trigger);
+                    log.info("[getMatchedSceneRuleList][消息({}) 匹配到规则场景编号({}) 的触发器({})]", message, sceneRule.getId(), trigger);
                     return true;
                 }
             }
@@ -329,31 +329,31 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
      *
      * @param message   设备消息
      * @param condition 触发条件
-     * @param ruleScene 规则场景（用于日志，无其它作用）
+     * @param sceneRule 规则场景（用于日志，无其它作用）
      * @param trigger   触发器（用于日志，无其它作用）
      * @return 是否匹配
      */
     private boolean isTriggerConditionMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition,
-                                              IotSceneRuleDO ruleScene, IotSceneRuleDO.Trigger trigger) {
+                                              IotSceneRuleDO sceneRule, IotSceneRuleDO.Trigger trigger) {
         try {
             // 1. 根据条件类型进行匹配
-            if (IotRuleSceneConditionTypeEnum.DEVICE_STATE.getType().equals(condition.getType())) {
+            if (IotSceneRuleConditionTypeEnum.DEVICE_STATE.getType().equals(condition.getType())) {
                 // 设备状态条件匹配
                 return matchDeviceStateCondition(message, condition);
-            } else if (IotRuleSceneConditionTypeEnum.DEVICE_PROPERTY.getType().equals(condition.getType())) {
+            } else if (IotSceneRuleConditionTypeEnum.DEVICE_PROPERTY.getType().equals(condition.getType())) {
                 // 设备属性条件匹配
                 return matchDevicePropertyCondition(message, condition);
-            } else if (IotRuleSceneConditionTypeEnum.CURRENT_TIME.getType().equals(condition.getType())) {
+            } else if (IotSceneRuleConditionTypeEnum.CURRENT_TIME.getType().equals(condition.getType())) {
                 // 当前时间条件匹配
                 return matchCurrentTimeCondition(condition);
             } else {
                 log.warn("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 存在未知的条件类型({})]",
-                        ruleScene.getId(), trigger, condition.getType());
+                        sceneRule.getId(), trigger, condition.getType());
                 return false;
             }
         } catch (Exception e) {
             log.error("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 条件匹配异常]",
-                    ruleScene.getId(), trigger, e);
+                    sceneRule.getId(), trigger, e);
             return false;
         }
     }
@@ -420,7 +420,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     private boolean evaluateCondition(Object sourceValue, String operator, String paramValue) {
         try {
             // 1. 校验操作符是否合法
-            IotRuleSceneConditionOperatorEnum operatorEnum = IotRuleSceneConditionOperatorEnum.operatorOf(operator);
+            IotSceneRuleConditionOperatorEnum operatorEnum = IotSceneRuleConditionOperatorEnum.operatorOf(operator);
             if (operatorEnum == null) {
                 log.warn("[evaluateCondition][存在错误的操作符({})]", operator);
                 return false;
@@ -428,22 +428,22 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
 
             // 2.1 构建 Spring 表达式的变量
             Map<String, Object> springExpressionVariables = MapUtil.<String, Object>builder()
-                    .put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, sourceValue)
+                    .put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, sourceValue)
                     .build();
             // 2.2 根据操作符类型处理参数值
             if (StrUtil.isNotBlank(paramValue)) {
-                // TODO @puhui999：这里是不是在 IotRuleSceneConditionOperatorEnum 加个属性；
-                if (operatorEnum == IotRuleSceneConditionOperatorEnum.IN
-                        || operatorEnum == IotRuleSceneConditionOperatorEnum.NOT_IN
-                        || operatorEnum == IotRuleSceneConditionOperatorEnum.BETWEEN
-                        || operatorEnum == IotRuleSceneConditionOperatorEnum.NOT_BETWEEN) {
+                // TODO @puhui999：这里是不是在 IotSceneRuleConditionOperatorEnum 加个属性；
+                if (operatorEnum == IotSceneRuleConditionOperatorEnum.IN
+                        || operatorEnum == IotSceneRuleConditionOperatorEnum.NOT_IN
+                        || operatorEnum == IotSceneRuleConditionOperatorEnum.BETWEEN
+                        || operatorEnum == IotSceneRuleConditionOperatorEnum.NOT_BETWEEN) {
                     // 处理多值情况
                     List<String> paramValues = StrUtil.split(paramValue, CharPool.COMMA);
-                    springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
+                    springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
                             convertList(paramValues, NumberUtil::parseDouble));
                 } else {
                     // 处理单值情况
-                    springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_VALUE,
+                    springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE,
                             NumberUtil.parseDouble(paramValue));
                 }
             }
@@ -464,19 +464,19 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
      *
      * @param message   设备消息
      * @param condition 触发条件
-     * @param ruleScene 规则场景（用于日志，无其它作用）
+     * @param sceneRule 规则场景（用于日志，无其它作用）
      * @param trigger   触发器（用于日志，无其它作用）
      * @return 是否匹配
      */
     @SuppressWarnings({"unchecked", "DataFlowIssue"})
     private boolean isTriggerConditionParameterMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition,
-                                                       IotSceneRuleDO ruleScene, IotSceneRuleDO.Trigger trigger) {
+                                                       IotSceneRuleDO sceneRule, IotSceneRuleDO.Trigger trigger) {
         // 1.1 校验操作符是否合法
-        IotRuleSceneConditionOperatorEnum operator =
-                IotRuleSceneConditionOperatorEnum.operatorOf(condition.getOperator());
+        IotSceneRuleConditionOperatorEnum operator =
+                IotSceneRuleConditionOperatorEnum.operatorOf(condition.getOperator());
         if (operator == null) {
             log.error("[isTriggerConditionParameterMatched][规则场景编号({}) 的触发器({}) 存在错误的操作符({})]",
-                    ruleScene.getId(), trigger, condition.getOperator());
+                    sceneRule.getId(), trigger, condition.getOperator());
             return false;
         }
         // 1.2 校验消息是否包含对应的值
@@ -488,31 +488,31 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
         // 2.1 构建 Spring 表达式的变量
         Map<String, Object> springExpressionVariables = new HashMap<>();
         try {
-            springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, messageValue);
-            springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_VALUE, condition.getParam());
+            springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, messageValue);
+            springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE, condition.getParam());
             List<String> parameterValues = StrUtil.splitTrim(condition.getParam(), CharPool.COMMA);
-            springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST, parameterValues);
+            springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST, parameterValues);
             // 特殊：解决数字的比较。因为 Spring 是基于它的 compareTo 方法，对数字的比较存在问题！
-            if (ObjectUtils.equalsAny(operator, IotRuleSceneConditionOperatorEnum.BETWEEN,
-                    IotRuleSceneConditionOperatorEnum.NOT_BETWEEN,
-                    IotRuleSceneConditionOperatorEnum.GREATER_THAN,
-                    IotRuleSceneConditionOperatorEnum.GREATER_THAN_OR_EQUALS,
-                    IotRuleSceneConditionOperatorEnum.LESS_THAN,
-                    IotRuleSceneConditionOperatorEnum.LESS_THAN_OR_EQUALS)
+            if (ObjectUtils.equalsAny(operator, IotSceneRuleConditionOperatorEnum.BETWEEN,
+                    IotSceneRuleConditionOperatorEnum.NOT_BETWEEN,
+                    IotSceneRuleConditionOperatorEnum.GREATER_THAN,
+                    IotSceneRuleConditionOperatorEnum.GREATER_THAN_OR_EQUALS,
+                    IotSceneRuleConditionOperatorEnum.LESS_THAN,
+                    IotSceneRuleConditionOperatorEnum.LESS_THAN_OR_EQUALS)
                     && NumberUtil.isNumber(messageValue)
                     && NumberUtils.isAllNumber(parameterValues)) {
-                springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_SOURCE,
+                springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE,
                         NumberUtil.parseDouble(messageValue));
-                springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_VALUE,
+                springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE,
                         NumberUtil.parseDouble(condition.getParam()));
-                springExpressionVariables.put(IotRuleSceneConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
+                springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
                         convertList(parameterValues, NumberUtil::parseDouble));
             }
             // 2.2 计算 Spring 表达式
             return (Boolean) SpringExpressionUtils.parseExpression(operator.getSpringExpression(), springExpressionVariables);
         } catch (Exception e) {
             log.error("[isTriggerConditionParameterMatched][消息({}) 规则场景编号({}) 的触发器({}) 的匹配表达式({}/{}) 计算异常]",
-                    message, ruleScene.getId(), trigger, operator, springExpressionVariables, e);
+                    message, sceneRule.getId(), trigger, operator, springExpressionVariables, e);
             return false;
         }
     }
@@ -521,15 +521,15 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
      * 执行规则场景的动作
      *
      * @param message    设备消息
-     * @param ruleScenes 规则场景列表
+     * @param sceneRules 规则场景列表
      */
-    private void executeRuleSceneAction(IotDeviceMessage message, List<IotSceneRuleDO> ruleScenes) {
+    private void executeSceneRuleAction(IotDeviceMessage message, List<IotSceneRuleDO> sceneRules) {
         // 1. 遍历规则场景
-        ruleScenes.forEach(ruleScene -> {
+        sceneRules.forEach(sceneRule -> {
             // 2. 遍历规则场景的动作
-            ruleScene.getActions().forEach(actionConfig -> {
+            sceneRule.getActions().forEach(actionConfig -> {
                 // 3.1 获取对应的动作 Action 数组
-                List<IotSceneRuleAction> actions = filterList(ruleSceneActions,
+                List<IotSceneRuleAction> actions = filterList(sceneRuleActions,
                         action -> action.getType().getType().equals(actionConfig.getType()));
                 if (CollUtil.isEmpty(actions)) {
                     return;
@@ -537,12 +537,12 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 // 3.2 执行动作
                 actions.forEach(action -> {
                     try {
-                        action.execute(message, ruleScene, actionConfig);
-                        log.info("[executeRuleSceneAction][消息({}) 规则场景编号({}) 的执行动作({}) 成功]",
-                                message, ruleScene.getId(), actionConfig);
+                        action.execute(message, sceneRule, actionConfig);
+                        log.info("[executeSceneRuleAction][消息({}) 规则场景编号({}) 的执行动作({}) 成功]",
+                                message, sceneRule.getId(), actionConfig);
                     } catch (Exception e) {
-                        log.error("[executeRuleSceneAction][消息({}) 规则场景编号({}) 的执行动作({}) 执行异常]",
-                                message, ruleScene.getId(), actionConfig, e);
+                        log.error("[executeSceneRuleAction][消息({}) 规则场景编号({}) 的执行动作({}) 执行异常]",
+                                message, sceneRule.getId(), actionConfig, e);
                     }
                 });
             });

@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRulePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRuleSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface IotRuleSceneService {
+public interface IotSceneRuleService {
 
     /**
      * 创建场景联动
@@ -24,14 +24,14 @@ public interface IotRuleSceneService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createRuleScene(@Valid IotRuleSceneSaveReqVO createReqVO);
+    Long createSceneRule(@Valid IotSceneRuleSaveReqVO createReqVO);
 
     /**
      * 更新场景联动
      *
      * @param updateReqVO 更新信息
      */
-    void updateRuleScene(@Valid IotRuleSceneSaveReqVO updateReqVO);
+    void updateSceneRule(@Valid IotSceneRuleSaveReqVO updateReqVO);
 
     /**
      * 更新场景联动状态
@@ -39,14 +39,14 @@ public interface IotRuleSceneService {
      * @param id     场景联动编号
      * @param status 状态
      */
-    void updateRuleSceneStatus(Long id, Integer status);
+    void updateSceneRuleStatus(Long id, Integer status);
 
     /**
      * 删除场景联动
      *
      * @param id 编号
      */
-    void deleteRuleScene(Long id);
+    void deleteSceneRule(Long id);
 
     /**
      * 获得场景联动
@@ -54,7 +54,7 @@ public interface IotRuleSceneService {
      * @param id 编号
      * @return 场景联动
      */
-    IotSceneRuleDO getRuleScene(Long id);
+    IotSceneRuleDO getSceneRule(Long id);
 
     /**
      * 获得场景联动分页
@@ -62,7 +62,7 @@ public interface IotRuleSceneService {
      * @param pageReqVO 分页查询
      * @return 场景联动分页
      */
-    PageResult<IotSceneRuleDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO);
+    PageResult<IotSceneRuleDO> getSceneRulePage(IotSceneRulePageReqVO pageReqVO);
 
     /**
      * 校验规则场景联动规则编号们是否存在。如下情况，视为无效：
@@ -70,7 +70,7 @@ public interface IotRuleSceneService {
      *
      * @param ids 场景联动规则编号数组
      */
-    void validateRuleSceneList(Collection<Long> ids);
+    void validateSceneRuleList(Collection<Long> ids);
 
     /**
      * 获得指定状态的场景联动列表
@@ -78,7 +78,7 @@ public interface IotRuleSceneService {
      * @param status 状态
      * @return 场景联动列表
      */
-    List<IotSceneRuleDO> getRuleSceneListByStatus(Integer status);
+    List<IotSceneRuleDO> getSceneRuleListByStatus(Integer status);
 
     /**
      * 【缓存】获得指定设备的场景列表
@@ -87,20 +87,20 @@ public interface IotRuleSceneService {
      * @param deviceName 设备名称
      * @return 场景列表
      */
-    List<IotSceneRuleDO> getRuleSceneListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
+    List<IotSceneRuleDO> getSceneRuleListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
 
     /**
-     * 基于 {@link IotRuleSceneTriggerTypeEnum#DEVICE} 场景，执行规则场景
+     * 基于 {@link IotSceneRuleTriggerTypeEnum#DEVICE} 场景，执行规则场景
      *
      * @param message 消息
      */
-    void executeRuleSceneByDevice(IotDeviceMessage message);
+    void executeSceneRuleByDevice(IotDeviceMessage message);
 
     /**
-     * 基于 {@link IotRuleSceneTriggerTypeEnum#TIMER} 场景，执行规则场景
+     * 基于 {@link IotSceneRuleTriggerTypeEnum#TIMER} 场景，执行规则场景
      *
      * @param id 场景联动规则编号
      */
-    void executeRuleSceneByTimer(Long id);
+    void executeSceneRuleByTimer(Long id);
 
 }

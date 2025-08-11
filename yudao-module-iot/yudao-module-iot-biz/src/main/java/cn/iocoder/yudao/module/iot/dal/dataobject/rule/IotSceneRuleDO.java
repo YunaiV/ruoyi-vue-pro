@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionOperatorEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleActionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -79,13 +79,13 @@ public class IotSceneRuleDO extends TenantBaseDO {
         /**
          * 场景事件类型
          *
-         * 枚举 {@link IotRuleSceneTriggerTypeEnum}
-         * 1. {@link IotRuleSceneTriggerTypeEnum#DEVICE_STATE_UPDATE} 时，operator 非空，并且 value 为在线状态
-         * 2. {@link IotRuleSceneTriggerTypeEnum#DEVICE_PROPERTY_POST}
-         *    {@link IotRuleSceneTriggerTypeEnum#DEVICE_EVENT_POST} 时，identifier、operator 非空，并且 value 为属性值
-         * 3. {@link IotRuleSceneTriggerTypeEnum#DEVICE_EVENT_POST}
-         *    {@link IotRuleSceneTriggerTypeEnum#DEVICE_SERVICE_INVOKE} 时，identifier 非空，但是 operator、value 为空
-         * 4. {@link IotRuleSceneTriggerTypeEnum#TIMER} 时，conditions 非空，并且设备无关（无需 productId、deviceId 字段）
+         * 枚举 {@link IotSceneRuleTriggerTypeEnum}
+         * 1. {@link IotSceneRuleTriggerTypeEnum#DEVICE_STATE_UPDATE} 时，operator 非空，并且 value 为在线状态
+         * 2. {@link IotSceneRuleTriggerTypeEnum#DEVICE_PROPERTY_POST}
+         *    {@link IotSceneRuleTriggerTypeEnum#DEVICE_EVENT_POST} 时，identifier、operator 非空，并且 value 为属性值
+         * 3. {@link IotSceneRuleTriggerTypeEnum#DEVICE_EVENT_POST}
+         *    {@link IotSceneRuleTriggerTypeEnum#DEVICE_SERVICE_INVOKE} 时，identifier 非空，但是 operator、value 为空
+         * 4. {@link IotSceneRuleTriggerTypeEnum#TIMER} 时，conditions 非空，并且设备无关（无需 productId、deviceId 字段）
          */
         private Integer type;
 
@@ -111,14 +111,14 @@ public class IotSceneRuleDO extends TenantBaseDO {
         /**
          * 操作符
          *
-         * 枚举 {@link IotRuleSceneConditionOperatorEnum}
+         * 枚举 {@link IotSceneRuleConditionOperatorEnum}
          */
         private String operator;
         /**
          * 参数（属性值、在线状态）
          * <p>
          * 如果有多个值，则使用 "," 分隔，类似 "1,2,3"。
-         * 例如说，{@link IotRuleSceneConditionOperatorEnum#IN}、{@link IotRuleSceneConditionOperatorEnum#BETWEEN}
+         * 例如说，{@link IotSceneRuleConditionOperatorEnum#IN}、{@link IotSceneRuleConditionOperatorEnum#BETWEEN}
          */
         private String value;
 
@@ -148,10 +148,10 @@ public class IotSceneRuleDO extends TenantBaseDO {
         /**
          * 触发条件类型
          *
-         * 枚举 {@link IotRuleSceneConditionTypeEnum}
-         * 1. {@link IotRuleSceneConditionTypeEnum#DEVICE_STATE} 时，operator 非空，并且 value 为在线状态
-         * 2. {@link IotRuleSceneConditionTypeEnum#DEVICE_PROPERTY} 时，identifier、operator 非空，并且 value 为属性值
-         * 3. {@link IotRuleSceneConditionTypeEnum#CURRENT_TIME} 时，operator 非空（使用 DATE_TIME_ 和 TIME_ 部分），并且 value 非空
+         * 枚举 {@link IotSceneRuleConditionTypeEnum}
+         * 1. {@link IotSceneRuleConditionTypeEnum#DEVICE_STATE} 时，operator 非空，并且 value 为在线状态
+         * 2. {@link IotSceneRuleConditionTypeEnum#DEVICE_PROPERTY} 时，identifier、operator 非空，并且 value 为属性值
+         * 3. {@link IotSceneRuleConditionTypeEnum#CURRENT_TIME} 时，operator 非空（使用 DATE_TIME_ 和 TIME_ 部分），并且 value 非空
          */
         private Integer type;
 
@@ -176,14 +176,14 @@ public class IotSceneRuleDO extends TenantBaseDO {
         /**
          * 操作符
          *
-         * 枚举 {@link IotRuleSceneConditionOperatorEnum}
+         * 枚举 {@link IotSceneRuleConditionOperatorEnum}
          */
         private String operator;
         /**
          * 参数
          *
          * 如果有多个值，则使用 "," 分隔，类似 "1,2,3"。
-         * 例如说，{@link IotRuleSceneConditionOperatorEnum#IN}、{@link IotRuleSceneConditionOperatorEnum#BETWEEN}
+         * 例如说，{@link IotSceneRuleConditionOperatorEnum#IN}、{@link IotSceneRuleConditionOperatorEnum#BETWEEN}
          */
         private String param;
 
@@ -198,11 +198,11 @@ public class IotSceneRuleDO extends TenantBaseDO {
         /**
          * 执行类型
          *
-         * 枚举 {@link IotRuleSceneActionTypeEnum}
-         * 1. {@link IotRuleSceneActionTypeEnum#DEVICE_PROPERTY_SET} 时，params 非空
-         *    {@link IotRuleSceneActionTypeEnum#DEVICE_SERVICE_INVOKE} 时，params 非空
-         * 2. {@link IotRuleSceneActionTypeEnum#ALERT_TRIGGER} 时，alertConfigId 为空，因为是 {@link IotAlertConfigDO} 里面关联它
-         * 3. {@link IotRuleSceneActionTypeEnum#ALERT_RECOVER} 时，alertConfigId 非空
+         * 枚举 {@link IotSceneRuleActionTypeEnum}
+         * 1. {@link IotSceneRuleActionTypeEnum#DEVICE_PROPERTY_SET} 时，params 非空
+         *    {@link IotSceneRuleActionTypeEnum#DEVICE_SERVICE_INVOKE} 时，params 非空
+         * 2. {@link IotSceneRuleActionTypeEnum#ALERT_TRIGGER} 时，alertConfigId 为空，因为是 {@link IotAlertConfigDO} 里面关联它
+         * 3. {@link IotSceneRuleActionTypeEnum#ALERT_RECOVER} 时，alertConfigId 非空
          */
         private Integer type;
 

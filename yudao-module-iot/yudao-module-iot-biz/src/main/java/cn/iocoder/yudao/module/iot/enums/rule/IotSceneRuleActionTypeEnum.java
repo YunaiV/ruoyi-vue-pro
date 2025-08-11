@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum IotRuleSceneActionTypeEnum implements ArrayValuable<Integer> {
+public enum IotSceneRuleActionTypeEnum implements ArrayValuable<Integer> {
 
     /**
      * 设备属性设置
@@ -42,7 +42,7 @@ public enum IotRuleSceneActionTypeEnum implements ArrayValuable<Integer> {
 
     private final Integer type;
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotRuleSceneActionTypeEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotSceneRuleActionTypeEnum::getType).toArray(Integer[]::new);
 
     @Override
     public Integer[] array() {
