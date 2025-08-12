@@ -69,7 +69,6 @@ public class IotMqttDownstreamHandler {
 
             // 5. 发送消息到设备
             return sendMessageToDevice(message, connectionInfo, payload);
-
         } catch (Exception e) {
             if (message != null) {
                 log.error("[handleDownstreamMessage][处理下行消息异常，设备 ID：{}，错误：{}]",

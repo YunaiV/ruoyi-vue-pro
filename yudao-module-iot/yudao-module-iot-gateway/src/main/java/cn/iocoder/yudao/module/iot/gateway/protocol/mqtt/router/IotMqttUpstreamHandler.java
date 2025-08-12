@@ -40,6 +40,7 @@ public class IotMqttUpstreamHandler {
 
     public IotMqttUpstreamHandler(IotMqttUpstreamProtocol protocol,
                                   IotDeviceMessageService deviceMessageService,
+                                  // TODO @haohao：用不到的 deviceService 可以删除哈；
                                   IotDeviceService deviceService,
                                   IotMqttConnectionManager connectionManager) {
         this.deviceMessageService = deviceMessageService;
@@ -70,6 +71,7 @@ public class IotMqttUpstreamHandler {
 
         log.info("[handle][设备认证成功，建立连接，客户端 ID: {}，用户名: {}]", clientId, username);
 
+        // TODO @haohao：这里是不是少了序号哈？
         // 设置异常和关闭处理器
         endpoint.exceptionHandler(ex -> {
             log.warn("[handle][连接异常，客户端 ID: {}，地址: {}]", clientId, getEndpointAddress(endpoint));

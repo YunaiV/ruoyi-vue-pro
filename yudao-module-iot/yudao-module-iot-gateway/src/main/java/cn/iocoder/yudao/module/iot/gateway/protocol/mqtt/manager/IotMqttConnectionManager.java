@@ -46,7 +46,9 @@ public class IotMqttConnectionManager {
             }
         } catch (Exception e) {
             // 忽略异常，返回默认值
+            // TODO @haohao：这个比较稳定会出现哇？
         }
+        // TODO @haohao：这个要枚举下么？
         return "unknown";
     }
 
@@ -194,4 +196,5 @@ public class IotMqttConnectionManager {
         private boolean authenticated;
 
     }
+
 }

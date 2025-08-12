@@ -50,6 +50,7 @@ public class IotMqttUpstreamProtocol {
         this.serverId = IotDeviceMessageUtils.generateServerId(mqttProperties.getPort());
     }
 
+    // TODO @haohao：这里的编写，是不是和 tcp 对应的，风格保持一致哈；
     @PostConstruct
     public void start() {
         // 创建服务器选项

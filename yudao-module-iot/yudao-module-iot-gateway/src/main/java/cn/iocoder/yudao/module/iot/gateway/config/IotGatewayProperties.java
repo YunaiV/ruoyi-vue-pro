@@ -353,7 +353,6 @@ public class IotGatewayProperties {
          * 连接超时时间（秒）
          */
         private Integer connectTimeoutSeconds = 60;
-
         /**
          * 保持连接超时时间（秒）
          */
@@ -363,7 +362,6 @@ public class IotGatewayProperties {
          * 是否启用 SSL
          */
         private Boolean sslEnabled = false;
-
         /**
          * SSL 配置
          */
@@ -379,27 +377,22 @@ public class IotGatewayProperties {
              * 密钥证书选项
              */
             private io.vertx.core.net.KeyCertOptions keyCertOptions;
-
             /**
              * 信任选项
              */
             private io.vertx.core.net.TrustOptions trustOptions;
-
             /**
              * SSL 证书路径
              */
             private String certPath;
-
             /**
              * SSL 私钥路径
              */
             private String keyPath;
-
             /**
              * 信任存储路径
              */
             private String trustStorePath;
-
             /**
              * 信任存储密码
              */
