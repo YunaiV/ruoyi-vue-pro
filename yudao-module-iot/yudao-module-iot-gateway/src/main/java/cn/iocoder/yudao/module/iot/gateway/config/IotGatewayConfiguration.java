@@ -129,12 +129,11 @@ public class IotGatewayConfiguration {
 
         @Bean
         public IotMqttUpstreamProtocol iotMqttUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                               IotDeviceService deviceService,
                                                                IotDeviceMessageService messageService,
                                                                IotMqttConnectionManager connectionManager,
                                                                Vertx mqttVertx) {
-            return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getMqtt(),
-                    deviceService, messageService, connectionManager, mqttVertx);
+            return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getMqtt(), messageService,
+                    connectionManager, mqttVertx);
         }
 
         @Bean

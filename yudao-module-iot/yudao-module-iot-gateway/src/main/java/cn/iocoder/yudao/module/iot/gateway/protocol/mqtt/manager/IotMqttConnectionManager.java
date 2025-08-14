@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager;
 
+import cn.hutool.core.util.StrUtil;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.Data;
@@ -24,6 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IotMqttConnectionManager {
 
     /**
+     * 未知地址常量（当获取端点地址失败时使用）
+     */
+    private static final String UNKNOWN_ADDRESS = "unknown";
+
+    /**
      * 连接信息映射：MqttEndpoint -> 连接信息
      */
     private final Map<MqttEndpoint, ConnectionInfo> connectionMap = new ConcurrentHashMap<>();
@@ -35,21 +41,32 @@ public class IotMqttConnectionManager {
 
     /**
      * 安全获取 endpoint 地址
+     * <p>
+     * 优先从缓存获取地址，缓存为空时再尝试实时获取
      *
      * @param endpoint MQTT 连接端点
-     * @return 地址字符串，如果获取失败则返回 "unknown"
+     * @return 地址字符串，获取失败时返回 "unknown"
      */
-    private String getEndpointAddress(MqttEndpoint endpoint) {
-        try {
-            if (endpoint != null) {
-                return endpoint.remoteAddress().toString();
-            }
-        } catch (Exception e) {
-            // 忽略异常，返回默认值
-            // TODO @haohao：这个比较稳定会出现哇？
+    public String getEndpointAddress(MqttEndpoint endpoint) {
+        String realTimeAddress = UNKNOWN_ADDRESS;
+        if (endpoint == null) {
+            return realTimeAddress;
         }
-        // TODO @haohao：这个要枚举下么？
-        return "unknown";
+
+        // 1. 优先从缓存获取（避免连接关闭时的异常）
+        ConnectionInfo connectionInfo = connectionMap.get(endpoint);
+        if (connectionInfo != null && StrUtil.isNotBlank(connectionInfo.getRemoteAddress())) {
+            return connectionInfo.getRemoteAddress();
+        }
+
+        // 2. 缓存为空时尝试实时获取
+        try {
+            realTimeAddress = endpoint.remoteAddress().toString();
+        } catch (Exception ignored) {
+            // 连接已关闭，忽略异常
+        }
+
+        return realTimeAddress;
     }
 
     /**
@@ -87,8 +104,9 @@ public class IotMqttConnectionManager {
         if (connectionInfo != null) {
             Long deviceId = connectionInfo.getDeviceId();
             deviceEndpointMap.remove(deviceId);
-            log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
-                    deviceId, getEndpointAddress(endpoint));
+
+            log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId,
+                    getEndpointAddress(endpoint));
         }
     }
 
@@ -194,6 +212,11 @@ public class IotMqttConnectionManager {
          * 是否已认证
          */
         private boolean authenticated;
+
+        /**
+         * 连接地址
+         */
+        private String remoteAddress;
 
     }
 

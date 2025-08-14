@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttUpstreamHandler;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import io.vertx.mqtt.MqttServer;
@@ -24,8 +23,6 @@ public class IotMqttUpstreamProtocol {
 
     private final IotGatewayProperties.MqttProperties mqttProperties;
 
-    private final IotDeviceService deviceService;
-
     private final IotDeviceMessageService messageService;
 
     private final IotMqttConnectionManager connectionManager;
@@ -38,12 +35,10 @@ public class IotMqttUpstreamProtocol {
     private MqttServer mqttServer;
 
     public IotMqttUpstreamProtocol(IotGatewayProperties.MqttProperties mqttProperties,
-                                   IotDeviceService deviceService,
                                    IotDeviceMessageService messageService,
                                    IotMqttConnectionManager connectionManager,
                                    Vertx vertx) {
         this.mqttProperties = mqttProperties;
-        this.deviceService = deviceService;
         this.messageService = messageService;
         this.connectionManager = connectionManager;
         this.vertx = vertx;
@@ -54,22 +49,22 @@ public class IotMqttUpstreamProtocol {
     @PostConstruct
     public void start() {
         // 创建服务器选项
-        MqttServerOptions options = new MqttServerOptions();
-        options.setPort(mqttProperties.getPort());
-        options.setMaxMessageSize(mqttProperties.getMaxMessageSize());
-        options.setTimeoutOnConnect(mqttProperties.getConnectTimeoutSeconds());
+        MqttServerOptions options = new MqttServerOptions()
+                .setPort(mqttProperties.getPort())
+                .setMaxMessageSize(mqttProperties.getMaxMessageSize())
+                .setTimeoutOnConnect(mqttProperties.getConnectTimeoutSeconds());
 
         // 配置 SSL（如果启用）
         if (Boolean.TRUE.equals(mqttProperties.getSslEnabled())) {
-            options.setSsl(true).setKeyCertOptions(mqttProperties.getSslOptions().getKeyCertOptions())
+            options.setSsl(true)
+                    .setKeyCertOptions(mqttProperties.getSslOptions().getKeyCertOptions())
                     .setTrustOptions(mqttProperties.getSslOptions().getTrustOptions());
         }
 
         // 创建服务器并设置连接处理器
         mqttServer = MqttServer.create(vertx, options);
         mqttServer.endpointHandler(endpoint -> {
-            IotMqttUpstreamHandler handler = new IotMqttUpstreamHandler(this, messageService, deviceService,
-                    connectionManager);
+            IotMqttUpstreamHandler handler = new IotMqttUpstreamHandler(this, messageService, connectionManager);
             handler.handle(endpoint);
         });
 
