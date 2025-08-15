@@ -15,7 +15,12 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class TimerTriggerMatcher extends AbstractIotSceneRuleTriggerMatcher {
+public class TimerTriggerMatcher extends AbstractIotSceneRuleMatcher {
+
+    @Override
+    public MatcherType getMatcherType() {
+        return MatcherType.TRIGGER;
+    }
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -26,13 +31,13 @@ public class TimerTriggerMatcher extends AbstractIotSceneRuleTriggerMatcher {
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
         // 1. 基础参数校验
         if (!isBasicTriggerValid(trigger)) {
-            logMatchFailure(message, trigger, "触发器基础参数无效");
+            logTriggerMatchFailure(message, trigger, "触发器基础参数无效");
             return false;
         }
 
         // 2. 检查 CRON 表达式是否存在
         if (StrUtil.isBlank(trigger.getCronExpression())) {
-            logMatchFailure(message, trigger, "定时触发器缺少 CRON 表达式");
+            logTriggerMatchFailure(message, trigger, "定时触发器缺少 CRON 表达式");
             return false;
         }
 
@@ -41,11 +46,11 @@ public class TimerTriggerMatcher extends AbstractIotSceneRuleTriggerMatcher {
 
         // 4. 可以添加 CRON 表达式格式验证
         if (!isValidCronExpression(trigger.getCronExpression())) {
-            logMatchFailure(message, trigger, "CRON 表达式格式无效: " + trigger.getCronExpression());
+            logTriggerMatchFailure(message, trigger, "CRON 表达式格式无效: " + trigger.getCronExpression());
             return false;
         }
 
-        logMatchSuccess(message, trigger);
+        logTriggerMatchSuccess(message, trigger);
         return true;
     }
 

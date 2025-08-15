@@ -19,19 +19,17 @@ import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRulePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRuleSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
-import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleTriggerMatcherManager;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,7 +65,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     @Resource
     private IotDeviceService deviceService;
     @Resource
-    private IotSceneRuleTriggerMatcherManager triggerMatcherManager;
+    private IotSceneRuleMatcherManager matcherManager;
     @Resource
     private List<IotSceneRuleAction> sceneRuleActions;
 
@@ -285,7 +283,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private boolean matchSingleTrigger(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger, IotSceneRuleDO sceneRule) {
         try {
             // 2. 检查触发器的条件分组
-            return triggerMatcherManager.isMatched(message, trigger) && isTriggerConditionGroupsMatched(message, trigger, sceneRule);
+            return matcherManager.isMatched(message, trigger) && isTriggerConditionGroupsMatched(message, trigger, sceneRule);
         } catch (Exception e) {
             log.error("[matchSingleTrigger][触发器匹配异常] sceneRuleId: {}, triggerType: {}, message: {}",
                     sceneRule.getId(), trigger.getType(), message, e);
@@ -333,7 +331,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     }
 
     /**
-     * 基于消息，判断触发器的条件是否匹配
+     * 基于消息，判断触发器的子条件是否匹配
      *
      * @param message   设备消息
      * @param condition 触发条件
@@ -344,123 +342,11 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private boolean isTriggerConditionMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition,
                                               IotSceneRuleDO sceneRule, IotSceneRuleDO.Trigger trigger) {
         try {
-            // 1. 根据条件类型进行匹配
-            if (IotSceneRuleConditionTypeEnum.DEVICE_STATE.getType().equals(condition.getType())) {
-                // 设备状态条件匹配
-                return matchDeviceStateCondition(message, condition);
-            } else if (IotSceneRuleConditionTypeEnum.DEVICE_PROPERTY.getType().equals(condition.getType())) {
-                // 设备属性条件匹配
-                return matchDevicePropertyCondition(message, condition);
-            } else if (IotSceneRuleConditionTypeEnum.CURRENT_TIME.getType().equals(condition.getType())) {
-                // 当前时间条件匹配
-                return matchCurrentTimeCondition(condition);
-            } else {
-                log.warn("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 存在未知的条件类型({})]",
-                        sceneRule.getId(), trigger, condition.getType());
-                return false;
-            }
+            // 使用重构后的条件匹配管理器进行匹配
+            return matcherManager.isConditionMatched(message, condition);
         } catch (Exception e) {
             log.error("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 条件匹配异常]",
                     sceneRule.getId(), trigger, e);
-            return false;
-        }
-    }
-
-    /**
-     * 匹配设备状态条件
-     *
-     * @param message   设备消息
-     * @param condition 触发条件
-     * @return 是否匹配
-     */
-    private boolean matchDeviceStateCondition(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
-        // TODO @芋艿：需要根据设备状态进行匹配
-        // 这里需要检查消息中的设备状态是否符合条件中定义的状态
-        log.debug("[matchDeviceStateCondition][设备状态条件匹配逻辑待实现] condition: {}", condition);
-        return false;
-    }
-
-    /**
-     * 匹配设备属性条件
-     *
-     * @param message   设备消息
-     * @param condition 触发条件
-     * @return 是否匹配
-     */
-    private boolean matchDevicePropertyCondition(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
-        // 1. 检查标识符是否匹配
-        String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
-        if (StrUtil.isBlank(condition.getIdentifier()) || !condition.getIdentifier().equals(messageIdentifier)) {
-            return false;
-        }
-
-        // 2. 获取消息中的属性值
-        Object messageValue = message.getData();
-        if (messageValue == null) {
-            return false;
-        }
-
-        // 3. 根据操作符进行匹配
-        return evaluateCondition(messageValue, condition.getOperator(), condition.getParam());
-    }
-
-    /**
-     * 匹配当前时间条件
-     *
-     * @param condition 触发条件
-     * @return 是否匹配
-     */
-    private boolean matchCurrentTimeCondition(IotSceneRuleDO.TriggerCondition condition) {
-        // TODO @芋艿：需要根据当前时间进行匹配
-        // 这里需要检查当前时间是否符合条件中定义的时间范围
-        log.debug("[matchCurrentTimeCondition][当前时间条件匹配逻辑待实现] condition: {}", condition);
-        return false;
-    }
-
-    /**
-     * 评估条件是否匹配
-     *
-     * @param sourceValue 源值（来自消息）
-     * @param operator    操作符
-     * @param paramValue  参数值（来自条件配置）
-     * @return 是否匹配
-     */
-    private boolean evaluateCondition(Object sourceValue, String operator, String paramValue) {
-        try {
-            // 1. 校验操作符是否合法
-            IotSceneRuleConditionOperatorEnum operatorEnum = IotSceneRuleConditionOperatorEnum.operatorOf(operator);
-            if (operatorEnum == null) {
-                log.warn("[evaluateCondition][存在错误的操作符({})]", operator);
-                return false;
-            }
-
-            // 2.1 构建 Spring 表达式的变量
-            Map<String, Object> springExpressionVariables = MapUtil.<String, Object>builder()
-                    .put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, sourceValue)
-                    .build();
-            // 2.2 根据操作符类型处理参数值
-            if (StrUtil.isNotBlank(paramValue)) {
-                // TODO @puhui999：这里是不是在 IotSceneRuleConditionOperatorEnum 加个属性；
-                if (operatorEnum == IotSceneRuleConditionOperatorEnum.IN
-                        || operatorEnum == IotSceneRuleConditionOperatorEnum.NOT_IN
-                        || operatorEnum == IotSceneRuleConditionOperatorEnum.BETWEEN
-                        || operatorEnum == IotSceneRuleConditionOperatorEnum.NOT_BETWEEN) {
-                    // 处理多值情况
-                    List<String> paramValues = StrUtil.split(paramValue, CharPool.COMMA);
-                    springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
-                            convertList(paramValues, NumberUtil::parseDouble));
-                } else {
-                    // 处理单值情况
-                    springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE,
-                            NumberUtil.parseDouble(paramValue));
-                }
-            }
-
-            // 3. 计算 Spring 表达式
-            return (Boolean) SpringExpressionUtils.parseExpression(operatorEnum.getSpringExpression(), springExpressionVariables);
-        } catch (Exception e) {
-            log.error("[evaluateCondition][条件评估异常] sourceValue: {}, operator: {}, paramValue: {}",
-                    sourceValue, operator, paramValue, e);
             return false;
         }
     }

@@ -14,12 +14,17 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleTriggerMatcher {
+public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleMatcher {
 
     /**
      * 设备状态更新消息方法
      */
     private static final String DEVICE_STATE_UPDATE_METHOD = IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod();
+
+    @Override
+    public MatcherType getMatcherType() {
+        return MatcherType.TRIGGER;
+    }
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -30,26 +35,26 @@ public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleTrigger
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
         // 1. 基础参数校验
         if (!isBasicTriggerValid(trigger)) {
-            logMatchFailure(message, trigger, "触发器基础参数无效");
+            logTriggerMatchFailure(message, trigger, "触发器基础参数无效");
             return false;
         }
 
         // 2. 检查消息方法是否匹配
         if (!DEVICE_STATE_UPDATE_METHOD.equals(message.getMethod())) {
-            logMatchFailure(message, trigger, "消息方法不匹配，期望: " + DEVICE_STATE_UPDATE_METHOD + ", 实际: " + message.getMethod());
+            logTriggerMatchFailure(message, trigger, "消息方法不匹配，期望: " + DEVICE_STATE_UPDATE_METHOD + ", 实际: " + message.getMethod());
             return false;
         }
 
         // 3. 检查操作符和值是否有效
-        if (!isOperatorAndValueValid(trigger)) {
-            logMatchFailure(message, trigger, "操作符或值无效");
+        if (!isTriggerOperatorAndValueValid(trigger)) {
+            logTriggerMatchFailure(message, trigger, "操作符或值无效");
             return false;
         }
 
         // 4. 获取设备状态值
         Object stateValue = message.getData();
         if (stateValue == null) {
-            logMatchFailure(message, trigger, "消息中设备状态值为空");
+            logTriggerMatchFailure(message, trigger, "消息中设备状态值为空");
             return false;
         }
 
@@ -57,9 +62,9 @@ public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleTrigger
         boolean matched = evaluateCondition(stateValue, trigger.getOperator(), trigger.getValue());
 
         if (matched) {
-            logMatchSuccess(message, trigger);
+            logTriggerMatchSuccess(message, trigger);
         } else {
-            logMatchFailure(message, trigger, "状态值条件不匹配");
+            logTriggerMatchFailure(message, trigger, "状态值条件不匹配");
         }
 
         return matched;

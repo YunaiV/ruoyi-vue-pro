@@ -15,14 +15,14 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
- * IoT 场景规则触发器匹配器抽象基类
+ * IoT 场景规则匹配器抽象基类
  * <p>
- * 提供通用的条件评估逻辑和工具方法
+ * 提供通用的条件评估逻辑和工具方法，支持触发器和条件两种匹配类型
  *
  * @author HUIHUI
  */
 @Slf4j
-public abstract class AbstractIotSceneRuleTriggerMatcher implements IotSceneRuleTriggerMatcher {
+public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher {
 
     /**
      * 评估条件是否匹配
@@ -68,6 +68,8 @@ public abstract class AbstractIotSceneRuleTriggerMatcher implements IotSceneRule
         }
     }
 
+    // ========== 触发器相关工具方法 ==========
+
     /**
      * 检查基础触发器参数是否有效
      *
@@ -79,14 +81,80 @@ public abstract class AbstractIotSceneRuleTriggerMatcher implements IotSceneRule
     }
 
     /**
-     * 检查操作符和值是否有效
+     * 检查触发器操作符和值是否有效
      *
      * @param trigger 触发器配置
      * @return 是否有效
      */
-    protected boolean isOperatorAndValueValid(IotSceneRuleDO.Trigger trigger) {
+    protected boolean isTriggerOperatorAndValueValid(IotSceneRuleDO.Trigger trigger) {
         return StrUtil.isNotBlank(trigger.getOperator()) && StrUtil.isNotBlank(trigger.getValue());
     }
+
+    /**
+     * 记录触发器匹配成功日志
+     *
+     * @param message 设备消息
+     * @param trigger 触发器配置
+     */
+    protected void logTriggerMatchSuccess(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
+        log.debug("[{}][消息({}) 匹配触发器({}) 成功]", getMatcherName(), message.getRequestId(), trigger.getType());
+    }
+
+    /**
+     * 记录触发器匹配失败日志
+     *
+     * @param message 设备消息
+     * @param trigger 触发器配置
+     * @param reason  失败原因
+     */
+    protected void logTriggerMatchFailure(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger, String reason) {
+        log.debug("[{}][消息({}) 匹配触发器({}) 失败: {}]", getMatcherName(), message.getRequestId(), trigger.getType(), reason);
+    }
+
+    // ========== 条件相关工具方法 ==========
+
+    /**
+     * 检查基础条件参数是否有效
+     *
+     * @param condition 触发条件
+     * @return 是否有效
+     */
+    protected boolean isBasicConditionValid(IotSceneRuleDO.TriggerCondition condition) {
+        return condition != null && condition.getType() != null;
+    }
+
+    /**
+     * 检查条件操作符和参数是否有效
+     *
+     * @param condition 触发条件
+     * @return 是否有效
+     */
+    protected boolean isConditionOperatorAndParamValid(IotSceneRuleDO.TriggerCondition condition) {
+        return StrUtil.isNotBlank(condition.getOperator()) && StrUtil.isNotBlank(condition.getParam());
+    }
+
+    /**
+     * 记录条件匹配成功日志
+     *
+     * @param message   设备消息
+     * @param condition 触发条件
+     */
+    protected void logConditionMatchSuccess(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
+        log.debug("[{}][消息({}) 匹配条件({}) 成功]", getMatcherName(), message.getRequestId(), condition.getType());
+    }
+
+    /**
+     * 记录条件匹配失败日志
+     *
+     * @param message   设备消息
+     * @param condition 触发条件
+     * @param reason    失败原因
+     */
+    protected void logConditionMatchFailure(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition, String reason) {
+        log.debug("[{}][消息({}) 匹配条件({}) 失败: {}]", getMatcherName(), message.getRequestId(), condition.getType(), reason);
+    }
+
+    // ========== 通用工具方法 ==========
 
     /**
      * 检查标识符是否匹配
@@ -97,27 +165,6 @@ public abstract class AbstractIotSceneRuleTriggerMatcher implements IotSceneRule
      */
     protected boolean isIdentifierMatched(String expectedIdentifier, String actualIdentifier) {
         return StrUtil.isNotBlank(expectedIdentifier) && expectedIdentifier.equals(actualIdentifier);
-    }
-
-    /**
-     * 记录匹配成功日志
-     *
-     * @param message 设备消息
-     * @param trigger 触发器配置
-     */
-    protected void logMatchSuccess(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
-        log.debug("[{}][消息({}) 匹配触发器({}) 成功]", getMatcherName(), message.getRequestId(), trigger.getType());
-    }
-
-    /**
-     * 记录匹配失败日志
-     *
-     * @param message 设备消息
-     * @param trigger 触发器配置
-     * @param reason  失败原因
-     */
-    protected void logMatchFailure(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger, String reason) {
-        log.debug("[{}][消息({}) 匹配触发器({}) 失败: {}]", getMatcherName(), message.getRequestId(), trigger.getType(), reason);
     }
 
 }

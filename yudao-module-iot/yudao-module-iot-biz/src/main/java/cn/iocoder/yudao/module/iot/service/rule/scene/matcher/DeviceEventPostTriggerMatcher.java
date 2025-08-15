@@ -16,12 +16,17 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class DeviceEventPostTriggerMatcher extends AbstractIotSceneRuleTriggerMatcher {
+public class DeviceEventPostTriggerMatcher extends AbstractIotSceneRuleMatcher {
 
     /**
      * 设备事件上报消息方法
      */
     private static final String DEVICE_EVENT_POST_METHOD = IotDeviceMessageMethodEnum.EVENT_POST.getMethod();
+
+    @Override
+    public MatcherType getMatcherType() {
+        return MatcherType.TRIGGER;
+    }
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -32,20 +37,20 @@ public class DeviceEventPostTriggerMatcher extends AbstractIotSceneRuleTriggerMa
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
         // 1. 基础参数校验
         if (!isBasicTriggerValid(trigger)) {
-            logMatchFailure(message, trigger, "触发器基础参数无效");
+            logTriggerMatchFailure(message, trigger, "触发器基础参数无效");
             return false;
         }
 
         // 2. 检查消息方法是否匹配
         if (!DEVICE_EVENT_POST_METHOD.equals(message.getMethod())) {
-            logMatchFailure(message, trigger, "消息方法不匹配，期望: " + DEVICE_EVENT_POST_METHOD + ", 实际: " + message.getMethod());
+            logTriggerMatchFailure(message, trigger, "消息方法不匹配，期望: " + DEVICE_EVENT_POST_METHOD + ", 实际: " + message.getMethod());
             return false;
         }
 
         // 3. 检查标识符是否匹配
         String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
         if (!isIdentifierMatched(trigger.getIdentifier(), messageIdentifier)) {
-            logMatchFailure(message, trigger, "标识符不匹配，期望: " + trigger.getIdentifier() + ", 实际: " + messageIdentifier);
+            logTriggerMatchFailure(message, trigger, "标识符不匹配，期望: " + trigger.getIdentifier() + ", 实际: " + messageIdentifier);
             return false;
         }
 
@@ -54,18 +59,18 @@ public class DeviceEventPostTriggerMatcher extends AbstractIotSceneRuleTriggerMa
         if (StrUtil.isNotBlank(trigger.getOperator()) && StrUtil.isNotBlank(trigger.getValue())) {
             Object eventData = message.getData();
             if (eventData == null) {
-                logMatchFailure(message, trigger, "消息中事件数据为空");
+                logTriggerMatchFailure(message, trigger, "消息中事件数据为空");
                 return false;
             }
 
             boolean matched = evaluateCondition(eventData, trigger.getOperator(), trigger.getValue());
             if (!matched) {
-                logMatchFailure(message, trigger, "事件数据条件不匹配");
+                logTriggerMatchFailure(message, trigger, "事件数据条件不匹配");
                 return false;
             }
         }
 
-        logMatchSuccess(message, trigger);
+        logTriggerMatchSuccess(message, trigger);
         return true;
     }
 

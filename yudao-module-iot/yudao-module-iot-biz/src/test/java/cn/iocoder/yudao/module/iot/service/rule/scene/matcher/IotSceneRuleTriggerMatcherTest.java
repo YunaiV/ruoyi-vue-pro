@@ -20,13 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class IotSceneRuleTriggerMatcherTest extends BaseMockitoUnitTest {
 
-    private IotSceneRuleTriggerMatcherManager matcherManager;
-    private List<IotSceneRuleTriggerMatcher> matchers;
+    private IotSceneRuleMatcherManager matcherManager;
 
     @BeforeEach
     void setUp() {
         // 创建所有匹配器实例
-        matchers = Arrays.asList(
+        List<IotSceneRuleMatcher> matchers = Arrays.asList(
                 new DeviceStateUpdateTriggerMatcher(),
                 new DevicePropertyPostTriggerMatcher(),
                 new DeviceEventPostTriggerMatcher(),
@@ -35,7 +34,7 @@ public class IotSceneRuleTriggerMatcherTest extends BaseMockitoUnitTest {
         );
 
         // 初始化匹配器管理器
-        matcherManager = new IotSceneRuleTriggerMatcherManager(matchers);
+        matcherManager = new IotSceneRuleMatcherManager(matchers);
     }
 
     @Test
@@ -197,4 +196,5 @@ public class IotSceneRuleTriggerMatcherTest extends BaseMockitoUnitTest {
         assertTrue(supportedTypes.contains(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE));
         assertTrue(supportedTypes.contains(IotSceneRuleTriggerTypeEnum.TIMER));
     }
+
 }
