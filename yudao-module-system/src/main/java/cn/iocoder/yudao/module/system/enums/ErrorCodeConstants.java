@@ -168,4 +168,12 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1-002-028-000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1_002_028_000, "模板参数({})缺失");
 
+    // ========== 单表生成用户组 1-002-028-000 ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_002_029_000, "单表生成用户组不存在");
+
+    //主子表生成学生表 学生表课程 班级 1_002_030_000
+    ErrorCode STUDENT_NOT_EXISTS = new ErrorCode(1_002_030_000, "学生主子表测试不存在");
+    ErrorCode STUDENT_COURSE_NOT_EXISTS = new ErrorCode(1_002_031_000, "学生课程不存在");
+    ErrorCode STUDENT_GRADE_NOT_EXISTS = new ErrorCode(1_002_032_000, "学生班级不存在");
+    ErrorCode STUDENT_GRADE_EXISTS = new ErrorCode(1_002_033_000, "学生班级已存在");
 }
