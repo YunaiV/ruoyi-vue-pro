@@ -85,20 +85,21 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testRedisStreamDataBridge() throws Exception {
+    public void testRedisDataBridge() throws Exception {
         // 1. 创建执行器实例
-        IotRedisStreamRuleAction action = new IotRedisStreamRuleAction();
+        IotRedisRuleAction action = new IotRedisRuleAction();
 
-        // 2. 创建配置
-        IotDataSinkRedisStreamConfig config = new IotDataSinkRedisStreamConfig()
-                .setHost("127.0.0.1")
-                .setPort(6379)
-                .setDatabase(0)
-                .setPassword("123456")
-                .setTopic("test-stream");
+        // 2. 创建配置 - 测试 Stream 数据结构
+        IotDataSinkRedisConfig config = new IotDataSinkRedisConfig();
+        config.setHost("127.0.0.1");
+        config.setPort(6379);
+        config.setDatabase(0);
+        config.setPassword("123456");
+        config.setTopic("test-stream");
+        config.setDataStructure(1); // Stream 类型
 
         // 3. 执行测试并验证缓存
-        executeAndVerifyCache(action, config, "RedisStream");
+        executeAndVerifyCache(action, config, "Redis");
     }
 
     @Test

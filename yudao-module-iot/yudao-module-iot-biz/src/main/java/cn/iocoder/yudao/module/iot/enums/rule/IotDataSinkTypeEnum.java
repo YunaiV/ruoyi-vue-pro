@@ -22,7 +22,7 @@ public enum IotDataSinkTypeEnum implements ArrayValuable<Integer> {
     MQTT(10, "MQTT"), // TODO 待实现；
 
     DATABASE(20, "Database"), // TODO @puhui999：待实现；可以简单点，对应的表名是什么，字段先固定了。
-    REDIS_STREAM(21, "Redis Stream"), // TODO @puhui999：改成 Redis；然后枚举不同的数据结构？这样，枚举就可以是 Redis 了
+    REDIS(21, "Redis"),
 
     ROCKETMQ(30, "RocketMQ"),
     RABBITMQ(31, "RabbitMQ"),
