@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
@@ -18,7 +19,7 @@ public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleTrigger
     /**
      * 设备状态更新消息方法
      */
-    private static final String DEVICE_STATE_UPDATE_METHOD = "thing.state.update";
+    private static final String DEVICE_STATE_UPDATE_METHOD = IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod();
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -68,4 +69,5 @@ public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleTrigger
     public int getPriority() {
         return 10; // 高优先级
     }
+
 }

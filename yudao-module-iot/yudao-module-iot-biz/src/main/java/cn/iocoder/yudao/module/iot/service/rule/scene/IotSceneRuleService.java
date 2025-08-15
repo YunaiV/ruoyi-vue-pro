@@ -83,15 +83,19 @@ public interface IotSceneRuleService {
     /**
      * 【缓存】获得指定设备的场景列表
      *
-     * @param productKey 产品 Key
-     * @param deviceName 设备名称
+     * @param productId 产品 ID
+     * @param deviceId  设备 ID
      * @return 场景列表
      */
-    List<IotSceneRuleDO> getSceneRuleListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
+    List<IotSceneRuleDO> getSceneRuleListByProductIdAndDeviceIdFromCache(Long productId, Long deviceId);
 
     /**
-     * 基于 {@link IotSceneRuleTriggerTypeEnum#DEVICE} 场景，执行规则场景
-     *
+     * 基于 {@link IotSceneRuleTriggerTypeEnum} 场景，执行规则场景
+     * 1. {@link IotSceneRuleTriggerTypeEnum#DEVICE_STATE_UPDATE}
+     * 2. {@link IotSceneRuleTriggerTypeEnum#DEVICE_PROPERTY_POST}
+     *    {@link IotSceneRuleTriggerTypeEnum#DEVICE_EVENT_POST}
+     * 3. {@link IotSceneRuleTriggerTypeEnum#DEVICE_EVENT_POST}
+     *    {@link IotSceneRuleTriggerTypeEnum#DEVICE_SERVICE_INVOKE}
      * @param message 消息
      */
     void executeSceneRuleByDevice(IotDeviceMessage message);

@@ -18,9 +18,6 @@ import java.util.Arrays;
 @Getter
 public enum IotSceneRuleTriggerTypeEnum implements ArrayValuable<Integer> {
 
-    @Deprecated
-    DEVICE(1), // 设备触发  // TODO @puhui999：@芋艿：这个可以作废
-
     // TODO @芋艿：后续“对应”部分，要 @下，等包结构梳理完；
     /**
      * 设备上下线变更

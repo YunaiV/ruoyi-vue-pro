@@ -76,4 +76,5 @@ public class TimerTriggerMatcher extends AbstractIotSceneRuleTriggerMatcher {
         // 定时触发器可以根据配置动态启用/禁用
         return true;
     }
+
 }

@@ -147,4 +147,5 @@ public class IotSceneRuleTriggerMatcherManager {
 
         return statistics;
     }
+
 }

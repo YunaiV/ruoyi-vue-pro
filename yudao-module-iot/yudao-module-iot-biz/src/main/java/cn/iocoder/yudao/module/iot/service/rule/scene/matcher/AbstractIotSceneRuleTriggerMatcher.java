@@ -119,4 +119,5 @@ public abstract class AbstractIotSceneRuleTriggerMatcher implements IotSceneRule
     protected void logMatchFailure(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger, String reason) {
         log.debug("[{}][消息({}) 匹配触发器({}) 失败: {}]", getMatcherName(), message.getRequestId(), trigger.getType(), reason);
     }
+
 }

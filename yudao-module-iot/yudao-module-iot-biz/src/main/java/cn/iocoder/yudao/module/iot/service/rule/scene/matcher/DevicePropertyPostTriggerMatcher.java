@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
@@ -19,7 +20,7 @@ public class DevicePropertyPostTriggerMatcher extends AbstractIotSceneRuleTrigge
     /**
      * 设备属性上报消息方法
      */
-    private static final String DEVICE_PROPERTY_POST_METHOD = "thing.property.post";
+    private static final String DEVICE_PROPERTY_POST_METHOD = IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod();
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -76,4 +77,5 @@ public class DevicePropertyPostTriggerMatcher extends AbstractIotSceneRuleTrigge
     public int getPriority() {
         return 20; // 中等优先级
     }
+
 }

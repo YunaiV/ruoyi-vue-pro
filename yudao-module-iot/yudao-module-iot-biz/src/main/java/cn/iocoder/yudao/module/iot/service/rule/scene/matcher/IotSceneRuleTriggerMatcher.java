@@ -59,4 +59,5 @@ public interface IotSceneRuleTriggerMatcher {
     default boolean isEnabled() {
         return true;
     }
+
 }
