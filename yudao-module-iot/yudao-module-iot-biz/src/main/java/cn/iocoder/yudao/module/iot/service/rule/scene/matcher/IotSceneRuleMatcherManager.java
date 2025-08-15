@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionLevelEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -107,8 +106,8 @@ public class IotSceneRuleMatcherManager {
 
         // 记录条件匹配器详情
         this.conditionMatcherMap.forEach((type, matcher) ->
-                log.info("[IotSceneRuleMatcherManager][条件匹配器] 类型: {}, 匹配器: {}, 优先级: {}, 层级: {}",
-                        type, matcher.getMatcherName(), matcher.getPriority(), matcher.getSupportedConditionLevel()));
+                log.info("[IotSceneRuleMatcherManager][条件匹配器] 类型: {}, 匹配器: {}, 优先级: {}",
+                        type, matcher.getMatcherName(), matcher.getPriority()));
     }
 
     /**
@@ -233,19 +232,6 @@ public class IotSceneRuleMatcherManager {
     }
 
     /**
-     * 根据条件层级获取匹配器列表
-     *
-     * @param level 条件层级
-     * @return 匹配器列表
-     */
-    public List<IotSceneRuleMatcher> getMatchersByLevel(IotSceneRuleConditionLevelEnum level) {
-        return allMatchers.stream()
-                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherType.CONDITION)
-                .filter(matcher -> matcher.getSupportedConditionLevel() == level)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * 获取所有匹配器的统计信息
      *
      * @return 统计信息映射表
@@ -257,15 +243,6 @@ public class IotSceneRuleMatcherManager {
         statistics.put("conditionMatchers", conditionMatcherMap.size());
         statistics.put("supportedTriggerTypes", getSupportedTriggerTypes());
         statistics.put("supportedConditionTypes", getSupportedConditionTypes());
-
-        // 按层级统计条件匹配器
-        Map<IotSceneRuleConditionLevelEnum, Long> levelStats = allMatchers.stream()
-                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherType.CONDITION)
-                .collect(Collectors.groupingBy(
-                        IotSceneRuleMatcher::getSupportedConditionLevel,
-                        Collectors.counting()
-                ));
-        statistics.put("conditionLevelStatistics", levelStats);
 
         // 触发器匹配器详情
         Map<String, Object> triggerMatcherDetails = new HashMap<>();
@@ -284,7 +261,6 @@ public class IotSceneRuleMatcherManager {
             Map<String, Object> detail = new HashMap<>();
             detail.put("matcherName", matcher.getMatcherName());
             detail.put("priority", matcher.getPriority());
-            detail.put("level", matcher.getSupportedConditionLevel());
             detail.put("enabled", matcher.isEnabled());
             conditionMatcherDetails.put(type.name(), detail);
         });

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionLevelEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import org.springframework.stereotype.Component;
 
@@ -24,11 +23,6 @@ public class DeviceStateConditionMatcher extends AbstractIotSceneRuleMatcher {
     @Override
     public IotSceneRuleConditionTypeEnum getSupportedConditionType() {
         return IotSceneRuleConditionTypeEnum.DEVICE_STATE;
-    }
-
-    @Override
-    public IotSceneRuleConditionLevelEnum getSupportedConditionLevel() {
-        return IotSceneRuleConditionLevelEnum.SECONDARY;
     }
 
     @Override

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionLevelEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 
@@ -55,15 +54,6 @@ public interface IotSceneRuleMatcher {
      * @return 条件类型枚举，触发器匹配器返回 null
      */
     default IotSceneRuleConditionTypeEnum getSupportedConditionType() {
-        return null;
-    }
-
-    /**
-     * 获取支持的条件层级（仅条件匹配器需要实现）
-     *
-     * @return 条件层级枚举，触发器匹配器返回 null
-     */
-    default IotSceneRuleConditionLevelEnum getSupportedConditionLevel() {
         return null;
     }
 

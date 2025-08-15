@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionLevelEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,11 +40,6 @@ public class CurrentTimeConditionMatcher extends AbstractIotSceneRuleMatcher {
     @Override
     public IotSceneRuleConditionTypeEnum getSupportedConditionType() {
         return IotSceneRuleConditionTypeEnum.CURRENT_TIME;
-    }
-
-    @Override
-    public IotSceneRuleConditionLevelEnum getSupportedConditionLevel() {
-        return IotSceneRuleConditionLevelEnum.SECONDARY;
     }
 
     @Override
