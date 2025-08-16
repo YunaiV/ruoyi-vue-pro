@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -12,6 +13,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,10 +49,22 @@ public class MailLogDO extends BaseDO implements Serializable {
      * 枚举 {@link UserTypeEnum}
      */
     private Integer userType;
+
     /**
      * 接收邮箱地址
      */
-    private String toMail;
+    @TableField(typeHandler = StringListTypeHandler.class)
+    private List<String> toMails;
+    /**
+     * 接收邮箱地址
+     */
+    @TableField(typeHandler = StringListTypeHandler.class)
+    private List<String> ccMails;
+    /**
+     * 密送邮箱地址
+     */
+    @TableField(typeHandler = StringListTypeHandler.class)
+    private List<String> bccMails;
 
     /**
      * 邮箱账号编号

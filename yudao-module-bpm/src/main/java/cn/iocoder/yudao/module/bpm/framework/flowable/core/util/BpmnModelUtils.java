@@ -852,7 +852,7 @@ public class BpmnModelUtils {
         } else if (flowNode instanceof ScriptTask) {
             skipExpression = ((ScriptTask) flowNode).getSkipExpression();
         }
-        
+
         if (StrUtil.isEmpty(skipExpression)) {
             return false;
         }
@@ -906,6 +906,49 @@ public class BpmnModelUtils {
             }
         }
         return nextFlowNodes;
+    }
+
+    /**
+     * 查找起始节点下一个用户任务列表列表
+     *
+     * @param source 起始节点
+     * @return 结果
+     */
+    public static List<UserTask> getNextUserTasks(FlowElement source) {
+        return getNextUserTasks(source, null, null);
+    }
+
+    /**
+     * 查找起始节点下一个用户任务列表列表
+     * @param source 起始节点
+     * @param hasSequenceFlow 已经经过的连线的 ID，用于判断线路是否重复
+     * @param userTaskList 用户任务列表
+     * @return 结果
+     */
+    public static List<UserTask> getNextUserTasks(FlowElement source, Set<String> hasSequenceFlow, List<UserTask> userTaskList) {
+        hasSequenceFlow = Optional.ofNullable(hasSequenceFlow).orElse(new HashSet<>());
+        userTaskList = Optional.ofNullable(userTaskList).orElse(new ArrayList<>());
+        // 获取出口连线
+        List<SequenceFlow> sequenceFlows = getElementOutgoingFlows(source);
+        if (!sequenceFlows.isEmpty()) {
+            for (SequenceFlow sequenceFlow : sequenceFlows) {
+                // 如果发现连线重复，说明循环了，跳过这个循环
+                if (hasSequenceFlow.contains(sequenceFlow.getId())) {
+                    continue;
+                }
+                // 添加已经走过的连线
+                hasSequenceFlow.add(sequenceFlow.getId());
+                FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
+                if (targetFlowElement instanceof UserTask) {
+                    // 若节点为用户任务，加入到结果列表中
+                    userTaskList.add((UserTask) targetFlowElement);
+                } else {
+                    // 若节点非用户任务，继续递归查找下一个节点
+                    getNextUserTasks(targetFlowElement, hasSequenceFlow, userTaskList);
+                }
+            }
+        }
+        return userTaskList;
     }
 
     /**

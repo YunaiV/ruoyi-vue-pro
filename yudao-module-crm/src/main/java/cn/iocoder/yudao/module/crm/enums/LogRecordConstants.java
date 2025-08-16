@@ -14,7 +14,7 @@ public interface LogRecordConstants {
     String CRM_CLUE_CREATE_SUB_TYPE = "创建线索";
     String CRM_CLUE_CREATE_SUCCESS = "创建了线索{{#clue.name}}";
     String CRM_CLUE_UPDATE_SUB_TYPE = "更新线索";
-    String CRM_CLUE_UPDATE_SUCCESS = "更新了线索【{{#clueName}}】: {_DIFF{#updateReq}}";
+    String CRM_CLUE_UPDATE_SUCCESS = "更新了线索【{{#clueName}}】: {_DIFF{#updateReqVO}}";
     String CRM_CLUE_DELETE_SUB_TYPE = "删除线索";
     String CRM_CLUE_DELETE_SUCCESS = "删除了线索【{{#clueName}}】";
     String CRM_CLUE_TRANSFER_SUB_TYPE = "转移线索";

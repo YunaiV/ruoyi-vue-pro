@@ -15,6 +15,7 @@ public interface MpMessageMapper extends BaseMapperX<MpMessageDO> {
                 .eqIfPresent(MpMessageDO::getAccountId, reqVO.getAccountId())
                 .eqIfPresent(MpMessageDO::getType, reqVO.getType())
                 .eqIfPresent(MpMessageDO::getOpenid, reqVO.getOpenid())
+                .eqIfPresent(MpMessageDO::getUserId, reqVO.getUserId())
                 .betweenIfPresent(MpMessageDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(MpMessageDO::getId));
     }

@@ -14,8 +14,8 @@ import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import jakarta.annotation.Resource;
 import me.zhyd.oauth.model.AuthUser;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
     @Resource
     private SocialUserBindMapper socialUserBindMapper;
 
-    @MockBean
+    @MockitoBean
     private SocialClientService socialClientService;
 
     @Test

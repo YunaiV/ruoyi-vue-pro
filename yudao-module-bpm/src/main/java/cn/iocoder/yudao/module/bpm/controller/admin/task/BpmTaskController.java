@@ -219,6 +219,14 @@ public class BpmTaskController {
         return success(true);
     }
 
+    @PutMapping("/withdraw")
+    @Operation(summary = "撤回任务")
+    @PreAuthorize("@ss.hasPermission('bpm:task:update')")
+    public CommonResult<Boolean> withdrawTask(@RequestParam("taskId") String taskId) {
+        taskService.withdrawTask(getLoginUserId(), taskId);
+        return success(true);
+    }
+
     @GetMapping("/list-by-parent-task-id")
     @Operation(summary = "获得指定父级任务的子任务列表") // 目前用于，减签的时候，获得子任务列表
     @Parameter(name = "parentTaskId", description = "父级任务编号", required = true)

@@ -5,6 +5,9 @@ import lombok.Data;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 邮箱发送消息
  *
@@ -21,8 +24,16 @@ public class MailSendMessage {
     /**
      * 接收邮件地址
      */
-    @NotNull(message = "接收邮件地址不能为空")
-    private String mail;
+    @NotEmpty(message = "接收邮件地址不能为空")
+    private Collection<String> toMails;
+    /**
+     * 抄送邮件地址
+     */
+    private Collection<String> ccMails;
+    /**
+     * 密送邮件地址
+     */
+    private Collection<String> bccMails;
     /**
      * 邮件账号编号
      */

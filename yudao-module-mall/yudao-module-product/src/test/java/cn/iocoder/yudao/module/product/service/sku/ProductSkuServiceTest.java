@@ -10,12 +10,12 @@ import cn.iocoder.yudao.module.product.dal.mysql.sku.ProductSkuMapper;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyService;
 import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,11 +44,11 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     @Resource
     private ProductSkuMapper productSkuMapper;
 
-    @MockBean
+    @MockitoBean
     private ProductSpuService productSpuService;
-    @MockBean
+    @MockitoBean
     private ProductPropertyService productPropertyService;
-    @MockBean
+    @MockitoBean
     private ProductPropertyValueService productPropertyValueService;
 
     public Long generateId() {

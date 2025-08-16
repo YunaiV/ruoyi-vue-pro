@@ -136,15 +136,20 @@ public class AliyunSmsClient extends AbstractSmsClient {
                 .map(entry -> percentCode(entry.getKey()) + "=" + percentCode(String.valueOf(entry.getValue())))
                 .collect(Collectors.joining("&"));
 
-        // 2.1 请求 Header
+        // 2. 请求 Body
+        String requestBody = ""; // 短信 API 为 RPC 接口，query parameters 在 uri 中拼接，因此 request body 如果没有特殊要求，设置为空
+        String hashedRequestPayload = DigestUtil.sha256Hex(requestBody);
+
+        // 3.1 请求 Header
         TreeMap<String, String> headers = new TreeMap<>();
         headers.put("host", HOST);
         headers.put("x-acs-version", VERSION);
         headers.put("x-acs-action", apiName);
         headers.put("x-acs-date", FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("GMT")).format(new Date()));
         headers.put("x-acs-signature-nonce", IdUtil.randomUUID());
+        headers.put("x-acs-content-sha256", hashedRequestPayload);
 
-        // 2.2 构建签名 Header
+        // 3.2 构建签名 Header
         StringBuilder canonicalHeaders = new StringBuilder(); // 构造请求头，多个规范化消息头，按照消息头名称（小写）的字符代码顺序以升序排列后拼接在一起
         StringBuilder signedHeadersBuilder = new StringBuilder(); // 已签名消息头列表，多个请求头名称（小写）按首字母升序排列并以英文分号（;）分隔
         headers.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().startsWith("x-acs-")
@@ -157,13 +162,13 @@ public class AliyunSmsClient extends AbstractSmsClient {
                 });
         String signedHeaders = signedHeadersBuilder.substring(0, signedHeadersBuilder.length() - 1);
 
-        // 3. 请求 Body
-        String requestBody = ""; // 短信 API 为 RPC 接口，query parameters 在 uri 中拼接，因此 request body 如果没有特殊要求，设置为空。
-        String hashedRequestBody = DigestUtil.sha256Hex(requestBody);
-
         // 4. 构建 Authorization 签名
-        String canonicalRequest = "POST" + "\n" + "/" + "\n" + queryString + "\n"
-                + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestBody;
+        String canonicalRequest = "POST" + "\n" +
+                "/" + "\n" +
+                queryString + "\n" +
+                canonicalHeaders + "\n" +
+                signedHeaders + "\n" +
+                hashedRequestPayload;
         String hashedCanonicalRequest = DigestUtil.sha256Hex(canonicalRequest);
         String stringToSign = "ACS3-HMAC-SHA256" + "\n" + hashedCanonicalRequest;
         String signature = SecureUtil.hmacSha256(properties.getApiSecret()).digestHex(stringToSign); // 计算签名
@@ -184,7 +189,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @SneakyThrows
     private static String percentCode(String str) {
         Assert.notNull(str, "str 不能为空");
-        return HttpUtils.encodeUtf8(str)
+        return URLEncoder.encode(str, StandardCharsets.UTF_8.name())
                 .replace("+", "%20") // 加号 "+" 被替换为 "%20"
                 .replace("*", "%2A") // 星号 "*" 被替换为 "%2A"
                 .replace("%7E", "~"); // 波浪号 "%7E" 被替换为 "~"

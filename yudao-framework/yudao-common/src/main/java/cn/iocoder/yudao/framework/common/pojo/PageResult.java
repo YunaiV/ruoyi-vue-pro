@@ -11,11 +11,11 @@ import java.util.List;
 @Data
 public final class PageResult<T> implements Serializable {
 
-    @Schema(description = "数据", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<T> list;
-
     @Schema(description = "总量", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long total;
+
+    @Schema(description = "数据", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<T> list;
 
     public PageResult() {
     }

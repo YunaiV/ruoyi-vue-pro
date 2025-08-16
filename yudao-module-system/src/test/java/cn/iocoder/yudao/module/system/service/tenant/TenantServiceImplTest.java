@@ -20,12 +20,12 @@ import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,17 +60,17 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     @Resource
     private TenantMapper tenantMapper;
 
-    @MockBean
+    @MockitoBean
     private TenantProperties tenantProperties;
-    @MockBean
+    @MockitoBean
     private TenantPackageService tenantPackageService;
-    @MockBean
+    @MockitoBean
     private AdminUserService userService;
-    @MockBean
+    @MockitoBean
     private RoleService roleService;
-    @MockBean
+    @MockitoBean
     private MenuService menuService;
-    @MockBean
+    @MockitoBean
     private PermissionService permissionService;
 
     @BeforeEach

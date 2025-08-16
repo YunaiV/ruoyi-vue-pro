@@ -56,6 +56,15 @@ public class DeptController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除部门")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('system:dept:delete')")
+    public CommonResult<Boolean> deleteDeptList(@RequestParam("ids") List<Long> ids) {
+        deptService.deleteDeptList(ids);
+        return success(true);
+    }
+
     @GetMapping("/list")
     @Operation(summary = "获取部门列表")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
