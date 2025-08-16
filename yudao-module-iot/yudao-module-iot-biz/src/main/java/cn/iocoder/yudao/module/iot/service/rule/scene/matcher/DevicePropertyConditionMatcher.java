@@ -26,6 +26,7 @@ public class DevicePropertyConditionMatcher extends AbstractIotSceneRuleMatcher 
         return IotSceneRuleConditionTypeEnum.DEVICE_PROPERTY;
     }
 
+    // TODO @puhui999：参数校验的，要不要 1.1 1.2 1.3 1.4 ？这样最终看到 2. 3. 就是核心逻辑列；
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
         // 1. 基础参数校验
@@ -56,13 +57,11 @@ public class DevicePropertyConditionMatcher extends AbstractIotSceneRuleMatcher 
 
         // 5. 使用条件评估器进行匹配
         boolean matched = evaluateCondition(propertyValue, condition.getOperator(), condition.getParam());
-
         if (matched) {
             logConditionMatchSuccess(message, condition);
         } else {
             logConditionMatchFailure(message, condition, "设备属性条件不匹配");
         }
-
         return matched;
     }
 

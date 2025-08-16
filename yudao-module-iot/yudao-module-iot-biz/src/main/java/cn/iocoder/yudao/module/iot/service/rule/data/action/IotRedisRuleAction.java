@@ -45,7 +45,6 @@ public class IotRedisRuleAction extends
         // 2. 根据数据结构类型执行不同的操作
         String messageJson = JsonUtils.toJsonString(message);
         IotRedisDataStructureEnum dataStructure = getDataStructureByType(config.getDataStructure());
-
         switch (dataStructure) {
             case STREAM:
                 executeStream(redisTemplate, config, messageJson);

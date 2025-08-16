@@ -18,18 +18,23 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
  */
 public interface IotSceneRuleMatcher {
 
+    // TODO @puhui999：MatcherTypeEnum；
+    // TODO @puhui999：可以考虑根据类型，新建 trigger、condition 包，然后把对应的实现类放进去哈；
     /**
      * 匹配器类型枚举
      */
     enum MatcherType {
+
         /**
          * 触发器匹配器 - 用于匹配主触发条件
          */
         TRIGGER,
+
         /**
          * 条件匹配器 - 用于匹配子条件
          */
         CONDITION
+
     }
 
     /**
@@ -38,6 +43,10 @@ public interface IotSceneRuleMatcher {
      * @return 匹配器类型
      */
     MatcherType getMatcherType();
+
+    // TODO @puhui999：【重要】有个思路，IotSceneRuleMatcher 拆分成 2 种 mather 接口；然后 AbstractIotSceneRuleMatcher 是个 Helper 工具类；
+
+    // TODO @puhui999：是不是和 AbstractSceneRuleMatcher 一样，分下块；
 
     /**
      * 获取支持的触发器类型（仅触发器匹配器需要实现）
@@ -90,6 +99,7 @@ public interface IotSceneRuleMatcher {
         return 100;
     }
 
+    // TODO @puhui999：如果目前没自定义，体感可以删除哈；
     /**
      * 获取匹配器名称，用于日志和调试
      *

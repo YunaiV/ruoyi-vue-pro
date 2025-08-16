@@ -60,7 +60,7 @@ public enum IotSceneRuleTriggerTypeEnum implements ArrayValuable<Integer> {
         return ARRAYS;
     }
 
-
+    // TODO @puhui999：可以参考下别的枚举哈，方法名，和实现都可以更简洁；of(String type) { firstMatch
     /**
      * 根据类型值查找触发器类型枚举
      *

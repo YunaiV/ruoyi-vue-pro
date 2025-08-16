@@ -20,6 +20,7 @@ public class DevicePropertyPostTriggerMatcher extends AbstractIotSceneRuleMatche
     /**
      * 设备属性上报消息方法
      */
+    // TODO @puhui999：是不是不用枚举哈？直接使用 IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod()
     private static final String DEVICE_PROPERTY_POST_METHOD = IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod();
 
     @Override
@@ -68,13 +69,11 @@ public class DevicePropertyPostTriggerMatcher extends AbstractIotSceneRuleMatche
 
         // 6. 使用条件评估器进行匹配
         boolean matched = evaluateCondition(propertyValue, trigger.getOperator(), trigger.getValue());
-
         if (matched) {
             logTriggerMatchSuccess(message, trigger);
         } else {
             logTriggerMatchFailure(message, trigger, "属性值条件不匹配");
         }
-
         return matched;
     }
 

@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class IotSceneRuleTriggerMatcherTest extends BaseMockitoUnitTest {
 
+    // TODO @puhui999：public 都加下哈；
+
     private IotSceneRuleMatcherManager matcherManager;
 
     @BeforeEach
@@ -42,13 +44,13 @@ public class IotSceneRuleTriggerMatcherTest extends BaseMockitoUnitTest {
         // 1. 准备测试数据
         IotDeviceMessage message = IotDeviceMessage.builder()
                 .requestId("test-001")
-                .method("thing.state.update")
-                .data(1) // 在线状态
+                .method("thing.state.update") // TODO @puhui999：这里的枚举；
+                .data(1) // 在线状态 TODO @puhui999：这里的枚举；
                 .build();
 
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_STATE_UPDATE.getType());
-        trigger.setOperator("=");
+        trigger.setOperator("="); // TODO @puhui999：这里的枚举；下面也是类似；
         trigger.setValue("1");
 
         // 2. 执行测试

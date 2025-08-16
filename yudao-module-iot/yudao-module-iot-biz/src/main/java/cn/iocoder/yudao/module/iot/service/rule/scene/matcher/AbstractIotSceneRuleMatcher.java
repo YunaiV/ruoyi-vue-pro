@@ -24,6 +24,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Slf4j
 public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher {
 
+    // TODO @puhui999：这个是不是也是【通用】条件哈？
+
     /**
      * 评估条件是否匹配
      *
@@ -32,6 +34,7 @@ public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher
      * @param paramValue  参数值（来自条件配置）
      * @return 是否匹配
      */
+    @SuppressWarnings("DataFlowIssue")
     protected boolean evaluateCondition(Object sourceValue, String operator, String paramValue) {
         try {
             // 1. 校验操作符是否合法
@@ -48,6 +51,7 @@ public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher
             // 处理参数值
             if (StrUtil.isNotBlank(paramValue)) {
                 // 处理多值情况（如 IN、BETWEEN 操作符）
+                // TODO @puhui999：使用这个，会不会有问题？例如说：string 恰好有 ， 分隔？
                 if (paramValue.contains(",")) {
                     List<String> paramValues = StrUtil.split(paramValue, ',');
                     springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
@@ -68,7 +72,7 @@ public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher
         }
     }
 
-    // ========== 触发器相关工具方法 ==========
+    // ========== 【触发器】相关工具方法 ==========
 
     /**
      * 检查基础触发器参数是否有效
@@ -111,7 +115,7 @@ public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher
         log.debug("[{}][消息({}) 匹配触发器({}) 失败: {}]", getMatcherName(), message.getRequestId(), trigger.getType(), reason);
     }
 
-    // ========== 条件相关工具方法 ==========
+    // ========== 【条件】相关工具方法 ==========
 
     /**
      * 检查基础条件参数是否有效
@@ -154,7 +158,7 @@ public abstract class AbstractIotSceneRuleMatcher implements IotSceneRuleMatcher
         log.debug("[{}][消息({}) 匹配条件({}) 失败: {}]", getMatcherName(), message.getRequestId(), condition.getType(), reason);
     }
 
-    // ========== 通用工具方法 ==========
+    // ========== 【通用】工具方法 ==========
 
     /**
      * 检查标识符是否匹配

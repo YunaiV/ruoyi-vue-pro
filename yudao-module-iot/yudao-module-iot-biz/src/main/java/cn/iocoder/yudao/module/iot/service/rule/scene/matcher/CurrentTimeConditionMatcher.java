@@ -56,15 +56,11 @@ public class CurrentTimeConditionMatcher extends AbstractIotSceneRuleMatcher {
             return false;
         }
 
-        // 3. 获取当前时间
+        // 3. 根据操作符类型进行不同的时间匹配
         LocalDateTime now = LocalDateTime.now();
-
-        // 4. 根据操作符类型进行不同的时间匹配
         String operator = condition.getOperator();
         String param = condition.getParam();
-
-        boolean matched = false;
-
+        boolean matched;
         try {
             if (operator.startsWith("date_time_")) {
                 // 日期时间匹配（时间戳）
@@ -82,13 +78,11 @@ public class CurrentTimeConditionMatcher extends AbstractIotSceneRuleMatcher {
             } else {
                 logConditionMatchFailure(message, condition, "时间条件不匹配");
             }
-
         } catch (Exception e) {
             log.error("[CurrentTimeConditionMatcher][时间条件匹配异常] operator: {}, param: {}", operator, param, e);
             logConditionMatchFailure(message, condition, "时间条件匹配异常: " + e.getMessage());
             matched = false;
         }
-
         return matched;
     }
 
@@ -107,21 +101,20 @@ public class CurrentTimeConditionMatcher extends AbstractIotSceneRuleMatcher {
         try {
             String actualOperator = operator.substring("time_".length());
 
+            // TODO @puhui999：if return 简化；
             if ("between".equals(actualOperator)) {
                 // 时间区间匹配
                 String[] timeRange = param.split(",");
                 if (timeRange.length != 2) {
                     return false;
                 }
-
                 LocalTime startTime = parseTime(timeRange[0].trim());
                 LocalTime endTime = parseTime(timeRange[1].trim());
-
                 return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
             } else {
                 // 单个时间比较
                 LocalTime targetTime = parseTime(param);
-
+                // TODO @puhui999：枚举类；
                 switch (actualOperator) {
                     case ">":
                         return currentTime.isAfter(targetTime);
@@ -138,6 +131,7 @@ public class CurrentTimeConditionMatcher extends AbstractIotSceneRuleMatcher {
                 }
             }
         } catch (Exception e) {
+            // TODO @puhui999：1）日志格式 [][]；2）方法名不对哈；
             log.error("[CurrentTimeConditionMatcher][时间解析异常] param: {}", param, e);
             return false;
         }
@@ -147,10 +141,10 @@ public class CurrentTimeConditionMatcher extends AbstractIotSceneRuleMatcher {
      * 解析时间字符串
      */
     private LocalTime parseTime(String timeStr) {
+        // TODO @puhui999：可以用 hutool Assert 类简化
         if (StrUtil.isBlank(timeStr)) {
             throw new IllegalArgumentException("时间字符串不能为空");
         }
-
         // 尝试不同的时间格式
         try {
             if (timeStr.length() == 5) { // HH:mm

@@ -61,6 +61,7 @@ public class TimerTriggerMatcher extends AbstractIotSceneRuleMatcher {
      * @return 是否有效
      */
     private boolean isValidCronExpression(String cronExpression) {
+        // TODO @puhui999：CronExpression.isValidExpression(cronExpression);
         try {
             // 简单的 CRON 表达式格式验证
             // 标准 CRON 表达式应该有 6 或 7 个字段（秒 分 时 日 月 周 [年]）

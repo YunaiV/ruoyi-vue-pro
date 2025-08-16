@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleMatcher {
 
+    // TODO @puhui999：是不是不用枚举哈；
     /**
      * 设备状态更新消息方法
      */
@@ -60,13 +61,11 @@ public class DeviceStateUpdateTriggerMatcher extends AbstractIotSceneRuleMatcher
 
         // 5. 使用条件评估器进行匹配
         boolean matched = evaluateCondition(stateValue, trigger.getOperator(), trigger.getValue());
-
         if (matched) {
             logTriggerMatchSuccess(message, trigger);
         } else {
             logTriggerMatchFailure(message, trigger, "状态值条件不匹配");
         }
-
         return matched;
     }
 

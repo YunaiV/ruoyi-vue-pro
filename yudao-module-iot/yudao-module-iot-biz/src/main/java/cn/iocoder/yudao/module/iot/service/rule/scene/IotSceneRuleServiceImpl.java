@@ -58,12 +58,15 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     @Resource
     private IotSceneRuleMapper sceneRuleMapper;
 
+    // TODO @puhui999：定时任务，基于它调度；
     @Resource(name = "iotSchedulerManager")
     private IotSchedulerManager schedulerManager;
     @Resource
     private IotProductService productService;
     @Resource
     private IotDeviceService deviceService;
+
+    // TODO @puhui999：sceneRuleMatcherManager 变量名
     @Resource
     private IotSceneRuleMatcherManager matcherManager;
     @Resource
@@ -135,7 +138,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         return sceneRuleMapper.selectListByStatus(status);
     }
 
-    // TODO 芋艿，缓存待实现
+    // TODO 芋艿，缓存待实现 @puhui999
     @Override
     @TenantIgnore // 忽略租户隔离：因为 IotSceneRuleMessageHandler 调用时，一般未传递租户，所以需要忽略
     public List<IotSceneRuleDO> getSceneRuleListByProductIdAndDeviceIdFromCache(Long productId, Long deviceId) {
@@ -177,7 +180,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
 
     @Override
     public void executeSceneRuleByDevice(IotDeviceMessage message) {
-        // TODO @芋艿：这里的 tenantId，通过设备获取；
+        // TODO @芋艿：这里的 tenantId，通过设备获取；@puhui999：
         TenantUtils.execute(message.getTenantId(), () -> {
             // 1. 获得设备匹配的规则场景
             List<IotSceneRuleDO> sceneRules = getMatchedSceneRuleListByMessage(message);
@@ -223,7 +226,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
      */
     private List<IotSceneRuleDO> getMatchedSceneRuleListByMessage(IotDeviceMessage message) {
         // 1. 匹配设备
-        // TODO @芋艿：可能需要 getSelf(); 缓存
+        // TODO @芋艿：可能需要 getSelf(); 缓存 @puhui999；
         // 1.1 通过 deviceId 获取设备信息
         IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
         if (device == null) {
@@ -342,7 +345,6 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private boolean isTriggerConditionMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition,
                                               IotSceneRuleDO sceneRule, IotSceneRuleDO.Trigger trigger) {
         try {
-            // 使用重构后的条件匹配管理器进行匹配
             return matcherManager.isConditionMatched(message, condition);
         } catch (Exception e) {
             log.error("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 条件匹配异常]",
@@ -351,8 +353,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         }
     }
 
-    // TODO @芋艿：【可优化】可以考虑增加下单测，边界太多了。
-
+    // TODO @puhui999：下面还需要么？
     /**
      * 判断触发器的条件参数是否匹配
      *

@@ -49,13 +49,11 @@ public class DeviceStateConditionMatcher extends AbstractIotSceneRuleMatcher {
 
         // 4. 使用条件评估器进行匹配
         boolean matched = evaluateCondition(stateValue, condition.getOperator(), condition.getParam());
-
         if (matched) {
             logConditionMatchSuccess(message, condition);
         } else {
             logConditionMatchFailure(message, condition, "设备状态条件不匹配");
         }
-
         return matched;
     }
 
