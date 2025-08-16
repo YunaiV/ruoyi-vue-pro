@@ -250,6 +250,14 @@ public interface BpmTaskService {
      */
     void copyTask(Long userId, @Valid BpmTaskCopyReqVO reqVO);
 
+    /**
+     * 撤回任务
+     *
+     * @param userId 用户编号
+     * @param taskId 任务编号
+     */
+    void withdrawTask(Long userId, String taskId);
+
     // ========== Event 事件相关方法 ==========
 
     /**

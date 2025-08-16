@@ -4,6 +4,8 @@ import lombok.Data;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,13 +18,24 @@ public class MailSendSingleToUserReqDTO {
 
     /**
      * 用户编号
+     *
+     * 如果非空，则加载对应用户的邮箱，添加到 {@link #toMails} 中
      */
     private Long userId;
+
     /**
-     * 邮箱
+     * 收件邮箱
      */
-    @Email
-    private String mail;
+    private List<@Email String> toMails;
+    /**
+     * 抄送邮箱
+     */
+    private List<@Email String> ccMails;
+    /**
+     * 密送邮箱
+     */
+    private List<@Email String> bccMails;
+
 
     /**
      * 邮件模板编号
