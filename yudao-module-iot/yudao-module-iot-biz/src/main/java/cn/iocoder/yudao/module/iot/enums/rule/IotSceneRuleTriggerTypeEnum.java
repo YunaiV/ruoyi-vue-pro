@@ -16,10 +16,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum IotRuleSceneTriggerTypeEnum implements ArrayValuable<Integer> {
-
-    @Deprecated
-    DEVICE(1), // 设备触发  // TODO @puhui999：@芋艿：这个可以作废
+public enum IotSceneRuleTriggerTypeEnum implements ArrayValuable<Integer> {
 
     // TODO @芋艿：后续“对应”部分，要 @下，等包结构梳理完；
     /**
@@ -56,11 +53,25 @@ public enum IotRuleSceneTriggerTypeEnum implements ArrayValuable<Integer> {
 
     private final Integer type;
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotRuleSceneTriggerTypeEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotSceneRuleTriggerTypeEnum::getType).toArray(Integer[]::new);
 
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+
+    /**
+     * 根据类型值查找触发器类型枚举
+     *
+     * @param typeValue 类型值
+     * @return 触发器类型枚举
+     */
+    public static IotSceneRuleTriggerTypeEnum findTriggerTypeEnum(Integer typeValue) {
+        return Arrays.stream(IotSceneRuleTriggerTypeEnum.values())
+                .filter(type -> type.getType().equals(typeValue))
+                .findFirst()
+                .orElse(null);
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum IotRuleSceneConditionOperatorEnum implements ArrayValuable<String> {
+public enum IotSceneRuleConditionOperatorEnum implements ArrayValuable<String> {
 
     EQUALS("=", "#source == #value"),
     NOT_EQUALS("!=", "!(#source == #value)"),
@@ -53,7 +53,7 @@ public enum IotRuleSceneConditionOperatorEnum implements ArrayValuable<String> {
     private final String operator;
     private final String springExpression;
 
-    public static final String[] ARRAYS = Arrays.stream(values()).map(IotRuleSceneConditionOperatorEnum::getOperator).toArray(String[]::new);
+    public static final String[] ARRAYS = Arrays.stream(values()).map(IotSceneRuleConditionOperatorEnum::getOperator).toArray(String[]::new);
 
     /**
      * Spring 表达式 - 原始值
@@ -68,7 +68,7 @@ public enum IotRuleSceneConditionOperatorEnum implements ArrayValuable<String> {
      */
     public static final String SPRING_EXPRESSION_VALUE_LIST = "values";
 
-    public static IotRuleSceneConditionOperatorEnum operatorOf(String operator) {
+    public static IotSceneRuleConditionOperatorEnum operatorOf(String operator) {
         return ArrayUtil.firstMatch(item -> item.getOperator().equals(operator), values());
     }
 

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertConfigService;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertRecordService;
 import cn.iocoder.yudao.module.system.api.mail.MailSendApi;
@@ -62,8 +62,8 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
     }
 
     @Override
-    public IotRuleSceneActionTypeEnum getType() {
-        return IotRuleSceneActionTypeEnum.ALERT_TRIGGER;
+    public IotSceneRuleActionTypeEnum getType() {
+        return IotSceneRuleActionTypeEnum.ALERT_TRIGGER;
     }
 
 }

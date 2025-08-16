@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
+import cn.iocoder.yudao.module.iot.service.rule.scene.IotSceneRuleService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class IotRuleSceneMessageHandler implements IotMessageSubscriber<IotDeviceMessage> {
+public class IotSceneRuleMessageHandler implements IotMessageSubscriber<IotDeviceMessage> {
 
     @Resource
-    private IotRuleSceneService ruleSceneService;
+    private IotSceneRuleService sceneRuleService;
 
     @Resource
     private IotMessageBus messageBus;
@@ -46,7 +46,7 @@ public class IotRuleSceneMessageHandler implements IotMessageSubscriber<IotDevic
             return;
         }
         log.info("[onMessage][消息内容({})]", message);
-        ruleSceneService.executeRuleSceneByDevice(message);
+        sceneRuleService.executeSceneRuleByDevice(message);
     }
 
 }

@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class IotRuleScenePageReqVO extends PageParam {
+public class IotSceneRulePageReqVO extends PageParam {
 
     @Schema(description = "场景名称", example = "赵六")
     private String name;

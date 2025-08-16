@@ -132,7 +132,7 @@ public class IotDeviceController {
         List<IotDeviceDO> list = deviceService.getDeviceListByCondition(deviceType, productId);
         return success(convertList(list, device ->  // 只返回 id、name、productId 字段
                 new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())
-                        .setProductId(device.getProductId())));
+                        .setProductId(device.getProductId()).setState(device.getState())));
     }
 
     @PostMapping("/import")

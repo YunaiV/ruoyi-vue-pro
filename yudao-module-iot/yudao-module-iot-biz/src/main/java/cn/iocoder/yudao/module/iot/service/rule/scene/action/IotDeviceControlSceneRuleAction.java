@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import jakarta.annotation.Resource;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class IotDeviceControlRuleSceneAction implements IotSceneRuleAction {
+public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
 
     @Resource
     private IotDeviceService deviceService;
@@ -48,8 +48,8 @@ public class IotDeviceControlRuleSceneAction implements IotSceneRuleAction {
     }
 
     @Override
-    public IotRuleSceneActionTypeEnum getType() {
-        return IotRuleSceneActionTypeEnum.DEVICE_PROPERTY_SET;
+    public IotSceneRuleActionTypeEnum getType() {
+        return IotSceneRuleActionTypeEnum.DEVICE_PROPERTY_SET;
     }
 
 }

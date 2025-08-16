@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertRecordDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertRecordService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
@@ -42,8 +42,8 @@ public class IotAlertRecoverSceneRuleAction implements IotSceneRuleAction {
     }
 
     @Override
-    public IotRuleSceneActionTypeEnum getType() {
-        return IotRuleSceneActionTypeEnum.ALERT_RECOVER;
+    public IotSceneRuleActionTypeEnum getType() {
+        return IotSceneRuleActionTypeEnum.ALERT_RECOVER;
     }
 
 }

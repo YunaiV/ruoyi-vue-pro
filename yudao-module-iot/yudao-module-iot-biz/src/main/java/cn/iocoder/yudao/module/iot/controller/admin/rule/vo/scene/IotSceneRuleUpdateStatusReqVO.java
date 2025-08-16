@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Schema(description = "管理后台 - IoT 场景联动更新状态 Request VO")
 @Data
-public class IotRuleSceneUpdateStatusReqVO {
+public class IotSceneRuleUpdateStatusReqVO {
 
     @Schema(description = "场景联动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "场景联动编号不能为空")
