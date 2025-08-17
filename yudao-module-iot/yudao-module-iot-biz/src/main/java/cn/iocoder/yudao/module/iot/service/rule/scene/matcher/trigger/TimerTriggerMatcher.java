@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.AbstractIotSceneRuleMatcher;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherHelper;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,12 +16,7 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class TimerTriggerMatcher extends AbstractIotSceneRuleMatcher {
-
-    @Override
-    public MatcherTypeEnum getMatcherType() {
-        return MatcherTypeEnum.TRIGGER;
-    }
+public class TimerTriggerMatcher implements IotSceneRuleTriggerMatcher {
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -31,14 +26,14 @@ public class TimerTriggerMatcher extends AbstractIotSceneRuleMatcher {
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
         // 1. 基础参数校验
-        if (!isBasicTriggerValid(trigger)) {
-            logTriggerMatchFailure(message, trigger, "触发器基础参数无效");
+        if (!IotSceneRuleMatcherHelper.isBasicTriggerValid(trigger)) {
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "触发器基础参数无效");
             return false;
         }
 
         // 2. 检查 CRON 表达式是否存在
         if (StrUtil.isBlank(trigger.getCronExpression())) {
-            logTriggerMatchFailure(message, trigger, "定时触发器缺少 CRON 表达式");
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "定时触发器缺少 CRON 表达式");
             return false;
         }
 
@@ -47,11 +42,11 @@ public class TimerTriggerMatcher extends AbstractIotSceneRuleMatcher {
 
         // 4. 可以添加 CRON 表达式格式验证
         if (!isValidCronExpression(trigger.getCronExpression())) {
-            logTriggerMatchFailure(message, trigger, "CRON 表达式格式无效: " + trigger.getCronExpression());
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "CRON 表达式格式无效: " + trigger.getCronExpression());
             return false;
         }
 
-        logTriggerMatchSuccess(message, trigger);
+        IotSceneRuleMatcherHelper.logTriggerMatchSuccess(getMatcherName(), message, trigger);
         return true;
     }
 

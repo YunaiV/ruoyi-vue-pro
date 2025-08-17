@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition.IotSceneRuleConditionMatcher;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger.IotSceneRuleTriggerMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -30,14 +32,14 @@ public class IotSceneRuleMatcherManager {
      * Key: 触发器类型枚举
      * Value: 对应的匹配器实例
      */
-    private final Map<IotSceneRuleTriggerTypeEnum, IotSceneRuleMatcher> triggerMatchers;
+    private final Map<IotSceneRuleTriggerTypeEnum, IotSceneRuleTriggerMatcher> triggerMatchers;
 
     /**
      * 条件匹配器映射表
      * Key: 条件类型枚举
      * Value: 对应的匹配器实例
      */
-    private final Map<IotSceneRuleConditionTypeEnum, IotSceneRuleMatcher> conditionMatchers;
+    private final Map<IotSceneRuleConditionTypeEnum, IotSceneRuleConditionMatcher> conditionMatchers;
 
     /**
      * 所有匹配器列表（按优先级排序）
@@ -60,18 +62,20 @@ public class IotSceneRuleMatcherManager {
                 .collect(Collectors.toList());
 
         // 分离触发器匹配器和条件匹配器
-        List<IotSceneRuleMatcher> triggerMatchers = this.allMatchers.stream()
-                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherTypeEnum.TRIGGER)
+        List<IotSceneRuleTriggerMatcher> triggerMatchers = this.allMatchers.stream()
+                .filter(matcher -> matcher instanceof IotSceneRuleTriggerMatcher)
+                .map(matcher -> (IotSceneRuleTriggerMatcher) matcher)
                 .toList();
-        List<IotSceneRuleMatcher> conditionMatchers = this.allMatchers.stream()
-                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherTypeEnum.CONDITION)
+        List<IotSceneRuleConditionMatcher> conditionMatchers = this.allMatchers.stream()
+                .filter(matcher -> matcher instanceof IotSceneRuleConditionMatcher)
+                .map(matcher -> (IotSceneRuleConditionMatcher) matcher)
                 .toList();
 
         // 构建触发器匹配器映射表
         // TODO @puhui999：convertMap()
         this.triggerMatchers = triggerMatchers.stream()
                 .collect(Collectors.toMap(
-                        IotSceneRuleMatcher::getSupportedTriggerType,
+                        IotSceneRuleTriggerMatcher::getSupportedTriggerType,
                         Function.identity(),
                         (existing, replacement) -> {
                             log.warn("[IotSceneRuleMatcherManager][触发器类型({})存在多个匹配器，使用优先级更高的: {}]",
@@ -84,7 +88,7 @@ public class IotSceneRuleMatcherManager {
         // 构建条件匹配器映射表
         this.conditionMatchers = conditionMatchers.stream()
                 .collect(Collectors.toMap(
-                        IotSceneRuleMatcher::getSupportedConditionType,
+                        IotSceneRuleConditionMatcher::getSupportedConditionType,
                         Function.identity(),
                         (existing, replacement) -> {
                             log.warn("[IotSceneRuleMatcherManager][条件类型({})存在多个匹配器，使用优先级更高的: {}]",
@@ -124,7 +128,7 @@ public class IotSceneRuleMatcherManager {
             log.warn("[isMatched][未知的触发器类型: {}]", trigger.getType());
             return false;
         }
-        IotSceneRuleMatcher matcher = triggerMatchers.get(triggerType);
+        IotSceneRuleTriggerMatcher matcher = triggerMatchers.get(triggerType);
         if (matcher == null) {
             log.warn("[isMatched][触发器类型({})没有对应的匹配器]", triggerType);
             return false;
@@ -159,7 +163,7 @@ public class IotSceneRuleMatcherManager {
             return false;
         }
 
-        IotSceneRuleMatcher matcher = conditionMatchers.get(conditionType);
+        IotSceneRuleConditionMatcher matcher = conditionMatchers.get(conditionType);
         if (matcher == null) {
             log.warn("[isConditionMatched][条件类型({})没有对应的匹配器]", conditionType);
             return false;
@@ -203,67 +207,6 @@ public class IotSceneRuleMatcherManager {
      */
     public Set<IotSceneRuleConditionTypeEnum> getSupportedConditionTypes() {
         return new HashSet<>(conditionMatchers.keySet());
-    }
-
-    // TODO @puhui999：用不到的方法，可以去掉先哈；
-
-    /**
-     * 获取指定触发器类型的匹配器
-     *
-     * @param triggerType 触发器类型
-     * @return 匹配器实例，如果不存在则返回 null
-     */
-    public IotSceneRuleMatcher getTriggerMatcher(IotSceneRuleTriggerTypeEnum triggerType) {
-        return triggerMatchers.get(triggerType);
-    }
-
-    /**
-     * 获取指定条件类型的匹配器
-     *
-     * @param conditionType 条件类型
-     * @return 匹配器实例，如果不存在则返回 null
-     */
-    public IotSceneRuleMatcher getConditionMatcher(IotSceneRuleConditionTypeEnum conditionType) {
-        return conditionMatchers.get(conditionType);
-    }
-
-    // TODO @puhui999：是不是不用这个哈；直接 @Getter，单测直接处理；
-    /**
-     * 获取所有匹配器的统计信息
-     *
-     * @return 统计信息映射表
-     */
-    public Map<String, Object> getMatcherStatistics() {
-        Map<String, Object> statistics = new HashMap<>();
-        statistics.put("totalMatchers", allMatchers.size());
-        statistics.put("triggerMatchers", triggerMatchers.size());
-        statistics.put("conditionMatchers", conditionMatchers.size());
-        statistics.put("supportedTriggerTypes", getSupportedTriggerTypes());
-        statistics.put("supportedConditionTypes", getSupportedConditionTypes());
-
-        // 触发器匹配器详情
-        Map<String, Object> triggerMatcherDetails = new HashMap<>();
-        triggerMatchers.forEach((type, matcher) -> {
-            Map<String, Object> detail = new HashMap<>();
-            detail.put("matcherName", matcher.getMatcherName());
-            detail.put("priority", matcher.getPriority());
-            detail.put("enabled", matcher.isEnabled());
-            triggerMatcherDetails.put(type.name(), detail);
-        });
-        statistics.put("triggerMatcherDetails", triggerMatcherDetails);
-
-        // 条件匹配器详情
-        Map<String, Object> conditionMatcherDetails = new HashMap<>();
-        conditionMatchers.forEach((type, matcher) -> {
-            Map<String, Object> detail = new HashMap<>();
-            detail.put("matcherName", matcher.getMatcherName());
-            detail.put("priority", matcher.getPriority());
-            detail.put("enabled", matcher.isEnabled());
-            conditionMatcherDetails.put(type.name(), detail);
-        });
-        statistics.put("conditionMatcherDetails", conditionMatcherDetails);
-
-        return statistics;
     }
 
 }
