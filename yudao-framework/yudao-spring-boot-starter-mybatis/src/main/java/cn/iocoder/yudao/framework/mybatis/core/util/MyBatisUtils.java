@@ -53,14 +53,14 @@ public class MyBatisUtils {
         if (CollUtil.isEmpty(sortingFields)) {
             return;
         }
-        if (wrapper instanceof QueryWrapper<T>) {
+        if (wrapper instanceof QueryWrapper) {
             QueryWrapper<T> query = (QueryWrapper<T>) wrapper;
             for (SortingField sortingField : sortingFields) {
                 query.orderBy(true,
                         SortingField.ORDER_ASC.equals(sortingField.getOrder()),
                         StrUtil.toUnderlineCase(sortingField.getField()));
             }
-        } else if (wrapper instanceof LambdaQueryWrapper<T>) {
+        } else if (wrapper instanceof LambdaQueryWrapper) {
             // LambdaQueryWrapper 不直接支持字符串字段排序，使用 last 方法拼接 ORDER BY
             LambdaQueryWrapper<T> lambdaQuery = (LambdaQueryWrapper<T>) wrapper;
             StringBuilder orderBy = new StringBuilder();
