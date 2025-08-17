@@ -42,6 +42,40 @@ public class TradeStatusSyncToWxaOrderHandler implements TradeOrderHandler {
         if (ObjUtil.notEqual(order.getPayChannelCode(), PayChannelEnum.WX_LITE.getCode())) {
             return;
         }
+
+        // 上传订单物流信息到微信小程序
+        uploadWxaOrderShippingInfo(order);
+    }
+
+    @Override
+    public void afterReceiveOrder(TradeOrderDO order) {
+        // 注意：只有微信小程序支付的订单，才需要同步
+        if (ObjUtil.notEqual(order.getPayChannelCode(), PayChannelEnum.WX_LITE.getCode())) {
+            return;
+        }
+        PayOrderRespDTO payOrder = payOrderApi.getOrder(order.getPayOrderId());
+        SocialWxaOrderNotifyConfirmReceiveReqDTO reqDTO = new SocialWxaOrderNotifyConfirmReceiveReqDTO()
+                .setTransactionId(payOrder.getChannelOrderNo())
+                .setReceivedTime(order.getReceiveTime());
+        try {
+            socialClientApi.notifyWxaOrderConfirmReceive(UserTypeEnum.MEMBER.getValue(), reqDTO);
+        } catch (Exception ex) {
+            log.error("[afterReceiveOrder][订单({}) 通知订单收货到微信小程序失败]", order, ex);
+        }
+
+        // 如果是门店自提订单，上传订单物流信息到微信小程序
+        // 原因是，门店自提订单没有 “afterDeliveryOrder” 阶段。可见 https://t.zsxq.com/KWD3u 反馈
+        if (DeliveryTypeEnum.PICK_UP.getType().equals(order.getDeliveryType())) {
+            uploadWxaOrderShippingInfo(order);
+        }
+    }
+
+    /**
+     * 上传订单物流信息到微信小程序
+     *
+     * @param order 订单
+     */
+    private void uploadWxaOrderShippingInfo(TradeOrderDO order) {
         PayOrderRespDTO payOrder = payOrderApi.getOrder(order.getPayOrderId());
         SocialWxaOrderUploadShippingInfoReqDTO reqDTO = new SocialWxaOrderUploadShippingInfoReqDTO()
                 .setTransactionId(payOrder.getChannelOrderNo())
@@ -61,23 +95,6 @@ public class TradeStatusSyncToWxaOrderHandler implements TradeOrderHandler {
             socialClientApi.uploadWxaOrderShippingInfo(UserTypeEnum.MEMBER.getValue(), reqDTO);
         } catch (Exception ex) {
             log.error("[afterDeliveryOrder][订单({}) 上传订单物流信息到微信小程序失败]", order, ex);
-        }
-    }
-
-    @Override
-    public void afterReceiveOrder(TradeOrderDO order) {
-        // 注意：只有微信小程序支付的订单，才需要同步
-        if (ObjUtil.notEqual(order.getPayChannelCode(), PayChannelEnum.WX_LITE.getCode())) {
-            return;
-        }
-        PayOrderRespDTO payOrder = payOrderApi.getOrder(order.getPayOrderId());
-        SocialWxaOrderNotifyConfirmReceiveReqDTO reqDTO = new SocialWxaOrderNotifyConfirmReceiveReqDTO()
-                .setTransactionId(payOrder.getChannelOrderNo())
-                .setReceivedTime(order.getReceiveTime());
-        try {
-            socialClientApi.notifyWxaOrderConfirmReceive(UserTypeEnum.MEMBER.getValue(), reqDTO);
-        } catch (Exception ex) {
-            log.error("[afterReceiveOrder][订单({}) 通知订单收货到微信小程序失败]", order, ex);
         }
     }
 
