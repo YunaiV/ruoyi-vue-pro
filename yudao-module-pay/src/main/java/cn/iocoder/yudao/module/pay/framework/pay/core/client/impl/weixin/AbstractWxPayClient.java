@@ -541,12 +541,21 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
      * @see <a href="https://github.com/binarywang/weixin-java-pay-demo/blob/master/src/main/java/com/github/binarywang/demo/wx/pay/controller/WxPayV3Controller.java#L202-L221">官方示例</a>
      */
     private SignatureHeader getRequestHeader(Map<String, String> headers) {
+        // 参见 https://gitee.com/zhijiantianya/yudao-cloud/issues/ICSFL6
         return SignatureHeader.builder()
-                .signature(headers.get("wechatpay-signature"))
-                .nonce(headers.get("wechatpay-nonce"))
-                .serial(headers.get("wechatpay-serial"))
-                .timeStamp(headers.get("wechatpay-timestamp"))
+                .signature(getHeaderValue(headers, "Wechatpay-Signature", "wechatpay-signature"))
+                .nonce(getHeaderValue(headers, "Wechatpay-Nonce", "wechatpay-nonce"))
+                .serial(getHeaderValue(headers, "Wechatpay-Serial", "wechatpay-serial"))
+                .timeStamp(getHeaderValue(headers, "Wechatpay-Timestamp", "wechatpay-timestamp"))
                 .build();
+    }
+
+    private String getHeaderValue(Map<String, String> headers, String capitalizedKey, String lowercaseKey) {
+        String value = headers.get(capitalizedKey);
+        if (value != null) {
+            return value;
+        }
+        return headers.get(lowercaseKey);
     }
 
     // TODO @芋艿：可能是 wxjava 的 bug：https://github.com/binarywang/WxJava/issues/1557
