@@ -128,6 +128,7 @@ public class ApiEncryptFilter extends ApiRequestFilter {
      *
      * @param request 请求
      */
+    @SuppressWarnings("PatternVariableCanBeUsed")
     private ApiEncrypt getApiEncrypt(HttpServletRequest request) {
         try {
             HandlerExecutionChain mappingHandler = requestMappingHandlerMapping.getHandler(request);
@@ -135,7 +136,8 @@ public class ApiEncryptFilter extends ApiRequestFilter {
                 return null;
             }
             Object handler = mappingHandler.getHandler();
-            if (handler instanceof HandlerMethod handlerMethod) {
+            if (handler instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handler;
                 ApiEncrypt annotation = handlerMethod.getMethodAnnotation(ApiEncrypt.class);
                 if (annotation == null) {
                     annotation = handlerMethod.getBeanType().getAnnotation(ApiEncrypt.class);

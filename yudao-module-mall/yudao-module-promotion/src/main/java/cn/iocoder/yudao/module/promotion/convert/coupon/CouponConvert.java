@@ -30,7 +30,7 @@ public interface CouponConvert {
     CouponRespDTO convert(CouponDO bean);
 
     default CouponDO convert(CouponTemplateDO template, Long userId) {
-        CouponDO couponDO = new CouponDO()
+        CouponDO coupon = new CouponDO()
                 .setTemplateId(template.getId())
                 .setName(template.getName())
                 .setTakeType(template.getTakeType())
@@ -44,13 +44,13 @@ public interface CouponConvert {
                 .setStatus(CouponStatusEnum.UNUSED.getStatus())
                 .setUserId(userId);
         if (CouponTemplateValidityTypeEnum.DATE.getType().equals(template.getValidityType())) {
-            couponDO.setValidStartTime(template.getValidStartTime());
-            couponDO.setValidEndTime(template.getValidEndTime());
+            coupon.setValidStartTime(template.getValidStartTime());
+            coupon.setValidEndTime(template.getValidEndTime());
         } else if (CouponTemplateValidityTypeEnum.TERM.getType().equals(template.getValidityType())) {
-            couponDO.setValidStartTime(LocalDateTime.now().plusDays(template.getFixedStartTerm()));
-            couponDO.setValidEndTime(LocalDateTime.now().plusDays(template.getFixedEndTerm()));
+            coupon.setValidStartTime(LocalDateTime.now().plusDays(template.getFixedStartTerm()));
+            coupon.setValidEndTime(coupon.getValidStartTime().plusDays(template.getFixedEndTerm()));
         }
-        return couponDO;
+        return coupon;
     }
 
     CouponPageReqVO convert(AppCouponPageReqVO pageReqVO, Collection<Long> userIds);
