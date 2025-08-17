@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.client.s3;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -15,9 +17,11 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 
 /**
@@ -26,6 +30,8 @@ import java.time.Duration;
  * @author 芋道源码
  */
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
+
+    private static final Duration EXPIRATION_DEFAULT = Duration.ofHours(24);
 
     private S3Client client;
     private S3Presigner presigner;
@@ -75,7 +81,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         // 上传文件
         client.putObject(putRequest, RequestBody.fromBytes(content));
         // 拼接返回路径
-        return config.getDomain() + "/" + path;
+        return presignGetUrl(path, null);
     }
 
     @Override
@@ -97,23 +103,38 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     }
 
     @Override
-    public FilePresignedUrlRespDTO getPresignedObjectUrl(String path) {
-        Duration expiration = Duration.ofHours(24);
-        return new FilePresignedUrlRespDTO(getPresignedUrl(path, expiration), config.getDomain() + "/" + path);
+    public String presignPutUrl(String path) {
+        return presigner.presignPutObject(PutObjectPresignRequest.builder()
+                .signatureDuration(EXPIRATION_DEFAULT)
+                .putObjectRequest(b -> b.bucket(config.getBucket()).key(path)).build())
+                .url().toString();
     }
 
-    /**
-     * 生成动态的预签名上传 URL
-     *
-     * @param path     相对路径
-     * @param expiration 过期时间
-     * @return 生成的上传 URL
-     */
-    private String getPresignedUrl(String path, Duration expiration) {
-        return presigner.presignPutObject(PutObjectPresignRequest.builder()
+    @Override
+    public String presignGetUrl(String url, Integer expirationSeconds) {
+        // 1. 将 url 转换为 path
+        String path = StrUtil.removePrefix(url, config.getDomain() + "/");
+        path = HttpUtils.removeUrlQuery(path);
+
+        // 2.1 情况一：公开访问：无需签名
+        // 考虑到老版本的兼容，所以必须是 config.getEnablePublicAccess() 为 false 时，才进行签名
+        if (!BooleanUtil.isFalse(config.getEnablePublicAccess())) {
+            return config.getDomain() + "/" + path;
+        }
+
+        // 2.2 情况二：私有访问：生成 GET 预签名 URL
+        String finalPath = path;
+        Duration expiration = expirationSeconds != null ? Duration.ofSeconds(expirationSeconds) : EXPIRATION_DEFAULT;
+        URL signedUrl = presigner.presignGetObject(GetObjectPresignRequest.builder()
                 .signatureDuration(expiration)
-                .putObjectRequest(b -> b.bucket(config.getBucket()).key(path))
-                .build()).url().toString();
+                .getObjectRequest(b -> b.bucket(config.getBucket()).key(finalPath)).build())
+                .url();
+        // 特殊：适配未使用 domain 返回的情况！！！
+        String signedUrlStr = signedUrl.toString();
+        if (!signedUrlStr.startsWith(config.getDomain())) {
+            signedUrlStr = signedUrlStr.replaceFirst(signedUrl.getProtocol() + "://" + signedUrl.getHost(), config.getDomain());
+        }
+        return signedUrlStr;
     }
 
     /**

@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.client;
 
-import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.FilePresignedUrlRespDTO;
-
 /**
  * 文件客户端
  *
@@ -42,13 +40,26 @@ public interface FileClient {
      */
     byte[] getContent(String path) throws Exception;
 
+    // ========== 文件签名，目前仅 S3 支持 ==========
+
     /**
-     * 获得文件预签名地址
+     * 获得文件预签名地址，用于上传
      *
      * @param path 相对路径
      * @return 文件预签名地址
      */
-    default FilePresignedUrlRespDTO getPresignedObjectUrl(String path) throws Exception {
+    default String presignPutUrl(String path) {
+        throw new UnsupportedOperationException("不支持的操作");
+    }
+
+    /**
+     * 生成文件预签名地址，用于读取
+     *
+     * @param url 完整的文件访问地址
+     * @param expirationSeconds 访问有效期，单位秒
+     * @return 文件预签名地址
+     */
+    default String presignGetUrl(String url, Integer expirationSeconds) {
         throw new UnsupportedOperationException("不支持的操作");
     }
 
