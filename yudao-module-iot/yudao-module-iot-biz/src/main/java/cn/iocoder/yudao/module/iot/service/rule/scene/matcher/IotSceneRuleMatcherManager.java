@@ -61,10 +61,10 @@ public class IotSceneRuleMatcherManager {
 
         // 分离触发器匹配器和条件匹配器
         List<IotSceneRuleMatcher> triggerMatchers = this.allMatchers.stream()
-                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherType.TRIGGER)
+                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherTypeEnum.TRIGGER)
                 .toList();
         List<IotSceneRuleMatcher> conditionMatchers = this.allMatchers.stream()
-                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherType.CONDITION)
+                .filter(matcher -> matcher.getMatcherType() == IotSceneRuleMatcher.MatcherTypeEnum.CONDITION)
                 .toList();
 
         // 构建触发器匹配器映射表

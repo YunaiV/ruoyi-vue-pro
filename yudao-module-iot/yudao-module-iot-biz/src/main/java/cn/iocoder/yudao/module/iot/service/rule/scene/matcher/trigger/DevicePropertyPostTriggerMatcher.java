@@ -1,10 +1,11 @@
-package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
+package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.AbstractIotSceneRuleMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,8 +25,8 @@ public class DevicePropertyPostTriggerMatcher extends AbstractIotSceneRuleMatche
     private static final String DEVICE_PROPERTY_POST_METHOD = IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod();
 
     @Override
-    public MatcherType getMatcherType() {
-        return MatcherType.TRIGGER;
+    public MatcherTypeEnum getMatcherType() {
+        return MatcherTypeEnum.TRIGGER;
     }
 
     @Override

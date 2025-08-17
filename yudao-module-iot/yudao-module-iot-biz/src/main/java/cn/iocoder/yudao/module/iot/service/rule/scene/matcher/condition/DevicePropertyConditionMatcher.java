@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
+package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.AbstractIotSceneRuleMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 public class DevicePropertyConditionMatcher extends AbstractIotSceneRuleMatcher {
 
     @Override
-    public MatcherType getMatcherType() {
-        return MatcherType.CONDITION;
+    public MatcherTypeEnum getMatcherType() {
+        return MatcherTypeEnum.CONDITION;
     }
 
     @Override
