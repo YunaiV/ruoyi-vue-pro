@@ -80,9 +80,15 @@ public class FileTypeUtils {
      */
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
-        response.setHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
         String contentType = getMineType(content, filename);
         response.setContentType(contentType);
+        // 设置内容显示、下载文件名：https://www.cnblogs.com/wq-9/articles/12165056.html
+        if (StrUtil.containsIgnoreCase(contentType, "image/")) {
+            // 参见 https://github.com/YunaiV/ruoyi-vue-pro/issues/692 讨论
+            response.setHeader("Content-Disposition", "inline;filename=" + HttpUtils.encodeUtf8(filename));
+        } else {
+            response.setHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
+        }
         // 针对 video 的特殊处理，解决视频地址在移动端播放的兼容性问题
         if (StrUtil.containsIgnoreCase(contentType, "video")) {
             response.setHeader("Content-Length", String.valueOf(content.length));
