@@ -119,6 +119,7 @@ public class TencentSmsClient extends AbstractSmsClient {
             return new SmsReceiveRespDTO()
                     .setSuccess("SUCCESS".equals(statusObj.getStr("report_status"))) // 是否接收成功
                     .setErrorCode(statusObj.getStr("errmsg")) // 状态报告编码
+                    .setErrorMsg(statusObj.getStr("description")) // 状态报告描述
                     .setMobile(statusObj.getStr("mobile")) // 手机号
                     .setReceiveTime(statusObj.getLocalDateTime("user_receive_time", null)) // 状态报告时间
                     .setSerialNo(statusObj.getStr("sid")); // 发送序列号
