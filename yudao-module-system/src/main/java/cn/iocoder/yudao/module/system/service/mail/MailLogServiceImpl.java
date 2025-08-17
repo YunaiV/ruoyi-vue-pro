@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
@@ -12,8 +13,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;
 
@@ -41,7 +41,8 @@ public class MailLogServiceImpl implements MailLogService {
     }
 
     @Override
-    public Long createMailLog(Long userId, Integer userType, String toMail,
+    public Long createMailLog(Long userId, Integer userType,
+                              Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
                               MailAccountDO account, MailTemplateDO template,
                               String templateContent, Map<String, Object> templateParams, Boolean isSend) {
         MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
@@ -49,7 +50,8 @@ public class MailLogServiceImpl implements MailLogService {
         logDOBuilder.sendStatus(Objects.equals(isSend, true) ? MailSendStatusEnum.INIT.getStatus()
                 : MailSendStatusEnum.IGNORE.getStatus())
                 // 用户信息
-                .userId(userId).userType(userType).toMail(toMail)
+                .userId(userId).userType(userType)
+                .toMails(ListUtil.toList(toMails)).ccMails(ListUtil.toList(ccMails)).bccMails(ListUtil.toList(bccMails))
                 .accountId(account.getId()).fromMail(account.getMail())
                 // 模板相关字段
                 .templateId(template.getId()).templateCode(template.getCode()).templateNickname(template.getNickname())

@@ -105,12 +105,40 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testValidateDeptExists_notFound() {
+    public void testDeleteDeptList_success() {
+        // mock 数据
+        DeptDO deptDO1 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO1);
+        DeptDO deptDO2 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO2);
         // 准备参数
-        Long id = randomLongId();
+        List<Long> ids = Arrays.asList(deptDO1.getId(), deptDO2.getId());
+
+        // 调用
+        deptService.deleteDeptList(ids);
+        // 校验数据不存在了
+        assertNull(deptMapper.selectById(deptDO1.getId()));
+        assertNull(deptMapper.selectById(deptDO2.getId()));
+    }
+
+    @Test
+    public void testDeleteDeptList_exitsChildren() {
+        // mock 数据
+        DeptDO parentDept = randomPojo(DeptDO.class);
+        deptMapper.insert(parentDept);
+        DeptDO childrenDeptDO = randomPojo(DeptDO.class, o -> {
+            o.setParentId(parentDept.getId());
+            o.setStatus(randomCommonStatus());
+        });
+        deptMapper.insert(childrenDeptDO);
+        DeptDO anotherDept = randomPojo(DeptDO.class);
+        deptMapper.insert(anotherDept);
+
+        // 准备参数（包含有子部门的 parentDept）
+        List<Long> ids = Arrays.asList(parentDept.getId(), anotherDept.getId());
 
         // 调用, 并断言异常
-        assertServiceException(() -> deptService.validateDeptExists(id), DEPT_NOT_FOUND);
+        assertServiceException(() -> deptService.deleteDeptList(ids), DEPT_EXITS_CHILDREN);
     }
 
     @Test

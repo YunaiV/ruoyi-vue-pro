@@ -60,6 +60,10 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_TRANSFER_FAIL_USER_NOT_EXISTS = new ErrorCode(1_009_005_014, "任务转办失败，转办人不存在");
     ErrorCode TASK_SIGNATURE_NOT_EXISTS = new ErrorCode(1_009_005_015, "签名不能为空！");
     ErrorCode TASK_REASON_REQUIRE = new ErrorCode(1_009_005_016, "审批意见不能为空！");
+    ErrorCode TASK_WITHDRAW_FAIL_PROCESS_NOT_RUNNING = new ErrorCode(1_009_005_017, "撤回失败，流程实例未运行！");
+    ErrorCode TASK_WITHDRAW_FAIL_TASK_NOT_EXISTS = new ErrorCode(1_009_005_018, "撤回失败，未查询到用户已办任务！");
+    ErrorCode TASK_WITHDRAW_FAIL_NOT_ALLOW = new ErrorCode(1_009_005_019, "撤回失败，此流程不允许撤回操作！");
+    ErrorCode TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW = new ErrorCode(1_009_005_019, "撤回失败，下一节点不满足撤回条件！");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1_009_010_000, "动态表单不存在");

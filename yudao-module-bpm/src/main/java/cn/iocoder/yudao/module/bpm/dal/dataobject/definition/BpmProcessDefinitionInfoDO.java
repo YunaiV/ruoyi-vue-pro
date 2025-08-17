@@ -173,6 +173,11 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     private Boolean allowCancelRunningProcess;
 
     /**
+     * 是否允许审批人撤回任务
+     */
+    private Boolean allowWithdrawTask;
+
+    /**
      * 流程 ID 规则
      */
     @TableField(typeHandler = JacksonTypeHandler.class)

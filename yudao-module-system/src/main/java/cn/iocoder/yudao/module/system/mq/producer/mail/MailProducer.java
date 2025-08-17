@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+import java.util.Collection;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
+
 /**
  * Mail 邮件相关消息的 Producer
  *
@@ -24,17 +29,22 @@ public class MailProducer {
      * 发送 {@link MailSendMessage} 消息
      *
      * @param sendLogId 发送日志编码
-     * @param mail 接收邮件地址
+     * @param toMails   接收邮件地址
+     * @param ccMails   抄送邮件地址
+     * @param bccMails  密送邮件地址
      * @param accountId 邮件账号编号
-     * @param nickname 邮件发件人
-     * @param title 邮件标题
-     * @param content 邮件内容
+     * @param nickname  邮件发件人
+     * @param title     邮件标题
+     * @param content   邮件内容
      */
-    public void sendMailSendMessage(Long sendLogId, String mail, Long accountId,
-                                    String nickname, String title, String content) {
+    public void sendMailSendMessage(Long sendLogId,
+                                    Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
+                                    Long accountId, String nickname, String title, String content) {
         MailSendMessage message = new MailSendMessage()
-                .setLogId(sendLogId).setMail(mail).setAccountId(accountId)
-                .setNickname(nickname).setTitle(title).setContent(content);
+                .setLogId(sendLogId)
+                .setToMails(toMails).setCcMails(ccMails).setBccMails(bccMails)
+                .setAccountId(accountId).setNickname(nickname)
+                .setTitle(title).setContent(content);
         applicationContext.publishEvent(message);
     }
 
