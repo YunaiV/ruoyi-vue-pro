@@ -26,7 +26,7 @@ public class BannerApplicationRunner implements ApplicationRunner {
                             "开发文档: \t{} \n\t" +
                             "视频教程: \t{} \n" +
                             "----------------------------------------------------------",
-                    "https://doc.iocoder.cn/api-doc/",
+                    "https://doc.iocoder.cn/api-doc/ + 'or' + http://127.0.0.1:48080/doc.html",
                     "https://doc.iocoder.cn",
                     "https://t.zsxq.com/02Yf6M7Qn");
 

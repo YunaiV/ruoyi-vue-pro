@@ -128,6 +128,13 @@
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
 
+<!--        DEMO模块测试-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-demo</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

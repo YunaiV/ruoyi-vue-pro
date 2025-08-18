@@ -44,6 +44,8 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurePathMatch(configurer, webProperties.getAdminApi());
         configurePathMatch(configurer, webProperties.getAppApi());
+//        添加open 的api
+        configurePathMatch(configurer,webProperties.getOpenApi());
     }
 
     /**

@@ -20,6 +20,9 @@ public class WebProperties {
     private Api appApi = new Api("/app-api", "**.controller.app.**");
     @NotNull(message = "Admin API 不能为空")
     private Api adminApi = new Api("/admin-api", "**.controller.admin.**");
+//    这里可以添加新的api前缀 比如 open
+    @NotNull
+    private Api openApi = new Api("/open-api", "**.controller.open.**");
 
     @NotNull(message = "Admin UI 不能为空")
     private Ui adminUi;
