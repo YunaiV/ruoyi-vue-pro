@@ -291,7 +291,7 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         // 调用
         smsSendService.receiveSmsStatus(channelCode, text);
         // 断言
-        receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(eq(result.getLogId()), eq(result.getSuccess()),
+        receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(eq(result.getLogId()), eq(result.getSerialNo()), eq(result.getSuccess()),
                 eq(result.getReceiveTime()), eq(result.getErrorCode()), eq(result.getErrorCode())));
     }
 

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.client.local;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
 
 import java.io.File;
@@ -38,7 +39,14 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
     @Override
     public byte[] getContent(String path) {
         String filePath = getFilePath(path);
-        return FileUtil.readBytes(filePath);
+        try {
+            return FileUtil.readBytes(filePath);
+        } catch (IORuntimeException ex) {
+            if (ex.getMessage().startsWith("File not exist:")) {
+                return null;
+            }
+            throw ex;
+        }
     }
 
     private String getFilePath(String path) {

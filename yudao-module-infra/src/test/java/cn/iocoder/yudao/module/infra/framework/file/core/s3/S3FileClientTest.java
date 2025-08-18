@@ -5,11 +5,11 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClient;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig;
+import jakarta.validation.Validation;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.Validation;
-
+@SuppressWarnings("resource")
 public class S3FileClientTest {
 
     @Test
@@ -71,11 +71,38 @@ public class S3FileClientTest {
         config.setAccessSecret("kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP");
         config.setBucket("ruoyi-vue-pro");
         config.setDomain("http://test.yudao.iocoder.cn"); // 如果有自定义域名，则可以设置。http://static.yudao.iocoder.cn
+        config.setEnablePathStyleAccess(false);
         // 默认上海的 endpoint
         config.setEndpoint("s3-cn-south-1.qiniucs.com");
 
         // 执行上传
         testExecuteUpload(config);
+    }
+
+    @Test
+    @Disabled // 七牛云存储（读私有桶），如果要集成测试，可以注释本行
+    public void testQiniu_privateGet() {
+        S3FileClientConfig config = new S3FileClientConfig();
+        // 配置成你自己的
+//        config.setAccessKey(System.getenv("QINIU_ACCESS_KEY"));
+//        config.setAccessSecret(System.getenv("QINIU_SECRET_KEY"));
+        config.setAccessKey("b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8");
+        config.setAccessSecret("kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP");
+        config.setBucket("ruoyi-vue-pro-private");
+        config.setDomain("http://t151glocd.hn-bkt.clouddn.com"); // 如果有自定义域名，则可以设置。http://static.yudao.iocoder.cn
+        config.setEnablePathStyleAccess(false);
+        // 默认上海的 endpoint
+        config.setEndpoint("s3-cn-south-1.qiniucs.com");
+
+        // 校验配置
+        ValidationUtils.validate(Validation.buildDefaultValidatorFactory().getValidator(), config);
+        // 创建 Client
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+        // 执行生成 URL 签名
+        String path = "output.png";
+        String presignedUrl = client.presignGetUrl(path, 300);
+        System.out.println(presignedUrl);
     }
 
     @Test
@@ -94,7 +121,7 @@ public class S3FileClientTest {
         testExecuteUpload(config);
     }
 
-    private void testExecuteUpload(S3FileClientConfig config) throws Exception {
+    private void testExecuteUpload(S3FileClientConfig config) {
         // 校验配置
         ValidationUtils.validate(Validation.buildDefaultValidatorFactory().getValidator(), config);
         // 创建 Client

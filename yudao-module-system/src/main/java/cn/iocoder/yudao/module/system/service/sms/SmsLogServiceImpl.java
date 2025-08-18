@@ -10,7 +10,8 @@ import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -63,10 +64,17 @@ public class SmsLogServiceImpl implements SmsLogService {
     }
 
     @Override
-    public void updateSmsReceiveResult(Long id, Boolean success, LocalDateTime receiveTime,
+    public void updateSmsReceiveResult(Long id, String apiSerialNo, Boolean success, LocalDateTime receiveTime,
                                        String apiReceiveCode, String apiReceiveMsg) {
         SmsReceiveStatusEnum receiveStatus = Objects.equals(success, true) ?
                 SmsReceiveStatusEnum.SUCCESS : SmsReceiveStatusEnum.FAILURE;
+        if (id == null || id == 0) {
+            SmsLogDO log = smsLogMapper.selectByApiSerialNo(apiSerialNo);
+            if (log == null) {
+                return;
+            }
+            id = log.getId();
+        }
         smsLogMapper.updateById(SmsLogDO.builder().id(id).receiveStatus(receiveStatus.getStatus())
                 .receiveTime(receiveTime).apiReceiveCode(apiReceiveCode).apiReceiveMsg(apiReceiveMsg).build());
     }

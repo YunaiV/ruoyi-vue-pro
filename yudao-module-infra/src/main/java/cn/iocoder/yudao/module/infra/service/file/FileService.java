@@ -37,14 +37,22 @@ public interface FileService {
                       String name, String directory, String type);
 
     /**
-     * 生成文件预签名地址信息
+     * 生成文件预签名地址信息，用于上传
      *
      * @param name      文件名
      * @param directory 目录
      * @return 预签名地址信息
      */
-    FilePresignedUrlRespVO getFilePresignedUrl(@NotEmpty(message = "文件名不能为空") String name,
-                                               String directory);
+    FilePresignedUrlRespVO presignPutUrl(@NotEmpty(message = "文件名不能为空") String name,
+                                         String directory);
+    /**
+     * 生成文件预签名地址信息，用于读取
+     *
+     * @param url 完整的文件访问地址
+     * @param expirationSeconds 访问有效期，单位秒
+     * @return 文件预签名地址
+     */
+    String presignGetUrl(String url, Integer expirationSeconds);
 
     /**
      * 创建文件

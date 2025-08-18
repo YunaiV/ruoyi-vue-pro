@@ -42,4 +42,14 @@ public interface FileApi {
     String createFile(@NotEmpty(message = "文件内容不能为空") byte[] content,
                       String name, String directory, String type);
 
+    /**
+     * 生成文件预签名地址，用于读取
+     *
+     * @param url 完整的文件访问地址
+     * @param expirationSeconds 访问有效期，单位秒
+     * @return 文件预签名地址
+     */
+    String presignGetUrl(@NotEmpty(message = "URL 不能为空") String url,
+                         Integer expirationSeconds);
+
 }
