@@ -129,12 +129,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .signatureDuration(expiration)
                 .getObjectRequest(b -> b.bucket(config.getBucket()).key(finalPath)).build())
                 .url();
-        // 特殊：适配未使用 domain 返回的情况！！！
-        String signedUrlStr = signedUrl.toString();
-        if (!signedUrlStr.startsWith(config.getDomain())) {
-            signedUrlStr = signedUrlStr.replaceFirst(signedUrl.getProtocol() + "://" + signedUrl.getHost(), config.getDomain());
-        }
-        return signedUrlStr;
+        return signedUrl.toString();
     }
 
     /**
