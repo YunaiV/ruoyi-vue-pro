@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.rule;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +61,9 @@ public enum IotSceneRuleTriggerTypeEnum implements ArrayValuable<Integer> {
         return ARRAYS;
     }
 
-    // TODO @puhui999：可以参考下别的枚举哈，方法名，和实现都可以更简洁；of(String type) { firstMatch
+    public static IotSceneRuleTriggerTypeEnum typeOf(Integer type) {
+        return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
+    }
     /**
      * 根据类型值查找触发器类型枚举
      *

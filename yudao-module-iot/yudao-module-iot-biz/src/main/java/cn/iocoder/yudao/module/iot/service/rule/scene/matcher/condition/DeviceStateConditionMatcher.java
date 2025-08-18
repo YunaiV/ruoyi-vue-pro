@@ -23,32 +23,31 @@ public class DeviceStateConditionMatcher implements IotSceneRuleConditionMatcher
 
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
-        // 1. 基础参数校验
+        // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicConditionValid(condition)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "条件基础参数无效");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "条件基础参数无效");
             return false;
         }
 
-        // 2. 检查操作符和参数是否有效
+        // 1.2 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "操作符或参数无效");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;
         }
 
-        // 3. 获取设备状态值
-        // 设备状态通常在消息的 data 字段中
-        Object stateValue = message.getData();
+        // 2.1 获取设备状态值
+        Object stateValue = message.getParams();
         if (stateValue == null) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "消息中设备状态值为空");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "消息中设备状态值为空");
             return false;
         }
 
-        // 4. 使用条件评估器进行匹配
+        // 2.2 使用条件评估器进行匹配
         boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(stateValue, condition.getOperator(), condition.getParam());
         if (matched) {
-            IotSceneRuleMatcherHelper.logConditionMatchSuccess(getMatcherName(), message, condition);
+            IotSceneRuleMatcherHelper.logConditionMatchSuccess(message, condition);
         } else {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "设备状态条件不匹配");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "设备状态条件不匹配");
         }
         return matched;
     }

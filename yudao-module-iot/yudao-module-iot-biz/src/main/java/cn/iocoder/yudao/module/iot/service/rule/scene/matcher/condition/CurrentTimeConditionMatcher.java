@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * 当前时间条件匹配器
@@ -40,115 +44,175 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
 
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
-        // 1. 基础参数校验
+        // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicConditionValid(condition)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "条件基础参数无效");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "条件基础参数无效");
             return false;
         }
 
-        // 2. 检查操作符和参数是否有效
+        // 1.2 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "操作符或参数无效");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;
         }
 
-        // 3. 根据操作符类型进行不同的时间匹配
-        LocalDateTime now = LocalDateTime.now();
+        // 1.3 验证操作符是否为支持的时间操作符
         String operator = condition.getOperator();
-        String param = condition.getParam();
-        boolean matched;
-        try {
-            if (operator.startsWith("date_time_")) {
-                // 日期时间匹配（时间戳）
-                matched = matchDateTime(now, operator, param);
-            } else if (operator.startsWith("time_")) {
-                // 当日时间匹配（HH:mm:ss）
-                matched = matchTime(now.toLocalTime(), operator, param);
-            } else {
-                // 其他操作符，使用通用条件评估器
-                matched = IotSceneRuleMatcherHelper.evaluateCondition(now.toEpochSecond(java.time.ZoneOffset.of("+8")), operator, param);
-            }
-
-            if (matched) {
-                IotSceneRuleMatcherHelper.logConditionMatchSuccess(getMatcherName(), message, condition);
-            } else {
-                IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "时间条件不匹配");
-            }
-        } catch (Exception e) {
-            log.error("[CurrentTimeConditionMatcher][时间条件匹配异常] operator: {}, param: {}", operator, param, e);
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "时间条件匹配异常: " + e.getMessage());
-            matched = false;
+        IotSceneRuleConditionOperatorEnum operatorEnum = IotSceneRuleConditionOperatorEnum.operatorOf(operator);
+        if (operatorEnum == null) {
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "无效的操作符: " + operator);
+            return false;
         }
+
+        if (!isTimeOperator(operatorEnum)) {
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "不支持的时间操作符: " + operator);
+            return false;
+        }
+
+        // 2.1 执行时间匹配
+        boolean matched = executeTimeMatching(operatorEnum, condition.getParam());
+
+        // 2.2 记录匹配结果
+        if (matched) {
+            IotSceneRuleMatcherHelper.logConditionMatchSuccess(message, condition);
+        } else {
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "时间条件不匹配");
+        }
+
         return matched;
     }
 
     /**
-     * 匹配日期时间（时间戳）
+     * 执行时间匹配逻辑
+     * 直接实现时间条件匹配，不使用 Spring EL 表达式
      */
-    private boolean matchDateTime(LocalDateTime now, String operator, String param) {
-        long currentTimestamp = now.toEpochSecond(java.time.ZoneOffset.of("+8"));
-        return IotSceneRuleMatcherHelper.evaluateCondition(currentTimestamp, operator.substring("date_time_".length()), param);
-    }
-
-    /**
-     * 匹配当日时间（HH:mm:ss）
-     */
-    private boolean matchTime(LocalTime currentTime, String operator, String param) {
+    private boolean executeTimeMatching(IotSceneRuleConditionOperatorEnum operatorEnum, String param) {
         try {
-            String actualOperator = operator.substring("time_".length());
+            LocalDateTime now = LocalDateTime.now();
 
-            // TODO @puhui999：if return 简化；
-            if ("between".equals(actualOperator)) {
-                // 时间区间匹配
-                String[] timeRange = param.split(",");
-                if (timeRange.length != 2) {
-                    return false;
-                }
-                LocalTime startTime = parseTime(timeRange[0].trim());
-                LocalTime endTime = parseTime(timeRange[1].trim());
-                return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
+            if (isDateTimeOperator(operatorEnum)) {
+                // 日期时间匹配（时间戳）
+                long currentTimestamp = now.toEpochSecond(java.time.ZoneOffset.of("+8"));
+                return matchDateTime(currentTimestamp, operatorEnum, param);
             } else {
-                // 单个时间比较
-                LocalTime targetTime = parseTime(param);
-                // TODO @puhui999：枚举类；
-                switch (actualOperator) {
-                    case ">":
-                        return currentTime.isAfter(targetTime);
-                    case "<":
-                        return currentTime.isBefore(targetTime);
-                    case ">=":
-                        return !currentTime.isBefore(targetTime);
-                    case "<=":
-                        return !currentTime.isAfter(targetTime);
-                    case "=":
-                        return currentTime.equals(targetTime);
-                    default:
-                        return false;
-                }
+                // 当日时间匹配（HH:mm:ss）
+                return matchTime(now.toLocalTime(), operatorEnum, param);
             }
         } catch (Exception e) {
-            // TODO @puhui999：1）日志格式 [][]；2）方法名不对哈；
-            log.error("[CurrentTimeConditionMatcher][时间解析异常] param: {}", param, e);
+            log.error("[executeTimeMatching][operatorEnum({}) param({}) 时间匹配异常]", operatorEnum, param, e);
             return false;
         }
     }
 
     /**
+     * 判断是否为日期时间操作符
+     */
+    private boolean isDateTimeOperator(IotSceneRuleConditionOperatorEnum operatorEnum) {
+        return operatorEnum == IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN ||
+                operatorEnum == IotSceneRuleConditionOperatorEnum.DATE_TIME_LESS_THAN ||
+                operatorEnum == IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN;
+    }
+
+    /**
+     * 判断是否为时间操作符
+     */
+    private boolean isTimeOperator(IotSceneRuleConditionOperatorEnum operatorEnum) {
+        return operatorEnum == IotSceneRuleConditionOperatorEnum.TIME_GREATER_THAN ||
+                operatorEnum == IotSceneRuleConditionOperatorEnum.TIME_LESS_THAN ||
+                operatorEnum == IotSceneRuleConditionOperatorEnum.TIME_BETWEEN ||
+                isDateTimeOperator(operatorEnum);
+    }
+
+    /**
+     * 匹配日期时间（时间戳）
+     * 直接实现时间戳比较逻辑
+     */
+    private boolean matchDateTime(long currentTimestamp, IotSceneRuleConditionOperatorEnum operatorEnum, String param) {
+        try {
+            long targetTimestamp = Long.parseLong(param);
+            return switch (operatorEnum) {
+                case DATE_TIME_GREATER_THAN -> currentTimestamp > targetTimestamp;
+                case DATE_TIME_LESS_THAN -> currentTimestamp < targetTimestamp;
+                case DATE_TIME_BETWEEN -> matchDateTimeBetween(currentTimestamp, param);
+                default -> {
+                    log.warn("[matchDateTime][operatorEnum({}) 不支持的日期时间操作符]", operatorEnum);
+                    yield false;
+                }
+            };
+        } catch (Exception e) {
+            log.error("[matchDateTime][operatorEnum({}) param({}) 日期时间匹配异常]", operatorEnum, param, e);
+            return false;
+        }
+    }
+
+    /**
+     * 匹配日期时间区间
+     */
+    private boolean matchDateTimeBetween(long currentTimestamp, String param) {
+        List<String> timestampRange = StrUtil.splitTrim(param, CharPool.COMMA);
+        if (timestampRange.size() != 2) {
+            log.warn("[matchDateTimeBetween][param({}) 时间戳区间参数格式错误]", param);
+            return false;
+        }
+        long startTimestamp = Long.parseLong(timestampRange.get(0).trim());
+        long endTimestamp = Long.parseLong(timestampRange.get(1).trim());
+        return currentTimestamp >= startTimestamp && currentTimestamp <= endTimestamp;
+    }
+
+    /**
+     * 匹配当日时间（HH:mm:ss）
+     * 直接实现时间比较逻辑
+     */
+    private boolean matchTime(LocalTime currentTime, IotSceneRuleConditionOperatorEnum operatorEnum, String param) {
+        try {
+            LocalTime targetTime = parseTime(param);
+            return switch (operatorEnum) {
+                case TIME_GREATER_THAN -> currentTime.isAfter(targetTime);
+                case TIME_LESS_THAN -> currentTime.isBefore(targetTime);
+                case TIME_BETWEEN -> matchTimeBetween(currentTime, param);
+                default -> {
+                    log.warn("[matchTime][operatorEnum({}) 不支持的时间操作符]", operatorEnum);
+                    yield false;
+                }
+            };
+        } catch (Exception e) {
+            log.error("[matchTime][][operatorEnum({}) param({}) 时间解析异常]", operatorEnum, param, e);
+            return false;
+        }
+    }
+
+    /**
+     * 匹配时间区间
+     */
+    private boolean matchTimeBetween(LocalTime currentTime, String param) {
+        List<String> timeRange = StrUtil.splitTrim(param, CharPool.COMMA);
+        if (timeRange.size() != 2) {
+            log.warn("[matchTimeBetween][param({}) 时间区间参数格式错误]", param);
+            return false;
+        }
+        LocalTime startTime = parseTime(timeRange.get(0).trim());
+        LocalTime endTime = parseTime(timeRange.get(1).trim());
+        return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
+    }
+
+    /**
      * 解析时间字符串
+     * 支持 HH:mm 和 HH:mm:ss 两种格式
      */
     private LocalTime parseTime(String timeStr) {
-        // TODO @puhui999：可以用 hutool Assert 类简化
-        if (StrUtil.isBlank(timeStr)) {
-            throw new IllegalArgumentException("时间字符串不能为空");
-        }
-        // 尝试不同的时间格式
+        Assert.isFalse(StrUtil.isBlank(timeStr), "时间字符串不能为空");
+
         try {
+            // 尝试不同的时间格式
             if (timeStr.length() == 5) { // HH:mm
                 return LocalTime.parse(timeStr, TIME_FORMATTER_SHORT);
-            } else { // HH:mm:ss
+            } else if (timeStr.length() == 8) { // HH:mm:ss
                 return LocalTime.parse(timeStr, TIME_FORMATTER);
+            } else {
+                throw new IllegalArgumentException("时间格式长度不正确，期望 HH:mm 或 HH:mm:ss 格式");
             }
         } catch (Exception e) {
+            log.error("[parseTime][timeStr({}) 时间格式解析失败]", timeStr, e);
             throw new IllegalArgumentException("时间格式无效: " + timeStr, e);
         }
     }

@@ -19,11 +19,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeviceEventPostTriggerMatcher implements IotSceneRuleTriggerMatcher {
 
-    /**
-     * 设备事件上报消息方法
-     */
-    private static final String DEVICE_EVENT_POST_METHOD = IotDeviceMessageMethodEnum.EVENT_POST.getMethod();
-
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
         return IotSceneRuleTriggerTypeEnum.DEVICE_EVENT_POST;
@@ -31,42 +26,44 @@ public class DeviceEventPostTriggerMatcher implements IotSceneRuleTriggerMatcher
 
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
-        // 1. 基础参数校验
+        // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicTriggerValid(trigger)) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "触发器基础参数无效");
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "触发器基础参数无效");
             return false;
         }
 
-        // 2. 检查消息方法是否匹配
-        if (!DEVICE_EVENT_POST_METHOD.equals(message.getMethod())) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "消息方法不匹配，期望: " + DEVICE_EVENT_POST_METHOD + ", 实际: " + message.getMethod());
+        // 1.2 检查消息方法是否匹配
+        if (!IotDeviceMessageMethodEnum.EVENT_POST.getMethod().equals(message.getMethod())) {
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息方法不匹配，期望: " +
+                    IotDeviceMessageMethodEnum.EVENT_POST.getMethod() + ", 实际: " + message.getMethod());
             return false;
         }
 
-        // 3. 检查标识符是否匹配
+        // 1.3 检查标识符是否匹配
         String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
         if (!IotSceneRuleMatcherHelper.isIdentifierMatched(trigger.getIdentifier(), messageIdentifier)) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "标识符不匹配，期望: " + trigger.getIdentifier() + ", 实际: " + messageIdentifier);
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "标识符不匹配，期望: " +
+                    trigger.getIdentifier() + ", 实际: " + messageIdentifier);
             return false;
         }
 
-        // 4. 对于事件触发器，通常不需要检查操作符和值，只要事件发生即匹配
+        // 2. 对于事件触发器，通常不需要检查操作符和值，只要事件发生即匹配
         // 但如果配置了操作符和值，则需要进行条件匹配
         if (StrUtil.isNotBlank(trigger.getOperator()) && StrUtil.isNotBlank(trigger.getValue())) {
             Object eventData = message.getData();
             if (eventData == null) {
-                IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "消息中事件数据为空");
+                IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中事件数据为空");
                 return false;
             }
 
             boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(eventData, trigger.getOperator(), trigger.getValue());
             if (!matched) {
-                IotSceneRuleMatcherHelper.logTriggerMatchFailure(getMatcherName(), message, trigger, "事件数据条件不匹配");
+                IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "事件数据条件不匹配");
                 return false;
             }
         }
 
-        IotSceneRuleMatcherHelper.logTriggerMatchSuccess(getMatcherName(), message, trigger);
+        IotSceneRuleMatcherHelper.logTriggerMatchSuccess(message, trigger);
         return true;
     }
 

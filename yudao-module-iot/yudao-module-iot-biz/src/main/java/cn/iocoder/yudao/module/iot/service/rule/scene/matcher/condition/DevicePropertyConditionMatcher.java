@@ -22,41 +22,40 @@ public class DevicePropertyConditionMatcher implements IotSceneRuleConditionMatc
         return IotSceneRuleConditionTypeEnum.DEVICE_PROPERTY;
     }
 
-    // TODO @puhui999：参数校验的，要不要 1.1 1.2 1.3 1.4 ？这样最终看到 2. 3. 就是核心逻辑列；
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
-        // 1. 基础参数校验
+        // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicConditionValid(condition)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "条件基础参数无效");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "条件基础参数无效");
             return false;
         }
 
-        // 2. 检查标识符是否匹配
+        // 1.2 检查标识符是否匹配
         String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
         if (!IotSceneRuleMatcherHelper.isIdentifierMatched(condition.getIdentifier(), messageIdentifier)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "标识符不匹配，期望: " + condition.getIdentifier() + ", 实际: " + messageIdentifier);
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "标识符不匹配，期望: " + condition.getIdentifier() + ", 实际: " + messageIdentifier);
             return false;
         }
 
-        // 3. 检查操作符和参数是否有效
+        // 1.3 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "操作符或参数无效");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;
         }
 
-        // 4. 获取属性值
-        Object propertyValue = message.getData();
+        // 2.1. 获取属性值
+        Object propertyValue = message.getParams();
         if (propertyValue == null) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "消息中属性值为空");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "消息中属性值为空");
             return false;
         }
 
-        // 5. 使用条件评估器进行匹配
+        // 2.2 使用条件评估器进行匹配
         boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(propertyValue, condition.getOperator(), condition.getParam());
         if (matched) {
-            IotSceneRuleMatcherHelper.logConditionMatchSuccess(getMatcherName(), message, condition);
+            IotSceneRuleMatcherHelper.logConditionMatchSuccess(message, condition);
         } else {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(getMatcherName(), message, condition, "设备属性条件不匹配");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "设备属性条件不匹配");
         }
         return matched;
     }

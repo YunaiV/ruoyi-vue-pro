@@ -173,19 +173,6 @@ public class IotSceneRuleTriggerMatcherTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    void testMatcherManagerStatistics() {
-        // 1. 执行测试
-        var statistics = matcherManager.getMatcherStatistics();
-
-        // 2. 验证结果
-        assertNotNull(statistics);
-        assertEquals(5, statistics.get("totalMatchers"));
-        assertEquals(5, statistics.get("enabledMatchers"));
-        assertNotNull(statistics.get("supportedTriggerTypes"));
-        assertNotNull(statistics.get("matcherDetails"));
-    }
-
-    @Test
     void testGetSupportedTriggerTypes() {
         // 1. 执行测试
         var supportedTypes = matcherManager.getSupportedTriggerTypes();

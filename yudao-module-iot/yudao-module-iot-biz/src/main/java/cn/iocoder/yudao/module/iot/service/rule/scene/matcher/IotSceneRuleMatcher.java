@@ -26,16 +26,6 @@ public interface IotSceneRuleMatcher {
         return 100;
     }
 
-    // TODO @puhui999：如果目前没自定义，体感可以删除哈；
-    /**
-     * 获取匹配器名称，用于日志和调试
-     *
-     * @return 匹配器名称
-     */
-    default String getMatcherName() {
-        return this.getClass().getSimpleName();
-    }
-
     /**
      * 是否启用该匹配器
      * <p>
