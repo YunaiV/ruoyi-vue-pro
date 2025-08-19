@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * TCP JSON 格式 {@link IotDeviceMessage} 编解码器
  *
@@ -93,7 +95,8 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
     @Override
     @SuppressWarnings("DataFlowIssue")
     public IotDeviceMessage decode(byte[] bytes) {
-        TcpJsonMessage tcpJsonMessage = JsonUtils.parseObject(bytes, TcpJsonMessage.class);
+        String jsonStr = new String(bytes, StandardCharsets.UTF_8).trim();
+        TcpJsonMessage tcpJsonMessage = JsonUtils.parseObject(jsonStr, TcpJsonMessage.class);
         Assert.notNull(tcpJsonMessage, "消息不能为空");
         Assert.notBlank(tcpJsonMessage.getMethod(), "消息方法不能为空");
         return IotDeviceMessage.of(
