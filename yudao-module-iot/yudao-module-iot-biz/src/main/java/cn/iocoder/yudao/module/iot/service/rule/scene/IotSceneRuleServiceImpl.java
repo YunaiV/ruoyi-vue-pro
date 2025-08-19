@@ -2,18 +2,11 @@ package cn.iocoder.yudao.module.iot.service.rule.scene;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.text.CharPool;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRulePageReqVO;
@@ -23,7 +16,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
-import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -36,12 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.RULE_SCENE_NOT_EXISTS;
 
@@ -349,65 +338,6 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         } catch (Exception e) {
             log.error("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 条件匹配异常]",
                     sceneRule.getId(), trigger, e);
-            return false;
-        }
-    }
-
-    // TODO @puhui999：下面还需要么？
-    /**
-     * 判断触发器的条件参数是否匹配
-     *
-     * @param message   设备消息
-     * @param condition 触发条件
-     * @param sceneRule 规则场景（用于日志，无其它作用）
-     * @param trigger   触发器（用于日志，无其它作用）
-     * @return 是否匹配
-     */
-    @SuppressWarnings({"unchecked", "DataFlowIssue"})
-    private boolean isTriggerConditionParameterMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition,
-                                                       IotSceneRuleDO sceneRule, IotSceneRuleDO.Trigger trigger) {
-        // 1.1 校验操作符是否合法
-        IotSceneRuleConditionOperatorEnum operator =
-                IotSceneRuleConditionOperatorEnum.operatorOf(condition.getOperator());
-        if (operator == null) {
-            log.error("[isTriggerConditionParameterMatched][规则场景编号({}) 的触发器({}) 存在错误的操作符({})]",
-                    sceneRule.getId(), trigger, condition.getOperator());
-            return false;
-        }
-        // 1.2 校验消息是否包含对应的值
-        String messageValue = MapUtil.getStr((Map<String, Object>) message.getData(), condition.getIdentifier());
-        if (messageValue == null) {
-            return false;
-        }
-
-        // 2.1 构建 Spring 表达式的变量
-        Map<String, Object> springExpressionVariables = new HashMap<>();
-        try {
-            springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, messageValue);
-            springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE, condition.getParam());
-            List<String> parameterValues = StrUtil.splitTrim(condition.getParam(), CharPool.COMMA);
-            springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST, parameterValues);
-            // 特殊：解决数字的比较。因为 Spring 是基于它的 compareTo 方法，对数字的比较存在问题！
-            if (ObjectUtils.equalsAny(operator, IotSceneRuleConditionOperatorEnum.BETWEEN,
-                    IotSceneRuleConditionOperatorEnum.NOT_BETWEEN,
-                    IotSceneRuleConditionOperatorEnum.GREATER_THAN,
-                    IotSceneRuleConditionOperatorEnum.GREATER_THAN_OR_EQUALS,
-                    IotSceneRuleConditionOperatorEnum.LESS_THAN,
-                    IotSceneRuleConditionOperatorEnum.LESS_THAN_OR_EQUALS)
-                    && NumberUtil.isNumber(messageValue)
-                    && NumberUtils.isAllNumber(parameterValues)) {
-                springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE,
-                        NumberUtil.parseDouble(messageValue));
-                springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE,
-                        NumberUtil.parseDouble(condition.getParam()));
-                springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
-                        convertList(parameterValues, NumberUtil::parseDouble));
-            }
-            // 2.2 计算 Spring 表达式
-            return (Boolean) SpringExpressionUtils.parseExpression(operator.getSpringExpression(), springExpressionVariables);
-        } catch (Exception e) {
-            log.error("[isTriggerConditionParameterMatched][消息({}) 规则场景编号({}) 的触发器({}) 的匹配表达式({}/{}) 计算异常]",
-                    message, sceneRule.getId(), trigger, operator, springExpressionVariables, e);
             return false;
         }
     }
