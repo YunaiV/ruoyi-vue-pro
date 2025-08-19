@@ -390,7 +390,7 @@ CREATE TABLE IF NOT EXISTS "system_tenant" (
     "contact_name" varchar(255) NOT NULL,
     "contact_mobile" varchar(255),
     "status" tinyint NOT NULL,
-    "website" varchar(63) DEFAULT '',
+    "websites" varchar(1024) DEFAULT '',
     "package_id"  bigint NOT NULL,
     "expire_time" timestamp NOT NULL,
     "account_count" int NOT NULL,
