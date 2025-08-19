@@ -123,6 +123,7 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
                 isDateTimeOperator(operatorEnum);
     }
 
+    // TODO @puhui999：switch 兼容下 jdk8
     /**
      * 匹配日期时间（时间戳）
      * 直接实现时间戳比较逻辑

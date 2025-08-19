@@ -31,6 +31,7 @@ public class DeviceServiceInvokeTriggerMatcherTest extends BaseMockitoUnitTest {
     @Test
     public void testGetSupportedTriggerType() {
         // when & then
+        // TODO @puhui999：单测按照现有项目的注释风格哈；类似 // 调用；// 断言
         assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE, matcher.getSupportedTriggerType());
     }
 

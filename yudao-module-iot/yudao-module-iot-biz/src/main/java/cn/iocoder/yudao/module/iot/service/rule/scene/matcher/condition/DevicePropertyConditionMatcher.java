@@ -22,6 +22,7 @@ public class DevicePropertyConditionMatcher implements IotSceneRuleConditionMatc
         return IotSceneRuleConditionTypeEnum.DEVICE_PROPERTY;
     }
 
+    // TODO @puhui999：matches 会不会更好？参考的 org.hamcrest.Matcher jdk 接口
     @Override
     public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
         // 1.1 基础参数校验

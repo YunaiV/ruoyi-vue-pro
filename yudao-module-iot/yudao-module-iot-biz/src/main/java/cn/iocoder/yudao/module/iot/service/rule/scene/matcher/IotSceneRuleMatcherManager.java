@@ -29,21 +29,18 @@ public class IotSceneRuleMatcherManager {
 
     /**
      * 触发器匹配器映射表
-     * Key: 触发器类型枚举
-     * Value: 对应的匹配器实例
      */
     private final Map<IotSceneRuleTriggerTypeEnum, IotSceneRuleTriggerMatcher> triggerMatchers;
 
     /**
      * 条件匹配器映射表
-     * Key: 条件类型枚举
-     * Value: 对应的匹配器实例
      */
     private final Map<IotSceneRuleConditionTypeEnum, IotSceneRuleConditionMatcher> conditionMatchers;
 
     /**
      * 所有匹配器列表（按优先级排序）
      */
+    // TODO @puhui999：貌似 local variable 也可以
     private final List<IotSceneRuleMatcher> allMatchers;
 
     public IotSceneRuleMatcherManager(List<IotSceneRuleMatcher> matchers) {
@@ -152,13 +149,13 @@ public class IotSceneRuleMatcherManager {
             log.warn("[isConditionMatched][conditionType({}) 未知的条件类型]", condition.getType());
             return false;
         }
-
         IotSceneRuleConditionMatcher matcher = conditionMatchers.get(conditionType);
         if (matcher == null) {
             log.warn("[isConditionMatched][conditionType({}) 没有对应的匹配器]", conditionType);
             return false;
         }
 
+        // 执行匹配逻辑
         try {
             return matcher.isMatched(message, condition);
         } catch (Exception e) {
@@ -174,11 +171,14 @@ public class IotSceneRuleMatcherManager {
      * @return 条件类型枚举
      */
     private IotSceneRuleConditionTypeEnum findConditionTypeEnum(Integer typeValue) {
+        // TODO @puhui999：是不是搞到枚举类里？
         return Arrays.stream(IotSceneRuleConditionTypeEnum.values())
                 .filter(type -> type.getType().equals(typeValue))
                 .findFirst()
                 .orElse(null);
     }
+
+    // TODO @puhui999：下面两个方法，是不是也可以删除哈？
 
     /**
      * 获取所有支持的触发器类型
