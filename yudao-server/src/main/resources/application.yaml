@@ -48,7 +48,7 @@ springdoc:
   default-flat-param-object: true # 参见 https://doc.xiaominfo.com/docs/faq/v4/knife4j-parameterobject-flat-param 文档
 
 knife4j:
-  enable: false # TODO 芋艿：需要关闭增强，具体原因见：https://github.com/xiaoymin/knife4j/issues/874
+  enable: true
   setting:
     language: zh_cn
 
