@@ -364,6 +364,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param message   消息
      * @param codecType 消息编解码类型
      */
+    @SuppressWarnings("SameParameterValue")
     private void sendSuccessResponse(NetSocket socket, String requestId, String message, String codecType) {
         sendResponse(socket, true, message, requestId, codecType);
     }
@@ -374,6 +375,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param params 参数对象（通常为 Map 类型）
      * @return 认证参数 DTO，解析失败时返回 null
      */
+    @SuppressWarnings("unchecked")
     private IotDeviceAuthReqDTO parseAuthParams(Object params) {
         if (params == null) {
             return null;
@@ -382,7 +384,6 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         try {
             // 参数默认为 Map 类型，直接转换
             if (params instanceof java.util.Map) {
-                @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> paramMap = (java.util.Map<String, Object>) params;
                 return new IotDeviceAuthReqDTO()
                         .setClientId(MapUtil.getStr(paramMap, "clientId"))
@@ -398,9 +399,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             // 其他情况尝试 JSON 转换
             String jsonStr = JsonUtils.toJsonString(params);
             return JsonUtils.parseObject(jsonStr, IotDeviceAuthReqDTO.class);
-
         } catch (Exception e) {
-            log.error("[parseAuthParams][解析认证参数失败]", e);
+            log.error("[parseAuthParams][解析认证参数({})失败]", params, e);
             return null;
         }
     }

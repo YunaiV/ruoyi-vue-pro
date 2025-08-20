@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.codec.tcp;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
@@ -8,8 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * TCP JSON 格式 {@link IotDeviceMessage} 编解码器
@@ -95,7 +94,7 @@ public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
     @Override
     @SuppressWarnings("DataFlowIssue")
     public IotDeviceMessage decode(byte[] bytes) {
-        String jsonStr = new String(bytes, StandardCharsets.UTF_8).trim();
+        String jsonStr = StrUtil.utf8Str(bytes).trim();
         TcpJsonMessage tcpJsonMessage = JsonUtils.parseObject(jsonStr, TcpJsonMessage.class);
         Assert.notNull(tcpJsonMessage, "消息不能为空");
         Assert.notBlank(tcpJsonMessage.getMethod(), "消息方法不能为空");
