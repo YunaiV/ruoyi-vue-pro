@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.springaicommunity.moonshot.MoonshotChatOptions;
 import org.springaicommunity.qianfan.QianFanChatOptions;
+import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -66,6 +67,9 @@ public class AiUtils {
                         .toolNames(toolNames).toolContext(toolContext).build();
             case AZURE_OPENAI:
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
+                        .toolNames(toolNames).toolContext(toolContext).build();
+            case ANTHROPIC:
+                return AnthropicChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
             case OLLAMA:
                 return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)

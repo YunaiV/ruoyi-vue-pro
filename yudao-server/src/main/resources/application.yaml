@@ -175,7 +175,8 @@ spring:
     azure: # OpenAI 微软
       openai:
         endpoint: https://eastusprejade.openai.azure.com
-        api-key: xxx
+    anthropic: # Anthropic Claude
+      api-key: sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942
     ollama:
       base-url: http://127.0.0.1:11434
       chat:

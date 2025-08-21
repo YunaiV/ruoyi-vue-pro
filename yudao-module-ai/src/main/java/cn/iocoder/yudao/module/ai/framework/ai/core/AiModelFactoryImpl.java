@@ -67,6 +67,7 @@ import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.minimax.MiniMaxEmbeddingModel;
 import org.springframework.ai.minimax.MiniMaxEmbeddingOptions;
 import org.springframework.ai.minimax.api.MiniMaxApi;
+import org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiChatAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiEmbeddingAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiEmbeddingProperties;
@@ -93,6 +94,8 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.openai.api.common.OpenAiApiConstants;
+import org.springframework.ai.anthropic.AnthropicChatModel;
+import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -168,6 +171,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildOpenAiChatModel(apiKey, url);
                 case AZURE_OPENAI:
                     return buildAzureOpenAiChatModel(apiKey, url);
+                case ANTHROPIC:
+                    return buildAnthropicChatModel(apiKey, url);
                 case OLLAMA:
                     return buildOllamaChatModel(url);
                 default:
@@ -206,6 +211,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(OpenAiChatModel.class);
             case AZURE_OPENAI:
                 return SpringUtil.getBean(AzureOpenAiChatModel.class);
+            case ANTHROPIC:
+                return SpringUtil.getBean(AnthropicChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             default:
@@ -508,6 +515,21 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .endpoint(url).credential(new KeyCredential(apiKey));
         return AzureOpenAiChatModel.builder()
                 .openAIClientBuilder(openAIClientBuilder)
+                .toolCallingManager(getToolCallingManager())
+                .build();
+    }
+
+    /**
+     * 可参考 {@link AnthropicChatAutoConfiguration} 的 anthropicApi 方法
+     */
+    private static AnthropicChatModel buildAnthropicChatModel(String apiKey, String url) {
+        AnthropicApi.Builder builder = AnthropicApi.builder().apiKey(apiKey);
+        if (StrUtil.isNotEmpty(url)) {
+            builder.baseUrl(url);
+        }
+        AnthropicApi anthropicApi = builder.build();
+        return AnthropicChatModel.builder()
+                .anthropicApi(anthropicApi)
                 .toolCallingManager(getToolCallingManager())
                 .build();
     }

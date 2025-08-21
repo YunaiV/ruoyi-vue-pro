@@ -16,8 +16,11 @@ import org.springframework.ai.image.ImageResponse;
  */
 public class TongYiImagesModelTest {
 
-    private final DashScopeImageModel imageModel = new DashScopeImageModel(
-            new DashScopeImageApi("sk-7d903764249848cfa912733146da12d1"));
+    private final DashScopeImageModel imageModel = DashScopeImageModel.builder()
+            .dashScopeApi(DashScopeImageApi.builder()
+                    .apiKey("sk-47aa124781be4bfb95244cc62f63f7d0")
+                    .build())
+            .build();
 
     @Test
     @Disabled
