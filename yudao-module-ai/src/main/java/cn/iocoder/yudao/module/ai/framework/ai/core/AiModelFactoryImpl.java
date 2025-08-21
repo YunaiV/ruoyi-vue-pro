@@ -347,7 +347,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link DashScopeImageAutoConfiguration} 的 dashScopeImageModel 方法
      */
     private static DashScopeImageModel buildTongYiImagesModel(String key) {
-        DashScopeImageApi dashScopeImageApi = new DashScopeImageApi(key);
+        DashScopeImageApi dashScopeImageApi = DashScopeImageApi.builder().apiKey(key).build();
         return DashScopeImageModel.builder()
                 .dashScopeApi(dashScopeImageApi)
                 .build();
