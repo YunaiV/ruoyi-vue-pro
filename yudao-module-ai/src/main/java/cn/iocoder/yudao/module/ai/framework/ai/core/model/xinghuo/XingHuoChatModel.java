@@ -18,28 +18,34 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class XingHuoChatModel implements ChatModel {
 
-    public static final String BASE_URL = "https://spark-api-open.xf-yun.com";
+    public static final String BASE_URL_V1 = "https://spark-api-open.xf-yun.com";
 
-    public static final String MODEL_DEFAULT = "generalv3.5";
+    public static final String BASE_URL_V2 = "https://spark-api-open.xf-yun.com";
+    public static final String BASE_COMPLETIONS_PATH_V2 = "/v2/chat/completions";
 
     /**
-     * 兼容 OpenAI 接口，进行复用
+     * 已知模型名列表：x1、4.0Ultra、generalv3.5、max-32k、generalv3、pro-128k、lite
      */
-    private final OpenAiChatModel openAiChatModel;
+    public static final String MODEL_DEFAULT = "4.0Ultra";
+
+    /**
+     * v1 兼容 OpenAI 接口，进行复用
+     */
+    private final OpenAiChatModel openAiChatModelV1;
 
     @Override
     public ChatResponse call(Prompt prompt) {
-        return openAiChatModel.call(prompt);
+        return openAiChatModelV1.call(prompt);
     }
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
-        return openAiChatModel.stream(prompt);
+        return openAiChatModelV1.stream(prompt);
     }
 
     @Override
     public ChatOptions getDefaultOptions() {
-        return openAiChatModel.getDefaultOptions();
+        return openAiChatModelV1.getDefaultOptions();
     }
 
 }

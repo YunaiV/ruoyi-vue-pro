@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.config.AiAutoConfiguration;
 import cn.iocoder.yudao.module.ai.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
@@ -173,6 +174,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildAzureOpenAiChatModel(apiKey, url);
                 case ANTHROPIC:
                     return buildAnthropicChatModel(apiKey, url);
+                case GEMINI:
+                    return buildGeminiChatModel(apiKey);
                 case OLLAMA:
                     return buildOllamaChatModel(url);
                 default:
@@ -213,6 +216,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(AzureOpenAiChatModel.class);
             case ANTHROPIC:
                 return SpringUtil.getBean(AnthropicChatModel.class);
+            case GEMINI:
+                return SpringUtil.getBean(GeminiChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             default:
@@ -532,6 +537,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .anthropicApi(anthropicApi)
                 .toolCallingManager(getToolCallingManager())
                 .build();
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#buildGeminiChatClient(YudaoAiProperties.GeminiProperties)}
+     */
+    private static GeminiChatModel buildGeminiChatModel(String apiKey) {
+        YudaoAiProperties.GeminiProperties properties = SpringUtil.getBean(YudaoAiProperties.class)
+                .getGemini().setApiKey(apiKey);
+        return new AiAutoConfiguration().buildGeminiChatClient(properties);
     }
 
     /**

@@ -14,6 +14,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class YudaoAiProperties {
 
     /**
+     * 谷歌 Gemini
+     */
+    private GeminiProperties gemini;
+
+    /**
      * 字节豆包
      */
     @SuppressWarnings("SpellCheckingInspection")
@@ -53,6 +58,19 @@ public class YudaoAiProperties {
      */
     @SuppressWarnings("SpellCheckingInspection")
     private SunoProperties suno;
+
+    @Data
+    public static class GeminiProperties {
+
+        private String enable;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
 
     @Data
     public static class DouBaoProperties {

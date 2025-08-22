@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -17,26 +17,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link XingHuoChatModel} 集成测试
+ * {@link GeminiChatModel} 集成测试
  *
- * @author fansili
+ * @author 芋道源码
  */
-public class XingHuoChatModelTests {
+public class GeminiChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
         .openAiApi(OpenAiApi.builder()
-                .baseUrl(XingHuoChatModel.BASE_URL_V2)
-                .completionsPath(XingHuoChatModel.BASE_COMPLETIONS_PATH_V2)
-                .apiKey("75b161ed2aef4719b275d6e7f2a4d4cd:YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz") // appKey:secretKey
+                .baseUrl(GeminiChatModel.BASE_URL)
+                .completionsPath(GeminiChatModel.COMPLETE_PATH)
+                .apiKey("AIzaSyAVoBxgoFvvte820vEQMma2LKBnC98bqMQ")
                 .build())
         .defaultOptions(OpenAiChatOptions.builder()
-//                .model("generalv3.5") // 模型
-                .model("x1") // 模型
+                .model(GeminiChatModel.MODEL_DEFAULT) // 模型
                 .temperature(0.7)
                 .build())
         .build();
 
-    private final XingHuoChatModel chatModel = new XingHuoChatModel(openAiChatModel);
+    private final GeminiChatModel chatModel = new GeminiChatModel(openAiChatModel);
 
     @Test
     @Disabled

@@ -12,6 +12,7 @@ import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -47,6 +48,9 @@ public class AiUtils {
                         .withToolNames(toolNames).withToolContext(toolContext).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
+            case DEEP_SEEK:
+                return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
+                        .toolNames(toolNames).toolContext(toolContext).build();
             case ZHI_PU:
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
@@ -57,7 +61,7 @@ public class AiUtils {
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
             case OPENAI:
-            case DEEP_SEEK: // 复用 OpenAI 客户端
+            case GEMINI: // 复用 OpenAI 客户端
             case DOU_BAO: // 复用 OpenAI 客户端
             case HUN_YUAN: // 复用 OpenAI 客户端
             case XING_HUO: // 复用 OpenAI 客户端

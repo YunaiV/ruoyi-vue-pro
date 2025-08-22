@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
@@ -50,6 +51,34 @@ public class AiAutoConfiguration {
     }
 
     // ========== 各种 AI Client 创建 ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.gemini.enable", havingValue = "true")
+    public GeminiChatModel geminiChatModel(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.GeminiProperties properties = yudaoAiProperties.getGemini();
+        return buildGeminiChatClient(properties);
+    }
+
+    public GeminiChatModel buildGeminiChatClient(YudaoAiProperties.GeminiProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(GeminiChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(GeminiChatModel.BASE_URL)
+                        .completionsPath(GeminiChatModel.COMPLETE_PATH)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new GeminiChatModel(openAiChatModel);
+    }
 
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.doubao.enable", havingValue = "true")
@@ -150,17 +179,22 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
         }
+        OpenAiApi.Builder builder = OpenAiApi.builder()
+                .baseUrl(XingHuoChatModel.BASE_URL_V1)
+                .apiKey(properties.getAppKey() + ":" + properties.getSecretKey());
+        if ("x1".equals(properties.getModel())) {
+            builder.baseUrl(XingHuoChatModel.BASE_URL_V2)
+                    .completionsPath(XingHuoChatModel.BASE_COMPLETIONS_PATH_V2);
+        }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(XingHuoChatModel.BASE_URL)
-                        .apiKey(properties.getAppKey() + ":" + properties.getSecretKey())
-                        .build())
+                .openAiApi(builder.build())
                 .defaultOptions(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
+                // TODO @芋艿：星火的 function call 有 bug，会报 ToolResponseMessage must have an id 错误！！！
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new XingHuoChatModel(openAiChatModel);
