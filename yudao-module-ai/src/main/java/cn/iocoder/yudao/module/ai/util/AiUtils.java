@@ -52,6 +52,7 @@ public class AiUtils {
             case DOU_BAO: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
+            case HUN_YUAN: // 复用 DeepSeek 客户端
             case ZHI_PU:
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
@@ -63,7 +64,6 @@ public class AiUtils {
                         .toolNames(toolNames).toolContext(toolContext).build();
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
-            case HUN_YUAN: // 复用 OpenAI 客户端
             case XING_HUO: // 复用 OpenAI 客户端
             case SILICON_FLOW: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端

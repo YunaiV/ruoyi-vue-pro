@@ -14,6 +14,9 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlo
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.model.tool.ToolCallingManager;
@@ -152,13 +155,14 @@ public class AiAutoConfiguration {
                     StrUtil.startWithIgnoreCase(properties.getModel(), "deepseek") ? HunYuanChatModel.DEEP_SEEK_BASE_URL
                             : HunYuanChatModel.BASE_URL);
         }
-        // 创建 OpenAiChatModel、HunYuanChatModel 对象
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+        // 创建 DeepSeekChatModel、HunYuanChatModel 对象
+        DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
                         .baseUrl(properties.getBaseUrl())
+                        .completionsPath(HunYuanChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .defaultOptions(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
