@@ -217,7 +217,7 @@ yudao:
       enable: true
       appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
       secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
-      model: generalv3.5
+      model: x1
     baichuan: # 百川智能
       enable: true
       api-key: sk-abc

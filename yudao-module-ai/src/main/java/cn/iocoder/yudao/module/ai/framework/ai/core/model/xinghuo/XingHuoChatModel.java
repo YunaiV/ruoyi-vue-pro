@@ -6,7 +6,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
 import reactor.core.publisher.Flux;
 
 /**
@@ -31,7 +30,7 @@ public class XingHuoChatModel implements ChatModel {
     /**
      * v1 兼容 OpenAI 接口，进行复用
      */
-    private final OpenAiChatModel openAiChatModelV1;
+    private final ChatModel openAiChatModelV1;
 
     @Override
     public ChatResponse call(Prompt prompt) {
