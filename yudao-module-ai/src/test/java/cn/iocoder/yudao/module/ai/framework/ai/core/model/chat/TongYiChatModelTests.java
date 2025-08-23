@@ -26,11 +26,13 @@ public class TongYiChatModelTests {
             .dashScopeApi(DashScopeApi.builder()
                     .apiKey("sk-47aa124781be4bfb95244cc62f63f7d0")
                     .build())
-            .defaultOptions( DashScopeChatOptions.builder()
-                    .withModel("qwen1.5-72b-chat") // 模型
+            .defaultOptions(DashScopeChatOptions.builder()
+//                    .withModel("qwen1.5-72b-chat") // 模型
+                    .withModel("qwen3-235b-a22b-thinking-2507") // 模型
 //                    .withModel("deepseek-r1") // 模型（deepseek-r1）
 //                    .withModel("deepseek-v3") // 模型（deepseek-v3）
 //                    .withModel("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
+//                    .withEnableThinking(true)
                     .build())
             .build();
 
@@ -54,11 +56,31 @@ public class TongYiChatModelTests {
     public void testStream() {
         // 准备参数
         List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
-        messages.add(new UserMessage("1 + 1 = ？"));
+//        messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
+        messages.add(new UserMessage("帮我推理下，怎么实现一个用户中心！"));
 
         // 调用
         Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
+    }
+
+    @Test
+    @Disabled
+    public void testStream_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        DashScopeChatOptions options = DashScopeChatOptions.builder()
+                .withModel("qwen3-235b-a22b-thinking-2507")
+                .withEnableThinking(true) // 必须设置，否则会报错
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
         // 打印结果
         flux.doOnNext(response -> {
 //            System.out.println(response);
