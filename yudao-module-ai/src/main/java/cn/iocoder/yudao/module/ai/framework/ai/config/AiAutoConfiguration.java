@@ -94,6 +94,7 @@ public class AiAutoConfiguration {
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(DouBaoChatModel.BASE_URL)
+                        .completionsPath(DouBaoChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
                 .defaultOptions(OpenAiChatOptions.builder()
