@@ -122,12 +122,12 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(SiliconFlowApiConstants.MODEL_DEFAULT);
         }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+        DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
                         .baseUrl(SiliconFlowApiConstants.DEFAULT_BASE_URL)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .defaultOptions(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
