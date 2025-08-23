@@ -37,6 +37,9 @@ public class AiChatMessageRespVO {
     @Schema(description = "聊天内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好，你好啊")
     private String content;
 
+    @Schema(description = "推理内容", example = "要达到这个目标，你需要...")
+    private String reasoningContent;
+
     @Schema(description = "是否携带上下文", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean useContext;
 

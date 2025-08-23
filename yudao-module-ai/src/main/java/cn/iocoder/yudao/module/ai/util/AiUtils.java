@@ -11,7 +11,9 @@ import org.springaicommunity.qianfan.QianFanChatOptions;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.deepseek.DeepSeekAssistantMessage;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.ollama.api.OllamaOptions;
@@ -45,6 +47,7 @@ public class AiUtils {
         switch (platform) {
             case TONG_YI:
                 return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens)
+                        .withEnableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
                         .withToolNames(toolNames).withToolContext(toolContext).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
@@ -104,6 +107,29 @@ public class AiUtils {
         context.put(TOOL_CONTEXT_LOGIN_USER, SecurityFrameworkUtils.getLoginUser());
         context.put(TOOL_CONTEXT_TENANT_ID, TenantContextHolder.getTenantId());
         return context;
+    }
+
+    @SuppressWarnings("ConstantValue")
+    public static String getChatResponseContent(ChatResponse response) {
+        if (response == null
+                || response.getResult() == null
+                || response.getResult().getOutput() == null) {
+            return null;
+        }
+        return response.getResult().getOutput().getText();
+    }
+
+    @SuppressWarnings("ConstantValue")
+    public static String getChatResponseReasoningContent(ChatResponse response) {
+        if (response == null
+                || response.getResult() == null
+                || response.getResult().getOutput() == null) {
+            return null;
+        }
+        if (response.getResult().getOutput() instanceof DeepSeekAssistantMessage) {
+            return ((DeepSeekAssistantMessage) (response.getResult().getOutput())).getReasoningContent();
+        }
+        return null;
     }
 
 }

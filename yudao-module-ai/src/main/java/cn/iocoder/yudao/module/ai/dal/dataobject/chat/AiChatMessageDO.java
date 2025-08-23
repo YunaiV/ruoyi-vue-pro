@@ -87,6 +87,10 @@ public class AiChatMessageDO extends BaseDO {
      * 聊天内容
      */
     private String content;
+    /**
+     * 推理内容
+     */
+    private String reasoningContent;
 
     /**
      * 是否携带上下文

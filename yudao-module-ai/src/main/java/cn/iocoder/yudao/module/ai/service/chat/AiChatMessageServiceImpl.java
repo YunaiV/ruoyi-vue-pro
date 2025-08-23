@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.ai.service.chat;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
-import cn.iocoder.yudao.module.ai.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -21,6 +19,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiToolDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeSegmentService;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
@@ -28,6 +27,7 @@ import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchR
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiToolService;
+import cn.iocoder.yudao.module.ai.util.AiUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -118,8 +118,10 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         ChatResponse chatResponse = chatModel.call(prompt);
 
         // 3.3 更新响应内容
-        String newContent = chatResponse.getResult().getOutput().getText();
-        chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(newContent));
+        String newContent = AiUtils.getChatResponseContent(chatResponse);
+        String newReasoningContent = AiUtils.getChatResponseReasoningContent(chatResponse);
+        chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId())
+                .setContent(newContent).setReasoningContent(newReasoningContent));
         // 3.4 响应结果
         Map<Long, AiKnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
                 convertSet(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getDocumentId));
@@ -168,6 +170,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 4.3 流式返回
         StringBuffer contentBuffer = new StringBuffer();
+        StringBuffer reasoningContentBuffer = new StringBuffer();
         return streamResponse.map(chunk -> {
             // 处理知识库的返回，只有首次才有
             List<AiChatMessageRespVO.KnowledgeSegment> segments = null;
@@ -181,22 +184,31 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 });
             }
             // 响应结果
-            String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getText() : null;
-            newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
-            contentBuffer.append(newContent);
+            String newContent = AiUtils.getChatResponseContent(chunk);
+            String newReasoningContent = AiUtils.getChatResponseReasoningContent(chunk);
+            if (StrUtil.isNotEmpty(newContent)) {
+                contentBuffer.append(newContent);
+            }
+            if (StrUtil.isNotEmpty(newReasoningContent)) {
+                reasoningContentBuffer.append(newReasoningContent);
+            }
             return success(new AiChatMessageSendRespVO()
                     .setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class))
                     .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class)
-                            .setContent(newContent).setSegments(segments)));
+                            .setContent(StrUtil.nullToDefault(newContent, "")) // 避免 null 的 情况
+                            .setReasoningContent(StrUtil.nullToDefault(newReasoningContent, "")) // 避免 null 的 情况
+                            .setSegments(segments))); // 知识库返回
         }).doOnComplete(() -> {
             // 忽略租户，因为 Flux 异步无法透传租户
             TenantUtils.executeIgnore(() -> chatMessageMapper.updateById(
-                    new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString())));
+                    new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString())
+                            .setReasoningContent(reasoningContentBuffer.toString())));
         }).doOnError(throwable -> {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             // 忽略租户，因为 Flux 异步无法透传租户
             TenantUtils.executeIgnore(() -> chatMessageMapper.updateById(
-                    new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage())));
+                    new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage())
+                            .setReasoningContent(reasoningContentBuffer.toString())));
         }).onErrorResume(error -> Flux.just(error(ErrorCodeConstants.CHAT_STREAM_ERROR)));
     }
 
