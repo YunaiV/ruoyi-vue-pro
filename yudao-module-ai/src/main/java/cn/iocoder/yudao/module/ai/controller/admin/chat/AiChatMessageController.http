@@ -20,6 +20,30 @@ tenant-id: {{adminTenantId}}
   "content": "1+1=?"
 }
 
+### 发送消息（流式）【带文件】
+POST {{baseUrl}}/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581797",
+  "content": "图片里有什么？",
+  "attachmentUrls": ["http://test.yudao.iocoder.cn/1755531278.jpeg"]
+}
+
+### 发送消息（流式）【追问带文件】
+POST {{baseUrl}}/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581797",
+  "content": "说下图片里，有哪些字？",
+  "useContext": true
+}
+
 ### 获得指定对话的消息列表
 GET {{baseUrl}}/ai/chat/message/list-by-conversation-id?conversationId=1781604279872581649
 Authorization: {{token}}

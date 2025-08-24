@@ -49,6 +49,9 @@ public class AiChatMessageRespVO {
     @Schema(description = "知识库段落数组")
     private List<KnowledgeSegment> segments;
 
+    @Schema(description = "附件 URL 数组", example = "https://www.iocoder.cn/1.png")
+    private List<String> attachmentUrls;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")
     private LocalDateTime createTime;
 
