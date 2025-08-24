@@ -55,7 +55,7 @@
         <jsoup.version>1.21.1</jsoup.version>
         <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.39</hutool-5.version>
+        <hutool.version>5.8.39</hutool.version>
         <fastexcel.version>1.2.0</fastexcel.version>
         <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
         <fastjson.version>1.2.83</fastjson.version>
