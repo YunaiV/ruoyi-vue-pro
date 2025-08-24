@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.enums.rule;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,10 @@ public enum IotSceneRuleConditionTypeEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    public static IotSceneRuleConditionTypeEnum typeOf(Integer type) {
+        return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
 
 }

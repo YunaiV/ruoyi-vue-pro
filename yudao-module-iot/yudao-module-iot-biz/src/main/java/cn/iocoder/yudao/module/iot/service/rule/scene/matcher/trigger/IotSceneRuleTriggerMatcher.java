@@ -33,6 +33,6 @@ public interface IotSceneRuleTriggerMatcher extends IotSceneRuleMatcher {
      * @param trigger 触发器配置
      * @return 是否匹配
      */
-    boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger);
+    boolean matches(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger);
 
 }

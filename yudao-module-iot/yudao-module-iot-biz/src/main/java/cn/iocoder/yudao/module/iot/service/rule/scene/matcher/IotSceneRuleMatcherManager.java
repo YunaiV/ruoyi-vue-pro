@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -37,33 +36,26 @@ public class IotSceneRuleMatcherManager {
      */
     private final Map<IotSceneRuleConditionTypeEnum, IotSceneRuleConditionMatcher> conditionMatchers;
 
-    /**
-     * 所有匹配器列表（按优先级排序）
-     */
-    // TODO @puhui999：貌似 local variable 也可以
-    private final List<IotSceneRuleMatcher> allMatchers;
-
     public IotSceneRuleMatcherManager(List<IotSceneRuleMatcher> matchers) {
         if (CollUtil.isEmpty(matchers)) {
             log.warn("[IotSceneRuleMatcherManager][没有找到任何匹配器]");
             this.triggerMatchers = new HashMap<>();
             this.conditionMatchers = new HashMap<>();
-            this.allMatchers = new ArrayList<>();
             return;
         }
 
         // 按优先级排序并过滤启用的匹配器
-        this.allMatchers = matchers.stream()
+        List<IotSceneRuleMatcher> allMatchers = matchers.stream()
                 .filter(IotSceneRuleMatcher::isEnabled)
                 .sorted(Comparator.comparing(IotSceneRuleMatcher::getPriority))
-                .collect(Collectors.toList());
+                .toList();
 
         // 分离触发器匹配器和条件匹配器
-        List<IotSceneRuleTriggerMatcher> triggerMatchers = this.allMatchers.stream()
+        List<IotSceneRuleTriggerMatcher> triggerMatchers = allMatchers.stream()
                 .filter(matcher -> matcher instanceof IotSceneRuleTriggerMatcher)
                 .map(matcher -> (IotSceneRuleTriggerMatcher) matcher)
                 .toList();
-        List<IotSceneRuleConditionMatcher> conditionMatchers = this.allMatchers.stream()
+        List<IotSceneRuleConditionMatcher> conditionMatchers = allMatchers.stream()
                 .filter(matcher -> matcher instanceof IotSceneRuleConditionMatcher)
                 .map(matcher -> (IotSceneRuleConditionMatcher) matcher)
                 .toList();
@@ -92,7 +84,7 @@ public class IotSceneRuleMatcherManager {
 
         // 日志输出初始化信息
         log.info("[IotSceneRuleMatcherManager][初始化完成，共加载({})个匹配器，其中触发器匹配器({})个，条件匹配器({})个]",
-                this.allMatchers.size(), this.triggerMatchers.size(), this.conditionMatchers.size());
+                allMatchers.size(), this.triggerMatchers.size(), this.conditionMatchers.size());
         this.triggerMatchers.forEach((type, matcher) ->
                 log.info("[IotSceneRuleMatcherManager][触发器匹配器类型: ({}), 优先级: ({})] ", type, matcher.getPriority()));
         this.conditionMatchers.forEach((type, matcher) ->
@@ -123,7 +115,7 @@ public class IotSceneRuleMatcherManager {
         }
 
         try {
-            return matcher.isMatched(message, trigger);
+            return matcher.matches(message, trigger);
         } catch (Exception e) {
             log.error("[isMatched][触发器匹配异常] message: {}, trigger: {}", message, trigger, e);
             return false;
@@ -144,7 +136,7 @@ public class IotSceneRuleMatcherManager {
         }
 
         // 根据条件类型查找对应的匹配器
-        IotSceneRuleConditionTypeEnum conditionType = findConditionTypeEnum(condition.getType());
+        IotSceneRuleConditionTypeEnum conditionType = IotSceneRuleConditionTypeEnum.typeOf(condition.getType());
         if (conditionType == null) {
             log.warn("[isConditionMatched][conditionType({}) 未知的条件类型]", condition.getType());
             return false;
@@ -157,45 +149,11 @@ public class IotSceneRuleMatcherManager {
 
         // 执行匹配逻辑
         try {
-            return matcher.isMatched(message, condition);
+            return matcher.matches(message, condition);
         } catch (Exception e) {
             log.error("[isConditionMatched][message({}) condition({}) 条件匹配异常]", message, condition, e);
             return false;
         }
-    }
-
-    /**
-     * 根据类型值查找条件类型枚举
-     *
-     * @param typeValue 类型值
-     * @return 条件类型枚举
-     */
-    private IotSceneRuleConditionTypeEnum findConditionTypeEnum(Integer typeValue) {
-        // TODO @puhui999：是不是搞到枚举类里？
-        return Arrays.stream(IotSceneRuleConditionTypeEnum.values())
-                .filter(type -> type.getType().equals(typeValue))
-                .findFirst()
-                .orElse(null);
-    }
-
-    // TODO @puhui999：下面两个方法，是不是也可以删除哈？
-
-    /**
-     * 获取所有支持的触发器类型
-     *
-     * @return 支持的触发器类型列表
-     */
-    public Set<IotSceneRuleTriggerTypeEnum> getSupportedTriggerTypes() {
-        return new HashSet<>(triggerMatchers.keySet());
-    }
-
-    /**
-     * 获取所有支持的条件类型
-     *
-     * @return 支持的条件类型列表
-     */
-    public Set<IotSceneRuleConditionTypeEnum> getSupportedConditionTypes() {
-        return new HashSet<>(conditionMatchers.keySet());
     }
 
 }

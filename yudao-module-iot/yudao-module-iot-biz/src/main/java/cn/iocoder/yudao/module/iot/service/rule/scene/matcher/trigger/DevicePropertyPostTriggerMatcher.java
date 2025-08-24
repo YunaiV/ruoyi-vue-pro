@@ -24,7 +24,7 @@ public class DevicePropertyPostTriggerMatcher implements IotSceneRuleTriggerMatc
     }
 
     @Override
-    public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
+    public boolean matches(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
         // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicTriggerValid(trigger)) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "触发器基础参数无效");

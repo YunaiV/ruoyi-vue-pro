@@ -7,268 +7,308 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static cn.hutool.core.util.RandomUtil.randomDouble;
+import static cn.hutool.core.util.RandomUtil.randomInt;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link DevicePropertyPostTriggerMatcher} 的单元测试类
+ * {@link DevicePropertyPostTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
 public class DevicePropertyPostTriggerMatcherTest extends BaseMockitoUnitTest {
 
+    @InjectMocks
     private DevicePropertyPostTriggerMatcher matcher;
 
-    @BeforeEach
-    public void setUp() {
-        matcher = new DevicePropertyPostTriggerMatcher();
+    @Test
+    public void testGetSupportedTriggerType_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        IotSceneRuleTriggerTypeEnum result = matcher.getSupportedTriggerType();
+
+        // 断言
+        assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_PROPERTY_POST, result);
     }
 
     @Test
-    public void testGetSupportedTriggerType() {
-        // when & then
-        assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_PROPERTY_POST, matcher.getSupportedTriggerType());
+    public void testGetPriority_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        int result = matcher.getPriority();
+
+        // 断言
+        assertEquals(20, result);
     }
 
     @Test
-    public void testGetPriority() {
-        // when & then
-        assertEquals(20, matcher.getPriority());
-    }
+    public void testIsEnabled_success() {
+        // 准备参数
+        // 无需准备参数
 
-    @Test
-    public void testIsEnabled() {
-        // when & then
-        assertTrue(matcher.isEnabled());
-    }
+        // 调用
+        boolean result = matcher.isEnabled();
 
-    @Test
-    public void testIsMatched_Success_TemperatureProperty() {
-        // given
-        Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 25.5)
-                .build();
-        IotDeviceMessage message = createPropertyPostMessage(properties);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "temperature",
-                IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
-                "20"
-        );
-
-        // when
-        boolean result = matcher.isMatched(message, trigger);
-
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_HumidityProperty() {
-        // given
+    public void testMatches_numericPropertyGreaterThanSuccess() {
+        // 准备参数
+        String propertyName = randomString();
+        Double propertyValue = 25.5;
+        Integer compareValue = 20;
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("humidity", 60)
+                .put(propertyName, propertyValue)
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "humidity",
+                propertyName,
+                IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
+                String.valueOf(compareValue)
+        );
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertTrue(result);
+    }
+
+    @Test
+    public void testMatches_integerPropertyEqualsSuccess() {
+        // 准备参数
+        String propertyName = randomString();
+        Integer propertyValue = randomInt();
+        Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
+                .put(propertyName, propertyValue)
+                .build();
+        IotDeviceMessage message = createPropertyPostMessage(properties);
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
-                "60"
+                String.valueOf(propertyValue)
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Failure_PropertyMismatch() {
-        // given
+    public void testMatches_propertyValueNotMeetCondition() {
+        // 准备参数
+        String propertyName = randomString();
+        Double propertyValue = 15.0;
+        Integer compareValue = 20;
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 15.0)
+                .put(propertyName, propertyValue)
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "temperature",
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
-                "20"
+                String.valueOf(compareValue)
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_PropertyNotFound() {
-        // given
+    public void testMatches_propertyNotFound() {
+        // 准备参数
+        String existingProperty = randomString();
+        String missingProperty = randomString();
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 25.5)
+                .put(existingProperty, randomDouble())
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "humidity", // 不存在的属性
+                missingProperty, // 不存在的属性
                 IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
-                "50"
+                String.valueOf(randomInt())
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_WrongMessageMethod() {
-        // given
+    public void testMatches_wrongMessageMethod() {
+        // 准备参数
+        String propertyName = randomString();
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 25.5)
+                .put(propertyName, randomDouble())
                 .build();
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
         message.setParams(properties);
-
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "temperature",
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
-                "20"
+                String.valueOf(randomInt())
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_MissingIdentifier() {
-        // given
+    public void testMatches_nullTriggerIdentifier() {
+        // 准备参数
+        String propertyName = randomString();
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 25.5)
+                .put(propertyName, randomDouble())
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_PROPERTY_POST.getType());
         trigger.setIdentifier(null); // 缺少标识符
         trigger.setOperator(IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator());
-        trigger.setValue("20");
+        trigger.setValue(String.valueOf(randomInt()));
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullMessageParams() {
-        // given
+    public void testMatches_nullMessageParams() {
+        // 准备参数
+        String propertyName = randomString();
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
         message.setParams(null);
-
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "temperature",
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
-                "20"
+                String.valueOf(randomInt())
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_InvalidMessageParams() {
-        // given
+    public void testMatches_invalidMessageParams() {
+        // 准备参数
+        String propertyName = randomString();
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
-        message.setParams("invalid-params"); // 不是 Map 类型
-
+        message.setParams(randomString()); // 不是 Map 类型
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "temperature",
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
-                "20"
+                String.valueOf(randomInt())
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Success_LessThanOperator() {
-        // given
+    public void testMatches_lessThanOperatorSuccess() {
+        // 准备参数
+        String propertyName = randomString();
+        Double propertyValue = 15.0;
+        Integer compareValue = 20;
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 15.0)
+                .put(propertyName, propertyValue)
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "temperature",
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.LESS_THAN.getOperator(),
-                "20"
+                String.valueOf(compareValue)
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_NotEqualsOperator() {
-        // given
+    public void testMatches_notEqualsOperatorSuccess() {
+        // 准备参数
+        String propertyName = randomString();
+        String propertyValue = randomString();
+        String compareValue = randomString();
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("status", "active")
+                .put(propertyName, propertyValue)
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "status",
+                propertyName,
                 IotSceneRuleConditionOperatorEnum.NOT_EQUALS.getOperator(),
-                "inactive"
+                compareValue
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_MultipleProperties() {
-        // given
+    public void testMatches_multiplePropertiesTargetPropertySuccess() {
+        // 准备参数
+        String targetProperty = randomString();
+        Integer targetValue = randomInt();
         Map<String, Object> properties = MapUtil.builder(new HashMap<String, Object>())
-                .put("temperature", 25.5)
-                .put("humidity", 60)
-                .put("status", "active")
+                .put(randomString(), randomDouble())
+                .put(targetProperty, targetValue)
+                .put(randomString(), randomString())
                 .build();
         IotDeviceMessage message = createPropertyPostMessage(properties);
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
-                "humidity",
+                targetProperty,
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
-                "60"
+                String.valueOf(targetValue)
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
@@ -279,6 +319,7 @@ public class DevicePropertyPostTriggerMatcherTest extends BaseMockitoUnitTest {
      */
     private IotDeviceMessage createPropertyPostMessage(Map<String, Object> properties) {
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
         message.setParams(properties);
         return message;
@@ -295,4 +336,5 @@ public class DevicePropertyPostTriggerMatcherTest extends BaseMockitoUnitTest {
         trigger.setValue(value);
         return trigger;
     }
+
 }

@@ -43,7 +43,7 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
     }
 
     @Override
-    public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
+    public boolean matches(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
         // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicConditionValid(condition)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "条件基础参数无效");

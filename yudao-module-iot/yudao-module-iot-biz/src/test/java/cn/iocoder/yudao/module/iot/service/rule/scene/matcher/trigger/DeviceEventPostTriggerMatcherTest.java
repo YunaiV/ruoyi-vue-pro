@@ -6,154 +6,178 @@ import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static cn.hutool.core.util.RandomUtil.randomInt;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link DeviceEventPostTriggerMatcher} 的单元测试类
+ * {@link DeviceEventPostTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
 public class DeviceEventPostTriggerMatcherTest extends BaseMockitoUnitTest {
 
+    @InjectMocks
     private DeviceEventPostTriggerMatcher matcher;
 
-    @BeforeEach
-    public void setUp() {
-        matcher = new DeviceEventPostTriggerMatcher();
+    @Test
+    public void testGetSupportedTriggerType_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        IotSceneRuleTriggerTypeEnum result = matcher.getSupportedTriggerType();
+
+        // 断言
+        assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_EVENT_POST, result);
     }
 
     @Test
-    public void testGetSupportedTriggerType() {
-        // when & then
-        assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_EVENT_POST, matcher.getSupportedTriggerType());
+    public void testGetPriority_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        int result = matcher.getPriority();
+
+        // 断言
+        assertEquals(30, result);
     }
 
     @Test
-    public void testGetPriority() {
-        // when & then
-        assertEquals(30, matcher.getPriority());
-    }
+    public void testIsEnabled_success() {
+        // 准备参数
+        // 无需准备参数
 
-    @Test
-    public void testIsEnabled() {
-        // when & then
-        assertTrue(matcher.isEnabled());
-    }
+        // 调用
+        boolean result = matcher.isEnabled();
 
-    @Test
-    public void testIsMatched_Success_AlarmEvent() {
-        // given
-        Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "alarm")
-                .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
-                        .put("message", "Temperature too high")
-                        .build())
-                .build();
-        IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("alarm");
-
-        // when
-        boolean result = matcher.isMatched(message, trigger);
-
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_ErrorEvent() {
-        // given
+    public void testMatches_alarmEventSuccess() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "error")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("code", 500)
-                        .put("description", "System error")
+                        .put("level", randomString())
+                        .put("message", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("error");
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_InfoEvent() {
-        // given
+    public void testMatches_errorEventSuccess() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "info")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("status", "normal")
+                        .put("code", randomInt())
+                        .put("description", randomString())
+                        .build())
+                .build();
+        IotDeviceMessage message = createEventPostMessage(eventParams);
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertTrue(result);
+    }
+
+    @Test
+    public void testMatches_infoEventSuccess() {
+        // 准备参数
+        String eventIdentifier = randomString();
+        Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", eventIdentifier)
+                .put("value", MapUtil.builder(new HashMap<String, Object>())
+                        .put("status", randomString())
                         .put("timestamp", System.currentTimeMillis())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("info");
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Failure_EventIdentifierMismatch() {
-        // given
+    public void testMatches_eventIdentifierMismatch() {
+        // 准备参数
+        String messageIdentifier = randomString();
+        String triggerIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "alarm")
+                .put("identifier", messageIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("error"); // 不匹配的事件标识符
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(triggerIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_WrongMessageMethod() {
-        // given
+    public void testMatches_wrongMessageMethod() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "alarm")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod()); // 错误的方法
         message.setParams(eventParams);
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("alarm");
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
-
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_MissingIdentifier() {
-        // given
+    public void testMatches_nullTriggerIdentifier() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "alarm")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
@@ -161,157 +185,166 @@ public class DeviceEventPostTriggerMatcherTest extends BaseMockitoUnitTest {
         trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_EVENT_POST.getType());
         trigger.setIdentifier(null); // 缺少标识符
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullMessageParams() {
-        // given
+    public void testMatches_nullMessageParams() {
+        // 准备参数
+        String eventIdentifier = randomString();
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.EVENT_POST.getMethod());
         message.setParams(null);
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("alarm");
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
-
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_InvalidMessageParams() {
-        // given
+    public void testMatches_invalidMessageParams() {
+        // 准备参数
+        String eventIdentifier = randomString();
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.EVENT_POST.getMethod());
-        message.setParams("invalid-params"); // 不是 Map 类型
+        message.setParams(randomString()); // 不是 Map 类型
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("alarm");
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
-
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_MissingEventIdentifierInParams() {
-        // given
+    public void testMatches_missingEventIdentifierInParams() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build()) // 缺少 identifier 字段
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("alarm");
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullTrigger() {
-        // given
+    public void testMatches_nullTrigger() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "alarm")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
 
-        // when
-        boolean result = matcher.isMatched(message, null);
+        // 调用
+        boolean result = matcher.matches(message, null);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullTriggerType() {
-        // given
+    public void testMatches_nullTriggerType() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "alarm")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(null);
-        trigger.setIdentifier("alarm");
+        trigger.setIdentifier(eventIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Success_ComplexEventValue() {
-        // given
+    public void testMatches_complexEventValueSuccess() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "maintenance")
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("type", "scheduled")
-                        .put("duration", 120)
-                        .put("components", new String[]{"motor", "sensor"})
-                        .put("priority", "medium")
+                        .put("type", randomString())
+                        .put("duration", randomInt())
+                        .put("components", new String[]{randomString(), randomString()})
+                        .put("priority", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("maintenance");
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_EmptyEventValue() {
-        // given
+    public void testMatches_emptyEventValueSuccess() {
+        // 准备参数
+        String eventIdentifier = randomString();
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "heartbeat")
-                .put("value", MapUtil.of()) // 空的事件值
+                .put("identifier", eventIdentifier)
+                .put("value", MapUtil.ofEntries()) // 空的事件值
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("heartbeat");
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(eventIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_CaseInsensitiveIdentifier() {
-        // given
+    public void testMatches_caseSensitiveIdentifierMismatch() {
+        // 准备参数
+        String eventIdentifier = randomString().toUpperCase(); // 大写
+        String triggerIdentifier = eventIdentifier.toLowerCase(); // 小写
         Map<String, Object> eventParams = MapUtil.builder(new HashMap<String, Object>())
-                .put("identifier", "ALARM") // 大写
+                .put("identifier", eventIdentifier)
                 .put("value", MapUtil.builder(new HashMap<String, Object>())
-                        .put("level", "high")
+                        .put("level", randomString())
                         .build())
                 .build();
         IotDeviceMessage message = createEventPostMessage(eventParams);
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("alarm"); // 小写
+        IotSceneRuleDO.Trigger trigger = createValidTrigger(triggerIdentifier);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         // 根据实际实现，这里可能需要调整期望结果
         // 如果实现是大小写敏感的，则应该为 false
         assertFalse(result);
@@ -324,6 +357,7 @@ public class DeviceEventPostTriggerMatcherTest extends BaseMockitoUnitTest {
      */
     private IotDeviceMessage createEventPostMessage(Map<String, Object> eventParams) {
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.EVENT_POST.getMethod());
         message.setParams(eventParams);
         return message;
@@ -338,4 +372,5 @@ public class DeviceEventPostTriggerMatcherTest extends BaseMockitoUnitTest {
         trigger.setIdentifier(identifier);
         return trigger;
     }
+
 }
