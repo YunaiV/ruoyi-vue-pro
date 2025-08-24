@@ -267,7 +267,7 @@
                     <exclusion>
                         <groupId>org.redisson</groupId>
                         <!-- 使用 redisson-spring-data-27 替代，解决 Tuple NoClassDefFoundError 报错 -->
-                        <artifactId>redisson-spring-data-34</artifactId>
+                        <artifactId>redisson-spring-data-35</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
