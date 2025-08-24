@@ -1,8 +1,15 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankModel;
+import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
+import com.alibaba.cloud.ai.model.RerankModel;
+import com.alibaba.cloud.ai.model.RerankOptions;
+import com.alibaba.cloud.ai.model.RerankRequest;
+import com.alibaba.cloud.ai.model.RerankResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -10,10 +17,13 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.document.Document;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * {@link DashScopeChatModel} 集成测试类
@@ -87,6 +97,33 @@ public class TongYiChatModelTests {
 //            System.out.println(response);
             System.out.println(response.getResult().getOutput());
         }).then().block();
+    }
+
+    @Test
+    @Disabled
+    public void testRerank() {
+        // 准备环境
+        RerankModel rerankModel = new DashScopeRerankModel(
+                DashScopeApi.builder()
+                        .apiKey("sk-47aa124781be4bfb95244cc62f63f7d0")
+                        .build());
+        // 准备参数
+        String query = "spring";
+        Document document01 = new Document("abc");
+        Document document02 = new Document("sapring");
+        RerankOptions options = DashScopeRerankOptions.builder()
+                .withTopN(1)
+                .withModel("gte-rerank-v2")
+                .build();
+        RerankRequest rerankRequest = new RerankRequest(
+                query,
+                asList(document01, document02),
+                options);
+
+        // 调用
+        RerankResponse call = rerankModel.call(rerankRequest);
+        // 打印结果
+        System.out.println(JsonUtils.toJsonPrettyString(call));
     }
 
 }

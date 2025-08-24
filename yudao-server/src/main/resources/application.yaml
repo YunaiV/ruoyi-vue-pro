@@ -184,7 +184,7 @@ spring:
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
     dashscope: # 通义千问
-      api-key: sk-71800982914041848008480000000000
+      api-key: sk-47aa124781be4bfb95244cc62f6xxxx
     minimax: # Minimax：https://www.minimaxi.com/
       api-key: xxxx
     moonshot: # 月之暗灭（KIMI）
@@ -194,6 +194,8 @@ spring:
       chat:
         options:
           model: deepseek-chat
+    model:
+      rerank: dashscope # 是否开启“通义千问”的 Rerank 模型，填写 dashscope 开启
 
 yudao:
   ai:
