@@ -376,7 +376,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 if (existDevice == null) {
                     createDevice(new IotDeviceSaveReqVO()
                             .setDeviceName(importDevice.getDeviceName())
-                            .setProductId(product.getId()).setGatewayId(gatewayId).setGroupIds(groupIds));
+                            .setProductId(product.getId()).setGatewayId(gatewayId).setGroupIds(groupIds)
+                            .setLocationType(importDevice.getLocationType()));
                     respVO.getCreateDeviceNames().add(importDevice.getDeviceName());
                     return;
                 }
@@ -385,7 +386,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                     throw exception(DEVICE_KEY_EXISTS);
                 }
                 updateDevice(new IotDeviceSaveReqVO().setId(existDevice.getId())
-                        .setGatewayId(gatewayId).setGroupIds(groupIds));
+                        .setGatewayId(gatewayId).setGroupIds(groupIds).setLocationType(importDevice.getLocationType()));
                 respVO.getUpdateDeviceNames().add(importDevice.getDeviceName());
             } catch (ServiceException ex) {
                 respVO.getFailureDeviceNames().put(importDevice.getDeviceName(), ex.getMessage());
