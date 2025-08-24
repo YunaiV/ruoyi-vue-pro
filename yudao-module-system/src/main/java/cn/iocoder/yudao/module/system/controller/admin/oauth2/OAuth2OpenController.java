@@ -94,6 +94,7 @@ public class OAuth2OpenController {
             @Parameter(name = "scope", example = "user_info"),
             @Parameter(name = "refresh_token", example = "123424233"),
     })
+    @SuppressWarnings("EnhancedSwitchMigration")
     public CommonResult<OAuth2OpenAccessTokenRespVO> postAccessToken(HttpServletRequest request,
                                                                      @RequestParam("grant_type") String grantType,
                                                                      @RequestParam(value = "code", required = false) String code, // 授权码模式

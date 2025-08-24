@@ -197,6 +197,9 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
      * @return 用户信息
      */
     private Map<String, String> buildUserInfo(Long userId, Integer userType) {
+        if (userId == null || userId <= 0) {
+            return Collections.emptyMap();
+        }
         if (userType.equals(UserTypeEnum.ADMIN.getValue())) {
             AdminUserDO user = adminUserService.getUser(userId);
             return MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
@@ -205,7 +208,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
             // 注意：目前 Member 暂时不读取，可以按需实现
             return Collections.emptyMap();
         }
-        return null;
+        throw new IllegalArgumentException("未知用户类型：" + userType);
     }
 
     private static String generateAccessToken() {

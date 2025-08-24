@@ -960,7 +960,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 3. 发送流程实例的状态事件
         processInstanceEventPublisher.sendProcessInstanceResultEvent(
-                BpmProcessInstanceConvert.INSTANCE.buildProcessInstanceStatusEvent(this, instance, status));
+                BpmProcessInstanceConvert.INSTANCE.buildProcessInstanceStatusEvent(this, instance, status, reason));
 
         // 4. 流程后置通知
         if (Objects.equals(status, BpmProcessInstanceStatusEnum.APPROVE.getStatus())) {
