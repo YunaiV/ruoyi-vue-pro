@@ -22,7 +22,7 @@
         <springdoc.version>2.8.9</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
         <!-- DB 相关 -->
-        <druid.version>1.2.24</druid.version>
+        <druid.version>1.2.27</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.4</mybatis-plus-join.version>
@@ -34,26 +34,26 @@
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
         <taos.version>3.3.3</taos.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.4</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>9.0.0</skywalking.version>
+        <skywalking.version>9.5.0</skywalking.version>
         <spring-boot-admin.version>3.5.2</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
-        <jedis-mock.version>1.1.8</jedis-mock.version>
+        <jedis-mock.version>1.1.11</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>7.0.1</flowable.version>
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
-        <jsoup.version>1.18.3</jsoup.version>
+        <jsoup.version>1.21.1</jsoup.version>
         <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.35</hutool-5.version>
-        <hutool-6.version>6.0.0-M19</hutool-6.version>
+        <hutool-5.version>5.8.39</hutool-5.version>
+        <hutool-6.version>6.0.0-M22</hutool-6.version>
         <fastexcel.version>1.2.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -62,10 +62,10 @@
         <commons-net.version>3.11.1</commons-net.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
         <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>3.1.0</tika-core.version>
+        <tika-core.version>3.2.2</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.1.118.Final</netty.version>
+        <netty.version>4.2.4.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <pf4j-spring.version>0.9.0</pf4j-spring.version>
         <vertx.version>4.5.13</vertx.version>
