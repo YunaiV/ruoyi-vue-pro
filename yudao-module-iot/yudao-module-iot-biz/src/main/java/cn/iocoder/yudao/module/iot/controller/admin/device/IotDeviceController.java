@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -104,7 +105,7 @@ public class IotDeviceController {
     @PreAuthorize("@ss.hasPermission('iot:device:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDeviceExcel(@Valid IotDevicePageReqVO exportReqVO,
-            HttpServletResponse response) throws IOException {
+                                  HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         CommonResult<PageResult<IotDeviceRespVO>> result = getDevicePage(exportReqVO);
         // 导出 Excel
@@ -152,9 +153,10 @@ public class IotDeviceController {
         // 手动创建导出 demo
         List<IotDeviceImportExcelVO> list = Arrays.asList(
                 IotDeviceImportExcelVO.builder().deviceName("温度传感器001").parentDeviceName("gateway110")
-                        .productKey("1de24640dfe").groupNames("灰度分组,生产分组").build(),
-                IotDeviceImportExcelVO.builder().deviceName("biubiu")
-                        .productKey("YzvHxd4r67sT4s2B").groupNames("").build());
+                        .productKey("1de24640dfe").groupNames("灰度分组,生产分组")
+                        .locationType(IotLocationTypeEnum.IP.getType()).build(),
+                IotDeviceImportExcelVO.builder().deviceName("biubiu").productKey("YzvHxd4r67sT4s2B")
+                        .groupNames("").locationType(IotLocationTypeEnum.MANUAL.getType()).build());
         // 输出
         ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
     }
