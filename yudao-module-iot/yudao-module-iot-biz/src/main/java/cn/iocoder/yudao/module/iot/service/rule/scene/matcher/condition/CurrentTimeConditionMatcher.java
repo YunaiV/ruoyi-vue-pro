@@ -43,7 +43,7 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
     }
 
     @Override
-    public boolean isMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
+    public boolean matches(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
         // 1.1 基础参数校验
         if (!IotSceneRuleMatcherHelper.isBasicConditionValid(condition)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "条件基础参数无效");
@@ -123,7 +123,6 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
                 isDateTimeOperator(operatorEnum);
     }
 
-    // TODO @puhui999：switch 兼容下 jdk8
     /**
      * 匹配日期时间（时间戳）
      * 直接实现时间戳比较逻辑
@@ -131,15 +130,17 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
     private boolean matchDateTime(long currentTimestamp, IotSceneRuleConditionOperatorEnum operatorEnum, String param) {
         try {
             long targetTimestamp = Long.parseLong(param);
-            return switch (operatorEnum) {
-                case DATE_TIME_GREATER_THAN -> currentTimestamp > targetTimestamp;
-                case DATE_TIME_LESS_THAN -> currentTimestamp < targetTimestamp;
-                case DATE_TIME_BETWEEN -> matchDateTimeBetween(currentTimestamp, param);
-                default -> {
+            switch (operatorEnum) {
+                case DATE_TIME_GREATER_THAN:
+                    return currentTimestamp > targetTimestamp;
+                case DATE_TIME_LESS_THAN:
+                    return currentTimestamp < targetTimestamp;
+                case DATE_TIME_BETWEEN:
+                    return matchDateTimeBetween(currentTimestamp, param);
+                default:
                     log.warn("[matchDateTime][operatorEnum({}) 不支持的日期时间操作符]", operatorEnum);
-                    yield false;
-                }
-            };
+                    return false;
+            }
         } catch (Exception e) {
             log.error("[matchDateTime][operatorEnum({}) param({}) 日期时间匹配异常]", operatorEnum, param, e);
             return false;
@@ -167,15 +168,17 @@ public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher
     private boolean matchTime(LocalTime currentTime, IotSceneRuleConditionOperatorEnum operatorEnum, String param) {
         try {
             LocalTime targetTime = parseTime(param);
-            return switch (operatorEnum) {
-                case TIME_GREATER_THAN -> currentTime.isAfter(targetTime);
-                case TIME_LESS_THAN -> currentTime.isBefore(targetTime);
-                case TIME_BETWEEN -> matchTimeBetween(currentTime, param);
-                default -> {
+            switch (operatorEnum) {
+                case TIME_GREATER_THAN:
+                    return currentTime.isAfter(targetTime);
+                case TIME_LESS_THAN:
+                    return currentTime.isBefore(targetTime);
+                case TIME_BETWEEN:
+                    return matchTimeBetween(currentTime, param);
+                default:
                     log.warn("[matchTime][operatorEnum({}) 不支持的时间操作符]", operatorEnum);
-                    yield false;
-                }
-            };
+                    return false;
+            }
         } catch (Exception e) {
             log.error("[matchTime][][operatorEnum({}) param({}) 时间解析异常]", operatorEnum, param, e);
             return false;

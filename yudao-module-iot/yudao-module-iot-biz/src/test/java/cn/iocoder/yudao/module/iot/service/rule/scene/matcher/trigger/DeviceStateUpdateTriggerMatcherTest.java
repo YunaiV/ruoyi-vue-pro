@@ -7,216 +7,231 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link DeviceStateUpdateTriggerMatcher} 的单元测试类
+ * {@link DeviceStateUpdateTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
 public class DeviceStateUpdateTriggerMatcherTest extends BaseMockitoUnitTest {
 
+    @InjectMocks
     private DeviceStateUpdateTriggerMatcher matcher;
 
-    @BeforeEach
-    public void setUp() {
-        matcher = new DeviceStateUpdateTriggerMatcher();
+    @Test
+    public void testGetSupportedTriggerType_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        IotSceneRuleTriggerTypeEnum result = matcher.getSupportedTriggerType();
+
+        // 断言
+        assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_STATE_UPDATE, result);
     }
 
     @Test
-    public void testGetSupportedTriggerType() {
-        // when & then
-        assertEquals(IotSceneRuleTriggerTypeEnum.DEVICE_STATE_UPDATE, matcher.getSupportedTriggerType());
+    public void testGetPriority_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        int result = matcher.getPriority();
+
+        // 断言
+        assertEquals(10, result);
     }
 
     @Test
-    public void testGetPriority() {
-        // when & then
-        assertEquals(10, matcher.getPriority());
+    public void testIsEnabled_success() {
+        // 准备参数
+        // 无需准备参数
+
+        // 调用
+        boolean result = matcher.isEnabled();
+
+        // 断言
+        assertTrue(result);
     }
 
     @Test
-    public void testIsEnabled() {
-        // when & then
-        assertTrue(matcher.isEnabled());
-    }
-
-    @Test
-    public void testIsMatched_Success_OnlineState() {
-        // given
+    public void testMatches_onlineStateSuccess() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
                 IotDeviceStateEnum.ONLINE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_OfflineState() {
-        // given
+    public void testMatches_offlineStateSuccess() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.OFFLINE.getState());
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
                 IotDeviceStateEnum.OFFLINE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Failure_StateMismatch() {
-        // given
+    public void testMatches_stateMismatch() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
                 IotDeviceStateEnum.OFFLINE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullTrigger() {
-        // given
+    public void testMatches_nullTrigger() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
 
-        // when
-        boolean result = matcher.isMatched(message, null);
+        // 调用
+        boolean result = matcher.matches(message, null);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullTriggerType() {
-        // given
+    public void testMatches_nullTriggerType() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(null);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_WrongMessageMethod() {
-        // given
+    public void testMatches_wrongMessageMethod() {
+        // 准备参数
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
         message.setParams(IotDeviceStateEnum.ONLINE.getState());
-
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
                 IotDeviceStateEnum.ONLINE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_MissingOperator() {
-        // given
+    public void testMatches_nullTriggerOperator() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_STATE_UPDATE.getType());
         trigger.setOperator(null);
         trigger.setValue(IotDeviceStateEnum.ONLINE.getState().toString());
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_MissingValue() {
-        // given
+    public void testMatches_nullTriggerValue() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_STATE_UPDATE.getType());
         trigger.setOperator(IotSceneRuleConditionOperatorEnum.EQUALS.getOperator());
         trigger.setValue(null);
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Failure_NullMessageParams() {
-        // given
+    public void testMatches_nullMessageParams() {
+        // 准备参数
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
         message.setParams(null);
-
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.EQUALS.getOperator(),
                 IotDeviceStateEnum.ONLINE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertFalse(result);
     }
 
     @Test
-    public void testIsMatched_Success_GreaterThanOperator() {
-        // given
+    public void testMatches_greaterThanOperatorSuccess() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.GREATER_THAN.getOperator(),
                 IotDeviceStateEnum.INACTIVE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
     @Test
-    public void testIsMatched_Success_NotEqualsOperator() {
-        // given
+    public void testMatches_notEqualsOperatorSuccess() {
+        // 准备参数
         IotDeviceMessage message = createStateUpdateMessage(IotDeviceStateEnum.ONLINE.getState());
         IotSceneRuleDO.Trigger trigger = createValidTrigger(
                 IotSceneRuleConditionOperatorEnum.NOT_EQUALS.getOperator(),
                 IotDeviceStateEnum.OFFLINE.getState().toString()
         );
 
-        // when
-        boolean result = matcher.isMatched(message, trigger);
+        // 调用
+        boolean result = matcher.matches(message, trigger);
 
-        // then
+        // 断言
         assertTrue(result);
     }
 
@@ -227,6 +242,7 @@ public class DeviceStateUpdateTriggerMatcherTest extends BaseMockitoUnitTest {
      */
     private IotDeviceMessage createStateUpdateMessage(Integer state) {
         IotDeviceMessage message = new IotDeviceMessage();
+        message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
         message.setParams(state);
         return message;
@@ -242,4 +258,5 @@ public class DeviceStateUpdateTriggerMatcherTest extends BaseMockitoUnitTest {
         trigger.setValue(value);
         return trigger;
     }
+
 }

@@ -55,9 +55,8 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     @Resource
     private IotDeviceService deviceService;
 
-    // TODO @puhui999：sceneRuleMatcherManager 变量名
     @Resource
-    private IotSceneRuleMatcherManager matcherManager;
+    private IotSceneRuleMatcherManager sceneRuleMatcherManager;
     @Resource
     private List<IotSceneRuleAction> sceneRuleActions;
 
@@ -275,7 +274,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private boolean matchSingleTrigger(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger, IotSceneRuleDO sceneRule) {
         try {
             // 2. 检查触发器的条件分组
-            return matcherManager.isMatched(message, trigger) && isTriggerConditionGroupsMatched(message, trigger, sceneRule);
+            return sceneRuleMatcherManager.isMatched(message, trigger) && isTriggerConditionGroupsMatched(message, trigger, sceneRule);
         } catch (Exception e) {
             log.error("[matchSingleTrigger][触发器匹配异常] sceneRuleId: {}, triggerType: {}, message: {}",
                     sceneRule.getId(), trigger.getType(), message, e);
@@ -334,7 +333,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private boolean isTriggerConditionMatched(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition,
                                               IotSceneRuleDO sceneRule, IotSceneRuleDO.Trigger trigger) {
         try {
-            return matcherManager.isConditionMatched(message, condition);
+            return sceneRuleMatcherManager.isConditionMatched(message, condition);
         } catch (Exception e) {
             log.error("[isTriggerConditionMatched][规则场景编号({}) 的触发器({}) 条件匹配异常]",
                     sceneRule.getId(), trigger, e);
