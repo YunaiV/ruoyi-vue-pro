@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnClass(name = {
         "org.apache.skywalking.apm.toolkit.opentracing.SkywalkingTracer", // 来自 apm-toolkit-opentracing.jar
 //        "io.opentracing.Tracer", // 来自 opentracing-api.jar
-        "jakarta.servlet.Filter"
+        "javax.servlet.Filter"
 })
 @EnableConfigurationProperties(TracerProperties.class)
 @ConditionalOnProperty(prefix = "yudao.tracer", value = "enable", matchIfMissing = true)
