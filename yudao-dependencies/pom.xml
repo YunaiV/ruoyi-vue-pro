@@ -62,6 +62,7 @@
         <guava.version>33.4.8-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <jsch.version>0.1.55</jsch.version>
         <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
@@ -541,11 +542,16 @@
                 <artifactId>commons-net</artifactId> <!-- 解决 ftp 连接 -->
                 <version>${commons-net.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
                 <version>${jsch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version> <!-- 解决 CVE-2025-48924 漏洞 -->
             </dependency>
 
             <dependency>
