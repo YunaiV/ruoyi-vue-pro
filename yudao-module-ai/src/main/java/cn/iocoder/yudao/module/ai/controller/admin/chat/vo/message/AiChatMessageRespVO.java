@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message;
 
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -48,6 +49,9 @@ public class AiChatMessageRespVO {
 
     @Schema(description = "知识库段落数组")
     private List<KnowledgeSegment> segments;
+
+    @Schema(description = "联网搜索的网页内容数组")
+    private List<AiWebSearchResponse.WebPage> webSearchPages;
 
     @Schema(description = "附件 URL 数组", example = "https://www.iocoder.cn/1.png")
     private List<String> attachmentUrls;
