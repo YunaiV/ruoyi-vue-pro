@@ -54,7 +54,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.35</hutool-5.version>
         <hutool-6.version>6.0.0-M19</hutool-6.version>
-        <fastexcel.version>1.2.0</fastexcel.version>
+        <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.8-jre</guava.version>
