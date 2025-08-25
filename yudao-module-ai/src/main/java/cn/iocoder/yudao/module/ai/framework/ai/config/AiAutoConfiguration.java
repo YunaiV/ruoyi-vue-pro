@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlo
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
@@ -58,11 +60,11 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.gemini.enable", havingValue = "true")
     public GeminiChatModel geminiChatModel(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.GeminiProperties properties = yudaoAiProperties.getGemini();
+        YudaoAiProperties.Gemini properties = yudaoAiProperties.getGemini();
         return buildGeminiChatClient(properties);
     }
 
-    public GeminiChatModel buildGeminiChatClient(YudaoAiProperties.GeminiProperties properties) {
+    public GeminiChatModel buildGeminiChatClient(YudaoAiProperties.Gemini properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(GeminiChatModel.MODEL_DEFAULT);
         }
@@ -86,11 +88,11 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.doubao.enable", havingValue = "true")
     public DouBaoChatModel douBaoChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.DouBaoProperties properties = yudaoAiProperties.getDoubao();
+        YudaoAiProperties.DouBao properties = yudaoAiProperties.getDoubao();
         return buildDouBaoChatClient(properties);
     }
 
-    public DouBaoChatModel buildDouBaoChatClient(YudaoAiProperties.DouBaoProperties properties) {
+    public DouBaoChatModel buildDouBaoChatClient(YudaoAiProperties.DouBao properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(DouBaoChatModel.MODEL_DEFAULT);
         }
@@ -114,11 +116,11 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.siliconflow.enable", havingValue = "true")
     public SiliconFlowChatModel siliconFlowChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.SiliconFlowProperties properties = yudaoAiProperties.getSiliconflow();
+        YudaoAiProperties.SiliconFlow properties = yudaoAiProperties.getSiliconflow();
         return buildSiliconFlowChatClient(properties);
     }
 
-    public SiliconFlowChatModel buildSiliconFlowChatClient(YudaoAiProperties.SiliconFlowProperties properties) {
+    public SiliconFlowChatModel buildSiliconFlowChatClient(YudaoAiProperties.SiliconFlow properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(SiliconFlowApiConstants.MODEL_DEFAULT);
         }
@@ -141,11 +143,11 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.hunyuan.enable", havingValue = "true")
     public HunYuanChatModel hunYuanChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.HunYuanProperties properties = yudaoAiProperties.getHunyuan();
+        YudaoAiProperties.HunYuan properties = yudaoAiProperties.getHunyuan();
         return buildHunYuanChatClient(properties);
     }
 
-    public HunYuanChatModel buildHunYuanChatClient(YudaoAiProperties.HunYuanProperties properties) {
+    public HunYuanChatModel buildHunYuanChatClient(YudaoAiProperties.HunYuan properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(HunYuanChatModel.MODEL_DEFAULT);
         }
@@ -176,11 +178,11 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.xinghuo.enable", havingValue = "true")
     public XingHuoChatModel xingHuoChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.XingHuoProperties properties = yudaoAiProperties.getXinghuo();
+        YudaoAiProperties.XingHuo properties = yudaoAiProperties.getXinghuo();
         return buildXingHuoChatClient(properties);
     }
 
-    public XingHuoChatModel buildXingHuoChatClient(YudaoAiProperties.XingHuoProperties properties) {
+    public XingHuoChatModel buildXingHuoChatClient(YudaoAiProperties.XingHuo properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
         }
@@ -208,11 +210,11 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.baichuan.enable", havingValue = "true")
     public BaiChuanChatModel baiChuanChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.BaiChuanProperties properties = yudaoAiProperties.getBaichuan();
+        YudaoAiProperties.BaiChuan properties = yudaoAiProperties.getBaichuan();
         return buildBaiChuanChatClient(properties);
     }
 
-    public BaiChuanChatModel buildBaiChuanChatClient(YudaoAiProperties.BaiChuanProperties properties) {
+    public BaiChuanChatModel buildBaiChuanChatClient(YudaoAiProperties.BaiChuan properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(BaiChuanChatModel.MODEL_DEFAULT);
         }
@@ -235,7 +237,7 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.midjourney.enable", havingValue = "true")
     public MidjourneyApi midjourneyApi(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.MidjourneyProperties config = yudaoAiProperties.getMidjourney();
+        YudaoAiProperties.Midjourney config = yudaoAiProperties.getMidjourney();
         return new MidjourneyApi(config.getBaseUrl(), config.getApiKey(), config.getNotifyUrl());
     }
 
@@ -259,6 +261,14 @@ public class AiAutoConfiguration {
 
     private static ToolCallingManager getToolCallingManager() {
         return SpringUtil.getBean(ToolCallingManager.class);
+    }
+
+    // ========== Web Search 相关 ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.web-search.enable", havingValue = "true")
+    public AiWebSearchClient webSearchClient(YudaoAiProperties yudaoAiProperties) {
+        return new AiBoChaWebSearchClient(yudaoAiProperties.getWebSearch().getApiKey());
     }
 
 }

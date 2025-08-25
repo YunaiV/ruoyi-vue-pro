@@ -272,7 +272,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         String cacheKey = buildClientCacheKey(MidjourneyApi.class, AiPlatformEnum.MIDJOURNEY.getPlatform(), apiKey,
                 url);
         return Singleton.get(cacheKey, (Func0<MidjourneyApi>) () -> {
-            YudaoAiProperties.MidjourneyProperties properties = SpringUtil.getBean(YudaoAiProperties.class)
+            YudaoAiProperties.Midjourney properties = SpringUtil.getBean(YudaoAiProperties.class)
                     .getMidjourney();
             return new MidjourneyApi(url, apiKey, properties.getNotifyUrl());
         });
@@ -409,7 +409,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#douBaoChatClient(YudaoAiProperties)}
      */
     private ChatModel buildDouBaoChatModel(String apiKey) {
-        YudaoAiProperties.DouBaoProperties properties = new YudaoAiProperties.DouBaoProperties()
+        YudaoAiProperties.DouBao properties = new YudaoAiProperties.DouBao()
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildDouBaoChatClient(properties);
     }
@@ -418,7 +418,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#hunYuanChatClient(YudaoAiProperties)}
      */
     private ChatModel buildHunYuanChatModel(String apiKey, String url) {
-        YudaoAiProperties.HunYuanProperties properties = new YudaoAiProperties.HunYuanProperties()
+        YudaoAiProperties.HunYuan properties = new YudaoAiProperties.HunYuan()
                 .setBaseUrl(url).setApiKey(apiKey);
         return new AiAutoConfiguration().buildHunYuanChatClient(properties);
     }
@@ -427,7 +427,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#siliconFlowChatClient(YudaoAiProperties)}
      */
     private ChatModel buildSiliconFlowChatModel(String apiKey) {
-        YudaoAiProperties.SiliconFlowProperties properties = new YudaoAiProperties.SiliconFlowProperties()
+        YudaoAiProperties.SiliconFlow properties = new YudaoAiProperties.SiliconFlow()
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildSiliconFlowChatClient(properties);
     }
@@ -485,7 +485,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private static XingHuoChatModel buildXingHuoChatModel(String key) {
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "XingHuoChatClient 的密钥需要 (appKey|secretKey) 格式");
-        YudaoAiProperties.XingHuoProperties properties = new YudaoAiProperties.XingHuoProperties()
+        YudaoAiProperties.XingHuo properties = new YudaoAiProperties.XingHuo()
                 .setAppKey(keys.get(0)).setSecretKey(keys.get(1));
         return new AiAutoConfiguration().buildXingHuoChatClient(properties);
     }
@@ -494,7 +494,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#baiChuanChatClient(YudaoAiProperties)}
      */
     private BaiChuanChatModel buildBaiChuanChatModel(String apiKey) {
-        YudaoAiProperties.BaiChuanProperties properties = new YudaoAiProperties.BaiChuanProperties()
+        YudaoAiProperties.BaiChuan properties = new YudaoAiProperties.BaiChuan()
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildBaiChuanChatClient(properties);
     }
@@ -540,10 +540,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link AiAutoConfiguration#buildGeminiChatClient(YudaoAiProperties.GeminiProperties)}
+     * 可参考 {@link AiAutoConfiguration#buildGeminiChatClient(YudaoAiProperties.Gemini)}
      */
     private static GeminiChatModel buildGeminiChatModel(String apiKey) {
-        YudaoAiProperties.GeminiProperties properties = SpringUtil.getBean(YudaoAiProperties.class)
+        YudaoAiProperties.Gemini properties = SpringUtil.getBean(YudaoAiProperties.class)
                 .getGemini().setApiKey(apiKey);
         return new AiAutoConfiguration().buildGeminiChatClient(properties);
     }

@@ -234,6 +234,9 @@ yudao:
       enable: true
   #    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
       base-url: http://127.0.0.1:3001
+    web-search:
+      enable: true
+      api-key: sk-40500e52840f4d24b956d0b1d80d9abe
 
 --- #################### 芋道相关配置 ####################
 
