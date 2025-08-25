@@ -134,6 +134,12 @@
             <artifactId>yudao-module-demo</artifactId>
             <version>${revision}</version>
         </dependency>
+<!--        coal模块-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-coal</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
     </dependencies>
 

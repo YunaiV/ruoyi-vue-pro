@@ -176,4 +176,12 @@ public interface ErrorCodeConstants {
     ErrorCode STUDENT_COURSE_NOT_EXISTS = new ErrorCode(1_002_031_000, "学生课程不存在");
     ErrorCode STUDENT_GRADE_NOT_EXISTS = new ErrorCode(1_002_032_000, "学生班级不存在");
     ErrorCode STUDENT_GRADE_EXISTS = new ErrorCode(1_002_033_000, "学生班级已存在");
+
+    // ========== 生产计划 TODO 补充编号 ==========
+    ErrorCode PRODUCTION_PLAN_NOT_EXISTS = new ErrorCode(1_002_034_000, "生产计划不存在");
+    ErrorCode PRODUCTION_PLAN_EXITS_CHILDREN = new ErrorCode(1_002_035_000, "存在存在子生产计划，无法删除");
+    ErrorCode PRODUCTION_PLAN_PARENT_NOT_EXITS = new ErrorCode(1_002_036_000,"父级生产计划不存在");
+    ErrorCode PRODUCTION_PLAN_PARENT_ERROR = new ErrorCode(1_002_037_000, "不能设置自己为父生产计划");
+    ErrorCode PRODUCTION_PLAN_NAME_DUPLICATE = new ErrorCode(1_002_038_000, "已经存在该计划名称的生产计划");
+    ErrorCode PRODUCTION_PLAN_PARENT_IS_CHILD = new ErrorCode(1_002_039_000, "不能设置自己的子ProductionPlan为父ProductionPlan");
 }

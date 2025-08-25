@@ -5,9 +5,11 @@
         <artifactId>yudao</artifactId>
         <version>${revision}</version> <!-- 1. 修改 version 为 ${revision} -->
     </parent>
+    <modules>
+    </modules>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-module-demo</artifactId>
-    <packaging>jar</packaging> <!-- 2. 新增 packaging 为 jar -->
+    <artifactId>yudao-module-coal</artifactId>
+    <packaging>jar</packaging>
 
     <name>${project.artifactId}</name> <!-- 3. 新增 name 为 ${project.artifactId} -->
     <description> <!-- 4. 新增 description 为该模块的描述 -->
@@ -43,6 +45,23 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-framework</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+<!--            excl导出-->
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-excel</artifactId>
+        </dependency>
+<!--        -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-system</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 
