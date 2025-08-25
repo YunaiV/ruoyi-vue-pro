@@ -996,17 +996,17 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 if (ObjUtil.notEqual(instance.getName(), name)) {
                     runtimeService.setProcessInstanceName(instance.getProcessInstanceId(), name);
                 }
+
+                // 流程前置通知：需要在流程启动后(事务提交后)。variables 已设置。或者放在 PROCESS_STARTED 事件中处理，先放这里。
+                if (ObjUtil.isNull(processDefinitionInfo.getProcessBeforeTriggerSetting())) {
+                    return;
+                }
+                BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
+                BpmHttpRequestUtils.executeBpmHttpRequest(instance,
+                        setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
             }
 
         });
-
-        // 流程前置通知
-        if (ObjUtil.isNull(processDefinitionInfo.getProcessBeforeTriggerSetting())) {
-            return;
-        }
-        BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
-        BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
     }
 
 }
