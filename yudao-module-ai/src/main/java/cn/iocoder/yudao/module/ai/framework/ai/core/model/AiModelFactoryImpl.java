@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.framework.ai.core;
+package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;

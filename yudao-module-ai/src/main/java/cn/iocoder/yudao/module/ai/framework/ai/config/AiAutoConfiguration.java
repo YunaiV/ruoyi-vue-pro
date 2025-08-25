@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.ai.framework.ai.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactory;
-import cn.iocoder.yudao.module.ai.framework.ai.core.AiModelFactoryImpl;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
