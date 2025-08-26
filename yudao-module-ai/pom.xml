@@ -187,6 +187,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
         <!-- TinyFlow：AI 工作流 -->
         <dependency>
             <groupId>dev.tinyflow</groupId>

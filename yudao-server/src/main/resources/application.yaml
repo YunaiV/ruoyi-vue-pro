@@ -196,6 +196,13 @@ spring:
           model: deepseek-chat
     model:
       rerank: false # 是否开启“通义千问”的 Rerank 模型，填写 dashscope 开启
+    mcp:
+      server:
+        enabled: true
+        name: yudao-mcp-server
+        version: 1.0.0
+        instructions: 一个 MCP 示例服务
+        sse-endpoint: /sse
 
 yudao:
   ai:

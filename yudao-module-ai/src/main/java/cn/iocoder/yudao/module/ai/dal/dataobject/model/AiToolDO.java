@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.ai.service.model.tool.DirectoryListToolFunction;
-import cn.iocoder.yudao.module.ai.service.model.tool.WeatherQueryToolFunction;
+import cn.iocoder.yudao.module.ai.tool.function.DirectoryListToolFunction;
+import cn.iocoder.yudao.module.ai.tool.function.WeatherQueryToolFunction;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
