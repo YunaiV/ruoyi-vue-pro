@@ -346,7 +346,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 2.2 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
-                conversation.getTemperature(), conversation.getMaxTokens(), toolNames, toolContext);
+                conversation.getTemperature(), conversation.getMaxTokens(),
+                toolNames, toolContext);
         return new Prompt(chatMessages, chatOptions);
     }
 

@@ -203,6 +203,14 @@ spring:
         version: 1.0.0
         instructions: 一个 MCP 示例服务
         sse-endpoint: /sse
+      client:
+        enabled: true
+        name: mcp
+        sse:
+          connections:
+            filesystem:
+              url: http://127.0.0.1:8089
+              sse-endpoint: /sse
 
 yudao:
   ai:

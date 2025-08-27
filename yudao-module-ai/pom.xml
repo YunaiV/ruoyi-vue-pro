@@ -193,6 +193,12 @@
             <version>${spring-ai.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
         <!-- TinyFlow：AI 工作流 -->
         <dependency>
             <groupId>dev.tinyflow</groupId>
