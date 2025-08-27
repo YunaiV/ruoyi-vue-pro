@@ -67,6 +67,7 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum.REJECT_CHILD_PROCESS;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE;
@@ -805,8 +806,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return;
         }
         // 3.2 情况二：直接结束，审批不通过
+        // 3.2.1 如果是子流程，需获取父流程。标记父流程为不通过。
+        // 注意需要在子流程结束前标记，因为如果子流程是最后一个节点。在子流程结束后标记, 会报错
+        ProcessInstance parentProcessInstance = null;
+        if (StrUtil.isNotBlank(instance.getSuperExecutionId())) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(instance.getSuperExecutionId()).singleResult();
+            parentProcessInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
+            // 标记父流程不通过
+            processInstanceService.updateProcessInstanceReject(parentProcessInstance, REJECT_CHILD_PROCESS.getReason());
+        }
+        // 3.2.2 标记流程为不通过并结束流程
         processInstanceService.updateProcessInstanceReject(instance, reqVO.getReason()); // 标记不通过
         moveTaskToEnd(task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason())); // 结束流程
+
+        // 3.2.3 如果是子流程，结束主流程
+        if (parentProcessInstance!=null) {
+            moveTaskToEnd(parentProcessInstance.getId(), BpmCommentTypeEnum.REJECT.formatComment(REJECT_CHILD_PROCESS.getReason()));
+        }
     }
 
     /**
