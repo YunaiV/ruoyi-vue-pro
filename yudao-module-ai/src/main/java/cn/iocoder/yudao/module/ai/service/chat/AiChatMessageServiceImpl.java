@@ -270,9 +270,29 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }).doOnError(throwable -> {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
             // 忽略租户，因为 Flux 异步无法透传租户
-            TenantUtils.executeIgnore(() -> chatMessageMapper.updateById(
-                    new AiChatMessageDO().setId(assistantMessage.getId()).setContent(throwable.getMessage())
-                            .setReasoningContent(reasoningContentBuffer.toString())));
+            TenantUtils.executeIgnore(() -> {
+                // 如果有内容，则更新内容
+                if (StrUtil.isNotEmpty(contentBuffer)) {
+                    chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId())
+                            .setContent(contentBuffer.toString()).setReasoningContent(reasoningContentBuffer.toString()));
+                } else {
+                    // 否则，则进行删除
+                    chatMessageMapper.deleteById(assistantMessage.getId());
+                }
+            });
+        }).doOnCancel(() -> {
+            log.info("[sendChatMessageStream][userId({}) sendReqVO({}) 取消请求]", userId, sendReqVO);
+            // 忽略租户，因为 Flux 异步无法透传租户
+            TenantUtils.executeIgnore(() -> {
+                // 如果有内容，则更新内容
+                if (StrUtil.isNotEmpty(contentBuffer)) {
+                    chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId())
+                            .setContent(contentBuffer.toString()).setReasoningContent(reasoningContentBuffer.toString()));
+                } else {
+                    // 否则，则进行删除
+                    chatMessageMapper.deleteById(assistantMessage.getId());
+                }
+            });
         }).onErrorResume(error -> Flux.just(error(ErrorCodeConstants.CHAT_STREAM_ERROR)));
     }
 

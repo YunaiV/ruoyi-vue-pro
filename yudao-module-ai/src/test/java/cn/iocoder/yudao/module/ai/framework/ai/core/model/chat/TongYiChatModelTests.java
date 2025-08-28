@@ -85,8 +85,8 @@ public class TongYiChatModelTests {
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
         DashScopeChatOptions options = DashScopeChatOptions.builder()
-//                .withModel("qwen3-235b-a22b-thinking-2507")
-                .withModel("qwen-max-2025-01-25")
+                .withModel("qwen3-235b-a22b-thinking-2507")
+//                .withModel("qwen-max-2025-01-25")
                 .withEnableThinking(true) // 必须设置，否则会报错
                 .build();
 
