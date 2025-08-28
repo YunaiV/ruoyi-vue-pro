@@ -36,6 +36,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiToolService;
 import cn.iocoder.yudao.module.ai.util.AiUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
 import com.google.common.collect.Maps;
+import io.modelcontextprotocol.client.McpSyncClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -47,6 +48,10 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.ai.mcp.client.autoconfigure.properties.McpClientCommonProperties;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,6 +123,17 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired(required = false) // 由于 yudao.ai.web-search.enable 配置项，可以关闭 AiWebSearchClient 的功能，所以这里只能不强制注入
     private AiWebSearchClient webSearchClient;
+
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
+    @Autowired(required = false) // 由于 yudao.ai.mcp.client.enable 配置项，可以关闭 McpSyncClient 的功能，所以这里只能不强制注入
+    private List<McpSyncClient> mcpClients;
+
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
+    @Autowired(required = false) // 由于 yudao.ai.mcp.client.enable 配置项，可以关闭 McpSyncClient 的功能，所以这里只能不强制注入
+    private McpClientCommonProperties mcpClientCommonProperties;
+
+    @Resource
+    private ToolCallbackResolver toolCallbackResolver;
 
     @Transactional(rollbackFor = Exception.class)
     public AiChatMessageSendRespVO sendMessage(AiChatMessageSendReqVO sendReqVO, Long userId) {
@@ -334,21 +350,52 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
 
         // 2.1 查询 tool 工具
-        Set<String> toolNames = null;
-        Map<String,Object> toolContext = Map.of();
-        if (conversation.getRoleId() != null) {
-            AiChatRoleDO chatRole = chatRoleService.getChatRole(conversation.getRoleId());
-            if (chatRole != null && CollUtil.isNotEmpty(chatRole.getToolIds())) {
-                toolNames = convertSet(toolService.getToolList(chatRole.getToolIds()), AiToolDO::getName);
-                toolContext = AiUtils.buildCommonToolContext();
-            }
-        }
+        List<ToolCallback> toolCallbacks = getToolCallbackListByRoleId(conversation.getRoleId());
+        Map<String,Object> toolContext = CollUtil.isNotEmpty(toolCallbacks) ? AiUtils.buildCommonToolContext()
+                : Map.of();
         // 2.2 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
                 conversation.getTemperature(), conversation.getMaxTokens(),
-                toolNames, toolContext);
+                toolCallbacks, toolContext);
         return new Prompt(chatMessages, chatOptions);
+    }
+
+    private List<ToolCallback> getToolCallbackListByRoleId(Long roleId) {
+        if (roleId == null) {
+            return null;
+        }
+        AiChatRoleDO chatRole = chatRoleService.getChatRole(roleId);
+        if (chatRole == null) {
+            return null;
+        }
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
+        // 1. 通过 toolIds
+        if (CollUtil.isNotEmpty(chatRole.getToolIds())) {
+            Set<String> toolNames = convertSet(toolService.getToolList(chatRole.getToolIds()), AiToolDO::getName);
+            toolNames.forEach(toolName -> {
+                ToolCallback toolCallback = toolCallbackResolver.resolve(toolName);
+                if (toolCallback != null) {
+                    toolCallbacks.add(toolCallback);
+                }
+            });
+        }
+        // 2. 通过 mcpClients
+        if (CollUtil.isNotEmpty(mcpClients) && CollUtil.isNotEmpty(chatRole.getMcpClientNames())) {
+            chatRole.getMcpClientNames().forEach(mcpClientName -> {
+                // 2.1 标准化名字，参考 McpClientAutoConfiguration 的 connectedClientName 方法
+                String finalMcpClientName = mcpClientCommonProperties.getName() + " - " + mcpClientName;
+                // 2.2 匹配对应的 McpSyncClient
+                mcpClients.forEach(mcpClient -> {
+                    if (ObjUtil.notEqual(mcpClient.getClientInfo().name(), finalMcpClientName)) {
+                        return;
+                    }
+                    ToolCallback[] mcpToolCallBacks = new SyncMcpToolCallbackProvider(mcpClient).getToolCallbacks();
+                    CollUtil.addAll(toolCallbacks, mcpToolCallBacks);
+                });
+            });
+        }
+        return toolCallbacks;
     }
 
     /**

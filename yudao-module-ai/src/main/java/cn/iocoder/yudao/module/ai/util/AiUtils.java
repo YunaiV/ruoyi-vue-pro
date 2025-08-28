@@ -18,12 +18,10 @@ import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Spring AI 工具类
@@ -40,15 +38,15 @@ public class AiUtils {
     }
 
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens,
-                                               Set<String> toolNames, Map<String, Object> toolContext) {
-        toolNames = ObjUtil.defaultIfNull(toolNames, Collections.emptySet());
+                                               List<ToolCallback> toolCallbacks, Map<String, Object> toolContext) {
+        toolCallbacks = ObjUtil.defaultIfNull(toolCallbacks, Collections.emptyList());
         toolContext = ObjUtil.defaultIfNull(toolContext, Collections.emptyMap());
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
                 return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens)
                         .withEnableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
-                        .withToolNames(toolNames).withToolContext(toolContext).build();
+                        .withToolCallbacks(toolCallbacks).withToolContext(toolContext).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case DEEP_SEEK:
@@ -57,30 +55,30 @@ public class AiUtils {
             case SILICON_FLOW: // 复用 DeepSeek 客户端
             case XING_HUO: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case ZHI_PU:
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case MINI_MAX:
                 return MiniMaxChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case MOONSHOT:
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case AZURE_OPENAI:
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case ANTHROPIC:
                 return AnthropicChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OLLAMA:
                 return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
-                        .toolNames(toolNames).toolContext(toolContext).build();
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
