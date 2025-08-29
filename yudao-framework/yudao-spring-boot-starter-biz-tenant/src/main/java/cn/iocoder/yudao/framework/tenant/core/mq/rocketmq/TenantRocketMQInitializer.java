@@ -18,11 +18,9 @@ public class TenantRocketMQInitializer implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof DefaultRocketMQListenerContainer) {
-            DefaultRocketMQListenerContainer container = (DefaultRocketMQListenerContainer) bean;
+        if (bean instanceof DefaultRocketMQListenerContainer container) {
             initTenantConsumer(container.getConsumer());
-        } else if (bean instanceof RocketMQTemplate) {
-            RocketMQTemplate template = (RocketMQTemplate) bean;
+        } else if (bean instanceof RocketMQTemplate template) {
             initTenantProducer(template.getProducer());
         }
         return bean;
