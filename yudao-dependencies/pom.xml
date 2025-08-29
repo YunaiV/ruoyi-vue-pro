@@ -73,8 +73,8 @@
         <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.0.0</jimureport.version>
-        <jimubi.version>1.9.5</jimubi.version>
+        <jimureport.version>2.1.1</jimureport.version>
+        <jimubi.version>2.1.0</jimubi.version>
         <weixin-java.version>4.7.7-20250808.182223</weixin-java.version>
     </properties>
 
@@ -610,6 +610,10 @@
                     <exclusion>
                         <groupId>com.github.jsqlparser</groupId>
                         <artifactId>jsqlparser</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>cn.hutool</groupId>
+                        <artifactId>hutool-core</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
