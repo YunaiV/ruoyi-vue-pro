@@ -3,12 +3,13 @@ package cn.iocoder.yudao.module.iot.controller.admin.thingmodel;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.*;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
+import com.google.common.base.Objects;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
 @Tag(name = "管理后台 - IoT 产品物模型")
 @RestController
@@ -30,6 +33,8 @@ public class IotThingModelController {
 
     @Resource
     private IotThingModelService thingModelService;
+    @Resource
+    private IotProductService productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品物模型")
@@ -64,16 +69,29 @@ public class IotThingModelController {
         return success(BeanUtils.toBean(thingModel, IotThingModelRespVO.class));
     }
 
-    @GetMapping("/list-by-product-id")
-    @Operation(summary = "获得产品物模型")
-    @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
+    @GetMapping("/get-tsl")
+    @Operation(summary = "获得产品物模型 TSL")
+    @Parameter(name = "productId", description = "产品 ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
-    public CommonResult<List<IotThingModelRespVO>> getThingModelListByProductId(@RequestParam("productId") Long productId) {
-        List<IotThingModelDO> list = thingModelService.getThingModelListByProductId(productId);
-        return success(BeanUtils.toBean(list, IotThingModelRespVO.class));
+    public CommonResult<IotThingModelTSLRespVO> getThingModelTsl(@RequestParam("productId") Long productId) {
+        // 1. 获得产品
+        IotProductDO product = productService.getProduct(productId);
+        if (product == null) {
+            return success(null);
+        }
+        IotThingModelTSLRespVO tslRespVO = new IotThingModelTSLRespVO()
+                .setProductId(product.getId()).setProductKey(product.getProductKey());
+        // 2. 获得物模型定义
+        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(productId);
+        tslRespVO.setProperties(convertList(filterList(thingModels, item ->
+                        Objects.equal(IotThingModelTypeEnum.PROPERTY.getType(), item.getType())), IotThingModelDO::getProperty))
+                .setServices(convertList(filterList(thingModels, item ->
+                        Objects.equal(IotThingModelTypeEnum.SERVICE.getType(), item.getType())), IotThingModelDO::getService))
+                .setEvents(convertList(filterList(thingModels, item ->
+                        Objects.equal(IotThingModelTypeEnum.EVENT.getType(), item.getType())), IotThingModelDO::getEvent));
+        return success(tslRespVO);
     }
 
-    // TODO @puhui @super：getThingModelListByProductId 和 getThingModelListByProductId 可以融合么？
     @GetMapping("/list")
     @Operation(summary = "获得产品物模型列表")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")

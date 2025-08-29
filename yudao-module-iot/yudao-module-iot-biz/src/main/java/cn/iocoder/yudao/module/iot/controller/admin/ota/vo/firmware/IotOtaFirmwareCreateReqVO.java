@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 @Schema(description = "管理后台 - IoT OTA 固件创建 Request VO")
 @Data
@@ -22,17 +23,11 @@ public class IotOtaFirmwareCreateReqVO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "产品编号不能为空")
-    private String productId;
+    private Long productId;
 
-    @Schema(description = "签名方式", example = "MD5")
-    // TODO @li：是不是必传哈
-    private String signMethod;
-
-    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao-firmware.zip")
+    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.zip")
     @NotEmpty(message = "固件文件 URL 不能为空")
+    @URL(message = "固件文件 URL 格式错误")
     private String fileUrl;
-
-    @Schema(description = "自定义信息，建议使用 JSON 格式", example = "{\"key1\":\"value1\",\"key2\":\"value2\"}")
-    private String information;
 
 }

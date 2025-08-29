@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.type.LongSetTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -29,16 +29,15 @@ import java.util.Set;
 public class IotDeviceDO extends TenantBaseDO {
 
     /**
+     * 设备编号 - 全部设备
+     */
+    public static final Long DEVICE_ID_ALL = 0L;
+
+    /**
      * 设备 ID，主键，自增
      */
     @TableId
     private Long id;
-    /**
-     * 设备唯一标识符，全局唯一，用于识别设备
-     *
-     * 类似阿里云 <a href="https://help.aliyun.com/zh/iot/developer-reference/api-querydeviceinfo">QueryDeviceInfo</a> 的 IotInstanceId
-     */
-    private String deviceKey;
     /**
      * 设备名称，在产品内唯一，用于标识设备
      */
@@ -118,32 +117,24 @@ public class IotDeviceDO extends TenantBaseDO {
      *
      * 关联 {@link IotOtaFirmwareDO#getId()}
      */
-    private String firmwareId;
+    private Long firmwareId;
 
-    // TODO @芋艿：【待定 003】：要不要增加 username？目前 tl 有，阿里云之类的没有
     /**
-     * 设备密钥，用于设备认证，需安全存储
+     * 设备密钥，用于设备认证
      */
     private String deviceSecret;
-    /**
-     * MQTT 客户端 ID
-     */
-    private String mqttClientId;
-    /**
-     * MQTT 用户名
-     */
-    private String mqttUsername;
-    /**
-     * MQTT 密码
-     */
-    private String mqttPassword;
     /**
      * 认证类型（如一机一密、动态注册）
      */
     // TODO @haohao：是不是要枚举哈
     private String authType;
 
-    // TODO @芋艿：【待定 002】：1）设备维护的时候，设置位置？类似 tl？；2）设备上传的时候，设置位置，类似 it？
+    /**
+     * 定位方式
+     * <p>
+     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum}
+     */
+    private Integer locationType;
     /**
      * 设备位置的纬度
      */

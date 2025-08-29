@@ -174,8 +174,7 @@ GET {{baseUrl}}/iot/product-thing-model/get?id=67
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
 
-
-### 请求 /iot/product-thing-model/list-by-product-id 接口 => 成功
-GET {{baseUrl}}/iot/product-thing-model/list-by-product-id?productId=1001
+### 请求 /iot/product-thing-model/get-tsl 接口 => 成功
+GET {{baseUrl}}/iot/product-thing-model/get-tsl?productId=1001
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}

@@ -3,13 +3,12 @@ package cn.iocoder.yudao.module.iot.dal.tdengine;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyHistoryListReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,17 +22,17 @@ import java.util.stream.Collectors;
 @InterceptorIgnore(tenantLine = "true") // 避免 SQL 解析，因为 JSqlParser 对 TDengine 的 SQL 解析会报错
 public interface IotDevicePropertyMapper {
 
-    List<TDengineTableField> getProductPropertySTableFieldList(@Param("productKey") String productKey);
+    List<TDengineTableField> getProductPropertySTableFieldList(@Param("productId") Long productId);
 
-    void createProductPropertySTable(@Param("productKey") String productKey,
+    void createProductPropertySTable(@Param("productId") Long productId,
                                      @Param("fields") List<TDengineTableField> fields);
 
     @SuppressWarnings("SimplifyStreamApiCallChains") // 保持 JDK8 兼容性
-    default void alterProductPropertySTable(String productKey,
+    default void alterProductPropertySTable(Long productId,
                                             List<TDengineTableField> oldFields,
                                             List<TDengineTableField> newFields) {
         oldFields.removeIf(field -> StrUtil.equalsAny(field.getField(),
-                TDengineTableField.FIELD_TS, "report_time", "device_key"));
+                TDengineTableField.FIELD_TS, "report_time", "device_id"));
         List<TDengineTableField> addFields = newFields.stream().filter( // 新增的字段
                         newField -> oldFields.stream().noneMatch(oldField -> oldField.getField().equals(newField.getField())))
                 .collect(Collectors.toList());
@@ -62,29 +61,28 @@ public interface IotDevicePropertyMapper {
         });
 
         // 执行
-        addFields.forEach(field -> alterProductPropertySTableAddField(productKey, field));
-        dropFields.forEach(field -> alterProductPropertySTableDropField(productKey, field));
-        modifyLengthFields.forEach(field -> alterProductPropertySTableModifyField(productKey, field));
+        addFields.forEach(field -> alterProductPropertySTableAddField(productId, field));
+        dropFields.forEach(field -> alterProductPropertySTableDropField(productId, field));
+        modifyLengthFields.forEach(field -> alterProductPropertySTableModifyField(productId, field));
         modifyTypeFields.forEach(field -> {
-            alterProductPropertySTableDropField(productKey, field);
-            alterProductPropertySTableAddField(productKey, field);
+            alterProductPropertySTableDropField(productId, field);
+            alterProductPropertySTableAddField(productId, field);
         });
     }
 
-    void alterProductPropertySTableAddField(@Param("productKey") String productKey,
+    void alterProductPropertySTableAddField(@Param("productId") Long productId,
                                             @Param("field") TDengineTableField field);
 
-    void alterProductPropertySTableModifyField(@Param("productKey") String productKey,
+    void alterProductPropertySTableModifyField(@Param("productId") Long productId,
                                                @Param("field") TDengineTableField field);
 
-    void alterProductPropertySTableDropField(@Param("productKey") String productKey,
+    void alterProductPropertySTableDropField(@Param("productId") Long productId,
                                              @Param("field") TDengineTableField field);
 
     void insert(@Param("device") IotDeviceDO device,
                 @Param("properties") Map<String, Object> properties,
                 @Param("reportTime") Long reportTime);
 
-    IPage<IotDevicePropertyRespVO> selectPageByHistory(IPage<?> page,
-                                                       @Param("reqVO") IotDevicePropertyHistoryPageReqVO reqVO);
+    List<IotDevicePropertyRespVO> selectListByHistory(@Param("reqVO") IotDevicePropertyHistoryListReqVO reqVO);
 
 }

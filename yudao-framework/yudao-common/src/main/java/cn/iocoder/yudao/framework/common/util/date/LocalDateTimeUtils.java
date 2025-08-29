@@ -8,6 +8,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.DateIntervalEnum;
 
+import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -16,8 +17,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cn.hutool.core.date.DatePattern.UTC_MS_WITH_XXX_OFFSET_PATTERN;
-import static cn.hutool.core.date.DatePattern.createFormatter;
+import static cn.hutool.core.date.DatePattern.*;
 
 /**
  * 时间工具类，用于 {@link LocalDateTime}
@@ -80,6 +80,21 @@ public class LocalDateTimeUtils {
     public static LocalDateTime[] buildBetweenTime(int year1, int month1, int day1,
                                                    int year2, int month2, int day2) {
         return new LocalDateTime[]{buildTime(year1, month1, day1), buildTime(year2, month2, day2)};
+    }
+
+    /**
+     * 判指定断时间，是否在该时间范围内
+     *
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param time 指定时间
+     * @return 是否
+     */
+    public static boolean isBetween(LocalDateTime startTime, LocalDateTime endTime, Timestamp time) {
+        if (startTime == null || endTime == null || time == null) {
+            return false;
+        }
+        return LocalDateTimeUtil.isIn(LocalDateTimeUtil.of(time), startTime, endTime);
     }
 
     /**
@@ -234,6 +249,11 @@ public class LocalDateTimeUtils {
         // 2. 循环，生成时间范围
         List<LocalDateTime[]> timeRanges = new ArrayList<>();
         switch (intervalEnum) {
+            case HOUR:
+                while (startTime.isBefore(endTime)) {
+                    timeRanges.add(new LocalDateTime[]{startTime, startTime.plusHours(1).minusNanos(1)});
+                    startTime = startTime.plusHours(1);
+                }
             case DAY:
                 while (startTime.isBefore(endTime)) {
                     timeRanges.add(new LocalDateTime[]{startTime, startTime.plusDays(1).minusNanos(1)});
@@ -297,6 +317,8 @@ public class LocalDateTimeUtils {
 
         // 2. 循环，生成时间范围
         switch (intervalEnum) {
+            case HOUR:
+                return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATETIME_MINUTE_PATTERN);
             case DAY:
                 return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN);
             case WEEK:

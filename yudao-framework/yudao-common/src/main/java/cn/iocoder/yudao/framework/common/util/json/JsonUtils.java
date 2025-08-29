@@ -3,18 +3,22 @@ package cn.iocoder.yudao.framework.common.util.json;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeDeserializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,11 @@ public class JsonUtils {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
-        objectMapper.registerModules(new JavaTimeModule()); // 解决 LocalDateTime 的序列化
+        // 解决 LocalDateTime 的序列化
+        SimpleModule simpleModule = new JavaTimeModule()
+                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
+                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
+        objectMapper.registerModules(simpleModule);
     }
 
     /**
@@ -89,6 +97,18 @@ public class JsonUtils {
 
     public static <T> T parseObject(String text, Type type) {
         if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseObject(byte[] text, Type type) {
+        if (ArrayUtil.isEmpty(text)) {
             return null;
         }
         try {

@@ -3,13 +3,14 @@ package cn.iocoder.yudao.module.iot.controller.admin.ota;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareCreateReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwarePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareCreateReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaFirmwareService;
-import com.fhs.core.trans.anno.TransMethodResult;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -22,12 +23,14 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - IoT OTA 固件")
 @RestController
-@RequestMapping("/iot/ota-firmware")
+@RequestMapping("/iot/ota/firmware")
 @Validated
 public class IotOtaFirmwareController {
 
     @Resource
     private IotOtaFirmwareService otaFirmwareService;
+    @Resource
+    private IotProductService productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建 OTA 固件")
@@ -47,10 +50,17 @@ public class IotOtaFirmwareController {
     @GetMapping("/get")
     @Operation(summary = "获得 OTA 固件")
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:query')")
-    @TransMethodResult
     public CommonResult<IotOtaFirmwareRespVO> getOtaFirmware(@RequestParam("id") Long id) {
-        IotOtaFirmwareDO otaFirmware = otaFirmwareService.getOtaFirmware(id);
-        return success(BeanUtils.toBean(otaFirmware, IotOtaFirmwareRespVO.class));
+        IotOtaFirmwareDO firmware = otaFirmwareService.getOtaFirmware(id);
+        if (firmware == null) {
+            return success(null);
+        }
+        return success(BeanUtils.toBean(firmware, IotOtaFirmwareRespVO.class, o -> {
+            IotProductDO product = productService.getProduct(firmware.getProductId());
+            if (product != null) {
+                o.setProductName(product.getName());
+            }
+        }));
     }
 
     @GetMapping("/page")

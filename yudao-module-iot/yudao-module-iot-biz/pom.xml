@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>yudao-module-iot</artifactId>
         <groupId>cn.iocoder.boot</groupId>
@@ -15,7 +14,7 @@
     <name>${project.artifactId}</name>
     <description>
         物联网 模块，主要实现 产品管理、设备管理、协议管理等功能。
-        <!-- TODO 芋艿：后续补充下 -->
+                <!-- TODO 芋艿：后续补充下 -->
     </description>
 
     <dependencies>
@@ -26,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-api</artifactId>
+            <artifactId>yudao-module-iot-core</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -75,10 +74,11 @@
         </dependency>
 
         <!-- 消息队列相关 -->
+        <!-- TODO @芋艿：临时打开 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <optional>true</optional>
+<!--            <optional>true</optional>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>
@@ -91,47 +91,17 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>org.pf4j</groupId>  <!-- PF4J：内置插件机制 -->
-            <artifactId>pf4j-spring</artifactId>
-        </dependency>
-
-        <!-- TODO @芋艿：bom 管理 -->
-        <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>4.0.25</version>
-            <type>pom</type>
-        </dependency>
-
-        <!-- TODO @芋艿：bom 管理 -->
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js</artifactId>
-            <version>24.1.2</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js-scriptengine</artifactId>
-            <version>24.1.2</version>
-        </dependency>
-
-        <!-- TODO @芋艿：合理注释 -->
-        <!-- IoT 数据桥梁的执行器所需消息队列。如果您只需要使用 rocketmq 那么则注释掉其它消息队列即可 -->
+        <!-- IoT 网络组件：接收来自设备的上行数据 -->
         <!--        <dependency>-->
-        <!--            <groupId>org.apache.rocketmq</groupId>-->
-        <!--            <artifactId>rocketmq-spring-boot-starter</artifactId>-->
+        <!--            <groupId>cn.iocoder.boot</groupId>-->
+        <!--            <artifactId>yudao-module-iot-net-component-http</artifactId>-->
+        <!--            <version>${revision}</version>-->
         <!--        </dependency>-->
         <!--        <dependency>-->
-        <!--            <groupId>org.springframework.kafka</groupId>-->
-        <!--            <artifactId>spring-kafka</artifactId>-->
+        <!--            <groupId>cn.iocoder.boot</groupId>-->
+        <!--            <artifactId>yudao-module-iot-net-component-emqx</artifactId>-->
+        <!--            <version>${revision}</version>-->
         <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-amqp</artifactId>-->
-        <!--        </dependency>-->
-
     </dependencies>
 
 </project>

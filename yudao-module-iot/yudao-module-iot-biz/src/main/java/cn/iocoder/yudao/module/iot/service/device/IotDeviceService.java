@@ -2,16 +2,18 @@ package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * IoT 设备 Service 接口
@@ -27,18 +29,6 @@ public interface IotDeviceService {
      * @return 编号
      */
     Long createDevice(@Valid IotDeviceSaveReqVO createReqVO);
-
-    /**
-     * 【设备注册】创建设备
-     *
-     * @param productKey 产品标识
-     * @param deviceName 设备名称
-     * @param gatewayId  网关设备 ID
-     * @return 设备
-     */
-    IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
-                             @NotEmpty(message = "设备名称不能为空") String deviceName,
-                             Long gatewayId);
 
     /**
      * 更新设备
@@ -58,6 +48,14 @@ public interface IotDeviceService {
     default void updateDeviceGateway(Long id, Long gatewayId) {
         updateDevice(new IotDeviceSaveReqVO().setId(id).setGatewayId(gatewayId));
     }
+
+    /**
+     * 更新设备状态
+     *
+     * @param device 设备信息
+     * @param state 状态
+     */
+    void updateDeviceState(IotDeviceDO device, Integer state);
 
     /**
      * 更新设备状态
@@ -97,6 +95,14 @@ public interface IotDeviceService {
     IotDeviceDO validateDeviceExists(Long id);
 
     /**
+     * 【缓存】校验设备是否存在
+     *
+     * @param id 设备 ID
+     * @return 设备对象
+     */
+    IotDeviceDO validateDeviceExistsFromCache(Long id);
+
+    /**
      * 获得设备
      *
      * @param id 编号
@@ -105,12 +111,25 @@ public interface IotDeviceService {
     IotDeviceDO getDevice(Long id);
 
     /**
-     * 根据设备 key 获得设备
+     * 【缓存】获得设备信息
+     * <p>
+     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
      *
-     * @param deviceKey 编号
+     * @param id 编号
      * @return IoT 设备
      */
-    IotDeviceDO getDeviceByDeviceKey(String deviceKey);
+    IotDeviceDO getDeviceFromCache(Long id);
+
+    /**
+     * 【缓存】根据产品 key 和设备名称，获得设备信息
+     * <p>
+     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
+     *
+     * @param productKey 产品 key
+     * @param deviceName 设备名称
+     * @return 设备信息
+     */
+    IotDeviceDO getDeviceFromCache(String productKey, String deviceName);
 
     /**
      * 获得设备分页
@@ -121,12 +140,14 @@ public interface IotDeviceService {
     PageResult<IotDeviceDO> getDevicePage(IotDevicePageReqVO pageReqVO);
 
     /**
-     * 基于设备类型，获得设备列表
+     * 根据条件，获得设备列表
      *
      * @param deviceType 设备类型
+     * @param productId 产品编号
      * @return 设备列表
      */
-    List<IotDeviceDO> getDeviceListByDeviceType(@Nullable Integer deviceType);
+    List<IotDeviceDO> getDeviceListByCondition(@Nullable Integer deviceType,
+                                               @Nullable Long productId);
 
     /**
      * 获得状态，获得设备列表
@@ -137,20 +158,12 @@ public interface IotDeviceService {
     List<IotDeviceDO> getDeviceListByState(Integer state);
 
     /**
-     * 根据产品ID获取设备列表
+     * 根据产品编号，获取设备列表
      *
-     * @param productId 产品ID，用于查询特定产品的设备列表
-     * @return 返回与指定产品ID关联的设备列表，列表中的每个元素为IotDeviceDO对象
+     * @param productId 产品编号
+     * @return 设备列表
      */
     List<IotDeviceDO> getDeviceListByProductId(Long productId);
-
-    /**
-     * 根据设备ID列表获取设备信息列表
-     *
-     * @param deviceIdList 设备ID列表，包含需要查询的设备ID
-     * @return 返回与设备ID列表对应的设备信息列表，列表中的每个元素为IotDeviceDO对象
-     */
-    List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList);
 
     /**
      * 基于产品编号，获得设备数量
@@ -167,17 +180,6 @@ public interface IotDeviceService {
      * @return 设备数量
      */
     Long getDeviceCountByGroupId(Long groupId);
-
-    /**
-     * 【缓存】根据产品 key 和设备名称，获得设备信息
-     * <p>
-     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
-     *
-     * @param productKey 产品 key
-     * @param deviceName 设备名称
-     * @return 设备信息
-     */
-    IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
 
     /**
      * 导入设备
@@ -197,12 +199,12 @@ public interface IotDeviceService {
     Long getDeviceCount(@Nullable LocalDateTime createTime);
 
     /**
-     * 获取 MQTT 连接参数
+     * 获得设备认证信息
      *
-     * @param deviceId 设备 ID
+     * @param id 设备编号
      * @return MQTT 连接参数
      */
-    IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId);
+    IotDeviceAuthInfoRespVO getDeviceAuthInfo(Long id);
 
     /**
      * 获得各个产品下的设备数量 Map
@@ -218,5 +220,55 @@ public interface IotDeviceService {
      *         value: 设备数量
      */
     Map<Integer, Long> getDeviceCountMapByState();
+
+    /**
+     * 通过产品标识和设备名称列表获取设备列表
+     *
+     * @param productKey  产品标识
+     * @param deviceNames 设备名称列表
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceListByProductKeyAndNames(String productKey, List<String> deviceNames);
+
+    /**
+     * 认证设备
+     *
+     * @param authReqDTO 认证信息
+     * @return 是否认证成功
+     */
+    boolean authDevice(@Valid IotDeviceAuthReqDTO authReqDTO);
+
+    /**
+     * 校验设备是否存在
+     *
+     * @param ids 设备编号数组
+     */
+    List<IotDeviceDO> validateDeviceListExists(Collection<Long> ids);
+
+    /**
+     * 获得设备列表
+     *
+     * @param ids 设备编号数组
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceList(Collection<Long> ids);
+
+    /**
+     * 获得设备 Map
+     *
+     * @param ids 设备编号数组
+     * @return 设备 Map
+     */
+    default Map<Long, IotDeviceDO> getDeviceMap(Collection<Long> ids) {
+        return convertMap(getDeviceList(ids), IotDeviceDO::getId);
+    }
+
+    /**
+     * 更新设备固件版本
+     *
+     * @param deviceId 设备编号
+     * @param firmwareId 固件编号
+     */
+    void updateDeviceFirmware(Long deviceId, Long firmwareId);
 
 }
