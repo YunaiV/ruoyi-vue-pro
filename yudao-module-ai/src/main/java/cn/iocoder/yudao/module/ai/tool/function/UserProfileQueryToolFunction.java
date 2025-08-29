@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.model.tool;
+package cn.iocoder.yudao.module.ai.tool.function;
 
 import cn.iocoder.yudao.module.ai.util.AiUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;

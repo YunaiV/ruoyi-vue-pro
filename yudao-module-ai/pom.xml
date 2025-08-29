@@ -19,8 +19,8 @@
           国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
     </description>
     <properties>
-        <spring-ai.version>1.0.0</spring-ai.version>
-        <alibaba-ai.version>1.0.0.2</alibaba-ai.version>
+        <spring-ai.version>1.0.1</spring-ai.version>
+        <alibaba-ai.version>1.0.0.3</alibaba-ai.version>
         <tinyflow.version>1.0.2</tinyflow.version>
     </properties>
 
@@ -82,6 +82,11 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-azure-openai</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-anthropic</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
@@ -180,6 +185,24 @@
                     <groupId>org.springframework.cloud</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- MCP 相关 -->
+        <!--
+            特殊说明：不能使用 spring-ai-starter-mcp-server-webflux 或 spring-ai-starter-mcp-client-webflux ！！！
+            原因：项目使用了 SpringMVC，而不是 WebFlux。引入上述 2 个，会导致 SSE Server 失效。
+        -->
+        <dependency>
+            <!-- 服务端 -->
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <!-- 客户端 -->
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client</artifactId>
+            <version>${spring-ai.version}</version>
         </dependency>
 
         <!-- TinyFlow：AI 工作流 -->

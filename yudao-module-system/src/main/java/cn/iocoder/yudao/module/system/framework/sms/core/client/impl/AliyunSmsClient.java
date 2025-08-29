@@ -113,13 +113,14 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     @VisibleForTesting
+    @SuppressWarnings("EnhancedSwitchMigration")
     Integer convertSmsTemplateAuditStatus(Integer templateStatus) {
-        return switch (templateStatus) {
-            case 0 -> SmsTemplateAuditStatusEnum.CHECKING.getStatus();
-            case 1 -> SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
-            case 2 -> SmsTemplateAuditStatusEnum.FAIL.getStatus();
-            default -> throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
-        };
+        switch (templateStatus) {
+            case 0: return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
+            case 1: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
+            case 2: return SmsTemplateAuditStatusEnum.FAIL.getStatus();
+            default: throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
+        }
     }
 
     /**
@@ -189,7 +190,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @SneakyThrows
     private static String percentCode(String str) {
         Assert.notNull(str, "str 不能为空");
-        return URLEncoder.encode(str, StandardCharsets.UTF_8)
+        return HttpUtils.encodeUtf8(str)
                 .replace("+", "%20") // 加号 "+" 被替换为 "%20"
                 .replace("*", "%2A") // 星号 "*" 被替换为 "%2A"
                 .replace("%7E", "~"); // 波浪号 "%7E" 被替换为 "~"

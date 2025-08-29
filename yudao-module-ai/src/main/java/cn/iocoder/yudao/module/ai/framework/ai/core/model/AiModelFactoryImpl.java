@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.framework.ai.core;
+package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.config.AiAutoConfiguration;
 import cn.iocoder.yudao.module.ai.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
@@ -67,6 +68,7 @@ import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.minimax.MiniMaxEmbeddingModel;
 import org.springframework.ai.minimax.MiniMaxEmbeddingOptions;
 import org.springframework.ai.minimax.api.MiniMaxApi;
+import org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiChatAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiEmbeddingAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiEmbeddingProperties;
@@ -93,6 +95,8 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.openai.api.common.OpenAiApiConstants;
+import org.springframework.ai.anthropic.AnthropicChatModel;
+import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -168,6 +172,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildOpenAiChatModel(apiKey, url);
                 case AZURE_OPENAI:
                     return buildAzureOpenAiChatModel(apiKey, url);
+                case ANTHROPIC:
+                    return buildAnthropicChatModel(apiKey, url);
+                case GEMINI:
+                    return buildGeminiChatModel(apiKey);
                 case OLLAMA:
                     return buildOllamaChatModel(url);
                 default:
@@ -206,6 +214,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(OpenAiChatModel.class);
             case AZURE_OPENAI:
                 return SpringUtil.getBean(AzureOpenAiChatModel.class);
+            case ANTHROPIC:
+                return SpringUtil.getBean(AnthropicChatModel.class);
+            case GEMINI:
+                return SpringUtil.getBean(GeminiChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             default:
@@ -260,7 +272,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         String cacheKey = buildClientCacheKey(MidjourneyApi.class, AiPlatformEnum.MIDJOURNEY.getPlatform(), apiKey,
                 url);
         return Singleton.get(cacheKey, (Func0<MidjourneyApi>) () -> {
-            YudaoAiProperties.MidjourneyProperties properties = SpringUtil.getBean(YudaoAiProperties.class)
+            YudaoAiProperties.Midjourney properties = SpringUtil.getBean(YudaoAiProperties.class)
                     .getMidjourney();
             return new MidjourneyApi(url, apiKey, properties.getNotifyUrl());
         });
@@ -347,7 +359,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link DashScopeImageAutoConfiguration} 的 dashScopeImageModel 方法
      */
     private static DashScopeImageModel buildTongYiImagesModel(String key) {
-        DashScopeImageApi dashScopeImageApi = new DashScopeImageApi(key);
+        DashScopeImageApi dashScopeImageApi = DashScopeImageApi.builder().apiKey(key).build();
         return DashScopeImageModel.builder()
                 .dashScopeApi(dashScopeImageApi)
                 .build();
@@ -397,7 +409,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#douBaoChatClient(YudaoAiProperties)}
      */
     private ChatModel buildDouBaoChatModel(String apiKey) {
-        YudaoAiProperties.DouBaoProperties properties = new YudaoAiProperties.DouBaoProperties()
+        YudaoAiProperties.DouBao properties = new YudaoAiProperties.DouBao()
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildDouBaoChatClient(properties);
     }
@@ -406,7 +418,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#hunYuanChatClient(YudaoAiProperties)}
      */
     private ChatModel buildHunYuanChatModel(String apiKey, String url) {
-        YudaoAiProperties.HunYuanProperties properties = new YudaoAiProperties.HunYuanProperties()
+        YudaoAiProperties.HunYuan properties = new YudaoAiProperties.HunYuan()
                 .setBaseUrl(url).setApiKey(apiKey);
         return new AiAutoConfiguration().buildHunYuanChatClient(properties);
     }
@@ -415,7 +427,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#siliconFlowChatClient(YudaoAiProperties)}
      */
     private ChatModel buildSiliconFlowChatModel(String apiKey) {
-        YudaoAiProperties.SiliconFlowProperties properties = new YudaoAiProperties.SiliconFlowProperties()
+        YudaoAiProperties.SiliconFlow properties = new YudaoAiProperties.SiliconFlow()
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildSiliconFlowChatClient(properties);
     }
@@ -473,7 +485,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private static XingHuoChatModel buildXingHuoChatModel(String key) {
         List<String> keys = StrUtil.split(key, '|');
         Assert.equals(keys.size(), 2, "XingHuoChatClient 的密钥需要 (appKey|secretKey) 格式");
-        YudaoAiProperties.XingHuoProperties properties = new YudaoAiProperties.XingHuoProperties()
+        YudaoAiProperties.XingHuo properties = new YudaoAiProperties.XingHuo()
                 .setAppKey(keys.get(0)).setSecretKey(keys.get(1));
         return new AiAutoConfiguration().buildXingHuoChatClient(properties);
     }
@@ -482,7 +494,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AiAutoConfiguration#baiChuanChatClient(YudaoAiProperties)}
      */
     private BaiChuanChatModel buildBaiChuanChatModel(String apiKey) {
-        YudaoAiProperties.BaiChuanProperties properties = new YudaoAiProperties.BaiChuanProperties()
+        YudaoAiProperties.BaiChuan properties = new YudaoAiProperties.BaiChuan()
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildBaiChuanChatClient(properties);
     }
@@ -510,6 +522,30 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .openAIClientBuilder(openAIClientBuilder)
                 .toolCallingManager(getToolCallingManager())
                 .build();
+    }
+
+    /**
+     * 可参考 {@link AnthropicChatAutoConfiguration} 的 anthropicApi 方法
+     */
+    private static AnthropicChatModel buildAnthropicChatModel(String apiKey, String url) {
+        AnthropicApi.Builder builder = AnthropicApi.builder().apiKey(apiKey);
+        if (StrUtil.isNotEmpty(url)) {
+            builder.baseUrl(url);
+        }
+        AnthropicApi anthropicApi = builder.build();
+        return AnthropicChatModel.builder()
+                .anthropicApi(anthropicApi)
+                .toolCallingManager(getToolCallingManager())
+                .build();
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#buildGeminiChatClient(YudaoAiProperties.Gemini)}
+     */
+    private static GeminiChatModel buildGeminiChatModel(String apiKey) {
+        YudaoAiProperties.Gemini properties = SpringUtil.getBean(YudaoAiProperties.class)
+                .getGemini().setApiKey(apiKey);
+        return new AiAutoConfiguration().buildGeminiChatClient(properties);
     }
 
     /**

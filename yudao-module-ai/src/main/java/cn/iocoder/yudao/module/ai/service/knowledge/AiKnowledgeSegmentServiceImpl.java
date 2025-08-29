@@ -18,6 +18,10 @@ import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
+import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
+import com.alibaba.cloud.ai.model.RerankModel;
+import com.alibaba.cloud.ai.model.RerankRequest;
+import com.alibaba.cloud.ai.model.RerankResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -27,6 +31,7 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +41,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_CONTENT_TOO_LONG;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_NOT_EXISTS;
+import static org.springframework.ai.vectorstore.SearchRequest.SIMILARITY_THRESHOLD_ACCEPT_ALL;
 
 /**
  * AI 知识库分片 Service 实现类
@@ -55,6 +61,11 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             VECTOR_STORE_METADATA_DOCUMENT_ID, String.class,
             VECTOR_STORE_METADATA_SEGMENT_ID, String.class);
 
+    /**
+     * Rerank 在向量检索时，检索数量 * 该系数，目的是为了提升 Rerank 的效果
+     */
+    private static final Integer RERANK_RETRIEVAL_FACTOR = 4;
+
     @Resource
     private AiKnowledgeSegmentMapper segmentMapper;
 
@@ -68,6 +79,9 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
     @Resource
     private TokenCountEstimator tokenCountEstimator;
+
+    @Autowired(required = false) // 由于 spring.ai.model.rerank 配置项，可以关闭 RerankModel 的功能，所以这里只能不强制注入
+    private RerankModel rerankModel;
 
     @Override
     public PageResult<AiKnowledgeSegmentDO> getKnowledgeSegmentPage(AiKnowledgeSegmentPageReqVO pageReqVO) {
@@ -211,28 +225,16 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         // 1. 校验
         AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(reqBO.getKnowledgeId());
 
-        // 2.1 向量检索
-        VectorStore vectorStore = getVectorStoreById(knowledge);
-        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
-                .query(reqBO.getContent())
-                .topK(ObjUtil.defaultIfNull(reqBO.getTopK(), knowledge.getTopK()))
-                .similarityThreshold(
-                        ObjUtil.defaultIfNull(reqBO.getSimilarityThreshold(), knowledge.getSimilarityThreshold()))
-                .filterExpression(new FilterExpressionBuilder()
-                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqBO.getKnowledgeId().toString())
-                        .build())
-                .build());
-        if (CollUtil.isEmpty(documents)) {
-            return ListUtil.empty();
-        }
-        // 2.2 段落召回
+        // 2. 检索
+        List<Document> documents = searchDocument(knowledge, reqBO);
+
+        // 3.1 段落召回
         List<AiKnowledgeSegmentDO> segments = segmentMapper
                 .selectListByVectorIds(convertList(documents, Document::getId));
         if (CollUtil.isEmpty(segments)) {
             return ListUtil.empty();
         }
-
-        // 3. 增加召回次数
+        // 3.2 增加召回次数
         segmentMapper.updateRetrievalCountIncrByIds(convertList(segments, AiKnowledgeSegmentDO::getId));
 
         // 4. 构建结果
@@ -247,6 +249,42 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         });
         result.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore())); // 按照分数降序排序
         return result;
+    }
+
+    /**
+     * 基于 Embedding + Rerank Model，检索知识库中的文档
+     *
+     * @param knowledge 知识库
+     * @param reqBO 检索请求
+     * @return 文档列表
+     */
+    private List<Document> searchDocument(AiKnowledgeDO knowledge, AiKnowledgeSegmentSearchReqBO reqBO) {
+        VectorStore vectorStore = getVectorStoreById(knowledge);
+        Integer topK = ObjUtil.defaultIfNull(reqBO.getTopK(), knowledge.getTopK());
+        Double similarityThreshold = ObjUtil.defaultIfNull(reqBO.getSimilarityThreshold(), knowledge.getSimilarityThreshold());
+
+        // 1. 向量检索
+        int searchTopK = rerankModel != null ? topK * RERANK_RETRIEVAL_FACTOR : topK;
+        double searchSimilarityThreshold = rerankModel != null ? SIMILARITY_THRESHOLD_ACCEPT_ALL : similarityThreshold;
+        SearchRequest.Builder searchRequestBuilder = SearchRequest.builder()
+                .query(reqBO.getContent())
+                .topK(searchTopK).similarityThreshold(searchSimilarityThreshold)
+                .filterExpression(new FilterExpressionBuilder()
+                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqBO.getKnowledgeId().toString()).build());
+        List<Document> documents = vectorStore.similaritySearch(searchRequestBuilder.build());
+        if (CollUtil.isEmpty(documents)) {
+            return documents;
+        }
+
+        // 2. Rerank 重排序
+        if (rerankModel != null) {
+            RerankResponse rerankResponse = rerankModel.call(new RerankRequest(reqBO.getContent(), documents,
+                    DashScopeRerankOptions.builder().withTopN(topK).build()));
+            documents = convertList(rerankResponse.getResults(),
+                    documentWithScore -> documentWithScore.getScore() >= similarityThreshold
+                            ? documentWithScore.getOutput() : null);
+        }
+        return documents;
     }
 
     @Override
