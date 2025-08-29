@@ -52,6 +52,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.task.api.Task;
@@ -69,6 +70,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNode;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum.REJECT_CHILD_PROCESS;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseNodeType;
 import static java.util.Arrays.asList;
@@ -949,6 +951,29 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     status);
         }
 
+        // 1.3 如果子流程拒绝，设置其父流程也为拒绝状态，且结束父流程
+        // 相关问题链接：https://t.zsxq.com/kZhyb
+        if (Objects.equals(status, BpmProcessInstanceStatusEnum.REJECT.getStatus())
+                && StrUtil.isNotBlank(instance.getSuperExecutionId())) {
+            // 1.3.1 获取父流程实例 并标记为不通过
+            Execution execution = runtimeService.createExecutionQuery().executionId(instance.getSuperExecutionId()).singleResult();
+            ProcessInstance parentProcessInstance = getProcessInstance(execution.getProcessInstanceId());
+            updateProcessInstanceReject(parentProcessInstance, REJECT_CHILD_PROCESS.getReason());
+
+            // 1.3.2 结束父流程。需要在子流程结束事务提交后执行
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+                @Override
+                public void afterCompletion(int transactionStatus) {
+                    // 回滚情况，直接返回
+                    if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
+                        return;
+                    }
+                    taskService.moveTaskToEnd(parentProcessInstance.getId(),REJECT_CHILD_PROCESS.getReason());
+                }
+            });
+        }
+
         // 2. 发送对应的消息通知
         if (Objects.equals(status, BpmProcessInstanceStatusEnum.APPROVE.getStatus())) {
             messageService.sendMessageWhenProcessInstanceApprove(
@@ -996,17 +1021,18 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 if (ObjUtil.notEqual(instance.getName(), name)) {
                     runtimeService.setProcessInstanceName(instance.getProcessInstanceId(), name);
                 }
+
+                // 流程前置通知：需要在流程启动后(事务提交后)，保证 variables 已设置
+                // 相关问题链接：https://t.zsxq.com/DF7Kq
+                if (ObjUtil.isNull(processDefinitionInfo.getProcessBeforeTriggerSetting())) {
+                    return;
+                }
+                BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
+                BpmHttpRequestUtils.executeBpmHttpRequest(instance,
+                        setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
             }
 
         });
-
-        // 流程前置通知
-        if (ObjUtil.isNull(processDefinitionInfo.getProcessBeforeTriggerSetting())) {
-            return;
-        }
-        BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
-        BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
     }
 
 }

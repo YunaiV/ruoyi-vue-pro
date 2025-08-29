@@ -19,6 +19,7 @@ public enum BpmReasonEnum {
     CANCEL_PROCESS_INSTANCE_BY_START_USER("用户主动取消流程，原因：{}"), // 场景：用户主动取消流程
     CANCEL_PROCESS_INSTANCE_BY_ADMIN("管理员【{}】取消流程，原因：{}"), // 场景：管理员取消流程
     CANCEL_CHILD_PROCESS_INSTANCE_BY_MAIN_PROCESS("子流程自动取消，原因：主流程已取消"),
+    REJECT_CHILD_PROCESS("子流程审批不通过"),
 
     // ========== 流程任务的独有原因 ==========
 
