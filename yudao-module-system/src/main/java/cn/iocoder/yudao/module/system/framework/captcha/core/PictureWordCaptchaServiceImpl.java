@@ -8,8 +8,8 @@ import com.anji.captcha.service.impl.CaptchaServiceFactory;
 import com.anji.captcha.util.AESUtil;
 import com.anji.captcha.util.ImageUtils;
 import com.anji.captcha.util.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 import cn.hutool.core.util.RandomUtil;
+import org.apache.commons.lang3.Strings;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -82,7 +82,7 @@ public class PictureWordCaptchaServiceImpl extends AbstractCaptchaService {
 
         // 用户输入的验证码(CaptchaVO 中 没有预留字段，暂时用 pointJson 无需加解密)
         String userCode = captchaVO.getPointJson();
-        if (!StringUtils.equalsIgnoreCase(code, userCode)) {
+        if (!Strings.CI.equals(code, userCode)) {
             afterValidateFail(captchaVO);
             return ResponseModel.errorMsg(RepCodeEnum.API_CAPTCHA_COORDINATE_ERROR);
         }

@@ -75,7 +75,7 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
         if (TenantBaseDO.class.isAssignableFrom(tableInfo.getEntityType())) {
             return false;
         }
-        // 如果添加了 @TenantIgnore 注解，显然也不忽略租户
+        // 如果添加了 @TenantIgnore 注解，则忽略租户
         TenantIgnore tenantIgnore = tableInfo.getEntityType().getAnnotation(TenantIgnore.class);
         return tenantIgnore != null;
     }

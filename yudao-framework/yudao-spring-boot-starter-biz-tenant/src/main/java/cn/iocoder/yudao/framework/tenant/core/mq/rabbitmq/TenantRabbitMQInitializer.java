@@ -13,8 +13,7 @@ public class TenantRabbitMQInitializer implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof RabbitTemplate) {
-            RabbitTemplate rabbitTemplate = (RabbitTemplate) bean;
+        if (bean instanceof RabbitTemplate rabbitTemplate) {
             rabbitTemplate.addBeforePublishPostProcessors(new TenantRabbitMQMessagePostProcessor());
         }
         return bean;
