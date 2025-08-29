@@ -77,8 +77,7 @@ public class AuthRequestFactory {
             extendList = extend.getConfig()
                     .keySet()
                     .stream()
-                    .map(String::toUpperCase)
-                    .filter(names::contains)
+                    .filter(x -> names.contains(x.toUpperCase()))
                     .collect(Collectors.toList());
         }
 

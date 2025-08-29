@@ -18,8 +18,10 @@ import java.util.Objects;
 public class DefaultDBFieldHandler implements MetaObjectHandler {
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     public void insertFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO baseDO) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
+            BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();
 
             LocalDateTime current = LocalDateTime.now();
             // 创建时间为空，则以当前时间为插入时间
