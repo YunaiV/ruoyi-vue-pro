@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -80,6 +81,13 @@ public class AiChatRoleDO extends BaseDO {
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> toolIds;
+    /**
+     * 引用的 MCP Client 名字列表
+     *
+     * 关联 spring.ai.mcp.client 下的名字
+     */
+    @TableField(typeHandler = StringListTypeHandler.class)
+    private List<String> mcpClientNames;
 
     /**
      * 是否公开

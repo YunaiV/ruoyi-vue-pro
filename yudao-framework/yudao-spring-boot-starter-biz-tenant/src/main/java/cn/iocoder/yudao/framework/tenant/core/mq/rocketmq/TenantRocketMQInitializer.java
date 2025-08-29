@@ -17,10 +17,13 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public class TenantRocketMQInitializer implements BeanPostProcessor {
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof DefaultRocketMQListenerContainer container) {
+        if (bean instanceof DefaultRocketMQListenerContainer) {
+            DefaultRocketMQListenerContainer container = (DefaultRocketMQListenerContainer) bean;
             initTenantConsumer(container.getConsumer());
-        } else if (bean instanceof RocketMQTemplate template) {
+        } else if (bean instanceof RocketMQTemplate) {
+            RocketMQTemplate template = (RocketMQTemplate) bean;
             initTenantProducer(template.getProducer());
         }
         return bean;

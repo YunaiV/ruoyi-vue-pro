@@ -37,4 +37,7 @@ public class AiChatRoleSaveMyReqVO {
     @Schema(description = "引用的工具编号列表", example = "1,2,3")
     private List<Long> toolIds;
 
+    @Schema(description = "引用的 MCP Client 名字列表", example = "filesystem")
+    private List<String> mcpClientNames;
+
 }

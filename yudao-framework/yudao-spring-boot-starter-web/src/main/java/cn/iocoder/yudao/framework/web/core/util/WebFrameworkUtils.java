@@ -145,11 +145,13 @@ public class WebFrameworkUtils {
         return (CommonResult<?>) request.getAttribute(REQUEST_ATTRIBUTE_COMMON_RESULT);
     }
 
+    @SuppressWarnings("PatternVariableCanBeUsed")
     public static HttpServletRequest getRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (!(requestAttributes instanceof ServletRequestAttributes servletRequestAttributes)) {
+        if (!(requestAttributes instanceof ServletRequestAttributes)) {
             return null;
         }
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         return servletRequestAttributes.getRequest();
     }
 

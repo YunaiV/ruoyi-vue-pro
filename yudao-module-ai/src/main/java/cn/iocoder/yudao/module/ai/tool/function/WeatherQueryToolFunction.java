@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.model.tool;
+package cn.iocoder.yudao.module.ai.tool.function;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.RandomUtil;

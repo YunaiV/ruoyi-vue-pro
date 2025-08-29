@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.framework.ai.core;
+package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;

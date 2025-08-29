@@ -8,9 +8,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -23,13 +23,15 @@ import java.util.List;
  */
 public class XingHuoChatModelTests {
 
-    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-        .openAiApi(OpenAiApi.builder()
-                .baseUrl(XingHuoChatModel.BASE_URL)
+    private final DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+        .deepSeekApi(DeepSeekApi.builder()
+                .baseUrl(XingHuoChatModel.BASE_URL_V2)
+                .completionsPath(XingHuoChatModel.BASE_COMPLETIONS_PATH_V2)
                 .apiKey("75b161ed2aef4719b275d6e7f2a4d4cd:YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz") // appKey:secretKey
                 .build())
-        .defaultOptions(OpenAiChatOptions.builder()
-                .model("generalv3.5") // 模型
+        .defaultOptions(DeepSeekChatOptions.builder()
+//                .model("generalv3.5") // 模型
+                .model("x1") // 模型
                 .temperature(0.7)
                 .build())
         .build();
@@ -62,6 +64,25 @@ public class XingHuoChatModelTests {
         Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages));
         // 打印结果
         flux.doOnNext(System.out::println).then().block();
+    }
+
+    @Test
+    @Disabled
+    public void testStream_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
+                .model("x1")
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
     }
 
 }
