@@ -34,7 +34,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiToolService;
 import cn.iocoder.yudao.module.ai.util.AiUtils;
-import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
+import cn.iocoder.yudao.module.ai.util.FileTypeUtils;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.client.McpSyncClient;
 import jakarta.annotation.Resource;

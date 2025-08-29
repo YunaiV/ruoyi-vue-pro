@@ -804,7 +804,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     .setTargetTaskDefinitionKey(returnTaskId).setReason(reqVO.getReason()));
             return;
         }
-        // 3.2 情况二：直接结束，审批不通过
+
+        // 3.2 情况二： 标记流程为不通过并结束流程
         processInstanceService.updateProcessInstanceReject(instance, reqVO.getReason()); // 标记不通过
         moveTaskToEnd(task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason())); // 结束流程
     }
@@ -986,6 +987,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void moveTaskToEnd(String processInstanceId, String reason) {
         List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
         if (CollUtil.isEmpty(taskList)) {
