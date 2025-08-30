@@ -23,7 +23,13 @@ public class TDengineTableField {
     public static final String TYPE_DOUBLE = "DOUBLE";
     public static final String TYPE_BOOL = "BOOL";
     public static final String TYPE_NCHAR = "NCHAR";
+    public static final String TYPE_VARCHAR = "VARCHAR";
     public static final String TYPE_TIMESTAMP = "TIMESTAMP";
+
+    /**
+     * 字段长度 - VARCHAR 默认长度
+     */
+    public static final int LENGTH_VARCHAR = 1024;
 
     /**
      * 注释 - TAG 字段

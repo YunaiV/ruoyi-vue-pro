@@ -53,6 +53,12 @@ public abstract class AbstractRedisStreamMessageListener<T extends AbstractRedis
         this.streamKey = messageType.getDeclaredConstructor().newInstance().getStreamKey();
     }
 
+    protected AbstractRedisStreamMessageListener(String streamKey, String group) {
+        this.messageType = null;
+        this.streamKey = streamKey;
+        this.group = group;
+    }
+
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
         // 消费消息

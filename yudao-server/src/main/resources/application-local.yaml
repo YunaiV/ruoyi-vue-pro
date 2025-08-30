@@ -185,6 +185,7 @@ logging:
     cn.iocoder.yudao.module.erp.dal.mysql: debug
     cn.iocoder.yudao.module.iot.dal.mysql: debug
     cn.iocoder.yudao.module.iot.dal.tdengine: DEBUG
+    cn.iocoder.yudao.module.iot.service.rule: debug
     cn.iocoder.yudao.module.ai.dal.mysql: debug
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
 
@@ -265,8 +266,3 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
-
---- #################### iot相关配置 TODO 芋艿【IOT】：再瞅瞅 ####################
-pf4j:
-#  pluginsDir: /tmp/
-  pluginsDir: ../plugins

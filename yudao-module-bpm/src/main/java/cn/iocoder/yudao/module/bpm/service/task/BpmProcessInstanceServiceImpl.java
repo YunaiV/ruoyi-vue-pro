@@ -958,7 +958,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 1.3.1 获取父流程实例 并标记为不通过
             Execution execution = runtimeService.createExecutionQuery().executionId(instance.getSuperExecutionId()).singleResult();
             ProcessInstance parentProcessInstance = getProcessInstance(execution.getProcessInstanceId());
-            updateProcessInstanceReject(parentProcessInstance, REJECT_CHILD_PROCESS.getReason());
+            updateProcessInstanceReject(parentProcessInstance, BpmReasonEnum.REJECT_CHILD_PROCESS.getReason());
 
             // 1.3.2 结束父流程。需要在子流程结束事务提交后执行
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -969,7 +969,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     if (ObjectUtil.equal(transactionStatus, TransactionSynchronization.STATUS_ROLLED_BACK)) {
                         return;
                     }
-                    taskService.moveTaskToEnd(parentProcessInstance.getId(),REJECT_CHILD_PROCESS.getReason());
+                    taskService.moveTaskToEnd(parentProcessInstance.getId(), BpmReasonEnum.REJECT_CHILD_PROCESS.getReason());
                 }
             });
         }

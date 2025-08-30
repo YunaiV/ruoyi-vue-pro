@@ -1,16 +1,20 @@
 package cn.iocoder.yudao.framework.mybatis.config;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserGlobal;
 import com.baomidou.mybatisplus.extension.parser.cache.JdkSerialCaffeineJsqlParseCache;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -18,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -73,6 +78,17 @@ public class YudaoMybatisAutoConfiguration {
         }
         // 找不到合适的 IKeyGenerator 实现类
         throw new IllegalArgumentException(StrUtil.format("DbType{} 找不到合适的 IKeyGenerator 实现类", dbType));
+    }
+
+    @Bean
+    public JacksonTypeHandler jacksonTypeHandler(List<ObjectMapper> objectMappers) {
+        // 特殊：设置 JacksonTypeHandler 的 ObjectMapper！
+        ObjectMapper objectMapper = CollUtil.getFirst(objectMappers);
+        if (objectMapper == null) {
+            objectMapper = JsonUtils.getObjectMapper();
+        }
+        JacksonTypeHandler.setObjectMapper(objectMapper);
+        return new JacksonTypeHandler(Object.class);
     }
 
 }
