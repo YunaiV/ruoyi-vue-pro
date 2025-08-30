@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 
@@ -21,7 +20,6 @@ import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = false) // 设置 chain = false，避免用户导入有问题
 public class CrmCustomerImportExcelVO {
 
     @ExcelProperty("客户名称")
