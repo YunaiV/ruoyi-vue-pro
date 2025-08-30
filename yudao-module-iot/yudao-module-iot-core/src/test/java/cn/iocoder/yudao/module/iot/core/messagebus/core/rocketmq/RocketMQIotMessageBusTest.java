@@ -60,7 +60,7 @@ public class RocketMQIotMessageBusTest {
         messageBus.post(topic, testMessage);
 
         // 创建订阅者
-        IotMessageSubscriber<String> subscriber1 = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> subscriber1 = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {
@@ -118,7 +118,7 @@ public class RocketMQIotMessageBusTest {
         messageBus.post(topic, testMessage);
 
         // 创建第一个订阅者
-        IotMessageSubscriber<TestMessage> subscriber1 = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<TestMessage> subscriber1 = new IotMessageSubscriber<TestMessage>() {
 
             @Override
             public String getTopic() {
@@ -142,7 +142,7 @@ public class RocketMQIotMessageBusTest {
 
         };
         // 创建第二个订阅者
-        IotMessageSubscriber<TestMessage> subscriber2 = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<TestMessage> subscriber2 = new IotMessageSubscriber<TestMessage>() {
 
             @Override
             public String getTopic() {
@@ -205,7 +205,7 @@ public class RocketMQIotMessageBusTest {
         messageBus.post(topic2, message2);
 
         // 创建订阅者 1 - 只订阅设备状态
-        IotMessageSubscriber<String> statusSubscriber = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> statusSubscriber = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {
@@ -228,7 +228,7 @@ public class RocketMQIotMessageBusTest {
 
         };
         // 创建订阅者 2 - 只订阅设备数据
-        IotMessageSubscriber<String> dataSubscriber = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> dataSubscriber = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {

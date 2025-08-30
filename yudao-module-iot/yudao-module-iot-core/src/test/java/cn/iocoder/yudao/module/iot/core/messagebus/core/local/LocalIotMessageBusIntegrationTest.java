@@ -48,7 +48,7 @@ public class LocalIotMessageBusIntegrationTest {
         AtomicInteger subscriber2Count = new AtomicInteger(0);
 
         // 创建第一个订阅者
-        IotMessageSubscriber<String> subscriber1 = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> subscriber1 = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {
@@ -70,7 +70,7 @@ public class LocalIotMessageBusIntegrationTest {
 
         };
         // 创建第二个订阅者
-        IotMessageSubscriber<String> subscriber2 = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> subscriber2 = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {
@@ -121,7 +121,7 @@ public class LocalIotMessageBusIntegrationTest {
         CountDownLatch latch = new CountDownLatch(2);
 
         // 创建订阅者 1 - 只订阅设备状态
-        IotMessageSubscriber<String> statusSubscriber = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> statusSubscriber = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {
@@ -142,7 +142,7 @@ public class LocalIotMessageBusIntegrationTest {
 
         };
         // 创建订阅者 2 - 只订阅设备数据
-        IotMessageSubscriber<String> dataSubscriber = new IotMessageSubscriber<>() {
+        IotMessageSubscriber<String> dataSubscriber = new IotMessageSubscriber<String>() {
 
             @Override
             public String getTopic() {
