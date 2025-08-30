@@ -15,13 +15,13 @@ import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskDeviceScopeEnum;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskRecordStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 

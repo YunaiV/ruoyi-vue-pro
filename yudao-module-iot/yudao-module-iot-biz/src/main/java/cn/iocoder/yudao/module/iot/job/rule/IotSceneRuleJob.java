@@ -3,11 +3,11 @@ package cn.iocoder.yudao.module.iot.job.rule;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.IotSceneRuleService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**

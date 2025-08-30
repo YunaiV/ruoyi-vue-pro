@@ -11,10 +11,10 @@ import cn.iocoder.yudao.module.iot.service.alert.IotAlertRecordService;
 import cn.iocoder.yudao.module.system.api.mail.MailSendApi;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.sms.SmsSendApi;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.util.List;
 
 // TODO @puhui999、@芋艿：未测试；需要场景联动开发完

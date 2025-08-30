@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.core.enums;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -57,7 +58,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     /**
      * 不进行 reply 回复的方法集合
      */
-    public static final Set<String> REPLY_DISABLED = Set.of(
+    public static final Set<String> REPLY_DISABLED = SetUtils.asSet(
             STATE_UPDATE.getMethod(),
             OTA_PROGRESS.getMethod() // 参考阿里云，OTA 升级进度上报，不进行回复
     );

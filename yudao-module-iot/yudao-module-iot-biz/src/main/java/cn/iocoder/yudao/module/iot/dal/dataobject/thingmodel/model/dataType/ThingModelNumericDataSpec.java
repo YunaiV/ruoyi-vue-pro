@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.dataType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 /**
  * IoT 物模型数据类型为数值的 DataSpec 定义

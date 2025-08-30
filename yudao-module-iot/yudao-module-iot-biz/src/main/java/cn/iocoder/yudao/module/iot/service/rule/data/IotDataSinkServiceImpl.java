@@ -8,12 +8,12 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSin
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotDataSinkMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
-import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 

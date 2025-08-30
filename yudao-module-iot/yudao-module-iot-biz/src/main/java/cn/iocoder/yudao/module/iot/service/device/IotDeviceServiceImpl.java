@@ -22,8 +22,6 @@ import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import jakarta.annotation.Resource;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
+import javax.annotation.Resource;
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -490,11 +490,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     public void updateDeviceFirmware(Long deviceId, Long firmwareId) {
         // 1. 校验设备是否存在
         IotDeviceDO device = validateDeviceExists(deviceId);
-        
+
         // 2. 更新设备固件版本
         IotDeviceDO updateObj = new IotDeviceDO().setId(deviceId).setFirmwareId(firmwareId);
         deviceMapper.updateById(updateObj);
-        
+
         // 3. 清空对应缓存
         deleteDeviceCache(device);
     }

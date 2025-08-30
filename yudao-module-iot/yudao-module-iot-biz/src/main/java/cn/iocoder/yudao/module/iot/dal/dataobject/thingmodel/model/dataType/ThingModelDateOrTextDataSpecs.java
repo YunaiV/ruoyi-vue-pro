@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.dataType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.validation.constraints.Max;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.Max;
 
 /**
  * IoT 物模型数据类型为时间型或文本型的 DataSpec 定义

@@ -14,13 +14,12 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,7 +37,7 @@ public class IotAlertConfigController {
 
     @Resource
     private IotAlertConfigService alertConfigService;
-    
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -80,7 +79,7 @@ public class IotAlertConfigController {
     @PreAuthorize("@ss.hasPermission('iot:alert-config:query')")
     public CommonResult<PageResult<IotAlertConfigRespVO>> getAlertConfigPage(@Valid IotAlertConfigPageReqVO pageReqVO) {
         PageResult<IotAlertConfigDO> pageResult = alertConfigService.getAlertConfigPage(pageReqVO);
-        
+
         // 转换返回
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSetByFlatMap(pageResult.getList(), config -> config.getReceiveUserIds().stream()));

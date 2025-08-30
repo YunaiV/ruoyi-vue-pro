@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Schema(description = "管理后台 - 通过产品标识和设备名称列表获取设备 Request VO")
@@ -19,4 +19,4 @@ public class IotDeviceByProductKeyAndNamesReqVO {
     @NotEmpty(message = "设备名称列表不能为空")
     private List<String> deviceNames;
 
-} 
+}

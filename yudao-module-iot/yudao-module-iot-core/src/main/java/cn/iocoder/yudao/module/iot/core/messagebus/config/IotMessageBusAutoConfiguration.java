@@ -115,7 +115,7 @@ public class IotMessageBusAutoConfiguration {
 
         private List<AbstractRedisStreamMessageListener<?>> getListeners(IotRedisMessageBus messageBus) {
             return convertList(messageBus.getSubscribers(), subscriber ->
-                    new AbstractRedisStreamMessageListener<>(subscriber.getTopic(), subscriber.getGroup()) {
+                    new AbstractRedisStreamMessageListener<AbstractRedisStreamMessage>(subscriber.getTopic(), subscriber.getGroup()) {
 
                         @Override
                         public void onMessage(AbstractRedisStreamMessage message) {
