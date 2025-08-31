@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 
+import java.util.Optional;
+
 /**
  * AI 模块的 Security 配置
  */
@@ -15,7 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 public class SecurityConfiguration {
 
     @Resource
-    private McpServerProperties serverProperties;
+    private Optional<McpServerProperties> serverProperties;
 
     @Bean("aiAuthorizeRequestsCustomizer")
     public AuthorizeRequestsCustomizer authorizeRequestsCustomizer() {
@@ -24,8 +26,10 @@ public class SecurityConfiguration {
             @Override
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
                 // MCP Server
-                registry.requestMatchers(serverProperties.getSseEndpoint()).permitAll();
-                registry.requestMatchers(serverProperties.getSseMessageEndpoint()).permitAll();
+                serverProperties.ifPresent(properties -> {
+                    registry.requestMatchers(properties.getSseEndpoint()).permitAll();
+                    registry.requestMatchers(properties.getSseMessageEndpoint()).permitAll();
+                });
             }
 
         };
