@@ -165,7 +165,8 @@ public class YudaoWebSecurityConfigurerAdapter {
         // 获得有 @PermitAll 注解的接口
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethodMap.entrySet()) {
             HandlerMethod handlerMethod = entry.getValue();
-            if (!handlerMethod.hasMethodAnnotation(PermitAll.class)) {
+            if (!handlerMethod.hasMethodAnnotation(PermitAll.class) // 方法级
+                && !handlerMethod.getBeanType().isAnnotationPresent(PermitAll.class)) { // 接口级
                 continue;
             }
             Set<String> urls = new HashSet<>();

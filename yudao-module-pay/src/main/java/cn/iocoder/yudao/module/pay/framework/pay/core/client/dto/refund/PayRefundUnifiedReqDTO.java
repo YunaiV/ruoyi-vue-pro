@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.DecimalMin;
@@ -16,7 +15,6 @@ import javax.validation.constraints.NotNull;
  *
  * @author jason
  */
-@Accessors(chain = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
