@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.ota;
 
-4import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;

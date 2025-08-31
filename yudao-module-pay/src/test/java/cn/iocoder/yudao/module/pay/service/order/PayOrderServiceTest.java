@@ -610,7 +610,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         orderExtensionMapper.insert(orderExtension);
         // 重要：需要将 order 的 extensionId 更新下
         order.setExtensionId(orderExtension.getId());
-        orderMapper.updateById(order);
+        orderMapper.updateById(new PayOrderDO().setId(order.getId()).setExtensionId(orderExtension.getId()));
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
@@ -622,7 +622,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 断言 PayOrderExtensionDO ：数据未更新，因为它是 SUCCESS
         assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
         // 断言 PayOrderDO ：数据未更新，因为它是 SUCCESS
-        assertPojoEquals(order, orderMapper.selectOne(null));
+        assertPojoEquals(order, orderMapper.selectOne(null), "updateTime", "updater");
         // 断言，调用
         verify(notifyService, never()).createPayNotifyTask(anyInt(), anyLong());
     }
