@@ -137,7 +137,8 @@ public class YudaoTenantAutoConfiguration {
         // 获得有 @TenantIgnore 注解的接口
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethodMap.entrySet()) {
             HandlerMethod handlerMethod = entry.getValue();
-            if (!handlerMethod.hasMethodAnnotation(TenantIgnore.class)) {
+            if (!handlerMethod.hasMethodAnnotation(TenantIgnore.class) // 方法级
+                && !handlerMethod.getBeanType().isAnnotationPresent(TenantIgnore.class)) { // 接口级
                 continue;
             }
             // 添加到忽略的 URL 中
