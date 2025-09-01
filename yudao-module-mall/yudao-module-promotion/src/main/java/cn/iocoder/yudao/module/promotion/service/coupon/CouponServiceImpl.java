@@ -166,6 +166,10 @@ public class CouponServiceImpl implements CouponService {
     public void invalidateCouponsByAdmin(List<Long> giveCouponIds, Long userId) {
         // 循环收回
         for (Long couponId : giveCouponIds) {
+            // couponId 为空或 0 则跳过
+            if (null == couponId || couponId <= 0) {
+                continue;
+            }
             try {
                 getSelf().invalidateCoupon(couponId, userId);
             } catch (Exception e) {

@@ -36,44 +36,47 @@ public class DouBaoMcpTests {
 
     @Test
     public void testMcpGetUserInfo() {
-
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("目前有哪些工具可以使用")
                 .call()
                 .content());
         System.out.println("====================================");
+
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("小新的年龄是多少")
                 .call()
                 .content());
         System.out.println("====================================");
+
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("获取小新的基本信息")
                 .call()
                 .content());
         System.out.println("====================================");
+
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("小新是什么职业的")
                 .call()
                 .content());
         System.out.println("====================================");
+
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("小新的教育背景")
                 .call()
                 .content());
         System.out.println("====================================");
+
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("小新的兴趣爱好是什么")
                 .call()
                 .content());
         System.out.println("====================================");
-
     }
 
 

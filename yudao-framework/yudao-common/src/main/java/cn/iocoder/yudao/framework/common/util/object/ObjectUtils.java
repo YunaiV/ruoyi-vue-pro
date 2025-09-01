@@ -60,4 +60,8 @@ public class ObjectUtils {
         return Arrays.asList(array).contains(obj);
     }
 
+    public static boolean isNotAllEmpty(Object... objs) {
+        return !ObjectUtil.isAllEmpty(objs);
+    }
+
 }

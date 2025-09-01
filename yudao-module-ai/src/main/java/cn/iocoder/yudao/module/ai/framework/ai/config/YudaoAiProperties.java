@@ -14,48 +14,53 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class YudaoAiProperties {
 
     /**
+     * 谷歌 Gemini
+     */
+    private Gemini gemini;
+
+    /**
      * 字节豆包
      */
-    @SuppressWarnings("SpellCheckingInspection")
-    private DouBaoProperties doubao;
+    private DouBao doubao;
 
     /**
      * 腾讯混元
      */
-    @SuppressWarnings("SpellCheckingInspection")
-    private HunYuanProperties hunyuan;
+    private HunYuan hunyuan;
 
     /**
      * 硅基流动
      */
-    @SuppressWarnings("SpellCheckingInspection")
-    private SiliconFlowProperties siliconflow;
+    private SiliconFlow siliconflow;
 
     /**
      * 讯飞星火
      */
-    @SuppressWarnings("SpellCheckingInspection")
-    private XingHuoProperties xinghuo;
+    private XingHuo xinghuo;
 
     /**
      * 百川
      */
-    @SuppressWarnings("SpellCheckingInspection")
-    private BaiChuanProperties baichuan;
+    private BaiChuan baichuan;
 
     /**
      * Midjourney 绘图
      */
-    private MidjourneyProperties midjourney;
+    private Midjourney midjourney;
 
     /**
      * Suno 音乐
      */
     @SuppressWarnings("SpellCheckingInspection")
-    private SunoProperties suno;
+    private Suno suno;
+
+    /**
+     * 网络搜索
+     */
+    private WebSearch webSearch;
 
     @Data
-    public static class DouBaoProperties {
+    public static class Gemini {
 
         private String enable;
         private String apiKey;
@@ -68,7 +73,20 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class HunYuanProperties {
+    public static class DouBao {
+
+        private String enable;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class HunYuan {
 
         private String enable;
         private String baseUrl;
@@ -82,7 +100,7 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class SiliconFlowProperties {
+    public static class SiliconFlow {
 
         private String enable;
         private String apiKey;
@@ -95,7 +113,7 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class XingHuoProperties {
+    public static class XingHuo {
 
         private String enable;
         private String appId;
@@ -110,7 +128,7 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class  BaiChuanProperties {
+    public static class BaiChuan {
 
         private String enable;
         private String apiKey;
@@ -123,7 +141,7 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class MidjourneyProperties {
+    public static class Midjourney {
 
         private String enable;
         private String baseUrl;
@@ -134,11 +152,20 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class SunoProperties {
+    public static class Suno {
 
-        private boolean enable = false;
+        private boolean enable;
 
         private String baseUrl;
+
+    }
+
+    @Data
+    public static class WebSearch {
+
+        private boolean enable;
+
+        private String apiKey;
 
     }
 

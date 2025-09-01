@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.iot.service.ota;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
+import cn.hutool.crypto.digest.DigestAlgorithm;
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareCreateReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwarePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaFirmwareMapper;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
@@ -17,16 +17,23 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE;
 
-@Slf4j
+/**
+ * OTA 固件管理 Service 实现类
+ *
+ * @author Shelly Chan
+ */
 @Service
 @Validated
+@Slf4j
 public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Resource
@@ -37,16 +44,22 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Override
     public Long createOtaFirmware(IotOtaFirmwareCreateReqVO saveReqVO) {
-        // 1. 校验固件产品 + 版本号不能重复
-        validateProductAndVersionDuplicate(saveReqVO.getProductId(), saveReqVO.getVersion());
+        // 1.1 校验固件产品 + 版本号不能重复
+        if (otaFirmwareMapper.selectByProductIdAndVersion(saveReqVO.getProductId(), saveReqVO.getVersion()) != null) {
+            throw exception(OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE);
+        }
+        // 1.2 校验产品存在
+        productService.validateProductExists(saveReqVO.getProductId());
 
-        // 2.1.转化数据格式，准备存储到数据库中
+        // 2. 构建对象 + 存储
         IotOtaFirmwareDO firmware = BeanUtils.toBean(saveReqVO, IotOtaFirmwareDO.class);
-        // 2.2.查询ProductKey
-        // TODO @li：productService.getProduct(Convert.toLong(firmware.getProductId())) 放到 1. 后面，先做参考校验。逻辑两段：1）先参数校验；2）构建对象 + 存储
-        IotProductDO product = productService.getProduct(Convert.toLong(firmware.getProductId()));
-        firmware.setProductKey(Objects.requireNonNull(product).getProductKey());
-        // TODO @芋艿: 附件、附件签名等属性的计算
+        // 2.1 计算文件签名等属性
+        try {
+            calculateFileDigest(firmware);
+        } catch (Exception e) {
+            log.error("[createOtaFirmware][url({}) 计算文件签名失败]", firmware.getFileUrl(), e);
+            throw new RuntimeException("计算文件签名失败: " + e.getMessage());
+        }
         otaFirmwareMapper.insert(firmware);
         return firmware.getId();
     }
@@ -67,6 +80,19 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
     }
 
     @Override
+    public IotOtaFirmwareDO getOtaFirmwareByProductIdAndVersion(Long productId, String version) {
+        return otaFirmwareMapper.selectByProductIdAndVersion(productId, version);
+    }
+
+    @Override
+    public List<IotOtaFirmwareDO> getOtaFirmwareList(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return otaFirmwareMapper.selectByIds(ids);
+    }
+
+    @Override
     public PageResult<IotOtaFirmwareDO> getOtaFirmwarePage(IotOtaFirmwarePageReqVO pageReqVO) {
         return otaFirmwareMapper.selectPage(pageReqVO);
     }
@@ -80,25 +106,21 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
         return firmware;
     }
 
-    // TODO @li：注释有点冗余
     /**
-     * 验证产品和版本号是否重复
-     * <p>
-     * 该方法用于确保在系统中不存在具有相同产品ID和版本号的固件条目
-     * 它通过调用otaFirmwareMapper的selectByProductIdAndVersion方法来查询数据库中是否存在匹配的产品ID和版本号的固件信息
-     * 如果查询结果非空且不为null，则抛出异常，提示固件信息已存在，从而避免数据重复
+     * 计算文件签名
      *
-     * @param productId 产品ID，用于数据库查询
-     * @param version   版本号，用于数据库查询
-     * @throws cn.iocoder.yudao.framework.common.exception.ServiceException，则抛出异常，提示固件信息已存在
+     * @param firmware 固件对象
      */
-    private void validateProductAndVersionDuplicate(String productId, String version) {
-        // 查询数据库中是否存在具有相同产品ID和版本号的固件信息
-        List<IotOtaFirmwareDO> list = otaFirmwareMapper.selectByProductIdAndVersion(productId, version);
-        // 如果查询结果非空且不为null，则抛出异常，提示固件信息已存在
-        if (CollUtil.isNotEmpty(list)) {
-            throw exception(OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE);
-        }
+    private void calculateFileDigest(IotOtaFirmwareDO firmware) {
+        String fileUrl = firmware.getFileUrl();
+        // 下载文件并计算签名
+        byte[] fileBytes = HttpUtil.downloadBytes(fileUrl);
+        // 设置文件大小
+        firmware.setFileSize((long) fileBytes.length);
+        // 计算 MD5 签名
+        firmware.setFileDigestAlgorithm(DigestAlgorithm.MD5.getValue());
+        String md5Hex = DigestUtil.digester(firmware.getFileDigestAlgorithm()).digestHex(new ByteArrayInputStream(fileBytes));
+        firmware.setFileDigestValue(md5Hex);
     }
 
 }

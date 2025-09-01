@@ -175,7 +175,8 @@ spring:
     azure: # OpenAI 微软
       openai:
         endpoint: https://eastusprejade.openai.azure.com
-        api-key: xxx
+    anthropic: # Anthropic Claude
+      api-key: sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
@@ -183,7 +184,7 @@ spring:
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
     dashscope: # 通义千问
-      api-key: sk-71800982914041848008480000000000
+      api-key: sk-47aa124781be4bfb95244cc62f6xxxx
     minimax: # Minimax：https://www.minimaxi.com/
       api-key: xxxx
     moonshot: # 月之暗灭（KIMI）
@@ -193,9 +194,30 @@ spring:
       chat:
         options:
           model: deepseek-chat
+    model:
+      rerank: false # 是否开启“通义千问”的 Rerank 模型，填写 dashscope 开启
+    mcp:
+      server:
+        enabled: false
+        name: yudao-mcp-server
+        version: 1.0.0
+        instructions: 一个 MCP 示例服务
+        sse-endpoint: /sse
+      client:
+        enabled: false
+        name: mcp
+        sse:
+          connections:
+            filesystem:
+              url: http://127.0.0.1:8089
+              sse-endpoint: /sse
 
 yudao:
   ai:
+    gemini: # 谷歌 Gemini
+      enable: true
+      api-key: AIzaSyAVoBxgoFvvte820vEQMma2LKBnC98bqMQ
+      model: gemini-2.5-flash
     doubao: # 字节豆包
       enable: true
       api-key: 5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272
@@ -212,7 +234,7 @@ yudao:
       enable: true
       appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
       secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
-      model: generalv3.5
+      model: x1
     baichuan: # 百川智能
       enable: true
       api-key: sk-abc
@@ -227,6 +249,9 @@ yudao:
       enable: true
   #    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
       base-url: http://127.0.0.1:3001
+    web-search:
+      enable: true
+      api-key: sk-40500e52840f4d24b956d0b1d80d9abe
 
 --- #################### 芋道相关配置 ####################
 
@@ -319,8 +344,8 @@ yudao:
       kd100:
         key: pLXUGAwK5305
         customer: E77DF18BE109F454A5CD319E44BF5177
+  iot:
+    message-bus:
+      type: redis # 消息总线的类型
 
 debug: false
-# 插件配置 TODO 芋艿：【IOT】需要处理下
-pf4j:
-  pluginsDir: /Users/anhaohao/code/gitee/ruoyi-vue-pro/plugins # 插件目录

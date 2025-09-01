@@ -1,0 +1,130 @@
+spring:
+  application:
+    name: iot-gateway-server
+  profiles:
+    active: local # 默认激活本地开发环境
+
+  # Redis 配置
+  data:
+    redis:
+      host: 127.0.0.1 # Redis 服务器地址
+      port: 6379 # Redis 服务器端口
+      database: 0 # Redis 数据库索引
+      # password: # Redis 密码，如果有的话
+      timeout: 30000ms # 连接超时时间
+
+--- #################### 消息队列相关 ####################
+
+# rocketmq 配置项，对应 RocketMQProperties 配置类
+rocketmq:
+  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
+  # Producer 配置项
+  producer:
+    group: ${spring.application.name}_PRODUCER # 生产者分组
+
+--- #################### IoT 网关相关配置 ####################
+
+yudao:
+  iot:
+    # 消息总线配置
+    message-bus:
+      type: redis # 消息总线的类型
+
+    # 网关配置
+    gateway:
+      # 设备 RPC 配置
+      rpc:
+        url: http://127.0.0.1:48080 # 主程序 API 地址
+        connect-timeout: 30s
+        read-timeout: 30s
+      # 设备 Token 配置
+      token:
+        secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
+        expiration: 7d
+
+      # 协议配置
+      protocol:
+        # ====================================
+        # 针对引入的 HTTP 组件的配置
+        # ====================================
+        http:
+          enabled: true
+          server-port: 8092
+        # ====================================
+        # 针对引入的 EMQX 组件的配置
+        # ====================================
+        emqx:
+          enabled: false
+          http-port: 8090                       # MQTT HTTP 服务端口
+          mqtt-host: 127.0.0.1                  # MQTT Broker 地址
+          mqtt-port: 1883                       # MQTT Broker 端口
+          mqtt-username: admin                  # MQTT 用户名
+          mqtt-password: public                 # MQTT 密码
+          mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
+          mqtt-ssl: false                       # 是否开启 SSL
+          mqtt-topics:
+            - "/sys/#"                          # 系统主题
+          clean-session: true                   # 是否启用 Clean Session (默认: true)
+          keep-alive-interval-seconds: 60       # 心跳间隔，单位秒 (默认: 60)
+          max-inflight-queue: 10000             # 最大飞行消息队列，单位：条
+          connect-timeout-seconds: 10           # 连接超时，单位：秒
+          # 是否信任所有 SSL 证书 (默认: false)。警告：生产环境必须为 false！
+          # 仅在开发环境或内网测试时，如果使用了自签名证书，可以临时设置为 true
+          trust-all: true # 在 dev 环境可以设为 true
+          # 遗嘱消息配置 (用于网关异常下线时通知其他系统)
+          will:
+            enabled: true # 生产环境强烈建议开启
+            topic: "gateway/status/${yudao.iot.gateway.emqx.mqtt-client-id}" # 遗嘱消息主题
+            payload: "offline" # 遗嘱消息负载
+            qos: 1 # 遗嘱消息 QoS
+            retain: true # 遗嘱消息是否保留
+          # 高级 SSL/TLS 配置 (当 trust-all: false 且 mqtt-ssl: true 时生效)
+          ssl-options:
+            key-store-path: "classpath:certs/client.jks" # 客户端证书库路径
+            key-store-password: "your-keystore-password" # 客户端证书库密码
+            trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
+            trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
+        # ====================================
+        # 针对引入的 TCP 组件的配置
+        # ====================================
+        tcp:
+          enabled: false
+          port: 8091
+          keep-alive-timeout-ms: 30000
+          max-connections: 1000
+          ssl-enabled: false
+          ssl-cert-path: "classpath:certs/client.jks"
+          ssl-key-path: "classpath:certs/client.jks"
+        # ====================================
+        # 针对引入的 MQTT 组件的配置
+        # ====================================
+        mqtt:
+          enabled: true
+          port: 1883
+          max-message-size: 8192
+          connect-timeout-seconds: 60
+          keep-alive-timeout-seconds: 300
+          ssl-enabled: false
+
+--- #################### 日志相关配置 ####################
+
+# 基础日志配置
+logging:
+  file:
+    name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
+  level:
+    # 应用基础日志级别
+    cn.iocoder.yudao.module.iot.gateway: INFO
+    org.springframework.boot: INFO
+    # RocketMQ 日志
+    org.apache.rocketmq: WARN
+    # MQTT 客户端日志
+    # io.vertx.mqtt: DEBUG
+    # 开发环境详细日志
+    cn.iocoder.yudao.module.iot.gateway.protocol.emqx: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
+    # 根日志级别
+    root: INFO
+
+debug: false

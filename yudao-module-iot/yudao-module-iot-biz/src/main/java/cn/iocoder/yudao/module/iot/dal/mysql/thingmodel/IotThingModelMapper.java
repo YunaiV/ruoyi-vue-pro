@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelP
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,8 +25,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
                 .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
                 .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
                 .eqIfPresent(IotThingModelDO::getProductId, reqVO.getProductId())
-                // TODO @芋艿：看看要不要加枚举
-                .notIn(IotThingModelDO::getIdentifier, "get", "set", "post")
                 .orderByDesc(IotThingModelDO::getId));
     }
 
@@ -36,8 +34,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
                 .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
                 .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
                 .eqIfPresent(IotThingModelDO::getProductId, reqVO.getProductId())
-                // TODO @芋艿：看看要不要加枚举
-                .notIn(IotThingModelDO::getIdentifier, "get", "set", "post")
                 .orderByDesc(IotThingModelDO::getId));
     }
 
@@ -50,8 +46,10 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
         return selectList(IotThingModelDO::getProductId, productId);
     }
 
-    default List<IotThingModelDO> selectListByProductKey(String productKey) {
-        return selectList(IotThingModelDO::getProductKey, productKey);
+    default List<IotThingModelDO> selectListByProductIdAndIdentifiers(Long productId, Collection<String> identifiers) {
+        return selectList(new LambdaQueryWrapperX<IotThingModelDO>()
+                .eq(IotThingModelDO::getProductId, productId)
+                .in(IotThingModelDO::getIdentifier, identifiers));
     }
 
     default List<IotThingModelDO> selectListByProductIdAndType(Long productId, Integer type) {
@@ -59,30 +57,9 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
                 IotThingModelDO::getType, type);
     }
 
-    default List<IotThingModelDO> selectListByProductIdAndIdentifiersAndTypes(Long productId,
-                                                                              List<String> identifiers,
-                                                                              List<Integer> types) {
-        return selectList(new LambdaQueryWrapperX<IotThingModelDO>()
-                .eq(IotThingModelDO::getProductId, productId)
-                .in(IotThingModelDO::getIdentifier, identifiers)
-                .in(IotThingModelDO::getType, types));
-    }
-
     default IotThingModelDO selectByProductIdAndName(Long productId, String name) {
         return selectOne(IotThingModelDO::getProductId, productId,
                 IotThingModelDO::getName, name);
-    }
-
-    // TODO @super：用不到，删除下；
-    /**
-     * 统计物模型数量
-     *
-     * @param createTime 创建时间，如果为空，则统计所有物模型数量
-     * @return 物模型数量
-     */
-    default Long selectCountByCreateTime(LocalDateTime createTime) {
-        return selectCount(new LambdaQueryWrapperX<IotThingModelDO>()
-                .geIfPresent(IotThingModelDO::getCreateTime, createTime));
     }
 
 }

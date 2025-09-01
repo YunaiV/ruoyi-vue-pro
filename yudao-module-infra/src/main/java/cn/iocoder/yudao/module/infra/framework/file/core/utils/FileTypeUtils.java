@@ -80,23 +80,33 @@ public class FileTypeUtils {
      */
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
-        String contentType = getMineType(content, filename);
-        response.setContentType(contentType);
+        String mineType = getMineType(content, filename);
+        response.setContentType(mineType);
         // 设置内容显示、下载文件名：https://www.cnblogs.com/wq-9/articles/12165056.html
-        if (StrUtil.containsIgnoreCase(contentType, "image/")) {
+        if (isImage(mineType)) {
             // 参见 https://github.com/YunaiV/ruoyi-vue-pro/issues/692 讨论
             response.setHeader("Content-Disposition", "inline;filename=" + HttpUtils.encodeUtf8(filename));
         } else {
             response.setHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
         }
         // 针对 video 的特殊处理，解决视频地址在移动端播放的兼容性问题
-        if (StrUtil.containsIgnoreCase(contentType, "video")) {
+        if (StrUtil.containsIgnoreCase(mineType, "video")) {
             response.setHeader("Content-Length", String.valueOf(content.length));
             response.setHeader("Content-Range", "bytes 0-" + (content.length - 1) + "/" + content.length);
             response.setHeader("Accept-Ranges", "bytes");
         }
         // 输出附件
         IoUtil.write(response.getOutputStream(), false, content);
+    }
+
+    /**
+     * 判断是否是图片
+     *
+     * @param mineType 类型
+     * @return 是否是图片
+     */
+    public static boolean isImage(String mineType) {
+        return StrUtil.startWith(mineType, "image/");
     }
 
 }

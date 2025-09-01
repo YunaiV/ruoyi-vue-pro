@@ -52,6 +52,9 @@ public class AiChatRoleRespVO implements VO {
     @Schema(description = "引用的工具编号列表", example = "1,2,3")
     private List<Long> toolIds;
 
+    @Schema(description = "引用的 MCP Client 名字列表", example = "filesystem")
+    private List<String> mcpClientNames;
+
     @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Boolean publicStatus;
 

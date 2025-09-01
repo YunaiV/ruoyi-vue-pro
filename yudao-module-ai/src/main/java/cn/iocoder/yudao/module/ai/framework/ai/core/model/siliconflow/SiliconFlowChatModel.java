@@ -23,7 +23,7 @@ public class SiliconFlowChatModel implements ChatModel {
     /**
      * 兼容 OpenAI 接口，进行复用
      */
-    private final OpenAiChatModel openAiChatModel;
+    private final ChatModel openAiChatModel;
 
     @Override
     public ChatResponse call(Prompt prompt) {

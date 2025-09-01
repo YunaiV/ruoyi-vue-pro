@@ -1,0 +1,37 @@
+<configuration>
+    <!-- 引用 Spring Boot 的 logback 基础配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 设置特定包的日志级别 -->
+    <logger name="cn.iocoder.yudao.module.iot.service.rule.scene.matcher" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- 设置 IotSceneRuleMatcherManager 的日志级别 -->
+    <logger name="cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherManager" level="INFO"
+            additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- 设置所有匹配器的日志级别 -->
+    <logger name="cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- 根日志级别 -->
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

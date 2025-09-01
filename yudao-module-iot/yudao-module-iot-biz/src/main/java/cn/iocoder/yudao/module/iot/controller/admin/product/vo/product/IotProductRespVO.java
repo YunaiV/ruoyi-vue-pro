@@ -61,24 +61,15 @@ public class IotProductRespVO {
     @DictFormat(DictTypeConstants.NET_TYPE)
     private Integer netType;
 
-    @Schema(description = "接入网关协议", example = "2")
-    @ExcelProperty(value = "接入网关协议", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.PROTOCOL_TYPE)
-    private Integer protocolType;
+    @Schema(description = "定位方式", example = "2")
+    @ExcelProperty(value = "定位方式", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.LOCATION_TYPE)
+    private Integer locationType;
 
-    @Schema(description = "协议编号（脚本解析 id）", requiredMode = Schema.RequiredMode.REQUIRED, example = "13177")
-    @ExcelProperty("协议编号（脚本解析 id）")
-    private Long protocolId;
-
-    @Schema(description = "数据格式")
+    @Schema(description = "数据格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty(value = "数据格式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.DATA_FORMAT)
-    private Integer dataFormat;
-
-    @Schema(description = "数据校验级别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty(value = "数据校验级别", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.VALIDATE_TYPE)
-    private Integer validateType;
+    @DictFormat(DictTypeConstants.CODEC_TYPE)
+    private String codecType;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.iot.job.device;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.framework.iot.config.YudaoIotProperties;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
-import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -23,26 +23,23 @@ import java.util.Set;
 /**
  * IoT 设备离线检查 Job
  *
- * 检测逻辑：设备最后一条 {@link cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage} 消息超过一定时间，则认为设备离线
+ * 检测逻辑：设备最后一条 {@link IotDeviceMessage} 消息超过一定时间，则认为设备离线
  *
+ * @see <a href="https://help.aliyun.com/zh/iot/support/faq-about-device-status#98f7056b2957y">阿里云 IoT —— 设备离线分析</a>
  * @author 芋道源码
  */
 @Component
 public class IotDeviceOfflineCheckJob implements JobHandler {
 
-    /**
-     * 设备离线超时时间
-     *
-     * TODO 芋艿：暂定 10 分钟，后续看看要不要基于设备或者全局有配置文件
-     */
-    public static final Duration OFFLINE_TIMEOUT = Duration.ofMinutes(10);
+    @Resource
+    private YudaoIotProperties iotProperties;
 
     @Resource
     private IotDeviceService deviceService;
     @Resource
     private IotDevicePropertyService devicePropertyService;
     @Resource
-    private IotDeviceUpstreamService deviceUpstreamService;
+    private IotDeviceMessageService deviceMessageService;
 
     @Override
     @TenantJob
@@ -52,24 +49,25 @@ public class IotDeviceOfflineCheckJob implements JobHandler {
         if (CollUtil.isEmpty(devices)) {
             return JsonUtils.toJsonString(Collections.emptyList());
         }
-        // 1.2 获取超时的 deviceKey 集合
-        Set<String> timeoutDeviceKeys = devicePropertyService.getDeviceKeysByReportTime(
-                LocalDateTime.now().minus(OFFLINE_TIMEOUT));
+        // 1.2 获取超时的设备集合
+        Set<Long> timeoutDeviceIds = devicePropertyService.getDeviceIdListByReportTime(getTimeoutTime());
 
         // 2. 下线设备
-        List<String> offlineDeviceKeys = CollUtil.newArrayList();
+        List<String[]> offlineDevices = CollUtil.newArrayList();
         for (IotDeviceDO device : devices) {
-            if (!timeoutDeviceKeys.contains(device.getDeviceKey())) {
+            if (!timeoutDeviceIds.contains(device.getId())) {
                 continue;
             }
-            offlineDeviceKeys.add(device.getDeviceKey());
+            offlineDevices.add(new String[]{device.getProductKey(), device.getDeviceName()});
             // 为什么不直接更新状态呢？因为通过 IotDeviceMessage 可以经过一系列的处理，例如说记录日志等等
-            deviceUpstreamService.updateDeviceState(((IotDeviceStateUpdateReqDTO)
-                    new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID()).setReportTime(LocalDateTime.now())
-                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
-                    .setState((IotDeviceStateEnum.OFFLINE.getState())));
+            deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOffline().setDeviceId(device.getId()));
         }
-        return JsonUtils.toJsonString(offlineDeviceKeys);
+        return JsonUtils.toJsonString(offlineDevices);
+    }
+
+    private LocalDateTime getTimeoutTime() {
+        return LocalDateTime.now().minus(Duration.ofNanos(
+                (long) (iotProperties.getKeepAliveTime().toNanos() * iotProperties.getKeepAliveFactor())));
     }
 
 }

@@ -78,7 +78,6 @@ public class AuthRequestFactory {
                     .keySet()
                     .stream()
                     .filter(x -> names.contains(x.toUpperCase()))
-                    .map(String::toUpperCase)
                     .collect(Collectors.toList());
         }
 

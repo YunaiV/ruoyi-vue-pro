@@ -11,8 +11,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,8 +23,6 @@ import java.util.List;
 @TableName(value = "trade_after_sale", autoResultMap = true)
 @KeySequence("trade_after_sale_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public class AfterSaleDO extends BaseDO {
 
     /**

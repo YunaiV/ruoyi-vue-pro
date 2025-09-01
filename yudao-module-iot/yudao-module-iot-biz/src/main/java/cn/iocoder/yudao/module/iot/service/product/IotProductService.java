@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,6 +47,16 @@ public interface IotProductService {
      * @return 产品
      */
     IotProductDO getProduct(Long id);
+
+    /**
+     * 【缓存】获得产品
+     * <p>
+     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
+     *
+     * @param id 编号
+     * @return 产品
+     */
+    IotProductDO getProductFromCache(Long id);
 
     /**
      * 根据产品 key 获得产品
@@ -102,5 +113,11 @@ public interface IotProductService {
      */
     Long getProductCount(@Nullable LocalDateTime createTime);
 
+    /**
+     * 批量校验产品存在
+     *
+     * @param ids 产品编号集合
+     */
+    void validateProductsExist(Collection<Long> ids);
 
 }
