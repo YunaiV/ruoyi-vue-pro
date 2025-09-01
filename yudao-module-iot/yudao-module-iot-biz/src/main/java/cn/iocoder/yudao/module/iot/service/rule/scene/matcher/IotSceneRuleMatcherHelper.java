@@ -91,7 +91,7 @@ public final class IotSceneRuleMatcherHelper {
         Map<String, Object> springExpressionVariables = new HashMap<>();
 
         // 设置源值
-        springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, sourceValue);
+        springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, StrUtil.toString(sourceValue));
 
         // 处理参数值
         if (StrUtil.isNotBlank(paramValue)) {
