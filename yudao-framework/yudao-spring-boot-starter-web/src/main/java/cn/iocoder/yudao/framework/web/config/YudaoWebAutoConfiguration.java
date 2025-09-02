@@ -81,7 +81,7 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
     /**
      * 创建 CorsFilter Bean，解决跨域问题
      */
-    @Order(value = 0)
+    @Order(value = WebFilterOrderEnum.CORS_FILTER)
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterBean() {
         // 创建 CorsConfiguration 对象
