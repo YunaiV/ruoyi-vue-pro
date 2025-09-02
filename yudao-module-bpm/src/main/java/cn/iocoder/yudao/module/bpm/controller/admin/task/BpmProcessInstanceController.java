@@ -196,4 +196,12 @@ public class BpmProcessInstanceController {
         return success(processInstanceService.getProcessInstanceBpmnModelView(id));
     }
 
+    @GetMapping("/get-print-data")
+    @Operation(summary = "获得打印数据")
+    @Parameter(name = "id", description = "流程实例的编号", required = true)
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    public CommonResult<BpmProcessPrintDataRespVO> getPrintData(@RequestParam("processInstanceId") String processInstanceId) {
+        return success(processInstanceService.getPrintData(getLoginUserId(), processInstanceId));
+    }
+
 }
