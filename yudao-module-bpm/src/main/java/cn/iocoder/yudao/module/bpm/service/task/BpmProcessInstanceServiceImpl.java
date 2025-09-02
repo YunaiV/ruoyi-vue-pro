@@ -800,12 +800,12 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             formField.setFormName(item.getStr("title"));
             formField.setFormType(item.getStr("type"));
             formField.setFormId(item.getStr("field"));
-            formField.setFormValue(processVariables.get(item.getStr("field")).toString());
+            formField.setFormValue(processVariables.getOrDefault(item.getStr("field"), "").toString());
             // TODO 根据不同类型的表单展示，下面为图片和输入框示例
             if (formField.getFormType().equals("input")) {
-                formField.setFormValueShow(processVariables.get(item.getStr("field")).toString());
+                formField.setFormValueShow(processVariables.getOrDefault(item.getStr("field"), "").toString());
             } else if (formField.getFormType().equals("UploadImg")) {
-                formField.setFormValueShow("<img style=\"max-width: 600px\" src=\"" + processVariables.get(item.getStr("field")).toString() + "\" />");
+                formField.setFormValueShow("<img style=\"max-width: 600px\" src=\"" + processVariables.getOrDefault(item.getStr("field"), "").toString() + "\" />");
             } else {
                 formField.setFormValueShow("此类型表单展示未完善");
             }
