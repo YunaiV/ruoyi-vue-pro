@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition;
 
+
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherHelper;
 import org.springframework.stereotype.Component;
+
 
 /**
  * 设备属性条件匹配器
@@ -43,10 +45,10 @@ public class DevicePropertyConditionMatcher implements IotSceneRuleConditionMatc
             return false;
         }
 
-        // 2.1. 获取属性值
-        Object propertyValue = message.getParams();
+        // 2.1. 获取属性值 - 使用工具类方法正确提取属性值
+        Object propertyValue = IotDeviceMessageUtils.extractPropertyValue(message, condition.getIdentifier());
         if (propertyValue == null) {
-            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "消息中属性值为空");
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "消息中属性值为空或未找到指定属性");
             return false;
         }
 

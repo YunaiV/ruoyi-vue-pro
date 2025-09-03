@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.BaseMatcherTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
@@ -16,10 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-public class TimerTriggerMatcherTest extends BaseMockitoUnitTest {
+public class TimerTriggerMatcherTest extends BaseMatcherTest {
 
-    @InjectMocks
     private TimerTriggerMatcher matcher;
+
+    @BeforeEach
+    public void setUp() {
+        matcher = new TimerTriggerMatcher();
+    }
 
     @Test
     public void testGetSupportedTriggerType_success() {

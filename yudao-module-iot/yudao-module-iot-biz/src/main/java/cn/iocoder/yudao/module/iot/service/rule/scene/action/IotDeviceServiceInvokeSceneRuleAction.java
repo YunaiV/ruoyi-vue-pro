@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * IoT 设备属性设置的 {@link IotSceneRuleAction} 实现类
+ * IoT 设备服务调用的 {@link IotSceneRuleAction} 实现类
  *
- * @author 芋道源码
+ * @author HUIHUI
  */
 @Component
 @Slf4j
-public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
+public class IotDeviceServiceInvokeSceneRuleAction implements IotSceneRuleAction {
 
     @Resource
     private IotDeviceService deviceService;
@@ -39,7 +39,7 @@ public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
             return;
         }
         if (StrUtil.isEmpty(actionConfig.getIdentifier())) {
-            log.error("[execute][规则场景({}) 动作配置({}) 属性标识符不能为空]", rule.getId(), actionConfig);
+            log.error("[execute][规则场景({}) 动作配置({}) 服务标识符不能为空]", rule.getId(), actionConfig);
             return;
         }
 
@@ -52,7 +52,7 @@ public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
     }
 
     /**
-     * 为单个设备执行属性设置
+     * 为单个设备执行服务调用
      */
     private void executeForSingleDevice(IotDeviceMessage message,
                                         IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig) {
@@ -64,12 +64,12 @@ public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
             return;
         }
 
-        // 2. 执行属性设置
-        executePropertySetForDevice(rule, actionConfig, device);
+        // 2. 执行服务调用
+        executeServiceInvokeForDevice(rule, actionConfig, device);
     }
 
     /**
-     * 为产品下的所有设备执行属性设置
+     * 为产品下的所有设备执行服务调用
      */
     private void executeForAllDevices(IotDeviceMessage message,
                                       IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig) {
@@ -87,20 +87,20 @@ public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
             return;
         }
 
-        // 3. 遍历所有设备执行属性设置
+        // 3. 遍历所有设备执行服务调用
         for (IotDeviceDO device : devices) {
-            executePropertySetForDevice(rule, actionConfig, device);
+            executeServiceInvokeForDevice(rule, actionConfig, device);
         }
     }
 
     /**
-     * 为指定设备执行属性设置
+     * 为指定设备执行服务调用
      */
-    private void executePropertySetForDevice(IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig, IotDeviceDO device) {
-        // 1. 构建属性设置消息
-        IotDeviceMessage downstreamMessage = buildPropertySetMessage(actionConfig, device);
+    private void executeServiceInvokeForDevice(IotSceneRuleDO rule, IotSceneRuleDO.Action actionConfig, IotDeviceDO device) {
+        // 1. 构建服务调用消息
+        IotDeviceMessage downstreamMessage = buildServiceInvokeMessage(actionConfig, device);
         if (downstreamMessage == null) {
-            log.error("[executePropertySetForDevice][规则场景({}) 动作配置({}) 设备({}) 构建属性设置消息失败]",
+            log.error("[executeServiceInvokeForDevice][规则场景({}) 动作配置({}) 设备({}) 构建服务调用消息失败]",
                     rule.getId(), actionConfig, device.getId());
             return;
         }
@@ -108,35 +108,38 @@ public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
         // 2. 发送设备消息
         try {
             IotDeviceMessage result = deviceMessageService.sendDeviceMessage(downstreamMessage, device);
-            log.info("[executePropertySetForDevice][规则场景({}) 动作配置({}) 设备({}) 属性设置消息({}) 发送成功]",
+            log.info("[executeServiceInvokeForDevice][规则场景({}) 动作配置({}) 设备({}) 服务调用消息({}) 发送成功]",
                     rule.getId(), actionConfig, device.getId(), result.getId());
         } catch (Exception e) {
-            log.error("[executePropertySetForDevice][规则场景({}) 动作配置({}) 设备({}) 属性设置消息发送失败]",
+            log.error("[executeServiceInvokeForDevice][规则场景({}) 动作配置({}) 设备({}) 服务调用消息发送失败]",
                     rule.getId(), actionConfig, device.getId(), e);
         }
     }
 
     /**
-     * 构建属性设置消息
+     * 构建服务调用消息
      *
      * @param actionConfig 动作配置
      * @param device       设备信息
      * @return 设备消息
      */
-    private IotDeviceMessage buildPropertySetMessage(IotSceneRuleDO.Action actionConfig, IotDeviceDO device) {
+    private IotDeviceMessage buildServiceInvokeMessage(IotSceneRuleDO.Action actionConfig, IotDeviceDO device) {
         try {
-            // 属性设置参数格式: {"properties": {"identifier": value}}
-            Object params = Map.of("properties", Map.of(actionConfig.getIdentifier(), actionConfig.getParams()));
-            return IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), params);
+            // 服务调用参数格式: {"identifier": "serviceId", "params": {...}}
+            Object params = Map.of(
+                    "identifier", actionConfig.getIdentifier(),
+                    "params", actionConfig.getParams() != null ? actionConfig.getParams() : Map.of()
+            );
+            return IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod(), params);
         } catch (Exception e) {
-            log.error("[buildPropertySetMessage][构建属性设置消息异常]", e);
+            log.error("[buildServiceInvokeMessage][构建服务调用消息异常]", e);
             return null;
         }
     }
 
     @Override
     public IotSceneRuleActionTypeEnum getType() {
-        return IotSceneRuleActionTypeEnum.DEVICE_PROPERTY_SET;
+        return IotSceneRuleActionTypeEnum.DEVICE_SERVICE_INVOKE;
     }
 
 }

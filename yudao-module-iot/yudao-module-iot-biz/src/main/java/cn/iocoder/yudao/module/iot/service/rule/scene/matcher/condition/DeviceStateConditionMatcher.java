@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherHelper;
@@ -35,8 +36,9 @@ public class DeviceStateConditionMatcher implements IotSceneRuleConditionMatcher
             return false;
         }
 
-        // 2.1 获取设备状态值
-        Object stateValue = message.getParams();
+        // 2.1 获取设备状态值 - 使用工具类方法正确提取状态值
+        // 对于设备状态条件，状态值通过 getIdentifier 获取（实际是从 params.state 字段）
+        String stateValue = IotDeviceMessageUtils.getIdentifier(message);
         if (stateValue == null) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "消息中设备状态值为空");
             return false;

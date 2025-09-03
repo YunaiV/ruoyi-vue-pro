@@ -52,10 +52,10 @@ public class DevicePropertyPostTriggerMatcher implements IotSceneRuleTriggerMatc
             return false;
         }
 
-        // 2.1 获取属性值
-        Object propertyValue = message.getParams();
+        // 2.1 获取属性值 - 使用工具类方法正确提取属性值
+        Object propertyValue = IotDeviceMessageUtils.extractPropertyValue(message, trigger.getIdentifier());
         if (propertyValue == null) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中属性值为空");
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中属性值为空或未找到指定属性");
             return false;
         }
 

@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.BaseMatcherTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +22,14 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-public class DeviceEventPostTriggerMatcherTest extends BaseMockitoUnitTest {
+public class DeviceEventPostTriggerMatcherTest extends BaseMatcherTest {
 
-    @InjectMocks
     private DeviceEventPostTriggerMatcher matcher;
+
+    @BeforeEach
+    public void setUp() {
+        matcher = new DeviceEventPostTriggerMatcher();
+    }
 
     @Test
     public void testGetSupportedTriggerType_success() {

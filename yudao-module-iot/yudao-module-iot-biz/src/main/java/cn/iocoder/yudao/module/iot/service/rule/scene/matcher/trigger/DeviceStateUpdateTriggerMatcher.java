@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherHelper;
@@ -43,16 +44,17 @@ public class DeviceStateUpdateTriggerMatcher implements IotSceneRuleTriggerMatch
             return false;
         }
 
-        // 2.1 获取设备状态值
-        Object stateValue = message.getParams();
-        if (stateValue == null) {
+        // 2.1 获取设备状态值 - 使用工具类方法正确提取状态值
+        // 对于状态更新消息，状态值通过 getIdentifier 获取（实际是从 params.state 字段）
+        String stateIdentifier = IotDeviceMessageUtils.getIdentifier(message);
+        if (stateIdentifier == null) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中设备状态值为空");
             return false;
         }
 
         // 2.2 使用条件评估器进行匹配
-        // TODO @puhui999: 状态匹配重新实现
-        boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(stateValue, trigger.getOperator(), trigger.getValue());
+        // 状态值通常是字符串或数字，直接使用标识符作为状态值
+        boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(stateIdentifier, trigger.getOperator(), trigger.getValue());
         if (matched) {
             IotSceneRuleMatcherHelper.logTriggerMatchSuccess(message, trigger);
         } else {

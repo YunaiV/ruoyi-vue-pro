@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,10 +21,23 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-public class DeviceStateUpdateTriggerMatcherTest extends BaseMockitoUnitTest {
+@SpringJUnitConfig(DeviceStateUpdateTriggerMatcherTest.TestConfig.class)
+public class DeviceStateUpdateTriggerMatcherTest {
 
-    @InjectMocks
+    @Configuration
+    static class TestConfig {
+        @Bean
+        public SpringUtil springUtil() {
+            return new SpringUtil();
+        }
+    }
+
     private DeviceStateUpdateTriggerMatcher matcher;
+
+    @BeforeEach
+    public void setUp() {
+        matcher = new DeviceStateUpdateTriggerMatcher();
+    }
 
     @Test
     public void testGetSupportedTriggerType_success() {

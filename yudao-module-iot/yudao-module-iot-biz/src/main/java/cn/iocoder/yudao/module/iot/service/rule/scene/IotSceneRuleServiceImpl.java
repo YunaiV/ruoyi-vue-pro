@@ -17,11 +17,11 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherManager;
+import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotSceneRuleTimerHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,9 +47,6 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     @Resource
     private IotSceneRuleMapper sceneRuleMapper;
 
-    // TODO @puhui999：定时任务，基于它调度；
-    @Resource(name = "iotSchedulerManager")
-    private IotSchedulerManager schedulerManager;
     @Resource
     private IotProductService productService;
     @Resource
@@ -59,11 +56,17 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private IotSceneRuleMatcherManager sceneRuleMatcherManager;
     @Resource
     private List<IotSceneRuleAction> sceneRuleActions;
+    @Resource
+    private IotSceneRuleTimerHandler timerHandler;
 
     @Override
     public Long createSceneRule(IotSceneRuleSaveReqVO createReqVO) {
         IotSceneRuleDO sceneRule = BeanUtils.toBean(createReqVO, IotSceneRuleDO.class);
         sceneRuleMapper.insert(sceneRule);
+
+        // 注册定时触发器
+        timerHandler.registerTimerTriggers(sceneRule);
+
         return sceneRule.getId();
     }
 
@@ -74,6 +77,9 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         // 更新
         IotSceneRuleDO updateObj = BeanUtils.toBean(updateReqVO, IotSceneRuleDO.class);
         sceneRuleMapper.updateById(updateObj);
+
+        // 更新定时触发器
+        timerHandler.updateTimerTriggers(updateObj);
     }
 
     @Override
@@ -83,12 +89,26 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         // 更新状态
         IotSceneRuleDO updateObj = new IotSceneRuleDO().setId(id).setStatus(status);
         sceneRuleMapper.updateById(updateObj);
+
+        // 根据状态管理定时触发器
+        if (CommonStatusEnum.isEnable(status)) {
+            // 启用时，获取完整的场景规则信息并注册定时触发器
+            IotSceneRuleDO sceneRule = sceneRuleMapper.selectById(id);
+            if (sceneRule != null) {
+                timerHandler.registerTimerTriggers(sceneRule);
+            }
+        } else {
+            // 禁用时，暂停定时触发器
+            timerHandler.pauseTimerTriggers(id);
+        }
     }
 
     @Override
     public void deleteSceneRule(Long id) {
         // 校验存在
         validateSceneRuleExists(id);
+        // 删除定时触发器
+        timerHandler.unregisterTimerTriggers(id);
         // 删除
         sceneRuleMapper.deleteById(id);
     }
