@@ -9,9 +9,7 @@ import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatche
 import org.springframework.stereotype.Component;
 
 /**
- * 设备服务调用触发器匹配器
- * <p>
- * 处理设备服务调用的触发器匹配逻辑
+ * 设备服务调用触发器匹配器：处理设备服务调用的触发器匹配逻辑
  *
  * @author HUIHUI
  */

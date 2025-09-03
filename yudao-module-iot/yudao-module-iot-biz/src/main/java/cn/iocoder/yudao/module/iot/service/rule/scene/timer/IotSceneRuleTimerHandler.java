@@ -18,9 +18,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
 /**
- * IoT 场景规则定时触发器处理器
- * <p>
- * 负责管理定时触发器的注册、更新、删除等操作
+ * IoT 场景规则定时触发器处理器：负责管理定时触发器的注册、更新、删除等操作
  *
  * @author HUIHUI
  */
@@ -37,19 +35,17 @@ public class IotSceneRuleTimerHandler {
      * @param sceneRule 场景规则
      */
     public void registerTimerTriggers(IotSceneRuleDO sceneRule) {
+        // 1. 过滤出定时触发器
         if (sceneRule == null || CollUtil.isEmpty(sceneRule.getTriggers())) {
             return;
         }
-
-        // 过滤出定时触发器
         List<IotSceneRuleDO.Trigger> timerTriggers = filterList(sceneRule.getTriggers(),
                 trigger -> ObjUtil.equals(trigger.getType(), IotSceneRuleTriggerTypeEnum.TIMER.getType()));
-
         if (CollUtil.isEmpty(timerTriggers)) {
             return;
         }
 
-        // 注册每个定时触发器
+        // 2. 注册每个定时触发器
         timerTriggers.forEach(trigger -> registerSingleTimerTrigger(sceneRule, trigger));
     }
 
@@ -63,23 +59,23 @@ public class IotSceneRuleTimerHandler {
             return;
         }
 
-        // 先删除旧的定时任务
+        // 1. 先删除旧的定时任务
         unregisterTimerTriggers(sceneRule.getId());
 
-        // 如果场景规则已禁用，则不重新注册
+        // 2.1 如果场景规则已禁用，则不重新注册
         if (CommonStatusEnum.isDisable(sceneRule.getStatus())) {
             log.info("[updateTimerTriggers][场景规则({}) 已禁用，不注册定时触发器]", sceneRule.getId());
             return;
         }
 
-        // 重新注册定时触发器
+        // 2.2 重新注册定时触发器
         registerTimerTriggers(sceneRule);
     }
 
     /**
      * 注销场景规则的定时触发器
      *
-     * @param sceneRuleId 场景规则ID
+     * @param sceneRuleId 场景规则 ID
      */
     public void unregisterTimerTriggers(Long sceneRuleId) {
         if (sceneRuleId == null) {
@@ -98,7 +94,7 @@ public class IotSceneRuleTimerHandler {
     /**
      * 暂停场景规则的定时触发器
      *
-     * @param sceneRuleId 场景规则ID
+     * @param sceneRuleId 场景规则 ID
      */
     public void pauseTimerTriggers(Long sceneRuleId) {
         if (sceneRuleId == null) {
@@ -115,25 +111,6 @@ public class IotSceneRuleTimerHandler {
     }
 
     /**
-     * 恢复场景规则的定时触发器
-     *
-     * @param sceneRuleId 场景规则ID
-     */
-    public void resumeTimerTriggers(Long sceneRuleId) {
-        if (sceneRuleId == null) {
-            return;
-        }
-
-        String jobName = buildJobName(sceneRuleId);
-        try {
-            schedulerManager.resumeJob(jobName);
-            log.info("[resumeTimerTriggers][场景规则({}) 定时触发器恢复成功]", sceneRuleId);
-        } catch (SchedulerException e) {
-            log.error("[resumeTimerTriggers][场景规则({}) 定时触发器恢复失败]", sceneRuleId, e);
-        }
-    }
-
-    /**
      * 注册单个定时触发器
      *
      * @param sceneRule 场景规则
@@ -146,18 +123,16 @@ public class IotSceneRuleTimerHandler {
             return;
         }
 
-        // 2. 构建任务名称和数据
-        String jobName = buildJobName(sceneRule.getId());
-
         try {
-            // 3. 注册定时任务
+            // 2.1 构建任务名称和数据
+            String jobName = buildJobName(sceneRule.getId());
+            // 2.2 注册定时任务
             schedulerManager.addOrUpdateJob(
                     IotSceneRuleJob.class,
                     jobName,
                     trigger.getCronExpression(),
                     IotSceneRuleJob.buildJobDataMap(sceneRule.getId())
             );
-
             log.info("[registerSingleTimerTrigger][场景规则({}) 定时触发器注册成功，CRON: {}]",
                     sceneRule.getId(), trigger.getCronExpression());
         } catch (SchedulerException e) {
@@ -169,10 +144,11 @@ public class IotSceneRuleTimerHandler {
     /**
      * 构建任务名称
      *
-     * @param sceneRuleId 场景规则ID
+     * @param sceneRuleId 场景规则 ID
      * @return 任务名称
      */
     private String buildJobName(Long sceneRuleId) {
         return "iot_scene_rule_timer_" + sceneRuleId;
     }
+
 }

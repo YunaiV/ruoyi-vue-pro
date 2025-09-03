@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 设备属性条件匹配器
- * <p>
- * 处理设备属性相关的子条件匹配逻辑
+ * 设备属性条件匹配器：处理设备属性相关的子条件匹配逻辑
  *
  * @author HUIHUI
  */
