@@ -63,4 +63,25 @@ public class MoonshotChatModelTests {
         }).then().block();
     }
 
+    // TODO @芋艿：暂时没解析 reasoning_content 结果，需要等官方修复
+    @Test
+    @Disabled
+    public void testStream_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        MoonshotChatOptions options = MoonshotChatOptions.builder()
+//                .model("kimi-k2-0711-preview")
+                .model("kimi-thinking-preview")
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
+    }
+
 }

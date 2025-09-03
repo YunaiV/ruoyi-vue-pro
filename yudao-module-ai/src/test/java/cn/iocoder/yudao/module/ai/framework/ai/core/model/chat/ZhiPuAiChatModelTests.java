@@ -23,7 +23,7 @@ import java.util.List;
 public class ZhiPuAiChatModelTests {
 
     private final ZhiPuAiChatModel chatModel = new ZhiPuAiChatModel(
-            new ZhiPuAiApi("32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs"), // 密钥
+            new ZhiPuAiApi("2f35fb6ca4ea41fab898729b7fac086c.6ESSfPcCkxaKEUlR"), // 密钥
             ZhiPuAiChatOptions.builder()
                     .model(ZhiPuAiApi.ChatModel.GLM_4.getName()) // 模型
                     .build()
@@ -54,6 +54,26 @@ public class ZhiPuAiChatModelTests {
 
         // 调用
         Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
+    }
+
+    // TODO @芋艿：暂时没解析 reasoning_content 结果，需要等官方修复
+    @Test
+    @Disabled
+    public void testStream_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
+                .model("GLM-4.5")
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
         // 打印结果
         flux.doOnNext(response -> {
 //            System.out.println(response);

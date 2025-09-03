@@ -18,6 +18,7 @@ import java.util.Objects;
 public class DefaultDBFieldHandler implements MetaObjectHandler {
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     public void insertFill(MetaObject metaObject) {
         if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
             BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();

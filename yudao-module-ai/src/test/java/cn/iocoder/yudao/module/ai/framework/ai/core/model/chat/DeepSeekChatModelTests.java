@@ -60,4 +60,23 @@ public class DeepSeekChatModelTests {
         flux.doOnNext(System.out::println).then().block();
     }
 
+    @Test
+    @Disabled
+    public void testStream_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
+                .model("deepseek-reasoner")
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
+    }
+
 }

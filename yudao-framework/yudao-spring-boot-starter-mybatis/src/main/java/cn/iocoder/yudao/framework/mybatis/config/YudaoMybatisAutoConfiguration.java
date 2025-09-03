@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.mybatis.config;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
@@ -46,6 +47,8 @@ public class YudaoMybatisAutoConfiguration {
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor()); // 分页插件
+        // ↓↓↓ 按需开启，可能会影响到 updateBatch 的地方：例如说文件配置管理 ↓↓↓
+        // mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor()); // 拦截没有指定条件的 update 和 delete 语句
         return mybatisPlusInterceptor;
     }
 
@@ -80,7 +83,11 @@ public class YudaoMybatisAutoConfiguration {
     @Bean
     public JacksonTypeHandler jacksonTypeHandler(List<ObjectMapper> objectMappers) {
         // 特殊：设置 JacksonTypeHandler 的 ObjectMapper！
-        JacksonTypeHandler.setObjectMapper(CollUtil.getFirst(objectMappers));
+        ObjectMapper objectMapper = CollUtil.getFirst(objectMappers);
+        if (objectMapper == null) {
+            objectMapper = JsonUtils.getObjectMapper();
+        }
+        JacksonTypeHandler.setObjectMapper(objectMapper);
         return new JacksonTypeHandler(Object.class);
     }
 

@@ -8,9 +8,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -23,12 +23,13 @@ import java.util.List;
  */
 public class HunYuanChatModelTests {
 
-    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
+    private final DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+            .deepSeekApi(DeepSeekApi.builder()
                     .baseUrl(HunYuanChatModel.BASE_URL)
-                    .apiKey("sk-bcd") // apiKey
+                    .completionsPath(HunYuanChatModel.COMPLETE_PATH)
+                    .apiKey("sk-abc") // apiKey
                     .build())
-            .defaultOptions(OpenAiChatOptions.builder()
+            .defaultOptions(DeepSeekChatOptions.builder()
                     .model(HunYuanChatModel.MODEL_DEFAULT) // 模型
                     .temperature(0.7)
                     .build())
@@ -64,12 +65,33 @@ public class HunYuanChatModelTests {
         flux.doOnNext(System.out::println).then().block();
     }
 
-    private final OpenAiChatModel deepSeekOpenAiChatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
+    @Test
+    @Disabled
+    public void testStream_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
+                .model("hunyuan-a13b")
+//                .model("hunyuan-turbos-latest")
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
+    }
+
+    private final DeepSeekChatModel deepSeekOpenAiChatModel = DeepSeekChatModel.builder()
+            .deepSeekApi(DeepSeekApi.builder()
                     .baseUrl(HunYuanChatModel.DEEP_SEEK_BASE_URL)
+                    .completionsPath(HunYuanChatModel.COMPLETE_PATH)
                     .apiKey("sk-abc") // apiKey
                     .build())
-            .defaultOptions(OpenAiChatOptions.builder()
+            .defaultOptions(DeepSeekChatOptions.builder()
 //                    .model(HunYuanChatModel.DEEP_SEEK_MODEL_DEFAULT) // 模型（"deepseek-v3"）
                     .model("deepseek-r1") // 模型（"deepseek-r1"）
                     .temperature(0.7)
@@ -94,7 +116,7 @@ public class HunYuanChatModelTests {
 
     @Test
     @Disabled
-    public void testStream_deekseek() {
+    public void testStream_deepseek() {
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
@@ -106,5 +128,23 @@ public class HunYuanChatModelTests {
         flux.doOnNext(System.out::println).then().block();
     }
 
+    @Test
+    @Disabled
+    public void testStream_deepseek_thinking() {
+        // 准备参数
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
+                .model("deepseek-r1")
+                .build();
+
+        // 调用
+        Flux<ChatResponse> flux = deepSeekChatModel.stream(new Prompt(messages, options));
+        // 打印结果
+        flux.doOnNext(response -> {
+//            System.out.println(response);
+            System.out.println(response.getResult().getOutput());
+        }).then().block();
+    }
 
 }

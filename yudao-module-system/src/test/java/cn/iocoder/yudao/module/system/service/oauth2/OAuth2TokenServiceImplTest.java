@@ -236,6 +236,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
     public void testCheckAccessToken_refreshToken() {
         // mock 数据（访问令牌）
         OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
+                .setUserId(0L)
                 .setExpiresTime(LocalDateTime.now().plusDays(1));
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
         // 准备参数

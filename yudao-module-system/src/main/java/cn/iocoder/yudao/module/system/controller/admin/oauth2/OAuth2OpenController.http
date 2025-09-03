@@ -35,6 +35,14 @@ tenant-id: {{adminTenantId}}
 
 grant_type=password&username=admin&password=admin123&scope=user.read
 
+### 请求 /system/oauth2/token + client_credentials 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}
+
+grant_type=client_credentials&scope=user.read
+
 ### 请求 /system/oauth2/token + refresh_token 接口 => 成功
 POST {{baseUrl}}/system/oauth2/token
 Content-Type: application/x-www-form-urlencoded

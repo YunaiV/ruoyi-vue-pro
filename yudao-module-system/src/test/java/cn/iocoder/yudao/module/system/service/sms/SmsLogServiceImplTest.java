@@ -41,47 +41,47 @@ public class SmsLogServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetSmsLogPage() {
-       // mock 数据
-       SmsLogDO dbSmsLog = randomSmsLogDO(o -> { // 等会查询到
-           o.setChannelId(1L);
-           o.setTemplateId(10L);
-           o.setMobile("15601691300");
-           o.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-           o.setSendTime(buildTime(2020, 11, 11));
-           o.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-           o.setReceiveTime(buildTime(2021, 11, 11));
-       });
-       smsLogMapper.insert(dbSmsLog);
-       // 测试 channelId 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
-       // 测试 templateId 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
-       // 测试 mobile 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
-       // 测试 sendStatus 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SmsSendStatusEnum.IGNORE.getStatus())));
-       // 测试 sendTime 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
-       // 测试 receiveStatus 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SmsReceiveStatusEnum.SUCCESS.getStatus())));
-       // 测试 receiveTime 不匹配
-       smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
-       // 准备参数
-       SmsLogPageReqVO reqVO = new SmsLogPageReqVO();
-       reqVO.setChannelId(1L);
-       reqVO.setTemplateId(10L);
-       reqVO.setMobile("156");
-       reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
-       reqVO.setSendTime(buildBetweenTime(2020, 11, 1, 2020, 11, 30));
-       reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-       reqVO.setReceiveTime(buildBetweenTime(2021, 11, 1, 2021, 11, 30));
+        // mock 数据
+        SmsLogDO dbSmsLog = randomSmsLogDO(o -> { // 等会查询到
+            o.setChannelId(1L);
+            o.setTemplateId(10L);
+            o.setMobile("15601691300");
+            o.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
+            o.setSendTime(buildTime(2020, 11, 11));
+            o.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
+            o.setReceiveTime(buildTime(2021, 11, 11));
+        });
+        smsLogMapper.insert(dbSmsLog);
+        // 测试 channelId 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
+        // 测试 templateId 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
+        // 测试 mobile 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
+        // 测试 sendStatus 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SmsSendStatusEnum.IGNORE.getStatus())));
+        // 测试 sendTime 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
+        // 测试 receiveStatus 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SmsReceiveStatusEnum.SUCCESS.getStatus())));
+        // 测试 receiveTime 不匹配
+        smsLogMapper.insert(cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
+        // 准备参数
+        SmsLogPageReqVO reqVO = new SmsLogPageReqVO();
+        reqVO.setChannelId(1L);
+        reqVO.setTemplateId(10L);
+        reqVO.setMobile("156");
+        reqVO.setSendStatus(SmsSendStatusEnum.INIT.getStatus());
+        reqVO.setSendTime(buildBetweenTime(2020, 11, 1, 2020, 11, 30));
+        reqVO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
+        reqVO.setReceiveTime(buildBetweenTime(2021, 11, 1, 2021, 11, 30));
 
-       // 调用
-       PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbSmsLog, pageResult.getList().get(0));
+        // 调用
+        PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbSmsLog, pageResult.getList().get(0));
     }
 
     @Test
@@ -153,13 +153,14 @@ public class SmsLogServiceImplTest extends BaseDbUnitTest {
         smsLogMapper.insert(dbSmsLog);
         // 准备参数
         Long id = dbSmsLog.getId();
+        String apiSerialNo = dbSmsLog.getApiSerialNo();
         Boolean success = randomBoolean();
         LocalDateTime receiveTime = randomLocalDateTime();
         String apiReceiveCode = randomString();
         String apiReceiveMsg = randomString();
 
         // 调用
-        smsLogService.updateSmsReceiveResult(id, success, receiveTime, apiReceiveCode, apiReceiveMsg);
+        smsLogService.updateSmsReceiveResult(id, apiSerialNo, success, receiveTime, apiReceiveCode, apiReceiveMsg);
         // 断言
         dbSmsLog = smsLogMapper.selectById(id);
         assertEquals(success ? SmsReceiveStatusEnum.SUCCESS.getStatus()

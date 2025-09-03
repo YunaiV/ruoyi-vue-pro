@@ -226,7 +226,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     private PayOrderRespDTO doGetOrderV3(String outTradeNo) throws WxPayException {
-        fixV3HttpClientConnectionPoolShutDown();
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayOrderQueryV3Request request = new WxPayOrderQueryV3Request()
                 .setOutTradeNo(outTradeNo);
@@ -299,7 +298,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     private PayRefundRespDTO doUnifiedRefundV3(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
-        fixV3HttpClientConnectionPoolShutDown();
         // 1. 构建 WxPayRefundRequest 请求
         WxPayRefundV3Request request = new WxPayRefundV3Request()
                 .setOutTradeNo(reqDTO.getOutTradeNo())
@@ -415,7 +413,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     private PayRefundRespDTO doGetRefundV3(String outTradeNo, String outRefundNo) throws WxPayException {
-        fixV3HttpClientConnectionPoolShutDown();
         // 1. 构建 WxPayRefundRequest 请求
         WxPayRefundQueryV3Request request = new WxPayRefundQueryV3Request();
         request.setOutRefundNo(outRefundNo);
@@ -439,7 +436,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     @Override
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws WxPayException {
-        fixV3HttpClientConnectionPoolShutDown();
         // 1. 构建 TransferBillsRequest 请求
         TransferBillsRequest request = TransferBillsRequest.newBuilder()
                 .appid(this.config.getAppId())
@@ -485,7 +481,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     @Override
     protected PayTransferRespDTO doGetTransfer(String outTradeNo) throws WxPayException {
-        fixV3HttpClientConnectionPoolShutDown();
         // 1. 执行请求
         TransferBillsGetResult response = client.getTransferService().getBillsByOutBillNo(outTradeNo);
 
@@ -541,17 +536,21 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
      * @see <a href="https://github.com/binarywang/weixin-java-pay-demo/blob/master/src/main/java/com/github/binarywang/demo/wx/pay/controller/WxPayV3Controller.java#L202-L221">官方示例</a>
      */
     private SignatureHeader getRequestHeader(Map<String, String> headers) {
+        // 参见 https://gitee.com/zhijiantianya/yudao-cloud/issues/ICSFL6
         return SignatureHeader.builder()
-                .signature(headers.get("wechatpay-signature"))
-                .nonce(headers.get("wechatpay-nonce"))
-                .serial(headers.get("wechatpay-serial"))
-                .timeStamp(headers.get("wechatpay-timestamp"))
+                .signature(getHeaderValue(headers, "Wechatpay-Signature", "wechatpay-signature"))
+                .nonce(getHeaderValue(headers, "Wechatpay-Nonce", "wechatpay-nonce"))
+                .serial(getHeaderValue(headers, "Wechatpay-Serial", "wechatpay-serial"))
+                .timeStamp(getHeaderValue(headers, "Wechatpay-Timestamp", "wechatpay-timestamp"))
                 .build();
     }
 
-    // TODO @芋艿：可能是 wxjava 的 bug：https://github.com/binarywang/WxJava/issues/1557
-    private void fixV3HttpClientConnectionPoolShutDown() {
-        client.getConfig().setApiV3HttpClient(null);
+    private String getHeaderValue(Map<String, String> headers, String capitalizedKey, String lowercaseKey) {
+        String value = headers.get(capitalizedKey);
+        if (value != null) {
+            return value;
+        }
+        return headers.get(lowercaseKey);
     }
 
     static String formatDateV2(LocalDateTime time) {

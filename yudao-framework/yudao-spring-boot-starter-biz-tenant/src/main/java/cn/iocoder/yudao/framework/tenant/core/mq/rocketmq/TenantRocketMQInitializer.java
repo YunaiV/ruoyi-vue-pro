@@ -17,6 +17,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public class TenantRocketMQInitializer implements BeanPostProcessor {
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof DefaultRocketMQListenerContainer) {
             DefaultRocketMQListenerContainer container = (DefaultRocketMQListenerContainer) bean;

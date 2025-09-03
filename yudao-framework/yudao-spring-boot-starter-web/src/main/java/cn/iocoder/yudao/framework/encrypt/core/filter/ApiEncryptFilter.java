@@ -23,6 +23,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.ServletRequestPathUtils;
 
 import java.io.IOException;
 
@@ -128,14 +129,22 @@ public class ApiEncryptFilter extends ApiRequestFilter {
      *
      * @param request 请求
      */
+    @SuppressWarnings("PatternVariableCanBeUsed")
     private ApiEncrypt getApiEncrypt(HttpServletRequest request) {
         try {
+            // 特殊：兼容 SpringBoot 2.X 版本会报错的问题 https://t.zsxq.com/kqyiB
+            if (!ServletRequestPathUtils.hasParsedRequestPath(request)) {
+                ServletRequestPathUtils.parseAndCache(request);
+            }
+
+            // 解析 @ApiEncrypt 注解
             HandlerExecutionChain mappingHandler = requestMappingHandlerMapping.getHandler(request);
             if (mappingHandler == null) {
                 return null;
             }
             Object handler = mappingHandler.getHandler();
-            if (handler instanceof HandlerMethod handlerMethod) {
+            if (handler instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handler;
                 ApiEncrypt annotation = handlerMethod.getMethodAnnotation(ApiEncrypt.class);
                 if (annotation == null) {
                     annotation = handlerMethod.getBeanType().getAnnotation(ApiEncrypt.class);

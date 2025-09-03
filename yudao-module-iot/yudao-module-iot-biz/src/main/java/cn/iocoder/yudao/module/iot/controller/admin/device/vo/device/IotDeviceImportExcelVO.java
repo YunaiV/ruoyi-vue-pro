@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * 设备 Excel 导入 VO
@@ -19,7 +18,6 @@ import lombok.experimental.Accessors;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = false) // 设置 chain = false，避免设备导入有问题
 public class IotDeviceImportExcelVO {
 
     @ExcelProperty("设备名称")

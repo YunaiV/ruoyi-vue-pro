@@ -47,8 +47,15 @@ public class HttpUtils {
         return builder.build();
     }
 
-    private String append(String base, Map<String, ?> query, boolean fragment) {
-        return append(base, query, null, fragment);
+    public static String removeUrlQuery(String url) {
+        if (!StrUtil.contains(url, '?')) {
+            return url;
+        }
+        UrlBuilder builder = UrlBuilder.of(url, Charset.defaultCharset());
+        // 移除 query、fragment
+        builder.setQuery(null);
+        builder.setFragment(null);
+        return builder.build();
     }
 
     /**

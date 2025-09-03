@@ -22,4 +22,8 @@ public interface SmsLogMapper extends BaseMapperX<SmsLogDO> {
                 .orderByDesc(SmsLogDO::getId));
     }
 
+    default SmsLogDO selectByApiSerialNo(String apiSerialNo) {
+        return selectOne(SmsLogDO::getApiSerialNo, apiSerialNo);
+    }
+
 }

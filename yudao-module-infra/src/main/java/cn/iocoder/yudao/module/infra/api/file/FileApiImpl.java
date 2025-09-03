@@ -22,4 +22,9 @@ public class FileApiImpl implements FileApi {
         return fileService.createFile(content, name, directory, type);
     }
 
+    @Override
+    public String presignGetUrl(String url, Integer expirationSeconds) {
+        return fileService.presignGetUrl(url, expirationSeconds);
+    }
+
 }
