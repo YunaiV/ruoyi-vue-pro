@@ -119,7 +119,7 @@ public interface BpmProcessInstanceService {
      * @param processInstanceId 流程实例id
      * @return 打印所需数据
      */
-    BpmProcessPrintDataRespVO getPrintData(Long loginUserId, String processInstanceId);
+    BpmProcessPrintDataRespVO getProcessInstancePrintData(Long loginUserId, String processInstanceId);
 
     // ========== Update 写入相关方法 ==========
 

@@ -735,7 +735,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
-    public BpmProcessPrintDataRespVO getPrintData(Long loginUserId, String processInstanceId) {
+    public BpmProcessPrintDataRespVO getProcessInstancePrintData(Long loginUserId, String processInstanceId) {
         // TODO 方法抽离
         // 流程实例
         HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(processInstanceId);
@@ -747,7 +747,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 .getProcessDefinitionInfo(historicProcessInstance.getProcessDefinitionId());
         BpmModelMetaInfoVO.PrintTemplateSetting printTemplateSetting = processDefinitionInfo.getPrintTemplateSetting();
         List<String> formFieldList = processDefinitionInfo.getFormFields();
-        List<JSONObject> formFieldObjList = formFieldList.stream().map(JSONUtil::parseObj).toList();
+        List<JSONObject> formFieldObjList = formFieldList != null ? formFieldList.stream().map(JSONUtil::parseObj).toList()
+                : ListUtil.of();
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .finished()
                 .includeTaskLocalVariables()
@@ -758,7 +759,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         Set<Long> userIds = convertSet(tasks, item -> Long.valueOf(item.getAssignee()));
         userIds.add(loginUserId);
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        HashMap<String, String> printDataMap = new HashMap<>(8 + formFieldList.size());
+        HashMap<String, String> printDataMap = new HashMap<>(8 + formFieldObjList.size());
         // 返回打印所需数据
         BpmProcessPrintDataRespVO printData = new BpmProcessPrintDataRespVO();
         // 打印模板是否开启
@@ -776,6 +777,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         printData.setStartUser(startUser.getNickname());
         printData.setStartUserDept(dept.getName());
         // 审批历史
+        // TODO @lesan：打印的时候，未来节点打印么？
         List<BpmProcessPrintDataRespVO.ApproveNode> approveNodes = new ArrayList<>(tasks.size());
         tasks.forEach(item -> {
             Map<String, Object> taskLocalVariables = item.getTaskLocalVariables();
@@ -793,8 +795,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         });
         printData.setApproveNodes(approveNodes);
         // 表单数据
+        // TODO @lesan：这个可以在端上搞么？主要考虑，vben 和 vue3 plus 可能使用了不同的前端框架；可能直接使用 form-create 前端的工具方法，会更方便。
         Map<String, Object> processVariables = historicProcessInstance.getProcessVariables();
-        List<BpmProcessPrintDataRespVO.FormField> formFields = new ArrayList<>(formFieldList.size());
+        List<BpmProcessPrintDataRespVO.FormField> formFields = new ArrayList<>(formFieldObjList.size());
         formFieldObjList.forEach(item -> {
             BpmProcessPrintDataRespVO.FormField formField = new BpmProcessPrintDataRespVO.FormField();
             formField.setFormName(item.getStr("title"));
@@ -834,6 +837,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             Elements mention = document.getElementsByAttributeValue("data-w-e-type", "mention");
             mention.forEach(item -> {
                 String mentionId = JSONUtil.parseObj(URLUtil.decode(item.attr("data-info"))).getStr("id");
+                // TODO @lesan：这里要求非空；
                 item.html(printDataMap.get(mentionId));
             });
             // 替换流程记录

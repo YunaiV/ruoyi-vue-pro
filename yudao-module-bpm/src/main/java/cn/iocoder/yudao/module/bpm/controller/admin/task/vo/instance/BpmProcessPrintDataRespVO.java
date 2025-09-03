@@ -5,8 +5,8 @@ import lombok.Data;
 
 import java.util.List;
 
-
-@Schema(description = "管理后台 - 打印数据 Response VO")
+// TODO @lesan：这个可能复用 BpmApprovalDetailRespVO 哇？
+@Schema(description = "管理后台 - 流程实例的打印数据 Response VO")
 @Data
 public class BpmProcessPrintDataRespVO {
 
@@ -14,6 +14,7 @@ public class BpmProcessPrintDataRespVO {
 
     private Integer processStatus;
 
+    // TODO @lesan：通过字典？
     private String processStatusShow;
 
     private String processInstanceId;
@@ -22,6 +23,7 @@ public class BpmProcessPrintDataRespVO {
 
     private String processName;
 
+    // TODO @lesan：UserSimpleBaseVO 替代 startUser、startUserDept；
     private String startUser;
 
     private String startUserDept;
