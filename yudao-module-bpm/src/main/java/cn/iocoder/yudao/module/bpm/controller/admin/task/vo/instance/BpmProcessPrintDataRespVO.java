@@ -7,13 +7,13 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
-// TODO @lesan：这个可能复用 BpmApprovalDetailRespVO 哇？@芋艿：暂时先这样吧，BpmApprovalDetailRespVO 太大了。。。
 @Schema(description = "管理后台 - 流程实例的打印数据 Response VO")
 @Data
 public class BpmProcessPrintDataRespVO {
 
     private Boolean printTemplateEnable;
 
+    // TODO @lesan：要不 processStatus、processInstanceId、processBusinessKey、processBusinessKey、startUser、endTime、processVariables 使用 BpmProcessInstanceRespVO ？虽然这个 VO 大了点，但是收一收字段。嘿嘿；进而只有 processInstance、tasks、formFields、printTemplateHtml 这些字段；
     private Integer processStatus;
 
     private String processInstanceId;
@@ -28,6 +28,7 @@ public class BpmProcessPrintDataRespVO {
 
     private String endTime;
 
+    // TODO @lesan：变量要不改成 tasks；
     private List<ApproveNode> approveNodes;
 
     private List<String> formFields;
@@ -36,6 +37,7 @@ public class BpmProcessPrintDataRespVO {
 
     private Map<String, Object> processVariables;
 
+    // TODO @lesan：类名要不要改成 tasks ？然后 id、name、signUrl、description；感觉理解成本低点；
     @Data
     public static class ApproveNode {
 

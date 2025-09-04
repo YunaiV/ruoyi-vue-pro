@@ -728,6 +728,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 userMap, deptMap);
     }
 
+    // TODO @lesan：这个可以放在 controller + convert 哇？保证 Service 只尽量处理写逻辑；
     @Override
     public BpmProcessPrintDataRespVO getProcessInstancePrintData(Long loginUserId, String processInstanceId) {
         // 1 数据准备
@@ -756,7 +757,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
         printData.setStartUser(new UserSimpleBaseVO().setNickname(startUser.getNickname()).setDeptName(dept.getName()));
         // 2.4 审批历史
-        // TODO @lesan：打印的时候，未来节点打印么？ @芋艿：只打印已完成的任务
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .finished()
                 .includeTaskLocalVariables()
