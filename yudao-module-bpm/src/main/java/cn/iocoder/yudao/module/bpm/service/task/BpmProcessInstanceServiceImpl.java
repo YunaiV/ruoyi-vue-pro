@@ -3,12 +3,9 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
@@ -16,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -61,10 +59,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -736,19 +730,33 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Override
     public BpmProcessPrintDataRespVO getProcessInstancePrintData(Long loginUserId, String processInstanceId) {
-        // TODO 方法抽离
-        // 流程实例
+        // 1 数据准备
         HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(processInstanceId);
         if (historicProcessInstance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
-        // 准备数据
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
                 .getProcessDefinitionInfo(historicProcessInstance.getProcessDefinitionId());
         BpmModelMetaInfoVO.PrintTemplateSetting printTemplateSetting = processDefinitionInfo.getPrintTemplateSetting();
-        List<String> formFieldList = processDefinitionInfo.getFormFields();
-        List<JSONObject> formFieldObjList = formFieldList != null ? formFieldList.stream().map(JSONUtil::parseObj).toList()
-                : ListUtil.of();
+        // 2 获取打印所需数据
+        BpmProcessPrintDataRespVO printData = new BpmProcessPrintDataRespVO();
+        // 2.1 打印模板是否开启
+        printData.setPrintTemplateEnable(printTemplateSetting != null && Boolean.TRUE.equals(printTemplateSetting.getEnable()));
+        // 2.2 流程相关数据
+        printData.setProcessStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance));
+        printData.setProcessInstanceId(historicProcessInstance.getId());
+        printData.setProcessName(historicProcessInstance.getName());
+        printData.setProcessBusinessKey(historicProcessInstance.getBusinessKey());
+        printData.setStartTime(DatePattern.NORM_DATETIME_MINUTE_FORMAT.format(historicProcessInstance.getStartTime()));
+        printData.setEndTime(Objects.isNull(historicProcessInstance.getEndTime()) ?
+                "" : DatePattern.NORM_DATETIME_MINUTE_FORMAT.format(historicProcessInstance.getEndTime()));
+        printData.setProcessVariables(historicProcessInstance.getProcessVariables());
+        // 2.3 发起人
+        AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(historicProcessInstance.getStartUserId()));
+        DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
+        printData.setStartUser(new UserSimpleBaseVO().setNickname(startUser.getNickname()).setDeptName(dept.getName()));
+        // 2.4 审批历史
+        // TODO @lesan：打印的时候，未来节点打印么？ @芋艿：只打印已完成的任务
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .finished()
                 .includeTaskLocalVariables()
@@ -757,27 +765,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                         BpmTaskStatusEnum.CANCEL.getStatus())
                 .orderByHistoricTaskInstanceStartTime().asc().list();
         Set<Long> userIds = convertSet(tasks, item -> Long.valueOf(item.getAssignee()));
-        userIds.add(loginUserId);
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        HashMap<String, String> printDataMap = new HashMap<>(8 + formFieldObjList.size());
-        // 返回打印所需数据
-        BpmProcessPrintDataRespVO printData = new BpmProcessPrintDataRespVO();
-        // 打印模板是否开启
-        printData.setPrintTemplateEnable(printTemplateSetting != null && Boolean.TRUE.equals(printTemplateSetting.getEnable()));
-        // 流程相关数据
-        printData.setProcessStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance));
-        printData.setProcessStatusShow(BpmProcessInstanceStatusEnum.valueOf(printData.getProcessStatus()).getDesc());
-        printData.setProcessInstanceId(historicProcessInstance.getId());
-        printData.setProcessName(historicProcessInstance.getName());
-        printData.setProcessBusinessKey(historicProcessInstance.getBusinessKey());
-        printData.setStartTime(DatePattern.NORM_DATETIME_MINUTE_FORMAT.format(historicProcessInstance.getStartTime()));
-        // 发起人
-        AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(historicProcessInstance.getStartUserId()));
-        DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
-        printData.setStartUser(startUser.getNickname());
-        printData.setStartUserDept(dept.getName());
-        // 审批历史
-        // TODO @lesan：打印的时候，未来节点打印么？
         List<BpmProcessPrintDataRespVO.ApproveNode> approveNodes = new ArrayList<>(tasks.size());
         tasks.forEach(item -> {
             Map<String, Object> taskLocalVariables = item.getTaskLocalVariables();
@@ -794,81 +782,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             approveNodes.add(approveNode);
         });
         printData.setApproveNodes(approveNodes);
-        // 表单数据
-        // TODO @lesan：这个可以在端上搞么？主要考虑，vben 和 vue3 plus 可能使用了不同的前端框架；可能直接使用 form-create 前端的工具方法，会更方便。
-        Map<String, Object> processVariables = historicProcessInstance.getProcessVariables();
-        List<BpmProcessPrintDataRespVO.FormField> formFields = new ArrayList<>(formFieldObjList.size());
-        formFieldObjList.forEach(item -> {
-            BpmProcessPrintDataRespVO.FormField formField = new BpmProcessPrintDataRespVO.FormField();
-            formField.setFormName(item.getStr("title"));
-            formField.setFormType(item.getStr("type"));
-            formField.setFormId(item.getStr("field"));
-            formField.setFormValue(processVariables.getOrDefault(item.getStr("field"), "").toString());
-            // TODO 根据不同类型的表单展示，下面为图片和输入框示例
-            if (formField.getFormType().equals("input")) {
-                formField.setFormValueShow(processVariables.getOrDefault(item.getStr("field"), "").toString());
-            } else if (formField.getFormType().equals("UploadImg")) {
-                formField.setFormValueShow("<img style=\"max-width: 600px\" src=\"" + processVariables.getOrDefault(item.getStr("field"), "").toString() + "\" />");
-            } else {
-                formField.setFormValueShow("此类型表单展示未完善");
-            }
-            printDataMap.put(formField.getFormId(), formField.getFormValueShow());
-            formFields.add(formField);
-        });
-        printData.setFormFields(formFields);
-        // 数据映射
-        printDataMap.put("processName", printData.getProcessName());
-        printDataMap.put("printUsername", userMap.get(loginUserId).getNickname());
-        printDataMap.put("processNum", printData.getProcessInstanceId());
-        printDataMap.put("printTime", DatePattern.NORM_DATETIME_MINUTE_FORMAT.format(new DateTime()));
-        printDataMap.put("startUser", printData.getStartUser());
-        printDataMap.put("startTime", printData.getStartTime());
-        printDataMap.put("startUserDept", printData.getStartUserDept());
-        printDataMap.put("processStatus", printData.getProcessStatusShow());
-        // 自定义模板
+        // 2.5 表单数据
+        printData.setFormFields(processDefinitionInfo.getFormFields());
+        // 2.6 自定义模板
         if (printData.getPrintTemplateEnable() && printTemplateSetting != null) {
-            Document document = Jsoup.parse(printTemplateSetting.getTemplate());
-            // 添加table的border
-            Elements tables = document.select("table");
-            tables.forEach(item -> {
-                item.attr("border", "1");
-            });
-            // 替换所有mention
-            Elements mention = document.getElementsByAttributeValue("data-w-e-type", "mention");
-            mention.forEach(item -> {
-                String mentionId = JSONUtil.parseObj(URLUtil.decode(item.attr("data-info"))).getStr("id");
-                // TODO @lesan：这里要求非空；
-                item.html(printDataMap.get(mentionId));
-            });
-            // 替换流程记录
-            Elements processRecords = document.getElementsByAttributeValue("data-w-e-type", "process-record");
-            Element processRecordElement = null;
-            if (!processRecords.isEmpty()) {
-                processRecordElement = new Element("table", "")
-                        .attr("style", "width:100%;")
-                        .attr("border", "1");
-                Element tbody = new Element("tbody", "");
-                Element rowHead = new Element("tr", "");
-                rowHead.appendChild(new Element("td", "")
-                        .attr("colspan", "2")
-                        .attr("width", "auto")
-                                .attr("style", "text-align: center;")
-                        .html("流程节点"));
-                tbody.appendChild(rowHead);
-                for (BpmProcessPrintDataRespVO.ApproveNode item : printData.getApproveNodes()) {
-                    Element row = new Element("tr", "");
-                    row.appendChild(new Element("td", "")
-                            .html(item.getNodeName()));
-                    row.appendChild(new Element("td", "")
-                            .html(item.getNodeDesc()));
-                    tbody.appendChild(row);
-                }
-                processRecordElement.appendChild(tbody);
-            }
-            for (Element item : processRecords) {
-                item.html(processRecordElement.outerHtml());
-            }
-            printData.setPrintTemplateHtml(document.html());
+            printData.setPrintTemplateHtml(printTemplateSetting.getTemplate());
         }
         return printData;
     }
