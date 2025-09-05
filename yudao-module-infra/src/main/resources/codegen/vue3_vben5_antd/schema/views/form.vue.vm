@@ -117,6 +117,10 @@ const [Modal, modalApi] = useVbenModal({
     // 加载数据
     const data = modalApi.getData<${apiName}.${simpleClassName}>();
     if (!data || !data.id) {
+#if (${table.templateType} == 2)## 树表特有
+      // 设置上级
+      await formApi.setValues(data);
+#end
       return;
     }
     modalApi.lock();

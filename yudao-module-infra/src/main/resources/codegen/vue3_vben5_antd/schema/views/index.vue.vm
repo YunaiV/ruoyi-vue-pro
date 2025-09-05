@@ -6,7 +6,7 @@ import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}
 import { ref } from 'vue';
 
 import {#if ($table.templateType != 2 && $deleteBatchEnable) confirm,#end Page, useVbenModal } from '@vben/common-ui';
-import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
+import { downloadFileFromBlobPart#if ($table.templateType != 2 && $deleteBatchEnable), isEmpty#end } from '@vben/utils';
 
 import { message#if ($table.templateType == 11), Tabs#end } from 'ant-design-vue';
 
@@ -73,18 +73,18 @@ function onRefresh() {
 function handleCreate() {
   formModalApi.setData(null).open();
 }
+#if (${table.templateType} == 2)## 树表特有：新增下级
+
+/** 添加下级${table.classComment} */
+function handleAppend(row: ${apiName}.${simpleClassName}) {
+  formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
+}
+#end
 
 /** 编辑${table.classComment} */
 function handleEdit(row: ${apiName}.${simpleClassName}) {
   formModalApi.setData(row).open();
 }
-#if (${table.templateType} == 2)## 树表特有：新增下级
-
-/** 新增下级${table.classComment} */
-function handleAppend(row: ${apiName}.${simpleClassName}) {
-  formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
-}
-#end
 
 /** 删除${table.classComment} */
 async function handleDelete(row: ${apiName}.${simpleClassName}) {
@@ -147,16 +147,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
     height: 'auto',
 #end
 #if (${table.templateType} == 2)## 树表设置
-  treeConfig: {
-    parentField: '${treeParentColumn.javaField}',
-    rowField: 'id',
-    transform: true,
-    expandAll: true,
-    reserve: true,
-  },
-  pagerConfig: {
-    enabled: false,
-  },
+    pagerConfig: {
+      enabled: false,
+    },
 #else## 标准表设置
     keepSource: true,
 #end
@@ -188,15 +181,24 @@ const [Grid, gridApi] = useVbenVxeGrid({
       refresh: true,
       search: true,
     },
+#if (${table.templateType} == 2)## 树表设置
+    treeConfig: {
+      parentField: '${treeParentColumn.javaField}',
+      rowField: 'id',
+      transform: true,
+      expandAll: true,
+      reserve: true,
+    },
+#end
   } as VxeTableGridOptions<${apiName}.${simpleClassName}>,
-#if (${table.templateType} == 11 || $deleteBatchEnable)
+#if (${table.templateType} == 11 || (${table.templateType} != 2 && $deleteBatchEnable))
   gridEvents: {
   #if(${table.templateType} == 11)
     cellClick: ({ row }: { row: ${apiName}.${simpleClassName}}) => {
       select${simpleClassName}.value = row;
     },
   #end
-  #if(${table.templateType} != 2 && $deleteBatchEnable)
+  #if (${table.templateType} != 2 && $deleteBatchEnable)
     checkboxAll: handleRowCheckboxChange,
     checkboxChange: handleRowCheckboxChange,
   #end
@@ -231,13 +233,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
       <template #toolbar-tools>
         <TableAction
           :actions="[
-            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
-            {
-              label: isExpanded ? '收缩' : '展开',
-              type: 'primary',
-              onClick: toggleExpand,
-            },
-            #end
             {
               label: $t('ui.actionTitle.create', ['${table.classComment}']),
               type: 'primary',
@@ -245,6 +240,13 @@ const [Grid, gridApi] = useVbenVxeGrid({
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
               onClick: handleCreate,
             },
+            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
+            {
+              label: isExpanded ? '收缩' : '展开',
+              type: 'primary',
+              onClick: toggleExpand,
+            },
+            #end
             {
               label: $t('ui.actionTitle.export'),
               type: 'primary',
