@@ -3,7 +3,7 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
-import { ref#if ($table.templateType == 2), computed#end } from 'vue';
+import { ref } from 'vue';
 
 import {#if ($table.templateType != 2 && $deleteBatchEnable) confirm,#end Page, useVbenModal } from '@vben/common-ui';
 import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
