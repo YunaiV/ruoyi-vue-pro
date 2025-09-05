@@ -206,7 +206,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
 <template>
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
-
 #if ($table.templateType == 11) ## erp情况
   <div>
 #end

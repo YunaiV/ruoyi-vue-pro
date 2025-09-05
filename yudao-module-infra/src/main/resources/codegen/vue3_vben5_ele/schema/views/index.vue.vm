@@ -213,17 +213,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
         #if ($table.templateType == 12) ## 内嵌情况
           <template #expand_content="{ row }">
             <!-- 子表的表单 -->
-            <el-tabs v-model="subTabsName" class="mx-8">
+            <ElTabs v-model="subTabsName" class="mx-8">
                 #foreach ($subTable in $subTables)
                     #set ($index = $foreach.count - 1)
                     #set ($subClassNameVar = $subClassNameVars.get($index))
                     #set ($subSimpleClassName = $subSimpleClassNames.get($index))
                     #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-                  <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
+                  <ElTabPane name="$subClassNameVar" label="${subTable.classComment}">
                     <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
-                  </el-tab-pane>
+                  </ElTabPane>
                 #end
-            </el-tabs>
+            </ElTabs>
           </template>
         #end
       <template #toolbar-tools>

@@ -11,8 +11,6 @@ import { message#if ($table.templateType == 11), Tabs#end } from 'ant-design-vue
 import { useVbenForm } from '#/adapter/form';
 import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 import { $t } from '#/locales';
-
-import { useFormSchema } from '../data';
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #foreach ($subSimpleClassName in $subSimpleClassNames)
@@ -21,6 +19,8 @@ import { useFormSchema } from '../data';
   import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
   #end
 #end
+
+import { useFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
 const formData = ref<${apiName}.${simpleClassName}>();
