@@ -68,14 +68,10 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
-    key: 'action_process_msg',
   });
   try {
     await delete${subSimpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_process_msg',
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     await getList();
   } finally {
     hideLoading();
@@ -88,12 +84,11 @@ async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
     duration: 0,
-    key: 'action_process_msg',
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success( $t('ui.actionMessage.deleteSuccess') );
+    message.success($t('ui.actionMessage.deleteSuccess'));
     await getList();
   } finally {
     hideLoading();

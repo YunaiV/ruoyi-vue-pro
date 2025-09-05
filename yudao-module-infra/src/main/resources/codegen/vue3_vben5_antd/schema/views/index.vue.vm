@@ -90,6 +90,7 @@ function handleAppend(row: ${apiName}.${simpleClassName}) {
 async function handleDelete(row: ${apiName}.${simpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
+    duration: 0,
   });
   try {
     await delete${simpleClassName}(row.id as number);
@@ -106,6 +107,7 @@ async function handleDeleteBatch() {
   await confirm($t('ui.actionMessage.deleteBatchConfirm'));
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deletingBatch'),
+    duration: 0,
   });
   try {
     await delete${simpleClassName}List(checkedIds.value);

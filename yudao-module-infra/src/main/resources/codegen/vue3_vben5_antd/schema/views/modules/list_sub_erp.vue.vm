@@ -60,14 +60,11 @@ function handleEdit(row: ${apiName}.${subSimpleClassName}) {
 async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
-    key: 'action_process_msg',
+    duration: 0,
   });
   try {
     await delete${subSimpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     onRefresh();
   } finally {
     hideLoading();
@@ -79,15 +76,12 @@ async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
 async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
-    key: 'action_key_msg',
+    duration: 0,
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     onRefresh();
   } finally {
     hideLoading();
