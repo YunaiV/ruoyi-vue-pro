@@ -1,5 +1,7 @@
 #set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+#if ( $table.templateType != 2 )
 import type { PageParam, PageResult } from '@vben/request';
+#end
 import type { Dayjs } from 'dayjs';
 
 import { requestClient } from '#/api/request';
@@ -97,8 +99,8 @@ export function update${simpleClassName}(data: ${apiName}.${simpleClassName}) {
 export function delete${simpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/delete?id=${id}`);
 }
-
 #if ( $table.templateType != 2 && $deleteBatchEnable)
+
 /** 批量删除${table.classComment} */
 export function delete${simpleClassName}List(ids: number[]) {
   return requestClient.delete(
