@@ -491,6 +491,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
     }
 
+    @Override
+    public List<HistoricTaskInstance> getFinishedTaskListByProcessInstanceIdWithoutCancel(String processInstanceId) {
+        return historyService.createHistoricTaskInstanceQuery()
+                .finished()
+                .includeTaskLocalVariables()
+                .processInstanceId(processInstanceId)
+                .taskVariableValueNotEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS,
+                        BpmTaskStatusEnum.CANCEL.getStatus())
+                .orderByHistoricTaskInstanceStartTime().asc().list();
+    }
+
     /**
      * 判断指定用户，是否是当前任务的审批人
      *
