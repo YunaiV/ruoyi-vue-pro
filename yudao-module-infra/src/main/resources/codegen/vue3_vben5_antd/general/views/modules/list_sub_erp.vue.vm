@@ -70,7 +70,7 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
     duration: 0,
   });
   try {
-    await delete${subSimpleClassName}(row.id as number);
+    await delete${subSimpleClassName}(row.id!);
     message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     await getList();
   } finally {

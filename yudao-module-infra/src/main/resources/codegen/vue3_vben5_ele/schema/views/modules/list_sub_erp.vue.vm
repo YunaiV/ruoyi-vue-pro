@@ -62,9 +62,9 @@ async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
     text: $t('ui.actionMessage.deleting', [row.id]),
   });
   try {
-    await delete${subSimpleClassName}(row.id as number);
+    await delete${subSimpleClassName}(row.id!);
     ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
-    onRefresh();
+    handleRefresh();
   } finally {
     loadingInstance.close();
   }
@@ -80,7 +80,7 @@ async function handleDeleteBatch() {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
     ElMessage.success($t('ui.actionMessage.deleteSuccess'));
-    onRefresh();
+    handleRefresh();
   } finally {
     loadingInstance.close();
   }
@@ -152,7 +152,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 });
 
 /** 刷新表格 */
-async function onRefresh() {
+async function handleRefresh() {
 #if ($table.templateType == 11) ## erp
   await gridApi.query();
 #else
@@ -172,7 +172,7 @@ watch(
       return;
     }
     await nextTick();
-    await onRefresh()
+    await handleRefresh()
   },
   { immediate: true },
 );
@@ -180,7 +180,7 @@ watch(
 
 <template>
     #if ($table.templateType == 11) ## erp
-      <FormModal @success="onRefresh" />
+      <FormModal @success="handleRefresh" />
       <Grid table-title="${subTable.classComment}列表">
         <template #toolbar-tools>
           <TableAction

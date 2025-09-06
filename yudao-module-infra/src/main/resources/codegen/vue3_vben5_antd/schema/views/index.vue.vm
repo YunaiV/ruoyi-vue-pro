@@ -54,14 +54,14 @@ const [FormModal, formModalApi] = useVbenModal({
 
 /** 切换树形展开/收缩状态 */
 const isExpanded = ref(true);
-function toggleExpand() {
+function handleExpand() {
   isExpanded.value = !isExpanded.value;
   gridApi.grid.setAllTreeExpand(isExpanded.value);
 }
 #end
 
 /** 刷新表格 */
-function onRefresh() {
+function handleRefresh() {
 #if ($table.templateType == 12) ## 内嵌情况
   gridApi.reload();
 #else
@@ -93,9 +93,9 @@ async function handleDelete(row: ${apiName}.${simpleClassName}) {
     duration: 0,
   });
   try {
-    await delete${simpleClassName}(row.id as number);
+    await delete${simpleClassName}(row.id!);
     message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
-    onRefresh();
+    handleRefresh();
   } finally {
     hideLoading();
   }
@@ -113,7 +113,7 @@ async function handleDeleteBatch() {
     await delete${simpleClassName}List(checkedIds.value);
     checkedIds.value = [];
     message.success($t('ui.actionMessage.deleteSuccess'));
-    onRefresh();
+    handleRefresh();
   } finally {
     hideLoading();
   }
@@ -209,7 +209,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 <template>
   <Page auto-content-height>
-    <FormModal @success="onRefresh" />
+    <FormModal @success="handleRefresh" />
 #if ($table.templateType == 11) ## erp情况
   <div>
 #end
@@ -244,7 +244,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
             {
               label: isExpanded ? '收缩' : '展开',
               type: 'primary',
-              onClick: toggleExpand,
+              onClick: handleExpand,
             },
             #end
             {

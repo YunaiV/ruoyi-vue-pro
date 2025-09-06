@@ -146,7 +146,7 @@ async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
     duration: 0,
   });
   try {
-    await delete${simpleClassName}(row.id as number);
+    await delete${simpleClassName}(row.id!);
     message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     await getList();
   } finally {
@@ -195,7 +195,7 @@ try {
 #if (${table.templateType} == 2)
 /** 切换树形展开/收缩状态 */
 const isExpanded = ref(true);
-function toggleExpand() {
+function handleExpand() {
   isExpanded.value = !isExpanded.value;
   tableRef.value?.setAllTreeExpand(isExpanded.value);
 }
@@ -303,7 +303,7 @@ onMounted(() => {
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
-          <Button @click="toggleExpand" class="mr-2">
+          <Button @click="handleExpand" class="mr-2">
             {{ isExpanded ? '收缩' : '展开' }}
           </Button>
         #end

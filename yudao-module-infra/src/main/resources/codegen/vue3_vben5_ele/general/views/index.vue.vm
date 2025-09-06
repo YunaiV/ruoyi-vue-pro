@@ -195,7 +195,7 @@ try {
 #if (${table.templateType} == 2)
 /** 切换树形展开/收缩状态 */
 const isExpanded = ref(true);
-function toggleExpand() {
+function handleExpand() {
   isExpanded.value = !isExpanded.value;
   tableRef.value?.setAllTreeExpand(isExpanded.value);
 }
@@ -306,7 +306,7 @@ onMounted(() => {
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
-          <el-button @click="toggleExpand" class="mr-2">
+          <el-button @click="handleExpand" class="mr-2">
             {{ isExpanded ? '收缩' : '展开' }}
           </el-button>
         #end
