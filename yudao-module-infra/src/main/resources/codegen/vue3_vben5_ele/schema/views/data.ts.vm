@@ -29,7 +29,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '上级${table.classComment}',
       component: 'ApiTreeSelect',
       componentProps: {
-        allowClear: true,
+        clearable: true,
         api: async () => {
           const data = await get${simpleClassName}List({});
           data.unshift({
@@ -157,13 +157,13 @@ export function useGridFormSchema(): VbenFormSchema[] {
   #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
       component: 'Input',
       componentProps: {
-        allowClear: true,
+        clearable: true,
         placeholder: '请输入${comment}',
       },
   #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
       component: 'Select',
       componentProps: {
-        allowClear: true,
+        clearable: true,
         #if ("" != $dictType)## 设置了 dictType 数据字典的情况
         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
         #else## 未设置 dictType 数据字典的情况
@@ -175,7 +175,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'RangePicker',
       componentProps: {
         ...getRangePickerDefaultProps(),
-        allowClear: true,
+        clearable: true,
       },
   #end
     },
@@ -360,13 +360,13 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
                     #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
                         component: 'Input',
                         componentProps: {
-                            allowClear: true,
+                            clearable: true,
                             placeholder: '请输入${comment}',
                         },
                     #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
                         component: 'Select',
                         componentProps: {
-                            allowClear: true,
+                            clearable: true,
                             #if ("" != $dictType)## 设置了 dictType 数据字典的情况
                                 options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
                             #else## 未设置 dictType 数据字典的情况
@@ -378,7 +378,7 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
                         component: 'RangePicker',
                         componentProps: {
                             ...getRangePickerDefaultProps(),
-                            allowClear: true,
+                            clearable: true,
                         },
                     #end
                 },
