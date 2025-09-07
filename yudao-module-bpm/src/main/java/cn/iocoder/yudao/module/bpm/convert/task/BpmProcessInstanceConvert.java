@@ -305,25 +305,23 @@ public interface BpmProcessInstanceConvert {
         // 打印模板是否开启
         printData.setPrintTemplateEnable(printTemplateSetting != null && Boolean.TRUE.equals(printTemplateSetting.getEnable()));
         // 流程相关数据
-        BpmProcessInstanceRespVO processInstance = new BpmProcessInstanceRespVO();
-        processInstance.setStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance));
-        processInstance.setId(historicProcessInstance.getId());
-        processInstance.setName(historicProcessInstance.getName());
-        processInstance.setBusinessKey(historicProcessInstance.getBusinessKey());
-        processInstance.setStartTime(DateUtils.of(historicProcessInstance.getStartTime()));
-        processInstance.setEndTime(DateUtils.of(historicProcessInstance.getEndTime()));
-        processInstance.setFormVariables(historicProcessInstance.getProcessVariables());
-        processInstance.setStartUser(startUser);
-        processInstance.setProcessDefinition(BeanUtils.toBean(processDefinitionInfo, BpmProcessDefinitionRespVO.class));
+        BpmProcessInstanceRespVO processInstance = new BpmProcessInstanceRespVO()
+                .setId(historicProcessInstance.getId()).setName(historicProcessInstance.getName())
+                .setBusinessKey(historicProcessInstance.getBusinessKey())
+                .setStartTime(DateUtils.of(historicProcessInstance.getStartTime()))
+                .setEndTime(DateUtils.of(historicProcessInstance.getEndTime()))
+                .setStartUser(startUser).setStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance))
+                .setFormVariables(historicProcessInstance.getProcessVariables())
+                .setProcessDefinition(BeanUtils.toBean(processDefinitionInfo, BpmProcessDefinitionRespVO.class));
         printData.setProcessInstance(processInstance);
         // 审批历史
-        List<BpmProcessPrintDataRespVO.ApproveTask> approveTasks = new ArrayList<>(tasks.size());
+        List<BpmProcessPrintDataRespVO.Task> approveTasks = new ArrayList<>(tasks.size());
         tasks.forEach(item -> {
             Map<String, Object> taskLocalVariables = item.getTaskLocalVariables();
-            BpmProcessPrintDataRespVO.ApproveTask approveTask = new BpmProcessPrintDataRespVO.ApproveTask();
+            BpmProcessPrintDataRespVO.Task approveTask = new BpmProcessPrintDataRespVO.Task();
             approveTask.setName(item.getName());
             approveTask.setId(item.getId());
-            approveTask.setSignUrl((String) taskLocalVariables.getOrDefault(BpmnVariableConstants.TASK_SIGN_PIC_URL, ""));
+            approveTask.setSignPicUrl((String) taskLocalVariables.get(BpmnVariableConstants.TASK_SIGN_PIC_URL));
             approveTask.setDescription(StrUtil.format("{} / {} / {} / {} / {}",
                     userMap.get(Long.valueOf(item.getAssignee())).getNickname(),
                     item.getName(),

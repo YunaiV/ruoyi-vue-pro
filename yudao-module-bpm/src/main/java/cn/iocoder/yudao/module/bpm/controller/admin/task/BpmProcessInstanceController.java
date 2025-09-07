@@ -214,8 +214,8 @@ public class BpmProcessInstanceController {
         AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(historicProcessInstance.getStartUserId()));
         DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
         List<HistoricTaskInstance> tasks = taskService.getFinishedTaskListByProcessInstanceIdWithoutCancel(processInstanceId);
-        Set<Long> userIds = convertSet(tasks, item -> Long.valueOf(item.getAssignee()));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(tasks, item -> Long.valueOf(item.getAssignee())));
         return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstancePrintData(historicProcessInstance,
                 processDefinitionService.getProcessDefinitionInfo(historicProcessInstance.getProcessDefinitionId()),
                 tasks, userMap,
