@@ -728,69 +728,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 userMap, deptMap);
     }
 
-    // TODO @lesan：这个可以放在 controller + convert 哇？保证 Service 只尽量处理写逻辑；
-    @Override
-    public BpmProcessPrintDataRespVO getProcessInstancePrintData(Long loginUserId, String processInstanceId) {
-        // 1 数据准备
-        HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(processInstanceId);
-        if (historicProcessInstance == null) {
-            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
-        }
-        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
-                .getProcessDefinitionInfo(historicProcessInstance.getProcessDefinitionId());
-        BpmModelMetaInfoVO.PrintTemplateSetting printTemplateSetting = processDefinitionInfo.getPrintTemplateSetting();
-        // 2 获取打印所需数据
-        BpmProcessPrintDataRespVO printData = new BpmProcessPrintDataRespVO();
-        // 2.1 打印模板是否开启
-        printData.setPrintTemplateEnable(printTemplateSetting != null && Boolean.TRUE.equals(printTemplateSetting.getEnable()));
-        // 2.2 流程相关数据
-        printData.setProcessStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance));
-        printData.setProcessInstanceId(historicProcessInstance.getId());
-        printData.setProcessName(historicProcessInstance.getName());
-        printData.setProcessBusinessKey(historicProcessInstance.getBusinessKey());
-        printData.setStartTime(DatePattern.NORM_DATETIME_MINUTE_FORMAT.format(historicProcessInstance.getStartTime()));
-        printData.setEndTime(Objects.isNull(historicProcessInstance.getEndTime()) ?
-                "" : DatePattern.NORM_DATETIME_MINUTE_FORMAT.format(historicProcessInstance.getEndTime()));
-        printData.setProcessVariables(historicProcessInstance.getProcessVariables());
-        // 2.3 发起人
-        AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(historicProcessInstance.getStartUserId()));
-        DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
-        printData.setStartUser(new UserSimpleBaseVO().setNickname(startUser.getNickname()).setDeptName(dept.getName()));
-        // 2.4 审批历史
-        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-                .finished()
-                .includeTaskLocalVariables()
-                .processInstanceId(processInstanceId)
-                .taskVariableValueNotEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS,
-                        BpmTaskStatusEnum.CANCEL.getStatus())
-                .orderByHistoricTaskInstanceStartTime().asc().list();
-        Set<Long> userIds = convertSet(tasks, item -> Long.valueOf(item.getAssignee()));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        List<BpmProcessPrintDataRespVO.ApproveNode> approveNodes = new ArrayList<>(tasks.size());
-        tasks.forEach(item -> {
-            Map<String, Object> taskLocalVariables = item.getTaskLocalVariables();
-            BpmProcessPrintDataRespVO.ApproveNode approveNode = new BpmProcessPrintDataRespVO.ApproveNode();
-            approveNode.setNodeName(item.getName());
-            approveNode.setNodeId(item.getId());
-            approveNode.setSignUrl((String) taskLocalVariables.getOrDefault(BpmnVariableConstants.TASK_SIGN_PIC_URL, ""));
-            approveNode.setNodeDesc(StrUtil.format("{} / {} / {} / {} / {}",
-                    userMap.get(Long.valueOf(item.getAssignee())).getNickname(),
-                    item.getName(),
-                    DateUtil.formatDateTime(item.getEndTime()),
-                    BpmTaskStatusEnum.valueOf((Integer) taskLocalVariables.get(BpmnVariableConstants.TASK_VARIABLE_STATUS)).getName(),
-                    taskLocalVariables.get(BpmnVariableConstants.TASK_VARIABLE_REASON)));
-            approveNodes.add(approveNode);
-        });
-        printData.setApproveNodes(approveNodes);
-        // 2.5 表单数据
-        printData.setFormFields(processDefinitionInfo.getFormFields());
-        // 2.6 自定义模板
-        if (printData.getPrintTemplateEnable() && printTemplateSetting != null) {
-            printData.setPrintTemplateHtml(printTemplateSetting.getTemplate());
-        }
-        return printData;
-    }
-
     // ========== Update 写入相关方法 ==========
 
     @Override

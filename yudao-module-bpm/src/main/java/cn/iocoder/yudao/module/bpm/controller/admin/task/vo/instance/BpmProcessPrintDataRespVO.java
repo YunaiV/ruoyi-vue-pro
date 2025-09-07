@@ -11,43 +11,28 @@ import java.util.Map;
 @Data
 public class BpmProcessPrintDataRespVO {
 
+    @Schema(description = "流程实例数据")
+    private BpmProcessInstanceRespVO processInstance;
+
+    @Schema(description = "是否开启自定义打印模板")
     private Boolean printTemplateEnable;
 
-    // TODO @lesan：要不 processStatus、processInstanceId、processBusinessKey、processBusinessKey、startUser、endTime、processVariables 使用 BpmProcessInstanceRespVO ？虽然这个 VO 大了点，但是收一收字段。嘿嘿；进而只有 processInstance、tasks、formFields、printTemplateHtml 这些字段；
-    private Integer processStatus;
-
-    private String processInstanceId;
-
-    private String processBusinessKey;
-
-    private String processName;
-
-    private UserSimpleBaseVO startUser;
-
-    private String startTime;
-
-    private String endTime;
-
-    // TODO @lesan：变量要不改成 tasks；
-    private List<ApproveNode> approveNodes;
-
-    private List<String> formFields;
-
+    @Schema(description = "自定义打印模板HTML")
     private String printTemplateHtml;
 
-    private Map<String, Object> processVariables;
+    @Schema(description = "审批任务列表")
+    private List<ApproveTask> tasks;
 
-    // TODO @lesan：类名要不要改成 tasks ？然后 id、name、signUrl、description；感觉理解成本低点；
     @Data
-    public static class ApproveNode {
+    public static class ApproveTask {
 
-        private String nodeName;
+        private String id;
 
-        private String nodeDesc;
+        private String name;
+
+        private String description;
 
         private String signUrl;
-
-        private String nodeId;
 
     }
 
