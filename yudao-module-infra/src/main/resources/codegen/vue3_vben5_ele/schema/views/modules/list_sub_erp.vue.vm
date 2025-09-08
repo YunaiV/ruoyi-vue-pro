@@ -210,7 +210,8 @@ watch(
             :actions="[
               {
                 label: $t('common.edit'),
-                type: 'text',
+                type: 'primary',
+                link: true,
                 icon: ACTION_ICON.EDIT,
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
                 onClick: handleEdit.bind(null, row),
@@ -218,7 +219,7 @@ watch(
               {
                 label: $t('common.delete'),
                 type: 'danger',
-                text: true,
+                link: true,
                 icon: ACTION_ICON.DELETE,
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
                 popConfirm: {
