@@ -51,6 +51,10 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
+  basic:
+    enable: true
+    username: admin
+    password: admin123
 
 # 工作流 Flowable 配置
 flowable:

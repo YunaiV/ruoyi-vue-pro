@@ -83,7 +83,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateFile_success_01() throws Exception {
         // 准备参数
-        byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+        byte[] content = ResourceUtil.readBytes("file/picUploadSuccess.jpg");
         String name = "单测文件名";
         String directory = randomString();
         String type = "image/jpeg";
@@ -117,7 +117,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateFile_success_02() throws Exception {
         // 准备参数
-        byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+        byte[] content = ResourceUtil.readBytes("file/picUploadSuccess.jpg");
         // mock Master 文件客户端
         String type = "image/jpeg";
         FileClient client = mock(FileClient.class);

@@ -129,7 +129,7 @@ public class S3FileClientTest {
         client.init();
         // 上传文件
         String path = IdUtil.fastSimpleUUID() + ".jpg";
-        byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+        byte[] content = ResourceUtil.readBytes("file/picUploadSuccess.jpg");
         String fullPath = client.upload(content, path, "image/jpeg");
         System.out.println("访问地址：" + fullPath);
         // 读取文件
