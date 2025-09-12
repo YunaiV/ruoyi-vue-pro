@@ -6,13 +6,15 @@
 <script lang="ts" setup>
   import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
+  import { computed, ref } from 'vue';
+
   import { useVbenModal } from '@vben/common-ui';
+
   import { ElMessage } from 'element-plus';
 
-  import { computed, ref } from 'vue';
-  import { $t } from '#/locales';
   import { useVbenForm } from '#/adapter/form';
   import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+  import { $t } from '#/locales';
 
   import { use${subSimpleClassName}FormSchema } from '../data';
 

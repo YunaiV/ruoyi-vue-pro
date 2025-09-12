@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-import type { VxeTableInstance } from '#/adapter/vxe-table';
+
+import { ref, h, reactive, onMounted, nextTick } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { cloneDeep, formatDateTime } from '@vben/utils';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
+import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
 import { ElButton, ElMessage, ElLoading, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
-import { DictTag } from '#/components/dict-tag';
-import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
 import ${simpleClassName}Form from './modules/form.vue';
 import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
 import { ContentWrap } from '#/components/content-wrap';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-import { TableToolbar } from '#/components/table-toolbar';
-import { useTableToolbar } from '#/hooks';
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
@@ -23,7 +23,6 @@ import { useTableToolbar } from '#/hooks';
     #end
 #end
 
-import { ref, h, reactive,onMounted,nextTick } from 'vue';
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
 import { handleTree,isEmpty } from '@vben/utils'
@@ -104,7 +103,7 @@ const getList = async () => {
 }
 
 /** 搜索按钮操作 */
-const handleQuery = () => {
+function handleQuery() {
 #if ( $table.templateType != 2 )
   queryParams.pageNo = 1
 #end
@@ -112,7 +111,7 @@ const handleQuery = () => {
 }
 
 /** 重置按钮操作 */
-const resetQuery = () => {
+function resetQuery() {
   queryFormRef.value.resetFields()
   handleQuery()
 }
@@ -182,7 +181,7 @@ function handleRowCheckboxChange({
 #end
 
 /** 导出表格 */
-async function onExport() {
+async function handleExport() {
 try {
   exportLoading.value = true;
   const data = await export${simpleClassName}(queryParams);
@@ -324,7 +323,7 @@ onMounted(() => {
               type="primary"
               class="ml-2"
               :loading="exportLoading"
-              @click="onExport"
+              @click="handleExport"
               v-access:code="['${permissionPrefix}:export']"
           >
             {{ $t('ui.actionTitle.export') }}

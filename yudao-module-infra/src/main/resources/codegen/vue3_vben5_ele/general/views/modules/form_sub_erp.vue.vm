@@ -6,13 +6,15 @@
   import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
   import type { FormRules } from 'element-plus';
 
+  import { computed, ref, reactive } from 'vue';
+
   import { useVbenModal } from '@vben/common-ui';
+  import { DICT_TYPE } from '@vben/constants';
+  import { getDictOptions } from '@vben/hooks';
   import { Tinymce as RichTextarea } from '#/components/tinymce';
   import { ImageUpload, FileUpload } from "#/components/upload";
   import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
-  import { DICT_TYPE, getDictOptions } from '#/utils';
 
-  import { computed, ref, reactive } from 'vue';
   import { $t } from '#/locales';
 
   import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';

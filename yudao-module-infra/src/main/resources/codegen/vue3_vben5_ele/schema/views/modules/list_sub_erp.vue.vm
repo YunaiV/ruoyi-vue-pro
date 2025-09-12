@@ -42,6 +42,19 @@ const [FormModal, formModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
+/** 刷新表格 */
+async function handleRefresh() {
+#if ($table.templateType == 11) ## erp
+  await gridApi.query();
+#else
+  #if ($subTable.subJoinMany) ## 一对多
+  await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+  #else
+  await gridApi.grid.loadData([await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)]);
+  #end
+#end
+}
+
 /** 创建${subTable.classComment} */
 function handleCreate() {
   if (!props.${subJoinColumn.javaField}){
@@ -150,19 +163,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
   }
   #end
 });
-
-/** 刷新表格 */
-async function handleRefresh() {
-#if ($table.templateType == 11) ## erp
-  await gridApi.query();
-#else
-  #if ($subTable.subJoinMany) ## 一对多
-  await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
-  #else
-  await gridApi.grid.loadData([await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)]);
-  #end
-#end
-}
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
