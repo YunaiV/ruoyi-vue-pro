@@ -57,6 +57,7 @@ public class DefaultDBFieldHandler implements MetaObjectHandler {
         Object modifier = getFieldValByName("updater", metaObject);
         Long userId = SecurityFrameworkUtils.getLoginUserId();
         if (Objects.nonNull(userId) && Objects.isNull(modifier)) {
+            // debug 这里的id被转换为 更新人  那么就会和MySQL中 product_sku updater(double(64,0)) 冲突！ 导致mysql“字符串转数值” 的隐性不兼容 ， 所以这里吧数据库的这个字段改为 varchar
             setFieldValByName("updater", userId.toString(), metaObject);
         }
     }
