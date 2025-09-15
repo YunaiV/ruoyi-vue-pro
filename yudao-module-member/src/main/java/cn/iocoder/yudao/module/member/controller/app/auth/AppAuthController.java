@@ -82,6 +82,7 @@ public class AppAuthController {
     @Operation(summary = "发送手机验证码")
     @PermitAll
     public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSmsSendReqVO reqVO) {
+        // 这在内部添加 最后调用的sendSmsCode 把商城的验证码打印出来 (这样不用短信运营商也能看到存储到redis 中的验证码是什么 25年9月15日
         authService.sendSmsCode(getLoginUserId(), reqVO);
         return success(true);
     }

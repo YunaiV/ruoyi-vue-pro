@@ -50,7 +50,10 @@ public class PayOrderDO extends BaseDO {
     private String channelCode;
 
     /**
-     * 用户编号
+     * 用户编号 产生支付订单出错的字段 和数据库不对应 25年9月15日
+     * 在数据库新增字段 直接解决 => ```sql ALTER TABLE `pay_order`
+     * ADD COLUMN `user_id` BIGINT NOT NULL COMMENT '用户编号' AFTER `status`,
+     * ADD COLUMN `user_type` TINYINT NOT NULL COMMENT '用户类型' AFTER `user_id`; ```
      */
     private Long userId;
     /**

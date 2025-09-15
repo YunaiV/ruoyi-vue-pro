@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsCodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsCodeMapper;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.framework.sms.config.SmsCodeProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,6 +27,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 @Validated
 public class SmsCodeServiceImpl implements SmsCodeService {
@@ -42,17 +44,23 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     @Override
     public void sendSmsCode(SmsCodeSendReqDTO reqDTO) {
         SmsSceneEnum sceneEnum = SmsSceneEnum.getCodeByScene(reqDTO.getScene());
-        Assert.notNull(sceneEnum, "验证码场景({}) 查找不到配置", reqDTO.getScene());
+        Assert.notNull(sceneEnum, "验证码场景({}) 查找不到配置1~4", reqDTO.getScene());
         // 创建验证码
         String code = createSmsCode(reqDTO.getMobile(), reqDTO.getScene(), reqDTO.getCreateIp());
-        // 发送验证码
+
+        // 250915 [开发者-内存中商城注册验证码打印]
+        log.warn("[开发者-用户验证码]  手机号: {}, 场景: {}, 验证码: {}",
+                reqDTO.getMobile(), reqDTO.getScene(), code);
+
+        // 发送验证码 (传入号码 、短信模板编号 以及包含 验证码的Map
         smsSendService.sendSingleSms(reqDTO.getMobile(), null, null,
                 sceneEnum.getTemplateCode(), MapUtil.of("code", code));
     }
 
     private String createSmsCode(String mobile, Integer scene, String ip) {
         // 校验是否可以发送验证码，不用筛选场景
-        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, null);
+        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, null); // 查最后发送验证码的记录
+        // 发过的 下面会校验 发送频率 、 和每日发送上限
         if (lastSmsCode != null) {
             if (LocalDateTimeUtil.between(lastSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
                     < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
@@ -69,6 +77,7 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         // 创建验证码记录
         String code = String.format("%0" + smsCodeProperties.getEndCode().toString().length() + "d",
                 randomInt(smsCodeProperties.getBeginCode(), smsCodeProperties.getEndCode() + 1));
+        // 保存这个 验证码对象到数据库中
         SmsCodeDO newSmsCode = SmsCodeDO.builder().mobile(mobile).code(code).scene(scene)
                 .todayIndex(lastSmsCode != null && isToday(lastSmsCode.getCreateTime()) ? lastSmsCode.getTodayIndex() + 1 : 1)
                 .createIp(ip).used(false).build();
