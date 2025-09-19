@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class TimerTriggerMatcher implements IotSceneRuleTriggerMatcher {
+public class IotTimerTriggerMatcher implements IotSceneRuleTriggerMatcher {
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {

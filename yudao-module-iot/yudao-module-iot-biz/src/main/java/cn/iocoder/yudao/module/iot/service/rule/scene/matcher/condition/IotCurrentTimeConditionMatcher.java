@@ -16,7 +16,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-// TODO @puhui999：是不是 IoT 的前缀，都加下哈；
 /**
  * 当前时间条件匹配器：处理时间相关的子条件匹配逻辑
  *
@@ -24,7 +23,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher {
+public class IotCurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher {
 
     /**
      * 时间格式化器 - HH:mm:ss

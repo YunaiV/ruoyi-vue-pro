@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-// TODO @puhui999：建议改成 IotBaseConditionMatcherTest
 /**
  * Matcher 测试基类
  * 提供通用的 Spring 测试配置
@@ -14,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author HUIHUI
  */
 @SpringJUnitConfig
-public abstract class BaseMatcherTest {
+public abstract class IotBaseConditionMatcherTest {
 
     /**
      * 注入一下 SpringUtil，解析 EL 表达式时需要

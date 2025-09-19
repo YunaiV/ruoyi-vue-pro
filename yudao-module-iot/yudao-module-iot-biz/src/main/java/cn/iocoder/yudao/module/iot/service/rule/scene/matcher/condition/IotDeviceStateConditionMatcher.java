@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @author HUIHUI
  */
 @Component
-public class DeviceStateConditionMatcher implements IotSceneRuleConditionMatcher {
+public class IotDeviceStateConditionMatcher implements IotSceneRuleConditionMatcher {
 
     @Override
     public IotSceneRuleConditionTypeEnum getSupportedConditionType() {
