@@ -32,7 +32,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
      */
     private final LoadingCache<Long, IotDeviceRespDTO> deviceCaches = buildAsyncReloadingCache(
             CACHE_EXPIRE,
-            new CacheLoader<>() {
+            new CacheLoader<Long, IotDeviceRespDTO>() {
 
                 @Override
                 public IotDeviceRespDTO load(Long id) {
@@ -51,7 +51,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
      */
     private final LoadingCache<KeyValue<String, String>, IotDeviceRespDTO> deviceCaches2 = buildAsyncReloadingCache(
             CACHE_EXPIRE,
-            new CacheLoader<>() {
+            new CacheLoader<KeyValue<String, String>, IotDeviceRespDTO>() {
 
                 @Override
                 public IotDeviceRespDTO load(KeyValue<String, String> kv) {
