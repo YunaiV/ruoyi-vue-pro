@@ -25,13 +25,13 @@ class IotTcpDataRuleActionTest {
     private IotTcpClient mockTcpClient;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         tcpDataRuleAction = new IotTcpDataRuleAction();
     }
 
     @Test
-    void testGetType() {
+    public void testGetType() {
         // 准备参数
         Integer expectedType = 2; // 数据接收类型枚举中 TCP 类型的值
 
@@ -42,8 +42,9 @@ class IotTcpDataRuleActionTest {
         assertEquals(expectedType, actualType);
     }
 
+    // TODO @puhui999：_ 后面是小写哈，单测的命名规则。
     @Test
-    void testInitProducer_Success() throws Exception {
+    public void testInitProducer_Success() throws Exception {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
         config.setHost("localhost");
@@ -59,7 +60,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    void testInitProducer_InvalidHost() {
+    public void testInitProducer_InvalidHost() {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
         config.setHost("");
@@ -77,7 +78,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    void testInitProducer_InvalidPort() {
+    public void testInitProducer_InvalidPort() {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
         config.setHost("localhost");
@@ -92,7 +93,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    void testCloseProducer() throws Exception {
+    public void testCloseProducer() throws Exception {
         // 准备参数
         IotTcpClient client = mock(IotTcpClient.class);
 
@@ -104,7 +105,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    void testExecute_WithValidConfig() {
+    public void testExecute_WithValidConfig() {
         // 准备参数
         IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.report",
                 "{\"temperature\": 25.5, \"humidity\": 60}");
@@ -124,7 +125,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    void testConfig_DefaultValues() {
+    public void testConfig_DefaultValues() {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
 
@@ -140,7 +141,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    void testMessageSerialization() {
+    public void testMessageSerialization() {
         // 准备参数
         IotDeviceMessage message = IotDeviceMessage.builder()
                 .deviceId(123L)

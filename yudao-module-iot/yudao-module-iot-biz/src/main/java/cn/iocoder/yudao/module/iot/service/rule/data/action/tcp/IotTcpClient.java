@@ -38,6 +38,7 @@ public class IotTcpClient {
     private BufferedReader reader;
     private final AtomicBoolean connected = new AtomicBoolean(false);
 
+    // TODO @puhui999：default 值，IotDataSinkTcpConfig.java 枚举起来哈；
     public IotTcpClient(String host, Integer port, Integer connectTimeoutMs, Integer readTimeoutMs,
                         Boolean ssl, String sslCertPath, String dataFormat) {
         this.host = host;
@@ -76,9 +77,9 @@ public class IotTcpClient {
             outputStream = socket.getOutputStream();
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
 
+            // 更新状态
             connected.set(true);
             log.info("[connect][TCP 客户端连接成功，服务器地址: {}:{}]", host, port);
-
         } catch (Exception e) {
             close();
             log.error("[connect][TCP 客户端连接失败，服务器地址: {}:{}]", host, port, e);
@@ -98,6 +99,7 @@ public class IotTcpClient {
         }
 
         try {
+            // TODO @puhui999：枚举值
             String messageData;
             if ("JSON".equalsIgnoreCase(dataFormat)) {
                 // JSON 格式
@@ -111,10 +113,8 @@ public class IotTcpClient {
             outputStream.write(messageData.getBytes(StandardCharsets.UTF_8));
             outputStream.write('\n'); // 添加换行符作为消息分隔符
             outputStream.flush();
-
             log.debug("[sendMessage][发送消息成功，设备 ID: {}，消息长度: {}]",
                     message.getDeviceId(), messageData.length());
-
         } catch (Exception e) {
             log.error("[sendMessage][发送消息失败，设备 ID: {}]", message.getDeviceId(), e);
             throw e;
@@ -153,9 +153,9 @@ public class IotTcpClient {
                 }
             }
 
+            // 更新状态
             connected.set(false);
             log.info("[close][TCP 客户端连接已关闭，服务器地址: {}:{}]", host, port);
-
         } catch (Exception e) {
             log.error("[close][关闭 TCP 客户端连接异常]", e);
         }

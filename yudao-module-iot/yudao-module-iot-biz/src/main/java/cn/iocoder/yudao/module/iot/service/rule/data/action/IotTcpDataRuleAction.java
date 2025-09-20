@@ -33,7 +33,7 @@ public class IotTcpDataRuleAction extends
 
     @Override
     protected IotTcpClient initProducer(IotDataSinkTcpConfig config) throws Exception {
-        // 1. 参数校验
+        // 1.1 参数校验
         if (config.getHost() == null || config.getHost().trim().isEmpty()) {
             throw new IllegalArgumentException("TCP 服务器地址不能为空");
         }
@@ -41,7 +41,7 @@ public class IotTcpDataRuleAction extends
             throw new IllegalArgumentException("TCP 服务器端口无效");
         }
 
-        // 2. 创建 TCP 客户端
+        // 2.1 创建 TCP 客户端
         IotTcpClient tcpClient = new IotTcpClient(
                 config.getHost(),
                 config.getPort(),
@@ -51,13 +51,10 @@ public class IotTcpDataRuleAction extends
                 config.getSslCertPath(),
                 config.getDataFormat()
         );
-
-        // 3. 连接服务器
+        // 2.2 连接服务器
         tcpClient.connect();
-
         log.info("[initProducer][TCP 客户端创建并连接成功，服务器: {}:{}，SSL: {}，数据格式: {}]",
                 config.getHost(), config.getPort(), config.getSsl(), config.getDataFormat());
-
         return tcpClient;
     }
 
@@ -71,22 +68,19 @@ public class IotTcpDataRuleAction extends
     @Override
     protected void execute(IotDeviceMessage message, IotDataSinkTcpConfig config) throws Exception {
         try {
-            // 1. 获取或创建 TCP 客户端
+            // 1.1 获取或创建 TCP 客户端
             IotTcpClient tcpClient = getProducer(config);
-
-            // 2. 检查连接状态，如果断开则重新连接
+            // 1.2 检查连接状态，如果断开则重新连接
             if (!tcpClient.isConnected()) {
                 log.warn("[execute][TCP 连接已断开，尝试重新连接，服务器: {}:{}]", config.getHost(), config.getPort());
                 tcpClient.connect();
             }
 
-            // 3. 发送消息并等待结果
+            // 2.1 发送消息并等待结果
             tcpClient.sendMessage(message);
-
-            // 4. 记录发送成功日志
+            // 2.2 记录发送成功日志
             log.info("[execute][message({}) config({}) 发送成功，TCP 服务器: {}:{}]",
                     message, config, config.getHost(), config.getPort());
-
         } catch (Exception e) {
             log.error("[execute][message({}) config({}) 发送失败，TCP 服务器: {}:{}]",
                     message, config, config.getHost(), config.getPort(), e);
