@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.swagger.config;
 
+import com.github.xiaoymin.knife4j.spring.configuration.Knife4jAutoConfiguration;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -44,7 +45,7 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  *
  * @author 芋道源码
  */
-@AutoConfiguration
+@AutoConfiguration(before = Knife4jAutoConfiguration.class) // before 原因，保证覆写的 Knife4jOpenApiCustomizer 先生效！相关 https://github.com/YunaiV/ruoyi-vue-pro/issues/954 讨论
 @ConditionalOnClass({OpenAPI.class})
 @EnableConfigurationProperties(SwaggerProperties.class)
 @ConditionalOnProperty(prefix = "springdoc.api-docs", name = "enabled", havingValue = "true", matchIfMissing = true) // 设置为 false 时，禁用
