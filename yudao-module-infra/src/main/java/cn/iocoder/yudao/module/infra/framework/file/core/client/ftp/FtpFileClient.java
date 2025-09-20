@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.ftp.Ftp;
+import cn.hutool.extra.ftp.FtpConfig;
 import cn.hutool.extra.ftp.FtpException;
 import cn.hutool.extra.ftp.FtpMode;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
@@ -18,6 +19,15 @@ import java.io.ByteArrayOutputStream;
  */
 public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
 
+    /**
+     * 连接超时时间，单位：毫秒
+     */
+    private static final Long CONNECTION_TIMEOUT = 3000L;
+    /**
+     * 读写超时时间，单位：毫秒
+     */
+    private static final Long SO_TIMEOUT = 10000L;
+
     private Ftp ftp;
 
     public FtpFileClient(Long id, FtpFileClientConfig config) {
@@ -26,9 +36,12 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
 
     @Override
     protected void doInit() {
-        // 初始化 Ftp 对象
-        this.ftp = new Ftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword(),
-                CharsetUtil.CHARSET_UTF_8, null, null, FtpMode.valueOf(config.getMode()));
+        // 初始化 Ftp 对象：https://gitee.com/zhijiantianya/yudao-cloud/pulls/207/
+        FtpConfig ftpConfig = new FtpConfig(config.getHost(), config.getPort(), config.getUsername(), config.getPassword(),
+                CharsetUtil.CHARSET_UTF_8, null, null);
+        ftpConfig.setConnectionTimeout(CONNECTION_TIMEOUT);
+        ftpConfig.setSoTimeout(SO_TIMEOUT);
+        this.ftp = new Ftp(ftpConfig, FtpMode.valueOf(config.getMode()));
     }
 
     @Override
