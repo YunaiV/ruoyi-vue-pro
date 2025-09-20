@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.customizers.OpenApiBuilderCustomizer;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.customizers.ServerBaseUrlCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.properties.SpringDocConfigProperties;
@@ -127,6 +128,7 @@ public class YudaoSwaggerAutoConfiguration {
                 .addOperationCustomizer((operation, handlerMethod) -> operation
                         .addParametersItem(buildTenantHeaderParameter())
                         .addParametersItem(buildSecurityHeaderParameter()))
+                .addOperationCustomizer(buildOperationIdCustomizer())
                 .build();
     }
 
@@ -156,6 +158,27 @@ public class YudaoSwaggerAutoConfiguration {
                 .description("认证 Token") // 描述
                 .in(String.valueOf(SecurityScheme.In.HEADER)) // 请求 header
                 .schema(new StringSchema()._default("Bearer test1").name(HEADER_TENANT_ID).description("认证 Token")); // 默认：使用用户编号为 1
+    }
+
+    /**
+     * 核心：自定义OperationId生成规则，组合「类名前缀 + 方法名」
+     *
+     * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/issues/957">app-api 前缀不生效，都是使用 admin-api</a>
+     */
+    private static OperationCustomizer buildOperationIdCustomizer() {
+        return (operation, handlerMethod) -> {
+            // 1. 获取控制器类名（如 UserController）
+            String className = handlerMethod.getBeanType().getSimpleName();
+            // 2. 提取类名前缀（去除 Controller 后缀，如 UserController -> User）
+            String classPrefix = className.replaceAll("Controller$", "");
+            // 3. 获取方法名（如 list）
+            String methodName = handlerMethod.getMethod().getName();
+            // 4. 组合生成 operationId（如 User_list）
+            String operationId = classPrefix + "_" + methodName;
+            // 5. 设置自定义 operationId
+            operation.setOperationId(operationId);
+            return operation;
+        };
     }
 
 }
