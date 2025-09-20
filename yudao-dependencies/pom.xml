@@ -63,7 +63,7 @@
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
-        <jsch.version>0.1.55</jsch.version>
+        <jsch.version>2.27.3</jsch.version>
         <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
@@ -543,7 +543,7 @@
                 <version>${commons-net.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.jcraft</groupId>
+                <groupId>com.github.mwiede</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
                 <version>${jsch.version}</version>
             </dependency>

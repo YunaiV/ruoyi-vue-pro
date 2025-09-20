@@ -14,6 +14,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -99,8 +100,10 @@ public class FileController {
         if (StrUtil.isEmpty(path)) {
             throw new IllegalArgumentException("结尾的 path 路径必须传递");
         }
-        // 解码，解决中文路径的问题 https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/807/
-        path = URLUtil.decode(path);
+        // 解码，解决中文路径的问题
+        // https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/807/
+        // https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1432/
+        path = URLUtil.decode(path, StandardCharsets.UTF_8, false);
 
         // 读取内容
         byte[] content = fileService.getFileContent(configId, path);

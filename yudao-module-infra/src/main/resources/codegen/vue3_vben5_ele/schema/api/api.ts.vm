@@ -98,7 +98,7 @@ export function delete${simpleClassName}List(ids: number[]) {
 
 /** 导出${table.classComment} */
 export function export${simpleClassName}(params: any) {
-  return requestClient.download('${baseURL}/export-excel', params);
+  return requestClient.download('${baseURL}/export-excel', { params });
 }
 
 ## 特殊：主子表专属逻辑

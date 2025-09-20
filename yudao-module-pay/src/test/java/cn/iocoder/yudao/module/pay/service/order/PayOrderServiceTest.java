@@ -610,7 +610,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         orderExtensionMapper.insert(orderExtension);
         // 重要：需要将 order 的 extensionId 更新下
         order.setExtensionId(orderExtension.getId());
-        orderMapper.updateById(new PayOrderDO().setId(order.getId()).setExtensionId(orderExtension.getId()));
+        orderMapper.updateById(order);
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
