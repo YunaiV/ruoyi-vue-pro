@@ -737,10 +737,10 @@ public class SimpleModelUtils {
                 BoundaryEvent boundaryEvent = null;
                 if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
                     boundaryEvent = buildTimeoutBoundaryEvent(receiveTask, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
-                            node.getDelaySetting().getDelayTime(), null, null);
+                            null, null, node.getDelaySetting().getDelayTime());
                 } else if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
                     boundaryEvent = buildTimeoutBoundaryEvent(receiveTask, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
-                            null, null, node.getDelaySetting().getDelayTime());
+                            node.getDelaySetting().getDelayTime(), null, null);
                 } else {
                     throw new UnsupportedOperationException("不支持的延迟类型：" + node.getDelaySetting());
                 }
