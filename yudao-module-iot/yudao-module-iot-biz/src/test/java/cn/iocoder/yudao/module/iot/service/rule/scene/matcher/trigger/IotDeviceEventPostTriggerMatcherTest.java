@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.BaseMatcherTest;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,17 +18,17 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link DeviceEventPostTriggerMatcher} 的单元测试
+ * {@link IotDeviceEventPostTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
-public class DeviceEventPostTriggerMatcherTest extends BaseMatcherTest {
+public class IotDeviceEventPostTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
-    private DeviceEventPostTriggerMatcher matcher;
+    private IotDeviceEventPostTriggerMatcher matcher;
 
     @BeforeEach
     public void setUp() {
-        matcher = new DeviceEventPostTriggerMatcher();
+        matcher = new IotDeviceEventPostTriggerMatcher();
     }
 
     @Test

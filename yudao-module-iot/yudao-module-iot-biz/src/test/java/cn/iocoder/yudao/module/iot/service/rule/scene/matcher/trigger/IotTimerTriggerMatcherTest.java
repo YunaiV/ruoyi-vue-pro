@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
-import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.BaseMatcherTest;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,17 +12,17 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link TimerTriggerMatcher} 的单元测试
+ * {@link IotTimerTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
-public class TimerTriggerMatcherTest extends BaseMatcherTest {
+public class IotTimerTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
-    private TimerTriggerMatcher matcher;
+    private IotTimerTriggerMatcher matcher;
 
     @BeforeEach
     public void setUp() {
-        matcher = new TimerTriggerMatcher();
+        matcher = new IotTimerTriggerMatcher();
     }
 
     @Test

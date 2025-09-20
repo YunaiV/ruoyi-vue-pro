@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
+import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
@@ -24,6 +25,8 @@ import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatche
 import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotSceneRuleTimerHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -60,6 +63,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private IotSceneRuleTimerHandler timerHandler;
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.SCENE_RULE_LIST, allEntries = true)
     public Long createSceneRule(IotSceneRuleSaveReqVO createReqVO) {
         IotSceneRuleDO sceneRule = BeanUtils.toBean(createReqVO, IotSceneRuleDO.class);
         sceneRuleMapper.insert(sceneRule);
@@ -71,6 +75,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     }
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.SCENE_RULE_LIST, allEntries = true)
     public void updateSceneRule(IotSceneRuleSaveReqVO updateReqVO) {
         // 校验存在
         validateSceneRuleExists(updateReqVO.getId());
@@ -83,6 +88,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     }
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.SCENE_RULE_LIST, allEntries = true)
     public void updateSceneRuleStatus(Long id, Integer status) {
         // 1. 校验存在
         validateSceneRuleExists(id);
@@ -105,6 +111,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     }
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.SCENE_RULE_LIST, allEntries = true)
     public void deleteSceneRule(Long id) {
         // 1. 校验存在
         validateSceneRuleExists(id);
@@ -149,15 +156,12 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         return sceneRuleMapper.selectListByStatus(status);
     }
 
-    // TODO @puhui999：缓存待实现
     @Override
+    @Cacheable(value = RedisKeyConstants.SCENE_RULE_LIST, key = "#productId + '_' + #deviceId ")
     @TenantIgnore // 忽略租户隔离：因为 IotSceneRuleMessageHandler 调用时，一般未传递租户，所以需要忽略
     public List<IotSceneRuleDO> getSceneRuleListByProductIdAndDeviceIdFromCache(Long productId, Long deviceId) {
         // 1. 查询启用状态的规则场景
-        // TODO @puhui999：这里查询 enable 的；
-        List<IotSceneRuleDO> list = sceneRuleMapper.selectList();
-        List<IotSceneRuleDO> enabledList = filterList(list,
-                sceneRule -> CommonStatusEnum.isEnable(sceneRule.getStatus()));
+        List<IotSceneRuleDO> enabledList = sceneRuleMapper.selectList(IotSceneRuleDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
 
         // 2. 根据 productKey 和 deviceName 进行匹配
         return filterList(enabledList, sceneRule -> {
@@ -190,9 +194,10 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
 
     @Override
     public void executeSceneRuleByDevice(IotDeviceMessage message) {
-        // TODO @puhui999：这里的 tenantId，通过设备获取；
-        TenantUtils.execute(message.getTenantId(), () -> {
-            // 1. 获得设备匹配的规则场景
+        // 1.1 这里的 tenantId，通过设备获取；
+        IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
+        TenantUtils.execute(device.getTenantId(), () -> {
+            // 1.2 获得设备匹配的规则场景
             List<IotSceneRuleDO> sceneRules = getMatchedSceneRuleListByMessage(message);
             if (CollUtil.isEmpty(sceneRules)) {
                 return;
@@ -238,14 +243,14 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
         // 1. 匹配设备
         // TODO 缓存 @puhui999：可能需要 getSelf()
         // 1.1 通过 deviceId 获取设备信息
-        IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
+        IotDeviceDO device = getSelf().deviceService.getDeviceFromCache(message.getDeviceId());
         if (device == null) {
             log.warn("[getMatchedSceneRuleListByMessage][设备({}) 不存在]", message.getDeviceId());
             return List.of();
         }
 
         // 1.2 通过 productId 获取产品信息
-        IotProductDO product = productService.getProductFromCache(device.getProductId());
+        IotProductDO product = getSelf().productService.getProductFromCache(device.getProductId());
         if (product == null) {
             log.warn("[getMatchedSceneRuleListByMessage][产品({}) 不存在]", device.getProductId());
             return List.of();

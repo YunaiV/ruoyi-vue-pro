@@ -1,42 +1,30 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link DeviceStateUpdateTriggerMatcher} 的单元测试
+ * {@link IotDeviceStateUpdateTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
-@SpringJUnitConfig(DeviceStateUpdateTriggerMatcherTest.TestConfig.class)
-public class DeviceStateUpdateTriggerMatcherTest {
+public class IotDeviceStateUpdateTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
-    @Configuration
-    static class TestConfig {
-        @Bean
-        public SpringUtil springUtil() {
-            return new SpringUtil();
-        }
-    }
-
-    private DeviceStateUpdateTriggerMatcher matcher;
+    private IotDeviceStateUpdateTriggerMatcher matcher;
 
     @BeforeEach
     public void setUp() {
-        matcher = new DeviceStateUpdateTriggerMatcher();
+        matcher = new IotDeviceStateUpdateTriggerMatcher();
     }
 
     @Test

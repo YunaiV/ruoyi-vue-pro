@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
-import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.BaseMatcherTest;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,17 +16,17 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link CurrentTimeConditionMatcher} 的单元测试
+ * {@link IotCurrentTimeConditionMatcher} 的单元测试
  *
  * @author HUIHUI
  */
-public class CurrentTimeConditionMatcherTest extends BaseMatcherTest {
+public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherTest {
 
-    private CurrentTimeConditionMatcher matcher;
+    private IotCurrentTimeConditionMatcher matcher;
 
     @BeforeEach
     public void setUp() {
-        matcher = new CurrentTimeConditionMatcher();
+        matcher = new IotCurrentTimeConditionMatcher();
     }
 
     @Test
