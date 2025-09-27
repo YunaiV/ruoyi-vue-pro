@@ -65,6 +65,7 @@ public class AiUtils {
             case MOONSHOT:
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
+            case GROK:
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
