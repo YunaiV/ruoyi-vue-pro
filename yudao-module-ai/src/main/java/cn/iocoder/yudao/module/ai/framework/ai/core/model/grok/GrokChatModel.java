@@ -19,8 +19,7 @@ public class GrokChatModel implements ChatModel {
 
     public static final String BASE_URL = "https://api.x.ai";
     public static final String COMPLETE_PATH = "/v1/chat/completions";
-
-    public static final String MODEL_DEFAULT = "grok-4-fast-reasoning\n";
+    public static final String MODEL_DEFAULT = "grok-4-fast-reasoning";
 
     /**
      * 兼容 OpenAI 接口，进行复用

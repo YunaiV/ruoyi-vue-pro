@@ -309,6 +309,5 @@ public class AiAutoConfiguration {
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new DouBaoChatModel(openAiChatModel);
-
     }
 }

@@ -65,7 +65,6 @@ public class AiUtils {
             case MOONSHOT:
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case GROK:
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
@@ -79,6 +78,9 @@ public class AiUtils {
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OLLAMA:
                 return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
+            case GROK:
+                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));

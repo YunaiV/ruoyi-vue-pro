@@ -174,7 +174,6 @@ public class YudaoAiProperties {
 
     }
 
-
     @Data
     public static class WebSearch {
 
