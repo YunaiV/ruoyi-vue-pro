@@ -1,10 +1,13 @@
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+#if ( $table.templateType != 2 )
 import type { PageParam, PageResult } from '@vben/request';
+#end
 import type { Dayjs } from 'dayjs';
 
 import { requestClient } from '#/api/request';
 #set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
-export namespace ${simpleClassName}Api {
+export namespace ${apiName} {
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
   #set ($index = $foreach.count - 1)
@@ -60,27 +63,35 @@ export namespace ${simpleClassName}Api {
 #if ( $table.templateType != 2 )
 /** 查询${table.classComment}分页 */
 export function get${simpleClassName}Page(params: PageParam) {
-  return requestClient.get<PageResult<${simpleClassName}Api.${simpleClassName}>>('${baseURL}/page', { params });
+  return requestClient.get<PageResult<${apiName}.${simpleClassName}>>(
+    '${baseURL}/page',
+    { params },
+  );
 }
 #else
 /** 查询${table.classComment}列表 */
 export function get${simpleClassName}List(params: any) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}[]>('${baseURL}/list', { params });
+  return requestClient.get<${apiName}.${simpleClassName}[]>(
+    '${baseURL}/list',
+    { params },
+  );
 }
 #end
 
 /** 查询${table.classComment}详情 */
 export function get${simpleClassName}(id: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}>(`${baseURL}/get?id=${id}`);
+  return requestClient.get<${apiName}.${simpleClassName}>(
+    `${baseURL}/get?id=${id}`,
+  );
 }
 
 /** 新增${table.classComment} */
-export function create${simpleClassName}(data: ${simpleClassName}Api.${simpleClassName}) {
+export function create${simpleClassName}(data: ${apiName}.${simpleClassName}) {
   return requestClient.post('${baseURL}/create', data);
 }
 
 /** 修改${table.classComment} */
-export function update${simpleClassName}(data: ${simpleClassName}Api.${simpleClassName}) {
+export function update${simpleClassName}(data: ${apiName}.${simpleClassName}) {
   return requestClient.put('${baseURL}/update', data);
 }
 
@@ -88,17 +99,19 @@ export function update${simpleClassName}(data: ${simpleClassName}Api.${simpleCla
 export function delete${simpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/delete?id=${id}`);
 }
-
 #if ( $table.templateType != 2 && $deleteBatchEnable)
+
 /** 批量删除${table.classComment} */
 export function delete${simpleClassName}List(ids: number[]) {
-  return requestClient.delete(`${baseURL}/delete-list?ids=${ids.join(',')}`)
+  return requestClient.delete(
+    `${baseURL}/delete-list?ids=${ids.join(',')}`,
+  );
 }
 #end
 
 /** 导出${table.classComment} */
 export function export${simpleClassName}(params: any) {
-  return requestClient.download('${baseURL}/export-excel', params);
+  return requestClient.download('${baseURL}/export-excel', { params });
 }
 
 ## 特殊：主子表专属逻辑
@@ -118,31 +131,38 @@ export function export${simpleClassName}(params: any) {
 #if ( $table.templateType == 11 )
 /** 获得${subTable.classComment}分页 */
 export function get${subSimpleClassName}Page(params: PageParam) {
-  return requestClient.get<PageResult<${simpleClassName}Api.${subSimpleClassName}>>(`${baseURL}/${subSimpleClassName_strikeCase}/page`, { params });
+  return requestClient.get<PageResult<${apiName}.${subSimpleClassName}>>(
+    `${baseURL}/${subSimpleClassName_strikeCase}/page`,
+    { params },
+  );
 }
 ## 情况二：非 MASTER_ERP 时，需要列表查询子表
 #else
   #if ( $subTable.subJoinMany )
 /** 获得${subTable.classComment}列表 */
 export function get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}: number) {
-  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}[]>(`${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
+  return requestClient.get<${apiName}.${subSimpleClassName}[]>(
+    `${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`,
+  );
 }
   #else
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}: number) {
-  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
+  return requestClient.get<${apiName}.${subSimpleClassName}>(
+    `${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`,
+  );
 }
   #end
 #end
 ## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
 #if ( $table.templateType == 11 )
 /** 新增${subTable.classComment} */
-export function create${subSimpleClassName}(data: ${simpleClassName}Api.${subSimpleClassName}) {
+export function create${subSimpleClassName}(data: ${apiName}.${subSimpleClassName}) {
   return requestClient.post(`${baseURL}/${subSimpleClassName_strikeCase}/create`, data);
 }
 
 /** 修改${subTable.classComment} */
-export function update${subSimpleClassName}(data: ${simpleClassName}Api.${subSimpleClassName}) {
+export function update${subSimpleClassName}(data: ${apiName}.${subSimpleClassName}) {
   return requestClient.put(`${baseURL}/${subSimpleClassName_strikeCase}/update`, data);
 }
 
@@ -154,13 +174,17 @@ export function delete${subSimpleClassName}(id: number) {
 #if ($deleteBatchEnable)
 /** 批量删除${subTable.classComment} */
 export function delete${subSimpleClassName}List(ids: number[]) {
-  return requestClient.delete(`${baseURL}/${subSimpleClassName_strikeCase}/delete-list?ids=${ids.join(',')}`)
+  return requestClient.delete(
+    `${baseURL}/${subSimpleClassName_strikeCase}/delete-list?ids=${ids.join(',')}`,
+  );
 }
 #end
 
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}(id: number) {
-  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get?id=${id}`);
+  return requestClient.get<${apiName}.${subSimpleClassName}>(
+    `${baseURL}/${subSimpleClassName_strikeCase}/get?id=${id}`,
+  );
 }
 #end
 #end

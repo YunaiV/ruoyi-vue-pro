@@ -4,10 +4,12 @@
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+  import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
   import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+
   import { $t } from '#/locales';
 
 #if ($subTable.subJoinMany) ## 一对多
@@ -33,7 +35,7 @@ const props = defineProps<{
 function onActionClick({
  code,
  row,
-}: OnActionClickParams<${simpleClassName}Api.${subSimpleClassName}>) {
+}: OnActionClickParams<${apiName}.${subSimpleClassName}>) {
   switch (code) {
     case 'delete': {
       onDelete(row);
@@ -67,16 +69,16 @@ const onAdd = async () => {
 }
 
 /** 删除${subTable.classComment} */
-const onDelete =  async (row: ${simpleClassName}Api.${subSimpleClassName}) => {
+const onDelete =  async (row: ${apiName}.${subSimpleClassName}) => {
   await gridApi.grid.remove(row);
 }
 
 /** 提供获取表格数据的方法供父组件调用 */
 defineExpose({
-  getData: (): ${simpleClassName}Api.${subSimpleClassName}[] => {
-    const data = gridApi.grid.getData() as ${simpleClassName}Api.${subSimpleClassName}[];
-    const removeRecords = gridApi.grid.getRemoveRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
-    const insertRecords = gridApi.grid.getInsertRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
+  getData: (): ${apiName}.${subSimpleClassName}[] => {
+    const data = gridApi.grid.getData() as ${apiName}.${subSimpleClassName}[];
+    const removeRecords = gridApi.grid.getRemoveRecords() as ${apiName}.${subSimpleClassName}[];
+    const insertRecords = gridApi.grid.getInsertRecords() as ${apiName}.${subSimpleClassName}[];
     return data
         .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
         .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));

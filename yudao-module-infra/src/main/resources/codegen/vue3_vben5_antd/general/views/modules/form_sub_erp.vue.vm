@@ -3,29 +3,97 @@
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-  import type { Rule } from 'ant-design-vue/es/form';
+import type { Rule } from 'ant-design-vue/es/form';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-  import { useVbenModal } from '@vben/common-ui';
-  import { Tinymce as RichTextarea } from '#/components/tinymce';
-  import { ImageUpload, FileUpload } from "#/components/upload";
-  import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
-  import { DICT_TYPE, getDictOptions } from '#/utils';
+import { computed, ref } from 'vue';
 
-  import { computed, ref } from 'vue';
-  import { $t } from '#/locales';
+import { useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { cloneDeep, formatDateTime } from '@vben/utils';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
 
-  import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { $t } from '#/locales';
 
-  const emit = defineEmits(['success']);
-  const getTitle = computed(() => {
-    return formData.value?.id
-        ? $t('ui.actionTitle.edit', ['${subTable.classComment}'])
-        : $t('ui.actionTitle.create', ['${subTable.classComment}']);
-  });
+import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-  const formRef = ref();
-  const formData = ref<Partial<${simpleClassName}Api.${subSimpleClassName}>>({
+const emit = defineEmits(['success']);
+const getTitle = computed(() => {
+  return formData.value?.id
+      ? $t('ui.actionTitle.edit', ['${subTable.classComment}'])
+      : $t('ui.actionTitle.create', ['${subTable.classComment}']);
+});
+
+const formRef = ref();
+const formData = ref<Partial<${simpleClassName}Api.${subSimpleClassName}>>({
+  #foreach ($column in $subColumns)
+    #if ($column.createOperation || $column.updateOperation)
+      #if ($column.htmlType == "checkbox")
+          $column.javaField: [],
+      #else
+          $column.javaField: undefined,
+      #end
+    #end
+  #end
+});
+const rules: Record<string, Rule[]> = {
+  #foreach ($column in $subColumns)
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+      #set($comment=$column.columnComment)
+        $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+    #end
+  #end
+};
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    await formRef.value?.validate();
+
+    modalApi.lock();
+    // 提交表单
+    const data = formData.value as ${simpleClassName}Api.${subSimpleClassName};
+    try {
+      await (formData.value?.id ? update${subSimpleClassName}(data) : create${subSimpleClassName}(data));
+      // 关闭并提示
+      await modalApi.close();
+      emit('success');
+      message.success({
+        content: $t('ui.actionMessage.operationSuccess'),
+      });
+    } finally {
+      modalApi.unlock();
+    }
+  },
+  async onOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      resetForm()
+      return;
+    }
+
+    // 加载数据
+    let data = modalApi.getData<${simpleClassName}Api.${subSimpleClassName}>();
+    if (!data) {
+      return;
+    }
+    if (data.id) {
+      modalApi.lock();
+      try {
+        data = await get${subSimpleClassName}(data.id);
+      } finally {
+        modalApi.unlock();
+      }
+    }
+    // 设置到 values
+    formData.value = data;
+  },
+});
+
+/** 重置表单 */
+function resetForm(){
+  formData.value = {
     #foreach ($column in $subColumns)
       #if ($column.createOperation || $column.updateOperation)
         #if ($column.htmlType == "checkbox")
@@ -35,75 +103,9 @@
         #end
       #end
     #end
-  });
-  const rules: Record<string, Rule[]> = {
-    #foreach ($column in $subColumns)
-      #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
-        #set($comment=$column.columnComment)
-          $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
-      #end
-    #end
   };
-
-  const [Modal, modalApi] = useVbenModal({
-    async onConfirm() {
-      await formRef.value?.validate();
-
-      modalApi.lock();
-      // 提交表单
-      const data = formData.value as ${simpleClassName}Api.${subSimpleClassName};
-      try {
-        await (formData.value?.id ? update${subSimpleClassName}(data) : create${subSimpleClassName}(data));
-        // 关闭并提示
-        await modalApi.close();
-        emit('success');
-        message.success({
-          content: $t('ui.actionMessage.operationSuccess'),
-          key: 'action_process_msg',
-        });
-      } finally {
-        modalApi.unlock();
-      }
-    },
-    async onOpenChange(isOpen: boolean) {
-      if (!isOpen) {
-        resetForm()
-        return;
-      }
-
-      // 加载数据
-      let data = modalApi.getData<${simpleClassName}Api.${subSimpleClassName}>();
-      if (!data) {
-        return;
-      }
-      if (data.id) {
-        modalApi.lock();
-        try {
-          data = await get${subSimpleClassName}(data.id);
-        } finally {
-          modalApi.unlock();
-        }
-      }
-      // 设置到 values
-      formData.value = data;
-    },
-  });
-
-  /** 重置表单 */
-  const resetForm = () => {
-    formData.value = {
-      #foreach ($column in $subColumns)
-        #if ($column.createOperation || $column.updateOperation)
-          #if ($column.htmlType == "checkbox")
-              $column.javaField: [],
-          #else
-              $column.javaField: undefined,
-          #end
-        #end
-      #end
-    };
-    formRef.value?.resetFields();
-  }
+  formRef.value?.resetFields();
+}
 </script>
 
 <template>

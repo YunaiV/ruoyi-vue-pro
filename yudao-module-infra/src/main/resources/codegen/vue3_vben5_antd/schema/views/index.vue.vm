@@ -1,56 +1,67 @@
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
-import { Page, useVbenModal } from '@vben/common-ui';
-import { message,Tabs } from 'ant-design-vue';
+import { ref } from 'vue';
+
+import {#if ($table.templateType != 2 && $deleteBatchEnable) confirm,#end Page, useVbenModal } from '@vben/common-ui';
+import { downloadFileFromBlobPart#if ($table.templateType != 2 && $deleteBatchEnable), isEmpty#end } from '@vben/utils';
+
+import { message#if ($table.templateType == 11), Tabs#end } from 'ant-design-vue';
+
+import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+#if (${table.templateType} == 2)## 树表接口
+import {
+  delete${simpleClassName},
+  export${simpleClassName},
+  get${simpleClassName}List,
+} from '#/api/${table.moduleName}/${table.businessName}';
+#else## 标准表接口
+import {
+  delete${simpleClassName},#if ($deleteBatchEnable)
+
+  delete${simpleClassName}List,#end
+  export${simpleClassName},
+  get${simpleClassName}Page,
+} from '#/api/${table.moduleName}/${table.businessName}';
+#end
+import { $t } from '#/locales';
+
+import { useGridColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
-
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
     #foreach ($subSimpleClassName in $subSimpleClassNames)
     #set ($index = $foreach.count - 1)
     #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
-import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
+import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue';
     #end
 #end
-
-import { ref, computed } from 'vue';
-import { $t } from '#/locales';
-import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
-#if (${table.templateType} == 2)## 树表接口
-import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
-#else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
-#end
-import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
-
-import { useGridColumns, useGridFormSchema } from './data';
 
 #if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
 /** 子表的列表 */
 const subTabsName = ref('$subClassNameVars.get(0)')
 #if ($table.templateType == 11)
-const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+const select${simpleClassName} = ref<${apiName}.${simpleClassName}>();
 #end
 #end
-
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
-
 #if (${table.templateType} == 2)## 树表特有：控制表格展开收缩
+
 /** 切换树形展开/收缩状态 */
 const isExpanded = ref(true);
-function toggleExpand() {
+function handleExpand() {
   isExpanded.value = !isExpanded.value;
   gridApi.grid.setAllTreeExpand(isExpanded.value);
 }
 #end
 
 /** 刷新表格 */
-function onRefresh() {
+function handleRefresh() {
 #if ($table.templateType == 12) ## 内嵌情况
   gridApi.reload();
 #else
@@ -60,34 +71,31 @@ function onRefresh() {
 
 /** 创建${table.classComment} */
 function handleCreate() {
-  formModalApi.setData({}).open();
+  formModalApi.setData(null).open();
 }
-
-/** 编辑${table.classComment} */
-function handleEdit(row: ${simpleClassName}Api.${simpleClassName}) {
-  formModalApi.setData(row).open();
-}
-
 #if (${table.templateType} == 2)## 树表特有：新增下级
-/** 新增下级${table.classComment} */
-function handleAppend(row: ${simpleClassName}Api.${simpleClassName}) {
+
+/** 添加下级${table.classComment} */
+function handleAppend(row: ${apiName}.${simpleClassName}) {
   formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
 }
 #end
 
+/** 编辑${table.classComment} */
+function handleEdit(row: ${apiName}.${simpleClassName}) {
+  formModalApi.setData(row).open();
+}
+
 /** 删除${table.classComment} */
-async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
+async function handleDelete(row: ${apiName}.${simpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
-    key: 'action_key_msg',
+    duration: 0,
   });
   try {
-    await delete${simpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
-    onRefresh();
+    await delete${simpleClassName}(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    handleRefresh();
   } finally {
     hideLoading();
   }
@@ -96,30 +104,28 @@ async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
 #if ($table.templateType != 2 && $deleteBatchEnable)
 /** 批量删除${table.classComment} */
 async function handleDeleteBatch() {
+  await confirm($t('ui.actionMessage.deleteBatchConfirm'));
   const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting'),
-    key: 'action_key_msg',
+    content: $t('ui.actionMessage.deletingBatch'),
+    duration: 0,
   });
   try {
     await delete${simpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess'),
-      key: 'action_key_msg',
-    });
-    onRefresh();
+    message.success($t('ui.actionMessage.deleteSuccess'));
+    handleRefresh();
   } finally {
     hideLoading();
   }
 }
 
-const checkedIds = ref<number[]>([])
+const checkedIds = ref<number[]>([]);
 function handleRowCheckboxChange({
   records,
 }: {
-  records: ${simpleClassName}Api.${simpleClassName}[];
+  records: ${apiName}.${simpleClassName}[];
 }) {
-  checkedIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id!);
 }
 #end
 
@@ -141,20 +147,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
     height: 'auto',
 #end
 #if (${table.templateType} == 2)## 树表设置
-  treeConfig: {
-    parentField: '${treeParentColumn.javaField}',
-    rowField: 'id',
-    transform: true,
-    expandAll: true,
-    reserve: true,
-  },
-  pagerConfig: {
-    enabled: false,
-  },
-#else## 标准表设置
     pagerConfig: {
-      enabled: true,
+      enabled: false,
     },
+#else## 标准表设置
+    keepSource: true,
 #end
     proxyConfig: {
       ajax: {
@@ -184,27 +181,35 @@ const [Grid, gridApi] = useVbenVxeGrid({
       refresh: true,
       search: true,
     },
-  } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,
-#if (${table.templateType} == 11 || $deleteBatchEnable)
-  gridEvents:{
-    #if(${table.templateType} == 11)
-    cellClick: ({ row }: { row: ${simpleClassName}Api.${simpleClassName}}) => {
+#if (${table.templateType} == 2)## 树表设置
+    treeConfig: {
+      parentField: '${treeParentColumn.javaField}',
+      rowField: 'id',
+      transform: true,
+      expandAll: true,
+      reserve: true,
+    },
+#end
+  } as VxeTableGridOptions<${apiName}.${simpleClassName}>,
+#if (${table.templateType} == 11 || (${table.templateType} != 2 && $deleteBatchEnable))
+  gridEvents: {
+  #if(${table.templateType} == 11)
+    cellClick: ({ row }: { row: ${apiName}.${simpleClassName}}) => {
       select${simpleClassName}.value = row;
     },
-    #end
-    #if(${table.templateType} != 2 && $deleteBatchEnable)
-      checkboxAll: handleRowCheckboxChange,
-      checkboxChange: handleRowCheckboxChange,
-    #end
-  }
+  #end
+  #if (${table.templateType} != 2 && $deleteBatchEnable)
+    checkboxAll: handleRowCheckboxChange,
+    checkboxChange: handleRowCheckboxChange,
+  #end
+  },
 #end
 });
 </script>
 
 <template>
   <Page auto-content-height>
-    <FormModal @success="onRefresh" />
-
+    <FormModal @success="handleRefresh" />
 #if ($table.templateType == 11) ## erp情况
   <div>
 #end
@@ -228,13 +233,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
       <template #toolbar-tools>
         <TableAction
           :actions="[
-            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
-            {
-              label: isExpanded ? '收缩' : '展开',
-              type: 'primary',
-              onClick: toggleExpand,
-            },
-            #end
             {
               label: $t('ui.actionTitle.create', ['${table.classComment}']),
               type: 'primary',
@@ -242,6 +240,13 @@ const [Grid, gridApi] = useVbenVxeGrid({
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
               onClick: handleCreate,
             },
+            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
+            {
+              label: isExpanded ? '收缩' : '展开',
+              type: 'primary',
+              onClick: handleExpand,
+            },
+            #end
             {
               label: $t('ui.actionTitle.export'),
               type: 'primary',
@@ -255,8 +260,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
               type: 'primary',
               danger: true,
               icon: ACTION_ICON.DELETE,
-              disabled: isEmpty(checkedIds),
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+              disabled: isEmpty(checkedIds),
               onClick: handleDeleteBatch,
             },
             #end
@@ -297,7 +302,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
         />
       </template>
     </Grid>
-
 #if ($table.templateType == 11) ## erp情况
     <!-- 子表的表单 -->
     <Tabs v-model:active-key="subTabsName" class="mt-2">

@@ -1,8 +1,16 @@
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
+
+import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
-import { message, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
+
+import { message#if ($table.templateType == 11), Tabs#end } from 'ant-design-vue';
+
+import { useVbenForm } from '#/adapter/form';
+import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { $t } from '#/locales';
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #foreach ($subSimpleClassName in $subSimpleClassNames)
@@ -12,21 +20,15 @@ import { message, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGro
   #end
 #end
 
-import { computed, ref } from 'vue';
-import { $t } from '#/locales';
-import { useVbenForm } from '#/adapter/form';
-import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
-
 import { useFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
-const formData = ref<${simpleClassName}Api.${simpleClassName}>();
+const formData = ref<${apiName}.${simpleClassName}>();
 const getTitle = computed(() => {
   return formData.value?.id
     ? $t('ui.actionTitle.edit', ['${table.classComment}'])
     : $t('ui.actionTitle.create', ['${table.classComment}']);
 });
-
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #if ( $subTables && $subTables.size() > 0 )
@@ -51,7 +53,7 @@ const [Form, formApi] = useVbenForm({
   },
   layout: 'horizontal',
   schema: useFormSchema(),
-  showDefaultActions: false
+  showDefaultActions: false,
 });
 
 const [Modal, modalApi] = useVbenModal({
@@ -60,8 +62,8 @@ const [Modal, modalApi] = useVbenModal({
     if (!valid) {
       return;
     }
-    ## 特殊：主子表专属逻辑
-    #if ( $table.templateType == 10 || $table.templateType == 12 )
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
       #if ( $subTables && $subTables.size() > 0 )
         // 校验子表单
         #foreach ($subTable in $subTables)
@@ -78,12 +80,12 @@ const [Modal, modalApi] = useVbenModal({
           #end
         #end
       #end
-    #end
+#end
     modalApi.lock();
     // 提交表单
-    const data = (await formApi.getValues()) as ${simpleClassName}Api.${simpleClassName};
-    ## 特殊：主子表专属逻辑
-    #if ( $table.templateType == 10 || $table.templateType == 12 )
+    const data = (await formApi.getValues()) as ${apiName}.${simpleClassName};
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
       #if ( $subTables && $subTables.size() > 0 )
         // 拼接子表的数据
         #foreach ($subTable in $subTables)
@@ -96,13 +98,13 @@ const [Modal, modalApi] = useVbenModal({
           #end
         #end
       #end
-    #end
+#end
     try {
       await (formData.value?.id ? update${simpleClassName}(data) : create${simpleClassName}(data));
       // 关闭并提示
       await modalApi.close();
       emit('success');
-      message.success( $t('ui.actionMessage.operationSuccess') );
+      message.success($t('ui.actionMessage.operationSuccess'));
     } finally {
       modalApi.unlock();
     }
@@ -113,21 +115,24 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
-    if (!data) {
+    const data = modalApi.getData<${apiName}.${simpleClassName}>();
+    if (!data || !data.id) {
+#if (${table.templateType} == 2)## 树表特有
+      // 设置上级
+      await formApi.setValues(data);
+#end
       return;
     }
-    if (data.id) {
-      modalApi.lock();
-      try {
-        data = await get${simpleClassName}(data.id);
-      } finally {
-        modalApi.unlock();
+    modalApi.lock();
+    try {
+      formData.value = await get${simpleClassName}(data.id);
+      // 设置到 values
+      if (formData.value) {
+        await formApi.setValues(formData.value);
       }
+    } finally {
+      modalApi.unlock();
     }
-    // 设置到 values
-    formData.value = data;
-    await formApi.setValues(formData.value);
   },
 });
 </script>
@@ -135,8 +140,8 @@ const [Modal, modalApi] = useVbenModal({
 <template>
   <Modal :title="getTitle">
     <Form class="mx-4" />
-    ## 特殊：主子表专属逻辑
-    #if ( $table.templateType == 10 || $table.templateType == 12 )
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
       <!-- 子表的表单 -->
       <Tabs v-model:active-key="subTabsName">
         #foreach ($subTable in $subTables)
@@ -149,6 +154,6 @@ const [Modal, modalApi] = useVbenModal({
           </Tabs.TabPane>
         #end
       </Tabs>
-    #end
+#end
   </Modal>
 </template>

@@ -5,9 +5,10 @@
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
 #if ($table.templateType == 11) ## erp
 import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
@@ -51,23 +52,20 @@ function handleCreate() {
 }
 
 /** 编辑${subTable.classComment} */
-function handleEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
+function handleEdit(row: ${apiName}.${subSimpleClassName}) {
   formModalApi.setData(row).open();
 }
 
 /** 删除${subTable.classComment} */
-async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
+async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
-    key: 'action_process_msg',
+    duration: 0,
   });
   try {
-    await delete${subSimpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
-    onRefresh();
+    await delete${subSimpleClassName}(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    handleRefresh();
   } finally {
     hideLoading();
   }
@@ -78,16 +76,13 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
-    key: 'action_key_msg',
+    duration: 0,
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
-    onRefresh();
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    handleRefresh();
   } finally {
     hideLoading();
   }
@@ -97,7 +92,7 @@ const checkedIds = ref<number[]>([])
 function handleRowCheckboxChange({
   records,
 }: {
-  records: ${simpleClassName}Api.${subSimpleClassName}[];
+  records: ${apiName}.${subSimpleClassName}[];
 }) {
   checkedIds.value = records.map((item) => item.id);
 }
@@ -149,7 +144,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     keyField: 'id',
     isHover: true,
   },
-  } as VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>,
+  } as VxeTableGridOptions<${apiName}.${subSimpleClassName}>,
   #if (${table.templateType} == 11 && $deleteBatchEnable)
   gridEvents:{
     checkboxAll: handleRowCheckboxChange,
@@ -159,7 +154,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 });
 
 /** 刷新表格 */
-async function onRefresh() {
+async function handleRefresh() {
 #if ($table.templateType == 11) ## erp
   await gridApi.query();
 #else
@@ -179,7 +174,7 @@ watch(
       return;
     }
     await nextTick();
-    await onRefresh()
+    await handleRefresh()
   },
   { immediate: true },
 );
@@ -187,7 +182,7 @@ watch(
 
 <template>
     #if ($table.templateType == 11) ## erp
-      <FormModal @success="onRefresh" />
+      <FormModal @success="handleRefresh" />
       <Grid table-title="${subTable.classComment}列表">
         <template #toolbar-tools>
           <TableAction

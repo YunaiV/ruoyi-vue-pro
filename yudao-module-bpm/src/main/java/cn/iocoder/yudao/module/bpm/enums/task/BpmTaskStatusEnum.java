@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.task;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
@@ -66,6 +67,10 @@ public enum BpmTaskStatusEnum {
 
     public static boolean isCancelStatus(Integer status) {
         return ObjUtil.equal(status, CANCEL.getStatus());
+    }
+
+    public static BpmTaskStatusEnum valueOf(Integer status) {
+        return ArrayUtil.firstMatch(item -> item.getStatus().equals(status), values());
     }
 
 }

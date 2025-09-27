@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -974,7 +976,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     status);
         }
 
-        // 1.3 如果子流程拒绝， 设置其父流程也为拒绝状态且结束父流程
+        // 1.3 如果子流程拒绝，设置其父流程也为拒绝状态，且结束父流程
+        // 相关问题链接：https://t.zsxq.com/kZhyb
         if (Objects.equals(status, BpmProcessInstanceStatusEnum.REJECT.getStatus())
                 && StrUtil.isNotBlank(instance.getSuperExecutionId())) {
             // 1.3.1 获取父流程实例 并标记为不通过
@@ -984,6 +987,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
             // 1.3.2 结束父流程。需要在子流程结束事务提交后执行
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
                 @Override
                 public void afterCompletion(int transactionStatus) {
                     // 回滚情况，直接返回
@@ -1043,7 +1047,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     runtimeService.setProcessInstanceName(instance.getProcessInstanceId(), name);
                 }
 
-                // 流程前置通知：需要在流程启动后(事务提交后)。variables 已设置。或者放在 PROCESS_STARTED 事件中处理，先放这里。
+                // 流程前置通知：需要在流程启动后(事务提交后)，保证 variables 已设置
+                // 相关问题链接：https://t.zsxq.com/DF7Kq
                 if (ObjUtil.isNull(processDefinitionInfo.getProcessBeforeTriggerSetting())) {
                     return;
                 }

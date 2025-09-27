@@ -343,7 +343,7 @@ public class CodegenEngine {
         filePath = formatFilePath(filePath, bindingMap);
         String content = templateEngine.getTemplate(vmPath).render(bindingMap);
         // 格式化代码
-        content = prettyCode(content);
+        content = prettyCode(content, vmPath);
         result.put(filePath, content);
     }
 
@@ -383,11 +383,14 @@ public class CodegenEngine {
      * 如果不处理，Vue 的 Pretty 格式校验可能会报错
      *
      * @param content 格式化前的代码
+     * @param vmPath 模板路径
      * @return 格式化后的代码
      */
-    private String prettyCode(String content) {
-        // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错
-        content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+    private String prettyCode(String content, String vmPath) {
+        // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错（需要排除 vben5）
+        if (!StrUtil.contains(vmPath, "vben5")) {
+            content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+        }
         // Vue 界面：去除多的 dateFormatter，只有一个的情况下，说明没使用到
         if (StrUtil.count(content, "dateFormatter") == 1) {
             content = StrUtils.removeLineContains(content, "dateFormatter");
