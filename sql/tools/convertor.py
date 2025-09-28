@@ -919,9 +919,15 @@ def main():
         help="目标数据库类型",
         choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
     )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="源数据库脚本路径",
+        default="../mysql/ruoyi-vue-pro.sql"
+    )
     args = parser.parse_args()
 
-    sql_file = pathlib.Path("../mysql/ruoyi-vue-pro.sql").resolve().as_posix()
+    sql_file = pathlib.Path(arg.path).resolve().as_posix()
     convertor = None
     if args.type == "postgres":
         convertor = PostgreSQLConvertor(sql_file)
