@@ -6,7 +6,7 @@ Author: dhb52 (https://gitee.com/dhb52)
 pip install simple-ddl-parser
 
 or with uv
-uv run --with simple-ddl-parser convertor.py postgres > ../postgresql/ruoyi-vue-pro.sql                                         239ms  四  5/22 21:03:16 2025
+uv run --with simple-ddl-parser convertor.py postgres > ../postgresql/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py sqlserver > ../sqlserver/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py kingbase > ../kingbase/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py opengauss > ../opengauss/ruoyi-vue-pro.sql
