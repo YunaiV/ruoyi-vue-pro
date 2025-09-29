@@ -24,6 +24,9 @@ from typing import Dict, Generator, Optional, Tuple, Union
 
 from simple_ddl_parser import DDLParser
 
+# 避免 Windows 系统使用默认的 GBK 编码
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
+
 PREAMBLE = """/*
  Yudao Database Transfer Tool
 
