@@ -927,7 +927,7 @@ def main():
     )
     args = parser.parse_args()
 
-    sql_file = pathlib.Path(arg.path).resolve().as_posix()
+    sql_file = pathlib.Path(args.path).resolve().as_posix()
     convertor = None
     if args.type == "postgres":
         convertor = PostgreSQLConvertor(sql_file)
