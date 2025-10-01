@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import java.util.List;
 
-// TODO @puhui999、@芋艿：未测试；需要场景联动开发完
 /**
  * IoT 告警触发的 {@link IotSceneRuleAction} 实现类
  *

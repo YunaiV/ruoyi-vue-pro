@@ -17,6 +17,8 @@ import lombok.Data;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = IotDataSinkHttpConfig.class, name = "1"),
+        @JsonSubTypes.Type(value = IotDataSinkTcpConfig.class, name = "2"),
+        @JsonSubTypes.Type(value = IotDataSinkWebSocketConfig.class, name = "3"),
         @JsonSubTypes.Type(value = IotDataSinkMqttConfig.class, name = "10"),
         @JsonSubTypes.Type(value = IotDataSinkRedisConfig.class, name = "21"),
         @JsonSubTypes.Type(value = IotDataSinkRocketMQConfig.class, name = "30"),
