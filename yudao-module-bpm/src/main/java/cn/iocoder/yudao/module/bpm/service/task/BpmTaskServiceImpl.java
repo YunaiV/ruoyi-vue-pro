@@ -875,16 +875,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @return 目标任务节点元素
      */
     private FlowElement validateTargetTaskCanReturn(BpmnModel bpmnModel, String sourceKey, String targetKey) {
-
-        // 1.3 获取当前任务节点元素
+        // 1.1 获取当前任务节点元素
         FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, sourceKey);
-        // 1.3 获取跳转的节点元素
+        // 1.2 获取跳转的节点元素
         FlowElement target = BpmnModelUtils.getFlowElementById(bpmnModel, targetKey);
         if (target == null) {
             throw exception(TASK_TARGET_NODE_NOT_EXISTS);
         }
 
-        // 2.2 只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
+        // 2. 只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
         if (!BpmnModelUtils.isSequentialReachable(source, target, null)) {
             throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
@@ -934,7 +933,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         });
 
         // 3. 构建需要预测的任务流程变量
-        Set<String> taskDefinitionKeyList = needSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
+        // TODO @jason：【驳回预测相关】是不是搞成一个变量，里面是 set 更简洁一点呀？
+        Set<String> taskDefinitionKeyList = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
         Map<String, Object> needSimulateVariables = convertMap(taskDefinitionKeyList,
                 taskId -> StrUtil.concat(false, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, taskId), item -> Boolean.TRUE);
 
@@ -944,27 +944,34 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
-                // 设置需要预测的任务流程变量。用于辅助预测
+                // 设置需要预测的任务流程变量，用于辅助预测
                 .processVariables(needSimulateVariables)
-                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略。导致自动通过
+                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
                 .localVariable(reqVO.getTargetTaskDefinitionKey(),
                         String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE)
                 .changeState();
     }
 
-    private Set<String> needSimulateTaskDefinitionKeys(BpmnModel bpmnModel, Task currentTask, FlowElement targetElement) {
-        // 获取需要预测的任务的 definition key。 当前任务还没完成。也需要预测。
+    private Set<String> getNeedSimulateTaskDefinitionKeys(BpmnModel bpmnModel, Task currentTask, FlowElement targetElement) {
+        // 1. 获取需要预测的任务的 definition key。因为当前任务还没完成，也需要预测
         Set<String> taskDefinitionKeys = CollUtil.newHashSet(currentTask.getTaskDefinitionKey());
-        // 从已结束任务中找到要回退的目标任务。按时间倒序最近的一个目标任务
+
+        // 2.1 从已结束任务中找到要回退的目标任务，按时间倒序最近的一个目标任务
         List<HistoricTaskInstance> endTaskList = CollectionUtils.filterList(
-                getTaskListByProcessInstanceId(currentTask.getProcessInstanceId(), Boolean.FALSE), item -> item.getEndTime() != null);
+                getTaskListByProcessInstanceId(currentTask.getProcessInstanceId(), Boolean.FALSE),
+                item -> item.getEndTime() != null);
+        // 2.2 遍历已结束的任务，找到在 targetTask 之后生成的任务，且串行可达的任务
         HistoricTaskInstance targetTask = findFirst(endTaskList,
                 item -> item.getTaskDefinitionKey().equals(targetElement.getId()));
+        // TODO @jason：【驳回预测相关】是不是 if targetTask 先判空？
         endTaskList.forEach(item -> {
             FlowElement element = getFlowElementById(bpmnModel, item.getTaskDefinitionKey());
-            // 如果已结束的任务在回退目标节点之后生成，且串行可达，则标记为需要预算节点。
+            // 如果已结束的任务在回退目标节点之后生成，且串行可达，则标记为需要预算节点
             // TODO 串行可达的方法需要和判断可回退节点 validateTargetTaskCanReturn 分开吗？ 并行网关可能会有问题。
-            if (targetTask != null && DateUtil.compare(item.getCreateTime(), targetTask.getCreateTime()) > 0
+            // TODO @jason：【驳回预测相关】这里是不是判断 element 哈？
+            if (targetTask != null
+                    // TODO @jason：【驳回预测相关】这里直接 createTime 的 compare 更简单？因为不太会出现空哈。
+                    && DateUtil.compare(item.getCreateTime(), targetTask.getCreateTime()) > 0
                     && BpmnModelUtils.isSequentialReachable(element, targetElement, null)) {
                 taskDefinitionKeys.add(item.getTaskDefinitionKey());
             }
@@ -1483,7 +1490,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     return;
                 }
                 FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略, 使用 local variable
+                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略（使用 local variable）
                 Boolean returnTaskFlag = runtimeService.getVariableLocal(task.getExecutionId(),
                         String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
                 Boolean skipStartUserNodeFlag = Convert.toBool(runtimeService.getVariable(processInstance.getProcessInstanceId(),

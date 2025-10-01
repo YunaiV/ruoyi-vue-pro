@@ -658,11 +658,11 @@ public class BpmnModelUtils {
 
         // 根据类型，获取入口连线
         List<SequenceFlow> sequenceFlows = getElementIncomingFlows(source);
-        // 1.没有入口连线，则返回 false
+        // 1. 没有入口连线，则返回 false
         if (CollUtil.isEmpty(sequenceFlows)) {
             return false;
         }
-        // 2.循环找目标元素, 找到目标节点
+        // 2. 循环找目标元素, 找到目标节点
         for (SequenceFlow sequenceFlow : sequenceFlows) {
             // 如果发现连线重复，说明循环了，跳过这个循环
             if (visitedElements.contains(sequenceFlow.getId())) {
@@ -679,7 +679,7 @@ public class BpmnModelUtils {
             if (sourceFlowElement instanceof ParallelGateway) {
                 continue;
             }
-            // 继续迭代， 如果找到目标节点直接返回 true
+            // 继续迭代，如果找到目标节点直接返回 true
             if (isSequentialReachable(sourceFlowElement, target, visitedElements)) {
                 return true;
             }

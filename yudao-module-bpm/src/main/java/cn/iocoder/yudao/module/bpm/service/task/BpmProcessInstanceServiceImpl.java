@@ -223,18 +223,18 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 3.1 计算当前登录用户的待办任务
         BpmTaskRespVO todoTask = taskService.getTodoTask(loginUserId, reqVO.getTaskId(), reqVO.getProcessInstanceId());
 
-        // 3.2 获取由于退回操作，需要预测的节点。 从流程变量中获取。 回退操作会设置这些变量
+        // 3.2 获取由于退回操作，需要预测的节点。从流程变量中获取，回退操作会设置这些变量
         Set<String> needSimulateTaskDefKeysByReturn = new HashSet<>();
         if (StrUtil.isNotEmpty(reqVO.getProcessInstanceId())) {
             Map<String, Object> variables = runtimeService.getVariables(reqVO.getProcessInstanceId());
             Map<String, Object> simulateTaskVariables = MapUtil.filter(variables,
                     item -> item.getKey().startsWith(PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX));
-            simulateTaskVariables.forEach(
-                    (key, value) -> needSimulateTaskDefKeysByReturn.add(StrUtil.removePrefix(key, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX)));
+            simulateTaskVariables.forEach((key, value) ->
+                    needSimulateTaskDefKeysByReturn.add(StrUtil.removePrefix(key, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX)));
         }
         // 移除运行中的节点，运行中的节点无需预测
+        // TODO @jason：是不是 foreach runActivityNodes，然后移除 needSimulateTaskDefKeysByReturn 更好？（理解成本低一点）
         CollectionUtils.convertList(runActivityNodes, ActivityNode::getId).forEach(needSimulateTaskDefKeysByReturn::remove);
-
 
         // 3.3 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
@@ -594,8 +594,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                          Set<String> needSimulateTaskDefKeysByReturn) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
-        // 回退操作时候，会记录需要预测的节点到流程变量中。即使在历史操作中，也需要预测。
-        if (!needSimulateTaskDefKeysByReturn.contains(node.getId()) && runActivityIds.contains(node.getId())) {
+        if (runActivityIds.contains(node.getId())
+                && !needSimulateTaskDefKeysByReturn.contains(node.getId())) { // 特殊：回退操作时候，会记录需要预测的节点到流程变量中。即使在历史操作中，也需要预测
             return null;
         }
         Integer status = BpmTaskStatusEnum.NOT_START.getStatus();
@@ -644,7 +644,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                        Map<String, Object> processVariables,
                                                        FlowElement node, Set<String> runActivityIds,
                                                        Set<String> needSimulateTaskDefKeysByReturn) {
-
         // 回退操作时候，会记录需要预测的节点到流程变量中。即使节点在历史操作中，也需要预测。
         if (!needSimulateTaskDefKeysByReturn.contains(node.getId()) && runActivityIds.contains(node.getId())) {
             return null;
