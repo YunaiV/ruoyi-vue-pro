@@ -123,7 +123,7 @@ const [FormModal, formModalApi] = useVbenModal({
 
 /** 创建${table.classComment} */
 function handleCreate() {
-  formModalApi.setData({}).open();
+  formModalApi.setData(null).open();
 }
 
 /** 编辑${table.classComment} */

@@ -38,7 +38,7 @@ function onActionClick({
 }: OnActionClickParams<${apiName}.${subSimpleClassName}>) {
   switch (code) {
     case 'delete': {
-      onDelete(row);
+      handleDelete(row);
       break;
     }
   }
@@ -64,12 +64,12 @@ gridOptions: {
 });
 
 /** 添加${subTable.classComment} */
-const onAdd = async () => {
+const handleAdd = async () => {
   await gridApi.grid.insertAt({} as ${apiName}.${subSimpleClassName}, -1);
 }
 
 /** 删除${subTable.classComment} */
-const onDelete =  async (row: ${apiName}.${subSimpleClassName}) => {
+const handleDelete =  async (row: ${apiName}.${subSimpleClassName}) => {
   await gridApi.grid.remove(row);
 }
 
@@ -188,7 +188,7 @@ watch(
       #end
   </Grid>
   <div class="flex justify-center -mt-4">
-    <Button :icon="h(Plus)" type="primary" ghost @click="onAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">
+    <Button :icon="h(Plus)" type="primary" ghost @click="handleAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
     </Button>
   </div>

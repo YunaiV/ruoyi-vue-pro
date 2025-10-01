@@ -69,7 +69,6 @@ function handleEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
 async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting', [row.id]),
-    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}(row.id as number);
@@ -85,7 +84,6 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 async function handleDeleteBatch() {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting'),
-    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);

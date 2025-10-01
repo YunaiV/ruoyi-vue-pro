@@ -43,7 +43,6 @@
       if (!valid) {
         return;
       }
-
       modalApi.lock();
       // 提交表单
       const data = (await formApi.getValues()) as ${apiName}.${subSimpleClassName};
@@ -63,7 +62,6 @@
         formData.value = undefined;
         return;
       }
-
       // 加载数据
       let data = modalApi.getData<${apiName}.${subSimpleClassName}>();
       if (!data) {

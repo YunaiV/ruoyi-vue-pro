@@ -13,7 +13,7 @@ import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}
 #if ($table.templateType == 11) ## erp
 import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
 #end
-import { useVbenModal } from '@vben/common-ui';
+import { confirm, useVbenModal } from '@vben/common-ui';
 import { message } from 'ant-design-vue';
 import { ref, computed, nextTick,watch } from 'vue';
 import { $t } from '#/locales';
@@ -74,8 +74,9 @@ async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
 #if ($deleteBatchEnable)
 /** 批量删除${subTable.classComment} */
 async function handleDeleteBatch() {
+  await confirm($t('ui.actionMessage.deleteBatchConfirm'));
   const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting'),
+    content: $t('ui.actionMessage.deletingBatch'),
     duration: 0,
   });
   try {
