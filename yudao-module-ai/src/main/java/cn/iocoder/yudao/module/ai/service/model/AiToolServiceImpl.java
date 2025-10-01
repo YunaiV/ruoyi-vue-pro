@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.tool.AiToolPageReqVO;
@@ -8,7 +7,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.tool.AiToolSaveReqVO
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiToolDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiToolMapper;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,6 +30,9 @@ public class AiToolServiceImpl implements AiToolService {
 
     @Resource
     private AiToolMapper toolMapper;
+
+    @Resource
+    private ToolCallbackResolver toolCallbackResolver;
 
     @Override
     public Long createTool(AiToolSaveReqVO createReqVO) {
@@ -70,9 +73,8 @@ public class AiToolServiceImpl implements AiToolService {
     }
 
     private void validateToolNameExists(String name) {
-        try {
-            SpringUtil.getBean(name);
-        } catch (NoSuchBeanDefinitionException e) {
+        ToolCallback toolCallback = toolCallbackResolver.resolve(name);
+        if (toolCallback == null) {
             throw exception(TOOL_NAME_NOT_EXISTS, name);
         }
     }

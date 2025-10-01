@@ -148,7 +148,7 @@ public class RoleServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testValidateUpdateRole_success() {
-        RoleDO roleDO = randomPojo(RoleDO.class);
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setType(RoleTypeEnum.CUSTOM.getType()));
         roleMapper.insert(roleDO);
         // 准备参数
         Long id = roleDO.getId();

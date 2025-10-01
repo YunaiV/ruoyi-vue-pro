@@ -1,0 +1,101 @@
+### 请求 /iot/device/message/send 接口（属性上报）=> 成功
+POST {{baseUrl}}/iot/device/message/send
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "deviceId": 25,
+  "method": "thing.property.post",
+  "params": {
+    "width": 1,
+    "height": "2",
+    "oneThree": "3"
+  }
+}
+
+### 请求 /iot/device/downstream 接口（服务调用）=> 成功 TODO 芋艿：未更新为最新
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "service",
+  "identifier": "temperature",
+  "data": {
+    "xx": "yy"
+  }
+}
+
+### 请求 /iot/device/downstream 接口（属性设置）=> 成功 TODO 芋艿：未更新为最新
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "property",
+  "identifier": "set",
+  "data": {
+    "xx": "yy"
+  }
+}
+
+### 请求 /iot/device/downstream 接口（属性获取）=> 成功 TODO 芋艿：未更新为最新
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "property",
+  "identifier": "get",
+  "data": ["xx", "yy"]
+}
+
+### 请求 /iot/device/downstream 接口（配置设置）=> 成功 TODO 芋艿：未更新为最新
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "config",
+  "identifier": "set"
+}
+
+### 请求 /iot/device/downstream 接口（OTA 升级）=> 成功 TODO 芋艿：未更新为最新
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "ota",
+  "identifier": "upgrade",
+  "data": {
+    "firmwareId": 1,
+    "version": "1.0.0",
+    "signMethod": "MD5",
+    "fileSign": "d41d8cd98f00b204e9800998ecf8427e",
+    "fileSize": 1024,
+    "fileUrl": "http://example.com/firmware.bin",
+    "information": "{\"desc\":\"升级到最新版本\"}"
+  }
+}
+
+### 查询设备消息对分页 - 基础查询（设备编号25）
+GET {{baseUrl}}/iot/device/message/pair-page?deviceId=25&pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 查询设备消息对分页 - 按标识符过滤（identifier=eat）
+GET {{baseUrl}}/iot/device/message/pair-page?deviceId=25&identifier=eat&pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}

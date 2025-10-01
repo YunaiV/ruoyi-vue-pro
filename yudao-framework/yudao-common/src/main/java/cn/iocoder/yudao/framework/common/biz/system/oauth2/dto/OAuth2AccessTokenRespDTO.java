@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.common.biz.system.oauth2.dto;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
  * @author 芋道源码
  */
 @Data
-@Accessors(chain = true)
 public class OAuth2AccessTokenRespDTO implements Serializable {
 
     /**

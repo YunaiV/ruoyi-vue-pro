@@ -35,7 +35,6 @@ public class RedisPendingMessageResendJob {
 
     private final List<AbstractRedisStreamMessageListener<?>> listeners;
     private final RedisMQTemplate redisTemplate;
-    private final String groupName;
     private final RedissonClient redissonClient;
 
     /**
@@ -64,13 +63,13 @@ public class RedisPendingMessageResendJob {
     private void execute() {
         StreamOperations<String, Object, Object> ops = redisTemplate.getRedisTemplate().opsForStream();
         listeners.forEach(listener -> {
-            PendingMessagesSummary pendingMessagesSummary = Objects.requireNonNull(ops.pending(listener.getStreamKey(), groupName));
+            PendingMessagesSummary pendingMessagesSummary = Objects.requireNonNull(ops.pending(listener.getStreamKey(), listener.getGroup()));
             // 每个消费者的 pending 队列消息数量
             Map<String, Long> pendingMessagesPerConsumer = pendingMessagesSummary.getPendingMessagesPerConsumer();
             pendingMessagesPerConsumer.forEach((consumerName, pendingMessageCount) -> {
                 log.info("[processPendingMessage][消费者({}) 消息数量({})]", consumerName, pendingMessageCount);
                 // 每个消费者的 pending消息的详情信息
-                PendingMessages pendingMessages = ops.pending(listener.getStreamKey(), Consumer.from(groupName, consumerName), Range.unbounded(), pendingMessageCount);
+                PendingMessages pendingMessages = ops.pending(listener.getStreamKey(), Consumer.from(listener.getGroup(), consumerName), Range.unbounded(), pendingMessageCount);
                 if (pendingMessages.isEmpty()) {
                     return;
                 }
@@ -91,7 +90,7 @@ public class RedisPendingMessageResendJob {
                             .ofObject(records.get(0).getValue()) // 设置内容
                             .withStreamKey(listener.getStreamKey()));
                     // ack 消息消费完成
-                    redisTemplate.getRedisTemplate().opsForStream().acknowledge(groupName, records.get(0));
+                    redisTemplate.getRedisTemplate().opsForStream().acknowledge(listener.getGroup(), records.get(0));
                     log.info("[processPendingMessage][消息({})重新投递成功]", records.get(0).getId());
                 });
             });

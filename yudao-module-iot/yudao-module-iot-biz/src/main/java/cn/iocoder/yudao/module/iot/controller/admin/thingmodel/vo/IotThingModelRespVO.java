@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo;
 
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
-import cn.idev.excel.annotation.ExcelProperty;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelEvent;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -12,18 +10,15 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - IoT 产品物模型 Response VO")
 @Data
-@ExcelIgnoreUnannotated
 public class IotThingModelRespVO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21816")
-    @ExcelProperty("产品ID")
     private Long id;
 
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long productId;
 
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "temperature_sensor")
-    @ExcelProperty("产品标识")
     private String productKey;
 
     @Schema(description = "功能标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "temperature")
@@ -48,7 +43,6 @@ public class IotThingModelRespVO {
     private ThingModelService service;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
 }

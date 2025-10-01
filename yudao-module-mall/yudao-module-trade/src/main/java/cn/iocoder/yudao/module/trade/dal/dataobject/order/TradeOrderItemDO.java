@@ -9,8 +9,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,8 +21,6 @@ import java.util.List;
 @TableName(value = "trade_order_item", autoResultMap = true)
 @KeySequence("trade_order_item_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
 public class TradeOrderItemDO extends BaseDO {
 
     // ========== 订单项基本信息 ==========

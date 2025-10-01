@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_CATEGORY_NOT_EXISTS;
 
 /**
@@ -99,23 +101,21 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     @Override
     public Map<String, Integer> getProductCategoryDeviceCountMap() {
         // 1. 获取所有数据
-        List<IotProductCategoryDO> categoryList = iotProductCategoryMapper.selectList();
-        List<IotProductDO> productList = productService.getProductList();
-        // TODO @super：不要 list 查询，返回内存，而是查询一个 Map<productId, count>
+        List<IotProductCategoryDO> categories = iotProductCategoryMapper.selectList();
+        List<IotProductDO> products = productService.getProductList();
         Map<Long, Integer> deviceCountMapByProductId = deviceService.getDeviceCountMapByProductId();
 
         // 2. 统计每个分类下的设备数量
         Map<String, Integer> categoryDeviceCountMap = new HashMap<>();
-        for (IotProductCategoryDO category : categoryList) {
-            categoryDeviceCountMap.put(category.getName(), 0);
-            // TODO @super：CollectionUtils.getSumValue()，看看能不能简化下
-            // 2.2 找到该分类下的所有产品,累加设备数量
-            for (IotProductDO product : productList) {
-                if (Objects.equals(product.getCategoryId(), category.getId())) {
-                    Integer deviceCount = deviceCountMapByProductId.getOrDefault(product.getId(), 0);
-                    categoryDeviceCountMap.merge(category.getName(), deviceCount, Integer::sum);
-                }
-            }
+        for (IotProductCategoryDO category : categories) {
+            // 2.1 找到该分类下的所有产品
+            List<IotProductDO> categoryProducts = filterList(products, 
+                product -> Objects.equals(product.getCategoryId(), category.getId()));
+            // 2.2 累加设备数量
+            Integer totalDeviceCount = getSumValue(categoryProducts, 
+                product -> deviceCountMapByProductId.getOrDefault(product.getId(), 0), 
+                Integer::sum, 0);
+            categoryDeviceCountMap.put(category.getName(), totalDeviceCount);
         }
         return categoryDeviceCountMap;
     }

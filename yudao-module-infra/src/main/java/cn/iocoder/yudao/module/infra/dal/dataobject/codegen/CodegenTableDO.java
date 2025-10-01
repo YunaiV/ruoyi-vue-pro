@@ -11,8 +11,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * 代码生成 table 表定义
@@ -22,8 +20,6 @@ import lombok.experimental.Accessors;
 @TableName(value = "infra_codegen_table", autoResultMap = true)
 @KeySequence("infra_codegen_table_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
 @TenantIgnore
 public class CodegenTableDO extends BaseDO {
 

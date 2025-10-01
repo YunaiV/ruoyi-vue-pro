@@ -33,6 +33,7 @@ public interface CrmClueMapper extends BaseMapperX<CrmClueDO> {
                 .eqIfPresent(CrmClueDO::getLevel, pageReqVO.getLevel())
                 .eqIfPresent(CrmClueDO::getSource, pageReqVO.getSource())
                 .eqIfPresent(CrmClueDO::getFollowUpStatus, pageReqVO.getFollowUpStatus())
+                .betweenIfPresent(CrmClueDO::getCreateTime, pageReqVO.getCreateTime())
                 .orderByDesc(CrmClueDO::getId);
         return selectJoinPage(pageReqVO, CrmClueDO.class, query);
     }

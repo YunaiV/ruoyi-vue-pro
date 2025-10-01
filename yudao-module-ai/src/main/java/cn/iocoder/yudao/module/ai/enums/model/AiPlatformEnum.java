@@ -33,6 +33,8 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
 
     OPENAI("OpenAI", "OpenAI"), // OpenAI 官方
     AZURE_OPENAI("AzureOpenAI", "AzureOpenAI"), // OpenAI 微软
+    ANTHROPIC("Anthropic", "Anthropic"), // Anthropic Claude
+    GEMINI("Gemini", "Gemini"), // 谷歌 Gemini
     OLLAMA("Ollama", "Ollama"),
 
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI

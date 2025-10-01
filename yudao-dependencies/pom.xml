@@ -14,57 +14,58 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2025.08-SNAPSHOT</revision>
-        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <revision>2025.09-SNAPSHOT</revision>
+        <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.4.5</spring.boot.version>
+        <spring.boot.version>3.5.5</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.8.3</springdoc.version>
-        <knife4j.version>4.6.0</knife4j.version>
+        <springdoc.version>2.8.11</springdoc.version>
+        <knife4j.version>4.5.0</knife4j.version>
         <!-- DB 相关 -->
-        <druid.version>1.2.24</druid.version>
+        <druid.version>1.2.27</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <mybatis-plus.version>3.5.14</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.4</mybatis-plus-join.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
-        <redisson.version>3.41.0</redisson.version>
+        <redisson.version>3.51.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
-        <taos.version>3.3.3</taos.version>
+        <taos.version>3.7.3</taos.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.4</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>9.0.0</skywalking.version>
-        <spring-boot-admin.version>3.4.5</spring-boot-admin.version>
+        <skywalking.version>9.5.0</skywalking.version>
+        <spring-boot-admin.version>3.5.2</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
-        <jedis-mock.version>1.1.8</jedis-mock.version>
+        <jedis-mock.version>1.1.11</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>7.0.1</flowable.version>
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
-        <jsoup.version>1.18.3</jsoup.version>
+        <jsoup.version>1.21.2</jsoup.version>
         <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.35</hutool-5.version>
-        <hutool-6.version>6.0.0-M19</hutool-6.version>
-        <fastexcel.version>1.2.0</fastexcel.version>
+        <hutool-5.version>5.8.40</hutool-5.version>
+        <hutool-6.version>6.0.0-M22</hutool-6.version>
+        <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.8-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
-        <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>3.1.0</tika-core.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <jsch.version>2.27.3</jsch.version>
+        <tika-core.version>3.2.2</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.1.118.Final</netty.version>
+        <netty.version>4.2.4.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <pf4j-spring.version>0.9.0</pf4j-spring.version>
         <vertx.version>4.5.13</vertx.version>
@@ -72,9 +73,9 @@
         <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.0.0</jimureport.version>
-        <jimubi.version>1.9.5</jimubi.version>
-        <weixin-java.version>4.7.5.B</weixin-java.version>
+        <jimureport.version>2.1.1</jimureport.version>
+        <jimubi.version>2.1.0</jimubi.version>
+        <weixin-java.version>4.7.7-20250808.182223</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -151,13 +152,19 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
+                <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springdoc</groupId>
+                        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
 
@@ -518,11 +525,16 @@
                 <artifactId>commons-net</artifactId> <!-- 解决 ftp 连接 -->
                 <version>${commons-net.version}</version>
             </dependency>
-
             <dependency>
-                <groupId>com.jcraft</groupId>
+                <groupId>com.github.mwiede</groupId>
                 <artifactId>jsch</artifactId> <!-- 解决 sftp 连接 -->
                 <version>${jsch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version> <!-- 解决 CVE-2025-48924 漏洞 -->
             </dependency>
 
             <dependency>
@@ -598,6 +610,10 @@
                     <exclusion>
                         <groupId>com.github.jsqlparser</groupId>
                         <artifactId>jsqlparser</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>cn.hutool</groupId>
+                        <artifactId>hutool-core</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

@@ -84,6 +84,27 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<IotProductRespVO> getProduct(@RequestParam("id") Long id) {
         IotProductDO product = productService.getProduct(id);
+        if (product == null) {
+            return success(null);
+        }
+        // 拼接数据
+        IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
+        return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {
+            if (category != null) {
+                bean.setCategoryName(category.getName());
+            }
+        }));
+    }
+
+    @GetMapping("/get-by-key")
+    @Operation(summary = "通过 ProductKey 获得产品")
+    @Parameter(name = "productKey", description = "产品Key", required = true, example = "abc123")
+    @PreAuthorize("@ss.hasPermission('iot:product:query')")
+    public CommonResult<IotProductRespVO> getProductByKey(@RequestParam("productKey") String productKey) {
+        IotProductDO product = productService.getProductByProductKey(productKey);
+        if (product == null) {
+            return success(null);
+        }
         // 拼接数据
         IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
         return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {
@@ -122,11 +143,11 @@ public class IotProductController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获取产品的精简信息列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<IotProductRespVO>> getSimpleProductList() {
+    public CommonResult<List<IotProductRespVO>> getProductSimpleList() {
         List<IotProductDO> list = productService.getProductList();
         return success(convertList(list, product -> // 只返回 id、name 字段
                 new IotProductRespVO().setId(product.getId()).setName(product.getName())
-                        .setDeviceType(product.getDeviceType())));
+                        .setDeviceType(product.getDeviceType()).setLocationType(product.getLocationType())));
     }
 
 }

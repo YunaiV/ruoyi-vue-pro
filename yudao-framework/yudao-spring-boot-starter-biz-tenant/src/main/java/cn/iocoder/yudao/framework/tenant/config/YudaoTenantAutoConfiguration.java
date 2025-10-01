@@ -44,8 +44,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -84,39 +83,11 @@ public class YudaoTenantAutoConfiguration {
     // ========== WEB ==========
 
     @Bean
-    public FilterRegistrationBean<TenantContextWebFilter> tenantContextWebFilter(TenantProperties tenantProperties) {
+    public FilterRegistrationBean<TenantContextWebFilter> tenantContextWebFilter() {
         FilterRegistrationBean<TenantContextWebFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new TenantContextWebFilter());
         registrationBean.setOrder(WebFilterOrderEnum.TENANT_CONTEXT_FILTER);
-        addIgnoreUrls(tenantProperties);
         return registrationBean;
-    }
-
-    /**
-     * 如果 Controller 接口上，有 {@link TenantIgnore} 注解，那么添加到忽略的 URL 中
-     *
-     * @param tenantProperties 租户配置
-     */
-    private void addIgnoreUrls(TenantProperties tenantProperties) {
-        // 获得接口对应的 HandlerMethod 集合
-        RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping)
-                applicationContext.getBean("requestMappingHandlerMapping");
-        Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = requestMappingHandlerMapping.getHandlerMethods();
-        // 获得有 @TenantIgnore 注解的接口
-        for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethodMap.entrySet()) {
-            HandlerMethod handlerMethod = entry.getValue();
-            if (!handlerMethod.hasMethodAnnotation(TenantIgnore.class)) {
-                continue;
-            }
-            // 添加到忽略的 URL 中
-            if (entry.getKey().getPatternsCondition() != null) {
-                tenantProperties.getIgnoreUrls().addAll(entry.getKey().getPatternsCondition().getPatterns());
-            }
-            if (entry.getKey().getPathPatternsCondition() != null) {
-                tenantProperties.getIgnoreUrls().addAll(
-                        convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
-            }
-        }
     }
 
     @Bean
@@ -146,10 +117,40 @@ public class YudaoTenantAutoConfiguration {
                                                                                    GlobalExceptionHandler globalExceptionHandler,
                                                                                    TenantFrameworkService tenantFrameworkService) {
         FilterRegistrationBean<TenantSecurityWebFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new TenantSecurityWebFilter(tenantProperties, webProperties,
+        registrationBean.setFilter(new TenantSecurityWebFilter(webProperties, tenantProperties, getTenantIgnoreUrls(),
                 globalExceptionHandler, tenantFrameworkService));
         registrationBean.setOrder(WebFilterOrderEnum.TENANT_SECURITY_FILTER);
         return registrationBean;
+    }
+
+    /**
+     * 如果 Controller 接口上，有 {@link TenantIgnore} 注解，则添加到忽略租户的 URL 集合中
+     *
+     * @return 忽略租户的 URL 集合
+     */
+    private Set<String> getTenantIgnoreUrls() {
+        Set<String> ignoreUrls = new HashSet<>();
+        // 获得接口对应的 HandlerMethod 集合
+        RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping)
+                applicationContext.getBean("requestMappingHandlerMapping");
+        Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = requestMappingHandlerMapping.getHandlerMethods();
+        // 获得有 @TenantIgnore 注解的接口
+        for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethodMap.entrySet()) {
+            HandlerMethod handlerMethod = entry.getValue();
+            if (!handlerMethod.hasMethodAnnotation(TenantIgnore.class) // 方法级
+                && !handlerMethod.getBeanType().isAnnotationPresent(TenantIgnore.class)) { // 接口级
+                continue;
+            }
+            // 添加到忽略的 URL 中
+            if (entry.getKey().getPatternsCondition() != null) {
+                ignoreUrls.addAll(entry.getKey().getPatternsCondition().getPatterns());
+            }
+            if (entry.getKey().getPathPatternsCondition() != null) {
+                ignoreUrls.addAll(
+                        convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
+            }
+        }
+        return ignoreUrls;
     }
 
     // ========== MQ ==========

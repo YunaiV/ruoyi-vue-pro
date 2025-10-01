@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class RewardActivityRespVO extends RewardActivityBaseVO {
 
     @Schema(description = "活动编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;

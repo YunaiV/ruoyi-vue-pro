@@ -94,7 +94,7 @@ function handleRowCheckboxChange({
 }: {
   records: ${apiName}.${subSimpleClassName}[];
 }) {
-  checkedIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id!);
 }
 #end
 

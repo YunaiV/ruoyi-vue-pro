@@ -7,8 +7,9 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelS
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * IoT 产品物模型 Service 接口
@@ -56,14 +57,32 @@ public interface IotThingModelService {
     List<IotThingModelDO> getThingModelListByProductId(Long productId);
 
     /**
+     * 获得产品物模型列表
+     *
+     * @param productId 产品编号
+     * @param identifiers 功能标识列表
+     * @return 产品物模型列表
+     */
+    List<IotThingModelDO> getThingModelListByProductIdAndIdentifiers(Long productId, Collection<String> identifiers);
+
+    /**
+     * 获得产品物模型列表
+     *
+     * @param productId 产品编号
+     * @param type 物模型类型
+     * @return 产品物模型列表
+     */
+    List<IotThingModelDO> getThingModelListByProductIdAndType(Long productId, Integer type);
+
+    /**
      * 【缓存】获得产品物模型列表
      *
      * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
      *
-     * @param productKey 产品标识
+     * @param productId 产品编号
      * @return 产品物模型列表
      */
-    List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey);
+    List<IotThingModelDO> getThingModelListByProductIdFromCache(Long productId);
 
     /**
      * 获得产品物模型分页
@@ -81,13 +100,12 @@ public interface IotThingModelService {
      */
     List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
 
-    // TODO @super：用不到，删除下哈。
     /**
-     * 获得物模型数量
+     * 批量校验物模型存在
      *
-     * @param createTime 创建时间，如果为空，则统计所有物模型数量
-     * @return 物模型数量
+     * @param productId 产品编号
+     * @param identifiers 标识符集合
      */
-    Long getThingModelCount(LocalDateTime createTime);
+    void validateThingModelListExists(Long productId, Set<String> identifiers);
 
 }
