@@ -66,20 +66,13 @@
         DESCRIBE product_property_${productId}
     </select>
 
-    <resultMap id="IotDevicePropertyRespVOMap"
-               type="cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO">
-        <result property="value" column="value"
-                typeHandler="cn.iocoder.yudao.module.iot.framework.mybatis.handler.SimpleObjectTypeHandler"/>
-        <result property="updateTime" column="update_time" javaType="java.lang.Long"/>
-    </resultMap>
-
     <select id="selectListByHistory"
-            resultMap="IotDevicePropertyRespVOMap">
+            resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO">
         SELECT ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} AS `value`, ts AS update_time
         FROM device_property_${reqVO.deviceId}
         WHERE ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} IS NOT NULL
           AND ts BETWEEN ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[0])}
-              AND ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[1])}
+            AND ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[1])}
         ORDER BY ts DESC
     </select>
 
