@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -46,16 +47,16 @@ public class IotSceneRuleMatcherManager {
         List<IotSceneRuleMatcher> allMatchers = matchers.stream()
                 .filter(IotSceneRuleMatcher::isEnabled)
                 .sorted(Comparator.comparing(IotSceneRuleMatcher::getPriority))
-                .toList();
+                .collect(Collectors.toList());
         // 1.2 分离触发器匹配器和条件匹配器
         List<IotSceneRuleTriggerMatcher> triggerMatchers = allMatchers.stream()
                 .filter(matcher -> matcher instanceof IotSceneRuleTriggerMatcher)
                 .map(matcher -> (IotSceneRuleTriggerMatcher) matcher)
-                .toList();
+                .collect(Collectors.toList());
         List<IotSceneRuleConditionMatcher> conditionMatchers = allMatchers.stream()
                 .filter(matcher -> matcher instanceof IotSceneRuleConditionMatcher)
                 .map(matcher -> (IotSceneRuleConditionMatcher) matcher)
-                .toList();
+                .collect(Collectors.toList());
 
         // 2.1 构建触发器匹配器映射表
         this.triggerMatchers = convertMap(triggerMatchers, IotSceneRuleTriggerMatcher::getSupportedTriggerType,

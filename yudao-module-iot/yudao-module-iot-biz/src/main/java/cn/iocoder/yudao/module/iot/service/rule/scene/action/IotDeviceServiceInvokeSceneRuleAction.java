@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -9,12 +10,12 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * IoT 设备服务调用的 {@link IotSceneRuleAction} 实现类
@@ -126,10 +127,10 @@ public class IotDeviceServiceInvokeSceneRuleAction implements IotSceneRuleAction
     private IotDeviceMessage buildServiceInvokeMessage(IotSceneRuleDO.Action actionConfig, IotDeviceDO device) {
         try {
             // 服务调用参数格式: {"identifier": "serviceId", "params": {...}}
-            Object params = Map.of(
-                    "identifier", actionConfig.getIdentifier(),
-                    "params", actionConfig.getParams() != null ? actionConfig.getParams() : Map.of()
-            );
+            Object params = MapUtil.builder()
+                    .put("identifier", actionConfig.getIdentifier())
+                    .put("params", actionConfig.getParams() != null ? actionConfig.getParams() : Collections.emptyMap())
+                    .build();
             return IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod(), params);
         } catch (Exception e) {
             log.error("[buildServiceInvokeMessage][构建服务调用消息异常]", e);
