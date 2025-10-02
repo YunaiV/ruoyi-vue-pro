@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.bpm.enums.task;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * 流程任务 Task 的状态枚举
@@ -13,7 +16,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTaskStatusEnum {
+public enum BpmTaskStatusEnum implements ArrayValuable<Integer> {
 
     SKIP(-2, "跳过"),
     NOT_START(-1, "未开始"),
@@ -36,6 +39,8 @@ public enum BpmTaskStatusEnum {
      */
     WAIT(0, "待审批");
 
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BpmTaskStatusEnum::getStatus).toArray(Integer[]::new);
+
     /**
      * 状态
      * <p>
@@ -46,6 +51,11 @@ public enum BpmTaskStatusEnum {
      * 名字
      */
     private final String name;
+
+    @Override
+    public Integer[] array() {
+        return ARRAYS;
+    }
 
     public static boolean isRejectStatus(Integer status) {
         return REJECT.getStatus().equals(status);

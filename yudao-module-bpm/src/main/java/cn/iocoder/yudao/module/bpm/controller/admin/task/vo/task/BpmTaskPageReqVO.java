@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +22,10 @@ public class BpmTaskPageReqVO extends PageParam {
 
     @Schema(description = "流程定义的标识", example = "2048")
     private String processDefinitionKey; // 精准匹配
+
+    @Schema(description = "审批状态", example = "1")
+    @InEnum(BpmTaskStatusEnum.class)
+    private Integer status; // 仅【已办】使用
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

@@ -70,7 +70,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.*;
+//import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 
 /**
@@ -230,6 +230,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
+        }
+        if (pageVO.getStatus() != null) {
+            taskQuery.taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, pageVO.getStatus());
         }
 //        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
 //            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
@@ -603,7 +606,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         runtimeService.setVariables(task.getProcessInstanceId(), variables);
 
         // 5. 移除辅助预测的流程变量，这些变量在回退操作中设置
-        String simulateVariableName = StrUtil.concat(false, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, task.getTaskDefinitionKey());
+        // todo @jason：可以直接 + 拼接哈
+        String simulateVariableName = StrUtil.concat(false,
+                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, task.getTaskDefinitionKey());
         runtimeService.removeVariable(task.getProcessInstanceId(), simulateVariableName);
 
         // 6. 调用 BPM complete 去完成任务
@@ -936,7 +941,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // TODO @jason：【驳回预测相关】是不是搞成一个变量，里面是 set 更简洁一点呀？
         Set<String> taskDefinitionKeyList = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
         Map<String, Object> needSimulateVariables = convertMap(taskDefinitionKeyList,
-                taskId -> StrUtil.concat(false, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, taskId), item -> Boolean.TRUE);
+                taskId -> StrUtil.concat(false, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, taskId), item -> Boolean.TRUE);
 
         // 4. 执行驳回
         // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
@@ -948,7 +953,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .processVariables(needSimulateVariables)
                  // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
                 .localVariable(reqVO.getTargetTaskDefinitionKey(),
-                        String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE)
+                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()),
+                        Boolean.TRUE)
                 .changeState();
     }
 
@@ -1492,9 +1498,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
                 // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略（使用 local variable）
                 Boolean returnTaskFlag = runtimeService.getVariableLocal(task.getExecutionId(),
-                        String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
+                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
                 Boolean skipStartUserNodeFlag = Convert.toBool(runtimeService.getVariable(processInstance.getProcessInstanceId(),
-                        PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
+                        BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
                         || BooleanUtil.isTrue(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
