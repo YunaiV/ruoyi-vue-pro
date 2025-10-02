@@ -191,6 +191,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (CollUtil.isNotEmpty(reqVO.getProcessVariables())) {
             processVariables.putAll(reqVO.getProcessVariables());
         }
+        // 特殊：如果是未发起的场景，则设置发起用户，解决“发起流程”时，需要使用到该变量的问题。例如说：https://t.zsxq.com/fMw5g
+        if (historicProcessInstance == null) {
+            processVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, loginUserId);
+        }
         // 1.3 读取其它相关数据
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
                 historicProcessInstance != null ? historicProcessInstance.getProcessDefinitionId()
