@@ -240,24 +240,20 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
      * @return 规则场景列表
      */
     private List<IotSceneRuleDO> getMatchedSceneRuleListByMessage(IotDeviceMessage message) {
-        // 1. 匹配设备
-        // TODO 缓存 @puhui999：可能需要 getSelf()
         // 1.1 通过 deviceId 获取设备信息
         IotDeviceDO device = getSelf().deviceService.getDeviceFromCache(message.getDeviceId());
         if (device == null) {
             log.warn("[getMatchedSceneRuleListByMessage][设备({}) 不存在]", message.getDeviceId());
-            return List.of();
+            return ListUtil.of();
         }
-
         // 1.2 通过 productId 获取产品信息
         IotProductDO product = getSelf().productService.getProductFromCache(device.getProductId());
         if (product == null) {
             log.warn("[getMatchedSceneRuleListByMessage][产品({}) 不存在]", device.getProductId());
-            return List.of();
+            return ListUtil.of();
         }
-
         // 1.3 获取匹配的规则场景
-        List<IotSceneRuleDO> sceneRules = getSceneRuleListByProductIdAndDeviceIdFromCache(
+        List<IotSceneRuleDO> sceneRules = getSelf().getSceneRuleListByProductIdAndDeviceIdFromCache(
                 product.getId(), device.getId());
         if (CollUtil.isEmpty(sceneRules)) {
             return sceneRules;
