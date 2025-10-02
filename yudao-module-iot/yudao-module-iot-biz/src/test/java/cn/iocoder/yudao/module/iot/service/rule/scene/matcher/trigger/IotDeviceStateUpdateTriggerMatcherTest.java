@@ -1,27 +1,31 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link DeviceStateUpdateTriggerMatcher} 的单元测试
+ * {@link IotDeviceStateUpdateTriggerMatcher} 的单元测试
  *
  * @author HUIHUI
  */
-public class DeviceStateUpdateTriggerMatcherTest extends BaseMockitoUnitTest {
+public class IotDeviceStateUpdateTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
-    @InjectMocks
-    private DeviceStateUpdateTriggerMatcher matcher;
+    private IotDeviceStateUpdateTriggerMatcher matcher;
+
+    @BeforeEach
+    public void setUp() {
+        matcher = new IotDeviceStateUpdateTriggerMatcher();
+    }
 
     @Test
     public void testGetSupportedTriggerType_success() {

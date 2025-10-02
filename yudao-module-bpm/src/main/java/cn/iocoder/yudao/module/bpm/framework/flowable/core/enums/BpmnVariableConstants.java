@@ -43,14 +43,23 @@ public class BpmnVariableConstants {
      * @see ProcessInstance#getProcessVariables()
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_ID = "PROCESS_START_USER_ID";
+
     /**
-     * 流程实例的变量 - 用于判断流程实例变量节点是否驳回. 格式 RETURN_FLAG_{节点 id}
+     * 流程实例的变量 - 用于判断流程实例变量节点是否驳回：格式 RETURN_FLAG_{节点 id}
      *
-     * 目的是：驳回到发起节点时，因为审批人与发起人相同，所以被自动通过。但是，此时还是希望不要自动通过
+     * 目的是：退回到发起节点时，因为审批人与发起人相同，所以被自动通过。但是，此时还是希望不要自动通过
      *
      * @see ProcessInstance#getProcessVariables()
      */
     public static final String PROCESS_INSTANCE_VARIABLE_RETURN_FLAG = "RETURN_FLAG_%s";
+
+    /**
+     * 流程实例的变量前缀 - 用于退回操作，记录需要预测的节点：格式 NEED_SIMULATE_TASK_{节点定义 id}
+     *
+     * 目的是：退回操作，预测节点会不准，在流程变量中记录需要预测的节点，来辅助预测
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX = "NEED_SIMULATE_TASK_";
+
     /**
      * 流程实例的变量 - 是否跳过表达式
      *

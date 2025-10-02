@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -16,14 +16,18 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link CurrentTimeConditionMatcher} 的单元测试
+ * {@link IotCurrentTimeConditionMatcher} 的单元测试
  *
  * @author HUIHUI
  */
-public class CurrentTimeConditionMatcherTest extends BaseMockitoUnitTest {
+public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherTest {
 
-    @InjectMocks
-    private CurrentTimeConditionMatcher matcher;
+    private IotCurrentTimeConditionMatcher matcher;
+
+    @BeforeEach
+    public void setUp() {
+        matcher = new IotCurrentTimeConditionMatcher();
+    }
 
     @Test
     public void testGetSupportedConditionType() {

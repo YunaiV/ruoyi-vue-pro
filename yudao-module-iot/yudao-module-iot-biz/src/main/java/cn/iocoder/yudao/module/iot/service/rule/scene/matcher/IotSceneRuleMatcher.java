@@ -4,10 +4,8 @@ import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition.IotScene
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger.IotSceneRuleTriggerMatcher;
 
 /**
- * IoT 场景规则匹配器基础接口
- * <p>
- * 定义所有匹配器的通用行为，包括优先级、名称和启用状态
- * <p>
+ * IoT 场景规则匹配器基础接口：定义所有匹配器的通用行为，包括优先级、名称和启用状态
+ *
  * - {@link IotSceneRuleTriggerMatcher} 触发器匹配器
  * - {@link IotSceneRuleConditionMatcher} 条件匹配器
  *

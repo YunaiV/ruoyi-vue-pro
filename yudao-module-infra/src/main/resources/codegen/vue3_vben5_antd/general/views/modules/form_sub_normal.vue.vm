@@ -5,12 +5,15 @@
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-  import { message, Tabs, Form, Input, Textarea,Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
-  import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
-  import { $t } from '#/locales';
-  import { DICT_TYPE, getDictOptions } from '#/utils';
+import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+
+import { message, Tabs, Form, Input, Textarea,Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
+import { $t } from '#/locales';
 
 #if ($subTable.subJoinMany) ## 一对多
 import type { VxeTableInstance } from '#/adapter/vxe-table';
@@ -30,13 +33,14 @@ const props = defineProps<{
 #if ($subTable.subJoinMany) ## 一对多
 const list = ref<${simpleClassName}Api.${subSimpleClassName}[]>([]) // 列表的数据
 const tableRef = ref<VxeTableInstance>();
+
 /** 添加${subTable.classComment} */
-const onAdd = async () => {
+async function handleAdd() {
   await tableRef.value?.insertAt({} as ${simpleClassName}Api.${subSimpleClassName}, -1);
 }
 
 /** 删除${subTable.classComment} */
-const onDelete =  async (row: ${simpleClassName}Api.${subSimpleClassName}) => {
+async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   await tableRef.value?.remove(row);
 }
 
@@ -46,9 +50,11 @@ defineExpose({
     const data = list.value as ${simpleClassName}Api.${subSimpleClassName}[];
     const removeRecords = tableRef.value?.getRemoveRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
     const insertRecords = tableRef.value?.getInsertRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
-    return data
-        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
-        ?.concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
+    return [
+      ...data.filter(
+        (row) => !removeRecords.some((removed) => removed.id === row.id),
+      ),
+      ...insertRecords.map((row: any) => ({ ...row, id: undefined })),
   },
 });
 
@@ -123,25 +129,25 @@ watch(
               #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
               #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <Input v-model:value="row.${javaField}" />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "imageUpload")## 图片上传
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <ImageUpload v-model:value="row.${javaField}" />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "fileUpload")## 文件上传
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <FileUpload v-model:value="row.${javaField}" />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "select")## 下拉框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <Select v-model:value="row.${javaField}" placeholder="请选择${comment}">
                         #if ("" != $dictType)## 有数据字典
                           <Select.Option
@@ -159,7 +165,7 @@ watch(
                 </vxe-column>
               #elseif($column.htmlType == "checkbox")## 多选框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <CheckboxGroup v-model:value="row.${javaField}">
                         #if ("" != $dictType)## 有数据字典
                           <Checkbox
@@ -177,7 +183,7 @@ watch(
                 </vxe-column>
               #elseif($column.htmlType == "radio")## 单选框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <RadioGroup v-model:value="row.${javaField}">
                         #if ("" != $dictType)## 有数据字典
                           <Radio
@@ -195,7 +201,7 @@ watch(
                 </vxe-column>
               #elseif($column.htmlType == "datetime")## 时间框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <DatePicker
                         v-model:value="row.${javaField}"
                         :showTime="true"
@@ -206,7 +212,7 @@ watch(
                 </vxe-column>
               #elseif($column.htmlType == "textarea" || $column.htmlType == "editor")## 文本框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <Textarea v-model:value="row.${javaField}" />
                   </template>
                 </vxe-column>
@@ -214,12 +220,12 @@ watch(
           #end
       #end
     <vxe-column field="operation" title="操作" align="center">
-      <template #default="{row}">
+      <template #default="{ row }">
         <Button
             size="small"
             type="link"
             danger
-            @click="onDelete(row as any)"
+            @click="handleDelect(row)"
             v-access:code="['${permissionPrefix}:delete']"
         >
           {{ $t('ui.actionTitle.delete') }}
@@ -228,7 +234,7 @@ watch(
     </vxe-column>
   </vxe-table>
   <div class="flex justify-center mt-4">
-    <Button :icon="h(Plus)" type="primary" ghost @click="onAdd" v-access:code="['${permissionPrefix}:create']">
+    <Button :icon="h(Plus)" type="primary" ghost @click="handleAdd" v-access:code="['${permissionPrefix}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
     </Button>
   </div>

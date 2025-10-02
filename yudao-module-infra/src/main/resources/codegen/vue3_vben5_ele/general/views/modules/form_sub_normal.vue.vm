@@ -5,12 +5,15 @@
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-  import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker } from 'element-plus';
-  import { computed, ref, reactive, h, onMounted,watch,nextTick } from 'vue';
-  import { $t } from '#/locales';
-  import { DICT_TYPE, getDictOptions } from '#/utils';
+import { computed, ref, reactive, h, onMounted,watch,nextTick } from 'vue';
+
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+
+import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker } from 'element-plus';
+import { $t } from '#/locales';
 
 #if ($subTable.subJoinMany) ## 一对多
 import type { VxeTableInstance } from '#/adapter/vxe-table';
@@ -31,12 +34,12 @@ const props = defineProps<{
 const list = ref<${simpleClassName}Api.${subSimpleClassName}[]>([]) // 列表的数据
 const tableRef = ref<VxeTableInstance>();
 /** 添加${subTable.classComment} */
-const onAdd = async () => {
+async function handleAdd() {
   await tableRef.value?.insertAt({} as ${simpleClassName}Api.${subSimpleClassName}, -1);
 }
 
 /** 删除${subTable.classComment} */
-const onDelete =  async (row: ${simpleClassName}Api.${subSimpleClassName}) => {
+async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   await tableRef.value?.remove(row);
 }
 
@@ -46,9 +49,11 @@ defineExpose({
     const data = list.value as ${simpleClassName}Api.${subSimpleClassName}[];
     const removeRecords = tableRef.value?.getRemoveRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
     const insertRecords = tableRef.value?.getInsertRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
-    return data
-        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
-        ?.concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
+    return [
+      ...data.filter(
+        (row) => !removeRecords.some((removed) => removed.id === row.id),
+      ),
+      ...insertRecords.map((row: any) => ({ ...row, id: undefined })),
   },
 });
 
@@ -227,7 +232,7 @@ watch(
     </vxe-column>
   </vxe-table>
   <div class="flex justify-center mt-4">
-    <el-button :icon="h(Plus)" type="primary" plain @click="onAdd" v-access:code="['${permissionPrefix}:create']">
+    <el-button :icon="h(Plus)" type="primary" plain @click="handleAdd" v-access:code="['${permissionPrefix}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
     </el-button>
   </div>

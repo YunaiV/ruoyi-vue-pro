@@ -2,10 +2,12 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -68,8 +70,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE;
+//import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 
 /**
@@ -229,6 +230,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
+        }
+        if (pageVO.getStatus() != null) {
+            taskQuery.taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, pageVO.getStatus());
         }
 //        if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
 //            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
@@ -491,6 +495,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return historyService.createHistoricActivityInstanceQuery().executionId(executionId).list();
     }
 
+    @Override
+    public List<HistoricTaskInstance> getFinishedTaskListByProcessInstanceIdWithoutCancel(String processInstanceId) {
+        return historyService.createHistoricTaskInstanceQuery()
+                .finished()
+                .includeTaskLocalVariables()
+                .processInstanceId(processInstanceId)
+                .taskVariableValueNotEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS,
+                        BpmTaskStatusEnum.CANCEL.getStatus())
+                .orderByHistoricTaskInstanceStartTime().asc().list();
+    }
+
     /**
      * 判断指定用户，是否是当前任务的审批人
      *
@@ -590,7 +605,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 bpmnModel, reqVO.getNextAssignees(), instance);
         runtimeService.setVariables(task.getProcessInstanceId(), variables);
 
-        // 5. 调用 BPM complete 去完成任务
+        // 5. 移除辅助预测的流程变量，这些变量在回退操作中设置
+        // todo @jason：可以直接 + 拼接哈
+        String simulateVariableName = StrUtil.concat(false,
+                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, task.getTaskDefinitionKey());
+        runtimeService.removeVariable(task.getProcessInstanceId(), simulateVariableName);
+
+        // 6. 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
@@ -840,34 +861,34 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (task.isSuspended()) {
             throw exception(TASK_IS_PENDING);
         }
-        // 1.2 校验源头和目标节点的关系，并返回目标元素
-        FlowElement targetElement = validateTargetTaskCanReturn(task.getTaskDefinitionKey(),
-                reqVO.getTargetTaskDefinitionKey(), task.getProcessDefinitionId());
+        // 1.2 获取流程模型信息
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        // 1.3 校验源头和目标节点的关系，并返回目标元素
+        FlowElement targetElement = validateTargetTaskCanReturn(bpmnModel, task.getTaskDefinitionKey(),
+                reqVO.getTargetTaskDefinitionKey());
 
         // 2. 调用 Flowable 框架的退回逻辑
-        returnTask(userId, task, targetElement, reqVO);
+        returnTask(userId, bpmnModel, task, targetElement, reqVO);
     }
 
     /**
      * 退回流程节点时，校验目标任务节点是否可退回
      *
-     * @param sourceKey           当前任务节点 Key
-     * @param targetKey           目标任务节点 key
-     * @param processDefinitionId 当前流程定义 ID
+     * @param bpmnModel 流程模型
+     * @param sourceKey 当前任务节点 Key
+     * @param targetKey 目标任务节点 key
      * @return 目标任务节点元素
      */
-    private FlowElement validateTargetTaskCanReturn(String sourceKey, String targetKey, String processDefinitionId) {
-        // 1.1 获取流程模型信息
-        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processDefinitionId);
-        // 1.3 获取当前任务节点元素
+    private FlowElement validateTargetTaskCanReturn(BpmnModel bpmnModel, String sourceKey, String targetKey) {
+        // 1.1 获取当前任务节点元素
         FlowElement source = BpmnModelUtils.getFlowElementById(bpmnModel, sourceKey);
-        // 1.3 获取跳转的节点元素
+        // 1.2 获取跳转的节点元素
         FlowElement target = BpmnModelUtils.getFlowElementById(bpmnModel, targetKey);
         if (target == null) {
             throw exception(TASK_TARGET_NODE_NOT_EXISTS);
         }
 
-        // 2.2 只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
+        // 2. 只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
         if (!BpmnModelUtils.isSequentialReachable(source, target, null)) {
             throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
         }
@@ -878,11 +899,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * 执行退回逻辑
      *
      * @param userId        用户编号
+     * @param bpmnModel     流程模型
      * @param currentTask   当前退回的任务
      * @param targetElement 需要退回到的目标任务
      * @param reqVO         前端参数封装
      */
-    public void returnTask(Long userId, Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
+    public void returnTask(Long userId, BpmnModel bpmnModel, Task currentTask, FlowElement targetElement, BpmTaskReturnReqVO reqVO) {
         // 1. 获得所有需要回撤的任务 taskDefinitionKey，用于稍后的 moveActivityIdsToSingleActivityId 回撤
         // 1.1 获取所有正常进行的任务节点 Key
         List<Task> taskList = taskService.createTaskQuery().processInstanceId(currentTask.getProcessInstanceId()).list();
@@ -915,16 +937,52 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
         });
 
-        // 3. 设置流程变量节点驳回标记：用于驳回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略。导致自动通过
-        runtimeService.setVariable(currentTask.getProcessInstanceId(),
-                String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE);
+        // 3. 构建需要预测的任务流程变量
+        // TODO @jason：【驳回预测相关】是不是搞成一个变量，里面是 set 更简洁一点呀？
+        Set<String> taskDefinitionKeyList = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
+        Map<String, Object> needSimulateVariables = convertMap(taskDefinitionKeyList,
+                taskId -> StrUtil.concat(false, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, taskId), item -> Boolean.TRUE);
+
         // 4. 执行驳回
         // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
         // 当多实例任务回退的时候有问题。相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
+                // 设置需要预测的任务流程变量，用于辅助预测
+                .processVariables(needSimulateVariables)
+                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
+                .localVariable(reqVO.getTargetTaskDefinitionKey(),
+                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()),
+                        Boolean.TRUE)
                 .changeState();
+    }
+
+    private Set<String> getNeedSimulateTaskDefinitionKeys(BpmnModel bpmnModel, Task currentTask, FlowElement targetElement) {
+        // 1. 获取需要预测的任务的 definition key。因为当前任务还没完成，也需要预测
+        Set<String> taskDefinitionKeys = CollUtil.newHashSet(currentTask.getTaskDefinitionKey());
+
+        // 2.1 从已结束任务中找到要回退的目标任务，按时间倒序最近的一个目标任务
+        List<HistoricTaskInstance> endTaskList = CollectionUtils.filterList(
+                getTaskListByProcessInstanceId(currentTask.getProcessInstanceId(), Boolean.FALSE),
+                item -> item.getEndTime() != null);
+        // 2.2 遍历已结束的任务，找到在 targetTask 之后生成的任务，且串行可达的任务
+        HistoricTaskInstance targetTask = findFirst(endTaskList,
+                item -> item.getTaskDefinitionKey().equals(targetElement.getId()));
+        // TODO @jason：【驳回预测相关】是不是 if targetTask 先判空？
+        endTaskList.forEach(item -> {
+            FlowElement element = getFlowElementById(bpmnModel, item.getTaskDefinitionKey());
+            // 如果已结束的任务在回退目标节点之后生成，且串行可达，则标记为需要预算节点
+            // TODO 串行可达的方法需要和判断可回退节点 validateTargetTaskCanReturn 分开吗？ 并行网关可能会有问题。
+            // TODO @jason：【驳回预测相关】这里是不是判断 element 哈？
+            if (targetTask != null
+                    // TODO @jason：【驳回预测相关】这里直接 createTime 的 compare 更简单？因为不太会出现空哈。
+                    && DateUtil.compare(item.getCreateTime(), targetTask.getCreateTime()) > 0
+                    && BpmnModelUtils.isSequentialReachable(element, targetElement, null)) {
+                taskDefinitionKeys.add(item.getTaskDefinitionKey());
+            }
+        });
+        return taskDefinitionKeys;
     }
 
     @Override
@@ -1438,12 +1496,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     return;
                 }
                 FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略
-                // TODO 芋艿：【优化】未来有没更好的判断方式？！另外，还要考虑清理机制。就是说，下次处理了之后，就移除这个标识
-                Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
-                        String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
+                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略（使用 local variable）
+                Boolean returnTaskFlag = runtimeService.getVariableLocal(task.getExecutionId(),
+                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
                 Boolean skipStartUserNodeFlag = Convert.toBool(runtimeService.getVariable(processInstance.getProcessInstanceId(),
-                        PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
+                        BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
                         || BooleanUtil.isTrue(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核

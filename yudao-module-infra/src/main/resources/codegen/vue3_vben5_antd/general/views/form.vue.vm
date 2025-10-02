@@ -1,12 +1,15 @@
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 import type { Rule } from 'ant-design-vue/es/form';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+
+import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
-import { DICT_TYPE, getDictOptions } from '#/utils';
 #if($table.templateType == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 import { handleTree } from '@vben/utils'
@@ -20,7 +23,6 @@ import { handleTree } from '@vben/utils'
   #end
 #end
 
-import { computed, ref } from 'vue';
 import { $t } from '#/locales';
 import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
@@ -70,7 +72,7 @@ const getTitle = computed(() => {
 #end
 
 /** 重置表单 */
-const resetForm = () => {
+function resetForm() {
   formData.value = {
     #foreach ($column in $columns)
       #if ($column.createOperation || $column.updateOperation)
@@ -88,7 +90,7 @@ const resetForm = () => {
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 /** 获得${table.classComment}树 */
-const get${simpleClassName}Tree = async () => {
+async function get${simpleClassName}Tree() {
   ${classNameVar}Tree.value = []
   const data = await get${simpleClassName}List({});
   data.unshift({
@@ -147,7 +149,6 @@ const [Modal, modalApi] = useVbenModal({
       emit('success');
       message.success({
         content: $t('ui.actionMessage.operationSuccess'),
-        key: 'action_process_msg',
       });
     } finally {
       modalApi.unlock();

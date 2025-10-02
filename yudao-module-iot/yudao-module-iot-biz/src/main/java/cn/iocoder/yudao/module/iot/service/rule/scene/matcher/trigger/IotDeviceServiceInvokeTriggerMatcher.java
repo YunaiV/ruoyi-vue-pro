@@ -9,14 +9,12 @@ import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatche
 import org.springframework.stereotype.Component;
 
 /**
- * 设备服务调用触发器匹配器
- * <p>
- * 处理设备服务调用的触发器匹配逻辑
+ * 设备服务调用触发器匹配器：处理设备服务调用的触发器匹配逻辑
  *
  * @author HUIHUI
  */
 @Component
-public class DeviceServiceInvokeTriggerMatcher implements IotSceneRuleTriggerMatcher {
+public class IotDeviceServiceInvokeTriggerMatcher implements IotSceneRuleTriggerMatcher {
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -46,7 +44,7 @@ public class DeviceServiceInvokeTriggerMatcher implements IotSceneRuleTriggerMat
 
         // 2. 对于服务调用触发器，通常只需要匹配服务标识符即可
         // 不需要检查操作符和值，因为服务调用本身就是触发条件
-        // TODO @puhui999: 服务调用时校验输入参数是否匹配条件
+        // TODO @puhui999: 服务调用时校验输入参数是否匹配条件？
         IotSceneRuleMatcherHelper.logTriggerMatchSuccess(message, trigger);
         return true;
     }

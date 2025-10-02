@@ -68,8 +68,11 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             payConfig.setKeyPath(FileUtils.createTempFile(Base64.decode(config.getKeyContent())).getPath());
         } else if (Objects.equals(config.getApiVersion(), API_VERSION_V3)) {
             payConfig.setPrivateKeyPath(FileUtils.createTempFile(config.getPrivateKeyContent()).getPath());
-            payConfig.setPublicKeyPath(FileUtils.createTempFile(config.getPublicKeyContent()).getPath());
-            // 特殊：强制使用微信公用模式，避免灰度期间的问题！！！
+            // 参考 https://gitee.com/yudaocode/yudao-ui-admin-vue3/issues/ICUE53 和 https://t.zsxq.com/ODR5V
+            if (StrUtil.isNotBlank(config.getPublicKeyContent())) {
+                payConfig.setPrivateCertPath(FileUtils.createTempFile(Base64.decode(config.getPublicKeyContent())).getPath());
+            }
+            // 特殊：强制使用微信公钥模式，避免灰度期间的问题！！！
             payConfig.setStrictlyNeedWechatPaySerial(true);
         }
 

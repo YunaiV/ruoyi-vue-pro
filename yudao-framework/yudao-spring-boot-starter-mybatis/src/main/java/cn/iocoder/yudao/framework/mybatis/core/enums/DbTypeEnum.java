@@ -60,6 +60,12 @@ public enum DbTypeEnum {
      * 人大金仓
      */
     KINGBASE_ES(DbType.KINGBASE_ES, "KingbaseES", "POSITION('#{value}' IN #{column}) <> 0"),
+
+    /**
+     * OceanBase
+     */
+    OCEAN_BASE(DbType.OCEAN_BASE, "OceanBase", "FIND_IN_SET('#{value}', #{column}) <> 0")
+
     ;
 
     public static final Map<String, DbTypeEnum> MAP_BY_NAME = Arrays.stream(values())

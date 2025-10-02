@@ -100,6 +100,10 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "任务后置通知设置", example = "{}")
     private HttpRequestSetting taskAfterTriggerSetting;
 
+    @Schema(description = "自定义打印模板设置", example = "{}")
+    @Valid
+    private PrintTemplateSetting printTemplateSetting;
+
     @Schema(description = "流程 ID 规则")
     @Data
     @Valid
@@ -177,6 +181,19 @@ public class BpmModelMetaInfoVO {
          */
         @Schema(description = "请求返回处理设置", example = "[]")
         private List<KeyValue<String, String>> response;
+
+    }
+
+    @Schema(description = "自定义打印模板设置")
+    @Data
+    public static class PrintTemplateSetting {
+
+        @Schema(description = "是否自定义打印模板", example = "false")
+        @NotNull(message = "是否自定义打印模板不能为空")
+        private Boolean enable;
+
+        @Schema(description = "打印模板", example = "<p></p>")
+        private String template;
 
     }
 

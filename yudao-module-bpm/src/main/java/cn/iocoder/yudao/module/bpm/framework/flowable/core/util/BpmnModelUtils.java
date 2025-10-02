@@ -658,10 +658,11 @@ public class BpmnModelUtils {
 
         // 根据类型，获取入口连线
         List<SequenceFlow> sequenceFlows = getElementIncomingFlows(source);
+        // 1. 没有入口连线，则返回 false
         if (CollUtil.isEmpty(sequenceFlows)) {
-            return true;
+            return false;
         }
-        // 循环找到目标元素
+        // 2. 循环找目标元素, 找到目标节点
         for (SequenceFlow sequenceFlow : sequenceFlows) {
             // 如果发现连线重复，说明循环了，跳过这个循环
             if (visitedElements.contains(sequenceFlow.getId())) {
@@ -669,21 +670,22 @@ public class BpmnModelUtils {
             }
             // 添加已经走过的连线
             visitedElements.add(sequenceFlow.getId());
-            // 这条线路存在目标节点，这条线路完成，进入下个线路
+            // 这条线路存在目标节点，直接返回 true
             FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
             if (target.getId().equals(sourceFlowElement.getId())) {
+               return true;
+            }
+            // 如果目标节点为并行网关，跳过这个循环 (TODO 疑问：这个判断作用是防止回退到并行网关分支上的节点吗？）
+            if (sourceFlowElement instanceof ParallelGateway) {
                 continue;
             }
-            // 如果目标节点为并行网关，则不继续
-            if (sourceFlowElement instanceof ParallelGateway) {
-                return false;
-            }
-            // 否则就继续迭代
-            if (!isSequentialReachable(sourceFlowElement, target, visitedElements)) {
-                return false;
+            // 继续迭代，如果找到目标节点直接返回 true
+            if (isSequentialReachable(sourceFlowElement, target, visitedElements)) {
+                return true;
             }
         }
-        return true;
+        // 未找到返回 false
+        return false;
     }
 
     /**
@@ -783,7 +785,6 @@ public class BpmnModelUtils {
         return resultElements;
     }
 
-    @SuppressWarnings("PatternVariableCanBeUsed")
     private static void simulateNextFlowElements(FlowElement currentElement, Map<String, Object> variables,
                                                  List<FlowElement> resultElements, Set<FlowElement> visitElements) {
         // 如果为空，或者已经遍历过，则直接结束

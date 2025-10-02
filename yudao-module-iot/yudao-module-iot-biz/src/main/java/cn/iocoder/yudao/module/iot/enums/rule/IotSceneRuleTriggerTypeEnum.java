@@ -19,7 +19,6 @@ import java.util.Arrays;
 @Getter
 public enum IotSceneRuleTriggerTypeEnum implements ArrayValuable<Integer> {
 
-    // TODO @芋艿：后续“对应”部分，要 @下，等包结构梳理完；
     /**
      * 设备上下线变更
      *

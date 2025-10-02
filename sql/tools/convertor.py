@@ -6,12 +6,12 @@ Author: dhb52 (https://gitee.com/dhb52)
 pip install simple-ddl-parser
 
 or with uv
-uv run --with simple-ddl-parser convertor.py postgres > ../postgresql/ruoyi-vue-pro.sql                                         239ms  四  5/22 21:03:16 2025
-uv run --with simple-ddl-parser convertor.py sqlserver > ../sqlserver/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py kingbase > ../kingbase/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py opengauss > ../opengauss/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py oracle > ../oracle/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py dm8 > ../dm/ruoyi-vue-pro-dm8.sql
+uv run --with simple-ddl-parser convertor.py postgres ../mysql/ruoyi-vue-pro.sql > ../postgresql/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py sqlserver ../mysql/ruoyi-vue-pro.sql > ../sqlserver/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py kingbase ../mysql/ruoyi-vue-pro.sql > ../kingbase/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py opengauss ../mysql/ruoyi-vue-pro.sql > ../opengauss/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py oracle ../mysql/ruoyi-vue-pro.sql > ../oracle/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py dm8 ../mysql/ruoyi-vue-pro.sql > ../dm/ruoyi-vue-pro-dm8.sql
 """
 
 import argparse
@@ -23,6 +23,9 @@ from abc import ABC, abstractmethod
 from typing import Dict, Generator, Optional, Tuple, Union
 
 from simple_ddl_parser import DDLParser
+
+# 避免 Windows 系统使用默认的 GBK 编码
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
 
 PREAMBLE = """/*
  Yudao Database Transfer Tool
@@ -919,9 +922,15 @@ def main():
         help="目标数据库类型",
         choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
     )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="源数据库脚本路径",
+        default="../mysql/ruoyi-vue-pro.sql"
+    )
     args = parser.parse_args()
 
-    sql_file = pathlib.Path("../mysql/ruoyi-vue-pro.sql").resolve().as_posix()
+    sql_file = pathlib.Path(args.path).resolve().as_posix()
     convertor = None
     if args.type == "postgres":
         convertor = PostgreSQLConvertor(sql_file)
