@@ -103,7 +103,6 @@ yudao:
           port: 1883
           max-message-size: 8192
           connect-timeout-seconds: 60
-          keep-alive-timeout-seconds: 300
           ssl-enabled: false
 
 --- #################### 日志相关配置 ####################

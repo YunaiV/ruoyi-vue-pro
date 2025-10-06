@@ -17,15 +17,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * 当前时间条件匹配器
- * <p>
- * 处理时间相关的子条件匹配逻辑
+ * 当前时间条件匹配器：处理时间相关的子条件匹配逻辑
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
-public class CurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher {
+public class IotCurrentTimeConditionMatcher implements IotSceneRuleConditionMatcher {
 
     /**
      * 时间格式化器 - HH:mm:ss

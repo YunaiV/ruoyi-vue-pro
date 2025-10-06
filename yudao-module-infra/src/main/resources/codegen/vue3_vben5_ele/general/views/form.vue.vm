@@ -3,10 +3,11 @@ import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleCl
 import type { FormRules } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
-import { DICT_TYPE, getDictOptions } from '#/utils';
 #if($table.templateType == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 import { handleTree } from '@vben/utils'

@@ -81,7 +81,6 @@ public class WxPayClientConfig implements PayClientConfig {
     /**
      * pub_key.pem 证书文件的对应字符串
      */
-    @NotBlank(message = "pub_key.pem 不能为空", groups = V3.class)
     private String publicKeyContent;
     @NotBlank(message = "publicKeyId 不能为空", groups = V3.class)
     private String publicKeyId;

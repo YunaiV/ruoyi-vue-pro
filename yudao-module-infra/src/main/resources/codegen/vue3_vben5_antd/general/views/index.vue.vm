@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-import type { VxeTableInstance } from '#/adapter/vxe-table';
+
+import { ref, h, reactive, onMounted, nextTick } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { cloneDeep, formatDateTime } from '@vben/utils';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
+import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
 import { Button, message,Tabs,Pagination,Form,RangePicker,DatePicker,Select,Input } from 'ant-design-vue';
-import { DictTag } from '#/components/dict-tag';
-import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
 import ${simpleClassName}Form from './modules/form.vue';
 import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
 import { ContentWrap } from '#/components/content-wrap';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-import { TableToolbar } from '#/components/table-toolbar';
-import { useTableToolbar } from '#/hooks';
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
@@ -23,7 +23,6 @@ import { useTableToolbar } from '#/hooks';
     #end
 #end
 
-import { ref, h, reactive,onMounted,nextTick } from 'vue';
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
 import { handleTree,isEmpty } from '@vben/utils'
@@ -77,7 +76,7 @@ const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
 
 /** 查询列表 */
-const getList = async () => {
+async function getList() {
   loading.value = true
   try {
     const params = cloneDeep(queryParams) as any;
@@ -104,7 +103,7 @@ const getList = async () => {
 }
 
 /** 搜索按钮操作 */
-const handleQuery = () => {
+function handleQuery() {
 #if ( $table.templateType != 2 )
   queryParams.pageNo = 1
 #end
@@ -112,7 +111,7 @@ const handleQuery = () => {
 }
 
 /** 重置按钮操作 */
-const resetQuery = () => {
+function resetQuery() {
   queryFormRef.value.resetFields()
   handleQuery()
 }
@@ -124,7 +123,7 @@ const [FormModal, formModalApi] = useVbenModal({
 
 /** 创建${table.classComment} */
 function handleCreate() {
-  formModalApi.setData({}).open();
+  formModalApi.setData(null).open();
 }
 
 /** 编辑${table.classComment} */
@@ -144,14 +143,10 @@ async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
-    key: 'action_process_msg',
   });
   try {
-    await delete${simpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_process_msg',
-    });
+    await delete${simpleClassName}(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     await getList();
   } finally {
     hideLoading();
@@ -164,12 +159,11 @@ async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
     duration: 0,
-    key: 'action_process_msg',
   });
   try {
     await delete${simpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success( $t('ui.actionMessage.deleteSuccess') );
+    message.success($t('ui.actionMessage.deleteSuccess'));
     await getList();
   } finally {
     hideLoading();
@@ -182,12 +176,12 @@ function handleRowCheckboxChange({
 }: {
   records: ${simpleClassName}Api.${simpleClassName}[];
 }) {
-  checkedIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id!);
 }
 #end
 
 /** 导出表格 */
-async function onExport() {
+async function handleExport() {
 try {
   exportLoading.value = true;
   const data = await export${simpleClassName}(queryParams);
@@ -200,7 +194,7 @@ try {
 #if (${table.templateType} == 2)
 /** 切换树形展开/收缩状态 */
 const isExpanded = ref(true);
-function toggleExpand() {
+function handleExpand() {
   isExpanded.value = !isExpanded.value;
   tableRef.value?.setAllTreeExpand(isExpanded.value);
 }
@@ -303,12 +297,12 @@ onMounted(() => {
     <!-- 列表 -->
     <ContentWrap title="${table.classComment}">
       <template #extra>
-        <TableToolbar
+        <VbenVxeTableToolbar
             ref="tableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
-          <Button @click="toggleExpand" class="mr-2">
+          <Button @click="handleExpand" class="mr-2">
             {{ isExpanded ? '收缩' : '展开' }}
           </Button>
         #end
@@ -326,7 +320,7 @@ onMounted(() => {
               type="primary"
               class="ml-2"
               :loading="exportLoading"
-              @click="onExport"
+              @click="handleExport"
               v-access:code="['${permissionPrefix}:export']"
           >
             {{ $t('ui.actionTitle.export') }}

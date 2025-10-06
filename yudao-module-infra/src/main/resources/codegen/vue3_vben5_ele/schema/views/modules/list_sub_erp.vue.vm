@@ -5,9 +5,10 @@
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
 #if ($table.templateType == 11) ## erp
 import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
@@ -41,6 +42,19 @@ const [FormModal, formModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
+/** 刷新表格 */
+async function handleRefresh() {
+#if ($table.templateType == 11) ## erp
+  await gridApi.query();
+#else
+  #if ($subTable.subJoinMany) ## 一对多
+  await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+  #else
+  await gridApi.grid.loadData([await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)]);
+  #end
+#end
+}
+
 /** 创建${subTable.classComment} */
 function handleCreate() {
   if (!props.${subJoinColumn.javaField}){
@@ -51,20 +65,19 @@ function handleCreate() {
 }
 
 /** 编辑${subTable.classComment} */
-function handleEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
+function handleEdit(row: ${apiName}.${subSimpleClassName}) {
   formModalApi.setData(row).open();
 }
 
 /** 删除${subTable.classComment} */
-async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
+async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting', [row.id]),
-    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
-    await delete${subSimpleClassName}(row.id as number);
+    await delete${subSimpleClassName}(row.id!);
     ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
-    onRefresh();
+    handleRefresh();
   } finally {
     loadingInstance.close();
   }
@@ -75,13 +88,12 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 async function handleDeleteBatch() {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting'),
-    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
     ElMessage.success($t('ui.actionMessage.deleteSuccess'));
-    onRefresh();
+    handleRefresh();
   } finally {
     loadingInstance.close();
   }
@@ -91,9 +103,9 @@ const checkedIds = ref<number[]>([])
 function handleRowCheckboxChange({
   records,
 }: {
-  records: ${simpleClassName}Api.${subSimpleClassName}[];
+  records: ${apiName}.${subSimpleClassName}[];
 }) {
-  checkedIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id!);
 }
 #end
 
@@ -143,7 +155,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     keyField: 'id',
     isHover: true,
   },
-  } as VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>,
+  } as VxeTableGridOptions<${apiName}.${subSimpleClassName}>,
   #if (${table.templateType} == 11 && $deleteBatchEnable)
   gridEvents:{
     checkboxAll: handleRowCheckboxChange,
@@ -151,19 +163,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
   }
   #end
 });
-
-/** 刷新表格 */
-async function onRefresh() {
-#if ($table.templateType == 11) ## erp
-  await gridApi.query();
-#else
-  #if ($subTable.subJoinMany) ## 一对多
-  await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
-  #else
-  await gridApi.grid.loadData([await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)]);
-  #end
-#end
-}
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
@@ -173,7 +172,7 @@ watch(
       return;
     }
     await nextTick();
-    await onRefresh()
+    await handleRefresh()
   },
   { immediate: true },
 );
@@ -181,7 +180,7 @@ watch(
 
 <template>
     #if ($table.templateType == 11) ## erp
-      <FormModal @success="onRefresh" />
+      <FormModal @success="handleRefresh" />
       <Grid table-title="${subTable.classComment}列表">
         <template #toolbar-tools>
           <TableAction
@@ -211,7 +210,8 @@ watch(
             :actions="[
               {
                 label: $t('common.edit'),
-                type: 'text',
+                type: 'primary',
+                link: true,
                 icon: ACTION_ICON.EDIT,
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
                 onClick: handleEdit.bind(null, row),
@@ -219,7 +219,7 @@ watch(
               {
                 label: $t('common.delete'),
                 type: 'danger',
-                text: true,
+                link: true,
                 icon: ACTION_ICON.DELETE,
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
                 popConfirm: {

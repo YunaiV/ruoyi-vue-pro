@@ -2,21 +2,24 @@
 #set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
-
-  import { useVbenModal } from '@vben/common-ui';
-  import { ElMessage } from 'element-plus';
+  import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
   import { computed, ref } from 'vue';
-  import { $t } from '#/locales';
+
+  import { useVbenModal } from '@vben/common-ui';
+
+  import { ElMessage } from 'element-plus';
+
   import { useVbenForm } from '#/adapter/form';
   import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+  import { $t } from '#/locales';
 
   import { use${subSimpleClassName}FormSchema } from '../data';
 
   const emit = defineEmits(['success']);
-  const formData = ref<${simpleClassName}Api.${subSimpleClassName}>();
+  const formData = ref<${apiName}.${subSimpleClassName}>();
   const getTitle = computed(() => {
     return formData.value?.id
         ? $t('ui.actionTitle.edit', ['${subTable.classComment}'])
@@ -45,7 +48,7 @@
 
       modalApi.lock();
       // 提交表单
-      const data = (await formApi.getValues()) as ${simpleClassName}Api.${subSimpleClassName};
+      const data = (await formApi.getValues()) as ${apiName}.${subSimpleClassName};
       data.${subJoinColumn.javaField} = formData.value?.${subJoinColumn.javaField};
       try {
         await (formData.value?.id ? update${subSimpleClassName}(data) : create${subSimpleClassName}(data));
@@ -64,7 +67,7 @@
       }
 
       // 加载数据
-      let data = modalApi.getData<${simpleClassName}Api.${subSimpleClassName}>();
+      let data = modalApi.getData<${apiName}.${subSimpleClassName}>();
       if (!data) {
         return;
       }

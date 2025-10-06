@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -12,6 +14,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -72,6 +75,7 @@ import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmA
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum.REJECT_CHILD_PROCESS;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseNodeType;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -187,6 +191,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (CollUtil.isNotEmpty(reqVO.getProcessVariables())) {
             processVariables.putAll(reqVO.getProcessVariables());
         }
+        // 特殊：如果是未发起的场景，则设置发起用户，解决“发起流程”时，需要使用到该变量的问题。例如说：https://t.zsxq.com/fMw5g
+        if (historicProcessInstance == null) {
+            processVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, loginUserId);
+        }
         // 1.3 读取其它相关数据
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
                 historicProcessInstance != null ? historicProcessInstance.getProcessDefinitionId()
@@ -218,10 +226,24 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 3.1 计算当前登录用户的待办任务
         BpmTaskRespVO todoTask = taskService.getTodoTask(loginUserId, reqVO.getTaskId(), reqVO.getProcessInstanceId());
-        // 3.2 预测未运行节点的审批信息
+
+        // 3.2 获取由于退回操作，需要预测的节点。从流程变量中获取，回退操作会设置这些变量
+        Set<String> needSimulateTaskDefKeysByReturn = new HashSet<>();
+        if (StrUtil.isNotEmpty(reqVO.getProcessInstanceId())) {
+            Map<String, Object> variables = runtimeService.getVariables(reqVO.getProcessInstanceId());
+            Map<String, Object> simulateTaskVariables = MapUtil.filter(variables,
+                    item -> item.getKey().startsWith(PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX));
+            simulateTaskVariables.forEach((key, value) ->
+                    needSimulateTaskDefKeysByReturn.add(StrUtil.removePrefix(key, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX)));
+        }
+        // 移除运行中的节点，运行中的节点无需预测
+        // TODO @jason：是不是 foreach runActivityNodes，然后移除 needSimulateTaskDefKeysByReturn 更好？（理解成本低一点）
+        CollectionUtils.convertList(runActivityNodes, ActivityNode::getId).forEach(needSimulateTaskDefKeysByReturn::remove);
+
+        // 3.3 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
-                processVariables, activities);
+                processVariables, activities, needSimulateTaskDefKeysByReturn);
 
         // 4. 拼接最终数据
         return buildApprovalDetail(reqVO, bpmnModel, processDefinition, processDefinitionInfo, historicProcessInstance,
@@ -461,7 +483,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     /**
-     *  获取结束节点的状态
+     * 获取结束节点的状态
      */
     private Integer getEndActivityNodeStatus(HistoricTaskInstance task) {
         Integer status = FlowableUtils.getTaskStatus(task);
@@ -546,7 +568,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     private List<ActivityNode> getSimulateApproveNodeList(Long startUserId, BpmnModel bpmnModel,
                                                           BpmProcessDefinitionInfoDO processDefinitionInfo,
                                                           Map<String, Object> processVariables,
-                                                          List<HistoricActivityInstance> activities) {
+                                                          List<HistoricActivityInstance> activities,
+                                                          Set<String> needSimulateTaskDefKeysByReturn) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
         Set<String> runActivityIds = convertSet(activities, HistoricActivityInstance::getActivityId);
@@ -555,7 +578,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             List<FlowElement> flowElements = BpmnModelUtils.simulateProcess(bpmnModel, processVariables);
             return convertList(flowElements, flowElement -> buildNotRunApproveNodeForBpmn(
                     startUserId, bpmnModel, flowElements,
-                    processDefinitionInfo, processVariables, flowElement, runActivityIds));
+                    processDefinitionInfo, processVariables, flowElement, runActivityIds, needSimulateTaskDefKeysByReturn));
         }
         // 情况二：SIMPLE 设计器
         if (Objects.equals(BpmModelTypeEnum.SIMPLE.getType(), processDefinitionInfo.getModelType())) {
@@ -564,17 +587,19 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             List<BpmSimpleModelNodeVO> simpleNodes = SimpleModelUtils.simulateProcess(simpleModel, processVariables);
             return convertList(simpleNodes, simpleNode -> buildNotRunApproveNodeForSimple(
                     startUserId, bpmnModel,
-                    processDefinitionInfo, processVariables, simpleNode, runActivityIds));
+                    processDefinitionInfo, processVariables, simpleNode, runActivityIds, needSimulateTaskDefKeysByReturn));
         }
         throw new IllegalArgumentException("未知设计器类型：" + processDefinitionInfo.getModelType());
     }
 
     private ActivityNode buildNotRunApproveNodeForSimple(Long startUserId, BpmnModel bpmnModel,
                                                          BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
-                                                         BpmSimpleModelNodeVO node, Set<String> runActivityIds) {
+                                                         BpmSimpleModelNodeVO node, Set<String> runActivityIds,
+                                                         Set<String> needSimulateTaskDefKeysByReturn) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
-        if (runActivityIds.contains(node.getId())) {
+        if (runActivityIds.contains(node.getId())
+                && !needSimulateTaskDefKeysByReturn.contains(node.getId())) { // 特殊：回退操作时候，会记录需要预测的节点到流程变量中。即使在历史操作中，也需要预测
             return null;
         }
         Integer status = BpmTaskStatusEnum.NOT_START.getStatus();
@@ -621,13 +646,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     private ActivityNode buildNotRunApproveNodeForBpmn(Long startUserId, BpmnModel bpmnModel, List<FlowElement> flowElements,
                                                        BpmProcessDefinitionInfoDO processDefinitionInfo,
                                                        Map<String, Object> processVariables,
-                                                       FlowElement node, Set<String> runActivityIds) {
-        if (runActivityIds.contains(node.getId())) {
+                                                       FlowElement node, Set<String> runActivityIds,
+                                                       Set<String> needSimulateTaskDefKeysByReturn) {
+        // 回退操作时候，会记录需要预测的节点到流程变量中。即使节点在历史操作中，也需要预测。
+        if (!needSimulateTaskDefKeysByReturn.contains(node.getId()) && runActivityIds.contains(node.getId())) {
             return null;
         }
+
         Integer status = BpmTaskStatusEnum.NOT_START.getStatus();
         // 如果节点被跳过，状态设置为跳过
-        if(BpmnModelUtils.isSkipNode(node, processVariables)){
+        if (BpmnModelUtils.isSkipNode(node, processVariables)) {
             status = BpmTaskStatusEnum.SKIP.getStatus();
         }
         ActivityNode activityNode = new ActivityNode().setId(node.getId())

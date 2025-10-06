@@ -43,7 +43,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     // ========== 设备配置 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/remote-configuration-1
 
-    CONFIG_PUSH("thing.config.push", "配置推送", true),
+    CONFIG_PUSH("thing.config.push", "配置推送", false),
 
     // ========== OTA 固件 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/perform-ota-updates

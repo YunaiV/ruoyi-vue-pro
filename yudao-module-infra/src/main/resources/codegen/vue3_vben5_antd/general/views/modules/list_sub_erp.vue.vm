@@ -6,48 +6,50 @@
 #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-  import type { VxeTableInstance } from '#/adapter/vxe-table';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { VxeTableInstance } from '#/adapter/vxe-table';
 
-  import { DictTag } from '#/components/dict-tag';
-  import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
-  import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-  import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
-  import { cloneDeep, formatDateTime } from '@vben/utils';
-  import { ContentWrap } from '#/components/content-wrap';
+import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
+
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+
+import { DictTag } from '#/components/dict-tag';
+import { getRangePickerDefaultProps } from '#/utils';
+import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+import { ContentWrap } from '#/components/content-wrap';
 
 #if ($table.templateType == 11) ## erp
-    import { useVbenModal } from '@vben/common-ui';
-    import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
-    import { Tinymce as RichTextarea } from '#/components/tinymce';
-    import { ImageUpload, FileUpload } from "#/components/upload";
-    import { message,Button, Tabs,Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox,RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
-    import { Plus, Trash2 } from '@vben/icons';
-    import { $t } from '#/locales';
-    import { TableToolbar } from '#/components/table-toolbar';
-    import { useTableToolbar } from '#/hooks';
+import { useVbenModal } from '@vben/common-ui';
+import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
+import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { message,Button, Tabs,Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox,RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
+import { Plus, Trash2 } from '@vben/icons';
+import { $t } from '#/locales';
 #end
 
 #if ($table.templateType == 11) ## erp
-    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-    import { isEmpty } from '@vben/utils';
-  #else
-  #if ($subTable.subJoinMany) ## 一对多
-  import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-  #else
-  import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-  #end
+import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { isEmpty } from '@vben/utils';
+#else
+#if ($subTable.subJoinMany) ## 一对多
+import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+#else
+import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+#end
 #end
 
 const props = defineProps<{
-      ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
+  ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
 
 #if ($table.templateType == 11) ## erp
-  const [FormModal, formModalApi] = useVbenModal({
-    connectedComponent: ${subSimpleClassName}Form,
-    destroyOnClose: true,
-  });
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: ${subSimpleClassName}Form,
+  destroyOnClose: true,
+});
 
 /** 创建${subTable.classComment} */
 function handleCreate() {
@@ -68,14 +70,10 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
-    key: 'action_process_msg',
   });
   try {
-    await delete${subSimpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_process_msg',
-    });
+    await delete${subSimpleClassName}(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     await getList();
   } finally {
     hideLoading();
@@ -88,12 +86,11 @@ async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
     duration: 0,
-    key: 'action_process_msg',
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success( $t('ui.actionMessage.deleteSuccess') );
+    message.success($t('ui.actionMessage.deleteSuccess'));
     await getList();
   } finally {
     hideLoading();
@@ -106,92 +103,92 @@ function handleRowCheckboxChange({
 }: {
   records: ${simpleClassName}Api.${subSimpleClassName}[];
 }) {
-  checkedIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id!);
 }
 #end
 #end
 
-  const loading = ref(true) // 列表的加载中
-  const list = ref<${simpleClassName}Api.${subSimpleClassName}[]>([]) // 列表的数据
+const loading = ref(true) // 列表的加载中
+const list = ref<${simpleClassName}Api.${subSimpleClassName}[]>([]) // 列表的数据
 #if ($table.templateType == 11) ## erp
-  const total = ref(0) // 列表的总页数
+const total = ref(0) // 列表的总页数
 #end
 #if ($table.templateType == 11) ## erp
-  const queryFormRef = ref() // 搜索的表单
-  const queryParams = reactive({
-      pageNo: 1,
-      pageSize: 10,
-      #foreach ($column in $subColumns)
-          #if ($column.listOperation)
-              #if ($column.listOperationCondition != 'BETWEEN')
-                      $column.javaField: undefined,
-              #end
-              #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
-                      $column.javaField: undefined,
-              #end
-          #end
+const queryFormRef = ref() // 搜索的表单
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+  #foreach ($column in $subColumns)
+    #if ($column.listOperation)
+      #if ($column.listOperationCondition != 'BETWEEN')
+            $column.javaField: undefined,
       #end
-  })
+      #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+            $column.javaField: undefined,
+      #end
+    #end
+  #end
+})
 
 /** 搜索按钮操作 */
-const handleQuery = () => {
+function handleQuery() {
   queryParams.pageNo = 1
   getList()
 }
 
 /** 重置按钮操作 */
-const resetQuery = () => {
+function resetQuery() {
   queryFormRef.value.resetFields()
   handleQuery()
 }
 #end
   /** 查询列表 */
-  const getList = async () => {
-    loading.value = true
-    try {
-      if (!props.${subJoinColumn.javaField}){
-        return []
-      }
-        ## 特殊：树表专属逻辑（树不需要分页接口）
-        #if ($table.templateType == 11) ## erp
-          const params = cloneDeep(queryParams) as any;
-            #foreach ($column in $columns)
-                #if ($column.listOperation)
-                    #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
-                      if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
-                        params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
-                      }
-                    #end
-                #end
-            #end
-          params.${subJoinColumn.javaField} = props.${subJoinColumn.javaField};
-          const data = await get${subSimpleClassName}Page(params)
-          list.value = data.list
-          total.value = data.total
-        #else
-            #if ($subTable.subJoinMany) ## 一对多
-             list.value = await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
-            #else
-             list.value = [await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)];
-            #end
-        #end
-    } finally {
-      loading.value = false
+async function getList() {
+  loading.value = true
+  try {
+    if (!props.${subJoinColumn.javaField}){
+      return []
     }
+      ## 特殊：树表专属逻辑（树不需要分页接口）
+      #if ($table.templateType == 11) ## erp
+        const params = cloneDeep(queryParams) as any;
+          #foreach ($column in $columns)
+              #if ($column.listOperation)
+                  #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                    if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
+                      params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
+                    }
+                  #end
+              #end
+          #end
+        params.${subJoinColumn.javaField} = props.${subJoinColumn.javaField};
+        const data = await get${subSimpleClassName}Page(params)
+        list.value = data.list
+        total.value = data.total
+      #else
+          #if ($subTable.subJoinMany) ## 一对多
+           list.value = await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
+          #else
+           list.value = [await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)];
+          #end
+      #end
+  } finally {
+    loading.value = false
   }
+}
 
-  /** 监听主表的关联字段的变化，加载对应的子表数据 */
-  watch(
-      () => props.${subJoinColumn.javaField},
-      async (val) => {
-        if (!val) {
-          return;
-        }
-        await nextTick();
-        await getList()
-      },
-      { immediate: true },
-  );
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+  () => props.${subJoinColumn.javaField},
+  async (val) => {
+    if (!val) {
+      return;
+    }
+    await nextTick();
+    await getList()
+  },
+  { immediate: true },
+);
 
 #if ($table.templateType == 11) ## erp
 /** 初始化 */
@@ -292,7 +289,7 @@ onMounted(() => {
         <!-- 列表 -->
         <ContentWrap title="${table.classComment}">
           <template #extra>
-            <TableToolbar
+            <VbenVxeTableToolbar
                 ref="tableToolbarRef"
                 v-model:hidden-search="hiddenSearchBar"
             >

@@ -18,10 +18,8 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
- * IoT 场景规则匹配器工具类
- * <p>
- * 提供通用的条件评估逻辑和工具方法，供触发器和条件匹配器使用
- * <p>
+ * IoT 场景规则匹配器工具类：提供通用的条件评估逻辑和工具方法，供触发器和条件匹配器使用
+ *
  * 该类包含了匹配器实现中常用的工具方法，如条件评估、参数校验、日志记录等
  *
  * @author HUIHUI
@@ -91,7 +89,7 @@ public final class IotSceneRuleMatcherHelper {
         Map<String, Object> springExpressionVariables = new HashMap<>();
 
         // 设置源值
-        springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, sourceValue);
+        springExpressionVariables.put(IotSceneRuleConditionOperatorEnum.SPRING_EXPRESSION_SOURCE, StrUtil.toString(sourceValue));
 
         // 处理参数值
         if (StrUtil.isNotBlank(paramValue)) {

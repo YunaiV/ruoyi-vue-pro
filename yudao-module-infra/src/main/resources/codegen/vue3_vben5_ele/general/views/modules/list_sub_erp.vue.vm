@@ -9,23 +9,25 @@
   import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
   import type { VxeTableInstance } from '#/adapter/vxe-table';
 
-  import { DictTag } from '#/components/dict-tag';
-  import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
-  import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
   import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
-  import { cloneDeep, formatDateTime } from '@vben/utils';
+
+  import { DICT_TYPE } from '@vben/constants';
+  import { getDictOptions } from '@vben/hooks';
+
+  import { DictTag } from '#/components/dict-tag';
+  import { getRangePickerDefaultProps } from '#/utils';
+  import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
   import { ContentWrap } from '#/components/content-wrap';
 
 #if ($table.templateType == 11) ## erp
     import { useVbenModal } from '@vben/common-ui';
+    import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
     import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
     import { Tinymce as RichTextarea } from '#/components/tinymce';
     import { ImageUpload, FileUpload } from "#/components/upload";
     import { ElMessage, ElLoading, ElButton, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
     import { Plus, Trash2 } from '@vben/icons';
     import { $t } from '#/locales';
-    import { TableToolbar } from '#/components/table-toolbar';
-    import { useTableToolbar } from '#/hooks';
 #end
 
 #if ($table.templateType == 11) ## erp
@@ -67,7 +69,6 @@ function handleEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
 async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting', [row.id]),
-    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}(row.id as number);
@@ -83,7 +84,6 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 async function handleDeleteBatch() {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting'),
-    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
@@ -101,7 +101,7 @@ function handleRowCheckboxChange({
 }: {
   records: ${simpleClassName}Api.${subSimpleClassName}[];
 }) {
-  checkedIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id!);
 }
 #end
 #end
@@ -129,64 +129,64 @@ function handleRowCheckboxChange({
   })
 
 /** 搜索按钮操作 */
-const handleQuery = () => {
+function handleQuery() {
   queryParams.pageNo = 1
   getList()
 }
 
 /** 重置按钮操作 */
-const resetQuery = () => {
+function resetQuery() {
   queryFormRef.value.resetFields()
   handleQuery()
 }
 #end
-  /** 查询列表 */
-  const getList = async () => {
-    loading.value = true
-    try {
-      if (!props.${subJoinColumn.javaField}){
-        return []
-      }
-        ## 特殊：树表专属逻辑（树不需要分页接口）
-        #if ($table.templateType == 11) ## erp
-          const params = cloneDeep(queryParams) as any;
-            #foreach ($column in $columns)
-                #if ($column.listOperation)
-                    #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
-                      if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
-                        params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
-                      }
-                    #end
-                #end
-            #end
-          params.${subJoinColumn.javaField} = props.${subJoinColumn.javaField};
-          const data = await get${subSimpleClassName}Page(params)
-          list.value = data.list
-          total.value = data.total
-        #else
-            #if ($subTable.subJoinMany) ## 一对多
-             list.value = await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
-            #else
-             list.value = [await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)];
-            #end
-        #end
-    } finally {
-      loading.value = false
+/** 查询列表 */
+async function getList() {
+  loading.value = true
+  try {
+    if (!props.${subJoinColumn.javaField}){
+      return []
     }
+      ## 特殊：树表专属逻辑（树不需要分页接口）
+      #if ($table.templateType == 11) ## erp
+        const params = cloneDeep(queryParams) as any;
+          #foreach ($column in $columns)
+              #if ($column.listOperation)
+                  #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                    if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
+                      params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
+                    }
+                  #end
+              #end
+          #end
+        params.${subJoinColumn.javaField} = props.${subJoinColumn.javaField};
+        const data = await get${subSimpleClassName}Page(params)
+        list.value = data.list
+        total.value = data.total
+      #else
+          #if ($subTable.subJoinMany) ## 一对多
+           list.value = await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
+          #else
+           list.value = [await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)];
+          #end
+      #end
+  } finally {
+    loading.value = false
   }
+}
 
-  /** 监听主表的关联字段的变化，加载对应的子表数据 */
-  watch(
-      () => props.${subJoinColumn.javaField},
-      async (val) => {
-        if (!val) {
-          return;
-        }
-        await nextTick();
-        await getList()
-      },
-      { immediate: true },
-  );
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+    () => props.${subJoinColumn.javaField},
+    async (val) => {
+      if (!val) {
+        return;
+      }
+      await nextTick();
+      await getList()
+    },
+    { immediate: true },
+);
 
 #if ($table.templateType == 11) ## erp
 /** 初始化 */
@@ -290,7 +290,7 @@ onMounted(() => {
         <!-- 列表 -->
         <ContentWrap title="${table.classComment}">
           <template #extra>
-            <TableToolbar
+            <VbenVxeTableToolbar
                 ref="tableToolbarRef"
                 v-model:hidden-search="hiddenSearchBar"
             >
