@@ -124,8 +124,9 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
-        controlsPosition: 'right',
         placeholder: '请输入${comment}',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
   #end
     },
@@ -326,8 +327,9 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                 component: 'InputNumber',
                                 componentProps: {
                                     min: 0,
-                                    controlsPosition: 'right',
                                     placeholder: '请输入${comment}',
+                                    controlsPosition: 'right',
+                                    class: '!w-full',
                                 },
                             #end
                         },
@@ -560,8 +562,9 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
                                     component: 'InputNumber',
                                     componentProps: {
                                         min: 0,
-                                        controlsPosition: 'right',
                                         placeholder: '请输入${comment}',
+                                        controlsPosition: 'right',
+                                        class: '!w-full',
                                     },
                                 #end
                             },
