@@ -88,6 +88,11 @@ public class IotGatewayProperties {
          */
         private MqttProperties mqtt;
 
+        /**
+         * MQTT WebSocket 组件配置
+         */
+        private MqttWsProperties mqttWs;
+
     }
 
     @Data
@@ -393,6 +398,102 @@ public class IotGatewayProperties {
              * 信任存储路径
              */
             private String trustStorePath;
+            /**
+             * 信任存储密码
+             */
+            private String trustStorePassword;
+
+        }
+
+    }
+
+    @Data
+    public static class MqttWsProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * WebSocket 服务器端口（默认：8083）
+         */
+        private Integer port = 8083;
+
+        /**
+         * WebSocket 路径（默认：/mqtt）
+         */
+        @NotEmpty(message = "WebSocket 路径不能为空")
+        private String path = "/mqtt";
+
+        /**
+         * 最大消息大小（字节）
+         */
+        private Integer maxMessageSize = 8192;
+
+        /**
+         * 连接超时时间（秒）
+         */
+        private Integer connectTimeoutSeconds = 60;
+
+        /**
+         * 保持连接超时时间（秒）
+         */
+        private Integer keepAliveTimeoutSeconds = 300;
+
+        /**
+         * 是否启用 SSL（wss://）
+         */
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL 配置
+         */
+        private SslOptions sslOptions = new SslOptions();
+
+        /**
+         * WebSocket 子协议（通常为 "mqtt" 或 "mqttv3.1"）
+         */
+        @NotEmpty(message = "WebSocket 子协议不能为空")
+        private String subProtocol = "mqtt";
+
+        /**
+         * 最大帧大小（字节）
+         */
+        private Integer maxFrameSize = 65536;
+
+        /**
+         * SSL 配置选项
+         */
+        @Data
+        public static class SslOptions {
+
+            /**
+             * 密钥证书选项
+             */
+            private io.vertx.core.net.KeyCertOptions keyCertOptions;
+
+            /**
+             * 信任选项
+             */
+            private io.vertx.core.net.TrustOptions trustOptions;
+
+            /**
+             * SSL 证书路径
+             */
+            private String certPath;
+
+            /**
+             * SSL 私钥路径
+             */
+            private String keyPath;
+
+            /**
+             * 信任存储路径
+             */
+            private String trustStorePath;
+
             /**
              * 信任存储密码
              */
