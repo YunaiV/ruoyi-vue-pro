@@ -233,8 +233,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     needSimulateTaskDefKeysByReturn.add(StrUtil.removePrefix(key, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX)));
         }
         // 移除运行中的节点，运行中的节点无需预测
-        // TODO @jason：是不是 foreach runActivityNodes，然后移除 needSimulateTaskDefKeysByReturn 更好？（理解成本低一点）
-        CollectionUtils.convertList(runActivityNodes, ActivityNode::getId).forEach(needSimulateTaskDefKeysByReturn::remove);
+        if (CollUtil.isNotEmpty(runActivityNodes)) {
+            runActivityNodes.forEach( activityNode ->  {
+                needSimulateTaskDefKeysByReturn.remove(activityNode.getId());
+            });
+        }
 
         // 3.3 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
