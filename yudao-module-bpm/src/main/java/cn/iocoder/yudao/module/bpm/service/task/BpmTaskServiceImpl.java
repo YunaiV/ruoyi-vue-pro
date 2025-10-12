@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
@@ -939,9 +938,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 3. 构建需要预测的任务流程变量
         // TODO @jason：【驳回预测相关】是不是搞成一个变量，里面是 set 更简洁一点呀？
-        Set<String> taskDefinitionKeyList = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
-        Map<String, Object> needSimulateVariables = convertMap(taskDefinitionKeyList,
-                taskId -> StrUtil.concat(false, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, taskId), item -> Boolean.TRUE);
+        Set<String> needSimulateTaskDefinitionKeys = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
+        Map<String, Object> needSimulateVariables = convertMap(needSimulateTaskDefinitionKeys,
+                key -> StrUtil.concat(false, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, key), item -> Boolean.TRUE);
+
 
         // 4. 执行驳回
         // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
@@ -962,22 +962,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1. 获取需要预测的任务的 definition key。因为当前任务还没完成，也需要预测
         Set<String> taskDefinitionKeys = CollUtil.newHashSet(currentTask.getTaskDefinitionKey());
 
-        // 2.1 从已结束任务中找到要回退的目标任务，按时间倒序最近的一个目标任务
+        // 2.1 获取已结束任务按时间倒序排序
         List<HistoricTaskInstance> endTaskList = CollectionUtils.filterList(
                 getTaskListByProcessInstanceId(currentTask.getProcessInstanceId(), Boolean.FALSE),
                 item -> item.getEndTime() != null);
-        // 2.2 遍历已结束的任务，找到在 targetTask 之后生成的任务，且串行可达的任务
+        // 2.2 从结束任务中找到最近一个的目标任务
         HistoricTaskInstance targetTask = findFirst(endTaskList,
                 item -> item.getTaskDefinitionKey().equals(targetElement.getId()));
-        // TODO @jason：【驳回预测相关】是不是 if targetTask 先判空？
+        if (targetTask == null) {
+            return taskDefinitionKeys;
+        }
+        // 2.3 遍历已结束的任务，找到在 targetTask 之后生成的任务，且串行可达的任务
         endTaskList.forEach(item -> {
             FlowElement element = getFlowElementById(bpmnModel, item.getTaskDefinitionKey());
-            // 如果已结束的任务在回退目标节点之后生成，且串行可达，则标记为需要预算节点
+            // 如果已结束的任务在回退目标节点之后生成，且串行可达，则加到需要预测节点中
             // TODO 串行可达的方法需要和判断可回退节点 validateTargetTaskCanReturn 分开吗？ 并行网关可能会有问题。
-            // TODO @jason：【驳回预测相关】这里是不是判断 element 哈？
-            if (targetTask != null
-                    // TODO @jason：【驳回预测相关】这里直接 createTime 的 compare 更简单？因为不太会出现空哈。
-                    && DateUtil.compare(item.getCreateTime(), targetTask.getCreateTime()) > 0
+            if (item.getCreateTime().compareTo(targetTask.getCreateTime()) > 0
                     && BpmnModelUtils.isSequentialReachable(element, targetElement, null)) {
                 taskDefinitionKeys.add(item.getTaskDefinitionKey());
             }
