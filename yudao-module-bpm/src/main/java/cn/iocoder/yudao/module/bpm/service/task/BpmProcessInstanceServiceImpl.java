@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -14,7 +13,6 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -73,7 +71,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNode;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum.REJECT_CHILD_PROCESS;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseNodeType;
@@ -237,8 +234,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     needSimulateTaskDefKeysByReturn.add(StrUtil.removePrefix(key, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX)));
         }
         // 移除运行中的节点，运行中的节点无需预测
-        // TODO @jason：是不是 foreach runActivityNodes，然后移除 needSimulateTaskDefKeysByReturn 更好？（理解成本低一点）
-        CollectionUtils.convertList(runActivityNodes, ActivityNode::getId).forEach(needSimulateTaskDefKeysByReturn::remove);
+        if (CollUtil.isNotEmpty(runActivityNodes)) {
+            runActivityNodes.forEach( activityNode -> needSimulateTaskDefKeysByReturn.remove(activityNode.getId()));
+        }
 
         // 3.3 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
