@@ -33,7 +33,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2025.09-jdk8-SNAPSHOT</revision>
+        <revision>2025.10-jdk8-SNAPSHOT</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
