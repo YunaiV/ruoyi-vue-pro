@@ -940,7 +940,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // TODO @jason：【驳回预测相关】是不是搞成一个变量，里面是 set 更简洁一点呀？
         Set<String> needSimulateTaskDefinitionKeys = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
         Map<String, Object> needSimulateVariables = convertMap(needSimulateTaskDefinitionKeys,
-                key -> StrUtil.concat(false, PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, key), item -> Boolean.TRUE);
+                key -> StrUtil.concat(false, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, key), item -> Boolean.TRUE);
 
 
         // 4. 执行驳回
