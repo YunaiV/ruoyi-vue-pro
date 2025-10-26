@@ -51,7 +51,7 @@ public class YudaoWebAutoConfiguration {
 
             @Override
             public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
-                var mapping = new RequestMappingHandlerMapping();
+                RequestMappingHandlerMapping mapping = new RequestMappingHandlerMapping();
                 // 实例化时就带上前缀
                 mapping.setPathPrefixes(buildPathPrefixes(webProperties));
                 return mapping;
