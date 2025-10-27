@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
@@ -75,6 +76,15 @@ public class CodegenTableDO extends BaseDO {
      * 例如说，user、permission、dict 等等
      */
     private String businessName;
+    /**
+     * 业务名（用于包名）
+     * 将 businessName 中的 "/" 转换为 "."，用于 Java 包名
+     * 
+     * 例如说，purchase/requisition 转换为 purchase.requisition
+     * 注意：该字段为计算字段，不存储到数据库
+     */
+    @TableField(exist = false)
+    private String businessNameForPackage;
     /**
      * 类名称（首字母大写）
      *

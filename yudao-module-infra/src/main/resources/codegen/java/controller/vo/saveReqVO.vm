@@ -1,4 +1,4 @@
-package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessNameForPackage}.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 #end
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
-import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessNameForPackage}.${subTable.className}DO;
 #end
 
 @Schema(description = "${sceneEnum.name} - ${table.classComment}新增/修改 Request VO")

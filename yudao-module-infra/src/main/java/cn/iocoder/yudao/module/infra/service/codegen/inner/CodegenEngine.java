@@ -308,6 +308,13 @@ public class CodegenEngine {
      */
     public Map<String, String> execute(CodegenTableDO table, List<CodegenColumnDO> columns,
                                        List<CodegenTableDO> subTables, List<List<CodegenColumnDO>> subColumnsList) {
+        // 1.0 为 table 和 subTables 设置 businessNameForPackage
+        table.setBusinessNameForPackage(table.getBusinessName().replaceAll("/", "\\."));
+        if (CollUtil.isNotEmpty(subTables)) {
+            subTables.forEach(subTable -> 
+                subTable.setBusinessNameForPackage(subTable.getBusinessName().replaceAll("/", "\\.")));
+        }
+        
         // 1.1 初始化 bindMap 上下文
         Map<String, Object> bindingMap = initBindingMap(table, columns, subTables, subColumnsList);
         // 1.2 获得模版
@@ -546,13 +553,17 @@ public class CodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
+        filePath = StrUtil.replace(filePath, "${table.businessNameForPackage}", table.getBusinessNameForPackage());
         // 特殊：主子表专属逻辑
         Integer subIndex = (Integer) bindingMap.get("subIndex");
         if (subIndex != null) {
-            CodegenTableDO subTable = ((List<CodegenTableDO>) bindingMap.get("subTables")).get(subIndex);
+            @SuppressWarnings("unchecked")
+            List<CodegenTableDO> subTables = (List<CodegenTableDO>) bindingMap.get("subTables");
+            CodegenTableDO subTable = subTables.get(subIndex);
             filePath = StrUtil.replace(filePath, "${subTable.moduleName}", subTable.getModuleName());
             filePath = StrUtil.replace(filePath, "${subTable.businessName}", subTable.getBusinessName());
             filePath = StrUtil.replace(filePath, "${subTable.className}", subTable.getClassName());
+            filePath = StrUtil.replace(filePath, "${subTable.businessNameForPackage}", subTable.getBusinessNameForPackage());
             filePath = StrUtil.replace(filePath, "${subSimpleClassName}",
                     ((List<String>) bindingMap.get("subSimpleClassNames")).get(subIndex));
             filePath = StrUtil.replace(filePath, "${subSimpleClassName_strikeCase}",
@@ -655,3 +666,4 @@ public class CodegenEngine {
     }
 
 }
+

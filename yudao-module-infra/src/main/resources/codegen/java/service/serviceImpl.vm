@@ -1,27 +1,28 @@
-package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
+package ${basePackage}.module.${table.moduleName}.service.${table.businessNameForPackage};
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import org.springframework.stereotype.Service;
 import ${jakartaPackage}.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
-import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessNameForPackage}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessNameForPackage}.${table.className}DO;
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
-import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
+import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessNameForPackage}.${subTable.className}DO;
 #end
 import ${PageResultClassName};
 import ${PageParamClassName};
 import ${BeanUtils};
 
-import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessNameForPackage}.${table.className}Mapper;
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
-import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName}.${subTable.className}Mapper;
+import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessNameForPackage}.${subTable.className}Mapper;
 #end
 
 import static ${ServiceExceptionUtilClassName}.exception;
