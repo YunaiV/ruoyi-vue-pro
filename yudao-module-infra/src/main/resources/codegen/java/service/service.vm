@@ -16,7 +16,7 @@ import ${PageParamClassName};
  *
  * @author ${table.author}
  */
-public interface ${table.className}Service {
+public interface ${sceneEnum.prefixClass}${table.className}Service {
 
     /**
      * 创建${table.classComment}

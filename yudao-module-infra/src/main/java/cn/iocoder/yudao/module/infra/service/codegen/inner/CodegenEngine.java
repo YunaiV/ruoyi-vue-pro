@@ -77,17 +77,17 @@ public class CodegenEngine {
             .put(javaTemplatePath("dal/do_sub"), // 特殊：主子表专属逻辑
                     javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${subTable.className}DO"))
             .put(javaTemplatePath("dal/mapper"),
-                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
+                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${sceneEnum.prefixClass}${table.className}Mapper"))
             .put(javaTemplatePath("dal/mapper_sub"), // 特殊：主子表专属逻辑
                     javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${subTable.className}Mapper"))
             .put(javaTemplatePath("dal/mapper.xml"), mapperXmlFilePath())
             .put(javaTemplatePath("service/serviceImpl"),
-                    javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
+                    javaModuleImplMainFilePath("service/${table.businessName}/${sceneEnum.prefixClass}${table.className}ServiceImpl"))
             .put(javaTemplatePath("service/service"),
-                    javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
+                    javaModuleImplMainFilePath("service/${table.businessName}/${sceneEnum.prefixClass}${table.className}Service"))
             // Java module-biz(server) Test
             .put(javaTemplatePath("test/serviceTest"),
-                    javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
+                    javaModuleImplTestFilePath("service/${table.businessName}/${sceneEnum.prefixClass}${table.className}ServiceImplTest"))
             // Java module-api Main
             .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants_手动操作"))
             // SQL
@@ -596,7 +596,7 @@ public class CodegenEngine {
     private static String mapperXmlFilePath() {
         return "yudao-module-${table.moduleName}/" + // 顶级模块
                 "yudao-module-${table.moduleName}-server/" + // 子模块
-                "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
+                "src/main/resources/mapper/${table.businessName}/${sceneEnum.prefixClass}${table.className}Mapper.xml";
     }
 
     private static String vueTemplatePath(String path) {

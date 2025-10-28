@@ -32,7 +32,7 @@ import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.business
 #foreach ($subTable in $subTables)
 import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
 #end
-import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
+import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${sceneEnum.prefixClass}${table.className}Service;
 
 @Tag(name = "${sceneEnum.name} - ${table.classComment}")
 @RestController
@@ -42,7 +42,7 @@ import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.$
 public class ${sceneEnum.prefixClass}${table.className}Controller {
 
     @Resource
-    private ${table.className}Service ${classNameVar}Service;
+    private ${sceneEnum.prefixClass}${table.className}Service ${classNameVar}Service;
 
     @PostMapping("/create")
     @Operation(summary = "创建${table.classComment}")

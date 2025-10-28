@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.enums.codegen;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import static cn.hutool.core.util.ArrayUtil.*;
+import static cn.hutool.core.util.ArrayUtil.firstMatch;
 
 /**
  * 代码生成的场景枚举
@@ -14,8 +14,10 @@ import static cn.hutool.core.util.ArrayUtil.*;
 @Getter
 public enum CodegenSceneEnum {
 
-    ADMIN(1, "管理后台", "admin", ""),
-    APP(2, "用户 APP", "app", "App");
+    ADMIN(1, "管理后台", "admin", "Admin"),
+    APP(2, "用户 APP", "app", "App"),
+    ADMIN_AND_APP(3, "管理后台 + 用户 APP", "", "")
+    ;
 
     /**
      * 场景

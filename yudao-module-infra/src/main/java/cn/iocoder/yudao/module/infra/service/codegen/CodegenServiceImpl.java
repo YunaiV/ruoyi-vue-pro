@@ -285,6 +285,19 @@ public class CodegenServiceImpl implements CodegenService {
         }
 
         // 执行生成
+        if (Objects.equals(table.getScene(), CodegenSceneEnum.ADMIN_AND_APP.getScene())) {
+            Map<String, String> result = new HashMap<>();
+            List<CodegenTableDO> finalSubTables = subTables;
+            List<List<CodegenColumnDO>> finalSubColumnsList = subColumnsList;
+            List.of(CodegenSceneEnum.ADMIN, CodegenSceneEnum.APP)
+                    .forEach(sceneEnum -> {
+                        table.setScene(sceneEnum.getScene());
+                        result.putAll(codegenEngine.execute(table, columns, finalSubTables, finalSubColumnsList));
+                    });
+            return result;
+        }
+
+
         return codegenEngine.execute(table, columns, subTables, subColumnsList);
     }
 

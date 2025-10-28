@@ -47,7 +47,7 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
  * @author ${table.author}
  */
 @Mapper
-public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO> {
+public interface ${sceneEnum.prefixClass}${table.className}Mapper extends BaseMapperX<${table.className}DO> {
 
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )

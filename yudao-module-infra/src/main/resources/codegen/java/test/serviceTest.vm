@@ -9,7 +9,7 @@ import ${baseFrameworkPackage}.test.core.ut.BaseDbUnitTest;
 
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
-import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${sceneEnum.prefixClass}${table.className}Mapper;
 import ${PageResultClassName};
 
 import ${jakartaPackage}.annotation.Resource;
@@ -60,18 +60,18 @@ import static org.mockito.Mockito.*;
        #end
 #end
 /**
- * {@link ${table.className}ServiceImpl} 的单元测试类
+ * {@link ${sceneEnum.prefixClass}${table.className}ServiceImpl} 的单元测试类
  *
  * @author ${table.author}
  */
-@Import(${table.className}ServiceImpl.class)
-public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
+@Import(${sceneEnum.prefixClass}${table.className}ServiceImpl.class)
+public class ${sceneEnum.prefixClass}${table.className}ServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private ${table.className}ServiceImpl ${classNameVar}Service;
+    private ${sceneEnum.prefixClass}${table.className}ServiceImpl ${classNameVar}Service;
 
     @Resource
-    private ${table.className}Mapper ${classNameVar}Mapper;
+    private ${sceneEnum.prefixClass}${table.className}Mapper ${classNameVar}Mapper;
 
     @Test
     public void testCreate${simpleClassName}_success() {

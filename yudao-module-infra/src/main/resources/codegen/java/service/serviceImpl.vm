@@ -17,7 +17,7 @@ import ${PageResultClassName};
 import ${PageParamClassName};
 import ${BeanUtils};
 
-import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${sceneEnum.prefixClass}${table.className}Mapper;
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
@@ -36,10 +36,10 @@ import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants
  */
 @Service
 @Validated
-public class ${table.className}ServiceImpl implements ${table.className}Service {
+public class ${sceneEnum.prefixClass}${table.className}ServiceImpl implements ${sceneEnum.prefixClass}${table.className}Service {
 
     @Resource
-    private ${table.className}Mapper ${classNameVar}Mapper;
+    private ${sceneEnum.prefixClass}${table.className}Mapper ${classNameVar}Mapper;
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
