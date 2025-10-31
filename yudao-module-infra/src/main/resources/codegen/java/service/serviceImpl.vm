@@ -18,6 +18,8 @@ import ${PageParamClassName};
 import ${BeanUtils};
 
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.convert.${sceneEnum.basePackage}.${businessName}.${sceneEnum.prefixClass}${table.className}Convert;
+
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
@@ -37,6 +39,8 @@ import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants
 @Service
 @Validated
 public class ${table.className}ServiceImpl implements ${table.className}Service {
+
+    private static final ${sceneEnum.prefixClass}${table.className}Convert ${classNameVar}Convert = ${sceneEnum.prefixClass}${table.className}Convert.INSTANCE;
 
     @Resource
     private ${table.className}Mapper ${classNameVar}Mapper;
@@ -65,7 +69,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
         // 插入
 #if ($voType == 10)
-        ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
+        ${table.className}DO ${classNameVar} = ${classNameVar}Convert.convert(${saveReqVOVar});
         ${classNameVar}Mapper.insert(${classNameVar});
 #else
         ${saveReqVOVar}.clean() // 清理掉创建、更新时间等相关属性值
@@ -112,7 +116,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
         // 更新
 #if ($voType == 10)
-        ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
+        ${table.className}DO updateObj = ${classNameVar}Convert.convert(${updateReqVOVar});
         ${classNameVar}Mapper.updateById(updateObj);
 #else
         ${updateReqVOVar}.clean() // 清理掉创建、更新时间等相关属性值
