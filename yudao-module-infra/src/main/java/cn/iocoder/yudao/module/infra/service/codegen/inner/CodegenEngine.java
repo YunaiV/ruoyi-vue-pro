@@ -85,6 +85,8 @@ public class CodegenEngine {
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
             .put(javaTemplatePath("service/service"),
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
+            .put(javaTemplatePath("convert/convert"),
+                    javaModuleImplMainFilePath("convert/${sceneEnum.basePackage}/${table.businessName}/${sceneEnum.prefixClass}${table.className}Convert"))
             // Java module-biz(server) Test
             .put(javaTemplatePath("test/serviceTest"),
                     javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))

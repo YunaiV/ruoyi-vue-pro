@@ -1,0 +1,28 @@
+package ${basePackage}.module.${table.moduleName}.convert.${sceneEnum.basePackage}.${businessName};
+
+import java.util.*;
+
+import ${PageResultClassName};
+
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${businessName}.${table.className}DO;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+
+@Mapper
+public interface ${sceneEnum.prefixClass}${table.className}Convert {
+
+    ${sceneEnum.prefixClass}${table.className}Convert INSTANCE = Mappers.getMapper(${sceneEnum.prefixClass}${table.className}Convert.class);
+
+    ${table.className}DO convert(${saveReqVOClass} saveReqVO);
+
+    ${respVOClass} convert(${table.className}DO entity);
+
+    List<${respVOClass}> convert(List<${table.className}DO> list);
+
+    @Mapping(source = "result.total", target = "total")
+    @Mapping(source = "result.list", target = "list")
+    PageResult<${respVOClass}> convert(PageResult<${table.className}DO> result);
+}

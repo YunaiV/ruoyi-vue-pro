@@ -33,6 +33,7 @@ import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.business
 import ${basePackage}.module.${subTable.moduleName}.dal.dataobject.${subTable.businessName}.${subTable.className}DO;
 #end
 import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
+import ${basePackage}.module.${table.moduleName}.convert.${sceneEnum.basePackage}.${businessName}.${sceneEnum.prefixClass}${table.className}Convert;
 
 @Tag(name = "${sceneEnum.name} - ${table.classComment}")
 @RestController
@@ -40,6 +41,8 @@ import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.$
 @RequestMapping("/${table.moduleName}/${simpleClassName_strikeCase}")
 @Validated
 public class ${sceneEnum.prefixClass}${table.className}Controller {
+
+    private static final ${sceneEnum.prefixClass}${table.className}Convert ${classNameVar}Convert = ${sceneEnum.prefixClass}${table.className}Convert.INSTANCE;
 
     @Resource
     private ${table.className}Service ${classNameVar}Service;
@@ -96,7 +99,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     public CommonResult<${respVOClass}> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
 #if ($voType == 10)
-        return success(BeanUtils.toBean(${classNameVar}, ${respVOClass}.class));
+        return success(${classNameVar}Convert.convert(${classNameVar}));
 #else
         return success(${classNameVar});
 #end
@@ -111,7 +114,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     public CommonResult<PageResult<${respVOClass}>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
         PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO);
 #if ($voType == 10)
-        return success(BeanUtils.toBean(pageResult, ${respVOClass}.class));
+        return success(${classNameVar}Convert.convert(pageResult));
 #else
         return success(pageResult);
 #end
@@ -127,7 +130,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     public CommonResult<List<${respVOClass}>> get${simpleClassName}List(@Valid ${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO) {
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(listReqVO);
 #if ($voType == 10)
-        return success(BeanUtils.toBean(list, ${respVOClass}.class));
+        return success(${classNameVar}Convert.convert(list));
 #else
 	    return success(list);
 #end
@@ -147,7 +150,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${respVOClass}.class,
-                        BeanUtils.toBean(list, ${respVOClass}.class));
+                        ${classNameVar}Convert.convert(list));
     }
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #else
@@ -156,7 +159,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(listReqVO);
         // 导出 Excel
         ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}RespVO.class,
-                        BeanUtils.toBean(list, ${table.className}RespVO.class));
+                        ${classNameVar}Convert.convert(list));
     }
 #end
 
