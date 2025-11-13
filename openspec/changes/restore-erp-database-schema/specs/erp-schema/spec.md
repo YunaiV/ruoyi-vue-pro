@@ -22,7 +22,7 @@ ERP 模块 **MUST** 提供完整的数据库初始化脚本，包含所有 Java 
 
 **When** 执行数据库初始化脚本
 
-**Then** 数据库中应包含以下 33 个表：
+**Then** 数据库中 **MUST** 包含以下 33 个表：
 
 **产品管理（3 表）**：
 - `erp_product`：产品表
@@ -67,7 +67,7 @@ ERP 模块 **MUST** 提供完整的数据库初始化脚本，包含所有 Java 
 - `erp_finance_payment`：付款单表
 - `erp_finance_payment_item`：付款单明细表
 
-**And** 每个表的字段必须与对应实体类的属性完全一致
+**And** 每个表的字段 **MUST** 与对应实体类的属性完全一致
 
 ---
 
@@ -104,7 +104,7 @@ public class ErpProductDO extends BaseDO {
 
 **When** 查询 `erp_product` 表结构
 
-**Then** 该表应包含以下字段（MySQL 语法）：
+**Then** 该表 **MUST** 包含以下字段（MySQL 语法）：
 - `id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '产品编号'`
 - `name VARCHAR(255) NOT NULL COMMENT '产品名称'`
 - `bar_code VARCHAR(255) COMMENT '产品条码'`
@@ -119,7 +119,7 @@ public class ErpProductDO extends BaseDO {
 - `sale_price DECIMAL(24,6) COMMENT '销售价格，单位：元'`
 - `min_price DECIMAL(24,6) COMMENT '最低价格，单位：元'`
 
-**And** 包含审计字段（继承自 `BaseDO`）：
+**And** **MUST** 包含审计字段（继承自 `BaseDO`）：
 - `creator VARCHAR(64) DEFAULT '' COMMENT '创建者'`
 - `create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'`
 - `updater VARCHAR(64) DEFAULT '' COMMENT '更新者'`
@@ -133,7 +133,7 @@ public class ErpProductDO extends BaseDO {
 
 **When** 生成数据库表字段
 
-**Then** 字段名应转换为下划线命名（snake_case）
+**Then** 字段名 **MUST** 转换为下划线命名（snake_case）
 - `barCode` → `bar_code`
 - `categoryId` → `category_id`
 - `expiryDay` → `expiry_day`
@@ -151,24 +151,24 @@ MySQL 数据库初始化脚本 **MUST** 符合 MySQL 8.0+ 语法规范，并 **S
 
 #### Scenario: MySQL 脚本格式规范
 
-**Given** 需要创建 MySQL 数据库表
+**Given** 需要创建 MySQL 数据库表（标准场景）
 
 **When** 编写 `CREATE TABLE` 语句
 
-**Then** 必须包含以下元素：
+**Then** **MUST** 包含以下元素：
 - 表名和字段名使用反引号包裹：`` `erp_product` ``
 - 字符集：`CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
 - 存储引擎：`ENGINE = InnoDB`
 - 表注释：`COMMENT = 'ERP 产品表'`
 - 字段注释：`COMMENT '产品编号'`
 
-**And** 脚本头部应包含：
+**And** 脚本头部 **MUST** 包含：
 ```sql
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 ```
 
-**And** 脚本尾部应包含：
+**And** 脚本尾部 **MUST** 包含：
 ```sql
 SET FOREIGN_KEY_CHECKS = 1;
 ```
@@ -179,7 +179,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 **When** 映射为 MySQL 字段类型
 
-**Then** 应遵循以下规则：
+**Then** **MUST** 遵循以下规则：
 
 | Java 类型 | MySQL 类型 | 示例字段 |
 |-----------|-----------|---------|
@@ -208,9 +208,9 @@ ERP 模块 **MUST** 提供 PostgreSQL 版本的数据库初始化脚本，与 My
 
 **When** 生成 PostgreSQL 版本
 
-**Then** 应创建文件 `yudao-module-erp/sql/erp-postgresql.sql`
+**Then** **MUST** 创建文件 `yudao-module-erp/sql/erp-postgresql.sql`
 
-**And** 该文件应包含：
+**And** 该文件 **MUST** 包含：
 - 所有 33 个表的 `CREATE TABLE` 语句
 - 所有表和字段的注释（`COMMENT ON TABLE/COLUMN`）
 - 全局触发器函数 `update_modified_column()`
@@ -222,7 +222,7 @@ ERP 模块 **MUST** 提供 PostgreSQL 版本的数据库初始化脚本，与 My
 
 **When** 转换为 PostgreSQL 语法
 
-**Then** 应应用以下映射规则：
+**Then** **MUST** 应用以下映射规则：
 
 | MySQL 类型 | PostgreSQL 类型 | 说明 |
 |-----------|----------------|------|
@@ -235,7 +235,7 @@ ERP 模块 **MUST** 提供 PostgreSQL 版本的数据库初始化脚本，与 My
 | `VARCHAR(n)` | `VARCHAR(n)` | 变长字符串 |
 | `DATETIME` | `TIMESTAMP` | 日期时间 |
 
-**And** 默认值映射：
+**And** 默认值 **MUST** 遵循以下映射：
 - `DEFAULT b'0'` → `DEFAULT FALSE`
 - `DEFAULT b'1'` → `DEFAULT TRUE`
 - `DEFAULT CURRENT_TIMESTAMP` → `DEFAULT CURRENT_TIMESTAMP`
@@ -251,7 +251,7 @@ public class ErpProductDO extends BaseDO { ... }
 
 **When** 生成 PostgreSQL 表定义
 
-**Then** 应使用 `BIGSERIAL` 类型自动创建序列
+**Then** **MUST** 使用 `BIGSERIAL` 类型自动创建序列
 
 ```sql
 CREATE TABLE erp_product (
@@ -260,9 +260,9 @@ CREATE TABLE erp_product (
 );
 ```
 
-**And** PostgreSQL 会自动创建名为 `erp_product_id_seq` 的序列
+**And** PostgreSQL **SHALL** 自动创建名为 `erp_product_id_seq` 的序列
 
-**Note**: MyBatis Plus 的 `KeySequenceDialect` 会自动处理序列名映射。
+**Note**: MyBatis Plus 的 `KeySequenceDialect` **SHALL** 自动处理序列名映射。
 
 #### Scenario: PostgreSQL 注释语法
 
@@ -277,7 +277,7 @@ CREATE TABLE `erp_product` (
 
 **When** 转换为 PostgreSQL 语法
 
-**Then** 应生成独立的注释语句
+**Then** **MUST** 生成独立的注释语句
 
 ```sql
 CREATE TABLE erp_product (
@@ -295,7 +295,7 @@ COMMENT ON COLUMN erp_product.id IS '产品编号';
 
 **When** 在 PostgreSQL 中实现相同功能
 
-**Then** 应创建全局触发器函数（仅定义一次）
+**Then** **MUST** 创建全局触发器函数（仅定义一次）
 
 ```sql
 CREATE OR REPLACE FUNCTION update_modified_column()
@@ -307,7 +307,7 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-**And** 为每个表创建 `BEFORE UPDATE` 触发器
+**And** **MUST** 为每个表创建 `BEFORE UPDATE` 触发器
 
 ```sql
 CREATE TRIGGER update_erp_product_update_time
@@ -336,11 +336,11 @@ EXECUTE FUNCTION update_modified_column();
 mysql -u root -p < yudao-module-erp/sql/erp-mysql.sql
 ```
 
-**Then** 脚本应成功执行，返回码为 0
+**Then** 脚本 **MUST** 成功执行，返回码为 0
 
-**And** 数据库中应包含 33 个表
+**And** 数据库中 **MUST** 包含 33 个表
 
-**And** 使用 `SHOW CREATE TABLE` 验证每个表的结构符合预期
+**And** **MUST** 使用 `SHOW CREATE TABLE` 验证每个表的结构符合预期
 
 #### Scenario: PostgreSQL 脚本执行验证
 
@@ -352,14 +352,14 @@ mysql -u root -p < yudao-module-erp/sql/erp-mysql.sql
 psql -U postgres -d ruoyi-vue-pro -f yudao-module-erp/sql/erp-postgresql.sql
 ```
 
-**Then** 脚本应成功执行，返回码为 0
+**Then** 脚本 **MUST** 成功执行，返回码为 0
 
-**And** 数据库中应包含：
+**And** 数据库中 **MUST** 包含：
 - 33 个表
 - 1 个触发器函数 `update_modified_column()`
 - 33 个触发器（每个表一个）
 
-**And** 使用 `\d+ table_name` 验证每个表的结构符合预期
+**And** **MUST** 使用 `\d+ table_name` 验证每个表的结构符合预期
 
 ---
 
@@ -377,9 +377,9 @@ psql -U postgres -d ruoyi-vue-pro -f yudao-module-erp/sql/erp-postgresql.sql
 
 **When** 启动 Spring Boot 应用程序（ERP 模块）
 
-**Then** MyBatis Plus 应成功扫描并映射所有 33 个实体类
+**Then** MyBatis Plus **MUST** 成功扫描并映射所有 33 个实体类
 
-**And** 应用日志中不应出现表或字段映射错误
+**And** 应用日志中 **MUST NOT** 出现表或字段映射错误
 
 #### Scenario: CRUD 操作验证
 
@@ -392,11 +392,11 @@ psql -U postgres -d ruoyi-vue-pro -f yudao-module-erp/sql/erp-postgresql.sql
 3. **Update**：更新产品名称
 4. **Delete**：逻辑删除产品（设置 `deleted = 1`）
 
-**Then** 所有操作都应成功执行
+**Then** 所有操作都 **MUST** 成功执行
 
-**And** `update_time` 字段应在更新操作后自动更新为当前时间
+**And** `update_time` 字段 **MUST** 在更新操作后自动更新为当前时间
 
-**And** 逻辑删除后，查询不应返回该记录（假设启用了逻辑删除插件）
+**And** 逻辑删除后，查询 **MUST NOT** 返回该记录（假设启用了逻辑删除插件）
 
 #### Scenario: 多租户支持验证
 
@@ -404,9 +404,9 @@ psql -U postgres -d ruoyi-vue-pro -f yudao-module-erp/sql/erp-postgresql.sql
 
 **When** 在多租户模式下执行查询操作
 
-**Then** MyBatis Plus 应自动添加 `WHERE tenant_id = ?` 条件
+**Then** MyBatis Plus **MUST** 自动添加 `WHERE tenant_id = ?` 条件
 
-**And** 不同租户的数据应完全隔离
+**And** 不同租户的数据 **MUST** 完全隔离
 
 ---
 

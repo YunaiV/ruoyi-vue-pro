@@ -7,19 +7,65 @@
 **优先级**: 高
 **范围**: `yudao-module-erp` 模块
 
-## 问题描述
+## Why
 
-当前 ERP 模块的数据库初始化脚本 (`yudao-module-erp/sql/erp-2024-05-03.sql`) 可能已经过时，需要：
+### 问题背景
 
-1. **验证完整性**：对比 Java 实体类（位于 `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/`），确保所有数据表和字段都已正确定义
-2. **修复 MySQL 脚本**：更新现有 MySQL 脚本，修复任何缺失或不一致的表结构
-3. **生成 PostgreSQL 脚本**：创建与 MySQL 脚本对应的 PostgreSQL 版本，以支持多数据库部署
+当前 ERP 模块的数据库初始化脚本存在以下问题：
 
-## 动机
+1. **字段类型错误**：`erp_product.unit_id` 字段使用 `INT` 类型，但 Java 实体类定义为 `Long`，应该使用 `BIGINT`
+2. **缺少 PostgreSQL 支持**：芋道项目承诺支持多种数据库，但 ERP 模块只有 MySQL 脚本
+3. **同步风险**：数据库脚本与代码实体类可能不一致，导致部署或运行时错误
 
-- **数据完整性**：确保数据库脚本与代码实体类保持同步
-- **多数据库支持**：芋道项目承诺支持 MySQL、PostgreSQL、Oracle、SQL Server、达梦等多种数据库
-- **开发者体验**：提供可靠的数据库初始化脚本，减少新开发者的部署障碍
+### 影响
+
+- **分布式 ID 溢出**：使用雪花算法等分布式 ID 时，`INT` 类型会导致数据溢出
+- **多数据库部署受限**：无法在 PostgreSQL 环境中部署 ERP 模块
+- **维护困难**：手动对比实体类与 SQL 脚本容易出错
+
+### 动机
+
+- **数据完整性**：确保数据库脚本与代码实体类保持 100% 同步
+- **多数据库支持**：实现芋道项目对 PostgreSQL 的承诺
+- **开发者体验**：提供可靠、完整的数据库初始化脚本
+
+## What Changes
+
+### 核心变更
+
+1. **修复 MySQL 脚本字段类型错误**
+   - 修复 `erp_product.unit_id`：`INT` → `BIGINT`
+   - 验证所有 33 个表的字段类型与实体类一致
+
+2. **生成 PostgreSQL 初始化脚本**
+   - 新建 `yudao-module-erp/sql/erp-postgresql.sql`（1,644 行）
+   - 实现 MySQL → PostgreSQL 的完整类型映射
+   - 创建 33 个表的 `BEFORE UPDATE` 触发器用于自动更新 `update_time`
+   - 添加完整的表和字段注释
+
+3. **创建完整的验证文档**
+   - 实体类结构分析（JSON 格式）
+   - MySQL 脚本结构分析（JSON 格式）
+   - 差异对比报告
+   - PostgreSQL 类型映射规则文档
+
+### 技术细节
+
+**MySQL 脚本修复**：
+- 1 个字段类型修正
+
+**PostgreSQL 脚本特性**：
+- 使用 `BIGSERIAL` 实现主键自增
+- `BIT(1)` → `BOOLEAN` 类型转换
+- `DATETIME` → `TIMESTAMP` 类型转换
+- `DECIMAL(24,6)` → `NUMERIC(24,6)` 精确数值
+- 全局触发器函数 `update_modified_column()` 用于自动更新时间戳
+
+### 不改变的内容
+
+- ❌ 不修改 Java 实体类
+- ❌ 不修改现有表结构逻辑（只修正类型错误）
+- ❌ 不涉及数据迁移（仅初始化脚本）
 
 ## 解决方案
 
