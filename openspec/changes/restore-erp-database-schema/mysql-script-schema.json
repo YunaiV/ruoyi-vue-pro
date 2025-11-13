@@ -1,0 +1,5530 @@
+{
+  "scriptInfo": {
+    "fileName": "erp-2024-05-03.sql",
+    "charset": "utf8mb4",
+    "collation": "utf8mb4_unicode_ci",
+    "parseDate": "2025-11-13",
+    "tableCount": 33
+  },
+  "tables": [
+    {
+      "tableName": "erp_account",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 结算账户",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "账户名称"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "账户编码"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "开启状态"
+        },
+        {
+          "name": "sort",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "排序"
+        },
+        {
+          "name": "default_status",
+          "type": "BIT(1)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否默认"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_customer",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 客户表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "客户编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "客户名称"
+        },
+        {
+          "name": "contact",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "联系人"
+        },
+        {
+          "name": "mobile",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "手机号码"
+        },
+        {
+          "name": "telephone",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "联系电话"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "电子邮箱"
+        },
+        {
+          "name": "fax",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "传真"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "开启状态"
+        },
+        {
+          "name": "sort",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "排序"
+        },
+        {
+          "name": "tax_no",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "纳税人识别号"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率"
+        },
+        {
+          "name": "bank_name",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "开户行"
+        },
+        {
+          "name": "bank_account",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "开户账号"
+        },
+        {
+          "name": "bank_address",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "开户地址"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_finance_payment",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 付款单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "付款单号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "状态"
+        },
+        {
+          "name": "payment_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "付款时间"
+        },
+        {
+          "name": "finance_user_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "财务人员编号"
+        },
+        {
+          "name": "supplier_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "供应商编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "付款账户编号"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "payment_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "实付金额，单位：分"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_finance_payment_item",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 付款项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "payment_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "付款单编号"
+        },
+        {
+          "name": "biz_type",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务类型"
+        },
+        {
+          "name": "biz_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务编号"
+        },
+        {
+          "name": "biz_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "业务单号"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "应付欠款，单位：分"
+        },
+        {
+          "name": "paid_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "已付欠款，单位：分"
+        },
+        {
+          "name": "payment_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "本次付款，单位：分"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_finance_receipt",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 收款单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "收款单号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "状态"
+        },
+        {
+          "name": "receipt_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "收款时间"
+        },
+        {
+          "name": "finance_user_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "财务人员编号"
+        },
+        {
+          "name": "customer_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "客户编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "收款账户编号"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "receipt_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "实收金额，单位：分"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_finance_receipt_item",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 收款项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "receipt_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "收款单编号"
+        },
+        {
+          "name": "biz_type",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务类型"
+        },
+        {
+          "name": "biz_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务编号"
+        },
+        {
+          "name": "biz_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "业务单号"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "应收金额，单位：分"
+        },
+        {
+          "name": "receipted_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "已收金额，单位：分"
+        },
+        {
+          "name": "receipt_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "本次收款，单位：分"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_product",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 产品表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "产品编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "产品名称"
+        },
+        {
+          "name": "bar_code",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "产品条码"
+        },
+        {
+          "name": "category_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品分类编号"
+        },
+        {
+          "name": "unit_id",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "单位编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品状态"
+        },
+        {
+          "name": "standard",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "产品规格"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(500)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "产品备注"
+        },
+        {
+          "name": "expiry_day",
+          "type": "INT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "保质期天数"
+        },
+        {
+          "name": "weight",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "基础重量（kg）"
+        },
+        {
+          "name": "purchase_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "采购价格，单位：元"
+        },
+        {
+          "name": "sale_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "销售价格，单位：元"
+        },
+        {
+          "name": "min_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "最低价格，单位：元"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_product_category",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 产品分类",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "分类编号"
+        },
+        {
+          "name": "parent_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "父分类编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "分类名称"
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "分类编码"
+        },
+        {
+          "name": "sort",
+          "type": "INT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "分类排序"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "开启状态"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_product_unit",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 产品单位表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "单位编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "单位名字"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "单位状态"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_purchase_in",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 采购入库表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "采购入库编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购状态"
+        },
+        {
+          "name": "supplier_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "供应商编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "in_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "入库时间"
+        },
+        {
+          "name": "order_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购订单编号"
+        },
+        {
+          "name": "order_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "采购订单号"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "payment_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "已付款金额，单位：元"
+        },
+        {
+          "name": "total_product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计产品价格，单位：元"
+        },
+        {
+          "name": "total_tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计税额，单位：元"
+        },
+        {
+          "name": "discount_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠率，百分比"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "other_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "其它金额，单位：元"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(512)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件地址"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_purchase_in_items",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售入库项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "in_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购入库编号"
+        },
+        {
+          "name": "order_item_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购订单项编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位单位"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "总价"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率，百分比"
+        },
+        {
+          "name": "tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_purchase_order",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 采购订单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "采购单编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购状态"
+        },
+        {
+          "name": "supplier_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "供应商编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "order_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购时间"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "total_product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计产品价格，单位：元"
+        },
+        {
+          "name": "total_tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计税额，单位：元"
+        },
+        {
+          "name": "discount_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠率，百分比"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "deposit_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "定金金额，单位：元"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(512)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件地址"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "in_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "采购入库数量"
+        },
+        {
+          "name": "return_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "采购退货数量"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_purchase_order_items",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 采购订单项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "order_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购订单编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位单位"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "总价"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率，百分比"
+        },
+        {
+          "name": "tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "in_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "采购入库数量"
+        },
+        {
+          "name": "return_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "采购退货数量"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_purchase_return",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 采购退货表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "采购退货编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "退货状态"
+        },
+        {
+          "name": "supplier_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "供应商编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "return_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "退货时间"
+        },
+        {
+          "name": "order_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购订单编号"
+        },
+        {
+          "name": "order_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "采购订单号"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "refund_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "已退款金额，单位：元"
+        },
+        {
+          "name": "total_product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计产品价格，单位：元"
+        },
+        {
+          "name": "total_tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计税额，单位：元"
+        },
+        {
+          "name": "discount_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠率，百分比"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "other_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "其它金额，单位：元"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(512)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件地址"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_purchase_return_items",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 采购退货项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "return_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购退货编号"
+        },
+        {
+          "name": "order_item_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "采购订单项编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位单位"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "总价"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率，百分比"
+        },
+        {
+          "name": "tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_sale_order",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售订单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "销售单编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售状态"
+        },
+        {
+          "name": "customer_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "客户编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "sale_user_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "销售用户编号"
+        },
+        {
+          "name": "order_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "下单时间"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "total_product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计产品价格，单位：元"
+        },
+        {
+          "name": "total_tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计税额，单位：元"
+        },
+        {
+          "name": "discount_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠率，百分比"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "deposit_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "定金金额，单位：元"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(512)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件地址"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "out_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "销售出库数量"
+        },
+        {
+          "name": "return_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "销售退货数量"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_sale_order_items",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售订单项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "order_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售订单编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位单位"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "总价"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率，百分比"
+        },
+        {
+          "name": "tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "out_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "销售出库数量"
+        },
+        {
+          "name": "return_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "销售退货数量"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_sale_out",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售出库表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "销售出库编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "出库状态"
+        },
+        {
+          "name": "customer_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "客户编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "sale_user_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "销售用户编号"
+        },
+        {
+          "name": "out_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "出库时间"
+        },
+        {
+          "name": "order_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售订单编号"
+        },
+        {
+          "name": "order_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "销售订单号"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "receipt_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "已收款金额，单位：元"
+        },
+        {
+          "name": "total_product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计产品价格，单位：元"
+        },
+        {
+          "name": "total_tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计税额，单位：元"
+        },
+        {
+          "name": "discount_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠率，百分比"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "other_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "其它金额，单位：元"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(512)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件地址"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_sale_out_items",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售出库项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "out_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售出库编号"
+        },
+        {
+          "name": "order_item_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售订单项编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位单位"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "总价"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率，百分比"
+        },
+        {
+          "name": "tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_sale_return",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售退货表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "销售退货编号"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "退货状态"
+        },
+        {
+          "name": "customer_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "客户编号"
+        },
+        {
+          "name": "account_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "结算账户编号"
+        },
+        {
+          "name": "sale_user_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "销售用户编号"
+        },
+        {
+          "name": "return_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "退货时间"
+        },
+        {
+          "name": "order_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售订单编号"
+        },
+        {
+          "name": "order_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "销售订单号"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计价格，单位：元"
+        },
+        {
+          "name": "refund_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "已退款金额，单位：元"
+        },
+        {
+          "name": "total_product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计产品价格，单位：元"
+        },
+        {
+          "name": "total_tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计税额，单位：元"
+        },
+        {
+          "name": "discount_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠率，百分比"
+        },
+        {
+          "name": "discount_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "优惠金额，单位：元"
+        },
+        {
+          "name": "other_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0.000000",
+          "comment": "其它金额，单位：元"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(512)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件地址"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_sale_return_items",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 销售退货项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "return_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售退货编号"
+        },
+        {
+          "name": "order_item_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "销售订单项编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位单位"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "总价"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率，百分比"
+        },
+        {
+          "name": "tax_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(1024)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 产品库存表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "库存数量"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_check",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 库存盘点单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "盘点编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "盘点单号"
+        },
+        {
+          "name": "check_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "盘点时间"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "状态"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件 URL"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_check_item",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 库存盘点项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "盘点项编号"
+        },
+        {
+          "name": "check_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "盘点编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位编号"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "产品单价"
+        },
+        {
+          "name": "stock_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "账面数量（当前库存）"
+        },
+        {
+          "name": "actual_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "实际数量（实际库存）"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "盈亏数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_in",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 其它入库单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "入库编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "入库单号"
+        },
+        {
+          "name": "supplier_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "供应商编号"
+        },
+        {
+          "name": "in_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "入库时间"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "状态"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件 URL"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_in_item",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 其它入库单项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "入库项编号"
+        },
+        {
+          "name": "in_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "入库编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位编号"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_move",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 库存调拨单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "调拨编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "调拨单号"
+        },
+        {
+          "name": "move_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "调拨时间"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "状态"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件 URL"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_move_item",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 库存调拨项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "调拨项编号"
+        },
+        {
+          "name": "move_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "调拨编号"
+        },
+        {
+          "name": "from_warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "调出仓库编号"
+        },
+        {
+          "name": "to_warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "调入仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位编号"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_out",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 其它入库单表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "出库编号"
+        },
+        {
+          "name": "no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "出库单号"
+        },
+        {
+          "name": "customer_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "客户编号"
+        },
+        {
+          "name": "out_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "出库时间"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "状态"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "附件 URL"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_out_item",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 其它出库单项表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "出库项编号"
+        },
+        {
+          "name": "out_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "出库编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "product_unit_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品单位编号"
+        },
+        {
+          "name": "product_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "产品单价"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品数量"
+        },
+        {
+          "name": "total_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "合计金额，单位：元"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_stock_record",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 产品库存明细表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "编号"
+        },
+        {
+          "name": "product_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "产品编号"
+        },
+        {
+          "name": "warehouse_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "出入库数量"
+        },
+        {
+          "name": "total_count",
+          "type": "DECIMAL(24, 6)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "总库存量"
+        },
+        {
+          "name": "biz_type",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务类型"
+        },
+        {
+          "name": "biz_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务编号"
+        },
+        {
+          "name": "biz_item_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "业务项编号"
+        },
+        {
+          "name": "biz_no",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "业务单号"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_supplier",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 供应商表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "供应商编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "供应商名称"
+        },
+        {
+          "name": "contact",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "联系人"
+        },
+        {
+          "name": "mobile",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "手机号码"
+        },
+        {
+          "name": "telephone",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "联系电话"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "电子邮箱"
+        },
+        {
+          "name": "fax",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "传真"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "开启状态"
+        },
+        {
+          "name": "sort",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "排序"
+        },
+        {
+          "name": "tax_no",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "纳税人识别号"
+        },
+        {
+          "name": "tax_percent",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "税率"
+        },
+        {
+          "name": "bank_name",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "开户行"
+        },
+        {
+          "name": "bank_account",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "开户账号"
+        },
+        {
+          "name": "bank_address",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "开户地址"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    },
+    {
+      "tableName": "erp_warehouse",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "comment": "ERP 仓库表",
+      "fields": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "comment": "仓库编号"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "comment": "仓库名称"
+        },
+        {
+          "name": "address",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "仓库地址"
+        },
+        {
+          "name": "sort",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "排序"
+        },
+        {
+          "name": "remark",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "备注"
+        },
+        {
+          "name": "principal",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "NULL",
+          "comment": "负责人"
+        },
+        {
+          "name": "warehouse_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "仓储费，单位：元"
+        },
+        {
+          "name": "truckage_price",
+          "type": "DECIMAL(24, 6)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "NULL",
+          "comment": "搬运费，单位：元"
+        },
+        {
+          "name": "status",
+          "type": "TINYINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "comment": "开启状态"
+        },
+        {
+          "name": "default_status",
+          "type": "BIT(1)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否默认"
+        },
+        {
+          "name": "creator",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "创建者"
+        },
+        {
+          "name": "create_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "创建时间"
+        },
+        {
+          "name": "updater",
+          "type": "VARCHAR(64)",
+          "nullable": true,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_unicode_ci",
+          "default": "''",
+          "comment": "更新者"
+        },
+        {
+          "name": "update_time",
+          "type": "DATETIME",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+          "comment": "更新时间"
+        },
+        {
+          "name": "deleted",
+          "type": "BIT(1)",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "b'0'",
+          "comment": "是否删除"
+        },
+        {
+          "name": "tenant_id",
+          "type": "BIGINT",
+          "nullable": false,
+          "autoIncrement": false,
+          "primaryKey": false,
+          "default": "0",
+          "comment": "租户编号"
+        }
+      ]
+    }
+  ]
+}

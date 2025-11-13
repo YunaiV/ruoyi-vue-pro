@@ -1,0 +1,681 @@
+{
+  "metadata": {
+    "generatedAt": "2025-11-13",
+    "totalTables": 33,
+    "module": "yudao-module-erp",
+    "description": "ERP模块完整数据库结构清单，基于实体类分析生成",
+    "baseClass": "BaseDO (包含审计字段: creator, create_time, updater, update_time, deleted, tenant_id)"
+  },
+  "tables": [
+    {
+      "tableName": "erp_account",
+      "className": "ErpAccountDO",
+      "category": "finance",
+      "sequenceName": "erp_account_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "结算账户编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "账户名称"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "账户编码"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "开启状态"},
+        {"name": "sort", "javaType": "Integer", "isPrimaryKey": false, "comment": "排序"},
+        {"name": "defaultStatus", "javaType": "Boolean", "isPrimaryKey": false, "comment": "是否默认"}
+      ]
+    },
+    {
+      "tableName": "erp_customer",
+      "className": "ErpCustomerDO",
+      "category": "sale",
+      "sequenceName": "erp_customer_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "客户编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "客户名称"},
+        {"name": "contact", "javaType": "String", "isPrimaryKey": false, "comment": "联系人"},
+        {"name": "mobile", "javaType": "String", "isPrimaryKey": false, "comment": "手机号码"},
+        {"name": "telephone", "javaType": "String", "isPrimaryKey": false, "comment": "联系电话"},
+        {"name": "email", "javaType": "String", "isPrimaryKey": false, "comment": "电子邮箱"},
+        {"name": "fax", "javaType": "String", "isPrimaryKey": false, "comment": "传真"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "开启状态"},
+        {"name": "sort", "javaType": "Integer", "isPrimaryKey": false, "comment": "排序"},
+        {"name": "taxNo", "javaType": "String", "isPrimaryKey": false, "comment": "纳税人识别号"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率"},
+        {"name": "bankName", "javaType": "String", "isPrimaryKey": false, "comment": "开户行"},
+        {"name": "bankAccount", "javaType": "String", "isPrimaryKey": false, "comment": "开户账号"},
+        {"name": "bankAddress", "javaType": "String", "isPrimaryKey": false, "comment": "开户地址"}
+      ]
+    },
+    {
+      "tableName": "erp_supplier",
+      "className": "ErpSupplierDO",
+      "category": "purchase",
+      "sequenceName": "erp_supplier_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "供应商编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "供应商名称"},
+        {"name": "contact", "javaType": "String", "isPrimaryKey": false, "comment": "联系人"},
+        {"name": "mobile", "javaType": "String", "isPrimaryKey": false, "comment": "手机号码"},
+        {"name": "telephone", "javaType": "String", "isPrimaryKey": false, "comment": "联系电话"},
+        {"name": "email", "javaType": "String", "isPrimaryKey": false, "comment": "电子邮箱"},
+        {"name": "fax", "javaType": "String", "isPrimaryKey": false, "comment": "传真"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "开启状态"},
+        {"name": "sort", "javaType": "Integer", "isPrimaryKey": false, "comment": "排序"},
+        {"name": "taxNo", "javaType": "String", "isPrimaryKey": false, "comment": "纳税人识别号"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率"},
+        {"name": "bankName", "javaType": "String", "isPrimaryKey": false, "comment": "开户行"},
+        {"name": "bankAccount", "javaType": "String", "isPrimaryKey": false, "comment": "开户账号"},
+        {"name": "bankAddress", "javaType": "String", "isPrimaryKey": false, "comment": "开户地址"}
+      ]
+    },
+    {
+      "tableName": "erp_product_category",
+      "className": "ErpProductCategoryDO",
+      "category": "product",
+      "sequenceName": "erp_product_category_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "分类编号"},
+        {"name": "parentId", "javaType": "Long", "isPrimaryKey": false, "comment": "父分类编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "分类名称"},
+        {"name": "code", "javaType": "String", "isPrimaryKey": false, "comment": "分类编码"},
+        {"name": "sort", "javaType": "Integer", "isPrimaryKey": false, "comment": "分类排序"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "开启状态"}
+      ]
+    },
+    {
+      "tableName": "erp_product_unit",
+      "className": "ErpProductUnitDO",
+      "category": "product",
+      "sequenceName": "erp_product_unit_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "单位编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "单位名字"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "单位状态"}
+      ]
+    },
+    {
+      "tableName": "erp_product",
+      "className": "ErpProductDO",
+      "category": "product",
+      "sequenceName": "erp_product_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "产品编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "产品名称"},
+        {"name": "barCode", "javaType": "String", "isPrimaryKey": false, "comment": "产品条码"},
+        {"name": "categoryId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品分类编号"},
+        {"name": "unitId", "javaType": "Long", "isPrimaryKey": false, "comment": "单位编号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "产品状态"},
+        {"name": "standard", "javaType": "String", "isPrimaryKey": false, "comment": "产品规格"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "产品备注"},
+        {"name": "expiryDay", "javaType": "Integer", "isPrimaryKey": false, "comment": "保质期天数"},
+        {"name": "weight", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "基础重量（kg）"},
+        {"name": "purchasePrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "采购价格，单位：元"},
+        {"name": "salePrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "销售价格，单位：元"},
+        {"name": "minPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最低价格，单位：元"}
+      ]
+    },
+    {
+      "tableName": "erp_warehouse",
+      "className": "ErpWarehouseDO",
+      "category": "stock",
+      "sequenceName": "erp_warehouse_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "仓库编号"},
+        {"name": "name", "javaType": "String", "isPrimaryKey": false, "comment": "仓库名称"},
+        {"name": "address", "javaType": "String", "isPrimaryKey": false, "comment": "仓库地址"},
+        {"name": "sort", "javaType": "Long", "isPrimaryKey": false, "comment": "排序"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "principal", "javaType": "String", "isPrimaryKey": false, "comment": "负责人"},
+        {"name": "warehousePrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "仓储费，单位：元"},
+        {"name": "truckagePrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "搬运费，单位：元"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "开启状态"},
+        {"name": "defaultStatus", "javaType": "Boolean", "isPrimaryKey": false, "comment": "是否默认"}
+      ]
+    },
+    {
+      "tableName": "erp_stock",
+      "className": "ErpStockDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "库存数量"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_record",
+      "className": "ErpStockRecordDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_record_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "出入库数量"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总库存量"},
+        {"name": "bizType", "javaType": "Integer", "isPrimaryKey": false, "comment": "业务类型"},
+        {"name": "bizId", "javaType": "Long", "isPrimaryKey": false, "comment": "业务编号"},
+        {"name": "bizItemId", "javaType": "Long", "isPrimaryKey": false, "comment": "业务项编号"},
+        {"name": "bizNo", "javaType": "String", "isPrimaryKey": false, "comment": "业务单号"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_in",
+      "className": "ErpStockInDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_in_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "入库编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "入库单号"},
+        {"name": "supplierId", "javaType": "Long", "isPrimaryKey": false, "comment": "供应商编号"},
+        {"name": "inTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "入库时间"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "状态"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件 URL"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_in_item",
+      "className": "ErpStockInItemDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_in_item_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "入库项编号"},
+        {"name": "inId", "javaType": "Long", "isPrimaryKey": false, "comment": "入库编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位编号"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单价"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_out",
+      "className": "ErpStockOutDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_out_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "出库编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "出库单号"},
+        {"name": "customerId", "javaType": "Long", "isPrimaryKey": false, "comment": "客户编号"},
+        {"name": "outTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "出库时间"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "状态"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件 URL"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_out_item",
+      "className": "ErpStockOutItemDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_out_item_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "出库项编号"},
+        {"name": "outId", "javaType": "Long", "isPrimaryKey": false, "comment": "出库编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位编号"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单价"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_move",
+      "className": "ErpStockMoveDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_move_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "调拨编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "调拨单号"},
+        {"name": "moveTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "调拨时间"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "状态"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件 URL"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_move_item",
+      "className": "ErpStockMoveItemDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_move_item_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "调拨项编号"},
+        {"name": "moveId", "javaType": "Long", "isPrimaryKey": false, "comment": "调拨编号"},
+        {"name": "fromWarehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "调出仓库编号"},
+        {"name": "toWarehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "调入仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位编号"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单价"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_check",
+      "className": "ErpStockCheckDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_check_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "盘点编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "盘点单号"},
+        {"name": "checkTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "盘点时间"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "状态"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件 URL"}
+      ]
+    },
+    {
+      "tableName": "erp_stock_check_item",
+      "className": "ErpStockCheckItemDO",
+      "category": "stock",
+      "sequenceName": "erp_stock_check_item_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "盘点项编号"},
+        {"name": "checkId", "javaType": "Long", "isPrimaryKey": false, "comment": "盘点编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位编号"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单价"},
+        {"name": "stockCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "账面数量（当前库存）"},
+        {"name": "actualCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "实际数量（实际库存）"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "盈亏数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计金额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_purchase_order",
+      "className": "ErpPurchaseOrderDO",
+      "category": "purchase",
+      "sequenceName": "erp_purchase_order_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "采购订单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "采购状态"},
+        {"name": "supplierId", "javaType": "Long", "isPrimaryKey": false, "comment": "供应商编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "结算账户编号"},
+        {"name": "orderTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "下单时间"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最终合计价格，单位：元"},
+        {"name": "totalProductPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计产品价格，单位：元"},
+        {"name": "totalTaxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计税额，单位：元"},
+        {"name": "discountPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠率，百分比"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "depositPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "定金金额，单位：元"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件地址"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "inCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "采购入库数量"},
+        {"name": "returnCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "采购退货数量"}
+      ]
+    },
+    {
+      "tableName": "erp_purchase_order_items",
+      "className": "ErpPurchaseOrderItemDO",
+      "category": "purchase",
+      "sequenceName": "erp_purchase_order_items_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "orderId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购订单编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位单位"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单位单价，单位：元"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总价，单位：元"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率，百分比"},
+        {"name": "taxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "inCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "采购入库数量"},
+        {"name": "returnCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "采购退货数量"}
+      ]
+    },
+    {
+      "tableName": "erp_purchase_in",
+      "className": "ErpPurchaseInDO",
+      "category": "purchase",
+      "sequenceName": "erp_purchase_in_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "采购入库单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "入库状态"},
+        {"name": "supplierId", "javaType": "Long", "isPrimaryKey": false, "comment": "供应商编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "结算账户编号"},
+        {"name": "inTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "入库时间"},
+        {"name": "orderId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购订单编号"},
+        {"name": "orderNo", "javaType": "String", "isPrimaryKey": false, "comment": "采购订单号"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最终合计价格，单位：元"},
+        {"name": "paymentPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "已支付金额，单位：元"},
+        {"name": "totalProductPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计产品价格，单位：元"},
+        {"name": "totalTaxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计税额，单位：元"},
+        {"name": "discountPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠率，百分比"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "otherPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "其它金额，单位：元"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件地址"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_purchase_in_items",
+      "className": "ErpPurchaseInItemDO",
+      "category": "purchase",
+      "sequenceName": "erp_purchase_in_items_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "inId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购入库编号"},
+        {"name": "orderItemId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购订单项编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位单位"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单位单价，单位：元"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总价，单位：元"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率，百分比"},
+        {"name": "taxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_purchase_return",
+      "className": "ErpPurchaseReturnDO",
+      "category": "purchase",
+      "sequenceName": "erp_purchase_return_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "采购退货单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "退货状态"},
+        {"name": "supplierId", "javaType": "Long", "isPrimaryKey": false, "comment": "供应商编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "结算账户编号"},
+        {"name": "returnTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "退货时间"},
+        {"name": "orderId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购订单编号"},
+        {"name": "orderNo", "javaType": "String", "isPrimaryKey": false, "comment": "采购订单号"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最终合计价格，单位：元"},
+        {"name": "refundPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "已退款金额，单位：元"},
+        {"name": "totalProductPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计产品价格，单位：元"},
+        {"name": "totalTaxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计税额，单位：元"},
+        {"name": "discountPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠率，百分比"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "otherPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "其它金额，单位：元"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件地址"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_purchase_return_items",
+      "className": "ErpPurchaseReturnItemDO",
+      "category": "purchase",
+      "sequenceName": "erp_purchase_return_items_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "returnId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购退货编号"},
+        {"name": "orderItemId", "javaType": "Long", "isPrimaryKey": false, "comment": "采购订单项编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位单位"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单位单价，单位：元"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总价，单位：元"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率，百分比"},
+        {"name": "taxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_sale_order",
+      "className": "ErpSaleOrderDO",
+      "category": "sale",
+      "sequenceName": "erp_sale_order_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "销售订单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "销售状态"},
+        {"name": "customerId", "javaType": "Long", "isPrimaryKey": false, "comment": "客户编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "结算账户编号"},
+        {"name": "saleUserId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售员编号"},
+        {"name": "orderTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "下单时间"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最终合计价格，单位：元"},
+        {"name": "totalProductPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计产品价格，单位：元"},
+        {"name": "totalTaxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计税额，单位：元"},
+        {"name": "discountPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠率，百分比"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "depositPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "定金金额，单位：元"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件地址"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "outCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "销售出库数量"},
+        {"name": "returnCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "销售退货数量"}
+      ]
+    },
+    {
+      "tableName": "erp_sale_order_items",
+      "className": "ErpSaleOrderItemDO",
+      "category": "sale",
+      "sequenceName": "erp_sale_order_items_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "orderId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售订单编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位单位"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单位单价，单位：元"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总价，单位：元"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率，百分比"},
+        {"name": "taxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"},
+        {"name": "outCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "销售出库数量"},
+        {"name": "returnCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "销售退货数量"}
+      ]
+    },
+    {
+      "tableName": "erp_sale_out",
+      "className": "ErpSaleOutDO",
+      "category": "sale",
+      "sequenceName": "erp_sale_out_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "销售出库单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "出库状态"},
+        {"name": "customerId", "javaType": "Long", "isPrimaryKey": false, "comment": "客户编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "结算账户编号"},
+        {"name": "saleUserId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售员编号"},
+        {"name": "outTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "出库时间"},
+        {"name": "orderId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售订单编号"},
+        {"name": "orderNo", "javaType": "String", "isPrimaryKey": false, "comment": "销售订单号"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最终合计价格，单位：元"},
+        {"name": "receiptPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "已收款金额，单位：元"},
+        {"name": "totalProductPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计产品价格，单位：元"},
+        {"name": "totalTaxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计税额，单位：元"},
+        {"name": "discountPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠率，百分比"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "otherPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "其它金额，单位：元"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件地址"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_sale_out_items",
+      "className": "ErpSaleOutItemDO",
+      "category": "sale",
+      "sequenceName": "erp_sale_out_items_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "outId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售出库编号"},
+        {"name": "orderItemId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售订单项编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位单位"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单位单价，单位：元"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总价，单位：元"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率，百分比"},
+        {"name": "taxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_sale_return",
+      "className": "ErpSaleReturnDO",
+      "category": "sale",
+      "sequenceName": "erp_sale_return_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "销售退货单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "退货状态"},
+        {"name": "customerId", "javaType": "Long", "isPrimaryKey": false, "comment": "客户编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "结算账户编号"},
+        {"name": "saleUserId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售员编号"},
+        {"name": "returnTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "退货时间"},
+        {"name": "orderId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售订单编号"},
+        {"name": "orderNo", "javaType": "String", "isPrimaryKey": false, "comment": "销售订单号"},
+        {"name": "totalCount", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "最终合计价格，单位：元"},
+        {"name": "refundPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "已退款金额，单位：元"},
+        {"name": "totalProductPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计产品价格，单位：元"},
+        {"name": "totalTaxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计税额，单位：元"},
+        {"name": "discountPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠率，百分比"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "otherPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "其它金额，单位：元"},
+        {"name": "fileUrl", "javaType": "String", "isPrimaryKey": false, "comment": "附件地址"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_sale_return_items",
+      "className": "ErpSaleReturnItemDO",
+      "category": "sale",
+      "sequenceName": "erp_sale_return_items_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "returnId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售退货编号"},
+        {"name": "orderItemId", "javaType": "Long", "isPrimaryKey": false, "comment": "销售订单项编号"},
+        {"name": "warehouseId", "javaType": "Long", "isPrimaryKey": false, "comment": "仓库编号"},
+        {"name": "productId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品编号"},
+        {"name": "productUnitId", "javaType": "Long", "isPrimaryKey": false, "comment": "产品单位单位"},
+        {"name": "productPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "产品单位单价，单位：元"},
+        {"name": "count", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "数量"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "总价，单位：元"},
+        {"name": "taxPercent", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税率，百分比"},
+        {"name": "taxPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "税额，单位：元"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_finance_payment",
+      "className": "ErpFinancePaymentDO",
+      "category": "finance",
+      "sequenceName": "erp_finance_payment_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "付款单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "付款状态"},
+        {"name": "paymentTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "付款时间"},
+        {"name": "financeUserId", "javaType": "Long", "isPrimaryKey": false, "comment": "财务人员编号"},
+        {"name": "supplierId", "javaType": "Long", "isPrimaryKey": false, "comment": "供应商编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "付款账户编号"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计价格，单位：元"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "paymentPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "实付金额，单位：分"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_finance_payment_item",
+      "className": "ErpFinancePaymentItemDO",
+      "category": "finance",
+      "sequenceName": "erp_finance_payment_item_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "入库项编号"},
+        {"name": "paymentId", "javaType": "Long", "isPrimaryKey": false, "comment": "付款单编号"},
+        {"name": "bizType", "javaType": "Integer", "isPrimaryKey": false, "comment": "业务类型"},
+        {"name": "bizId", "javaType": "Long", "isPrimaryKey": false, "comment": "业务编号"},
+        {"name": "bizNo", "javaType": "String", "isPrimaryKey": false, "comment": "业务单号"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "应付金额，单位：分"},
+        {"name": "paidPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "已付金额，单位：分"},
+        {"name": "paymentPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "本次付款，单位：分"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_finance_receipt",
+      "className": "ErpFinanceReceiptDO",
+      "category": "finance",
+      "sequenceName": "erp_finance_receipt_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "编号"},
+        {"name": "no", "javaType": "String", "isPrimaryKey": false, "comment": "收款单号"},
+        {"name": "status", "javaType": "Integer", "isPrimaryKey": false, "comment": "收款状态"},
+        {"name": "receiptTime", "javaType": "LocalDateTime", "isPrimaryKey": false, "comment": "收款时间"},
+        {"name": "financeUserId", "javaType": "Long", "isPrimaryKey": false, "comment": "财务人员编号"},
+        {"name": "customerId", "javaType": "Long", "isPrimaryKey": false, "comment": "客户编号"},
+        {"name": "accountId", "javaType": "Long", "isPrimaryKey": false, "comment": "收款账户编号"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "合计价格，单位：元"},
+        {"name": "discountPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "优惠金额，单位：元"},
+        {"name": "receiptPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "实付金额，单位：分"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    },
+    {
+      "tableName": "erp_finance_receipt_item",
+      "className": "ErpFinanceReceiptItemDO",
+      "category": "finance",
+      "sequenceName": "erp_finance_receipt_item_seq",
+      "fields": [
+        {"name": "id", "javaType": "Long", "isPrimaryKey": true, "comment": "入库项编号"},
+        {"name": "receiptId", "javaType": "Long", "isPrimaryKey": false, "comment": "收款单编号"},
+        {"name": "bizType", "javaType": "Integer", "isPrimaryKey": false, "comment": "业务类型"},
+        {"name": "bizId", "javaType": "Long", "isPrimaryKey": false, "comment": "业务编号"},
+        {"name": "bizNo", "javaType": "String", "isPrimaryKey": false, "comment": "业务单号"},
+        {"name": "totalPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "应收金额，单位：分"},
+        {"name": "receiptedPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "已收金额，单位：分"},
+        {"name": "receiptPrice", "javaType": "BigDecimal", "isPrimaryKey": false, "comment": "本次收款，单位：分"},
+        {"name": "remark", "javaType": "String", "isPrimaryKey": false, "comment": "备注"}
+      ]
+    }
+  ],
+  "categorySummary": {
+    "product": {
+      "count": 3,
+      "tables": ["erp_product_category", "erp_product_unit", "erp_product"]
+    },
+    "stock": {
+      "count": 11,
+      "tables": ["erp_warehouse", "erp_stock", "erp_stock_record", "erp_stock_in", "erp_stock_in_item", "erp_stock_out", "erp_stock_out_item", "erp_stock_move", "erp_stock_move_item", "erp_stock_check", "erp_stock_check_item"]
+    },
+    "purchase": {
+      "count": 7,
+      "tables": ["erp_supplier", "erp_purchase_order", "erp_purchase_order_items", "erp_purchase_in", "erp_purchase_in_items", "erp_purchase_return", "erp_purchase_return_items"]
+    },
+    "sale": {
+      "count": 7,
+      "tables": ["erp_customer", "erp_sale_order", "erp_sale_order_items", "erp_sale_out", "erp_sale_out_items", "erp_sale_return", "erp_sale_return_items"]
+    },
+    "finance": {
+      "count": 5,
+      "tables": ["erp_account", "erp_finance_payment", "erp_finance_payment_item", "erp_finance_receipt", "erp_finance_receipt_item"]
+    }
+  },
+  "notes": [
+    "所有实体类继承自 BaseDO，包含审计字段：creator, create_time, updater, update_time, deleted, tenant_id",
+    "字段名采用驼峰命名（camelCase），在数据库中应转换为下划线命名（snake_case）",
+    "所有表都使用 KeySequence 注解用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增",
+    "BigDecimal 类型字段通常用于金额和数量，需要设置合适的精度",
+    "LocalDateTime 类型字段用于时间戳",
+    "Boolean 类型字段在 MySQL 中通常映射为 TINYINT(1) 或 BIT(1)"
+  ]
+}

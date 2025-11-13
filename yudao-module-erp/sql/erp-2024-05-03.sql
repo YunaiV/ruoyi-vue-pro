@@ -212,7 +212,7 @@ CREATE TABLE `erp_product`  (
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '产品名称',
   `bar_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '产品条码',
   `category_id` bigint NOT NULL COMMENT '产品分类编号',
-  `unit_id` int NOT NULL COMMENT '单位编号',
+  `unit_id` bigint NOT NULL COMMENT '单位编号',
   `status` tinyint NOT NULL COMMENT '产品状态',
   `standard` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '产品规格',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '产品备注',
