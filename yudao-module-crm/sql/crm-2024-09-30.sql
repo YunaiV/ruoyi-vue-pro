@@ -1,17 +1,25 @@
 /*
- Navicat Premium Data Transfer
+ MySQL Database Schema for CRM Module
 
- Source Server         : 127.0.0.1 MySQL
- Source Server Type    : MySQL
- Source Server Version : 80200 (8.2.0)
- Source Host           : 127.0.0.1:3306
- Source Schema         : ruoyi-vue-pro
+ Source: ruoyi-vue-pro CRM Module
+ Target Database: MySQL 5.7+ / 8.0+
+ Last Modified: 2025-11-13
+ Version: v2025.10-SNAPSHOT
 
- Target Server Type    : MySQL
- Target Server Version : 80200 (8.2.0)
- File Encoding         : 65001
+ Usage:
+ 1. Create database: CREATE DATABASE IF NOT EXISTS `ruoyi-vue-pro` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ 2. Select database: USE `ruoyi-vue-pro`;
+ 3. Execute this script: source crm-2024-09-30.sql
 
- Date: 26/02/2024 13:16:22
+ Important Changes:
+ - 2025-11-13: Fixed crm_business_status.percent field type from decimal(24,6) to int
+ - 2025-11-13: Fixed crm_contact_business table fields (id, contact_id, business_id) from int to bigint
+
+ Note:
+ - This script is synchronized with entity classes in yudao-module-crm
+ - All field types match the Java entity definitions
+ - Compatible with MySQL 5.7 and 8.0+
+ - PostgreSQL version available in crm-postgresql.sql
 */
 
 SET NAMES utf8mb4;
@@ -90,7 +98,7 @@ CREATE TABLE `crm_business_status`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type_id` bigint NOT NULL COMMENT '状态类型编号',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '状态类型名',
-  `percent` decimal(24, 6) NOT NULL COMMENT '赢单率',
+  `percent` int NOT NULL COMMENT '赢单率',
   `sort` int NOT NULL DEFAULT 1 COMMENT '排序',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -105,7 +113,7 @@ CREATE TABLE `crm_business_status`  (
 -- Records of crm_business_status
 -- ----------------------------
 BEGIN;
-INSERT INTO `crm_business_status` (`id`, `type_id`, `name`, `percent`, `sort`, `creator`, `create_time`, `updater`, `update_time`, `tenant_id`, `deleted`) VALUES (4, 3, '小状态', 10.000000, 1, '1', '2023-11-30 12:18:42', '', '2024-02-21 12:30:33', 1, b'0'), (5, 4, '吃饭', 20.000000, 0, '', '2024-02-21 12:54:57', '', '2024-02-21 13:49:11', 1, b'0'), (6, 4, '睡觉', 30.000000, 1, '', '2024-02-21 12:54:57', '', '2024-02-21 13:49:11', 1, b'0'), (7, 5, '', 10.000000, 0, '', '2024-02-21 12:56:49', '', '2024-02-21 12:57:36', 1, b'0'), (8, 4, '阿豆豆', 10.000000, 2, '', '2024-02-21 13:49:11', '', '2024-02-21 13:49:11', 1, b'0'), (9, 6, '初步接触', 10.000000, 0, '', '2024-02-23 15:58:25', '', '2024-02-23 15:58:25', 1, b'0'), (10, 6, '需求分析', 20.000000, 1, '', '2024-02-23 15:58:25', '', '2024-02-23 15:58:25', 1, b'0'), (11, 6, '方案制定', 30.000000, 2, '', '2024-02-23 15:58:25', '', '2024-02-23 15:58:25', 1, b'0');
+INSERT INTO `crm_business_status` (`id`, `type_id`, `name`, `percent`, `sort`, `creator`, `create_time`, `updater`, `update_time`, `tenant_id`, `deleted`) VALUES (4, 3, '小状态', 10, 1, '1', '2023-11-30 12:18:42', '', '2024-02-21 12:30:33', 1, b'0'), (5, 4, '吃饭', 20, 0, '', '2024-02-21 12:54:57', '', '2024-02-21 13:49:11', 1, b'0'), (6, 4, '睡觉', 30, 1, '', '2024-02-21 12:54:57', '', '2024-02-21 13:49:11', 1, b'0'), (7, 5, '', 10, 0, '', '2024-02-21 12:56:49', '', '2024-02-21 12:57:36', 1, b'0'), (8, 4, '阿豆豆', 10, 2, '', '2024-02-21 13:49:11', '', '2024-02-21 13:49:11', 1, b'0'), (9, 6, '初步接触', 10, 0, '', '2024-02-23 15:58:25', '', '2024-02-23 15:58:25', 1, b'0'), (10, 6, '需求分析', 20, 1, '', '2024-02-23 15:58:25', '', '2024-02-23 15:58:25', 1, b'0'), (11, 6, '方案制定', 30, 2, '', '2024-02-23 15:58:25', '', '2024-02-23 15:58:25', 1, b'0');
 COMMIT;
 
 -- ----------------------------
@@ -218,9 +226,9 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `crm_contact_business`;
 CREATE TABLE `crm_contact_business`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `contact_id` int NULL DEFAULT NULL COMMENT '联系人id',
-  `business_id` int NULL DEFAULT NULL COMMENT '商机id',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `contact_id` bigint NULL DEFAULT NULL COMMENT '联系人id',
+  `business_id` bigint NULL DEFAULT NULL COMMENT '商机id',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
