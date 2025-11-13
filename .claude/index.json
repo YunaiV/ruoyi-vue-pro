@@ -1,0 +1,459 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "timestamp": "2025-11-13T13:29:06+08:00",
+    "project_name": "ruoyi-vue-pro",
+    "project_version": "2025.10-SNAPSHOT",
+    "scan_status": "completed",
+    "truncated": false
+  },
+  "ignore_patterns": [
+    "target/**",
+    ".gradle/**",
+    "/build/**",
+    "!gradle/wrapper/gradle-wrapper.jar",
+    "!.mvn/wrapper/maven-wrapper.jar",
+    ".flattened-pom.xml",
+    ".idea/**",
+    "*.iws",
+    "*.iml",
+    "*.ipr",
+    ".classpath",
+    ".factorypath",
+    ".project",
+    ".settings/**",
+    "*.log",
+    "*.xml.versionsBackup",
+    "*.swp",
+    "rebel.xml",
+    "application-my.yaml",
+    "**/.DS_Store",
+    "node_modules/**",
+    ".git/**",
+    ".github/**",
+    "dist/**",
+    "build/**",
+    ".next/**",
+    "__pycache__/**",
+    "*.lock",
+    "*.bin",
+    "*.pdf",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.gif",
+    "*.mp4",
+    "*.zip",
+    "*.tar",
+    "*.gz"
+  ],
+  "modules": [
+    {
+      "path": "yudao-dependencies",
+      "name": "依赖管理",
+      "type": "dependencies",
+      "language": "maven",
+      "description": "统一管理所有第三方依赖版本，基于 BOM 模式",
+      "entry_points": [],
+      "has_tests": false,
+      "has_config": true,
+      "files_scanned": 1,
+      "doc_path": null
+    },
+    {
+      "path": "yudao-framework",
+      "name": "技术框架层",
+      "type": "framework",
+      "language": "java",
+      "description": "封装技术组件，提供可复用的技术能力",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "sub_modules": [
+        "yudao-common",
+        "yudao-spring-boot-starter-mybatis",
+        "yudao-spring-boot-starter-redis",
+        "yudao-spring-boot-starter-web",
+        "yudao-spring-boot-starter-security",
+        "yudao-spring-boot-starter-websocket",
+        "yudao-spring-boot-starter-monitor",
+        "yudao-spring-boot-starter-protection",
+        "yudao-spring-boot-starter-job",
+        "yudao-spring-boot-starter-mq",
+        "yudao-spring-boot-starter-excel",
+        "yudao-spring-boot-starter-test",
+        "yudao-spring-boot-starter-biz-tenant",
+        "yudao-spring-boot-starter-biz-data-permission",
+        "yudao-spring-boot-starter-biz-ip"
+      ],
+      "files_scanned": 32,
+      "doc_path": "yudao-framework/CLAUDE.md"
+    },
+    {
+      "path": "yudao-server",
+      "name": "应用启动",
+      "type": "application",
+      "language": "java",
+      "description": "Spring Boot 应用启动入口，整合所有模块",
+      "entry_points": [
+        "src/main/java/cn/iocoder/yudao/server/YudaoServerApplication.java"
+      ],
+      "has_tests": false,
+      "has_config": true,
+      "config_files": [
+        "src/main/resources/application.yaml",
+        "src/main/resources/application-local.yaml",
+        "src/main/resources/application-dev.yaml"
+      ],
+      "files_scanned": 4,
+      "doc_path": null
+    },
+    {
+      "path": "yudao-module-system",
+      "name": "系统功能模块",
+      "type": "business",
+      "language": "java",
+      "description": "用户、角色、菜单、部门、租户等系统管理功能",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "system_user",
+        "system_role",
+        "system_menu",
+        "system_dept",
+        "system_tenant"
+      ],
+      "api_controllers": true,
+      "files_scanned": 15,
+      "doc_path": "yudao-module-system/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-infra",
+      "name": "基础设施模块",
+      "type": "business",
+      "language": "java",
+      "description": "代码生成、文件存储、定时任务、API 日志等基础设施功能",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "infra_job",
+        "infra_file",
+        "infra_config",
+        "infra_api_access_log",
+        "infra_api_error_log"
+      ],
+      "api_controllers": true,
+      "files_scanned": 20,
+      "doc_path": "yudao-module-infra/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-bpm",
+      "name": "工作流程模块",
+      "type": "business",
+      "language": "java",
+      "description": "基于 Flowable 的工作流引擎，支持 BPMN + 仿钉钉/飞书双设计器",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "bpm_process_definition",
+        "bpm_task",
+        "bpm_process_instance",
+        "bpm_user_group",
+        "bpm_form"
+      ],
+      "api_controllers": true,
+      "files_scanned": 25,
+      "doc_path": "yudao-module-bpm/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-pay",
+      "name": "支付系统模块",
+      "type": "business",
+      "language": "java",
+      "description": "支付宝、微信等支付渠道，支付订单、退款订单管理",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "pay_order",
+        "pay_refund",
+        "pay_app",
+        "pay_channel"
+      ],
+      "api_controllers": true,
+      "files_scanned": 10,
+      "doc_path": "yudao-module-pay/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-member",
+      "name": "会员中心模块",
+      "type": "business",
+      "language": "java",
+      "description": "会员管理、会员等级、会员标签、积分签到等",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "member_user",
+        "member_level",
+        "member_tag",
+        "member_point",
+        "member_sign_in"
+      ],
+      "api_controllers": true,
+      "files_scanned": 12,
+      "doc_path": "yudao-module-member/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-report",
+      "name": "数据报表模块",
+      "type": "business",
+      "language": "java",
+      "description": "基于积木报表、GoView 的报表与大屏设计器",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": false,
+      "api_controllers": true,
+      "files_scanned": 5,
+      "doc_path": "yudao-module-report/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-mall",
+      "name": "商城系统模块",
+      "type": "business",
+      "language": "java",
+      "description": "商品、订单、购物车、促销活动、营销工具等电商功能",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "sub_modules": [
+        "yudao-module-product",
+        "yudao-module-promotion",
+        "yudao-module-statistics",
+        "yudao-module-trade",
+        "yudao-module-trade-api"
+      ],
+      "database_tables": [
+        "mall_product",
+        "mall_order",
+        "mall_cart",
+        "mall_promotion"
+      ],
+      "api_controllers": true,
+      "files_scanned": 30,
+      "doc_path": "yudao-module-mall/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-crm",
+      "name": "CRM 系统模块",
+      "type": "business",
+      "language": "java",
+      "description": "客户关系管理、线索、商机、合同、回款等",
+      "entry_points": [],
+      "has_tests": false,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "crm_customer",
+        "crm_leads",
+        "crm_business",
+        "crm_contract",
+        "crm_receivable"
+      ],
+      "api_controllers": true,
+      "files_scanned": 15,
+      "doc_path": "yudao-module-crm/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-erp",
+      "name": "ERP 系统模块",
+      "type": "business",
+      "language": "java",
+      "description": "进销存管理、采购、销售、库存、财务等",
+      "entry_points": [],
+      "has_tests": false,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "erp_stock",
+        "erp_purchase",
+        "erp_sale",
+        "erp_warehouse"
+      ],
+      "api_controllers": true,
+      "files_scanned": 15,
+      "doc_path": "yudao-module-erp/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-ai",
+      "name": "AI 大模型模块",
+      "type": "business",
+      "language": "java",
+      "description": "AI 对话、知识库、图像生成、音乐生成、工作流编排等功能",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "ai_chat_message",
+        "ai_chat_conversation",
+        "ai_knowledge",
+        "ai_image",
+        "ai_music"
+      ],
+      "api_controllers": true,
+      "files_scanned": 60,
+      "doc_path": "yudao-module-ai/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-iot",
+      "name": "物联网模块",
+      "type": "business",
+      "language": "java",
+      "description": "设备管理、物模型、数据规则引擎、场景联动等 IoT 功能",
+      "entry_points": [],
+      "has_tests": true,
+      "has_config": true,
+      "has_database": true,
+      "sub_modules": [
+        "yudao-module-iot-biz",
+        "yudao-module-iot-core",
+        "yudao-module-iot-gateway"
+      ],
+      "database_tables": [
+        "iot_device",
+        "iot_product",
+        "iot_thing_model",
+        "iot_data_rule"
+      ],
+      "api_controllers": true,
+      "files_scanned": 25,
+      "doc_path": "yudao-module-iot/CLAUDE.md"
+    },
+    {
+      "path": "yudao-module-mp",
+      "name": "微信公众号模块",
+      "type": "business",
+      "language": "java",
+      "description": "粉丝管理、消息管理、素材管理、菜单管理等微信公众号功能",
+      "entry_points": [],
+      "has_tests": false,
+      "has_config": true,
+      "has_database": true,
+      "database_tables": [
+        "mp_account",
+        "mp_message",
+        "mp_user",
+        "mp_menu",
+        "mp_material"
+      ],
+      "api_controllers": true,
+      "files_scanned": 10,
+      "doc_path": "yudao-module-mp/CLAUDE.md"
+    }
+  ],
+  "coverage": {
+    "estimated_total_files": 2500,
+    "scanned_files": 314,
+    "coverage_percentage": 12.6,
+    "module_coverage": {
+      "total_modules": 15,
+      "documented_modules": 12,
+      "missing_docs": [
+        "yudao-dependencies",
+        "yudao-server"
+      ]
+    },
+    "gaps": [
+      {
+        "module": "yudao-module-system",
+        "gap": "需补充详细的 API 接口文档与数据模型"
+      },
+      {
+        "module": "yudao-module-infra",
+        "gap": "需补充代码生成器的使用指南"
+      },
+      {
+        "module": "yudao-module-crm",
+        "gap": "需补充测试用例"
+      },
+      {
+        "module": "yudao-module-erp",
+        "gap": "需补充测试用例"
+      },
+      {
+        "module": "yudao-module-mp",
+        "gap": "需补充测试用例"
+      }
+    ]
+  },
+  "database": {
+    "main_scripts": {
+      "mysql": "sql/mysql/ruoyi-vue-pro.sql",
+      "oracle": "sql/oracle/ruoyi-vue-pro.sql",
+      "postgresql": "sql/postgresql/ruoyi-vue-pro.sql",
+      "sqlserver": "sql/sqlserver/ruoyi-vue-pro.sql",
+      "dm": "sql/dm/ruoyi-vue-pro-dm8.sql",
+      "kingbase": "sql/kingbase/ruoyi-vue-pro.sql"
+    },
+    "total_tables": 200,
+    "table_prefixes": [
+      "system_",
+      "infra_",
+      "bpm_",
+      "pay_",
+      "mall_",
+      "crm_",
+      "erp_",
+      "ai_",
+      "iot_",
+      "member_",
+      "mp_"
+    ]
+  },
+  "technologies": {
+    "languages": ["java", "sql"],
+    "frameworks": [
+      "spring-boot-3.5.5",
+      "spring-security-6.5.2",
+      "mybatis-plus-3.5.12",
+      "flowable-7.0.0",
+      "quartz-2.5.0"
+    ],
+    "databases": [
+      "mysql-5.7",
+      "mysql-8.0",
+      "oracle",
+      "postgresql",
+      "sqlserver",
+      "mariadb",
+      "dm",
+      "kingbase",
+      "tidb"
+    ],
+    "middleware": [
+      "redis",
+      "redisson-3.35.0",
+      "rabbitmq",
+      "kafka",
+      "rocketmq"
+    ]
+  },
+  "next_steps": [
+    "为每个业务模块生成独立的 CLAUDE.md 文档",
+    "补充 API 接口清单与数据模型说明",
+    "为缺少测试的模块（crm、erp、mp）补充测试用例",
+    "完善代码生成器的详细使用指南",
+    "添加更多的代码示例与最佳实践"
+  ]
+}
