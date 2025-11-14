@@ -53,44 +53,124 @@ CREATE TABLE IF NOT EXISTS `ai_workflow` (
 -- ============================================================
 
 -- 添加推理内容字段
-ALTER TABLE `ai_chat_message`
-ADD COLUMN IF NOT EXISTS `reasoning_content` text COLLATE utf8mb4_unicode_ci COMMENT '推理内容(用于存储模型的推理过程)' AFTER `content`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_chat_message'
+      AND COLUMN_NAME = 'reasoning_content');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_chat_message` ADD COLUMN `reasoning_content` text COLLATE utf8mb4_unicode_ci COMMENT ''推理内容(用于存储模型的推理过程)'' AFTER `content`',
+    'SELECT ''Column reasoning_content already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 添加联网搜索字段
-ALTER TABLE `ai_chat_message`
-ADD COLUMN IF NOT EXISTS `web_search_pages` varchar(8192) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '联网搜索的网页内容数组(JSON 格式)' AFTER `segment_ids`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_chat_message'
+      AND COLUMN_NAME = 'web_search_pages');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_chat_message` ADD COLUMN `web_search_pages` varchar(8192) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT ''联网搜索的网页内容数组(JSON 格式)'' AFTER `segment_ids`',
+    'SELECT ''Column web_search_pages already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 添加附件URL字段
-ALTER TABLE `ai_chat_message`
-ADD COLUMN IF NOT EXISTS `attachment_urls` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '附件 URL 数组(逗号分隔)' AFTER `web_search_pages`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_chat_message'
+      AND COLUMN_NAME = 'attachment_urls');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_chat_message` ADD COLUMN `attachment_urls` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT ''附件 URL 数组(逗号分隔)'' AFTER `web_search_pages`',
+    'SELECT ''Column attachment_urls already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- ============================================================
 -- 3. ai_chat_role 表添加字段
 -- ============================================================
 
 -- 添加知识库关联字段
-ALTER TABLE `ai_chat_role`
-ADD COLUMN IF NOT EXISTS `knowledge_ids` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '引用的知识库编号列表(逗号分隔)' AFTER `model_id`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_chat_role'
+      AND COLUMN_NAME = 'knowledge_ids');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_chat_role` ADD COLUMN `knowledge_ids` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT ''引用的知识库编号列表(逗号分隔)'' AFTER `model_id`',
+    'SELECT ''Column knowledge_ids already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 添加工具关联字段
-ALTER TABLE `ai_chat_role`
-ADD COLUMN IF NOT EXISTS `tool_ids` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '引用的工具编号列表(逗号分隔)' AFTER `knowledge_ids`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_chat_role'
+      AND COLUMN_NAME = 'tool_ids');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_chat_role` ADD COLUMN `tool_ids` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT ''引用的工具编号列表(逗号分隔)'' AFTER `knowledge_ids`',
+    'SELECT ''Column tool_ids already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 添加MCP客户端关联字段
-ALTER TABLE `ai_chat_role`
-ADD COLUMN IF NOT EXISTS `mcp_client_names` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '引用的 MCP Client 名字列表(逗号分隔)' AFTER `tool_ids`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_chat_role'
+      AND COLUMN_NAME = 'mcp_client_names');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_chat_role` ADD COLUMN `mcp_client_names` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT ''引用的 MCP Client 名字列表(逗号分隔)'' AFTER `tool_ids`',
+    'SELECT ''Column mcp_client_names already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- ============================================================
 -- 4. ai_music 表添加字段
 -- ============================================================
 
 -- 添加音乐标签字段
-ALTER TABLE `ai_music`
-ADD COLUMN IF NOT EXISTS `tags` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '音乐风格标签(JSON 数组格式)' AFTER `model`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_music'
+      AND COLUMN_NAME = 'tags');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_music` ADD COLUMN `tags` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT ''音乐风格标签(JSON 数组格式)'' AFTER `model`',
+    'SELECT ''Column tags already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 添加音乐时长字段
-ALTER TABLE `ai_music`
-ADD COLUMN IF NOT EXISTS `duration` double DEFAULT NULL COMMENT '音乐时长(秒)' AFTER `tags`;
+SET @col_exists = (SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'ai_music'
+      AND COLUMN_NAME = 'duration');
+
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `ai_music` ADD COLUMN `duration` double DEFAULT NULL COMMENT ''音乐时长(秒)'' AFTER `tags`',
+    'SELECT ''Column duration already exists'' AS message');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- ============================================================
 -- 升级完成
