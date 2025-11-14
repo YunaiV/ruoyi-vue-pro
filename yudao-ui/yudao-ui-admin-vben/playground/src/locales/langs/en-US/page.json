@@ -1,0 +1,16 @@
+{
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "codeLogin": "Code Login",
+    "qrcodeLogin": "Qr Code Login",
+    "forgetPassword": "Forget Password",
+    "sendingCode": "SMS Code is sending...",
+    "codeSentTo": "Code has been sent to {0}"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "analytics": "Analytics",
+    "workspace": "Workspace"
+  }
+}

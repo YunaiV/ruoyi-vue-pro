@@ -1,0 +1,58 @@
+/**
+ * 这里是 uni-list 组件内置的常用样式变量
+ * 如果需要覆盖样式，这里提供了基本的组件样式变量，您可以尝试修改这里的变量，去完成样式替换，而不用去修改源码
+ *
+ */
+
+// 背景色
+$background-color : #fff;
+// 分割线颜色
+$divide-line-color : #e5e5e5;
+
+// 默认头像大小，如需要修改此值，注意同步修改 js 中的值 const avatarWidth = xx ，目前只支持方形头像
+// nvue 页面不支持修改头像大小
+$avatar-width : 45px ;
+
+// 头像边框
+$avatar-border-radius: 5px;
+$avatar-border-color: #eee;
+$avatar-border-width: 1px;
+
+// 标题文字样式
+$title-size : 16px;
+$title-color : #3b4144;
+$title-weight : normal;
+
+// 描述文字样式
+$note-size : 12px;
+$note-color : #999;
+$note-weight : normal;
+
+// 右侧额外内容默认样式
+$right-text-size : 12px;
+$right-text-color : #999;
+$right-text-weight : normal;
+
+// 角标样式
+// nvue 页面不支持修改圆点位置以及大小
+// 角标在左侧时，角标的位置，默认为 0 ，负数左/下移动，正数右/上移动
+$badge-left: 0px;
+$badge-top: 0px;
+
+// 显示圆点时，圆点大小
+$dot-width: 10px;
+$dot-height: 10px;
+
+// 显示角标时，角标大小和字体大小
+$badge-size : 18px;
+$badge-font : 12px;
+// 显示角标时，角标前景色
+$badge-color : #fff;
+// 显示角标时，角标背景色
+$badge-background-color : #ff5a5f;
+// 显示角标时，角标左右间距
+$badge-space : 6px;
+
+// 状态样式
+// 选中颜色
+$hover : #f5f5f5;

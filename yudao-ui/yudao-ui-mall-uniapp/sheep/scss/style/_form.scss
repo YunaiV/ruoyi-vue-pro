@@ -1,0 +1,121 @@
+/* ==================
+         表单
+ ==================== */
+.ui-form-item {
+  padding: 1rpx 24rpx;
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  justify-content: space-between;
+  .title {
+    text-align: justify;
+    padding-right: 30rpx;
+    font-size: 30rpx;
+    position: relative;
+    height: 60rpx;
+    line-height: 60rpx;
+  }
+  .content {
+    flex: 1;
+  }
+  input,
+  ui-input {
+    flex: 1;
+    font-size: 30rpx;
+    color: #555;
+    padding-right: 20rpx;
+  }
+  text[class*='icon-'] {
+    font-size: 36rpx;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  textarea {
+    margin: 32rpx 0 30rpx;
+    height: 4.6em;
+    width: 100%;
+    line-height: 1.2em;
+    flex: 1;
+    font-size: 28rpx;
+    padding: 0;
+  }
+  picker,
+  .arrow {
+    flex: 1;
+    padding-right: 40rpx;
+    overflow: hidden;
+    position: relative;
+  }
+  picker .picker,
+  .arrow > view {
+    line-height: 100rpx;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+  }
+  picker::after,
+  .arrow::after {
+    font-family: 'ui';
+    display: block;
+    content: '\e605';
+    position: absolute;
+    font-size: 34rpx;
+    color: #8799a3;
+    line-height: 100rpx;
+    width: 60rpx;
+    text-align: center;
+    top: 0;
+    bottom: 0;
+    right: -20rpx;
+    margin: auto;
+  }
+  textarea[disabled],
+  textarea[disabled] .placeholder {
+    color: transparent;
+  }
+  &.align-start .title {
+    height: 1em;
+    margin-top: 32rpx;
+    line-height: 1em;
+  }
+  .grid-square {
+    > view {
+      background-color: #f8f8f8;
+      border-radius: 12rpx;
+      .mask {
+        background-color: rgba(0, 0, 0, 0.6);
+        position: absolute;
+        font-size: 20rpx;
+        color: #ffffff;
+        width: 100%;
+        bottom: 0;
+        text-align: center;
+        padding: 6rpx 0;
+        &.red-mask {
+          background-color: rgba(255, 80, 80, 0.6);
+        }
+      }
+      [class*='icon'] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        transform: scale(1.5);
+        justify-content: center;
+      }
+      .text-gray {
+        position: absolute;
+        width: 100%;
+        font-size: 24rpx;
+        text-align: center;
+        bottom: 20rpx;
+      }
+    }
+  }
+}
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}

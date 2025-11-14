@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<style type="text/css">
+		html,
+		body,
+		canvas {
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			overflow-y: hidden;
+			background-color: transparent;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="lime-painter"></canvas>
+	<script type="text/javascript" src="./uni.webview.1.5.3.js"></script>
+	<script type="text/javascript" src="./painter.js"></script>
+	<script> 
+		var cache = [];
+		var painter = null;
+		var canvas = null;
+		var context = null;
+		var timer = null;
+		var pixelRatio = 1;
+		console.log = function (...args) {
+			postMessage(args);
+		};
+		// function stringify(key, value) {
+		// 	if (typeof value === 'object' && value !== null) {
+		// 		if (cache.indexOf(value) !== -1) {
+		// 			return;
+		// 		}
+		// 		cache.push(value);
+		// 	}
+		// 	return value;
+		// };
+
+		function emit(event, data) {
+			postMessage({
+				event,
+				data: (typeof data !== 'object' && data !== null ? data : JSON.stringify(data)) 
+			});
+			cache = [];
+		};
+		function postMessage(data) {
+			uni.postMessage({
+				data
+			});
+		};
+		
+		function init(dpr) {
+			canvas = document.querySelector('#lime-painter');
+			context = canvas.getContext('2d');
+			pixelRatio = dpr || window.devicePixelRatio;
+			painter = new Painter({
+				id: 'lime-painter',
+				context,
+				canvas,
+				pixelRatio,
+				width: canvas.offsetWidth,
+				height: canvas.offsetHeight,
+				listen: {
+					onProgress(v) {
+						emit('progressChange', v);
+					},
+					onEffectFail(err) {
+						//console.error(err)
+						emit('fail', err);
+					}
+				}
+			});
+			emit('inited', true);
+		};
+		function save(args) {
+			delete args.success;
+			delete args.fail;
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				const path = painter.save(args);
+				if (typeof path == 'string') {
+					const index = Math.ceil(path.length / 8);
+					for (var i = 0; i < 8; i++) {
+						if (i == 7) {
+							emit('success', path.substr(i * index, index));
+						} else {
+							emit('file', path.substr(i * index, index));
+						}
+					};
+				} else {
+					// console.log('canvas no data')
+					emit('fail', 'canvas no data');
+				};
+			}, 30);
+		};
+		async function source(args) {
+			let size = await painter.source(args);
+			emit('layoutChange', size);
+			if(!canvas.height) {
+				console.log('canvas no size')
+				emit('fail', 'canvas no size');
+			}
+			painter.render().catch(err => {
+				// console.error(err)
+				emit('fail', err);
+			});
+		};
+	</script>
+</body>
+
+</html>

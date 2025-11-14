@@ -1,0 +1,21 @@
+{
+  "name": "@vben/backend-mock",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "license": "MIT",
+  "author": "",
+  "scripts": {
+    "build": "nitro build",
+    "start": "nitro dev"
+  },
+  "dependencies": {
+    "@faker-js/faker": "catalog:",
+    "jsonwebtoken": "catalog:",
+    "nitropack": "catalog:"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "catalog:",
+    "h3": "catalog:"
+  }
+}

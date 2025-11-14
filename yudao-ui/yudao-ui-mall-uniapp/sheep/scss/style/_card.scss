@@ -1,0 +1,353 @@
+/* ==================
+         卡片
+ ==================== */
+
+.ui-cards {
+  display: block;
+  overflow: hidden;
+  & .ui-btn.badge {
+    top: 0;
+    right: 0;
+    font-size: 24rpx;
+    padding: 0rpx 15rpx;
+    height: 40rpx;
+  }
+  &.no-card > .ui-item {
+    margin: 0rpx;
+    border-radius: 0rpx;
+  }
+  & > .ui-item {
+    display: block;
+    overflow: hidden;
+    border-radius: 10rpx;
+    margin: 30rpx;
+  }
+  & > .ui-item.shadow-blur {
+    overflow: initial;
+  }
+  .grid.grid-square {
+    margin-bottom: -20rpx;
+  }
+  &.article {
+    display: block;
+    & > .ui-item {
+      padding: 30rpx;
+      background-color: var(--box-bg);
+      display: flex;
+      align-items: flex-start;
+    }
+    & > .time {
+      padding: 30rpx 0 0 30rpx;
+    }
+    & > .ui-item .title {
+      font-size: 30rpx;
+      font-weight: 900;
+      color: #333333;
+    }
+    & > .ui-item .content {
+      flex: 1;
+    }
+    & > .ui-item > image {
+      width: 240rpx;
+      height: 6.4em;
+      margin-left: 20rpx;
+      border-radius: 6rpx;
+    }
+    & > .ui-item .content .desc {
+      font-size: 12px;
+      color: var(--text-c);
+    }
+    & > .ui-item .content .text-content {
+      font-size: 28rpx;
+      color: #888;
+    }
+  }
+  &.case {
+    .image {
+      position: relative;
+      image {
+        width: 100%;
+        display: block;
+      }
+      .ui-tag {
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      .ui-bar {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background-color: transparent;
+        padding: 0rpx 30rpx;
+      }
+      .bg-black {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+      }
+    }
+    &.no-card .image {
+      margin: 30rpx 30rpx 0;
+      overflow: hidden;
+      border-radius: 10rpx;
+    }
+  }
+  &.dynamic {
+    display: block;
+    & > .ui-item {
+      display: block;
+      overflow: hidden;
+      & > .text-content {
+        padding: 0 30rpx 0;
+        font-size: 30rpx;
+        margin-bottom: 20rpx;
+      }
+      & .square-img {
+        width: 100%;
+        height: 200rpx;
+        border-radius: 6rpx;
+      }
+      & .only-img {
+        width: 100%;
+        height: 320rpx;
+        border-radius: 6rpx;
+      }
+    }
+  }
+  &.goods {
+    display: block;
+    & > .ui-item {
+      padding: 30rpx;
+      display: flex;
+      position: relative;
+      background-color: var(--ui-BG);
+      & + .ui-item {
+        border-top: 1rpx solid #eeeeee;
+      }
+      .content {
+        width: 410rpx;
+        padding: 0rpx;
+      }
+      .title {
+        font-size: 30rpx;
+        font-weight: 900;
+        color: #333333;
+        line-height: 1.4;
+        height: 1.4em;
+        overflow: hidden;
+      }
+    }
+    &.col-goods.col-twice {
+      display: flex;
+      flex-wrap: wrap;
+      padding-bottom: 30rpx;
+      & > .ui-item {
+        width: calc(50% - 30rpx);
+        margin: 20rpx 20rpx 0rpx 20rpx;
+        .content {
+          padding: 20rpx;
+        }
+      }
+      & > .ui-item:nth-child(2n) {
+        margin-left: 0rpx;
+      }
+    }
+    &.col-goods > .ui-item {
+      padding: 0rpx;
+      display: block;
+      border: 0px;
+      .content {
+        width: 100%;
+        padding: 30rpx;
+      }
+    }
+    &.no-card > .ui-item .content {
+      width: 470rpx;
+      padding: 0rpx;
+    }
+    &.no-card > .ui-item .title,
+    &.col-goods > .ui-item .title {
+      height: 3em;
+      overflow: hidden;
+    }
+    & > .ui-item .text-linecut-2 {
+      -webkit-line-clamp: 1;
+    }
+    &.no-card > .ui-item .text-linecut-2,
+    &.col-goods > .ui-item .text-linecut-2 {
+      -webkit-line-clamp: 2;
+      line-height: 1.6em;
+      height: 3.2em;
+    }
+    & > .ui-item > image {
+      width: 200rpx;
+      height: 200rpx;
+      margin-right: 20rpx;
+      border-radius: 6rpx;
+    }
+    &.no-card > .ui-item > image {
+      width: 220rpx;
+      height: 170rpx;
+    }
+    &.col-goods > .ui-item > image {
+      width: 100%;
+      height: 340rpx;
+      border-bottom-left-radius: 0rpx;
+      border-bottom-right-radius: 0rpx;
+      display: block;
+    }
+    &.col-goods.col-twice > .ui-item > image {
+      height: 236rpx;
+    }
+  }
+  &.loan {
+    display: block;
+    & > .ui-item {
+      padding: 30rpx 0 30rpx 30rpx;
+      display: flex;
+      position: relative;
+      background-color: var(--box-bg);
+
+      .content {
+        width: 450rpx;
+        padding: 0rpx;
+        .tag-list {
+          width: 450rpx;
+          display: flex;
+          flex-wrap: wrap;
+          font-size: 12px;
+          margin-top: 18rpx;
+        }
+      }
+      .action {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+    }
+  }
+  &.houses {
+    display: block;
+    & > .ui-item {
+      padding: 20rpx;
+      display: flex;
+      position: relative;
+      background-color: var(--box-bg);
+      .image {
+        width: 230rpx;
+        height: 180rpx;
+        margin-right: 20rpx;
+        border-radius: 6rpx;
+      }
+      .content {
+        width: 400rpx;
+        padding: 0rpx;
+        .tag-list {
+          width: 400rpx;
+          display: flex;
+          flex-wrap: wrap;
+          font-size: 12px;
+          margin-top: 10rpx;
+          .ui-item {
+            height: 20px;
+            line-height: 20px;
+          }
+        }
+      }
+      .action {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+    }
+  }
+
+  &.product {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 30rpx;
+    & > .ui-item {
+      width: calc(100% - 15rpx);
+      margin: 20rpx 20rpx 0rpx 20rpx;
+      background-color: var(--box-bg);
+      position: relative;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      // display: flex;
+      // flex-wrap: wrap;
+      .content {
+        padding: 20rpx;
+        // width: calc(100% - 345rpx);
+        .text-cut {
+          font-size: 16px;
+        }
+      }
+      .image {
+        width: 100%;
+        height: 240rpx;
+        border-radius: 6rpx 0 0 6rpx;
+        display: block;
+      }
+      .ui-progress-tag {
+        width: 4em;
+        text-align: right;
+        font-size: 12px;
+      }
+      .border-top {
+        width: 100%;
+      }
+      .ui-tag {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 6rpx 0 6rpx 0;
+      }
+    }
+    // & > .ui-item:nth-child(2n) {
+    // 	margin-left: 0rpx;
+    // }
+  }
+  &.shop {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 30rpx;
+    & > .ui-item {
+      width: calc(50% - 30rpx);
+      margin: 20rpx 20rpx 0rpx 20rpx;
+      background-color: var(--box-bg);
+      padding: 20rpx;
+      .content {
+        margin-top: 15rpx;
+      }
+      .image {
+        width: 100%;
+        height: 285rpx;
+        border-radius: 6rpx;
+        display: block;
+      }
+    }
+    & > .ui-item:nth-child(2n) {
+      margin-left: 0rpx;
+    }
+  }
+
+  &.orders .ui-item {
+    margin-top: 30rpx;
+    .address-box {
+      padding: 15rpx;
+      margin: 0 30rpx 30rpx;
+      border: 1px solid;
+      border-color: var(--main-a);
+      border-radius: 10px;
+      position: relative;
+      .ui-form-group {
+        min-height: 10px;
+      }
+    }
+  }
+}

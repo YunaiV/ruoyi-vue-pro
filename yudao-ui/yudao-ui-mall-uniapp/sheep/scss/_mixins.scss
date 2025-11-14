@@ -1,0 +1,61 @@
+@mixin bg-square {
+  background: {
+    color: #fff;
+    image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%),
+      linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%);
+    size: 40rpx 40rpx;
+    position: 0 0, 20rpx 20rpx;
+  }
+}
+
+@mixin flex($direction: row) {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: $direction;
+}
+@mixin flex-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin arrow {
+  content: '';
+  height: 0;
+  width: 0;
+  position: absolute;
+}
+@mixin arrow-top {
+  @include arrow;
+  // border-color: transparent transparent $ui-BG;
+  border-style: none solid solid;
+  border-width: 0 20rpx 20rpx;
+}
+
+@mixin arrow-right {
+  @include arrow;
+  // border-color: transparent  $ui-BG transparent;
+  border-style: solid solid solid none;
+  border-width: 20rpx 20rpx 20rpx 0;
+}
+@mixin position-center {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+}
+
+@mixin blur {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  color: var(--ui-TC);
+}

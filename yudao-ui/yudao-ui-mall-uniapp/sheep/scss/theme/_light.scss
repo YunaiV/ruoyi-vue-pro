@@ -1,0 +1,39 @@
+// 核心主题样式文件
+@mixin theme-light {
+  // 背景色
+  --ui-BG: #ffffff;
+  --ui-BG-1: #f6f6f6;
+  --ui-BG-2: #f1f1f1;
+  --ui-BG-3: #e8e8e8;
+  --ui-BG-4: #e0e0e0;
+
+  // 文本色
+  --ui-TC: #303030;
+  --ui-TC-1: #525252;
+  --ui-TC-2: #777777;
+  --ui-TC-3: #9e9e9e;
+  --ui-TC-4: #c6c6c6;
+
+  // 模糊
+  --ui-Blur: rgba(255, 255, 255, 0.98);
+  --ui-Blur-1: rgba(255, 255, 255, 0.75);
+  --ui-Blur-2: rgba(255, 255, 255, 0.25);
+  --ui-Blur-3: rgba(255, 255, 255, 0.05);
+
+  // 边框
+  --ui-Border: rgba(119, 119, 119, 0.25);
+  --ui-Outline: rgba(0, 0, 0, 0.1);
+  --ui-Line: rgba(119, 119, 119, 0.25);
+
+  // 透明与阴影
+  --ui-Shadow: 0 0.5em 1em rgba(0, 0, 0, 0.15);
+  --ui-Shadow-sm: 0 0.125em 0.25em rgba(0, 0, 0, 0.075);
+  --ui-Shadow-lg: 0 1em 3em rgba(0, 0, 0, 0.175);
+  --ui-Shadow-inset: inset 0 0.1em 0.2em rgba(0, 0, 0, 0.075);
+
+  --ui-Shadow-opacity: 0.45;
+  --ui-Shadow-opacity-sm: 0.075;
+  --ui-Shadow-opacity-lg: 0.65;
+
+  --ui-BG-opacity: 0.1;
+}

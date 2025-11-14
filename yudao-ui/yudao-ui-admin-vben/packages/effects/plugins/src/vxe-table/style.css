@@ -1,0 +1,143 @@
+:root .vxe-grid {
+  --vxe-ui-font-color: hsl(var(--foreground));
+  --vxe-ui-font-primary-color: hsl(var(--primary));
+
+  /* --vxe-ui-font-lighten-color: #babdc0;
+  --vxe-ui-font-darken-color: #86898e; */
+  --vxe-ui-font-disabled-color: hsl(var(--foreground) / 50%);
+
+  /* base */
+  --vxe-ui-base-popup-border-color: hsl(var(--border));
+  --vxe-ui-input-disabled-color: hsl(var(--border) / 60%);
+
+  /* --vxe-ui-base-popup-box-shadow: 0px 12px 30px 8px rgb(0 0 0 / 50%); */
+
+  /* layout */
+  --vxe-ui-layout-background-color: hsl(var(--background));
+  --vxe-ui-table-resizable-line-color: hsl(var(--heavy));
+
+  /* --vxe-ui-table-fixed-left-scrolling-box-shadow: 8px 0px 10px -5px hsl(var(--accent));
+  --vxe-ui-table-fixed-right-scrolling-box-shadow: -8px 0px 10px -5px hsl(var(--accent)); */
+
+  /* input */
+  --vxe-ui-input-border-color: hsl(var(--border));
+
+  /* --vxe-ui-input-placeholder-color: #8d9095; */
+
+  /* --vxe-ui-input-disabled-background-color: #262727; */
+
+  /* loading */
+  --vxe-ui-loading-background-color: hsl(var(--overlay-content));
+
+  /* table */
+  --vxe-ui-table-header-background-color: hsl(var(--accent));
+  --vxe-ui-table-border-color: hsl(var(--border));
+  --vxe-ui-table-row-hover-background-color: hsl(var(--accent-hover));
+  --vxe-ui-table-row-striped-background-color: hsl(var(--accent) / 60%);
+  --vxe-ui-table-row-hover-striped-background-color: hsl(var(--accent));
+  --vxe-ui-table-row-radio-checked-background-color: hsl(var(--accent));
+  --vxe-ui-table-row-hover-radio-checked-background-color: hsl(
+    var(--accent-hover)
+  );
+  --vxe-ui-table-row-checkbox-checked-background-color: hsl(var(--accent));
+  --vxe-ui-table-row-hover-checkbox-checked-background-color: hsl(
+    var(--accent-hover)
+  );
+  --vxe-ui-table-row-current-background-color: hsl(var(--accent));
+  --vxe-ui-table-row-hover-current-background-color: hsl(var(--accent-hover));
+  --vxe-ui-font-primary-tinge-color: hsl(var(--primary));
+  --vxe-ui-font-primary-lighten-color: hsl(var(--primary) / 60%);
+  --vxe-ui-font-primary-darken-color: hsl(var(--primary));
+
+  height: auto !important;
+
+  /* --vxe-ui-table-fixed-scrolling-box-shadow-color: rgb(0 0 0 / 80%); */
+}
+
+.vxe-pager {
+  .vxe-pager--prev-btn:not(.is--disabled):active,
+  .vxe-pager--next-btn:not(.is--disabled):active,
+  .vxe-pager--num-btn:not(.is--disabled):active,
+  .vxe-pager--jump-prev:not(.is--disabled):active,
+  .vxe-pager--jump-next:not(.is--disabled):active,
+  .vxe-pager--prev-btn:not(.is--disabled):focus,
+  .vxe-pager--next-btn:not(.is--disabled):focus,
+  .vxe-pager--num-btn:not(.is--disabled):focus,
+  .vxe-pager--jump-prev:not(.is--disabled):focus,
+  .vxe-pager--jump-next:not(.is--disabled):focus {
+    color: hsl(var(--accent-foreground));
+    background-color: hsl(var(--accent));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 0 0 1px hsl(var(--border));
+  }
+
+  .vxe-pager--wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .vxe-pager--sizes {
+    margin-right: auto;
+  }
+}
+
+.vxe-pager--wrapper {
+  @apply justify-center md:justify-end;
+}
+
+.vxe-tools--operate {
+  margin-right: 0.25rem;
+  margin-left: 0.75rem;
+}
+
+.vxe-table-custom--checkbox-option:hover {
+  background: none !important;
+}
+
+.vxe-toolbar {
+  padding: 0;
+}
+
+.vxe-buttons--wrapper:not(:empty),
+.vxe-tools--operate:not(:empty),
+.vxe-tools--wrapper:not(:empty) {
+  padding: 0.6em 0;
+}
+
+.vxe-tools--operate:not(:has(button)) {
+  margin-left: 0;
+}
+
+.vxe-grid--layout-header-wrapper {
+  overflow: visible;
+}
+
+.vxe-grid--layout-body-content-wrapper {
+  overflow: hidden;
+}
+
+/* 必填字段错误样式 */
+.vxe-table .required-field-error::after {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  z-index: 10;
+  padding: 1px 4px;
+  font-size: 10px;
+  line-height: 1;
+  color: white;
+  content: '必填';
+  background-color: #ff4d4f;
+  border-radius: 0 0 0 4px;
+}
+
+/* 必填字段内的输入框样式 */
+.vxe-table .required-field-error .ant-select,
+.vxe-table .required-field-error .ant-input-number,
+.vxe-table .required-field-error .ant-input {
+  border-color: #ff4d4f !important;
+}
+
+.vxe-table .required-field-error .ant-select .ant-select-selector {
+  border-color: #ff4d4f !important;
+}

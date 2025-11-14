@@ -1,0 +1,26 @@
+export const MotionPresets = [
+  'fade',
+  'fadeVisible',
+  'fadeVisibleOnce',
+  'rollBottom',
+  'rollLeft',
+  'rollRight',
+  'rollTop',
+  'rollVisibleBottom',
+  'rollVisibleLeft',
+  'rollVisibleRight',
+  'rollVisibleTop',
+  'pop',
+  'popVisible',
+  'popVisibleOnce',
+  'slideBottom',
+  'slideLeft',
+  'slideRight',
+  'slideTop',
+  'slideVisibleBottom',
+  'slideVisibleLeft',
+  'slideVisibleRight',
+  'slideVisibleTop',
+] as const;
+
+export type MotionPreset = (typeof MotionPresets)[number];

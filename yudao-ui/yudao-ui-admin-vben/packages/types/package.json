@@ -1,0 +1,27 @@
+{
+  "name": "@vben/types",
+  "version": "5.5.9",
+  "homepage": "https://github.com/vbenjs/vue-vben-admin",
+  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
+    "directory": "packages/types"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./global": {
+      "types": "./global.d.ts"
+    }
+  },
+  "dependencies": {
+    "@vben-core/typings": "workspace:*",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  }
+}

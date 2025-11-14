@@ -1,0 +1,68 @@
+@import './light'; //浅蓝主题
+@import './dark'; //深蓝主题
+// 多主题
+.theme-light {
+  @include theme-light;
+}
+.theme-dark {
+  @include theme-dark;
+}
+.theme-auto {
+  @include theme-light;
+}
+@media (prefers-color-scheme: dark) {
+  .theme-auto {
+    @include theme-dark;
+  }
+}
+
+@each $value in ('', '-1', '-2', '-3', '-4') {
+  // 背景色 + 文字色 ： 白色 + 默认色；
+  .ui-BG#{$value} {
+    background-color: var(--ui-BG#{$value}) !important;
+    color: var(--ui-TC);
+  }
+  // 文字颜色
+  .ui-TC#{$value} {
+    color: var(--ui-TC#{$value}) !important;
+  }
+  // 主题色背景
+  .ui-BG-Main#{$value} {
+    background-color: var(--ui-BG-Main#{$value}) !important;
+    color: var(--ui-BG-Main-TC) !important;
+  }
+  // 主题色渐变，横向
+  .ui-BG-Main-Gradient {
+    background: linear-gradient(90deg, var(--ui-BG-Main), var(--ui-BG-Main-gradient)) !important;
+    color: var(--ui-BG-Main-TC) !important;
+  }
+  // 主题色文字
+  .ui-TC-Main#{$value} {
+    color: var(--ui-BG-Main#{$value}) !important;
+  }
+  // 主题色阴影
+  .ui-Shadow-Main {
+    box-shadow: var(--ui-Main-box-shadow) !important;
+  }
+  .ui-BG-Main-light {
+    background: var(----ui-BG-Main-light) !important;
+    color: var(--ui-BG-Main#{$value}) !important;
+  }
+}
+
+@each $color, $value in $colors {
+  .main-#{$color} {
+    --ui-BG-Main: #{$value};
+    --ui-BG-Main-tag: #{rgba($value, 0.05)};
+    --ui-BG-Main-gradient: #{rgba($value, 0.6)};
+    --ui-BG-Main-light: #{rgba($value, 0.2)};
+    --ui-BG-Main-opacity-1: #{rgba($value, 0.1)};
+    --ui-BG-Main-opacity-4: #{rgba($value, 0.4)};
+    --ui-Main-box-shadow: 0 0.2em 0.5em #{rgba($value, var(--ui-Shadow-opacity))};
+    --ui-BG-Main-1: #{mix(rgba(255, 255, 255, 0.7), desaturate($value, 20%), 10%)};
+    --ui-BG-Main-2: #{mix(rgba(255, 255, 255, 0.6), desaturate($value, 40%), 20%)};
+    --ui-BG-Main-3: #{mix(rgba(119, 119, 119, 0.2), desaturate($value, 40%), 40%)};
+    --ui-BG-Main-4: #{mix(rgba(119, 119, 119, 0.1), desaturate($value, 40%), 60%)};
+    --ui-BG-Main-TC: #ffffff !important;
+  }
+}

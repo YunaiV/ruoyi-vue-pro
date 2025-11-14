@@ -1,0 +1,354 @@
+body {
+  color: var(--text-a);
+  background-color: var(--ui-BG-1) !important;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ==================
+         初始化
+ ==================== */
+.ui-link {
+  cursor: pointer;
+}
+navigator {
+  display: inline-flex;
+}
+navigator.navigator-hover {
+  background-color: inherit;
+  transform: translate(1rpx, 1rpx);
+  // opacity: 1;
+}
+
+/* ==================
+         辅助类
+ ==================== */
+.none {
+  display: none !important;
+}
+.inline {
+  display: inline !important;
+}
+.inline-block {
+  display: inline-block !important;
+}
+.block {
+  display: block !important;
+}
+.touch-none {
+  pointer-events: none;
+}
+.touch-all {
+  pointer-events: all;
+}
+.flex {
+  display: flex !important;
+}
+.inline-flex {
+  display: inline-flex !important;
+}
+.w-100 {
+  width: 100%;
+}
+/* -- 浮动 -- */
+.cf::after,
+.cf::before {
+  content: '';
+  display: table;
+}
+.cf::after {
+  clear: both;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+.position-center {
+  @include position-center;
+}
+.position-relative {
+  position: relative;
+}
+/* -- 工具类 -- */
+@function negativify-map($map) {
+  $result: ();
+  @each $key, $value in $map {
+    @if $key != 0 {
+      $result: map-merge($result, ('n' + $key: (-$value)));
+    }
+  }
+  @return $result;
+}
+
+$utilities: () !default;
+$utilities: map-merge(
+  (
+    'margin': (
+      responsive: true,
+      property: margin,
+      class: m,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'margin-x': (
+      property: margin-right margin-left,
+      class: mx,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'margin-y': (
+      property: margin-top margin-bottom,
+      class: my,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'margin-top': (
+      property: margin-top,
+      class: mt,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'margin-right': (
+      property: margin-right,
+      class: mr,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'margin-bottom': (
+      property: margin-bottom,
+      class: mb,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'margin-left': (
+      property: margin-left,
+      class: ml,
+      values:
+        map-merge(
+          $spacers,
+          (
+            auto: auto,
+          )
+        ),
+    ),
+    'padding': (
+      responsive: true,
+      property: padding,
+      class: p,
+      values: $spacers,
+    ),
+    'padding-x': (
+      property: padding-right padding-left,
+      class: px,
+      values: $spacers,
+    ),
+    'padding-y': (
+      property: padding-top padding-bottom,
+      class: py,
+      values: $spacers,
+    ),
+    'padding-top': (
+      property: padding-top,
+      class: pt,
+      values: $spacers,
+    ),
+    'padding-right': (
+      property: padding-right,
+      class: pr,
+      values: $spacers,
+    ),
+    'padding-bottom': (
+      property: padding-bottom,
+      class: pb,
+      values: $spacers,
+    ),
+    'padding-left': (
+      property: padding-left,
+      class: pl,
+      values: $spacers,
+    ),
+    'font-weight': (
+      property: font-weight,
+      class: text,
+      values: (
+        light: $font-weight-light,
+        lighter: $font-weight-lighter,
+        normal: $font-weight-normal,
+        bold: $font-weight-bold,
+        bolder: $font-weight-bolder,
+      ),
+    ),
+    'text-align': (
+      property: text-align,
+      class: text,
+      values: left right center,
+    ),
+    'font-color': (
+      property: color,
+      class: text,
+      values:
+        map-merge(
+          $colors,
+          map-merge(
+            $grays,
+            map-merge(
+              $darks,
+              (
+                'reset': inherit,
+              )
+            )
+          )
+        ),
+    ),
+    'line-height': (
+      property: line-height,
+      class: lh,
+      values: (
+        1: 1,
+        sm: $line-height-sm,
+        base: $line-height-base,
+        lg: $line-height-lg,
+      ),
+    ),
+    'white-space': (
+      property: white-space,
+      class: text,
+      values: (
+        nowrap: nowrap,
+      ),
+    ),
+    'radius': (
+      property: border-radius,
+      class: radius,
+      values: (
+        null: $radius,
+        sm: $radius-sm,
+        lg: $radius-lg,
+        0: 0,
+      ),
+    ),
+    'round': (
+      property: border-radius,
+      class: round,
+      values: (
+        null: $round-pill,
+        circle: 50%,
+      ),
+    ),
+    'radius-top': (
+      property: border-top-left-radius border-top-right-radius,
+      class: radius-top,
+      values: (
+        null: $radius,
+      ),
+    ),
+    'radius-right': (
+      property: border-top-right-radius border-bottom-right-radius,
+      class: radius-right,
+      values: (
+        null: $radius,
+      ),
+    ),
+    'radius-bottom': (
+      property: border-bottom-right-radius border-bottom-left-radius,
+      class: radius-bottom,
+      values: (
+        null: $radius,
+      ),
+    ),
+    'radius-left': (
+      property: border-bottom-left-radius border-top-left-radius,
+      class: radius-left,
+      values: (
+        null: $radius,
+      ),
+    ),
+    'radius-lr': (
+      property: border-top-left-radius border-bottom-right-radius,
+      class: radius-lr,
+      values: (
+        null: $radius,
+      ),
+    ),
+    'radius-lrs': (
+      property: border-top-right-radius border-bottom-left-radius,
+      class: radius-lr,
+      values: (
+        null: 0,
+      ),
+    ),
+    'radius-rl': (
+      property: border-top-right-radius border-bottom-left-radius,
+      class: radius-rl,
+      values: (
+        null: $radius,
+      ),
+    ),
+    'radius-rls': (
+      property: border-top-left-radius border-bottom-right-radius,
+      class: radius-rl,
+      values: (
+        null: 0,
+      ),
+    ),
+  ),
+  $utilities
+);
+@each $key, $utility in $utilities {
+  @if type-of($utility) == 'map' {
+    $values: map-get($utility, values);
+    @if type-of($values) == 'string' or type-of(nth($values, 1)) != 'list' {
+      $values: zip($values, $values);
+    }
+    @each $key, $value in $values {
+      $properties: map-get($utility, property);
+      @if type-of($properties) == 'string' {
+        $properties: append((), $properties);
+      }
+      $property-class: if(
+        map-has-key($utility, class),
+        map-get($utility, class),
+        nth($properties, 1)
+      );
+      $property-class: if($property-class == null, '', $property-class);
+      $property-class-modifier: if($key, if($property-class == '', '', '-') + $key, '');
+      .#{$property-class + $property-class-modifier} {
+        @each $property in $properties {
+          #{$property}: $value !important;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@vben/tsconfig/web.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "#/*": ["./src/_env/*"]
+    }
+  },
+  "include": [
+    ".vitepress/*.mts",
+    ".vitepress/**/*.ts",
+    ".vitepress/**/*.vue",
+    "src/*.mts",
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ],
+  "exclude": ["node_modules"]
+}

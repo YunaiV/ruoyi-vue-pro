@@ -1,0 +1,103 @@
+/* ==================
+          栅栏
+ ==================== */
+@use 'sass:math';
+
+@mixin make_col($screen) {
+  @for $i from 1 through 12 {
+    .ui-col-#{$screen}-#{$i} {
+      width: calc(100% / 12 * #{$i});
+    }
+    .ui-cols-#{$screen}-#{$i} .ui-item {
+      width: calc(100% / #{$i});
+    }
+  }
+}
+.ui-container {
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30rpx;
+  padding-right: 30rpx;
+  width: 100%;
+  max-width: 1440px;
+  &-fluid {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+.ui-grid {
+  display: flex;
+  flex-wrap: wrap;
+  &.multi-column {
+    display: block;
+    column-count: 2;
+    column-width: 0px;
+    column-gap: 0px;
+    > .ui-item {
+      break-inside: avoid;
+      padding: 0.001em;
+    }
+  }
+  &.grid-square {
+    overflow: hidden;
+    > .ui-item {
+      margin-right: 20rpx;
+      margin-bottom: 20rpx;
+      position: relative;
+      overflow: hidden;
+    }
+    @for $i from 1 through 12 {
+      &.ui-cols-#{$i} > .ui-item {
+        padding-bottom: calc((100% - #{20rpx * ($i - 1)}) / #{$i});
+        height: 0;
+        width: calc((100% - #{20rpx * ($i - 1)}) / #{$i});
+      }
+    }
+    @for $i from 1 through 12 {
+      &.ui-cols-#{$i} > .ui-item:nth-child(#{$i}n) {
+        margin-right: 0;
+      }
+    }
+  }
+}
+@for $i from 1 through 12 {
+  .ui-cols-#{$i} .ui-item {
+    width: calc(100% / #{$i});
+  }
+}
+@for $i from 1 through 12 {
+  .ui-col-#{$i} {
+    width: calc(100% / 12 * #{$i});
+  }
+}
+// 小屏
+@media screen and (min-width: 0px) {
+  @include make_col('xs');
+}
+
+// 小屏
+@media screen and (min-width: 320px) {
+  @include make_col('sm');
+}
+
+// 中屏
+@media screen and (min-width: 768px) {
+  @include make_col('md');
+}
+
+// 普通屏
+@media screen and (min-width: 1025px) {
+  @include make_col('lg');
+}
+
+// 大屏
+@media screen and (min-width: 1440px) {
+  @include make_col('xl');
+}
+
+// 超大屏
+@media screen and (min-width: 1920px) {
+  @include make_col('xxl');
+}

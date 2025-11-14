@@ -1,0 +1,66 @@
+{
+  "name": "@vben/tailwind-config",
+  "version": "5.5.9",
+  "private": true,
+  "homepage": "https://github.com/vbenjs/vue-vben-admin",
+  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
+    "directory": "internal/tailwind-config"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "stub": "pnpm unbuild --stub"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./*"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./postcss": {
+      "types": "./src/postcss.config.ts",
+      "import": "./dist/postcss.config.mjs",
+      "require": "./dist/postcss.config.cjs",
+      "default": "./dist/postcss.config.mjs"
+    },
+    "./*": "./*"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^3.4.3"
+  },
+  "dependencies": {
+    "@iconify/json": "catalog:",
+    "@iconify/tailwind": "catalog:",
+    "@manypkg/get-packages": "catalog:",
+    "@tailwindcss/nesting": "catalog:",
+    "@tailwindcss/typography": "catalog:",
+    "autoprefixer": "catalog:",
+    "cssnano": "catalog:",
+    "postcss": "catalog:",
+    "postcss-antd-fixes": "catalog:",
+    "postcss-import": "catalog:",
+    "postcss-preset-env": "catalog:",
+    "tailwindcss": "catalog:",
+    "tailwindcss-animate": "catalog:"
+  },
+  "devDependencies": {
+    "@types/postcss-import": "catalog:"
+  }
+}

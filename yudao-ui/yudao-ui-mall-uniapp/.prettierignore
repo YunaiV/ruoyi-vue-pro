@@ -1,0 +1,6 @@
+/unpackage/*
+/node_modules/**
+/uni_modules/**
+/public/*
+**/*.svg
+**/*.sh

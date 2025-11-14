@@ -1,0 +1,43 @@
+@import './icon'; //核心图标库
+@import './coloricon'; //扩展图标库
+@import './sheepicon';
+.icon-spin {
+  animation: icon-spin 2s infinite linear;
+}
+
+.icon-pulse {
+  animation: icon-spin 1s infinite steps(8);
+}
+
+@keyframes icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+.icon-90 {
+  transform: rotate(90deg);
+}
+.icon-180 {
+  transform: rotate(180deg);
+}
+.icon-270 {
+  transform: rotate(270deg);
+}
+.icon-x {
+  transform: scale(-1, 1);
+}
+.icon-y {
+  transform: scale(1, -1);
+}
+.icon-fw {
+  width: calc(18em / 14);
+  text-align: center;
+}
+@each $class, $value in $iconsize {
+  .icon-#{$class} {
+    transform: scale(#{$value});
+  }
+}

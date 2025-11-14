@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Web Application",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "noEmit": false
+  }
+}

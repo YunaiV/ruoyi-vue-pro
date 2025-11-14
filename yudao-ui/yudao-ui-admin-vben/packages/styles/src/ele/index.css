@@ -1,0 +1,44 @@
+.el-card {
+  --el-card-border-radius: var(--radius) !important;
+}
+
+.form-valid-error {
+  /** select 选择器的样式 */
+  .el-select .el-select__wrapper {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
+
+  /** input 选择器的样式 */
+  .el-input .el-input__wrapper {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
+
+  /** radio和checkbox 选择器的样式 */
+  .el-radio .el-radio__inner,
+  .el-checkbox .el-checkbox__inner {
+    border: 1px solid var(--el-color-danger);
+  }
+
+  .el-checkbox-button .el-checkbox-button__inner,
+  .el-radio-button .el-radio-button__inner {
+    border: 1px solid var(--el-color-danger);
+  }
+
+  .el-checkbox-button:first-child .el-checkbox-button__inner,
+  .el-radio-button:first-child .el-radio-button__inner {
+    border-left: 1px solid var(--el-color-danger);
+  }
+
+  .el-checkbox-button:not(:first-child) .el-checkbox-button__inner,
+  .el-radio-button:not(:first-child) .el-radio-button__inner {
+    border-left: none;
+  }
+
+  .el-textarea .el-textarea__inner {
+    border: 1px solid var(--el-color-danger);
+  }
+}
+
+html .el-loading-mask {
+  z-index: 1000;
+}

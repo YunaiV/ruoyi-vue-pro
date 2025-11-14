@@ -1,0 +1,103 @@
+{
+  "id": "shopro",
+  "name": "shopro",
+  "displayName": "芋道商城",
+  "version": "2025.10",
+  "description": "芋道商城，一套代码，同时发行到iOS、Android、H5、微信小程序多个平台，请使用手机扫码快速体验强大功能",
+  "scripts": {
+    "prettier": "prettier --write  \"{pages,sheep}/**/*.{js,json,tsx,css,less,scss,vue,html,md}\""
+  },
+  "repository": "https://github.com/sheepjs/shop.git",
+  "keywords": [
+    "商城",
+    "B2C",
+    "商城模板"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sheepjs/shop/issues"
+  },
+  "homepage": "https://github.com/dcloudio/hello-uniapp#readme",
+  "dcloudext": {
+    "category": [
+      "前端页面模板",
+      "uni-app前端项目模板"
+    ],
+    "sale": {
+      "regular": {
+        "price": "0.00"
+      },
+      "sourcecode": {
+        "price": "0.00"
+      }
+    },
+    "contact": {
+      "qq": ""
+    },
+    "declaration": {
+      "ads": "无",
+      "data": "无",
+      "permissions": "无"
+    },
+    "npmurl": ""
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": {
+        "tcb": "u",
+        "aliyun": "u"
+      },
+      "client": {
+        "App": {
+          "app-vue": "y",
+          "app-nvue": "u"
+        },
+        "H5-mobile": {
+          "Safari": "y",
+          "Android Browser": "y",
+          "微信浏览器(Android)": "y",
+          "QQ浏览器(Android)": "y"
+        },
+        "H5-pc": {
+          "Chrome": "y",
+          "IE": "y",
+          "Edge": "y",
+          "Firefox": "y",
+          "Safari": "y"
+        },
+        "小程序": {
+          "微信": "y",
+          "阿里": "u",
+          "百度": "u",
+          "字节跳动": "u",
+          "QQ": "u",
+          "京东": "u"
+        },
+        "快应用": {
+          "华为": "u",
+          "联盟": "u"
+        },
+        "Vue": {
+          "vue2": "u",
+          "vue3": "y"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "dayjs": "^1.11.7",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
+    "luch-request": "^3.0.8",
+    "pinia": "^2.0.33",
+    "pinia-plugin-persist-uni": "^1.2.0",
+    "weixin-js-sdk": "^1.6.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.7",
+    "vconsole": "^3.15.0"
+  }
+}

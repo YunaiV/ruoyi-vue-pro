@@ -1,0 +1,22 @@
+html.dark {
+  color-scheme: dark;
+}
+
+.dark .VPContent {
+  /* background-color: #14161a; */
+}
+
+.form-valid-error p {
+  margin: 0;
+}
+
+/* 顶部导航栏选中项样式 */
+.VPNavBarMenuLink,
+.VPNavBarMenuGroup {
+  border-bottom: 1px solid transparent;
+}
+
+.VPNavBarMenuLink.active,
+.VPNavBarMenuGroup.active {
+  border-bottom-color: var(--vp-c-brand-1);
+}

@@ -1,0 +1,34 @@
+@forward './constants';
+
+@mixin b($block) {
+  $B: $namespace + '-' + $block !global;
+
+  .#{$B} {
+    @content;
+  }
+}
+
+@mixin e($name) {
+  @at-root {
+    &#{$element-separator}#{$name} {
+      @content;
+    }
+  }
+}
+
+@mixin m($name) {
+  @at-root {
+    &#{$modifier-separator}#{$name} {
+      @content;
+    }
+  }
+}
+
+// block__element.is-active {}
+@mixin is($state, $prefix: $state-prefix) {
+  @at-root {
+    &.#{$prefix}-#{$state} {
+      @content;
+    }
+  }
+}

@@ -1,0 +1,104 @@
+/* ==================
+          文本
+ ==================== */
+@use 'sass:math';
+.font-0 {
+  font-size: 24rpx;
+  --textSize: -4rpx;
+}
+.font-1 {
+  font-size: 28rpx;
+  --textSize: 0rpx;
+}
+.font-2 {
+  font-size: 32rpx;
+  --textSize: 4rpx;
+}
+.font-3 {
+  font-size: 36rpx;
+  --textSize: 8rpx;
+}
+.font-4 {
+  font-size: 40rpx;
+  --textSize: 12rpx;
+}
+.text {
+  @each $class, $value in $fontsize {
+    &-#{$class},
+    &-#{math.div($value ,2)} {
+      font-size: calc(#{$value}rpx + var(--textSize)) !important;
+    }
+  }
+  &-cut {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  @at-root [class*='text-linecut'] {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    word-break: break-all;
+  }
+  @for $i from 2 through 10 {
+    &-linecut-#{$i} {
+      -webkit-line-clamp: #{$i};
+    }
+  }
+  &-justify {
+    text-align: justify;
+  }
+  &-justify-line {
+    text-align: justify;
+    line-height: 0.5em;
+    margin-top: 0.5em;
+    &::after {
+      content: '.';
+      display: inline-block;
+      width: 100%;
+    }
+  }
+
+  &-Abc {
+    text-transform: Capitalize !important;
+  }
+  &-ABC {
+    text-transform: Uppercase !important;
+  }
+  &-abc {
+    text-transform: Lowercase !important;
+  }
+  &-del,
+  &-line {
+    text-decoration: line-through !important;
+  }
+  &-bottomline {
+    text-decoration: underline !important;
+  }
+  &-italic {
+    font-style: italic !important;
+  }
+  &-style-none {
+    text-decoration: none !important;
+  }
+  &-break {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  &-reset {
+    color: inherit !important;
+  }
+  &-price::before {
+    content: '¥';
+    font-size: 80%;
+    margin-right: 4rpx;
+  }
+  &-hide {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+  }
+}

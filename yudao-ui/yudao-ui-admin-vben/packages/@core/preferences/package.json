@@ -1,0 +1,37 @@
+{
+  "name": "@vben-core/preferences",
+  "version": "5.5.9",
+  "homepage": "https://github.com/vbenjs/vue-vben-admin",
+  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
+    "directory": "packages/@core/preferences"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "#build": "pnpm unbuild"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "default": "./src/index.ts",
+      "#default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@vben-core/shared": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "@vueuse/core": "catalog:",
+    "vue": "catalog:"
+  }
+}

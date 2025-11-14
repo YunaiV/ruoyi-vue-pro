@@ -1,0 +1,52 @@
+{
+  "name": "@vben-core/form-ui",
+  "version": "5.5.9",
+  "homepage": "https://github.com/vbenjs/vue-vben-admin",
+  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
+    "directory": "packages/@vben-core/uikit/form-ui"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm unbuild",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@vben-core/composables": "workspace:*",
+    "@vben-core/icons": "workspace:*",
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben-core/shared": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "@vee-validate/zod": "catalog:",
+    "@vueuse/core": "catalog:",
+    "vee-validate": "catalog:",
+    "vue": "catalog:",
+    "zod": "catalog:",
+    "zod-defaults": "catalog:"
+  }
+}

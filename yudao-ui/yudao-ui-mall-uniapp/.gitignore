@@ -1,0 +1,11 @@
+unpackage/*
+node_modules/*
+.idea/*
+deploy.sh
+.hbuilderx/
+.vscode/
+**/.DS_Store
+yarn.lock
+package-lock.json
+*.keystore
+pnpm-lock.yaml

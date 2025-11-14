@@ -1,0 +1,33 @@
+{
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "codeLogin": "验证码登录",
+    "qrcodeLogin": "二维码登录",
+    "forgetPassword": "忘记密码"
+  },
+  "dashboard": {
+    "title": "概览",
+    "analytics": "分析页",
+    "workspace": "工作台"
+  },
+  "action": {
+    "action": "操作",
+    "add": "新增",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "import": "导入",
+    "export": "导出",
+    "submit": "提交",
+    "cancel": "取消",
+    "confirm": "确认",
+    "reset": "重置",
+    "search": "搜索",
+    "more": "更多"
+  },
+  "tenant": {
+    "placeholder": "请选择租户",
+    "success": "切换租户成功"
+  }
+}

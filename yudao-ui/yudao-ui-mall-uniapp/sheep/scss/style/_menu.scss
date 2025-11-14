@@ -1,0 +1,54 @@
+.ui-menu {
+  background-color: var(--ui-BG);
+}
+
+.ui-menu-item {
+  position: relative;
+  @include flex-bar;
+  min-height: 4em;
+  padding: 0 30rpx;
+  .ui-menu-item-icon {
+    width: 1.7em;
+    margin-right: 0.3em;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(1.3);
+  }
+  .ui-menu-item-icon .ui-menu-item-image {
+    width: 1.2em;
+    height: 1.2em;
+    display: inline-block;
+  }
+  .ui-menu-item-content {
+    flex: 1;
+    position: relative;
+    @include flex-bar;
+  }
+  .ui-menu-item-arrow {
+    width: 1.6em;
+    text-align: center;
+    color: var(--ui-TC-3);
+  }
+  &::after {
+    content: ' ';
+    width: calc(200% - 120rpx);
+    left: 30rpx;
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    height: 200%;
+    border-top: 1px solid var(--ui-Border);
+    border-radius: inherit;
+    transform: scale(1);
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+  &.first-item::after {
+    display: none;
+  }
+  &:first-child::after {
+    display: none;
+  }
+}

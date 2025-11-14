@@ -1,0 +1,71 @@
+{
+  "title": "演示",
+  "access": {
+    "frontendPermissions": "前端权限",
+    "backendPermissions": "后端权限",
+    "pageAccess": "页面访问",
+    "buttonControl": "按钮控制",
+    "menuVisible403": "菜单可见(403)",
+    "superVisible": "Super 可见",
+    "adminVisible": "Admin 可见",
+    "userVisible": "User 可见"
+  },
+  "nested": {
+    "title": "嵌套菜单",
+    "menu1": "菜单 1",
+    "menu2": "菜单 2",
+    "menu2_1": "菜单 2-1",
+    "menu3": "菜单 3",
+    "menu3_1": "菜单 3-1",
+    "menu3_2": "菜单 3-2",
+    "menu3_2_1": "菜单 3-2-1"
+  },
+  "outside": {
+    "title": "外部页面",
+    "embedded": "内嵌",
+    "externalLink": "外链"
+  },
+  "badge": {
+    "title": "菜单徽标",
+    "dot": "点徽标",
+    "text": "文本徽标",
+    "color": "徽标颜色"
+  },
+  "activeIcon": {
+    "title": "菜单激活图标",
+    "children": "子级激活图标"
+  },
+  "fallback": {
+    "title": "缺省页"
+  },
+  "features": {
+    "title": "功能",
+    "hideChildrenInMenu": "隐藏子菜单",
+    "loginExpired": "登录过期",
+    "icons": "图标",
+    "watermark": "水印",
+    "tabs": "标签页",
+    "tabDetail": "标签详情页",
+    "fullScreen": "全屏",
+    "clipboard": "剪贴板",
+    "menuWithQuery": "带参菜单",
+    "openInNewWindow": "新窗口打开",
+    "fileDownload": "文件下载",
+    "requestParamsSerializer": "参数序列化"
+  },
+  "breadcrumb": {
+    "navigation": "面包屑导航",
+    "lateral": "平级模式",
+    "level": "层级模式",
+    "levelDetail": "层级模式详情",
+    "lateralDetail": "平级模式详情"
+  },
+  "vben": {
+    "title": "项目",
+    "about": "关于",
+    "document": "文档",
+    "antdv": "Ant Design Vue 版本",
+    "naive-ui": "Naive UI 版本",
+    "element-plus": "Element Plus 版本"
+  }
+}

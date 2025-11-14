@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Web Application",
+  "extends": "./web.json",
+  "compilerOptions": {
+    "types": ["vite/client", "@vben/types/global"]
+  }
+}

@@ -1,0 +1,20 @@
+.form-valid-error {
+  .n-base-selection__state-border,
+  .n-input__state-border,
+  .n-radio-group__splitor {
+    border: var(--n-border-error);
+  }
+
+  .n-radio-group .n-radio-button,
+  .n-radio-group .n-radio-group__splitor {
+    --n-button-border-color: rgb(255 56 96);
+  }
+
+  .n-radio__dot {
+    --n-box-shadow: inset 0 0 0 1px rgb(255 56 96);
+  }
+
+  .n-checkbox-box__border {
+    --n-border: 1px solid rgb(255 56 96);
+  }
+}

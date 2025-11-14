@@ -1,0 +1,222 @@
+{
+  "name": "芋道商城",
+  "appid": "__UNI__460BC4C",
+  "description": "基于 uni-app + Vue3 技术驱动的在线商城系统，内含诸多功能与丰富的活动，期待您的使用和反馈。",
+  "versionName": "2025.10",
+  "versionCode": "183",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueCompiler": "uni-app",
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "nvueLaunchMode": "fast",
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "safearea": {
+      "bottom": {
+        "offset": "none"
+      }
+    },
+    "modules": {
+      "Payment": {},
+      "Share": {},
+      "VideoPlayer": {},
+      "OAuth": {}
+    },
+    "distribute": {
+      "android": {
+        "permissions": [
+          "<uses-feature android:name=\"android.hardware.camera\"/>",
+          "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+          "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_MOCK_LOCATION\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
+          "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+          "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+          "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+          "<uses-permission android:name=\"android.permission.GET_TASKS\"/>",
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+          "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+          "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+          "<uses-permission android:name=\"android.permission.READ_CONTACTS\"/>",
+          "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+          "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.READ_SMS\"/>",
+          "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\"/>",
+          "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+          "<uses-permission android:name=\"android.permission.SEND_SMS\"/>",
+          "<uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\"/>",
+          "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+          "<uses-permission android:name=\"android.permission.WRITE_CONTACTS\"/>",
+          "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+          "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
+          "<uses-permission android:name=\"android.permission.WRITE_SMS\"/>",
+          "<uses-permission android:name=\"android.permission.RECEIVE_USER_PRESENT\"/>"
+        ],
+        "minSdkVersion": 21,
+        "schemes": "shopro"
+      },
+      "ios": {
+        "urlschemewhitelist": ["baidumap", "iosamap"],
+        "dSYMs": false,
+        "privacyDescription": {
+          "NSPhotoLibraryUsageDescription": "需要同意访问您的相册选取图片才能完善该条目",
+          "NSPhotoLibraryAddUsageDescription": "需要同意访问您的相册才能保存该图片",
+          "NSCameraUsageDescription": "需要同意访问您的摄像头拍摄照片才能完善该条目",
+          "NSUserTrackingUsageDescription": "开启追踪并不会获取您在其它站点的隐私信息,该行为仅用于标识设备,保障服务安全和提升浏览体验"
+        },
+        "urltypes": "shopro",
+        "capabilities": {
+          "entitlements": {
+            "com.apple.developer.associated-domains": ["applinks:shopro.sheepjs.com"]
+          }
+        },
+        "idfa": true
+      },
+      "sdkConfigs": {
+        "speech": {},
+        "ad": {},
+        "oauth": {
+          "apple": {},
+          "weixin": {
+            "appid": "wxae7a0c156da9383b",
+            "UniversalLinks": "https://shopro.sheepjs.com/uni-universallinks/__UNI__082C0BA/"
+          }
+        },
+        "payment": {
+          "weixin": {
+            "__platform__": ["ios", "android"],
+            "appid": "wxae7a0c156da9383b",
+            "UniversalLinks": "https://shopro.sheepjs.com/uni-universallinks/__UNI__082C0BA/"
+          },
+          "alipay": {
+            "__platform__": ["ios", "android"]
+          }
+        },
+        "share": {
+          "weixin": {
+            "appid": "wxae7a0c156da9383b",
+            "UniversalLinks": "https://shopro.sheepjs.com/uni-universallinks/__UNI__082C0BA/"
+          }
+        }
+      },
+      "orientation": ["portrait-primary"],
+      "splashscreen": {
+        "androidStyle": "common",
+        "iosStyle": "common",
+        "useOriginalMsgbox": true
+      },
+      "icons": {
+        "android": {
+          "hdpi": "unpackage/res/icons/72x72.png",
+          "xhdpi": "unpackage/res/icons/96x96.png",
+          "xxhdpi": "unpackage/res/icons/144x144.png",
+          "xxxhdpi": "unpackage/res/icons/192x192.png"
+        },
+        "ios": {
+          "appstore": "unpackage/res/icons/1024x1024.png",
+          "ipad": {
+            "app": "unpackage/res/icons/76x76.png",
+            "app@2x": "unpackage/res/icons/152x152.png",
+            "notification": "unpackage/res/icons/20x20.png",
+            "notification@2x": "unpackage/res/icons/40x40.png",
+            "proapp@2x": "unpackage/res/icons/167x167.png",
+            "settings": "unpackage/res/icons/29x29.png",
+            "settings@2x": "unpackage/res/icons/58x58.png",
+            "spotlight": "unpackage/res/icons/40x40.png",
+            "spotlight@2x": "unpackage/res/icons/80x80.png"
+          },
+          "iphone": {
+            "app@2x": "unpackage/res/icons/120x120.png",
+            "app@3x": "unpackage/res/icons/180x180.png",
+            "notification@2x": "unpackage/res/icons/40x40.png",
+            "notification@3x": "unpackage/res/icons/60x60.png",
+            "settings@2x": "unpackage/res/icons/58x58.png",
+            "settings@3x": "unpackage/res/icons/87x87.png",
+            "spotlight@2x": "unpackage/res/icons/80x80.png",
+            "spotlight@3x": "unpackage/res/icons/120x120.png"
+          }
+        }
+      }
+    }
+  },
+  "quickapp": {},
+  "quickapp-native": {
+    "icon": "/static/logo.png",
+    "package": "com.example.demo",
+    "features": [
+      {
+        "name": "system.clipboard"
+      }
+    ]
+  },
+  "quickapp-webview": {
+    "icon": "/static/logo.png",
+    "package": "com.example.demo",
+    "minPlatformVersion": 1070,
+    "versionName": "1.0.0",
+    "versionCode": 100
+  },
+  "mp-weixin": {
+    "appid": "wx66186af0759f47c9",
+    "setting": {
+      "urlCheck": false,
+      "minified": true,
+      "postcss": true
+    },
+    "optimization": {
+      "subPackages": true
+    },
+    "plugins": {},
+    "lazyCodeLoading": "requiredComponents",
+    "usingComponents": {},
+    "permission": {},
+    "requiredPrivateInfos": ["chooseAddress"]
+  },
+  "mp-alipay": {
+    "usingComponents": true
+  },
+  "mp-baidu": {
+    "usingComponents": true
+  },
+  "mp-toutiao": {
+    "usingComponents": true
+  },
+  "mp-jd": {
+    "usingComponents": true
+  },
+  "h5": {
+    "template": "index.html",
+    "router": {
+      "mode": "history",
+      "base": "/"
+    },
+    "sdkConfigs": {
+      "maps": {}
+    },
+    "async": {
+      "timeout": 20000
+    },
+    "title": "芋道商城",
+    "optimization": {
+      "treeShaking": {
+        "enable": true
+      }
+    }
+  },
+  "vueVersion": "3",
+  "_spaceID": "192b4892-5452-4e1d-9f09-eee1ece40639",
+  "locale": "zh-Hans",
+  "fallbackLocale": "zh-Hans"
+}

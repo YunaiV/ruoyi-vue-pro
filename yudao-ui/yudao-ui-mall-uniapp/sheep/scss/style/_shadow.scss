@@ -1,0 +1,90 @@
+/* ==================
+          阴影
+ ==================== */
+
+.shadow {
+  box-shadow: var(--ui-Shadow);
+  &-sm {
+    box-shadow: var(--ui-Shadow-sm);
+  }
+  &-lg {
+    box-shadow: var(--ui-Shadow-lg);
+  }
+  &-inset {
+    box-shadow: var(--ui-Shadow-inset);
+  }
+  @each $color, $value in $colors {
+    @at-root .shadow-#{$color} {
+      box-shadow: 0 0.5em 1em rgba($value, var(--ui-Shadow-opacity));
+    }
+    &-sm.shadow-#{$color} {
+      box-shadow: 0 0.125em 0.25em rgba($value, var(--ui-Shadow-opacity));
+    }
+    &-lg.shadow-#{$color} {
+      box-shadow: 0 1em 3em rgba($value, var(--ui-Shadow-opacity-lg));
+    }
+  }
+
+  &-warp {
+    position: relative;
+  }
+  &-warp:before,
+  &-warp:after {
+    position: absolute;
+    content: '';
+    bottom: -10rpx;
+    left: 20rpx;
+    width: calc(50% - #{40rpx});
+    height: 30rpx;
+    transform: skew(0deg, -6deg);
+    transform-origin: 50% 50%;
+    background-color: rgba(0, 0, 0, var(--ui-Shadow-opacity));
+    filter: blur(20rpx);
+    z-index: -1;
+    opacity: 0.5;
+  }
+  &-warp:after {
+    right: 20rpx;
+    left: auto;
+    transform: skew(0deg, 6deg);
+  }
+  &-blur {
+    position: relative;
+  }
+  &-blur::before {
+    content: '';
+    display: block;
+    background: inherit;
+    filter: blur(20rpx);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0.5em;
+    left: 0.5em;
+    z-index: -1;
+    opacity: var(--ui-Shadow-opacity-lg);
+    transform-origin: 0 0;
+    border-radius: inherit;
+    transform: scale(1, 1);
+  }
+}
+.drop-shadow {
+  filter: drop-shadow(0 0 30rpx rgba(0, 0, 0, 0.1));
+  &-sm {
+    filter: drop-shadow(0 4rpx 4rpx rgba(0, 0, 0, 0.06));
+  }
+  &-lg {
+    filter: drop-shadow(0 30rpx 60rpx rgba(0, 0, 0, 0.2));
+  }
+  @each $color, $value in $colors {
+    @at-root .drop-shadow-#{$color} {
+      filter: drop-shadow(0 15rpx 15rpx rgba(darken($value, 10%), 0.3));
+    }
+    &-sm.drop-shadow-#{$color} {
+      filter: drop-shadow(0 4rpx 4rpx rgba(darken($value, 10%), 0.3));
+    }
+    &-lg.drop-shadow-#{$color} {
+      filter: drop-shadow(0 50rpx 100rpx rgba(darken($value, 10%), 0.2));
+    }
+  }
+}

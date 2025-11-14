@@ -1,0 +1,127 @@
+.process-panel__container {
+  box-sizing: border-box;
+  max-height: 100%;
+  padding: 0 8px;
+  overflow-y: scroll;
+  border-left: 1px solid #eee;
+  box-shadow: 0 0 8px #ccc;
+}
+
+.panel-tab__title {
+  padding: 0 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  line-height: 1.2em;
+
+  i {
+    margin-right: 8px;
+    font-size: 1.2em;
+  }
+}
+
+.panel-tab__content {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 16px;
+  border-top: 1px solid #eee;
+
+  .panel-tab__content--title {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 8px;
+
+    span {
+      flex: 1;
+      text-align: left;
+    }
+  }
+}
+
+.element-property {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  margin: 8px 0;
+
+  .element-property__label {
+    box-sizing: border-box;
+    display: block;
+    width: 90px;
+    padding-right: 12px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: right;
+  }
+
+  .element-property__value {
+    flex: 1;
+    line-height: 32px;
+  }
+
+  .ant-form-item {
+    width: 100%;
+    padding-bottom: 18px;
+    margin-bottom: 0;
+  }
+}
+
+.list-property {
+  flex-direction: column;
+
+  .element-listener-item {
+    display: inline-grid;
+    grid-template-columns: 16px auto 32px 32px;
+    grid-column-gap: 8px;
+    width: 100%;
+  }
+
+  .element-listener-item + .element-listener-item {
+    margin-top: 8px;
+  }
+}
+
+.listener-filed__title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0;
+
+  span {
+    width: 200px;
+    font-size: 14px;
+    text-align: left;
+  }
+
+  i {
+    margin-right: 8px;
+  }
+}
+
+.element-drawer__button {
+  display: inline-flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.element-drawer__button > .ant-button {
+  width: 100%;
+}
+
+.ant-collapse-item__content {
+  padding-bottom: 0;
+}
+
+.ant-input.is-disabled .ant-input__inner {
+  color: #999;
+}
+
+.ant-form-item.ant-form-item--mini {
+  margin-bottom: 0;
+
+  & + .ant-form-item {
+    margin-top: 16px;
+  }
+}

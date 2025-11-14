@@ -1,0 +1,31 @@
+{
+  "name": "@vben/vsh",
+  "version": "5.5.9",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "stub": "pnpm unbuild --stub"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "vsh": "./bin/vsh.mjs"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@vben/node-utils": "workspace:*",
+    "cac": "catalog:",
+    "circular-dependency-scanner": "catalog:",
+    "depcheck": "catalog:",
+    "publint": "catalog:"
+  }
+}

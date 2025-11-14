@@ -1,0 +1,759 @@
+// TODO 整个样式是不是要重新优化一下
+// iconfont 样式
+@font-face {
+  font-family: iconfont; /* Project id 4495938 */
+  src:
+    url('iconfont.woff2?t=1737639517142') format('woff2'),
+    url('iconfont.woff?t=1737639517142') format('woff'),
+    url('iconfont.ttf?t=1737639517142') format('truetype');
+}
+// 配置节点头部
+.config-header {
+  display: flex;
+  flex-direction: column;
+
+  .node-name {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+  }
+
+  .divide-line {
+    width: 100%;
+    height: 1px;
+    margin-top: 16px;
+    background: #eee;
+  }
+
+  .config-editable-input {
+    max-width: 510px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 24px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    transition: all 0.3s;
+
+    &:focus {
+      outline: 0;
+      border-color: #40a9ff;
+      box-shadow: 0 0 0 2px rgb(24 144 255 / 20%);
+    }
+  }
+}
+// 节点连线气泡卡片样式
+.handler-item-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  width: 320px;
+  cursor: pointer;
+
+  .handler-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 12px;
+  }
+
+  .handler-item-icon {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    user-select: none;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 50%;
+
+    &:hover {
+      background: #e2e2e2;
+      box-shadow: 0 2px 4px 0 rgb(0 0 0 / 10%);
+    }
+
+    .icon-size {
+      font-size: 25px;
+      line-height: 50px;
+    }
+  }
+
+  .approve {
+    color: #ff943e;
+  }
+
+  .copy {
+    color: #3296fa;
+  }
+
+  .condition {
+    color: #67c23a;
+  }
+
+  .parallel {
+    color: #626aef;
+  }
+
+  .inclusive {
+    color: #345da2;
+  }
+
+  .delay {
+    color: #e47470;
+  }
+
+  .trigger {
+    color: #3373d2;
+  }
+
+  .router {
+    color: #ca3a31;
+  }
+
+  .transactor {
+    color: #309;
+  }
+
+  .child-process {
+    color: #963;
+  }
+
+  .async-child-process {
+    color: #066;
+  }
+
+  .handler-item-text {
+    width: 80px;
+    margin-top: 4px;
+    font-size: 13px;
+    text-align: center;
+  }
+}
+// Simple 流程模型样式
+.simple-process-model-container {
+  width: 100%;
+  height: 100%;
+  padding-top: 32px;
+  overflow-x: auto;
+  background-color: #fafafa;
+
+  .simple-process-model {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: fit-content;
+    background: url('./svg/simple-process-bg.svg') 0 0 repeat;
+    transform: scale(1);
+    transform-origin: 50% 0 0;
+    transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    // 节点容器 定义节点宽度
+    .node-container {
+      width: 200px;
+    }
+    // 节点
+    .node-box {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 70px;
+      padding: 5px 10px 8px;
+      cursor: pointer;
+      background-color: #fff;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px 0 rgb(10 30 65 / 16%);
+      transition: all 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+      &.status-pass {
+        background-color: #a9da90;
+        border-color: #67c23a;
+      }
+
+      &.status-pass:hover {
+        border-color: #67c23a;
+      }
+
+      &.status-running {
+        background-color: #e7f0fe;
+        border-color: #5a9cf8;
+      }
+
+      &.status-running:hover {
+        border-color: #5a9cf8;
+      }
+
+      &.status-reject {
+        background-color: #f6e5e5;
+        border-color: #e47470;
+      }
+
+      &.status-reject:hover {
+        border-color: #e47470;
+      }
+
+      &:hover {
+        border-color: #0089ff;
+
+        .node-toolbar {
+          opacity: 1;
+        }
+
+        .branch-node-move {
+          display: flex;
+        }
+      }
+
+      // 普通节点标题
+      .node-title-container {
+        display: flex;
+        align-items: center;
+        padding: 4px;
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+
+        .node-title-icon {
+          display: flex;
+          align-items: center;
+
+          &.user-task {
+            color: #ff943e;
+          }
+
+          &.copy-task {
+            color: #3296fa;
+          }
+
+          &.start-user {
+            color: #676565;
+          }
+
+          &.delay-node {
+            color: #e47470;
+          }
+
+          &.trigger-node {
+            color: #3373d2;
+          }
+
+          &.router-node {
+            color: #ca3a31;
+          }
+
+          &.transactor-task {
+            color: #309;
+          }
+
+          &.child-process {
+            color: #963;
+          }
+
+          &.async-child-process {
+            color: #066;
+          }
+        }
+
+        .node-title {
+          margin-left: 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 14px;
+          font-weight: 600;
+          line-height: 18px;
+          color: #1f1f1f;
+          white-space: nowrap;
+
+          &:hover {
+            border-bottom: 1px dashed #f60;
+          }
+        }
+      }
+
+      // 条件节点标题
+      .branch-node-title-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0;
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+
+        .input-max-width {
+          max-width: 115px !important;
+        }
+
+        .branch-title {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 13px;
+          font-weight: 600;
+          color: #f60;
+          white-space: nowrap;
+
+          &:hover {
+            border-bottom: 1px dashed #000;
+          }
+        }
+
+        .branch-priority {
+          min-width: 50px;
+          font-size: 12px;
+        }
+      }
+
+      .node-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 32px;
+        padding: 4px 8px;
+        margin-top: 4px;
+        line-height: 32px;
+        color: #111f2c;
+        background: rgb(0 0 0 / 3%);
+        border-radius: 4px;
+
+        .node-text {
+          display: -webkit-box;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          -webkit-line-clamp: 2; /* 这将限制文本显示为两行 */
+          font-size: 14px;
+          line-height: 24px;
+          word-break: break-all;
+          -webkit-box-orient: vertical;
+        }
+      }
+
+      //条件节点内容
+      .branch-node-content {
+        display: flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 4px 0;
+        margin-top: 4px;
+        line-height: 32px;
+        color: #111f2c;
+        background: rgb(0 0 0 / 3%);
+        border-radius: 4px;
+
+        .branch-node-text {
+          display: -webkit-box;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          -webkit-line-clamp: 1; /* 这将限制文本显示为一行 */
+          font-size: 12px;
+          line-height: 24px;
+          word-break: break-all;
+          -webkit-box-orient: vertical;
+        }
+      }
+
+      // 节点操作 ：删除
+      .node-toolbar {
+        position: absolute;
+        top: -20px;
+        right: 0;
+        display: flex;
+        opacity: 0;
+
+        .toolbar-icon {
+          vertical-align: middle;
+          text-align: center;
+        }
+      }
+
+      // 条件节点左右移动
+      .branch-node-move {
+        position: absolute;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 10px;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .move-node-left {
+        top: 0;
+        left: -2px;
+        background: rgb(126 134 142 / 8%);
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+      }
+
+      .move-node-right {
+        top: 0;
+        right: -2px;
+        background: rgb(126 134 142 / 8%);
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+
+    .node-config-error {
+      border-color: #ff5219 !important;
+    }
+    // 普通节点包装
+    .node-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    // 节点连线处理
+    .node-handler-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 70px;
+      user-select: none;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        z-index: 0;
+        width: 2px;
+        height: 100%;
+        margin: auto;
+        content: '';
+        background-color: #dedede;
+      }
+
+      .node-handler {
+        .add-icon {
+          position: relative;
+          top: -5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 25px;
+          height: 25px;
+          color: #fff;
+          cursor: pointer;
+          background-color: #0089ff;
+          border-radius: 50%;
+
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+      }
+
+      .node-handler-arrow {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        display: flex;
+        transform: translateX(-50%);
+      }
+    }
+
+    // 条件节点包装
+    .branch-node-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+
+      .branch-node-container {
+        position: relative;
+        display: flex;
+        min-width: fit-content;
+
+        &::before {
+          position: absolute;
+          left: 50%;
+          width: 4px;
+          height: 100%;
+          content: '';
+          background-color: #fafafa;
+          transform: translate(-50%);
+        }
+
+        .branch-node-add {
+          position: absolute;
+          top: -18px;
+          left: 50%;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          height: 36px;
+          padding: 0 10px;
+          font-size: 12px;
+          line-height: 36px;
+          border: 2px solid #dedede;
+          border-radius: 18px;
+          transform: translateX(-50%);
+          transform-origin: center center;
+        }
+
+        .branch-node-readonly {
+          position: absolute;
+          top: -18px;
+          left: 50%;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          background-color: #fff;
+          border: 2px solid #dedede;
+          border-radius: 50%;
+          transform: translateX(-50%);
+          transform-origin: center center;
+
+          &.status-pass {
+            background-color: #e9f4e2;
+            border-color: #6bb63c;
+          }
+
+          &.status-pass:hover {
+            border-color: #6bb63c;
+          }
+
+          .icon-size {
+            font-size: 22px;
+
+            &.condition {
+              color: #67c23a;
+            }
+
+            &.parallel {
+              color: #626aef;
+            }
+
+            &.inclusive {
+              color: #345da2;
+            }
+          }
+        }
+
+        .branch-node-item {
+          position: relative;
+          display: flex;
+          flex-shrink: 0;
+          flex-direction: column;
+          align-items: center;
+          min-width: 280px;
+          padding: 40px 40px 0;
+          background: transparent;
+          border-top: 2px solid #dedede;
+          border-bottom: 2px solid #dedede;
+
+          &::before {
+            position: absolute;
+            inset: 0;
+            width: 2px;
+            height: 100%;
+            margin: auto;
+            content: '';
+            background-color: #dedede;
+          }
+        }
+        // 覆盖条件节点第一个节点左上角的线
+        .branch-line-first-top {
+          position: absolute;
+          top: -5px;
+          left: -1px;
+          width: 50%;
+          height: 7px;
+          content: '';
+          background-color: #fafafa;
+        }
+        // 覆盖条件节点第一个节点左下角的线
+        .branch-line-first-bottom {
+          position: absolute;
+          bottom: -5px;
+          left: -1px;
+          width: 50%;
+          height: 7px;
+          content: '';
+          background-color: #fafafa;
+        }
+        // 覆盖条件节点最后一个节点右上角的线
+        .branch-line-last-top {
+          position: absolute;
+          top: -5px;
+          right: -1px;
+          width: 50%;
+          height: 7px;
+          content: '';
+          background-color: #fafafa;
+        }
+        // 覆盖条件节点最后一个节点右下角的线
+        .branch-line-last-bottom {
+          position: absolute;
+          right: -1px;
+          bottom: -5px;
+          width: 50%;
+          height: 7px;
+          content: '';
+          background-color: #fafafa;
+        }
+      }
+    }
+
+    .node-fixed-name {
+      display: inline-block;
+      width: auto;
+      padding: 0 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      white-space: nowrap;
+    }
+    // 开始节点包装
+    .start-node-wrapper {
+      position: relative;
+      margin-top: 16px;
+
+      .start-node-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .start-node-box {
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 90px;
+          height: 36px;
+          padding: 3px 4px;
+          color: #212121;
+          cursor: pointer;
+          background: #fafafa;
+          border-radius: 30px;
+          box-shadow: 0 1px 5px 0 rgb(10 30 65 / 8%);
+        }
+      }
+    }
+
+    // 结束节点包装
+    .end-node-wrapper {
+      margin-bottom: 16px;
+
+      .end-node-box {
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 36px;
+        color: #212121;
+        background-color: #fff;
+        border: 2px solid transparent;
+        border-radius: 30px;
+        box-shadow: 0 1px 5px 0 rgb(10 30 65 / 8%);
+
+        &.status-pass {
+          background-color: #a9da90;
+          border-color: #6bb63c;
+        }
+
+        &.status-pass:hover {
+          border-color: #6bb63c;
+        }
+
+        &.status-reject {
+          background-color: #f6e5e5;
+          border-color: #e47470;
+        }
+
+        &.status-reject:hover {
+          border-color: #e47470;
+        }
+
+        &.status-cancel {
+          background-color: #eaeaeb;
+          border-color: #919398;
+        }
+
+        &.status-cancel:hover {
+          border-color: #919398;
+        }
+      }
+    }
+
+    // 可编辑的 title 输入框
+    .editable-title-input {
+      max-width: 145px;
+      height: 20px;
+      margin-left: 4px;
+      font-size: 12px;
+      line-height: 20px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      transition: all 0.3s;
+
+      &:focus {
+        outline: 0;
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgb(24 144 255 / 20%);
+      }
+    }
+  }
+}
+
+.iconfont {
+  font-family: iconfont !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-trigger::before {
+  content: '\e6d3';
+}
+
+.icon-router::before {
+  content: '\e6b2';
+}
+
+.icon-delay::before {
+  content: '\e600';
+}
+
+.icon-start-user::before {
+  content: '\e679';
+}
+
+.icon-inclusive::before {
+  content: '\e602';
+}
+
+.icon-copy::before {
+  content: '\e7eb';
+}
+
+.icon-transactor::before {
+  content: '\e61c';
+}
+
+.icon-exclusive::before {
+  content: '\e717';
+}
+
+.icon-approve::before {
+  content: '\e715';
+}
+
+.icon-parallel::before {
+  content: '\e688';
+}
+
+.icon-async-child-process::before {
+  content: '\e6f2';
+}
+
+.icon-child-process::before {
+  content: '\e6c1';
+}

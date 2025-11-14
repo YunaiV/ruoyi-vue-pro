@@ -1,0 +1,35 @@
+{
+  "name": "@vben/docs",
+  "version": "5.5.9",
+  "private": true,
+  "scripts": {
+    "build": "vitepress build",
+    "dev": "vitepress dev",
+    "docs:preview": "vitepress preview"
+  },
+  "imports": {
+    "#/*": {
+      "node": "./src/_env/node/*",
+      "default": "./src/_env/*"
+    }
+  },
+  "dependencies": {
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben/common-ui": "workspace:*",
+    "@vben/locales": "workspace:*",
+    "@vben/plugins": "workspace:*",
+    "@vben/styles": "workspace:*",
+    "ant-design-vue": "catalog:",
+    "lucide-vue-next": "catalog:",
+    "medium-zoom": "catalog:",
+    "radix-vue": "catalog:",
+    "vitepress-plugin-group-icons": "catalog:"
+  },
+  "devDependencies": {
+    "@nolebase/vitepress-plugin-git-changelog": "catalog:",
+    "@vben/vite-config": "workspace:*",
+    "@vite-pwa/vitepress": "catalog:",
+    "vitepress": "catalog:",
+    "vue": "catalog:"
+  }
+}

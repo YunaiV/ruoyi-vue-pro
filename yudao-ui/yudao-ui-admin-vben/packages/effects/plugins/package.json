@@ -1,0 +1,70 @@
+{
+  "name": "@vben/plugins",
+  "version": "5.5.9",
+  "homepage": "https://github.com/vbenjs/vue-vben-admin",
+  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
+    "directory": "packages/effects/plugins"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    "./code-editor": {
+      "types": "./src/code-editor/index.ts",
+      "default": "./src/code-editor/index.ts"
+    },
+    "./echarts": {
+      "types": "./src/echarts/index.ts",
+      "default": "./src/echarts/index.ts"
+    },
+    "./vxe-table": {
+      "types": "./src/vxe-table/index.ts",
+      "default": "./src/vxe-table/index.ts"
+    },
+    "./motion": {
+      "types": "./src/motion/index.ts",
+      "default": "./src/motion/index.ts"
+    },
+    "./markmap": {
+      "types": "./src/markmap/index.ts",
+      "default": "./src/markmap/index.ts"
+    },
+    "./tinyflow": {
+      "types": "./src/tinyflow/index.ts",
+      "default": "./src/tinyflow/index.ts"
+    }
+  },
+  "dependencies": {
+    "@tinyflow-ai/vue": "catalog:",
+    "@vben-core/form-ui": "workspace:*",
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben-core/shared": "workspace:*",
+    "@vben/hooks": "workspace:*",
+    "@vben/icons": "workspace:*",
+    "@vben/locales": "workspace:*",
+    "@vben/preferences": "workspace:*",
+    "@vben/types": "workspace:*",
+    "@vben/utils": "workspace:*",
+    "@vueuse/core": "catalog:",
+    "@vueuse/motion": "catalog:",
+    "codemirror": "catalog:",
+    "echarts": "catalog:",
+    "markdown-it": "catalog:",
+    "markmap-common": "catalog:",
+    "markmap-lib": "catalog:",
+    "markmap-toolbar": "catalog:",
+    "markmap-view": "catalog:",
+    "vue": "catalog:",
+    "vxe-pc-ui": "catalog:",
+    "vxe-table": "catalog:"
+  },
+  "devDependencies": {
+    "@types/codemirror": "catalog:",
+    "@types/markdown-it": "catalog:"
+  }
+}

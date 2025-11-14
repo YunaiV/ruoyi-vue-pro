@@ -1,0 +1,151 @@
+@keyframes title-animation {
+  0% {
+    font-size: 32rpx;
+  }
+  100% {
+    font-size: 36rpx;
+  }
+}
+
+.login-wrap {
+  padding: 50rpx 34rpx;
+  min-height: 500rpx;
+  background-color: #fff;
+  border-radius: 20rpx 20rpx 0 0;
+}
+
+.head-box {
+  .head-title {
+    min-width: 160rpx;
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #333333;
+    line-height: 36rpx;
+  }
+  .head-title-active {
+    width: 160rpx;
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #999;
+    line-height: 36rpx;
+  }
+  .head-title-animation {
+    animation-name: title-animation;
+    animation-duration: 0.1s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+  .head-title-line {
+    position: relative;
+    &::before {
+      content: '';
+      width: 1rpx;
+      height: 34rpx;
+      background-color: #e4e7ed;
+      position: absolute;
+      left: -30rpx;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  .head-subtitle {
+    font-size: 26rpx;
+    font-weight: 400;
+    color: #afb6c0;
+    text-align: left;
+    display: flex;
+  }
+}
+
+// .code-btn[disabled] {
+// 	background-color: #fff;
+// }
+.code-btn-start {
+  width: 160rpx;
+  height: 56rpx;
+  line-height: normal;
+  border: 2rpx solid var(--ui-BG-Main);
+  border-radius: 28rpx;
+  font-size: 26rpx;
+  font-weight: 400;
+  color: var(--ui-BG-Main);
+  opacity: 1;
+}
+
+.forgot-btn {
+  width: 160rpx;
+  line-height: 56rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #999;
+}
+
+.login-btn-start {
+  width: 158rpx;
+  height: 56rpx;
+  line-height: normal;
+  background: linear-gradient(90deg, var(--ui-BG-Main), var(--ui-BG-Main-gradient));
+  border-radius: 28rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #fff;
+}
+
+.type-btn {
+  padding: 20rpx;
+  margin: 40rpx auto;
+  width: 200rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #999999;
+}
+
+.auto-login-box {
+  width: 100%;
+  .auto-login-btn {
+    width: 68rpx;
+    height: 68rpx;
+    border-radius: 50%;
+    margin: 0 30rpx;
+  }
+  .auto-login-img {
+    width: 68rpx;
+    height: 68rpx;
+    border-radius: 50%;
+  }
+}
+
+.agreement-box {
+  margin: 80rpx auto 0;
+  .protocol-check {
+    transform: scale(0.7);
+  }
+  .agreement-text {
+    font-size: 26rpx;
+    font-weight: 500;
+    color: #999999;
+    .tcp-text {
+      color: var(--ui-BG-Main);
+    }
+  }
+}
+
+// 修改密码
+.editPwd-btn-box {
+  .save-btn {
+    width: 690rpx;
+    line-height: 70rpx;
+    background: linear-gradient(90deg, var(--ui-BG-Main), var(--ui-BG-Main-gradient));
+    border-radius: 35rpx;
+    font-size: 28rpx;
+    font-weight: 500;
+    color: #ffffff;
+  }
+  .forgot-btn {
+    width: 690rpx;
+    line-height: 70rpx;
+    font-size: 28rpx;
+    font-weight: 500;
+    color: #999999;
+  }
+}

@@ -1,0 +1,140 @@
+/* ==================
+          边框
+ ==================== */
+/* -- 实线 -- */
+.border {
+  overflow: initial !important;
+  @at-root [class*='border'],
+    [class*='dashed'] {
+    position: relative;
+    &.dline {
+      --ui-Border: var(--ui-BG-3);
+    }
+    &::after {
+      content: ' ';
+      width: 200%;
+      height: 200%;
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+      transform: scale(0.5);
+      transform-origin: 0 0;
+      pointer-events: none;
+      box-sizing: border-box;
+      border-radius: inherit;
+    }
+    &.radius::after {
+      border-radius: calc(#{$radius} * 2);
+    }
+    &.round::after {
+      border-radius: #{$round-pill};
+    }
+  }
+  &::after {
+    border: 1px solid var(--ui-Border);
+  }
+  &s::after {
+    border: 4rpx solid var(--ui-Border);
+  }
+  &ss::after {
+    border: 8rpx solid var(--ui-Border);
+  }
+  @each $value in (top, right, bottom, left) {
+    &-#{$value}::after {
+      border-#{$value}: 1px solid var(--ui-Border);
+    }
+    &s-#{$value}::after {
+      border-#{$value}: 4rpx solid var(--ui-Border);
+    }
+    &ss-#{$value}::after {
+      border-#{$value}: 8rpx solid var(--ui-Border);
+    }
+  }
+}
+/* -- 虚线 -- */
+.dashed {
+  &::after {
+    border: 4rpx dashed var(--ui-Border);
+  }
+  &s::after {
+    border: 6rpx dashed var(--ui-Border);
+  }
+  @each $value in (top, right, bottom, left) {
+    &-#{$value}::after {
+      border-#{$value}: 4rpx dashed var(--ui-Border);
+    }
+    &s-#{$value}::after {
+      border-#{$value}: 6rpx dashed var(--ui-Border);
+    }
+  }
+}
+@each $color, $value in map-merge($colors, map-merge($darks, $grays)) {
+  .border-#{$color}::after,
+  .border-#{$color}[class*='-shine']::before {
+    border-color: $value !important;
+  }
+}
+@each $value in (a, b, c, d, e) {
+  .main-#{$value}-border::after,
+  .main-#{$value}-border[class*='-shine']::before {
+    border-color: var(--main-#{$value}) !important;
+  }
+}
+.dashed-shine,
+.dasheds-shine {
+  position: relative;
+  overflow: hidden;
+  &::after,
+  &::before {
+    border-style: dashed;
+    border-color: var(--ui-Border);
+    animation: shineafter 1s infinite linear;
+    width: calc(200% + 40px);
+    height: 200%;
+    border-width: 2px 0;
+  }
+  &::before {
+    content: ' ';
+    position: absolute;
+    transform: scale(0.5);
+    transform-origin: 0 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    animation: shinebefore 1s infinite linear;
+    width: 200%;
+    height: calc(200% + 40px);
+    border-width: 0 2px;
+  }
+}
+.dasheds-shine {
+  &::after,
+  &::before {
+    border-width: 4px 0;
+  }
+  &::before {
+    border-width: 0 4px;
+  }
+}
+
+@keyframes shineafter {
+  0% {
+    top: 0;
+    left: -22px;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+  }
+}
+
+@keyframes shinebefore {
+  0% {
+    top: -22px;
+    left: 0;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+  }
+}

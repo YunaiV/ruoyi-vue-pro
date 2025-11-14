@@ -1,0 +1,286 @@
+/* ==================
+          常用工具
+ ==================== */
+
+.ss-bg-opactity-block {
+  background-color: rgba(#000, 0.2);
+  color: #fff;
+}
+
+/* ==================
+          flex布局
+ ==================== */
+
+.ss-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.ss-flex-1 {
+  flex: 1;
+}
+
+.ss-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.ss-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.ss-flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.ss-col-center {
+  align-items: center;
+}
+
+.ss-col-top {
+  align-items: flex-start;
+}
+
+.ss-col-bottom {
+  align-items: flex-end;
+}
+
+.ss-col-stretch {
+  align-items: stretch;
+}
+
+.ss-row-center {
+  justify-content: center;
+}
+
+.ss-row-left {
+  justify-content: flex-start;
+}
+
+.ss-row-right {
+  justify-content: flex-end;
+}
+
+.ss-row-between {
+  justify-content: space-between;
+}
+
+.ss-row-around {
+  justify-content: space-around;
+}
+
+.ss-self-start {
+  align-self: flex-start;
+}
+
+.ss-self-end {
+  align-self: flex-end;
+}
+
+.ss-self-center {
+  align-self: center;
+}
+.ss-h-100 {
+  height: 100%;
+}
+.ss-w-100 {
+  width: 100%;
+}
+
+/* ==================
+
+    margin padding: 内外边距
+	
+ ==================== */
+@for $i from 0 through 100 {
+  // 只要双数和能被5除尽的数
+  @if $i % 2==0 or $i % 5==0 {
+    // 得出：u-margin-30或者u-m-30
+    .ss-margin-#{$i},
+    .ss-m-#{$i} {
+      margin: $i + rpx;
+    }
+    .ss-m-x-#{$i} {
+      margin-left: $i + rpx;
+      margin-right: $i + rpx;
+    }
+    .ss-m-y-#{$i} {
+      margin-top: $i + rpx;
+      margin-bottom: $i + rpx;
+    }
+
+    // 得出：u-padding-30或者u-p-30
+    .ss-padding-#{$i},
+    .ss-p-#{$i} {
+      padding: $i + rpx;
+    }
+    .ss-p-x-#{$i} {
+      padding-left: $i + rpx;
+      padding-right: $i + rpx;
+    }
+    .ss-p-y-#{$i} {
+      padding-top: $i + rpx;
+      padding-bottom: $i + rpx;
+    }
+
+    @each $short, $long in l left, t top, r right, b bottom {
+      // 缩写版，结果如： u-m-l-30
+      // 定义外边距
+      .ss-m-#{$short}-#{$i} {
+        margin-#{$long}: $i + rpx;
+      }
+
+      // 定义内边距
+      .ss-p-#{$short}-#{$i} {
+        padding-#{$long}: $i + rpx;
+      }
+
+      // 完整版，结果如：u-margin-left-30
+      // 定义外边距
+      .ss-margin-#{$long}-#{$i} {
+        margin-#{$long}: $i + rpx;
+      }
+
+      // 定义内边距
+      .ss-padding-#{$long}-#{$i} {
+        padding-#{$long}: $i + rpx;
+      }
+    }
+  }
+}
+
+/* ==================
+
+    radius
+	
+ ==================== */
+@for $i from 0 through 100 {
+  // 只要双数和能被5除尽的数
+  @if $i % 2==0 or $i % 5==0 {
+    .ss-radius-#{$i},
+    .ss-r-#{$i} {
+      border-radius: $i + rpx;
+    }
+
+    .ss-r-t-#{$i} {
+      border-top-left-radius: $i + rpx;
+      border-top-right-radius: $i + rpx;
+    }
+
+    .ss-r-b-#{$i} {
+      border-bottom-left-radius: $i + rpx;
+      border-bottom-right-radius: $i + rpx;
+    }
+
+    @each $short, $long in tl 'top-left', tr 'top-right', bl 'bottom-right', br 'bottom-right' {
+      // 定义外边距
+      .ss-r-#{$short}-#{$i} {
+        border-#{$long}-radius: $i + rpx;
+      }
+
+      // 定义内边距
+      .ss-radius-#{$long}-#{$i} {
+        border-#{$long}-radius: $i + rpx;
+      }
+    }
+  }
+}
+
+/* ==================
+
+    溢出省略号
+    @param {Number} 行数
+	
+ ==================== */
+@mixin ellipsis($rowCount: 1) {
+  // @if $rowCount <=1 {
+  //   overflow: hidden;
+  //   text-overflow: ellipsis;
+  //   white-space: nowrap;
+  // } @else {
+  //   min-width: 0;
+  //   overflow: hidden;
+  //   text-overflow: ellipsis;
+  //   display: -webkit-box;
+  //   -webkit-line-clamp: $rowCount;
+  //   -webkit-box-orient: vertical;
+  // }
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: $rowCount;
+  -webkit-box-orient: vertical;
+}
+
+@for $i from 1 through 6 {
+  .ss-line-#{$i} {
+    @include ellipsis($i);
+  }
+}
+
+/* ==================
+    hover
+ ==================== */
+.ss-hover-class {
+  background-color: $gray-c;
+  opacity: 0.6;
+}
+.ss-hover-btn {
+  transform: translate(1px, 1px);
+}
+
+/* ==================
+    底部安全区域
+ ==================== */
+
+.ss-safe-bottom {
+  padding-bottom: 0;
+  padding-bottom: calc(constant(safe-area-inset-bottom) / 5 * 3);
+  padding-bottom: calc(env(safe-area-inset-bottom) / 5 * 3);
+}
+
+/* ==================
+
+    字体大小
+	
+ ==================== */
+
+@for $i from 20 through 50 {
+  .ss-font-#{$i} {
+    font-size: $i + rpx;
+  }
+}
+
+/* ==================
+    按钮
+ ==================== */
+.ss-reset-button {
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  background-color: transparent;
+  color: inherit;
+  position: relative;
+  border: 0rpx;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: baseline;
+  transform: translate(0, 0);
+}
+.ss-reset-button.button-hover {
+  transform: translate(1px, 1px);
+  background: none;
+}
+
+.ss-reset-button::after {
+  border: none;
+}

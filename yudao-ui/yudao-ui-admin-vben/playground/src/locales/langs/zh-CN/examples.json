@@ -1,0 +1,76 @@
+{
+  "title": "示例",
+  "modal": {
+    "title": "弹窗"
+  },
+  "drawer": {
+    "title": "抽屉"
+  },
+  "ellipsis": {
+    "title": "文本省略"
+  },
+  "resize": {
+    "title": "拖动调整"
+  },
+  "form": {
+    "title": "表单",
+    "basic": "基础表单",
+    "layout": "自定义布局",
+    "query": "查询表单",
+    "rules": "表单校验",
+    "dynamic": "动态表单",
+    "custom": "自定义组件",
+    "api": "Api",
+    "merge": "合并表单",
+    "scrollToError": "滚动到错误字段",
+    "upload-error": "部分文件上传失败",
+    "upload-urls": "文件上传后的网址",
+    "file": "文件",
+    "upload-image": "点击上传图片"
+  },
+  "vxeTable": {
+    "title": "Vxe 表格",
+    "basic": "基础表格",
+    "remote": "远程加载",
+    "tree": "树形表格",
+    "fixed": "固定表头/列",
+    "virtual": "虚拟滚动",
+    "editCell": "单元格编辑",
+    "editRow": "行编辑",
+    "custom-cell": "自定义单元格",
+    "form": "搜索表单"
+  },
+  "captcha": {
+    "title": "验证码",
+    "pointSelection": "点选验证",
+    "sliderCaptcha": "滑块验证",
+    "sliderRotateCaptcha": "旋转验证",
+    "sliderTranslateCaptcha": "拼图滑块验证",
+    "captchaCardTitle": "请完成安全验证",
+    "pageDescription": "通过点击图片中的特定位置来验证用户身份。",
+    "pageTitle": "验证码组件示例",
+    "basic": "基本使用",
+    "titlePlaceholder": "验证码标题文案",
+    "captchaImageUrlPlaceholder": "验证码图片（支持img标签src属性值）",
+    "hintImage": "提示图片",
+    "hintText": "提示文本",
+    "hintImagePlaceholder": "提示图片（支持img标签src属性值）",
+    "hintTextPlaceholder": "提示文本",
+    "showConfirm": "展示确认",
+    "hideConfirm": "隐藏确认",
+    "widthPlaceholder": "验证码图片宽度 默认300px",
+    "heightPlaceholder": "验证码图片高度 默认220px",
+    "paddingXPlaceholder": "水平内边距 默认12px",
+    "paddingYPlaceholder": "垂直内边距 默认16px",
+    "index": "索引：",
+    "timestamp": "时间戳：",
+    "x": "x：",
+    "y": "y："
+  },
+  "layout": {
+    "col-page": "双列布局"
+  },
+  "button-group": {
+    "title": "按钮组"
+  }
+}

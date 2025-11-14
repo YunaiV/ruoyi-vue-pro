@@ -1,0 +1,79 @@
+/* ==================
+		弹性布局
+ ==================== */
+.flex {
+  display: flex !important;
+  &-sub {
+    flex: 1 !important;
+  }
+  &-twice {
+    flex: 2 !important;
+  }
+  &-treble {
+    flex: 3 !important;
+  }
+  &-column {
+    flex-direction: column !important;
+  }
+  &-row {
+    flex-direction: row !important;
+  }
+  &-column-reverse {
+    flex-direction: column-reverse !important;
+  }
+  &-row-reverse {
+    flex-direction: row-reverse !important;
+  }
+  &-wrap {
+    flex-wrap: wrap !important;
+  }
+  &-center {
+    @include flex-center;
+  }
+  &-bar {
+    @include flex-bar;
+  }
+}
+.basis {
+  @each $class, $value in (xs: 20%, sm: 40%, df: 50%, lg: 60%, xl: 80%) {
+    &-#{$class} {
+      flex-basis: $value !important;
+    }
+  }
+}
+.align {
+  @each $class,
+    $value
+      in (start: flex-start, end: flex-end, center: center, stretch: stretch, baseline: baseline)
+  {
+    &-#{$class} {
+      align-items: $value !important;
+    }
+  }
+}
+.self {
+  @each $class,
+    $value
+      in (start: flex-start, end: flex-end, center: center, stretch: stretch, baseline: baseline)
+  {
+    &-#{$class} {
+      align-self: $value !important;
+    }
+  }
+}
+.justify {
+  @each $class,
+    $value
+      in (
+        start: flex-start,
+        end: flex-end,
+        center: center,
+        between: space-between,
+        around: space-around
+      )
+  {
+    &-#{$class} {
+      justify-content: $value !important;
+    }
+  }
+}

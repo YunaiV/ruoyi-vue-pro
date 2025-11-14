@@ -1,0 +1,98 @@
+.default-json-theme {
+  font-family: Consolas, Menlo, Courier, monospace;
+  font-size: 14px;
+  color: hsl(var(--foreground));
+  white-space: nowrap;
+  background: hsl(var(--background));
+
+  &.jv-container.boxed {
+    border: 1px solid hsl(var(--border));
+  }
+
+  .jv-ellipsis {
+    display: inline-block;
+    padding: 0 4px 2px;
+    font-size: 0.9em;
+    line-height: 0.9;
+    vertical-align: 2px;
+    color: hsl(var(--secondary-foreground));
+    cursor: pointer;
+    user-select: none;
+    background-color: hsl(var(--secondary));
+    border-radius: 3px;
+  }
+
+  .jv-button {
+    color: hsl(var(--primary));
+  }
+
+  .jv-key {
+    color: hsl(var(--heavy-foreground));
+  }
+
+  .jv-item {
+    &.jv-array {
+      color: hsl(var(--heavy-foreground));
+    }
+
+    &.jv-boolean {
+      color: hsl(var(--red-400));
+    }
+
+    &.jv-function {
+      color: hsl(var(--destructive-foreground));
+    }
+
+    &.jv-number {
+      color: hsl(var(--info-foreground));
+    }
+
+    &.jv-number-float {
+      color: hsl(var(--info-foreground));
+    }
+
+    &.jv-number-integer {
+      color: hsl(var(--info-foreground));
+    }
+
+    &.jv-object {
+      color: hsl(var(--accent-darker));
+    }
+
+    &.jv-undefined {
+      color: hsl(var(--secondary-foreground));
+    }
+
+    &.jv-string {
+      color: hsl(var(--primary));
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+  }
+
+  &.jv-container .jv-code {
+    padding: 10px;
+
+    &.boxed:not(.open) {
+      padding-bottom: 20px;
+      margin-bottom: 10px;
+    }
+
+    &.open {
+      padding-bottom: 10px;
+    }
+
+    .jv-toggle {
+      &::before {
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+
+      &:hover {
+        &::before {
+          background: hsl(var(--accent-foreground));
+        }
+      }
+    }
+  }
+}

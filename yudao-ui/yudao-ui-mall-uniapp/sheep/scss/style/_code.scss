@@ -1,0 +1,55 @@
+.ui-code {
+  font-family: Monaco, Menlo, Consolas, 'Courier New';
+  font-size: 90%;
+  position: relative;
+  z-index: 1;
+  color: var(--ui-TC);
+  .ui-rich-text {
+    display: inline-block;
+  }
+
+  &.code {
+    display: inline-block;
+    padding: 0 10rpx;
+    margin: 0 10rpx;
+    border-radius: $radius-sm;
+    line-height: 1.6;
+    vertical-align: baseline;
+  }
+
+  &.pre {
+    display: block;
+    margin: 1em 0;
+    line-height: 1.6;
+    &.hasTitle {
+      margin: 3.2em 0 1em;
+    }
+    // border-radius: $radius-sm;
+    .ui-code-title {
+      position: absolute;
+      top: -2.2em;
+      color: var(--ui-TC-2);
+      left: 0;
+    }
+    .ui-rich-text {
+      padding: 40rpx;
+      white-space: pre-wrap;
+      word-break: break-all;
+      word-wrap: break-word;
+    }
+    .ui-scroll-view {
+      &.ui-scroll {
+        max-height: 500px;
+        white-space: pre;
+      }
+    }
+    .ui-copy-btn {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      right: 0;
+      padding: 0.8em;
+      border-radius: 0 $radius-sm 0 $radius-sm;
+    }
+  }
+}
