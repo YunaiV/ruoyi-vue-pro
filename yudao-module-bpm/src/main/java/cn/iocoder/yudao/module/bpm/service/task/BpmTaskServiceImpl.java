@@ -1048,33 +1048,34 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Transactional(rollbackFor = Exception.class)
     public void moveTaskToEnd(String processInstanceId, String reason) {
         List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
-        if (CollUtil.isEmpty(taskList)) {
-            return;
-        }
-
+        
         // 1. 其它未结束的任务，直接取消
         // 疑问：为什么不通过 updateTaskStatusWhenCanceled 监听取消，而是直接提前调用呢？
         // 回答：详细见 updateTaskStatusWhenCanceled 的方法，加签的场景
-        taskList.forEach(task -> {
-            Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
-            if (BpmTaskStatusEnum.isEndStatus(otherTaskStatus)) {
-                return;
-            }
-            processTaskCanceled(task.getId());
-        });
+        if (CollUtil.isNotEmpty(taskList)) {
+            taskList.forEach(task -> {
+                Integer otherTaskStatus = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
+                if (BpmTaskStatusEnum.isEndStatus(otherTaskStatus)) {
+                    return;
+                }
+                processTaskCanceled(task.getId());
+            });
 
-        // 2. 终止流程
-        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(taskList.get(0).getProcessDefinitionId());
-        List<String> activityIds = CollUtil.newArrayList(convertSet(taskList, Task::getTaskDefinitionKey));
-        EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
-        Assert.notNull(endEvent, "结束节点不能为空");
-        runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstanceId)
-                .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
-                .changeState();
+            // 2. 终止流程
+            BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(taskList.get(0).getProcessDefinitionId());
+            List<String> activityIds = CollUtil.newArrayList(convertSet(taskList, Task::getTaskDefinitionKey));
+            EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
+            Assert.notNull(endEvent, "结束节点不能为空");
+            runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstanceId)
+                    .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
+                    .changeState();
+        }
 
-        // 3. 特殊：如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法
+        // 3. 特殊：如果跳转到 EndEvent 流程还未结束，执行 deleteProcessInstance 方法
         // TODO 芋艿：目前发现并行分支情况下，会存在这个情况，后续看看有没更好的方案；
+        // 疑问：为什么不通过 updateTaskStatusWhenCanceled 监听取消，而是直接提前调用呢？
+        // 回答：详细见 updateTaskStatusWhenCanceled 的方法，加签的场景
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
         if (CollUtil.isNotEmpty(executions)) {
             log.warn("[moveTaskToEnd][执行跳转到 EndEvent 后, 流程实例未结束，强制执行 deleteProcessInstance 方法]");
