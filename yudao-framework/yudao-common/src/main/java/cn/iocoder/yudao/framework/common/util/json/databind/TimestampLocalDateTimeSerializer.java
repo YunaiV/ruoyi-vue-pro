@@ -19,8 +19,21 @@ public class TimestampLocalDateTimeSerializer extends JsonSerializer<LocalDateTi
 
     @Override
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        // 将 LocalDateTime 对象，转换为 Long 时间戳
-        gen.writeNumber(value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        String fieldName = gen.getOutputContext().getCurrentName();
+        try {
+            Field field = gen.getOutputContext().getCurrentValue().getClass().getDeclaredField(fieldName);
+            JsonFormat[] jsonFormats = field.getAnnotationsByType(JsonFormat.class);
+            if(jsonFormats.length > 0){
+                String pattern = jsonFormats[0].pattern();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                gen.writeString(formatter.format(value));
+            }else{
+                // 将 LocalDateTime 对象，转换为 Long 时间戳
+                gen.writeNumber(value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            }
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
