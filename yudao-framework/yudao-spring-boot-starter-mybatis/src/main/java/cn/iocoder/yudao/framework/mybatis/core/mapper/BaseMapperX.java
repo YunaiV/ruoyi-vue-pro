@@ -24,10 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * BaseMapperX 是一个泛型接口，继承自 MPJBaseMapper，用于提供一系列便捷的数据库操作方法。
- * 该接口主要包含分页查询、单条记录查询、多条记录查询、批量插入等常用操作。
+ * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
  *
- * @param <T> 实体类型
+ * 1. {@link BaseMapper} 为 MyBatis Plus 的基础接口，提供基础的 CRUD 能力
+ * 2. {@link MPJBaseMapper} 为 MyBatis Plus Join 的基础接口，提供连表 Join 能力
  */
 public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
