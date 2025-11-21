@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -105,6 +106,7 @@ public class YudaoWebAutoConfiguration {
     /**
      * 创建 CorsFilter Bean，解决跨域问题
      */
+    @Order(value = WebFilterOrderEnum.CORS_FILTER)
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterBean() {
         // 创建 CorsConfiguration 对象
