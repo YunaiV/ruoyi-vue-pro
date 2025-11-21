@@ -85,7 +85,9 @@ public interface DeliveryExpressTemplateConvert {
                     .setChargeMode(template.getChargeMode())
                     .setCharge(convertTemplateCharge(findFirst(templateIdChargeMap.get(template.getId()), charge -> charge.getAreaIds().contains(areaId))))
                     .setFree(convertTemplateFree(findFirst(templateIdFreeMap.get(template.getId()), free -> free.getAreaIds().contains(areaId))));
-            result.put(template.getId(), bo);
+            if (bo.getCharge() != null || bo.getFree() != null) {
+                result.put(template.getId(), bo);
+            }
         });
         return result;
     }
