@@ -276,7 +276,9 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 如果有角色编号，查询角色对应的用户编号
         Set<Long> userIds = reqVO.getRoleId() != null ?
                 permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId())) : null;
-
+        if (userIds != null && userIds.isEmpty()) {
+            return PageResult.empty();
+        }
         // 分页查询
         return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()), userIds);
     }
