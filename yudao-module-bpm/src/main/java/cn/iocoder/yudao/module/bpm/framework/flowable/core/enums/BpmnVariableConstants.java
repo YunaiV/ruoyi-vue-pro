@@ -54,11 +54,11 @@ public class BpmnVariableConstants {
     public static final String PROCESS_INSTANCE_VARIABLE_RETURN_FLAG = "RETURN_FLAG_%s";
 
     /**
-     * 流程实例的变量前缀 - 用于退回操作，记录需要预测的节点：格式 NEED_SIMULATE_TASK_{节点定义 id}
+     * 流程实例的变量 - 用于退回操作，记录需要预测的节点 ids, 变量值类型为 Set
      *
      * 目的是：退回操作，预测节点会不准，在流程变量中记录需要预测的节点，来辅助预测
      */
-    public static final String PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX = "NEED_SIMULATE_TASK_";
+    public static final String PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS = "NEED_SIMULATE_TASK_IDS";
 
     /**
      * 流程实例的变量 - 是否跳过表达式
