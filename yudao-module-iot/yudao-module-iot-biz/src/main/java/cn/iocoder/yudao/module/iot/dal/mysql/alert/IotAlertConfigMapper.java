@@ -33,7 +33,7 @@ public interface IotAlertConfigMapper extends BaseMapperX<IotAlertConfigDO> {
     default List<IotAlertConfigDO> selectListBySceneRuleIdAndStatus(Long sceneRuleId, Integer status) {
         return selectList(new LambdaQueryWrapperX<IotAlertConfigDO>()
                 .eq(IotAlertConfigDO::getStatus, status)
-                .apply(MyBatisUtils.findInSet("scene_rule_id", sceneRuleId)));
+                .apply(MyBatisUtils.findInSet("scene_rule_ids", sceneRuleId)));
     }
 
 }
