@@ -353,7 +353,9 @@ const handleDelete = async (id: number) => {
     // 发起删除
     await ${simpleClassName}Api.delete${simpleClassName}(id)
     message.success(t('common.delSuccess'))
+#if ( $table.templateType == 11 )
     currentRow.value = {}
+#end
     // 刷新列表
     await getList()
   } catch {}
