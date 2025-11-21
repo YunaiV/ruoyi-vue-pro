@@ -178,6 +178,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildGeminiChatModel(apiKey);
                 case OLLAMA:
                     return buildOllamaChatModel(url);
+                case GROK:
+                    return buildGrokChatModel(apiKey,url);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -405,6 +407,12 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .build();
     }
 
+    private ChatModel buildGrokChatModel(String apiKey,String url) {
+        YudaoAiProperties.Grok properties = new YudaoAiProperties.Grok()
+                .setBaseUrl(url)
+                .setApiKey(apiKey);
+        return new AiAutoConfiguration().buildGrokChatClient(properties);
+    }
     /**
      * 可参考 {@link AiAutoConfiguration#douBaoChatClient(YudaoAiProperties)}
      */

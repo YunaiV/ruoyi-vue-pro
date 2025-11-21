@@ -161,6 +161,20 @@ public class YudaoAiProperties {
     }
 
     @Data
+    public static class Grok {
+
+        private String enable;
+        private String apiKey;
+        private String baseUrl;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
     public static class WebSearch {
 
         private boolean enable;

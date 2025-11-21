@@ -79,6 +79,9 @@ public class AiUtils {
             case OLLAMA:
                 return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
+            case GROK:
+                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
