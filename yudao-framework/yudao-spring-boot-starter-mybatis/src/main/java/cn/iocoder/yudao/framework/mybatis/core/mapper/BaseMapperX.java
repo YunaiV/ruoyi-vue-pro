@@ -24,10 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
+ * BaseMapperX 是一个泛型接口，继承自 MPJBaseMapper，用于提供一系列便捷的数据库操作方法。
+ * 该接口主要包含分页查询、单条记录查询、多条记录查询、批量插入等常用操作。
  *
- * 1. {@link BaseMapper} 为 MyBatis Plus 的基础接口，提供基础的 CRUD 能力
- * 2. {@link MPJBaseMapper} 为 MyBatis Plus Join 的基础接口，提供连表 Join 能力
+ * @param <T> 实体类型
  */
 public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
@@ -63,6 +63,29 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
         // MyBatis Plus Join 查询
         IPage<D> mpPage = MyBatisUtils.buildPage(pageParam);
+        mpPage = selectJoinPage(mpPage, clazz, lambdaWrapper);
+        // 转换返回
+        return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
+
+    /**
+     * 执行分页查询并返回结果。
+     *
+     * @param pageParam 分页参数，包含页码、每页条数和排序字段信息。如果 pageSize 为 {@link PageParam#PAGE_SIZE_NONE}，则不分页，直接查询所有数据。
+     * @param clazz     结果集的类类型
+     * @param lambdaWrapper MyBatis Plus Join 查询条件包装器
+     * @param <D>       结果集的泛型类型
+     * @return 返回分页查询的结果，包括总记录数和当前页的数据列表
+     */
+    default <D> PageResult<D> selectJoinPage(SortablePageParam pageParam, Class<D> clazz, MPJLambdaWrapper<T> lambdaWrapper) {
+        // 特殊：不分页，直接查询全部
+        if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageSize())) {
+            List<D> list = selectJoinList(clazz, lambdaWrapper);
+            return new PageResult<>(list, (long) list.size());
+        }
+
+        // MyBatis Plus Join 查询
+        IPage<D> mpPage = MyBatisUtils.buildPage(pageParam, pageParam.getSortingFields());
         mpPage = selectJoinPage(mpPage, clazz, lambdaWrapper);
         // 转换返回
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
