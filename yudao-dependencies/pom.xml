@@ -46,7 +46,7 @@
         <jedis-mock.version>1.1.11</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <flowable.version>7.0.1</flowable.version>
+        <flowable.version>7.2.0</flowable.version>
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.21.2</jsoup.version>

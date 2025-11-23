@@ -14,9 +14,9 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import jakarta.annotation.Resource;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class BpmCallActivityListener implements ExecutionListener {
     public static final String DELEGATE_EXPRESSION = "${bpmCallActivityListener}";
 
     @Setter
-    private FixedValue listenerConfig;
+    private Expression listenerConfig;
 
     @Resource
     private BpmProcessDefinitionService processDefinitionService;

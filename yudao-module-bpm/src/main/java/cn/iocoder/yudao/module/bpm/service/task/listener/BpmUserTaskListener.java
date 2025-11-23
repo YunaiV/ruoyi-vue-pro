@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import jakarta.annotation.Resource;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.context.annotation.Scope;
@@ -33,7 +33,7 @@ public class BpmUserTaskListener implements TaskListener {
     private BpmProcessInstanceService processInstanceService;
 
     @Setter
-    private FixedValue listenerConfig;
+    private Expression listenerConfig;
 
     @Override
     public void notify(DelegateTask delegateTask) {
