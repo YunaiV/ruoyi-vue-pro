@@ -70,7 +70,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             payConfig.setPrivateKeyPath(FileUtils.createTempFile(config.getPrivateKeyContent()).getPath());
             // 参考 https://gitee.com/yudaocode/yudao-ui-admin-vue3/issues/ICUE53 和 https://t.zsxq.com/ODR5V
             if (StrUtil.isNotBlank(config.getPublicKeyContent())) {
-                payConfig.setPrivateCertPath(FileUtils.createTempFile(Base64.decode(config.getPublicKeyContent())).getPath());
+                payConfig.setPublicKeyPath(FileUtils.createTempFile(config.getPublicKeyContent()).getPath());
             }
             // 兼容微信支付公钥模式(BeanUtil.copyProperties忽略了该字段，当切换为公钥模式时，需要手动设置该值)
             // 解决当商户切换到公钥，废弃平台证书，导致报错无可用平台证书的问题
