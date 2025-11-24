@@ -54,7 +54,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
         }
         // 执行抄送
         createProcessInstanceCopy(userIds, reason,
-                task.getProcessInstanceId(), task.getTaskDefinitionKey(), task.getId(), task.getName());
+                task.getProcessInstanceId(), task.getTaskDefinitionKey(), task.getName(), task.getId());
     }
 
     @Override
