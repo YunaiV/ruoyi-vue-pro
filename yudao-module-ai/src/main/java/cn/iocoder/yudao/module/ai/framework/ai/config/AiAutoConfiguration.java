@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatMod
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
 import cn.iocoder.yudao.module.ai.tool.method.PersonService;
+import io.micrometer.observation.ObservationRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
@@ -36,6 +37,7 @@ import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClie
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreProperties;
 import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreProperties;
 import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -61,6 +63,13 @@ public class AiAutoConfiguration {
     @Bean
     public AiModelFactory aiModelFactory() {
         return new AiModelFactoryImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ObservationRegistry observationRegistry() {
+        // 特殊：兜底有 ObservationRegistry Bean，避免相关的 ChatModel 创建报错。相关 issue：https://t.zsxq.com/CuPu4
+        return ObservationRegistry.NOOP;
     }
 
     // ========== 各种 AI Client 创建 ==========
