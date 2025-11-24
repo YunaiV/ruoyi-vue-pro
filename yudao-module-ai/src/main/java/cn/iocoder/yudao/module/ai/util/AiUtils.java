@@ -68,6 +68,7 @@ public class AiUtils {
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
+            case GROK: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case AZURE_OPENAI:
@@ -78,9 +79,6 @@ public class AiUtils {
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OLLAMA:
                 return OllamaChatOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
-                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case GROK:
-                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));

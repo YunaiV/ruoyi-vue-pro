@@ -407,12 +407,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .build();
     }
 
-    private ChatModel buildGrokChatModel(String apiKey,String url) {
-        YudaoAiProperties.Grok properties = new YudaoAiProperties.Grok()
-                .setBaseUrl(url)
-                .setApiKey(apiKey);
-        return new AiAutoConfiguration().buildGrokChatClient(properties);
-    }
     /**
      * 可参考 {@link AiAutoConfiguration#douBaoChatClient(YudaoAiProperties)}
      */
@@ -594,6 +588,13 @@ public class AiModelFactoryImpl implements AiModelFactory {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);
         return new StabilityAiImageModel(stabilityAiApi);
+    }
+
+    private ChatModel buildGrokChatModel(String apiKey,String url) {
+        YudaoAiProperties.Grok properties = new YudaoAiProperties.Grok()
+                .setBaseUrl(url)
+                .setApiKey(apiKey);
+        return new AiAutoConfiguration().buildGrokChatClient(properties);
     }
 
     // ========== 各种创建 EmbeddingModel 的方法 ==========

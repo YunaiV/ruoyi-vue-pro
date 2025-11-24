@@ -255,6 +255,28 @@ public class AiAutoConfiguration {
         return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
+    public ChatModel buildGrokChatClient(YudaoAiProperties.Grok properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(GrokChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(Optional.ofNullable(properties.getBaseUrl())
+                                .orElse(GrokChatModel.BASE_URL))
+                        .completionsPath(GrokChatModel.COMPLETE_PATH)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new DouBaoChatModel(openAiChatModel);
+    }
+
     // ========== RAG 相关 ==========
 
     @Bean
@@ -289,25 +311,4 @@ public class AiAutoConfiguration {
         return List.of(ToolCallbacks.from(personService));
     }
 
-    public ChatModel buildGrokChatClient(YudaoAiProperties.Grok properties) {
-        if (StrUtil.isEmpty(properties.getModel())) {
-            properties.setModel(GrokChatModel.MODEL_DEFAULT);
-        }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(Optional.ofNullable(properties.getBaseUrl())
-                               .orElse(GrokChatModel.BASE_URL))
-                        .completionsPath(GrokChatModel.COMPLETE_PATH)
-                        .apiKey(properties.getApiKey())
-                        .build())
-                .defaultOptions(OpenAiChatOptions.builder()
-                        .model(properties.getModel())
-                        .temperature(properties.getTemperature())
-                        .maxTokens(properties.getMaxTokens())
-                        .topP(properties.getTopP())
-                        .build())
-                .toolCallingManager(getToolCallingManager())
-                .build();
-        return new DouBaoChatModel(openAiChatModel);
-    }
 }
