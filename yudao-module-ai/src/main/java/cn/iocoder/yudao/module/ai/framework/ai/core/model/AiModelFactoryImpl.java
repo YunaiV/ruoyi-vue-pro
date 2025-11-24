@@ -87,7 +87,7 @@ import org.springframework.ai.model.zhipuai.autoconfigure.ZhiPuAiImageAutoConfig
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
@@ -436,10 +436,12 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link ZhiPuAiChatAutoConfiguration} 的 zhiPuAiChatModel 方法
      */
     private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
-        ZhiPuAiApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiApi(apiKey)
-                : new ZhiPuAiApi(url, apiKey);
+        ZhiPuAiApi.Builder zhiPuAiApiBuilder = ZhiPuAiApi.builder().apiKey(apiKey);
+        if (StrUtil.isNotEmpty(url)) {
+            zhiPuAiApiBuilder.baseUrl(url);
+        }
         ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder().model(ZhiPuAiApi.DEFAULT_CHAT_MODEL).temperature(0.7).build();
-        return new ZhiPuAiChatModel(zhiPuAiApi, options, getToolCallingManager(), DEFAULT_RETRY_TEMPLATE,
+        return new ZhiPuAiChatModel(zhiPuAiApiBuilder.build(), options, getToolCallingManager(), DEFAULT_RETRY_TEMPLATE,
                 getObservationRegistry().getIfAvailable());
     }
 
@@ -601,10 +603,12 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link ZhiPuAiEmbeddingAutoConfiguration} 的 zhiPuAiEmbeddingModel 方法
      */
     private ZhiPuAiEmbeddingModel buildZhiPuEmbeddingModel(String apiKey, String url, String model) {
-        ZhiPuAiApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiApi(apiKey)
-                : new ZhiPuAiApi(url, apiKey);
+        ZhiPuAiApi.Builder zhiPuAiApiBuilder = ZhiPuAiApi.builder().apiKey(apiKey);
+        if (StrUtil.isNotEmpty(url)) {
+            zhiPuAiApiBuilder.baseUrl(url);
+        }
         ZhiPuAiEmbeddingOptions zhiPuAiEmbeddingOptions = ZhiPuAiEmbeddingOptions.builder().model(model).build();
-        return new ZhiPuAiEmbeddingModel(zhiPuAiApi, MetadataMode.EMBED, zhiPuAiEmbeddingOptions);
+        return new ZhiPuAiEmbeddingModel(zhiPuAiApiBuilder.build(), MetadataMode.EMBED, zhiPuAiEmbeddingOptions);
     }
 
     /**
@@ -632,7 +636,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     private OllamaEmbeddingModel buildOllamaEmbeddingModel(String url, String model) {
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(url).build();
-        OllamaOptions ollamaOptions = OllamaOptions.builder().model(model).build();
+        OllamaEmbeddingOptions ollamaOptions = OllamaEmbeddingOptions.builder().model(model).build();
         return OllamaEmbeddingModel.builder()
                 .ollamaApi(ollamaApi)
                 .defaultOptions(ollamaOptions)
