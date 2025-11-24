@@ -40,6 +40,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
     MIDJOURNEY("Midjourney", "Midjourney"), // Midjourney
     SUNO("Suno", "Suno"), // Suno AI
+    GROK("Grok","Grok"), // Grok
 
     ;
 

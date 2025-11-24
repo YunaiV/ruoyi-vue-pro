@@ -33,7 +33,7 @@ INSERT INTO dual VALUES (1);
 DROP TABLE IF EXISTS infra_api_access_log;
 CREATE TABLE infra_api_access_log
 (
-    id               int8         NOT NULL,
+    id               int8         NOT NULL DEFAULT NEXTVAL('infra_api_access_log_seq'),
     trace_id         varchar(64)  NOT NULL DEFAULT '',
     user_id          int8         NOT NULL DEFAULT 0,
     user_type        int2         NOT NULL DEFAULT 0,
@@ -102,7 +102,7 @@ CREATE SEQUENCE infra_api_access_log_seq
 DROP TABLE IF EXISTS infra_api_error_log;
 CREATE TABLE infra_api_error_log
 (
-    id                           int8          NOT NULL,
+    id                           int8          NOT NULL DEFAULT NEXTVAL('infra_api_error_log_seq'),
     trace_id                     varchar(64)   NOT NULL,
     user_id                      int8          NOT NULL DEFAULT 0,
     user_type                    int2          NOT NULL DEFAULT 0,
@@ -175,7 +175,7 @@ CREATE SEQUENCE infra_api_error_log_seq
 DROP TABLE IF EXISTS infra_codegen_column;
 CREATE TABLE infra_codegen_column
 (
-    id                       int8         NOT NULL,
+    id                       int8         NOT NULL default nextval('infra_codegen_column_seq'),
     table_id                 int8         NOT NULL,
     column_name              varchar(200) NOT NULL,
     data_type                varchar(100) NOT NULL,
@@ -238,7 +238,7 @@ CREATE SEQUENCE infra_codegen_column_seq
 DROP TABLE IF EXISTS infra_codegen_table;
 CREATE TABLE infra_codegen_table
 (
-    id                    int8         NOT NULL,
+    id                    int8         NOT NULL default nextval('infra_codegen_table_seq'),
     data_source_config_id int8         NOT NULL,
     scene                 int2         NOT NULL DEFAULT 1,
     table_name            varchar(200) NOT NULL DEFAULT '',
@@ -303,7 +303,7 @@ CREATE SEQUENCE infra_codegen_table_seq
 DROP TABLE IF EXISTS infra_config;
 CREATE TABLE infra_config
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('infra_config_seq'),
     category    varchar(50)  NOT NULL,
     type        int2         NOT NULL,
     name        varchar(100) NOT NULL DEFAULT '',
@@ -362,7 +362,7 @@ CREATE SEQUENCE infra_config_seq
 DROP TABLE IF EXISTS infra_data_source_config;
 CREATE TABLE infra_data_source_config
 (
-    id          int8          NOT NULL,
+    id          int8          NOT NULL default nextval('infra_data_source_config_seq'),
     name        varchar(100)  NOT NULL DEFAULT '',
     url         varchar(1024) NOT NULL,
     username    varchar(255)  NOT NULL,
@@ -399,7 +399,7 @@ CREATE SEQUENCE infra_data_source_config_seq
 DROP TABLE IF EXISTS infra_file;
 CREATE TABLE infra_file
 (
-    id          int8          NOT NULL,
+    id          int8          NOT NULL default nextval('infra_file_seq'),
     config_id   int8          NULL     DEFAULT NULL,
     name        varchar(256)  NULL     DEFAULT NULL,
     path        varchar(512)  NOT NULL,
@@ -440,7 +440,7 @@ CREATE SEQUENCE infra_file_seq
 DROP TABLE IF EXISTS infra_file_config;
 CREATE TABLE infra_file_config
 (
-    id          int8          NOT NULL,
+    id          int8          NOT NULL default nextval('infra_file_config_seq'),
     name        varchar(63)   NOT NULL,
     storage     int2          NOT NULL,
     remark      varchar(255)  NULL     DEFAULT NULL,
@@ -496,7 +496,7 @@ CREATE SEQUENCE infra_file_config_seq
 DROP TABLE IF EXISTS infra_file_content;
 CREATE TABLE infra_file_content
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('infra_file_content_seq'),
     config_id   int8         NOT NULL,
     path        varchar(512) NOT NULL,
     content     bytea        NOT NULL,
@@ -531,7 +531,7 @@ CREATE SEQUENCE infra_file_content_seq
 DROP TABLE IF EXISTS infra_job;
 CREATE TABLE infra_job
 (
-    id              int8         NOT NULL,
+    id              int8         NOT NULL default nextval('infra_job_seq'),
     name            varchar(32)  NOT NULL,
     status          int2         NOT NULL,
     handler_name    varchar(64)  NOT NULL,
@@ -597,7 +597,7 @@ CREATE SEQUENCE infra_job_seq
 DROP TABLE IF EXISTS infra_job_log;
 CREATE TABLE infra_job_log
 (
-    id            int8          NOT NULL,
+    id            int8          NOT NULL default nextval('infra_job_log_seq'),
     job_id        int8          NOT NULL,
     handler_name  varchar(64)   NOT NULL,
     handler_param varchar(255)  NULL     DEFAULT NULL,
@@ -644,7 +644,7 @@ CREATE SEQUENCE infra_job_log_seq
 DROP TABLE IF EXISTS system_dept;
 CREATE TABLE system_dept
 (
-    id             int8        NOT NULL,
+    id             int8        NOT NULL default nextval('system_dept_seq'),
     name           varchar(30) NOT NULL DEFAULT '',
     parent_id      int8        NOT NULL DEFAULT 0,
     sort           int4        NOT NULL DEFAULT 0,
@@ -711,7 +711,7 @@ CREATE SEQUENCE system_dept_seq
 DROP TABLE IF EXISTS system_dict_data;
 CREATE TABLE system_dict_data
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('system_dict_data_seq'),
     sort        int4         NOT NULL DEFAULT 0,
     label       varchar(100) NOT NULL DEFAULT '',
     value       varchar(100) NOT NULL DEFAULT '',
@@ -1367,7 +1367,7 @@ CREATE SEQUENCE system_dict_data_seq
 DROP TABLE IF EXISTS system_dict_type;
 CREATE TABLE system_dict_type
 (
-    id           int8         NOT NULL,
+    id           int8         NOT NULL default nextval('system_dict_type_seq'),
     name         varchar(100) NOT NULL DEFAULT '',
     type         varchar(100) NOT NULL DEFAULT '',
     status       int2         NOT NULL DEFAULT 0,
@@ -1521,7 +1521,7 @@ CREATE SEQUENCE system_dict_type_seq
 DROP TABLE IF EXISTS system_login_log;
 CREATE TABLE system_login_log
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('system_login_log_seq'),
     log_type    int8         NOT NULL,
     trace_id    varchar(64)  NOT NULL DEFAULT '',
     user_id     int8         NOT NULL DEFAULT 0,
@@ -1568,7 +1568,7 @@ CREATE SEQUENCE system_login_log_seq
 DROP TABLE IF EXISTS system_mail_account;
 CREATE TABLE system_mail_account
 (
-    id              int8         NOT NULL,
+    id              int8         NOT NULL default nextval('system_mail_account_seq'),
     mail            varchar(255) NOT NULL,
     username        varchar(255) NOT NULL,
     password        varchar(255) NOT NULL,
@@ -1623,7 +1623,7 @@ CREATE SEQUENCE system_mail_account_seq
 DROP TABLE IF EXISTS system_mail_log;
 CREATE TABLE system_mail_log
 (
-    id                int8           NOT NULL,
+    id                int8           NOT NULL default nextval('system_mail_log_seq'),
     user_id           int8           NULL     DEFAULT NULL,
     user_type         int2           NULL     DEFAULT NULL,
     to_mail           varchar(255)   NOT NULL,
@@ -1682,7 +1682,7 @@ CREATE SEQUENCE system_mail_log_seq
 DROP TABLE IF EXISTS system_mail_template;
 CREATE TABLE system_mail_template
 (
-    id          int8           NOT NULL,
+    id          int8           NOT NULL default nextval('system_mail_template_seq'),
     name        varchar(63)    NOT NULL,
     code        varchar(63)    NOT NULL,
     account_id  int8           NOT NULL,
@@ -1740,7 +1740,7 @@ CREATE SEQUENCE system_mail_template_seq
 DROP TABLE IF EXISTS system_menu;
 CREATE TABLE system_menu
 (
-    id             int8         NOT NULL,
+    id             int8         NOT NULL default nextval('system_menu_seq'),
     name           varchar(50)  NOT NULL,
     permission     varchar(100) NOT NULL DEFAULT '',
     type           int2         NOT NULL,
@@ -2714,7 +2714,7 @@ CREATE SEQUENCE system_menu_seq
 DROP TABLE IF EXISTS system_notice;
 CREATE TABLE system_notice
 (
-    id          int8        NOT NULL,
+    id          int8        NOT NULL default nextval('system_notice_seq'),
     title       varchar(50) NOT NULL,
     content     text        NOT NULL,
     type        int2        NOT NULL,
@@ -2764,7 +2764,7 @@ CREATE SEQUENCE system_notice_seq
 DROP TABLE IF EXISTS system_notify_message;
 CREATE TABLE system_notify_message
 (
-    id                int8          NOT NULL,
+    id                int8          NOT NULL default nextval('system_notify_message_seq'),
     user_id           int8          NOT NULL,
     user_type         int2          NOT NULL,
     template_id       int8          NOT NULL,
@@ -2832,7 +2832,7 @@ CREATE SEQUENCE system_notify_message_seq
 DROP TABLE IF EXISTS system_notify_template;
 CREATE TABLE system_notify_template
 (
-    id          int8          NOT NULL,
+    id          int8          NOT NULL default nextval('system_notify_template_seq'),
     name        varchar(63)   NOT NULL,
     code        varchar(64)   NOT NULL,
     nickname    varchar(255)  NOT NULL,
@@ -2877,7 +2877,7 @@ CREATE SEQUENCE system_notify_template_seq
 DROP TABLE IF EXISTS system_oauth2_access_token;
 CREATE TABLE system_oauth2_access_token
 (
-    id            int8         NOT NULL,
+    id            int8         NOT NULL default nextval('system_oauth2_access_token_seq'),
     user_id       int8         NOT NULL,
     user_type     int2         NOT NULL,
     user_info     varchar(512) NOT NULL,
@@ -2927,7 +2927,7 @@ CREATE SEQUENCE system_oauth2_access_token_seq
 DROP TABLE IF EXISTS system_oauth2_approve;
 CREATE TABLE system_oauth2_approve
 (
-    id           int8         NOT NULL,
+    id           int8         NOT NULL default nextval('system_oauth2_approve_seq'),
     user_id      int8         NOT NULL,
     user_type    int2         NOT NULL,
     client_id    varchar(255) NOT NULL,
@@ -2970,7 +2970,7 @@ CREATE SEQUENCE system_oauth2_approve_seq
 DROP TABLE IF EXISTS system_oauth2_client;
 CREATE TABLE system_oauth2_client
 (
-    id                             int8          NOT NULL,
+    id                             int8          NOT NULL default nextval('system_oauth2_client_seq'),
     client_id                      varchar(255)  NOT NULL,
     secret                         varchar(255)  NOT NULL,
     name                           varchar(255)  NOT NULL,
@@ -3041,7 +3041,7 @@ CREATE SEQUENCE system_oauth2_client_seq
 DROP TABLE IF EXISTS system_oauth2_code;
 CREATE TABLE system_oauth2_code
 (
-    id           int8         NOT NULL,
+    id           int8         NOT NULL default nextval('system_oauth2_code_seq'),
     user_id      int8         NOT NULL,
     user_type    int2         NOT NULL,
     code         varchar(32)  NOT NULL,
@@ -3088,7 +3088,7 @@ CREATE SEQUENCE system_oauth2_code_seq
 DROP TABLE IF EXISTS system_oauth2_refresh_token;
 CREATE TABLE system_oauth2_refresh_token
 (
-    id            int8         NOT NULL,
+    id            int8         NOT NULL default nextval('system_oauth2_refresh_token_seq'),
     user_id       int8         NOT NULL,
     refresh_token varchar(32)  NOT NULL,
     user_type     int2         NOT NULL,
@@ -3131,7 +3131,7 @@ CREATE SEQUENCE system_oauth2_refresh_token_seq
 DROP TABLE IF EXISTS system_operate_log;
 CREATE TABLE system_operate_log
 (
-    id             int8          NOT NULL,
+    id             int8          NOT NULL default nextval('system_operate_log_seq'),
     trace_id       varchar(64)   NOT NULL DEFAULT '',
     user_id        int8          NOT NULL,
     user_type      int2          NOT NULL DEFAULT 0,
@@ -3188,7 +3188,7 @@ CREATE SEQUENCE system_operate_log_seq
 DROP TABLE IF EXISTS system_post;
 CREATE TABLE system_post
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('system_post_seq'),
     code        varchar(64)  NOT NULL,
     name        varchar(50)  NOT NULL,
     sort        int4         NOT NULL,
@@ -3241,7 +3241,7 @@ CREATE SEQUENCE system_post_seq
 DROP TABLE IF EXISTS system_role;
 CREATE TABLE system_role
 (
-    id                  int8         NOT NULL,
+    id                  int8         NOT NULL default nextval('system_role_seq'),
     name                varchar(30)  NOT NULL,
     code                varchar(100) NOT NULL,
     sort                int4         NOT NULL,
@@ -3304,7 +3304,7 @@ CREATE SEQUENCE system_role_seq
 DROP TABLE IF EXISTS system_role_menu;
 CREATE TABLE system_role_menu
 (
-    id          int8        NOT NULL,
+    id          int8        NOT NULL default nextval('system_role_menu_seq'),
     role_id     int8        NOT NULL,
     menu_id     int8        NOT NULL,
     creator     varchar(64) NULL     DEFAULT '',
@@ -4210,7 +4210,7 @@ CREATE SEQUENCE system_role_menu_seq
 DROP TABLE IF EXISTS system_sms_channel;
 CREATE TABLE system_sms_channel
 (
-    id           int8         NOT NULL,
+    id           int8         NOT NULL default nextval('system_sms_channel_seq'),
     signature    varchar(12)  NOT NULL,
     code         varchar(63)  NOT NULL,
     status       int2         NOT NULL,
@@ -4264,7 +4264,7 @@ CREATE SEQUENCE system_sms_channel_seq
 DROP TABLE IF EXISTS system_sms_code;
 CREATE TABLE system_sms_code
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('system_sms_code_seq'),
     mobile      varchar(11)  NOT NULL,
     code        varchar(6)   NOT NULL,
     create_ip   varchar(15)  NOT NULL,
@@ -4313,7 +4313,7 @@ CREATE SEQUENCE system_sms_code_seq
 DROP TABLE IF EXISTS system_sms_log;
 CREATE TABLE system_sms_log
 (
-    id               int8         NOT NULL,
+    id               int8         NOT NULL default nextval('system_sms_log_seq'),
     channel_id       int8         NOT NULL,
     channel_code     varchar(63)  NOT NULL,
     template_id      int8         NOT NULL,
@@ -4384,7 +4384,7 @@ CREATE SEQUENCE system_sms_log_seq
 DROP TABLE IF EXISTS system_sms_template;
 CREATE TABLE system_sms_template
 (
-    id              int8         NOT NULL,
+    id              int8         NOT NULL default nextval('system_sms_template_seq'),
     type            int2         NOT NULL,
     status          int2         NOT NULL,
     code            varchar(63)  NOT NULL,
@@ -4456,7 +4456,7 @@ CREATE SEQUENCE system_sms_template_seq
 DROP TABLE IF EXISTS system_social_client;
 CREATE TABLE system_social_client
 (
-    id            int8         NOT NULL,
+    id            int8         NOT NULL default nextval('system_social_client_seq'),
     name          varchar(255) NOT NULL,
     social_type   int2         NOT NULL,
     user_type     int2         NOT NULL,
@@ -4514,7 +4514,7 @@ CREATE SEQUENCE system_social_client_seq
 DROP TABLE IF EXISTS system_social_user;
 CREATE TABLE system_social_user
 (
-    id             int8          NOT NULL,
+    id             int8          NOT NULL default nextval('system_social_user_seq'),
     type           int2          NOT NULL,
     openid         varchar(32)   NOT NULL,
     token          varchar(256)  NULL     DEFAULT NULL,
@@ -4563,7 +4563,7 @@ CREATE SEQUENCE system_social_user_seq
 DROP TABLE IF EXISTS system_social_user_bind;
 CREATE TABLE system_social_user_bind
 (
-    id             int8        NOT NULL,
+    id             int8        NOT NULL default nextval('system_social_user_bind_seq'),
     user_id        int8        NOT NULL,
     user_type      int2        NOT NULL,
     social_type    int2        NOT NULL,
@@ -4602,7 +4602,7 @@ CREATE SEQUENCE system_social_user_bind_seq
 DROP TABLE IF EXISTS system_tenant;
 CREATE TABLE system_tenant
 (
-    id              int8         NOT NULL,
+    id              int8         NOT NULL default nextval('system_tenant_seq'),
     name            varchar(30)  NOT NULL,
     contact_user_id int8         NULL     DEFAULT NULL,
     contact_name    varchar(30)  NOT NULL,
@@ -4660,7 +4660,7 @@ CREATE SEQUENCE system_tenant_seq
 DROP TABLE IF EXISTS system_tenant_package;
 CREATE TABLE system_tenant_package
 (
-    id          int8          NOT NULL,
+    id          int8          NOT NULL default nextval('system_tenant_package_seq'),
     name        varchar(30)   NOT NULL,
     status      int2          NOT NULL DEFAULT 0,
     remark      varchar(256)  NULL     DEFAULT '',
@@ -4707,7 +4707,7 @@ CREATE SEQUENCE system_tenant_package_seq
 DROP TABLE IF EXISTS system_user_post;
 CREATE TABLE system_user_post
 (
-    id          int8        NOT NULL,
+    id          int8        NOT NULL default nextval('system_user_post_seq'),
     user_id     int8        NOT NULL DEFAULT 0,
     post_id     int8        NOT NULL DEFAULT 0,
     creator     varchar(64) NULL     DEFAULT '',
@@ -4759,7 +4759,7 @@ CREATE SEQUENCE system_user_post_seq
 DROP TABLE IF EXISTS system_user_role;
 CREATE TABLE system_user_role
 (
-    id          int8        NOT NULL,
+    id          int8        NOT NULL default nextval('system_user_role_seq'),
     user_id     int8        NOT NULL,
     role_id     int8        NOT NULL,
     creator     varchar(64) NULL     DEFAULT '',
@@ -4819,7 +4819,7 @@ CREATE SEQUENCE system_user_role_seq
 DROP TABLE IF EXISTS system_users;
 CREATE TABLE system_users
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('system_users_seq'),
     username    varchar(30)  NOT NULL,
     password    varchar(100) NOT NULL DEFAULT '',
     nickname    varchar(30)  NOT NULL,
@@ -4902,7 +4902,7 @@ CREATE SEQUENCE system_users_seq
 DROP TABLE IF EXISTS yudao_demo01_contact;
 CREATE TABLE yudao_demo01_contact
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('yudao_demo01_contact_seq'),
     name        varchar(100) NOT NULL DEFAULT '',
     sex         int2         NOT NULL,
     birthday    timestamp    NOT NULL,
@@ -4952,7 +4952,7 @@ CREATE SEQUENCE yudao_demo01_contact_seq
 DROP TABLE IF EXISTS yudao_demo02_category;
 CREATE TABLE yudao_demo02_category
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('yudao_demo02_category_seq'),
     name        varchar(100) NOT NULL DEFAULT '',
     parent_id   int8         NOT NULL,
     creator     varchar(64)  NULL     DEFAULT '',
@@ -5001,7 +5001,7 @@ CREATE SEQUENCE yudao_demo02_category_seq
 DROP TABLE IF EXISTS yudao_demo03_course;
 CREATE TABLE yudao_demo03_course
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('yudao_demo03_course_seq'),
     student_id  int8         NOT NULL,
     name        varchar(100) NOT NULL DEFAULT '',
     score       int2         NOT NULL,
@@ -5063,7 +5063,7 @@ CREATE SEQUENCE yudao_demo03_course_seq
 DROP TABLE IF EXISTS yudao_demo03_grade;
 CREATE TABLE yudao_demo03_grade
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('yudao_demo03_grade_seq'),
     student_id  int8         NOT NULL,
     name        varchar(100) NOT NULL DEFAULT '',
     teacher     varchar(255) NOT NULL,
@@ -5111,7 +5111,7 @@ CREATE SEQUENCE yudao_demo03_grade_seq
 DROP TABLE IF EXISTS yudao_demo03_student;
 CREATE TABLE yudao_demo03_student
 (
-    id          int8         NOT NULL,
+    id          int8         NOT NULL default nextval('yudao_demo03_student_seq'),
     name        varchar(100) NOT NULL DEFAULT '',
     sex         int2         NOT NULL,
     birthday    timestamp    NOT NULL,
