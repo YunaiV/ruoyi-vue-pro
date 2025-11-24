@@ -35,7 +35,7 @@
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
-        <taos.version>3.7.3</taos.version>
+        <taos.version>3.7.8</taos.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.4</rocketmq-spring.version>
         <!-- 服务保障相关 -->
@@ -69,13 +69,13 @@
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.2.7.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
-        <vertx.version>4.5.13</vertx.version>
+        <vertx.version>4.5.22</vertx.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.39.2</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.1.1</jimureport.version>
-        <jimubi.version>2.1.0</jimubi.version>
+        <jimureport.version>2.1.3</jimureport.version>
+        <jimubi.version>2.2.0</jimubi.version>
         <weixin-java.version>4.7.8-20251117.120146</weixin-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
