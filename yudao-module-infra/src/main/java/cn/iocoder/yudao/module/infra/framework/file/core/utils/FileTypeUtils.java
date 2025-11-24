@@ -91,9 +91,8 @@ public class FileTypeUtils {
         }
         // 针对 video 的特殊处理，解决视频地址在移动端播放的兼容性问题
         if (StrUtil.containsIgnoreCase(mineType, "video")) {
-            response.setHeader("Content-Length", String.valueOf(content.length));
-            response.setHeader("Content-Range", "bytes 0-" + (content.length - 1) + "/" + content.length);
             response.setHeader("Accept-Ranges", "bytes");
+            response.setHeader("Content-Length", String.valueOf(content.length));
         }
         // 输出附件
         IoUtil.write(response.getOutputStream(), false, content);
