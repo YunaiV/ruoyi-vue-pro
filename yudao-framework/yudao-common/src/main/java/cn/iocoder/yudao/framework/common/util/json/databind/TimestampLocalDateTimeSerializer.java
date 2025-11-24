@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.common.util.json.databind;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -25,7 +25,7 @@ public class TimestampLocalDateTimeSerializer extends JsonSerializer<LocalDateTi
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         String fieldName = gen.getOutputContext().getCurrentName();
         Class<?> clazz = gen.getOutputContext().getCurrentValue().getClass();
-        Field field = FieldUtils.getField(clazz, fieldName, true);
+        Field field = ReflectUtil.getField(clazz, fieldName);
         // 情况一：有 JsonFormat 自定义注解，则使用它。https://github.com/YunaiV/ruoyi-vue-pro/pull/1019
         JsonFormat[] jsonFormats = field.getAnnotationsByType(JsonFormat.class);
         if (jsonFormats.length > 0) {
