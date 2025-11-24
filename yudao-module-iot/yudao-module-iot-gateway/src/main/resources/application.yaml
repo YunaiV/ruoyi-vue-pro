@@ -5,13 +5,12 @@ spring:
     active: local # 默认激活本地开发环境
 
   # Redis 配置
-  data:
-    redis:
-      host: 127.0.0.1 # Redis 服务器地址
-      port: 6379 # Redis 服务器端口
-      database: 0 # Redis 数据库索引
-      # password: # Redis 密码，如果有的话
-      timeout: 30000ms # 连接超时时间
+  redis:
+    host: 127.0.0.1 # Redis 服务器地址
+    port: 6379 # Redis 服务器端口
+    database: 0 # Redis 数据库索引
+    # password: # Redis 密码，如果有的话
+    timeout: 30000ms # 连接超时时间
 
 --- #################### 消息队列相关 ####################
 
