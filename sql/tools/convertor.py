@@ -52,6 +52,7 @@ def load_and_clean(sql_file: str) -> str:
     REPLACE_PAIR_LIST = (
         (")\nVALUES ", ") VALUES "),
         (" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ", " "),
+        (" CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ", " "),
         (" KEY `", " INDEX `"),
         ("UNIQUE INDEX", "UNIQUE KEY"),
         ("b'0'", "'0'"),
@@ -61,6 +62,11 @@ def load_and_clean(sql_file: str) -> str:
     content = open(sql_file, encoding="utf-8").read()
     for replace_pair in REPLACE_PAIR_LIST:
         content = content.replace(*replace_pair)
+    # 移除索引字段的前缀长度定义，例如: `name`(32) -> `name`
+    # 移除索引定义上的 USING BTREE COMMENT 部分
+    # 相关 issue：https://t.zsxq.com/96IFc 、https://t.zsxq.com/rC3A3
+    content = re.sub(r'`([^`]+)`\(\d+\)', r'`\1`', content)
+    content = re.sub(r'\s+USING\s+BTREE\s+COMMENT\s+\'[^\']+\'', '', content)
     content = re.sub(r"ENGINE.*COMMENT", "COMMENT", content)
     content = re.sub(r"ENGINE.*;", ";", content)
     return content
@@ -262,10 +268,10 @@ class Convertor(ABC):
             # 解析注释
             for column in table_ddl["columns"]:
                 column["comment"] = bytes(column["comment"], "utf-8").decode(
-                    "unicode_escape"
+                    r"unicode_escape"
                 )[1:-1]
             table_ddl["comment"] = bytes(table_ddl["comment"], "utf-8").decode(
-                "unicode_escape"
+                r"unicode_escape"
             )[1:-1]
 
             # 为每个表生成个6个基本部分
