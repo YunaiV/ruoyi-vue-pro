@@ -28,7 +28,7 @@ public class AnthropicChatModelTest {
                     .baseUrl("https://aihubmix.com")
                     .build())
             .defaultOptions(AnthropicChatOptions.builder()
-                    .model(AnthropicApi.ChatModel.CLAUDE_SONNET_4)
+                    .model(AnthropicApi.ChatModel.CLAUDE_SONNET_4_5)
                     .temperature(0.7)
                     .maxTokens(4096)
                     .build())
@@ -70,7 +70,7 @@ public class AnthropicChatModelTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("thkinking 下，1+1 为什么等于 2 "));
         AnthropicChatOptions options = AnthropicChatOptions.builder()
-                .model(AnthropicApi.ChatModel.CLAUDE_SONNET_4)
+                .model(AnthropicApi.ChatModel.CLAUDE_SONNET_4_5)
                 .thinking(AnthropicApi.ThinkingType.ENABLED, 3096)
                 .temperature(1D)
                 .build();
