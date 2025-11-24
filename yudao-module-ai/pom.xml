@@ -136,7 +136,7 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <!-- 月之暗灭 -->
+            <!-- 月之暗面 -->
             <groupId>org.springaicommunity</groupId>
             <artifactId>moonshot-spring-boot-starter</artifactId>
             <version>1.0.0</version>
