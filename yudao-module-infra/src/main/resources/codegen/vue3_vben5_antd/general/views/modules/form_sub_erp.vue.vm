@@ -4,21 +4,20 @@
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 <script lang="ts" setup>
 import type { Rule } from 'ant-design-vue/es/form';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
-import { cloneDeep, formatDateTime } from '@vben/utils';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
 
 import { $t } from '#/locales';
 
-import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 
 const emit = defineEmits(['success']);
 const getTitle = computed(() => {

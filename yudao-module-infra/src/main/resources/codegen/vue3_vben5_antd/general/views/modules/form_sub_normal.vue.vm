@@ -5,25 +5,27 @@
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
-import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
 
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
-import { message, Tabs, Form, Input, Textarea,Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
+import { message, Tabs, Form, Input, Textarea, Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
 import { $t } from '#/locales';
 
 #if ($subTable.subJoinMany) ## 一对多
 import type { VxeTableInstance } from '#/adapter/vxe-table';
 import { Plus } from "@vben/icons";
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else
 import type { Rule } from 'ant-design-vue/es/form';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
-import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 
 const props = defineProps<{
@@ -55,6 +57,7 @@ defineExpose({
         (row) => !removeRecords.some((removed) => removed.id === row.id),
       ),
       ...insertRecords.map((row: any) => ({ ...row, id: undefined })),
+    ];
   },
 });
 
@@ -113,7 +116,7 @@ watch(
 
 <template>
 #if ($subTable.subJoinMany) ## 一对多
-  <vxe-table ref="tableRef" :data="list" show-overflow class="mx-4">
+  <VxeTable ref="tableRef" :data="list" show-overflow class="mx-4">
       #foreach($column in $subColumns)
           #if ($column.createOperation || $column.updateOperation)
               #set ($comment = $column.columnComment)
@@ -128,25 +131,25 @@ watch(
               #end
               #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
               #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <Input v-model:value="row.${javaField}" />
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "imageUpload")## 图片上传
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <ImageUpload v-model:value="row.${javaField}" />
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "fileUpload")## 文件上传
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <FileUpload v-model:value="row.${javaField}" />
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "select")## 下拉框
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <Select v-model:value="row.${javaField}" placeholder="请选择${comment}">
                         #if ("" != $dictType)## 有数据字典
@@ -162,9 +165,9 @@ watch(
                         #end
                     </Select>
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "checkbox")## 多选框
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <CheckboxGroup v-model:value="row.${javaField}">
                         #if ("" != $dictType)## 有数据字典
@@ -180,9 +183,9 @@ watch(
                         #end
                     </CheckboxGroup>
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "radio")## 单选框
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <RadioGroup v-model:value="row.${javaField}">
                         #if ("" != $dictType)## 有数据字典
@@ -198,9 +201,9 @@ watch(
                         #end
                     </RadioGroup>
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "datetime")## 时间框
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <DatePicker
                         v-model:value="row.${javaField}"
@@ -209,30 +212,30 @@ watch(
                         valueFormat='x'
                     />
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #elseif($column.htmlType == "textarea" || $column.htmlType == "editor")## 文本框
-                <vxe-column field="${javaField}" title="${comment}" align="center">
+                <VxeColumn field="${javaField}" title="${comment}" align="center">
                   <template #default="{ row }">
                     <Textarea v-model:value="row.${javaField}" />
                   </template>
-                </vxe-column>
+                </VxeColumn>
               #end
           #end
       #end
-    <vxe-column field="operation" title="操作" align="center">
+    <VxeColumn field="operation" title="操作" align="center">
       <template #default="{ row }">
         <Button
             size="small"
             type="link"
             danger
-            @click="handleDelect(row)"
+            @click="handleDelete(row)"
             v-access:code="['${permissionPrefix}:delete']"
         >
           {{ $t('ui.actionTitle.delete') }}
         </Button>
       </template>
-    </vxe-column>
-  </vxe-table>
+    </VxeColumn>
+  </VxeTable>
   <div class="flex justify-center mt-4">
     <Button :icon="h(Plus)" type="primary" ghost @click="handleAdd" v-access:code="['${permissionPrefix}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}

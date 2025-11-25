@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { ref, h, reactive, onMounted, nextTick } from 'vue';
 
@@ -7,12 +7,13 @@ import { Page, useVbenModal } from '@vben/common-ui';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
-import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
-import { Button, message,Tabs,Pagination,Form,RangePicker,DatePicker,Select,Input } from 'ant-design-vue';
+import { cloneDeep, downloadFileFromBlobPart, formatDateTime, isEmpty } from '@vben/utils';
+import { Button, Card, message, Tabs, Pagination, Form, RangePicker, DatePicker, Select, Input } from 'ant-design-vue';
 import ${simpleClassName}Form from './modules/form.vue';
 import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
-import { ContentWrap } from '#/components/content-wrap';
+import { DictTag } from '#/components/dict-tag';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+import { getRangePickerDefaultProps } from '#/utils/rangePickerProps';
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
@@ -25,13 +26,11 @@ import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
-import { handleTree,isEmpty } from '@vben/utils'
-import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { handleTree } from '@vben/utils'
+import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
-import { isEmpty } from '@vben/utils';
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
-import { downloadFileFromBlobPart } from '@vben/utils';
 
 #if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
 /** 子表的列表 */
@@ -211,7 +210,7 @@ onMounted(() => {
   <Page auto-content-height>
     <FormModal @success="getList" />
 
-    <ContentWrap v-if="!hiddenSearchBar">
+    <Card v-if="!hiddenSearchBar" class="mb-4">
       <!-- 搜索工作栏 -->
       <Form
           :model="queryParams"
@@ -292,10 +291,10 @@ onMounted(() => {
           </Button>
         </Form.Item>
       </Form>
-    </ContentWrap>
+    </Card>
 
     <!-- 列表 -->
-    <ContentWrap title="${table.classComment}">
+    <Card title="${table.classComment}">
       <template #extra>
         <VbenVxeTableToolbar
             ref="tableToolbarRef"
@@ -338,9 +337,9 @@ onMounted(() => {
             批量删除
           </Button>
         #end
-        </TableToolbar>
+        </VbenVxeTableToolbar>
       </template>
-      <vxe-table
+      <VxeTable
           ref="tableRef"
           :data="list"
         #if ( $table.templateType == 2 )
@@ -368,12 +367,12 @@ onMounted(() => {
 #end
       >
 #if ($table.templateType != 2 && $deleteBatchEnable)
-        <vxe-column type="checkbox" width="40"></vxe-column>
+        <VxeColumn type="checkbox" width="40" />
 #end
           ## 特殊：主子表专属逻辑
           #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
             <!-- 子表的列表 -->
-            <vxe-column type="expand" width="60">
+            <VxeColumn type="expand" width="60">
               <template #content="{ row }">
                 <!-- 子表的表单 -->
                 <Tabs v-model:active-key="subTabsName" class="mx-8">
@@ -388,7 +387,7 @@ onMounted(() => {
                     #end
                 </Tabs>
               </template>
-            </vxe-column>
+            </VxeColumn>
           #end
           #foreach($column in $columns)
               #if ($column.listOperationResult)
@@ -397,31 +396,31 @@ onMounted(() => {
                   #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
                   #set ($comment=$column.columnComment)
                   #if ($column.javaType == "LocalDateTime")## 时间类型
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.${javaField})}}
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #elseif($column.dictType && "" != $column.dictType)## 数据字典
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
-                    <vxe-column field="${javaField}" title="${comment}" align="center"  tree-node/>
+                    <VxeColumn field="${javaField}" title="${comment}" align="center"  tree-node/>
                   #else
-                    <vxe-column field="${javaField}" title="${comment}" align="center" />
+                    <VxeColumn field="${javaField}" title="${comment}" align="center" />
                   #end
               #end
           #end
-        <vxe-column field="operation" title="操作" align="center">
+        <VxeColumn field="operation" title="操作" align="center">
           <template #default="{row}">
 #if ( $table.templateType == 2 )
   <Button
       size="small"
       type="link"
-      @click="handleAppend(row as any)"
+      @click="handleAppend(row)"
       v-access:code="['${permissionPrefix}:create']"
   >
     新增下级
@@ -430,7 +429,7 @@ onMounted(() => {
             <Button
                 size="small"
                 type="link"
-                @click="handleEdit(row as any)"
+                @click="handleEdit(row)"
                 v-access:code="['${permissionPrefix}:update']"
             >
               {{ $t('ui.actionTitle.edit') }}
@@ -443,14 +442,14 @@ onMounted(() => {
                 #if ( $table.templateType == 2 )
                 :disabled="!isEmpty(row?.children)"
                 #end
-                @click="handleDelete(row as any)"
+                @click="handleDelete(row)"
                 v-access:code="['${permissionPrefix}:delete']"
             >
               {{ $t('ui.actionTitle.delete') }}
             </Button>
           </template>
-        </vxe-column>
-      </vxe-table>
+        </VxeColumn>
+      </VxeTable>
 #if ( $table.templateType != 2 )
       <!-- 分页 -->
       <div class="mt-2 flex justify-end">
@@ -463,9 +462,9 @@ onMounted(() => {
         />
       </div>
 #end
-    </ContentWrap>
+    </Card>
 #if ($table.templateType == 11) ## erp情况
-  <ContentWrap>
+  <Card>
     <!-- 子表的表单 -->
     <Tabs v-model:active-key="subTabsName">
         #foreach ($subTable in $subTables)
@@ -478,7 +477,7 @@ onMounted(() => {
           </Tabs.TabPane>
         #end
     </Tabs>
-  </ContentWrap>
+  </Card>
 #end
   </Page>
 </template>
