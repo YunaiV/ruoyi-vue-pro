@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.mp.dal.mysql.message.MpMessageTemplateMapper;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplate;
