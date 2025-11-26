@@ -6,18 +6,18 @@
 #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 import type { VxeTableInstance } from '#/adapter/vxe-table';
 
-import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
+import { reactive, ref, h, nextTick, watch, onMounted } from 'vue';
 
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
 import { DictTag } from '#/components/dict-tag';
-import { getRangePickerDefaultProps } from '#/utils';
+import { getRangePickerDefaultProps } from '#/utils/rangePickerProps';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-import { ContentWrap } from '#/components/content-wrap';
+import { formatDateTime } from '@vben/utils';
 
 #if ($table.templateType == 11) ## erp
 import { useVbenModal } from '@vben/common-ui';
@@ -25,19 +25,19 @@ import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
 import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import { message,Button, Tabs,Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox,RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
+import { message, Button, Card, Tabs, Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
 import { Plus, Trash2 } from '@vben/icons';
 import { $t } from '#/locales';
 #end
 
 #if ($table.templateType == 11) ## erp
-import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-import { isEmpty } from '@vben/utils';
+import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+import { isEmpty, cloneDeep } from '@vben/utils';
 #else
 #if ($subTable.subJoinMany) ## 一对多
-import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else
-import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 #end
 
@@ -203,7 +203,7 @@ onMounted(() => {
     #if ($table.templateType == 11) ## erp
       <FormModal @success="getList" />
       <div class="h-[600px]">
-        <ContentWrap v-if="!hiddenSearchBar">
+        <Card v-if="!hiddenSearchBar" class="mb-4">
           <!-- 搜索工作栏 -->
           <Form
               :model="queryParams"
@@ -284,10 +284,10 @@ onMounted(() => {
               </Button>
             </Form.Item>
           </Form>
-        </ContentWrap>
+        </Card>
 
         <!-- 列表 -->
-        <ContentWrap title="${table.classComment}">
+        <Card title="${table.classComment}">
           <template #extra>
             <VbenVxeTableToolbar
                 ref="tableToolbarRef"
@@ -315,9 +315,9 @@ onMounted(() => {
                     批量删除
                   </Button>
                 #end
-            </TableToolbar>
+            </VbenVxeTableToolbar>
           </template>
-          <vxe-table
+          <VxeTable
               ref="tableRef"
               :data="list"
               show-overflow
@@ -328,7 +328,7 @@ onMounted(() => {
               #end
           >
               #if ($deleteBatchEnable)
-                <vxe-column type="checkbox" width="40"></vxe-column>
+                <VxeColumn type="checkbox" width="40" />
               #end
               #foreach($column in $subColumns)
                   #if ($column.listOperationResult)
@@ -336,30 +336,30 @@ onMounted(() => {
                       #set ($javaField = $column.javaField)
                       #set ($comment=$column.columnComment)
                       #if ($column.javaType == "LocalDateTime")## 时间类型
-                        <vxe-column field="${javaField}" title="${comment}" align="center">
+                        <VxeColumn field="${javaField}" title="${comment}" align="center">
                           <template #default="{row}">
                             {{formatDateTime(row.${javaField})}}
                           </template>
-                        </vxe-column>
+                        </VxeColumn>
                       #elseif($column.dictType && "" != $column.dictType)## 数据字典
-                        <vxe-column field="${javaField}" title="${comment}" align="center">
+                        <VxeColumn field="${javaField}" title="${comment}" align="center">
                           <template #default="{row}">
                             <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                           </template>
-                        </vxe-column>
+                        </VxeColumn>
                       #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
-                        <vxe-column field="${javaField}" title="${comment}" align="center"  tree-node/>
+                        <VxeColumn field="${javaField}" title="${comment}" align="center"  tree-node/>
                       #else
-                        <vxe-column field="${javaField}" title="${comment}" align="center" />
+                        <VxeColumn field="${javaField}" title="${comment}" align="center" />
                       #end
                   #end
               #end
-            <vxe-column field="operation" title="操作" align="center">
+            <VxeColumn field="operation" title="操作" align="center">
               <template #default="{row}">
                 <Button
                     size="small"
                     type="link"
-                    @click="handleEdit(row as any)"
+                    @click="handleEdit(row)"
                     v-access:code="['${permissionPrefix}:update']"
                 >
                   {{ $t('ui.actionTitle.edit') }}
@@ -369,14 +369,14 @@ onMounted(() => {
                     type="link"
                     danger
                     class="ml-2"
-                    @click="handleDelete(row as any)"
+                    @click="handleDelete(row)"
                     v-access:code="['${permissionPrefix}:delete']"
                 >
                   {{ $t('ui.actionTitle.delete') }}
                 </Button>
               </template>
-            </vxe-column>
-          </vxe-table>
+            </VxeColumn>
+          </VxeTable>
           <!-- 分页 -->
           <div class="mt-2 flex justify-end">
             <Pagination
@@ -387,11 +387,11 @@ onMounted(() => {
                 @change="getList"
             />
           </div>
-        </ContentWrap>
+        </Card>
       </div>
     #else
-    <ContentWrap title="${subTable.classComment}列表">
-      <vxe-table
+    <Card title="${subTable.classComment}列表">
+      <VxeTable
           :data="list"
           show-overflow
           :loading="loading"
@@ -402,23 +402,23 @@ onMounted(() => {
                   #set ($javaField = $column.javaField)
                   #set ($comment=$column.columnComment)
                   #if ($column.javaType == "LocalDateTime")## 时间类型
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.${javaField})}}
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #elseif($column.dictType && "" != $column.dictType)## 数据字典
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #else
-                    <vxe-column field="${javaField}" title="${comment}" align="center" />
+                    <VxeColumn field="${javaField}" title="${comment}" align="center" />
                   #end
               #end
           #end
-      </vxe-table>
-    </ContentWrap>
+      </VxeTable>
+    </Card>
     #end
 </template>

@@ -8,7 +8,7 @@
 <script lang="ts" setup>
   import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
-  import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+  import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
 
   import { $t } from '#/locales';
 
@@ -16,7 +16,6 @@
 import { Plus } from "@vben/icons";
 import { Button, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import type { OnActionClickParams } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { use${subSimpleClassName}GridEditColumns } from '../data';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
@@ -31,22 +30,9 @@ const props = defineProps<{
 }>()
 
 #if ($subTable.subJoinMany) ## 一对多
-/** 表格操作按钮的回调函数 */
-function onActionClick({
- code,
- row,
-}: OnActionClickParams<${apiName}.${subSimpleClassName}>) {
-  switch (code) {
-    case 'delete': {
-      handleDelete(row);
-      break;
-    }
-  }
-}
-
 const [Grid, gridApi] = useVbenVxeGrid({
 gridOptions: {
-  columns: use${subSimpleClassName}GridEditColumns(onActionClick),
+  columns: use${subSimpleClassName}GridEditColumns(),
   border: true,
   showOverflow: true,
   autoResize: true,
@@ -186,6 +172,17 @@ watch(
               #end
           #end
       #end
+    <template #actions="{ row }">
+      <Button
+          size="small"
+          type="link"
+          danger
+          @click="handleDelete(row)"
+          v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:delete']"
+      >
+        {{ $t('ui.actionTitle.delete') }}
+      </Button>
+    </template>
   </Grid>
   <div class="flex justify-center -mt-4">
     <Button :icon="h(Plus)" type="primary" ghost @click="handleAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">

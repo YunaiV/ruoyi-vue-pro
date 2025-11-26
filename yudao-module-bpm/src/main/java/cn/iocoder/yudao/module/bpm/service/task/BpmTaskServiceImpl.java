@@ -949,11 +949,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Set<String> needSimulateTaskDefinitionKeys = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
 
         // 4. 执行驳回
-        // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
-        // 当多实例任务回退的时候有问题。相关 issue: https://github.com/flowable/flowable-engine/issues/3944
+        // ① 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId。原因：当多实例任务回退的时候有问题。
+        //    相关 issue: https://github.com/flowable/flowable-engine/issues/3944
+        // ② flowable 7.2.0 版本后，继续使用 moveActivityIdsToSingleActivityId 方法。原因：flowable 7.2.0 版本修复了该问题。
+        //    相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1018
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
+                .moveActivityIdsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
                 // 设置需要预测的任务 ids 的流程变量，用于辅助预测
                 .processVariable(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskDefinitionKeys)
                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过

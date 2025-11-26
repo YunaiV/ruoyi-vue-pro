@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Rule } from 'ant-design-vue/es/form';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { computed, ref } from 'vue';
 
@@ -11,7 +11,7 @@ import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
 #if($table.templateType == 2)## 树表需要导入这些
-import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
 import { handleTree } from '@vben/utils'
 #end
 ## 特殊：主子表专属逻辑
@@ -24,7 +24,7 @@ import { handleTree } from '@vben/utils'
 #end
 
 import { $t } from '#/locales';
-import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 
 const emit = defineEmits(['success']);
 

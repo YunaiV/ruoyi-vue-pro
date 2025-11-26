@@ -48,13 +48,13 @@ public class IotDeviceEventPostTriggerMatcher implements IotSceneRuleTriggerMatc
         // 2. 对于事件触发器，通常不需要检查操作符和值，只要事件发生即匹配
         // 但如果配置了操作符和值，则需要进行条件匹配
         if (StrUtil.isNotBlank(trigger.getOperator()) && StrUtil.isNotBlank(trigger.getValue())) {
-            Object eventData = message.getData();
-            if (eventData == null) {
-                IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中事件数据为空");
+            Object eventParams = message.getParams();
+            if (eventParams == null) {
+                IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中事件参数为空");
                 return false;
             }
 
-            boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(eventData, trigger.getOperator(), trigger.getValue());
+            boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(eventParams, trigger.getOperator(), trigger.getValue());
             if (!matched) {
                 IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "事件数据条件不匹配");
                 return false;

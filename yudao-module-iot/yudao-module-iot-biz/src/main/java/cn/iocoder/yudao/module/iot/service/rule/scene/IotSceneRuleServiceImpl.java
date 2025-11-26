@@ -241,13 +241,13 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
      */
     private List<IotSceneRuleDO> getMatchedSceneRuleListByMessage(IotDeviceMessage message) {
         // 1.1 通过 deviceId 获取设备信息
-        IotDeviceDO device = getSelf().deviceService.getDeviceFromCache(message.getDeviceId());
+        IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
         if (device == null) {
             log.warn("[getMatchedSceneRuleListByMessage][设备({}) 不存在]", message.getDeviceId());
             return ListUtil.of();
         }
         // 1.2 通过 productId 获取产品信息
-        IotProductDO product = getSelf().productService.getProductFromCache(device.getProductId());
+        IotProductDO product = productService.getProductFromCache(device.getProductId());
         if (product == null) {
             log.warn("[getMatchedSceneRuleListByMessage][产品({}) 不存在]", device.getProductId());
             return ListUtil.of();
