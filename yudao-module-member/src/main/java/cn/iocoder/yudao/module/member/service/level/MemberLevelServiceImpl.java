@@ -274,16 +274,25 @@ public class MemberLevelServiceImpl implements MemberLevelService {
             log.warn("计算会员等级失败：会员等级配置不存在");
             return null;
         }
-
+        //获取当前积分等级
         MemberLevelDO matchLevel = list.stream()
                 .filter(level -> userExperience >= level.getExperience())
                 .max(Comparator.nullsFirst(Comparator.comparing(MemberLevelDO::getLevel)))
                 .orElse(null);
-        if (matchLevel == null) {
-            log.warn("计算会员等级失败：未找到会员{}经验{}对应的等级配置", user.getId(), userExperience);
-            return null;
+        if(matchLevel == null){
+            //小于等级1的积分，获取积分规则中等级最小的
+            matchLevel = list.stream().filter(level -> userExperience <= level.getExperience()).min(Comparator.nullsFirst(Comparator.comparing(MemberLevelDO::getLevel))).orElse(null);
+            if (matchLevel == null) {
+                log.warn("计算会员等级失败：未找到会员{}经验{}对应的等级配置", 1, userExperience);
+            }
+        } else {
+            //如果积分大于当前积分，寻找 等级+1 配置
+            MemberLevelDO finalMatchLevel = matchLevel;
+            MemberLevelDO lastLevel = list.stream().filter(level -> level.getLevel() == (finalMatchLevel.getLevel() + 1)).findFirst().orElse(null);
+            if(lastLevel != null){
+                matchLevel = lastLevel;
+            }
         }
-
         // 等级没有变化
         if (ObjectUtil.equal(matchLevel.getId(), user.getLevelId())) {
             return null;
