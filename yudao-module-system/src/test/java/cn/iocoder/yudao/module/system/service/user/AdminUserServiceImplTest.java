@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import jakarta.annotation.Resource;
@@ -82,6 +83,8 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     private FileApi fileApi;
     @MockitoBean
     private ConfigApi configApi;
+    @MockitoBean
+    private OAuth2TokenService oauth2TokenService;
 
     @BeforeEach
     public void before() {
