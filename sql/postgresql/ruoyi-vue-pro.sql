@@ -4461,7 +4461,8 @@ CREATE TABLE system_social_client
     social_type   int2         NOT NULL,
     user_type     int2         NOT NULL,
     client_id     varchar(255) NOT NULL,
-    client_secret varchar(255) NOT NULL,
+    client_secret varchar(2048) NOT NULL,
+    public_key    varchar(2048) NULL     DEFAULT NULL,
     agent_id      varchar(255) NULL     DEFAULT NULL,
     status        int2         NOT NULL,
     creator       varchar(64)  NULL     DEFAULT '',
@@ -4481,6 +4482,7 @@ COMMENT ON COLUMN system_social_client.social_type IS '社交平台的类型';
 COMMENT ON COLUMN system_social_client.user_type IS '用户类型';
 COMMENT ON COLUMN system_social_client.client_id IS '客户端编号';
 COMMENT ON COLUMN system_social_client.client_secret IS '客户端密钥';
+COMMENT ON COLUMN system_social_client.public_key IS 'publicKey公钥';
 COMMENT ON COLUMN system_social_client.agent_id IS '代理编号';
 COMMENT ON COLUMN system_social_client.status IS '状态';
 COMMENT ON COLUMN system_social_client.creator IS '创建者';

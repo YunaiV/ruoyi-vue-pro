@@ -27,6 +27,9 @@ public class SocialClientRespVO {
     @Schema(description = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "peter")
     private String clientSecret;
 
+    @Schema(description = "publicKey公钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000045")
+    private String publicKey;
+
     @Schema(description = "授权方的网页应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000045")
     private String agentId;
 

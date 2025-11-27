@@ -10433,7 +10433,8 @@ CREATE TABLE system_social_client
     social_type   tinyint                                 NOT NULL,
     user_type     tinyint                                 NOT NULL,
     client_id     nvarchar(255)                           NOT NULL,
-    client_secret nvarchar(255)                           NOT NULL,
+    client_secret nvarchar(2048)                           NOT NULL,
+    public_key    nvarchar(2048) DEFAULT NULL              NULL,
     agent_id      nvarchar(255) DEFAULT NULL              NULL,
     status        tinyint                                 NOT NULL,
     creator       nvarchar(64)  DEFAULT ''                NULL,
@@ -10485,6 +10486,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'system_social_client',
      'COLUMN', N'client_secret'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'publicKey公钥',
+     'SCHEMA', N'dbo',
+     'TABLE', N'system_social_client',
+     'COLUMN', N'public_key'
 GO
 
 EXEC sp_addextendedproperty
