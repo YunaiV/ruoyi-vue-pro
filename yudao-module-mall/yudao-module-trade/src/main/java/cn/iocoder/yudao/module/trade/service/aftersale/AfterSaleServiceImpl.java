@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -352,12 +353,20 @@ public class AfterSaleServiceImpl implements AfterSaleService {
             throw exception(AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND);
         }
 
-        // 发起退款单。注意，需要在事务提交后，再进行发起，避免重复发起
-        createPayRefund(userIp, afterSale);
+        Integer newStatus;
+        if (ObjUtil.equals(afterSale.getRefundPrice(), 0)) {
+            // 特殊：退款为 0 的订单，直接标记为完成（积分商城）。关联案例：https://t.zsxq.com/AQEvL
+            updateAfterSaleStatus(afterSale.getId(), AfterSaleStatusEnum.WAIT_REFUND.getStatus(), new AfterSaleDO()
+                    .setStatus(AfterSaleStatusEnum.COMPLETE.getStatus()).setRefundTime(LocalDateTime.now()));
+            newStatus = AfterSaleStatusEnum.COMPLETE.getStatus();
+        } else {
+            // 发起退款单。注意，需要在事务提交后，再进行发起，避免重复发起
+            createPayRefund(userIp, afterSale);
+            newStatus = afterSale.getStatus();  // 特殊：这里状态不变，而是最终 updateAfterSaleRefunded 处理！！！
+        }
 
         // 记录售后日志
-        AfterSaleLogUtils.setAfterSaleInfo(afterSale.getId(), afterSale.getStatus(),
-                afterSale.getStatus()); // 特殊：这里状态不变，而是最终 updateAfterSaleRefunded 处理！！！
+        AfterSaleLogUtils.setAfterSaleInfo(afterSale.getId(), afterSale.getStatus(), newStatus);
     }
 
     private void createPayRefund(String userIp, AfterSaleDO afterSale) {

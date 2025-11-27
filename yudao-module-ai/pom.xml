@@ -19,9 +19,9 @@
           国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
     </description>
     <properties>
-        <spring-ai.version>1.0.1</spring-ai.version>
-        <alibaba-ai.version>1.0.0.3</alibaba-ai.version>
-        <tinyflow.version>1.0.2</tinyflow.version>
+        <spring-ai.version>1.1.0</spring-ai.version>
+        <alibaba-ai.version>1.1.0.0-M5</alibaba-ai.version>
+        <tinyflow.version>1.2.6</tinyflow.version>
     </properties>
 
     <dependencies>
@@ -136,7 +136,7 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <!-- 月之暗灭 -->
+            <!-- 月之暗面 -->
             <groupId>org.springaicommunity</groupId>
             <artifactId>moonshot-spring-boot-starter</artifactId>
             <version>1.0.0</version>

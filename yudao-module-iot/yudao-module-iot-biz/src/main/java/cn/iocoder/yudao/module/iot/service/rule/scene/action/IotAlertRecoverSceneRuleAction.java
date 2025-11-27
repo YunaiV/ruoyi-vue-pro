@@ -14,7 +14,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
-// TODO @puhui999、@芋艿：未测试；需要场景联动开发完
 /**
  * IoT 告警恢复的 {@link IotSceneRuleAction} 实现类
  *

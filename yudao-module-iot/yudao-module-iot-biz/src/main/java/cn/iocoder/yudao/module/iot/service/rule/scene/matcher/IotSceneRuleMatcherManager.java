@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
- * IoT 场景规则匹配器统一管理器
- * <p>
- * 负责管理所有匹配器（触发器匹配器和条件匹配器），并提供统一的匹配入口
+ * IoT 场景规则匹配器统一管理器：负责管理所有匹配器（触发器匹配器和条件匹配器），并提供统一的匹配入口
  *
  * @author HUIHUI
  */
@@ -45,13 +43,12 @@ public class IotSceneRuleMatcherManager {
             return;
         }
 
-        // 按优先级排序并过滤启用的匹配器
+        // 1.1 按优先级排序并过滤启用的匹配器
         List<IotSceneRuleMatcher> allMatchers = matchers.stream()
                 .filter(IotSceneRuleMatcher::isEnabled)
                 .sorted(Comparator.comparing(IotSceneRuleMatcher::getPriority))
                 .collect(Collectors.toList());
-
-        // 分离触发器匹配器和条件匹配器
+        // 1.2 分离触发器匹配器和条件匹配器
         List<IotSceneRuleTriggerMatcher> triggerMatchers = allMatchers.stream()
                 .filter(matcher -> matcher instanceof IotSceneRuleTriggerMatcher)
                 .map(matcher -> (IotSceneRuleTriggerMatcher) matcher)
@@ -61,7 +58,7 @@ public class IotSceneRuleMatcherManager {
                 .map(matcher -> (IotSceneRuleConditionMatcher) matcher)
                 .collect(Collectors.toList());
 
-        // 构建触发器匹配器映射表
+        // 2.1 构建触发器匹配器映射表
         this.triggerMatchers = convertMap(triggerMatchers, IotSceneRuleTriggerMatcher::getSupportedTriggerType,
                 Function.identity(),
                 (existing, replacement) -> {
@@ -71,7 +68,7 @@ public class IotSceneRuleMatcherManager {
                                     existing.getSupportedTriggerType() : replacement.getSupportedTriggerType());
                     return existing.getPriority() <= replacement.getPriority() ? existing : replacement;
                 }, LinkedHashMap::new);
-        // 构建条件匹配器映射表
+        // 2.2 构建条件匹配器映射表
         this.conditionMatchers = convertMap(conditionMatchers, IotSceneRuleConditionMatcher::getSupportedConditionType,
                 Function.identity(),
                 (existing, replacement) -> {
@@ -83,7 +80,7 @@ public class IotSceneRuleMatcherManager {
                 },
                 LinkedHashMap::new);
 
-        // 日志输出初始化信息
+        // 3. 日志输出初始化信息
         log.info("[IotSceneRuleMatcherManager][初始化完成，共加载({})个匹配器，其中触发器匹配器({})个，条件匹配器({})个]",
                 allMatchers.size(), this.triggerMatchers.size(), this.conditionMatchers.size());
         this.triggerMatchers.forEach((type, matcher) ->
@@ -136,7 +133,7 @@ public class IotSceneRuleMatcherManager {
             return false;
         }
 
-        // 根据条件类型查找对应的匹配器
+        // 1. 根据条件类型查找对应的匹配器
         IotSceneRuleConditionTypeEnum conditionType = IotSceneRuleConditionTypeEnum.typeOf(condition.getType());
         if (conditionType == null) {
             log.warn("[isConditionMatched][conditionType({}) 未知的条件类型]", condition.getType());
@@ -148,7 +145,7 @@ public class IotSceneRuleMatcherManager {
             return false;
         }
 
-        // 执行匹配逻辑
+        // 2. 执行匹配逻辑
         try {
             return matcher.matches(message, condition);
         } catch (Exception e) {

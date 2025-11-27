@@ -227,6 +227,9 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
         // 2. 检索
         List<Document> documents = searchDocument(knowledge, reqBO);
+        if (CollUtil.isEmpty(documents)) {
+            return ListUtil.empty();
+        }
 
         // 3.1 段落召回
         List<AiKnowledgeSegmentDO> segments = segmentMapper

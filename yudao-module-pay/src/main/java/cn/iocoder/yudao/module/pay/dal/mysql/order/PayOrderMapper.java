@@ -48,6 +48,10 @@ public interface PayOrderMapper extends BaseMapperX<PayOrderDO> {
                 PayOrderDO::getMerchantOrderId, merchantOrderId);
     }
 
+    default PayOrderDO selectByNo(String no) {
+        return selectOne(PayOrderDO::getNo, no);
+    }
+
     default int updateByIdAndStatus(Long id, Integer status, PayOrderDO update) {
         return update(update, new LambdaQueryWrapper<PayOrderDO>()
                 .eq(PayOrderDO::getId, id).eq(PayOrderDO::getStatus, status));

@@ -32,4 +32,9 @@ public interface OAuth2AccessTokenMapper extends BaseMapperX<OAuth2AccessTokenDO
                 .orderByDesc(OAuth2AccessTokenDO::getId));
     }
 
+    default List<OAuth2AccessTokenDO> selectListByUserIdAndUserType(Long userId, Integer userType) {
+        return selectList(OAuth2AccessTokenDO::getUserId, userId,
+                OAuth2AccessTokenDO::getUserType, userType);
+    }
+
 }

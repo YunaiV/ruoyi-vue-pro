@@ -80,6 +80,11 @@ public class PayOrderServiceImpl implements PayOrderService {
     }
 
     @Override
+    public PayOrderDO getOrder(String no) {
+        return orderMapper.selectByNo(no);
+    }
+
+    @Override
     public PayOrderDO getOrder(Long appId, String merchantOrderId) {
         return orderMapper.selectByAppIdAndMerchantOrderId(appId, merchantOrderId);
     }

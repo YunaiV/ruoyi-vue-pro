@@ -6,12 +6,9 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcher;
 
 /**
- * IoT 场景规则触发器匹配器接口
- * <p>
- * 专门处理主触发条件的匹配逻辑，如设备消息类型、定时器等
- * <p>
- * 触发器匹配器负责判断设备消息是否满足场景规则的主触发条件，
- * 是场景规则执行的第一道门槛
+ * IoT 场景规则触发器匹配器接口：专门处理主触发条件的匹配逻辑，如设备消息类型、定时器等
+ *
+ * 触发器匹配器负责判断设备消息是否满足场景规则的主触发条件，是场景规则执行的第一道门槛
  *
  * @author HUIHUI
  */

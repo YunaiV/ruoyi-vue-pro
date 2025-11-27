@@ -9,18 +9,16 @@ import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatche
 import org.springframework.stereotype.Component;
 
 /**
- * 设备属性上报触发器匹配器
- * <p>
- * 处理设备属性数据上报的触发器匹配逻辑
+ * 设备状态更新触发器匹配器：处理设备上下线状态变更的触发器匹配逻辑
  *
  * @author HUIHUI
  */
 @Component
-public class DevicePropertyPostTriggerMatcher implements IotSceneRuleTriggerMatcher {
+public class IotDeviceStateUpdateTriggerMatcher implements IotSceneRuleTriggerMatcher {
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
-        return IotSceneRuleTriggerTypeEnum.DEVICE_PROPERTY_POST;
+        return IotSceneRuleTriggerTypeEnum.DEVICE_STATE_UPDATE;
     }
 
     @Override
@@ -32,46 +30,40 @@ public class DevicePropertyPostTriggerMatcher implements IotSceneRuleTriggerMatc
         }
 
         // 1.2 检查消息方法是否匹配
-        if (!IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod().equals(message.getMethod())) {
+        if (!IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod().equals(message.getMethod())) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息方法不匹配，期望: " +
-                    IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod() + ", 实际: " + message.getMethod());
+                    IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod() + ", 实际: " + message.getMethod());
             return false;
         }
 
-        // 1.3 检查标识符是否匹配
-        String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
-        if (!IotSceneRuleMatcherHelper.isIdentifierMatched(trigger.getIdentifier(), messageIdentifier)) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "标识符不匹配，期望: " +
-                    trigger.getIdentifier() + ", 实际: " + messageIdentifier);
-            return false;
-        }
-
-        // 1.4 检查操作符和值是否有效
+        // 1.3 检查操作符和值是否有效
         if (!IotSceneRuleMatcherHelper.isTriggerOperatorAndValueValid(trigger)) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "操作符或值无效");
             return false;
         }
 
-        // 2.1 获取属性值
-        Object propertyValue = message.getParams();
-        if (propertyValue == null) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中属性值为空");
+        // 2.1 获取设备状态值 - 使用工具类方法正确提取状态值
+        // 对于状态更新消息，状态值通过 getIdentifier 获取（实际是从 params.state 字段）
+        String stateIdentifier = IotDeviceMessageUtils.getIdentifier(message);
+        if (stateIdentifier == null) {
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中设备状态值为空");
             return false;
         }
 
         // 2.2 使用条件评估器进行匹配
-        boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(propertyValue, trigger.getOperator(), trigger.getValue());
+        // 状态值通常是字符串或数字，直接使用标识符作为状态值
+        boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(stateIdentifier, trigger.getOperator(), trigger.getValue());
         if (matched) {
             IotSceneRuleMatcherHelper.logTriggerMatchSuccess(message, trigger);
         } else {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "属性值条件不匹配");
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "状态值条件不匹配");
         }
         return matched;
     }
 
     @Override
     public int getPriority() {
-        return 20; // 中等优先级
+        return 10; // 高优先级
     }
 
 }

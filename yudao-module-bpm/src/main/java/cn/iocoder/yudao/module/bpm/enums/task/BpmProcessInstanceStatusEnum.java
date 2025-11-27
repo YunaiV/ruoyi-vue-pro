@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.enums.task;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,10 @@ public enum BpmProcessInstanceStatusEnum implements ArrayValuable<Integer> {
     public static boolean isProcessEndStatus(Integer status) {
         return ObjectUtils.equalsAny(status,
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus());
+    }
+
+    public static BpmProcessInstanceStatusEnum valueOf(Integer status) {
+        return ArrayUtil.firstMatch(item -> item.getStatus().equals(status), values());
     }
 
 }

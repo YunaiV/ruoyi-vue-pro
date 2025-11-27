@@ -76,4 +76,12 @@ public interface RedisKeyConstants {
      */
     String DATA_SINK = "iot:data_sink";
 
+    /**
+     * 场景联动规则的数据缓存，使用 Spring Cache 操作
+     * <p>
+     * KEY 格式：scene_rule_list_${productId}_${deviceId}
+     * VALUE 数据类型：String 数组(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO} 列表
+     */
+    String SCENE_RULE_LIST = "iot:scene_rule_list";
+
 }

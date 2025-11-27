@@ -9,15 +9,14 @@ import org.quartz.CronExpression;
 import org.springframework.stereotype.Component;
 
 /**
- * 定时触发器匹配器
- * <p>
- * 处理定时触发的触发器匹配逻辑
+ * 定时触发器匹配器：处理定时触发的触发器匹配逻辑
+ *
  * 注意：定时触发器不依赖设备消息，主要用于定时任务场景
  *
  * @author HUIHUI
  */
 @Component
-public class TimerTriggerMatcher implements IotSceneRuleTriggerMatcher {
+public class IotTimerTriggerMatcher implements IotSceneRuleTriggerMatcher {
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
