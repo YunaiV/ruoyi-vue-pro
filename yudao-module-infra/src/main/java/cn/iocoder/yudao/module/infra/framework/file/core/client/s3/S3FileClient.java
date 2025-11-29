@@ -173,13 +173,13 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
             return config.getRegion();
         }
 
-        // 2. 尝试从 endpoint 中解析 region
+        // 2.1 尝试从 endpoint 中解析 region
         String endpoint = config.getEndpoint();
         if (StrUtil.isEmpty(endpoint)) {
             return "us-east-1";
         }
 
-        // 移除协议头（http:// 或 https://）
+        // 2.2 移除协议头（http:// 或 https://）
         String host = endpoint;
         if (HttpUtil.isHttp(endpoint) || HttpUtil.isHttps(endpoint)) {
             try {
@@ -189,12 +189,11 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 return "us-east-1";
             }
         }
-
         if (StrUtil.isEmpty(host)) {
             return "us-east-1";
         }
 
-        // 3. AWS S3 格式：s3.us-west-2.amazonaws.com 或 s3.amazonaws.com
+        // 3.1 AWS S3 格式：s3.us-west-2.amazonaws.com 或 s3.amazonaws.com
         if (host.contains("amazonaws.com")) {
             // 匹配 s3.{region}.amazonaws.com 格式
             if (host.startsWith("s3.") && host.contains(".amazonaws.com")) {
@@ -206,8 +205,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
             // s3.amazonaws.com 或 s3-accelerate.amazonaws.com 使用默认值
             return "us-east-1";
         }
-
-        // 4. 阿里云 OSS 格式：oss-cn-beijing.aliyuncs.com
+        // 3.2 阿里云 OSS 格式：oss-cn-beijing.aliyuncs.com
         if (host.contains(S3FileClientConfig.ENDPOINT_ALIYUN)) {
             // 匹配 oss-{region}.aliyuncs.com 格式
             if (host.startsWith("oss-") && host.contains("." + S3FileClientConfig.ENDPOINT_ALIYUN)) {
@@ -217,8 +215,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 }
             }
         }
-
-        // 5. 腾讯云 COS 格式：cos.ap-shanghai.myqcloud.com
+        // 3.3 腾讯云 COS 格式：cos.ap-shanghai.myqcloud.com
         if (host.contains(S3FileClientConfig.ENDPOINT_TENCENT)) {
             // 匹配 cos.{region}.myqcloud.com 格式
             if (host.startsWith("cos.") && host.contains("." + S3FileClientConfig.ENDPOINT_TENCENT)) {
@@ -229,7 +226,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
             }
         }
 
-        // 6. 其他情况（MinIO、七牛云等）使用默认值
+        // 3.4 其他情况（MinIO、七牛云等）使用默认值
         return "us-east-1";
     }
 
