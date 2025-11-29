@@ -267,7 +267,6 @@ justauth:
       client-secret: xx
       alipay-public-key: xx
       ignore-check-redirect-uri: true
-      redirect-uri: http://yunai.natapp1.cc
       ignore-check-state: true
   cache:
     type: REDIS
