@@ -210,6 +210,10 @@ public class SocialClientServiceImpl implements SocialClientService {
                 return new AuthAlipayRequest(newAuthConfig, client.getPublicKey());
             }
             // 2.3 设置会 request 里，进行后续使用
+            if (SocialTypeEnum.ALIPAY_MINI_PROGRAM.getType().equals(socialType)) {
+                // 特殊：如果是支付宝的小程序，多了 publicKey 属性，可见 AuthConfig 里的 alipayPublicKey 字段说明
+                return new AuthAlipayRequest(newAuthConfig, client.getPublicKey());
+            }
             ReflectUtil.setFieldValue(request, "config", newAuthConfig);
         }
         return request;
