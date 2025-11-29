@@ -922,16 +922,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<UserTask> returnUserTaskList = BpmnModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
         List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
-        List<String> runExecutionIds = new ArrayList<>();
+//        List<String> runExecutionIds = new ArrayList<>();
         // 2. 给当前要被退回的 task 数组，设置退回意见
         taskList.forEach(task -> {
             // 需要排除掉，不需要设置退回意见的任务
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
-            if (task.getExecutionId() != null) {
-                runExecutionIds.add(task.getExecutionId());
-            }
+//            if (task.getExecutionId() != null) {
+//                runExecutionIds.add(task.getExecutionId());
+//            }
 
             // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
             if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
@@ -953,9 +953,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         //    相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         // ② flowable 7.2.0 版本后，继续使用 moveActivityIdsToSingleActivityId 方法。原因：flowable 7.2.0 版本修复了该问题。
         //    相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1018
+        // ③ moveExecutionsToSingleActivityId 基于运行时执行实例层面的精确控制，它的操作对象（第一个参数）是 executionId，需要收集到 runExecutionIds
+        //    moveActivityIdsToSingleActivityId 基于 BPMN 模型层面的节点迁移，它的操作对象（第一个参数）是 taskKey
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
+//                .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
+                .moveActivityIdsToSingleActivityId(returnTaskKeyList, reqVO.getTargetTaskDefinitionKey())
                 // 设置需要预测的任务 ids 的流程变量，用于辅助预测
                 .processVariable(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskDefinitionKeys)
                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
