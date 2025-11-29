@@ -1354,6 +1354,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3000, 16, '百川智能', 'BaiChuan', 'ai_platform', 0, '', '', '', '1', '2025-03-23 12:15:46', '1', '2025-03-23 12:15:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3001, 50, 'Vben5.0 Ant Design Schema 模版', '40', 'infra_codegen_front_type', 0, '', '', NULL, '1', '2025-04-23 21:47:47', '1', '2025-05-02 12:01:15', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3002, 6, '支付宝余额', '6', 'brokerage_withdraw_type', 0, '', '', 'API 打款', '1', '2025-05-10 08:24:49', '1', '2025-05-10 08:24:49', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3035, 40, '支付宝小程序', 40, '', '', '', '1', '2023-11-04 13:05:38', '1', '2023-11-04 13:07:16', '0');
 COMMIT;
 -- @formatter:on
 
@@ -4461,7 +4462,8 @@ CREATE TABLE system_social_client
     social_type   int2         NOT NULL,
     user_type     int2         NOT NULL,
     client_id     varchar(255) NOT NULL,
-    client_secret varchar(255) NOT NULL,
+    client_secret varchar(2048) NOT NULL,
+    public_key    varchar(2048) NULL    DEFAULT NULL,
     agent_id      varchar(255) NULL     DEFAULT NULL,
     status        int2         NOT NULL,
     creator       varchar(64)  NULL     DEFAULT '',
@@ -4481,6 +4483,7 @@ COMMENT ON COLUMN system_social_client.social_type IS '社交平台的类型';
 COMMENT ON COLUMN system_social_client.user_type IS '用户类型';
 COMMENT ON COLUMN system_social_client.client_id IS '客户端编号';
 COMMENT ON COLUMN system_social_client.client_secret IS '客户端密钥';
+COMMENT ON COLUMN system_social_client.public_key IS 'publicKey公钥';
 COMMENT ON COLUMN system_social_client.agent_id IS '代理编号';
 COMMENT ON COLUMN system_social_client.status IS '状态';
 COMMENT ON COLUMN system_social_client.creator IS '创建者';

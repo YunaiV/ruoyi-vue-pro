@@ -3299,6 +3299,8 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3002, 6, N'支付宝余额', N'6', N'brokerage_withdraw_type', 0, N'', N'', N'API 打款', N'1', N'2025-05-10 08:24:49', N'1', N'2025-05-10 08:24:49', N'0')
 GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3035, 40, N'支付宝小程序', N'40', N'system_social_type', 0, N'', N'', N'', N'1', N'2023-11-04 13:05:38', N'1', N'2023-11-04 13:07:16', N'0')
+GO
 SET IDENTITY_INSERT system_dict_data OFF
 GO
 COMMIT
@@ -10433,7 +10435,8 @@ CREATE TABLE system_social_client
     social_type   tinyint                                 NOT NULL,
     user_type     tinyint                                 NOT NULL,
     client_id     nvarchar(255)                           NOT NULL,
-    client_secret nvarchar(255)                           NOT NULL,
+    client_secret nvarchar(2048)                           NOT NULL,
+    public_key    nvarchar(2048) DEFAULT NULL              NULL,
     agent_id      nvarchar(255) DEFAULT NULL              NULL,
     status        tinyint                                 NOT NULL,
     creator       nvarchar(64)  DEFAULT ''                NULL,
@@ -10485,6 +10488,13 @@ EXEC sp_addextendedproperty
      'SCHEMA', N'dbo',
      'TABLE', N'system_social_client',
      'COLUMN', N'client_secret'
+GO
+
+EXEC sp_addextendedproperty
+     'MS_Description', N'publicKey公钥',
+     'SCHEMA', N'dbo',
+     'TABLE', N'system_social_client',
+     'COLUMN', N'public_key'
 GO
 
 EXEC sp_addextendedproperty

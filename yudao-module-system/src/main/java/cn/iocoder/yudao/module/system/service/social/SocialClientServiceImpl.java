@@ -50,6 +50,7 @@ import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthAlipayRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,7 +169,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     public AuthUser getAuthUser(Integer socialType, Integer userType, String code, String state) {
         // 构建请求
         AuthRequest authRequest = buildAuthRequest(socialType, userType);
-        AuthCallback authCallback = AuthCallback.builder().code(code).state(state).build();
+        AuthCallback authCallback = AuthCallback.builder().code(code).auth_code(code).state(state).build();
         // 执行请求
         AuthResponse<?> authResponse = authRequest.login(authCallback);
         log.info("[getAuthUser][请求社交平台 type({}) request({}) response({})]", socialType,
@@ -203,6 +204,10 @@ public class SocialClientServiceImpl implements SocialClientService {
             newAuthConfig.setClientSecret(client.getClientSecret());
             if (client.getAgentId() != null) { // 如果有 agentId 则修改 agentId
                 newAuthConfig.setAgentId(client.getAgentId());
+            }
+            // 如果是阿里的小程序
+            if (SocialTypeEnum.ALIPAY_MINI_PROGRAM.getType().equals(socialType)) {
+                return new AuthAlipayRequest(newAuthConfig, client.getPublicKey());
             }
             // 2.3 设置会 request 里，进行后续使用
             ReflectUtil.setFieldValue(request, "config", newAuthConfig);

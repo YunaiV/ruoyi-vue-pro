@@ -41,6 +41,9 @@ public class SocialClientSaveReqVO {
     @Schema(description = "客户端密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "peter")
     @NotNull(message = "客户端密钥不能为空")
     private String clientSecret;
+    
+    @Schema(description = "publicKey公钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000045")
+    private String publicKey;
 
     @Schema(description = "授权方的网页应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000045")
     private String agentId;
