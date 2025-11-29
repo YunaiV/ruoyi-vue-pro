@@ -65,7 +65,7 @@ public class SocialClientSaveReqVO {
     @JsonIgnore
     public boolean isPublicKeyValid() {
         // 如果是支付宝，必须填写 publicKey 属性
-        return !Objects.equals(socialType, SocialTypeEnum.ALIPAY.getType())
+        return !Objects.equals(socialType, SocialTypeEnum.ALIPAY_MINI_PROGRAM.getType())
                 || !StrUtil.isEmpty(publicKey);
     }
 
