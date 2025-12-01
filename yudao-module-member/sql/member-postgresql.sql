@@ -43,7 +43,7 @@ CREATE TABLE member_address (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -93,7 +93,7 @@ CREATE TABLE member_config (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -142,7 +142,7 @@ CREATE TABLE member_experience_record (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -193,7 +193,7 @@ CREATE TABLE member_group (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -241,7 +241,7 @@ CREATE TABLE member_level (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -294,7 +294,7 @@ CREATE TABLE member_level_record (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -349,7 +349,7 @@ CREATE TABLE member_point_record (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -401,7 +401,7 @@ CREATE TABLE member_sign_in_config (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -447,7 +447,7 @@ CREATE TABLE member_sign_in_record (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -490,7 +490,7 @@ CREATE TABLE member_tag (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 
@@ -548,7 +548,7 @@ CREATE TABLE member_user (
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted int2 NOT NULL DEFAULT 0,
+  deleted boolean NOT NULL DEFAULT FALSE,
   tenant_id int8 NOT NULL DEFAULT 0
 );
 

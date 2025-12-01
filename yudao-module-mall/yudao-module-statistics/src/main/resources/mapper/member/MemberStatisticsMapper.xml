@@ -38,7 +38,8 @@
         </if>
     </select>
 
-    <select id="selectListByCreateTimeBetween"
+    <!-- MySQL 版本：按日期分组查询注册用户数 -->
+    <select id="selectListByCreateTimeBetween" databaseId="mysql"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
         SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
                count(1)                             AS count
@@ -46,6 +47,17 @@
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
         GROUP BY date
+    </select>
+
+    <!-- PostgreSQL 版本：按日期分组查询注册用户数 -->
+    <select id="selectListByCreateTimeBetween" databaseId="postgresql"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
+        SELECT TO_CHAR(create_time, 'YYYY-MM-DD') AS date,
+               count(1)                           AS count
+        FROM member_user
+        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY TO_CHAR(create_time, 'YYYY-MM-DD')
     </select>
 
 </mapper>

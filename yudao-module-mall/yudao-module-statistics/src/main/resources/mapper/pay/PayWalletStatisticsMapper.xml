@@ -45,8 +45,17 @@
             AND deleted = FALSE
     </select>
 
-    <select id="selectRechargePriceSummary" resultType="java.lang.Integer">
+    <!-- MySQL 版本：充值金额汇总 -->
+    <select id="selectRechargePriceSummary" databaseId="mysql" resultType="java.lang.Integer">
         SELECT IFNULL(SUM(pay_price), 0)
+        FROM pay_wallet_recharge
+        WHERE pay_status = #{payStatus}
+          AND deleted = FALSE
+    </select>
+
+    <!-- PostgreSQL 版本：充值金额汇总 -->
+    <select id="selectRechargePriceSummary" databaseId="postgresql" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(pay_price), 0)
         FROM pay_wallet_recharge
         WHERE pay_status = #{payStatus}
           AND deleted = FALSE

@@ -17,6 +17,8 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -90,6 +93,29 @@ public class YudaoMybatisAutoConfiguration {
         }
         JacksonTypeHandler.setObjectMapper(objectMapper);
         return new JacksonTypeHandler(Object.class);
+    }
+
+    /**
+     * 配置 DatabaseIdProvider，用于支持多数据库 SQL 切换
+     *
+     * 在 Mapper XML 中可以使用 databaseId 属性来区分不同数据库的 SQL：
+     * - databaseId="mysql" 仅在 MySQL 数据库执行
+     * - databaseId="postgresql" 仅在 PostgreSQL 数据库执行
+     * - 不指定 databaseId 则所有数据库都执行
+     */
+    @Bean
+    public DatabaseIdProvider databaseIdProvider() {
+        VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
+        Properties properties = new Properties();
+        properties.setProperty("MySQL", "mysql");
+        properties.setProperty("PostgreSQL", "postgresql");
+        properties.setProperty("Oracle", "oracle");
+        properties.setProperty("SQL Server", "sqlserver");
+        properties.setProperty("DM DBMS", "dm");
+        properties.setProperty("KingbaseES", "kingbase");
+        properties.setProperty("H2", "h2");
+        databaseIdProvider.setProperties(properties);
+        return databaseIdProvider;
     }
 
 }

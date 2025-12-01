@@ -61,7 +61,8 @@
           AND create_time BETWEEN #{beginTime} AND #{endTime}
     </select>
 
-    <select id="selectListByPayTimeBetweenAndGroupByDay"
+    <!-- MySQL 版本：按天分组 -->
+    <select id="selectListByPayTimeBetweenAndGroupByDay" databaseId="mysql"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
         SELECT DATE_FORMAT(pay_time, '%Y-%m-%d') AS date,
                COUNT(1)                          AS orderPayCount,
@@ -73,7 +74,21 @@
         GROUP BY date
     </select>
 
-    <select id="selectListByPayTimeBetweenAndGroupByMonth"
+    <!-- PostgreSQL 版本：按天分组 -->
+    <select id="selectListByPayTimeBetweenAndGroupByDay" databaseId="postgresql"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
+        SELECT TO_CHAR(pay_time, 'YYYY-MM-DD') AS date,
+               COUNT(1)                        AS orderPayCount,
+               SUM(pay_price)                  AS orderPayPrice
+        FROM trade_order
+        WHERE pay_status = TRUE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY TO_CHAR(pay_time, 'YYYY-MM-DD')
+    </select>
+
+    <!-- MySQL 版本：按月分组 -->
+    <select id="selectListByPayTimeBetweenAndGroupByMonth" databaseId="mysql"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
         SELECT DATE_FORMAT(pay_time, '%Y-%m') AS date,
                COUNT(1)                       AS order_pay_count,
@@ -85,6 +100,19 @@
         GROUP BY date
     </select>
 
+    <!-- PostgreSQL 版本：按月分组 -->
+    <select id="selectListByPayTimeBetweenAndGroupByMonth" databaseId="postgresql"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
+        SELECT TO_CHAR(pay_time, 'YYYY-MM') AS date,
+               COUNT(1)                     AS order_pay_count,
+               SUM(pay_price)               AS order_pay_price
+        FROM trade_order
+        WHERE pay_status = TRUE
+          AND create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY TO_CHAR(pay_time, 'YYYY-MM')
+    </select>
+
     <select id="selectCountByStatusAndDeliveryType" resultType="java.lang.Long">
         SELECT COUNT(1)
         FROM trade_order
@@ -93,10 +121,22 @@
           AND deleted = FALSE
     </select>
 
-    <select id="selectPaySummaryByPayStatusAndPayTimeBetween"
+    <!-- MySQL 版本：支付汇总 -->
+    <select id="selectPaySummaryByPayStatusAndPayTimeBetween" databaseId="mysql"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO">
         SELECT IFNULL(SUM(pay_price), 0) AS order_pay_price,
                COUNT(1)                  AS order_pay_count
+        FROM trade_order
+        WHERE pay_status = #{payStatus}
+          AND pay_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+    </select>
+
+    <!-- PostgreSQL 版本：支付汇总 -->
+    <select id="selectPaySummaryByPayStatusAndPayTimeBetween" databaseId="postgresql"
+            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO">
+        SELECT COALESCE(SUM(pay_price), 0) AS order_pay_price,
+               COUNT(1)                    AS order_pay_count
         FROM trade_order
         WHERE pay_status = #{payStatus}
           AND pay_time BETWEEN #{beginTime} AND #{endTime}
