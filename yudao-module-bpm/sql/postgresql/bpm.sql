@@ -35,7 +35,7 @@ CREATE TABLE bpm_category
     create_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64) NULL     DEFAULT '',
     update_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8        NOT NULL DEFAULT 0
 );
 
@@ -88,7 +88,7 @@ CREATE TABLE bpm_form
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -139,7 +139,7 @@ CREATE TABLE bpm_oa_leave
     create_time          timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater              varchar(64) NULL     DEFAULT '',
     update_time          timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted              int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id            int8        NOT NULL DEFAULT 0
 );
 
@@ -214,7 +214,7 @@ CREATE TABLE bpm_process_definition_info
     create_time                     timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                         varchar(64)   NULL     DEFAULT '',
     update_time                     timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                         int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id                       int8          NOT NULL DEFAULT 0
 );
 
@@ -288,7 +288,7 @@ CREATE TABLE bpm_process_expression
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8          NOT NULL DEFAULT 0
 );
 
@@ -339,7 +339,7 @@ CREATE TABLE bpm_process_instance_copy
     create_time           timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater               varchar(64) NULL     DEFAULT '',
     update_time           timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted               int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id             int8        NOT NULL DEFAULT 0
 );
 
@@ -397,7 +397,7 @@ CREATE TABLE bpm_process_listener
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8          NOT NULL DEFAULT 0
 );
 
@@ -445,7 +445,7 @@ CREATE TABLE bpm_user_group
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8          NOT NULL DEFAULT 0
 );
 

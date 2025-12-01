@@ -56,7 +56,7 @@ CREATE TABLE infra_api_access_log
     create_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater          varchar(64)  NULL     DEFAULT '',
     update_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted          int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id        int8         NOT NULL DEFAULT 0
 );
 
@@ -128,7 +128,7 @@ CREATE TABLE infra_api_error_log
     create_time                  timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                      varchar(64)   NULL     DEFAULT '',
     update_time                  timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                      int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id                    int8          NOT NULL DEFAULT 0
 );
 
@@ -197,7 +197,7 @@ CREATE TABLE infra_codegen_column
     create_time              timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                  varchar(64)  NULL     DEFAULT '',
     update_time              timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                  int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_codegen_column
@@ -261,7 +261,7 @@ CREATE TABLE infra_codegen_table
     create_time           timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater               varchar(64)  NULL     DEFAULT '',
     update_time           timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted               int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_codegen_table
@@ -315,7 +315,7 @@ CREATE TABLE infra_config
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_config
@@ -371,7 +371,7 @@ CREATE TABLE infra_data_source_config
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_data_source_config
@@ -410,7 +410,7 @@ CREATE TABLE infra_file
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_file
@@ -450,7 +450,7 @@ CREATE TABLE infra_file_config
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_file_config
@@ -504,7 +504,7 @@ CREATE TABLE infra_file_content
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_file_content
@@ -544,7 +544,7 @@ CREATE TABLE infra_job
     create_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater         varchar(64)  NULL     DEFAULT '',
     update_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted         int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_job
@@ -611,7 +611,7 @@ CREATE TABLE infra_job_log
     create_time   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater       varchar(64)   NULL     DEFAULT '',
     update_time   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted       int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE infra_job_log
@@ -656,7 +656,7 @@ CREATE TABLE system_dept
     create_time    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater        varchar(64) NULL     DEFAULT '',
     update_time    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted        int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id      int8        NOT NULL DEFAULT 0
 );
 
@@ -724,7 +724,7 @@ CREATE TABLE system_dict_data
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_dict_data
@@ -1376,7 +1376,7 @@ CREATE TABLE system_dict_type
     create_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater      varchar(64)  NULL     DEFAULT '',
     update_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted      int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     deleted_time timestamp    NULL     DEFAULT NULL
 );
 
@@ -1534,7 +1534,7 @@ CREATE TABLE system_login_log
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -1580,7 +1580,7 @@ CREATE TABLE system_mail_account
     create_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater         varchar(64)  NULL     DEFAULT '',
     update_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted         int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_mail_account
@@ -1643,7 +1643,7 @@ CREATE TABLE system_mail_log
     create_time       timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater           varchar(64)    NULL     DEFAULT '',
     update_time       timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted           int2           NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_mail_log
@@ -1696,7 +1696,7 @@ CREATE TABLE system_mail_template
     create_time timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)    NULL     DEFAULT '',
     update_time timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2           NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_mail_template
@@ -1758,7 +1758,7 @@ CREATE TABLE system_menu
     create_time    timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater        varchar(64)  NULL     DEFAULT '',
     update_time    timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted        int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_menu
@@ -2723,7 +2723,7 @@ CREATE TABLE system_notice
     create_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64) NULL     DEFAULT '',
     update_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8        NOT NULL DEFAULT 0
 );
 
@@ -2779,7 +2779,7 @@ CREATE TABLE system_notify_message
     create_time       timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater           varchar(64)   NULL     DEFAULT '',
     update_time       timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted           int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id         int8          NOT NULL DEFAULT 0
 );
 
@@ -2845,7 +2845,7 @@ CREATE TABLE system_notify_template
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_notify_template
@@ -2890,7 +2890,7 @@ CREATE TABLE system_oauth2_access_token
     create_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater       varchar(64)  NULL     DEFAULT '',
     update_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted       int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id     int8         NOT NULL DEFAULT 0
 );
 
@@ -2938,7 +2938,7 @@ CREATE TABLE system_oauth2_approve
     create_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater      varchar(64)  NULL     DEFAULT '',
     update_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted      int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id    int8         NOT NULL DEFAULT 0
 );
 
@@ -2990,7 +2990,7 @@ CREATE TABLE system_oauth2_client
     create_time                    timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                        varchar(64)   NULL     DEFAULT '',
     update_time                    timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                        int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_oauth2_client
@@ -3054,7 +3054,7 @@ CREATE TABLE system_oauth2_code
     create_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater      varchar(64)  NULL     DEFAULT '',
     update_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted      int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id    int8         NOT NULL DEFAULT 0
 );
 
@@ -3099,7 +3099,7 @@ CREATE TABLE system_oauth2_refresh_token
     create_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater       varchar(64)  NULL     DEFAULT '',
     update_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted       int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id     int8         NOT NULL DEFAULT 0
 );
 
@@ -3149,7 +3149,7 @@ CREATE TABLE system_operate_log
     create_time    timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater        varchar(64)   NULL     DEFAULT '',
     update_time    timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted        int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id      int8          NOT NULL DEFAULT 0
 );
 
@@ -3198,7 +3198,7 @@ CREATE TABLE system_post
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -3254,7 +3254,7 @@ CREATE TABLE system_role
     create_time         timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater             varchar(64)  NULL     DEFAULT '',
     update_time         timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted             int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id           int8         NOT NULL DEFAULT 0
 );
 
@@ -3311,7 +3311,7 @@ CREATE TABLE system_role_menu
     create_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64) NULL     DEFAULT '',
     update_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8        NOT NULL DEFAULT 0
 );
 
@@ -4222,7 +4222,7 @@ CREATE TABLE system_sms_channel
     create_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater      varchar(64)  NULL     DEFAULT '',
     update_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted      int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_sms_channel
@@ -4277,7 +4277,7 @@ CREATE TABLE system_sms_code
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -4339,7 +4339,7 @@ CREATE TABLE system_sms_log
     create_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater          varchar(64)  NULL     DEFAULT '',
     update_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted          int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_sms_log
@@ -4399,7 +4399,7 @@ CREATE TABLE system_sms_template
     create_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater         varchar(64)  NULL     DEFAULT '',
     update_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted         int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_sms_template
@@ -4468,7 +4468,7 @@ CREATE TABLE system_social_client
     create_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater       varchar(64)  NULL     DEFAULT '',
     update_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted       int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id     int8         NOT NULL DEFAULT 0
 );
 
@@ -4528,7 +4528,7 @@ CREATE TABLE system_social_user
     create_time    timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater        varchar(64)   NULL     DEFAULT '',
     update_time    timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted        int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id      int8          NOT NULL DEFAULT 0
 );
 
@@ -4572,7 +4572,7 @@ CREATE TABLE system_social_user_bind
     create_time    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater        varchar(64) NULL     DEFAULT '',
     update_time    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted        int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id      int8        NOT NULL DEFAULT 0
 );
 
@@ -4616,7 +4616,7 @@ CREATE TABLE system_tenant
     create_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater         varchar(64)  NULL     DEFAULT '',
     update_time     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted         int2         NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_tenant
@@ -4669,7 +4669,7 @@ CREATE TABLE system_tenant_package
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0
+    deleted boolean NOT NULL DEFAULT false
 );
 
 ALTER TABLE system_tenant_package
@@ -4714,7 +4714,7 @@ CREATE TABLE system_user_post
     create_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64) NULL     DEFAULT '',
     update_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8        NOT NULL DEFAULT 0
 );
 
@@ -4766,7 +4766,7 @@ CREATE TABLE system_user_role
     create_time timestamp   NULL     DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64) NULL     DEFAULT '',
     update_time timestamp   NULL     DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8        NOT NULL DEFAULT 0
 );
 
@@ -4837,7 +4837,7 @@ CREATE TABLE system_users
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -4912,7 +4912,7 @@ CREATE TABLE yudao_demo01_contact
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -4959,7 +4959,7 @@ CREATE TABLE yudao_demo02_category
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -5009,7 +5009,7 @@ CREATE TABLE yudao_demo03_course
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -5071,7 +5071,7 @@ CREATE TABLE yudao_demo03_grade
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
@@ -5120,7 +5120,7 @@ CREATE TABLE yudao_demo03_student
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 

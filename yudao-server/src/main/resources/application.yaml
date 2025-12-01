@@ -315,6 +315,21 @@ yudao:
       - /admin-api/system/user/profile/**
       - /admin-api/system/auth/**
     ignore-tables:
+      # AI 模块表（不支持多租户）
+      - ai_api_key
+      - ai_model
+      - ai_tool
+      - ai_workflow
+      - ai_chat_role
+      - ai_chat_conversation
+      - ai_chat_message
+      - ai_knowledge
+      - ai_knowledge_document
+      - ai_knowledge_segment
+      - ai_image
+      - ai_music
+      - ai_write
+      - ai_mind_map
     ignore-caches:
       - user_role_ids
       - permission_menu_ids

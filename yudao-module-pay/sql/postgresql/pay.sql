@@ -42,7 +42,7 @@ CREATE TABLE pay_app
     create_time          timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater              varchar(64)  NULL     DEFAULT '',
     update_time          timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted              int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id            int8         NOT NULL DEFAULT 0
 );
 
@@ -88,7 +88,7 @@ CREATE TABLE pay_channel
     create_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)   NULL     DEFAULT '',
     update_time timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8          NOT NULL DEFAULT 0
 );
 
@@ -139,7 +139,7 @@ CREATE TABLE pay_demo_order
     create_time                    timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                        varchar(64)  NULL     DEFAULT '',
     update_time                    timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                        int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id                      int8         NOT NULL DEFAULT 0
 );
 
@@ -194,7 +194,7 @@ CREATE TABLE pay_demo_withdraw
     create_time            timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                varchar(64)  NULL     DEFAULT '',
     update_time            timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id              int8         NOT NULL DEFAULT 0
 );
 
@@ -241,7 +241,7 @@ CREATE TABLE pay_notify_log
     create_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater      varchar(64)  NULL     DEFAULT '',
     update_time  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted      int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id    int8         NOT NULL DEFAULT 0
 );
 
@@ -288,7 +288,7 @@ CREATE TABLE pay_notify_task
     create_time       timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater           varchar(64)  NULL     DEFAULT '',
     update_time       timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted           int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id         int8         NOT NULL DEFAULT 0
 );
 
@@ -350,7 +350,7 @@ CREATE TABLE pay_order
     create_time        timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater            varchar(64)   NULL     DEFAULT '',
     update_time        timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted            int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id          int8          NOT NULL DEFAULT 0
 );
 
@@ -412,7 +412,7 @@ CREATE TABLE pay_order_extension
     create_time          timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater              varchar(64)  NULL     DEFAULT '',
     update_time          timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted              int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id            int8         NOT NULL DEFAULT 0
 );
 
@@ -475,7 +475,7 @@ CREATE TABLE pay_refund
     create_time          timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater              varchar(64)   NULL     DEFAULT '',
     update_time          timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted              int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id            int8          NOT NULL DEFAULT 0
 );
 
@@ -547,7 +547,7 @@ CREATE TABLE pay_transfer
     create_time            timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater                varchar(64)   NULL     DEFAULT '',
     update_time            timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted                int2          NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id              int8          NOT NULL DEFAULT 0
 );
 
@@ -605,7 +605,7 @@ CREATE TABLE pay_wallet
     create_time    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater        varchar(64) NULL     DEFAULT '',
     update_time    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted        int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id      int8        NOT NULL DEFAULT 0
 );
 
@@ -659,7 +659,7 @@ CREATE TABLE pay_wallet_recharge
     create_time           timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater               varchar(64) NULL     DEFAULT '',
     update_time           timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted               int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id             int8        NOT NULL DEFAULT 0
 );
 
@@ -711,7 +711,7 @@ CREATE TABLE pay_wallet_recharge_package
     create_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64) NULL     DEFAULT '',
     update_time timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2        NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8        NOT NULL DEFAULT 0
 );
 
@@ -755,7 +755,7 @@ CREATE TABLE pay_wallet_transaction
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updater     varchar(64)  NULL     DEFAULT '',
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     int2         NOT NULL DEFAULT 0,
+    deleted boolean NOT NULL DEFAULT false,
     tenant_id   int8         NOT NULL DEFAULT 0
 );
 
