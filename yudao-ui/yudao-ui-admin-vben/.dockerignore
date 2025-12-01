@@ -1,7 +1,0 @@
-node_modules
-.git
-.gitignore
-*.md
-dist
-.turbo
-dist.zip

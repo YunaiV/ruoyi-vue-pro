@@ -1,3 +1,0 @@
-# CHANGE LOG
-
-TODO
