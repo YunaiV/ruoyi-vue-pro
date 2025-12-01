@@ -36,11 +36,9 @@ import {
 } from '#/api/bpm/model';
 import { $t } from '#/locales';
 
-// 导入重命名表单
 import CategoryRenameForm from '../../category/modules/rename-form.vue';
-// 导入 FormCreate 表单详情
 import FormCreateDetail from '../../form/modules/detail.vue';
-import { useGridColumns } from './data';
+import { useGridColumns } from '../data';
 
 const props = defineProps<{
   categoryInfo: ModelCategoryInfo;
@@ -50,46 +48,26 @@ const props = defineProps<{
 
 const emit = defineEmits(['success']);
 
-/** 重命名分类对话框 */
 const [CategoryRenameModal, categoryRenameModalApi] = useVbenModal({
   connectedComponent: CategoryRenameForm,
   destroyOnClose: true,
 });
 
-/** 流程表单详情对话框 */
 const [FormCreateDetailModal, formCreateDetailModalApi] = useVbenModal({
   connectedComponent: FormCreateDetail,
   destroyOnClose: true,
 });
 
 const router = useRouter();
-// 获取当前登录用户Id
-const userStore = useUserStore();
-const userId = userStore.userInfo?.id;
+const userId = useUserStore().userInfo?.id;
+
 const isModelSorting = ref(false);
 const originalData = ref<BpmModelApi.Model[]>([]);
 const modelList = ref<BpmModelApi.Model[]>([]);
-// 根据是否为第一个分类, 来设置初始展开状态
-const isExpand = ref(!!props.isFirst);
+// TODO @jason：可以全部展开么？ @芋艿 上次讨论。好像是因为性能问题才只展开第一个分类
+const isExpand = ref(props.isFirst); // 根据是否为第一个分类, 来设置初始展开状态
 
-const [Grid, gridApi] = useVbenVxeGrid({
-  gridOptions: {
-    columns: useGridColumns(),
-    pagerConfig: {
-      enabled: false,
-    },
-    data: modelList.value,
-    rowConfig: {
-      keyField: 'id',
-    },
-    toolbarConfig: {
-      enabled: false, // 完全禁用工具栏
-    },
-  } as VxeTableGridOptions,
-});
-
-// 排序引用，以便后续启用或禁用排序
-const sortableInstance = ref<any>(null);
+const sortableInstance = ref<any>(null); // 排序引用，以便后续启用或禁用排序
 /** 解决 v-model 问题，使用计算属性 */
 const expandKeys = computed(() => (isExpand.value ? ['1'] : []));
 
@@ -103,6 +81,24 @@ const hasPermiDelete = computed(() => {
 });
 const hasPermiDeploy = computed(() => {
   return hasAccessByCodes(['bpm:model:deploy']);
+});
+
+const [Grid, gridApi] = useVbenVxeGrid({
+  gridOptions: {
+    columns: useGridColumns(),
+    data: modelList.value,
+    keepSource: true,
+    pagerConfig: {
+      enabled: false,
+    },
+    rowConfig: {
+      keyField: 'id',
+      isHover: true,
+    },
+    toolbarConfig: {
+      enabled: false,
+    },
+  } as VxeTableGridOptions,
 });
 
 /** 处理模型的排序 */
@@ -126,7 +122,6 @@ function handleModelSort() {
     // 已存在实例，则启用排序功能
     sortableInstance.value.option('disabled', false);
   } else {
-    const sortableClass = `.category-${props.categoryInfo.id} .vxe-table .vxe-table--body-wrapper:not(.fixed-right--wrapper) .vxe-table--body tbody`;
     // 确保使用最新的数据
     modelList.value = cloneDeep(props.categoryInfo.modelList);
     // 更新表格数据
@@ -134,32 +129,41 @@ function handleModelSort() {
       data: modelList.value,
     });
 
-    sortableInstance.value = useSortable(sortableClass, modelList.value, {
-      draggable: '.vxe-body--row',
-      animation: 150,
-      handle: '.drag-handle',
-      disabled: false,
-      onEnd: ({ newDraggableIndex, oldDraggableIndex }) => {
-        if (oldDraggableIndex !== newDraggableIndex) {
-          modelList.value.splice(
-            newDraggableIndex ?? 0,
-            0,
-            modelList.value.splice(oldDraggableIndex ?? 0, 1)[0]!,
-          );
-        }
+    sortableInstance.value = useSortable(
+      `.category-${props.categoryInfo.id} .vxe-table .vxe-table--body-wrapper:not(.fixed-right--wrapper) .vxe-table--body tbody`,
+      modelList.value,
+      {
+        draggable: '.vxe-body--row',
+        animation: 150,
+        handle: '.drag-handle',
+        disabled: false,
+        onEnd: ({ newDraggableIndex, oldDraggableIndex }) => {
+          if (oldDraggableIndex !== newDraggableIndex) {
+            modelList.value.splice(
+              newDraggableIndex ?? 0,
+              0,
+              modelList.value.splice(oldDraggableIndex ?? 0, 1)[0]!,
+            );
+          }
+        },
       },
-    });
+    );
   }
 }
 
 /** 处理模型的排序提交 */
 async function handleModelSortSubmit() {
+  // 确保数据已经正确同步
+  if (!modelList.value || modelList.value.length === 0) {
+    message.error('排序数据异常，请重试');
+    return;
+  }
+
+  const hideLoading = message.loading({
+    content: '正在保存排序...',
+    duration: 0,
+  });
   try {
-    // 确保数据已经正确同步
-    if (!modelList.value || modelList.value.length === 0) {
-      message.error('排序数据异常，请重试');
-      return;
-    }
     // 保存排序
     const ids = modelList.value.map((item) => item.id);
     await updateModelSortBatch(ids);
@@ -169,6 +173,8 @@ async function handleModelSortSubmit() {
     emit('success');
   } catch (error) {
     console.error('排序保存失败', error);
+  } finally {
+    hideLoading();
   }
 }
 
@@ -206,29 +212,42 @@ async function handleDeleteCategory() {
     return;
   }
 
-  confirm({
+  await confirm({
+    beforeClose: async ({ isConfirm }) => {
+      if (!isConfirm) return;
+      // 发起删除
+      const hideLoading = message.loading({
+        content: `正在删除分类: "${props.categoryInfo.name}"...`,
+        duration: 0,
+      });
+      try {
+        await deleteCategory(props.categoryInfo.id);
+      } finally {
+        hideLoading();
+      }
+      return true;
+    },
     content: `确定要删除[${props.categoryInfo.name}]吗？`,
-  }).then(async () => {
-    // 发起删除
-    await deleteCategory(props.categoryInfo.id);
-    message.success(
-      $t('ui.actionMessage.deleteSuccess', [props.categoryInfo.name]),
-    );
-    // 刷新列表
-    emit('success');
+    icon: 'question',
   });
+  message.success(
+    $t('ui.actionMessage.deleteSuccess', [props.categoryInfo.name]),
+  );
+  // 刷新列表
+  emit('success');
 }
 
 /** 处理表单详情点击 */
-function handleFormDetail(row: any) {
+async function handleFormDetail(row: any) {
   if (row.formType === BpmModelFormType.NORMAL) {
     const data = {
       id: row.formId,
     };
     formCreateDetailModalApi.setData(data).open();
   } else {
-    // TODO 待实现
-    console.warn('业务表单待实现', row);
+    await router.push({
+      path: row.formCustomCreatePath,
+    });
   }
 }
 
@@ -237,6 +256,7 @@ function isManagerUser(row: any) {
   return row.managerUserIds && row.managerUserIds.includes(userId);
 }
 
+/** 模型操作 */
 async function modelOperation(type: string, id: number) {
   await router.push({
     name: 'BpmModelUpdate',
@@ -246,20 +266,27 @@ async function modelOperation(type: string, id: number) {
 
 /** 发布流程 */
 async function handleDeploy(row: any) {
-  confirm({
+  await confirm({
     beforeClose: async ({ isConfirm }) => {
       if (!isConfirm) return;
       // 发起部署
-      await deployModel(row.id);
+      const hideLoading = message.loading({
+        content: `正在发布流程: "${row.name}"...`,
+        duration: 0,
+      });
+      try {
+        await deployModel(row.id);
+      } finally {
+        hideLoading();
+      }
       return true;
     },
     content: `确认要发布[${row.name}]流程吗？`,
     icon: 'question',
-  }).then(async () => {
-    message.success(`发布[${row.name}]流程成功`);
-    // 刷新列表
-    emit('success');
   });
+  message.success(`发布[${row.name}]流程成功`);
+  // 刷新列表
+  emit('success');
 }
 
 /** '更多'操作按钮 */
@@ -296,60 +323,82 @@ function handleModelCommand(command: string, row: any) {
 }
 
 /** 更新状态操作 */
-function handleChangeState(row: any) {
+async function handleChangeState(row: any) {
   const state = row.processDefinition.suspensionState;
   const newState = state === 1 ? 2 : 1;
   const statusState = state === 1 ? '停用' : '启用';
-  confirm({
+  await confirm({
     beforeClose: async ({ isConfirm }) => {
       if (!isConfirm) return;
       // 发起更新状态
-      await updateModelState(row.id, newState);
+      const hideLoading = message.loading({
+        content: `正在${statusState}流程: "${row.name}"...`,
+        duration: 0,
+      });
+      try {
+        await updateModelState(row.id, newState);
+      } finally {
+        hideLoading();
+      }
       return true;
     },
     content: `确认要${statusState}流程: "${row.name}" 吗？`,
     icon: 'question',
-  }).then(async () => {
-    message.success(`${statusState} 流程: "${row.name}" 成功`);
-    // 刷新列表
-    emit('success');
   });
+  message.success(`${statusState} 流程: "${row.name}" 成功`);
+  // 刷新列表
+  emit('success');
 }
 
 /** 清理流程操作 */
-function handleClean(row: any) {
-  confirm({
+async function handleClean(row: any) {
+  await confirm({
     beforeClose: async ({ isConfirm }) => {
       if (!isConfirm) return;
       // 发起清理操作
-      await cleanModel(row.id);
+      const hideLoading = message.loading({
+        content: `正在清理流程: "${row.name}"...`,
+        duration: 0,
+      });
+      try {
+        await cleanModel(row.id);
+      } finally {
+        hideLoading();
+      }
       return true;
     },
     content: `确认要清理流程: "${row.name}" 吗？`,
     icon: 'question',
-  }).then(async () => {
-    message.success(`清理流程: "${row.name}" 成功`);
-    // 刷新列表
-    emit('success');
   });
+  message.success(`清理流程: "${row.name}" 成功`);
+  // 刷新列表
+  emit('success');
 }
 
 /** 删除流程操作 */
-function handleDelete(row: any) {
-  confirm({
+async function handleDelete(row: any) {
+  await confirm({
     beforeClose: async ({ isConfirm }) => {
       if (!isConfirm) return;
       // 发起删除操作
-      await deleteModel(row.id);
+      const hideLoading = message.loading({
+        content: $t('ui.actionMessage.deleting', [row.name]),
+        duration: 0,
+      });
+      try {
+        await deleteModel(row.id);
+      } finally {
+        hideLoading();
+      }
       return true;
     },
     content: `确认要删除流程: "${row.name}" 吗？`,
     icon: 'question',
-  }).then(async () => {
-    message.success(`删除流程: "${row.name}" 成功`);
-    // 刷新列表
-    emit('success');
   });
+
+  message.success(`删除流程: "${row.name}" 成功`);
+  // 刷新列表
+  emit('success');
 }
 
 /** 跳转到指定流程定义列表 */
@@ -401,10 +450,10 @@ watchEffect(() => {
   }
 });
 
-// 处理重命名成功
-const handleRenameSuccess = () => {
+/** 处理重命名成功 */
+function handleRenameSuccess() {
   emit('success');
-};
+}
 </script>
 
 <template>
@@ -415,12 +464,14 @@ const handleRenameSuccess = () => {
     >
       <div class="flex h-12 items-center">
         <!-- 头部：分类名 -->
-        <!-- TODO @jason：1）无法拖动排序；2）拖动后，直接请求排序，不用有个【保存】；排序模型分类，和排序分类里的模型，交互有点不同哈。 -->
+        <!-- TODO @jason：2）拖动后，直接请求排序，不用有个【保存】；排序模型分类，和排序分类里的模型，交互有点不同哈。@芋艿 好像 yudao-ui-admin-vue3 交互也是这样的，需要改吗? -->
         <div class="flex items-center">
           <Tooltip v-if="isCategorySorting" title="拖动排序">
-            <span
-              class="icon-[ic--round-drag-indicator] ml-2.5 cursor-move text-2xl text-gray-500"
-            ></span>
+            <!-- drag-handle 标识可以拖动，不能删掉 -->
+            <IconifyIcon
+              icon="ic:round-drag-indicator"
+              class="drag-handle ml-2.5 cursor-move text-2xl text-gray-500"
+            />
           </Tooltip>
           <div class="ml-4 mr-2 text-lg font-medium">
             {{ categoryInfo.name }}
@@ -497,7 +548,7 @@ const handleRenameSuccess = () => {
       <Collapse
         :active-key="expandKeys"
         :bordered="false"
-        class="bg-transparent"
+        class="collapse-no-padding bg-transparent"
       >
         <Collapse.Panel
           key="1"
@@ -510,15 +561,16 @@ const handleRenameSuccess = () => {
             :class="`category-${categoryInfo.id}`"
           >
             <template #name="{ row }">
-              <div class="flex items-center">
+              <div class="flex items-center overflow-hidden">
                 <Tooltip
                   v-if="isModelSorting"
                   title="拖动排序"
                   placement="left"
                 >
+                  <!-- drag-handle 标识用于推动排序。 useSortable 用到 -->
                   <IconifyIcon
                     icon="ic:round-drag-indicator"
-                    class="mr-2.5 cursor-move text-2xl text-gray-500"
+                    class="drag-handle mr-2.5 flex-shrink-0 cursor-move text-2xl text-gray-500"
                   />
                 </Tooltip>
                 <div
@@ -535,9 +587,11 @@ const handleRenameSuccess = () => {
                   class="mr-2.5 h-9 w-9 flex-shrink-0 rounded"
                   alt="图标"
                 />
-                <EllipsisText :max-width="160" :tooltip-when-ellipsis="true">
-                  {{ row.name }}
-                </EllipsisText>
+                <div class="min-w-0 overflow-hidden">
+                  <EllipsisText :tooltip-when-ellipsis="true">
+                    {{ row.name }}
+                  </EllipsisText>
+                </div>
               </div>
             </template>
             <template #startUserIds="{ row }">
@@ -615,7 +669,7 @@ const handleRenameSuccess = () => {
                   size="small"
                   class="px-1"
                   @click="modelOperation('update', row.id)"
-                  :disabled="!isManagerUser(row) || !hasPermiUpdate"
+                  :disabled="!isManagerUser(row) && !hasPermiUpdate"
                 >
                   修改
                 </Button>
@@ -624,7 +678,7 @@ const handleRenameSuccess = () => {
                   size="small"
                   class="px-1"
                   @click="handleDeploy(row)"
-                  :disabled="!isManagerUser(row) || !hasPermiDeploy"
+                  :disabled="!isManagerUser(row) && !hasPermiDeploy"
                 >
                   发布
                 </Button>
@@ -664,7 +718,7 @@ const handleRenameSuccess = () => {
                       <Menu.Item
                         danger
                         key="handleDelete"
-                        :disabled="!isManagerUser(row) || !hasPermiDelete"
+                        :disabled="!isManagerUser(row) && !hasPermiDelete"
                       >
                         删除
                       </Menu.Item>
@@ -685,16 +739,10 @@ const handleRenameSuccess = () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.category-draggable-model {
-  // ant-collapse-header 自定义样式
-  :deep(.ant-collapse-header) {
-    padding: 0;
-  }
-
-  // 折叠面板样式
-  :deep(.ant-collapse-content-box) {
-    padding: 0;
-  }
+<style scoped>
+/* :deep() 实现样式穿透 */
+.collapse-no-padding :deep(.ant-collapse-header),
+.collapse-no-padding :deep(.ant-collapse-content-box) {
+  padding: 0;
 }
 </style>

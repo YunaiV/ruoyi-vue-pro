@@ -264,7 +264,7 @@ function handleMouseleave() {
       theme,
       {
         'bg-sidebar-deep': isSidebarMixed,
-        'bg-sidebar border-border border-r': !isSidebarMixed,
+        'border-r border-border bg-sidebar': !isSidebarMixed,
       },
     ]"
     :style="style"
@@ -295,7 +295,7 @@ function handleMouseleave() {
         'border-l': extraVisible,
       }"
       :style="extraStyle"
-      class="border-border bg-sidebar fixed top-0 h-full overflow-hidden border-r transition-all duration-200"
+      class="fixed top-0 h-full overflow-hidden border-r border-border bg-sidebar transition-all duration-200"
     >
       <SidebarCollapseButton
         v-if="isSidebarMixed && expandOnHover"

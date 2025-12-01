@@ -1,5 +1,3 @@
-import type { PageResult } from '@vben/request';
-
 import { requestClient } from '#/api/request';
 
 export namespace MallKefuConversationApi {
@@ -20,7 +18,7 @@ export namespace MallKefuConversationApi {
   }
 
   /** 会话置顶请求 */
-  export interface ConversationPinnedUpdate {
+  export interface ConversationPinnedUpdateReqVO {
     id: number; // 会话编号
     pinned: boolean; // 是否置顶
   }
@@ -28,7 +26,7 @@ export namespace MallKefuConversationApi {
 
 /** 获得客服会话列表 */
 export function getConversationList() {
-  return requestClient.get<PageResult<MallKefuConversationApi.Conversation>>(
+  return requestClient.get<MallKefuConversationApi.Conversation[]>(
     '/promotion/kefu-conversation/list',
   );
 }
@@ -42,7 +40,7 @@ export function getConversation(id: number) {
 
 /** 客服会话置顶 */
 export function updateConversationPinned(
-  data: MallKefuConversationApi.ConversationPinnedUpdate,
+  data: MallKefuConversationApi.ConversationPinnedUpdateReqVO,
 ) {
   return requestClient.put(
     '/promotion/kefu-conversation/update-conversation-pinned',

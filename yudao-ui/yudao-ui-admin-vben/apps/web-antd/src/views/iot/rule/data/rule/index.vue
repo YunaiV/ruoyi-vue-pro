@@ -10,7 +10,9 @@ import { deleteDataRule, getDataRulePage } from '#/api/iot/rule/data/rule';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
-import DataRuleForm from './DataRuleForm.vue';
+import DataRuleForm from './data-rule-form.vue';
+
+// TODO @haohao：貌似和 apps/web-antd/src/views/iot/rule/data/index.vue 重复的。可能这个是对的。然后把 apps/web-antd/src/views/iot/rule/data/index.vue 搞成 tabs；
 
 /** IoT 数据流转规则列表 */
 defineOptions({ name: 'IotDataRule' });
@@ -43,9 +45,7 @@ async function handleDelete(row: any) {
   });
   try {
     await deleteDataRule(row.id);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();

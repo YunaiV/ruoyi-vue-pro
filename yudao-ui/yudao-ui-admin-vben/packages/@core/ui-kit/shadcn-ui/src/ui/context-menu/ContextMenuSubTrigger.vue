@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { ContextMenuSubTriggerProps } from 'radix-vue';
+import type { ContextMenuSubTriggerProps } from 'reka-ui';
 
 import { computed } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
 import { ChevronRight } from 'lucide-vue-next';
-import { ContextMenuSubTrigger, useForwardProps } from 'radix-vue';
+import { ContextMenuSubTrigger, useForwardProps } from 'reka-ui';
 
 const props = defineProps<
   ContextMenuSubTriggerProps & {
@@ -29,7 +29,7 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        'focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none',
+        'flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
         inset && 'pl-8',
         props.class,
       )

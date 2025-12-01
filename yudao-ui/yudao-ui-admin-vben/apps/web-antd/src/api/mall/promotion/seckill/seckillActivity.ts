@@ -1,7 +1,5 @@
 import type { PageParam, PageResult } from '@vben/request';
 
-import type { MallSpuApi } from '#/api/mall/product/spu';
-
 import { requestClient } from '#/api/request';
 
 export namespace MallSeckillActivityApi {
@@ -33,16 +31,6 @@ export namespace MallSeckillActivityApi {
     totalStock?: number; // 秒杀总库存
     seckillPrice?: number; // 秒杀价格
     products?: SeckillProduct[]; // 秒杀商品列表
-  }
-
-  /** 扩展 SKU 配置 */
-  export type SkuExtension = {
-    productConfig: SeckillProduct; // 秒杀商品配置
-  } & MallSpuApi.Sku;
-
-  /** 扩展 SPU 配置 */
-  export interface SpuExtension extends MallSpuApi.Spu {
-    skus: SkuExtension[]; // SKU 列表
   }
 }
 

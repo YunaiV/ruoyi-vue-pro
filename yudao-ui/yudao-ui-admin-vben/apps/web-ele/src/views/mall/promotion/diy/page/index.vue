@@ -39,7 +39,6 @@ function handleEdit(row: MallDiyPageApi.DiyPage) {
   formModalApi.setData(row).open();
 }
 
-// TODO @霖：貌似跳转不过去；
 /** 装修页面 */
 function handleDecorate(row: MallDiyPageApi.DiyPage) {
   push({ name: 'DiyPageDecorate', params: { id: row.id } });

@@ -98,8 +98,12 @@ onMounted(() => {
     </template>
 
     <Grid>
-      <template #top>
-        <ElTabs v-model="statusTab" class="-mt-11" @tab-change="handleChangeStatus">
+      <template #toolbar-actions>
+        <ElTabs
+          v-model="statusTab"
+          class="w-full"
+          @tab-change="handleChangeStatus"
+        >
           <ElTabs.TabPane
             v-for="tab in statusTabs"
             :key="tab.value"
@@ -151,8 +155,3 @@ onMounted(() => {
     </Grid>
   </Page>
 </template>
-<style scoped>
-:deep(.vxe-toolbar div) {
-  z-index: 1;
-}
-</style>

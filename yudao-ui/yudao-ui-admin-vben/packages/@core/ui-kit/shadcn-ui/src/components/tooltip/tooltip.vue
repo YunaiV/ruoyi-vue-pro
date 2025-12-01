@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TooltipContentProps } from 'radix-vue';
+import type { TooltipContentProps } from 'reka-ui';
 
 import type { StyleValue } from 'vue';
 
@@ -35,7 +35,7 @@ withDefaults(defineProps<Props>(), {
         :class="contentClass"
         :side="side"
         :style="contentStyle"
-        class="side-content text-popover-foreground bg-accent rounded-md"
+        class="side-content rounded-md bg-accent text-popover-foreground"
       >
         <slot></slot>
       </TooltipContent>

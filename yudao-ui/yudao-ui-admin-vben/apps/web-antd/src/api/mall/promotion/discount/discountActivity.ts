@@ -1,7 +1,5 @@
 import type { PageParam, PageResult } from '@vben/request';
 
-import type { MallSpuApi } from '#/api/mall/product/spu';
-
 import { requestClient } from '#/api/request';
 
 export namespace MallDiscountActivityApi {
@@ -24,16 +22,6 @@ export namespace MallDiscountActivityApi {
     startTime?: Date; // 开始时间
     endTime?: Date; // 结束时间
     products?: DiscountProduct[]; // 商品列表
-  }
-
-  /** 扩展 SKU 配置 */
-  export type SkuExtension = {
-    productConfig: DiscountProduct; // 限时折扣配置
-  } & MallSpuApi.Sku;
-
-  /** 扩展 SPU 配置 */
-  export interface SpuExtension extends MallSpuApi.Spu {
-    skus: SkuExtension[]; // SKU 列表
   }
 }
 

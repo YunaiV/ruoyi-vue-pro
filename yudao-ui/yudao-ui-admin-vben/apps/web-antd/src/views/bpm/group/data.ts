@@ -1,12 +1,21 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { SystemUserApi } from '#/api/system/user';
+
+import { h } from 'vue';
 
 import { CommonStatusEnum, DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
+import { Tag } from 'ant-design-vue';
+
 import { z } from '#/adapter/form';
 import { getSimpleUserList } from '#/api/system/user';
 import { getRangePickerDefaultProps } from '#/utils';
+
+/** 关联数据 */
+let userList: SystemUserApi.User[] = [];
+getSimpleUserList().then((data) => (userList = data));
 
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
@@ -119,7 +128,21 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'userIds',
       title: '成员',
       minWidth: 200,
-      slots: { default: 'userIds' },
+      slots: {
+        default: ({ row }) => {
+          const userIds = row.userIds || [];
+          return userIds.map((userId: number) =>
+            h(
+              Tag,
+              {
+                color: 'blue',
+                class: 'mr-1',
+              },
+              () => userList.find((u) => u.id === userId)?.nickname,
+            ),
+          );
+        },
+      },
     },
     {
       field: 'status',

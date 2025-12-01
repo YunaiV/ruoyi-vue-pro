@@ -16,7 +16,7 @@ export function useImagesUpload() {
       },
     },
     setup() {
-      // TODO: @dhb52 其实还是靠 props 默认参数起作用，没能从 formCreate 传递
+      // TODO: @puhui999：@dhb52 其实还是靠 props 默认参数起作用，没能从 formCreate 传递
       return (props: { maxNumber?: number; multiple?: boolean }) => (
         <ImageUpload maxNumber={props.maxNumber} multiple={props.multiple} />
       );

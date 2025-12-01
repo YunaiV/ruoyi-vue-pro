@@ -167,7 +167,9 @@ async function submit(channelCode: string) {
 
     // 打开轮询任务
     createQueryInterval();
-  } finally {}
+  } finally {
+    //
+  }
 }
 
 /** 构建提交支付的额外参数 */

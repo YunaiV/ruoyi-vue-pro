@@ -7,80 +7,52 @@ import { requestClient } from '#/api/request';
 export namespace MallPointActivityApi {
   /** 积分商城商品 */
   export interface PointProduct {
-    /** 积分商城商品编号 */
-    id?: number;
-    /** 积分商城活动 id */
-    activityId?: number;
-    /** 商品 SPU 编号 */
-    spuId?: number;
-    /** 商品 SKU 编号 */
-    skuId: number;
-    /** 可兑换数量 */
-    count: number;
-    /** 兑换积分 */
-    point: number;
-    /** 兑换金额，单位：分 */
-    price: number;
-    /** 积分商城商品库存 */
-    stock: number;
-    /** 积分商城商品状态 */
-    activityStatus?: number;
+    id?: number; // 积分商城商品编号
+    activityId?: number; // 积分商城活动 id
+    spuId?: number; // 商品 SPU 编号
+    skuId: number; // 商品 SKU 编号
+    count: number; // 可兑换数量
+    point: number; // 兑换积分
+    price: number; // 兑换金额，单位：分
+    stock: number; // 积分商城商品库存
+    activityStatus?: number; // 积分商城商品状态
   }
 
   /** 积分商城活动 */
   export interface PointActivity {
-    /** 积分商城活动编号 */
-    id: number;
-    /** 积分商城活动商品 */
-    spuId: number;
-    /** 活动状态 */
-    status: number;
-    /** 积分商城活动库存 */
-    stock: number;
-    /** 积分商城活动总库存 */
-    totalStock: number;
-    /** 备注 */
-    remark?: string;
-    /** 排序 */
-    sort: number;
-    /** 创建时间 */
-    createTime: string;
-    /** 积分商城商品 */
-    products: PointProduct[];
-    /** 商品名称 */
-    spuName: string;
-    /** 商品主图 */
-    picUrl: string;
-    /** 商品市场价，单位：分 */
-    marketPrice: number;
-    /** 兑换积分 */
-    point: number;
-    /** 兑换金额，单位：分 */
-    price: number;
+    id: number; // 积分商城活动编号
+    spuId: number; // 积分商城活动商品
+    status: number; // 活动状态
+    stock: number; // 积分商城活动库存
+    totalStock: number; // 积分商城活动总库存
+    remark?: string; // 备注
+    sort: number; // 排序
+    createTime: string; // 创建时间
+    products: PointProduct[]; // 积分商城商品
+    spuName: string; // 商品名称
+    picUrl: string; // 商品主图
+    marketPrice: number; // 商品市场价，单位：分
+    point: number; // 兑换积分
+    price: number; // 兑换金额，单位：分
   }
 
+  // TODO @puhui999：这些还需要么？
   /** 扩展 SKU 配置 */
   export type SkuExtension = {
-    /** 积分商城商品配置 */
-    productConfig: PointProduct;
+    productConfig: PointProduct; // 积分商城商品配置
   } & MallSpuApi.Sku;
 
   /** 扩展 SPU 配置 */
   export interface SpuExtension extends MallSpuApi.Spu {
-    /** SKU 列表 */
-    skus: SkuExtension[];
+    skus: SkuExtension[]; // SKU 列表
   }
 
   /** 扩展 SPU 配置（带积分信息） */
   export interface SpuExtensionWithPoint extends MallSpuApi.Spu {
-    /** 积分商城活动库存 */
-    pointStock: number;
-    /** 积分商城活动总库存 */
-    pointTotalStock: number;
-    /** 兑换积分 */
-    point: number;
-    /** 兑换金额，单位：分 */
-    pointPrice: number;
+    pointStock: number; // 积分商城活动库存
+    pointTotalStock: number; // 积分商城活动总库存
+    point: number; // 兑换积分
+    pointPrice: number; // 兑换金额，单位：分
   }
 }
 

@@ -1,0 +1,42 @@
+# https://github.com/changesets/action
+name: Changeset version
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  pull-requests: write
+  contents: write
+
+env:
+  CI: true
+
+jobs:
+  version:
+    if: (github.event.pull_request.merged || github.event_name == 'workflow_dispatch') && github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, '[skip ci]') && github.repository == 'vbenjs/vue-vben-admin'
+    # if: github.repository == 'vbenjs/vue-vben-admin'
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        with:
+          version: pnpm run version
+          commit: 'chore: bump versions'
+          title: 'chore: bump versions'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

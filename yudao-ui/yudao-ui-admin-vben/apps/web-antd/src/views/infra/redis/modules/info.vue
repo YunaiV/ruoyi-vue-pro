@@ -1,60 +1,74 @@
 <script lang="ts" setup>
 import type { InfraRedisApi } from '#/api/infra/redis';
 
-import { Descriptions } from 'ant-design-vue';
+import { useDescription } from '#/components/description';
 
 defineProps<{
   redisData?: InfraRedisApi.RedisMonitorInfo;
 }>();
+
+const [Descriptions] = useDescription({
+  bordered: false,
+  column: 6,
+  class: 'mx-4',
+  schema: [
+    {
+      field: 'info.redis_version',
+      label: 'Redis 版本',
+    },
+    {
+      field: 'info.redis_mode',
+      label: '运行模式',
+      render: (val) => (val === 'standalone' ? '单机' : '集群'),
+    },
+    {
+      field: 'info.tcp_port',
+      label: '端口',
+    },
+    {
+      field: 'info.connected_clients',
+      label: '客户端数',
+    },
+    {
+      field: 'info.uptime_in_days',
+      label: '运行时间(天)',
+    },
+    {
+      field: 'info.used_memory_human',
+      label: '使用内存',
+    },
+    {
+      field: 'info.used_cpu_user_children',
+      label: '使用 CPU',
+      render: (val) => Number.parseFloat(val).toFixed(2),
+    },
+    {
+      field: 'info.maxmemory_human',
+      label: '内存配置',
+    },
+    {
+      field: 'info.aof_enabled',
+      label: 'AOF 是否开启',
+      render: (val) => (val === '0' ? '否' : '是'),
+    },
+    {
+      field: 'info.rdb_last_bgsave_status',
+      label: 'RDB 是否成功',
+    },
+    {
+      field: 'dbSize',
+      label: 'Key 数量',
+    },
+    {
+      field: 'info.instantaneous_input_kbps',
+      label: '网络入口/出口',
+      render: (val, data) =>
+        `${val}kps / ${data?.info?.instantaneous_output_kbps}kps`,
+    },
+  ],
+});
 </script>
 
 <template>
-  <Descriptions
-    :column="6"
-    bordered
-    size="middle"
-    :label-style="{ width: '138px' }"
-  >
-    <Descriptions.Item label="Redis 版本">
-      {{ redisData?.info?.redis_version }}
-    </Descriptions.Item>
-    <Descriptions.Item label="运行模式">
-      {{ redisData?.info?.redis_mode === 'standalone' ? '单机' : '集群' }}
-    </Descriptions.Item>
-    <Descriptions.Item label="端口">
-      {{ redisData?.info?.tcp_port }}
-    </Descriptions.Item>
-    <Descriptions.Item label="客户端数">
-      {{ redisData?.info?.connected_clients }}
-    </Descriptions.Item>
-    <Descriptions.Item label="运行时间(天)">
-      {{ redisData?.info?.uptime_in_days }}
-    </Descriptions.Item>
-    <Descriptions.Item label="使用内存">
-      {{ redisData?.info?.used_memory_human }}
-    </Descriptions.Item>
-    <Descriptions.Item label="使用 CPU">
-      {{
-        redisData?.info
-          ? parseFloat(redisData?.info?.used_cpu_user_children).toFixed(2)
-          : ''
-      }}
-    </Descriptions.Item>
-    <Descriptions.Item label="内存配置">
-      {{ redisData?.info?.maxmemory_human }}
-    </Descriptions.Item>
-    <Descriptions.Item label="AOF 是否开启">
-      {{ redisData?.info?.aof_enabled === '0' ? '否' : '是' }}
-    </Descriptions.Item>
-    <Descriptions.Item label="RDB 是否成功">
-      {{ redisData?.info?.rdb_last_bgsave_status }}
-    </Descriptions.Item>
-    <Descriptions.Item label="Key 数量">
-      {{ redisData?.dbSize }}
-    </Descriptions.Item>
-    <Descriptions.Item label="网络入口/出口">
-      {{ redisData?.info?.instantaneous_input_kbps }}kps /
-      {{ redisData?.info?.instantaneous_output_kbps }}kps
-    </Descriptions.Item>
-  </Descriptions>
+  <Descriptions :data="redisData" />
 </template>

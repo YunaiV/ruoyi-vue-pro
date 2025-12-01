@@ -12,20 +12,12 @@ import songInfo from './songInfo/index.vue';
 defineOptions({ name: 'AiMusicListIndex' });
 
 const currentType = ref('mine');
-// loading 状态
-const loading = ref(false);
-// 当前音乐
-const currentSong = ref({});
-
+const loading = ref(false); // loading 状态
+const currentSong = ref({}); // 当前音乐
 const mySongList = ref<Recordable<any>[]>([]);
 const squareSongList = ref<Recordable<any>[]>([]);
 
-/*
- *@Description: 调接口生成音乐列表
- *@MethodAuthor: xiaohong
- *@Date: 2024-06-27 17:06:44
- */
-function generateMusic(formData: Recordable<any>) {
+function generateMusic(_formData: Recordable<any>) {
   loading.value = true;
   setTimeout(() => {
     mySongList.value = Array.from({ length: 20 }, (_, index) => {
@@ -53,11 +45,6 @@ function generateMusic(formData: Recordable<any>) {
   }, 3000);
 }
 
-/*
- *@Description: 设置当前播放的音乐
- *@MethodAuthor: xiaohong
- *@Date: 2024-07-19 11:22:33
- */
 function setCurrentSong(music: Recordable<any>) {
   currentSong.value = music;
 }

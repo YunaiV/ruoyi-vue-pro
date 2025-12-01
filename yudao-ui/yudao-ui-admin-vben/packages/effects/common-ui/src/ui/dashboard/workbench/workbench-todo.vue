@@ -39,7 +39,7 @@ withDefaults(defineProps<Props>(), {
           class="flex cursor-pointer justify-between gap-x-6 py-5"
         >
           <div class="flex min-w-0 items-center gap-x-4">
-            <VbenCheckbox v-model:checked="item.completed" name="completed" />
+            <VbenCheckbox v-model="item.completed" name="completed" />
             <div class="min-w-0 flex-auto">
               <p class="text-foreground text-sm font-semibold leading-6">
                 {{ item.title }}

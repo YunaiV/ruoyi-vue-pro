@@ -24,14 +24,15 @@ const formData = ref<ErpPurchaseOrderApi.PurchaseOrder>();
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof PurchaseOrderItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['采购订单'])
-    : formType.value === 'update'
-      ? $t('ui.actionTitle.edit', ['采购订单'])
-      : '采购订单详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['采购订单']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['采购订单']);
+  } else {
+    return '采购订单详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -53,27 +54,27 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新采购订单项 */
-const handleUpdateItems = (items: ErpPurchaseOrderApi.PurchaseOrderItem[]) => {
+function handleUpdateItems(items: ErpPurchaseOrderApi.PurchaseOrderItem[]) {
   formData.value = modalApi.getData<ErpPurchaseOrderApi.PurchaseOrder>();
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 更新优惠金额 */
-const handleUpdateDiscountPrice = (discountPrice: number) => {
+function handleUpdateDiscountPrice(discountPrice: number) {
   formApi.setValues({
     discountPrice,
   });
-};
+}
 
 /** 更新总金额 */
-const handleUpdateTotalPrice = (totalPrice: number) => {
+function handleUpdateTotalPrice(totalPrice: number) {
   formApi.setValues({
     totalPrice,
   });
-};
+}
 
 /** 创建或更新采购订单 */
 const [Modal, modalApi] = useVbenModal({

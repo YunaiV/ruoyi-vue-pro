@@ -3,14 +3,6 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace CrmBusinessStatusApi {
-  /** 商机状态信息 */
-  export interface BusinessStatusType {
-    [x: string]: any;
-    id?: number;
-    name: string;
-    percent: number;
-  }
-
   /** 商机状态组信息 */
   export interface BusinessStatus {
     id?: number;
@@ -20,6 +12,14 @@ export namespace CrmBusinessStatusApi {
     creator?: string;
     createTime?: Date;
     statuses?: BusinessStatusType[];
+  }
+
+  /** 商机状态信息 */
+  export interface BusinessStatusType {
+    id?: number;
+    name: string;
+    percent: number;
+    [x: string]: any;
   }
 }
 

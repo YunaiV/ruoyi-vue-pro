@@ -24,8 +24,8 @@ const props = withDefaults(defineProps<DictSelectProps>(), {
 
 const attrs = useAttrs();
 
-// 获得字典配置
-const dictOptions = computed(() => {
+/** 获得字典配置 */
+const getDictOption = computed(() => {
   switch (props.valueType) {
     case 'bool': {
       return getDictOptions(props.dictType, 'boolean');
@@ -46,7 +46,7 @@ const dictOptions = computed(() => {
 <template>
   <ElSelect v-if="selectType === 'select'" class="w-1/1" v-bind="attrs">
     <ElOption
-      v-for="(dict, index) in dictOptions"
+      v-for="(dict, index) in getDictOption"
       :key="index"
       :value="dict.value"
       :label="dict.label"
@@ -54,7 +54,7 @@ const dictOptions = computed(() => {
   </ElSelect>
   <ElRadioGroup v-if="selectType === 'radio'" class="w-1/1" v-bind="attrs">
     <ElRadio
-      v-for="(dict, index) in dictOptions"
+      v-for="(dict, index) in getDictOption"
       :key="index"
       :label="dict.value"
     >
@@ -67,7 +67,7 @@ const dictOptions = computed(() => {
     v-bind="attrs"
   >
     <ElCheckbox
-      v-for="(dict, index) in dictOptions"
+      v-for="(dict, index) in getDictOption"
       :key="index"
       :label="dict.value"
     >

@@ -113,7 +113,7 @@ async function handleCreateContactBusinessList(businessIds: number[]) {
   const data = {
     contactId: props.bizId,
     businessIds,
-  } as CrmContactApi.ContactBusinessReq;
+  } as CrmContactApi.ContactBusinessReqVO;
   await createContactBusinessList(data);
   handleRefresh();
 }

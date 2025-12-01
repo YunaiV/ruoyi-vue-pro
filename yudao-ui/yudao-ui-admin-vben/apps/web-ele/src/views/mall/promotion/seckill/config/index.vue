@@ -64,14 +64,10 @@ async function handleStatusChange(
     })
       .then(async () => {
         // 更新状态
-        const res = await updateSeckillConfigStatus(row.id, newStatus);
-        if (res) {
-          // 提示并返回成功
-          ElMessage.success(`${text}成功`);
-          resolve(true);
-        } else {
-          reject(new Error('操作失败'));
-        }
+        await updateSeckillConfigStatus(row.id, newStatus);
+        // 提示并返回成功
+        ElMessage.success(`${text}成功`);
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));

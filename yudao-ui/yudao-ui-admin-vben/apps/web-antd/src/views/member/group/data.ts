@@ -21,6 +21,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '分组名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入分组名称',
+      },
       rules: 'required',
     },
     {

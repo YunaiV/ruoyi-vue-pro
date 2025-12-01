@@ -1,14 +1,8 @@
 import type { PageParam, PageResult } from '@vben/request';
 
-import { requestClient } from '#/api/request';
+import { MaterialType } from '@vben/constants';
 
-/** 素材类型枚举 */
-export enum MaterialType {
-  IMAGE = 1, // 图片
-  THUMB = 4, // 缩略图
-  VIDEO = 3, // 视频
-  VOICE = 2, // 语音
-}
+import { requestClient } from '#/api/request';
 
 export namespace MpMaterialApi {
   /** 素材信息 */

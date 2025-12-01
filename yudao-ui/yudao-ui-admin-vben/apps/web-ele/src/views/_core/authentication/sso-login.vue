@@ -11,7 +11,7 @@ import { authorize, getAuthorize } from '#/api/system/oauth2/open';
 
 defineOptions({ name: 'SSOLogin' });
 
-const { query } = useRoute(); // 路由参数
+const { query } = useRoute();
 
 const client = ref({
   name: '',

@@ -1,11 +1,13 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { AiKnowledgeDocumentApi } from '#/api/ai/knowledge/document';
 
 import { AiModelTypeEnum, CommonStatusEnum, DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
 import { z } from '#/adapter/form';
 import { getModelSimpleList } from '#/api/ai/model/model';
+
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -51,7 +53,6 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         placeholder: '请输入检索 topK',
-        class: 'w-full',
         min: 0,
         max: 10,
       },
@@ -63,7 +64,6 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         placeholder: '请输入检索相似度阈值',
-        class: 'w-full',
         min: 0,
         max: 1,
         step: 0.01,
@@ -92,12 +92,17 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '文件名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入文件名称',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'status',
       label: '是否启用',
       component: 'Select',
       componentProps: {
+        placeholder: '请选择是否启用',
         allowClear: true,
         options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
       },
@@ -106,45 +111,66 @@ export function useGridFormSchema(): VbenFormSchema[] {
 }
 
 /** 列表的字段 */
-export function useGridColumns(): VxeTableGridOptions['columns'] {
+export function useGridColumns(
+  onStatusChange?: (
+    newStatus: number,
+    row: AiKnowledgeDocumentApi.KnowledgeDocument,
+  ) => PromiseLike<boolean | undefined>,
+): VxeTableGridOptions['columns'] {
   return [
     {
       field: 'id',
       title: '文档编号',
+      minWidth: 100,
     },
     {
       field: 'name',
       title: '文件名称',
+      minWidth: 200,
     },
     {
       field: 'contentLength',
       title: '字符数',
+      minWidth: 100,
     },
     {
       field: 'tokens',
       title: 'Token 数',
+      minWidth: 100,
     },
     {
       field: 'segmentMaxTokens',
       title: '分片最大 Token 数',
+      minWidth: 150,
     },
     {
       field: 'retrievalCount',
       title: '召回次数',
+      minWidth: 100,
     },
     {
       field: 'status',
       title: '是否启用',
-      slots: { default: 'status' },
+      minWidth: 100,
+      align: 'center',
+      cellRender: {
+        attrs: { beforeChange: onStatusChange },
+        name: 'CellSwitch',
+        props: {
+          checkedValue: CommonStatusEnum.ENABLE,
+          unCheckedValue: CommonStatusEnum.DISABLE,
+        },
+      },
     },
     {
       field: 'createTime',
       title: '上传时间',
+      minWidth: 180,
       formatter: 'formatDateTime',
     },
     {
       title: '操作',
-      width: 150,
+      minWidth: 150,
       fixed: 'right',
       slots: { default: 'actions' },
     },

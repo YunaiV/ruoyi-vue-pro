@@ -19,7 +19,7 @@ defineProps<{ triggerClass?: string }>();
         <CircleHelp
           :class="
             cn(
-              'text-foreground/80 hover:text-foreground inline-flex size-5 cursor-pointer',
+              'inline-flex size-5 cursor-pointer text-foreground/80 hover:text-foreground',
               triggerClass,
             )
           "

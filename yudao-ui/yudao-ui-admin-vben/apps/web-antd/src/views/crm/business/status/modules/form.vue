@@ -105,7 +105,7 @@ const [Modal, modalApi] = useVbenModal({
 
 /** 添加状态 */
 async function handleAddStatus() {
-  formData.value!.statuses!.unshift({
+  formData.value!.statuses!.splice(-3, 0, {
     name: '',
     percent: undefined,
   } as any);

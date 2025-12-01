@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<DictSelectProps>(), {
 
 const attrs = useAttrs();
 
-// 获得字典配置
+/** 获得字典配置 */
 const getDictOption = computed(() => {
   switch (props.valueType) {
     case 'bool': {

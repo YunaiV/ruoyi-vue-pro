@@ -34,7 +34,7 @@ function handleItemClick(value: string) {
                 ? 'bg-accent text-accent-foreground'
                 : ''
             "
-            class="data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground text-foreground/80 mb-1 cursor-pointer"
+            class="mb-1 cursor-pointer text-foreground/80 data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"
             @click="handleItemClick(menu.value)"
           >
             <component :is="menu.icon" v-if="menu.icon" class="mr-2 size-4" />

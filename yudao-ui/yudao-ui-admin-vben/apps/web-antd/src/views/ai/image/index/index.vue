@@ -11,11 +11,11 @@ import { Segmented } from 'ant-design-vue';
 
 import { getModelSimpleList } from '#/api/ai/model/model';
 
-import Common from './components/common/index.vue';
-import Dall3 from './components/dall3/index.vue';
-import ImageList from './components/ImageList.vue';
-import Midjourney from './components/midjourney/index.vue';
-import StableDiffusion from './components/stableDiffusion/index.vue';
+import Common from './modules/common/index.vue';
+import Dall3 from './modules/dall3/index.vue';
+import ImageList from './modules/list.vue';
+import Midjourney from './modules/midjourney/index.vue';
+import StableDiffusion from './modules/stable-diffusion/index.vue';
 
 const imageListRef = ref<any>(); // image 列表 ref
 const dall3Ref = ref<any>(); // dall3(openai) ref
@@ -23,7 +23,6 @@ const midjourneyRef = ref<any>(); // midjourney ref
 const stableDiffusionRef = ref<any>(); // stable diffusion ref
 const commonRef = ref<any>(); // stable diffusion ref
 
-// 定义属性
 const selectPlatform = ref('common'); // 选中的平台
 const platformOptions = [
   {
@@ -43,19 +42,18 @@ const platformOptions = [
     value: AiPlatformEnum.STABLE_DIFFUSION,
   },
 ];
-
 const models = ref<AiModelModelApi.Model[]>([]); // 模型列表
 
 /** 绘画 start  */
-const handleDrawStart = async () => {};
+async function handleDrawStart() {}
 
 /** 绘画 complete */
-const handleDrawComplete = async () => {
+async function handleDrawComplete() {
   await imageListRef.value.getImageList();
-};
+}
 
 /** 重新生成：将画图详情填充到对应平台 */
-const handleRegeneration = async (image: AiImageApi.Image) => {
+async function handleRegeneration(image: AiImageApi.Image) {
   // 切换平台
   selectPlatform.value = image.platform;
   // 根据不同平台填充 image
@@ -79,7 +77,7 @@ const handleRegeneration = async (image: AiImageApi.Image) => {
     // No default
   }
   // TODO @fan：貌似 other 重新设置不行？
-};
+}
 
 /** 组件挂载的时候 */
 onMounted(async () => {
@@ -91,7 +89,7 @@ onMounted(async () => {
 <template>
   <Page auto-content-height>
     <div class="absolute inset-0 m-4 flex h-full w-full flex-row">
-      <div class="bg-card left-0 mr-4 flex w-96 flex-col rounded-lg p-4">
+      <div class="left-0 mr-4 flex w-96 flex-col rounded-lg bg-card p-4">
         <div class="flex justify-center">
           <Segmented
             v-model:value="selectPlatform"
@@ -125,7 +123,7 @@ onMounted(async () => {
           />
         </div>
       </div>
-      <div class="bg-card flex-1">
+      <div class="flex-1 bg-card">
         <ImageList ref="imageListRef" @on-regeneration="handleRegeneration" />
       </div>
     </div>

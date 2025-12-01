@@ -1,79 +1,169 @@
 <script lang="tsx">
-import type { DescriptionProps } from 'element-plus';
+import type { CSSProperties, PropType, Slots } from 'vue';
 
-import type { PropType } from 'vue';
+import type { DescriptionItemSchema, DescriptionProps } from './typing';
 
-import type { DescriptionItemSchema, DescriptionsOptions } from './typing';
+import { computed, defineComponent, ref, unref, useAttrs } from 'vue';
 
-import { defineComponent } from 'vue';
-
-import { get } from '@vben/utils';
+import { get, getNestedValue, isFunction } from '@vben/utils';
 
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus';
 
-/** 对 Descriptions 进行二次封装 */
-const Description = defineComponent({
-  name: 'Descriptions',
-  props: {
-    data: {
-      type: Object as PropType<Record<string, any>>,
-      default: () => ({}),
+const props = {
+  border: { default: true, type: Boolean },
+  column: {
+    default: () => {
+      return { lg: 3, md: 3, sm: 2, xl: 3, xs: 1, xxl: 4 };
     },
-    schema: {
-      type: Array as PropType<DescriptionItemSchema[]>,
-      default: () => [],
-    },
-    // Descriptions 原生 props
-    componentProps: {
-      type: Object as PropType<DescriptionProps>,
-      default: () => ({}),
-    },
+    type: [Number, Object],
   },
+  data: { type: Object },
+  schema: {
+    default: () => [],
+    type: Array as PropType<DescriptionItemSchema[]>,
+  },
+  size: {
+    default: 'default',
+    type: String,
+    validator: (v: string) =>
+      ['default', 'middle', 'small', undefined].includes(v),
+  },
+  title: { default: '', type: String },
+  direction: { default: 'horizontal', type: String },
+};
 
-  setup(props: DescriptionsOptions) {
-    // TODO @puhui999：每个 field 的 slot 的考虑
-    // TODO @puhui999：from 5.0：extra: () => getSlot(slots, 'extra')
-    /** 过滤掉不需要展示的 */
-    const shouldShowItem = (item: DescriptionItemSchema) => {
-      if (item.hidden === undefined) return true;
-      return typeof item.hidden === 'function'
-        ? !item.hidden(props.data)
-        : !item.hidden;
-    };
-    /** 渲染内容 */
-    const renderContent = (item: DescriptionItemSchema) => {
-      if (item.content) {
-        return typeof item.content === 'function'
-          ? item.content(props.data)
-          : item.content;
+function getSlot(slots: Slots, slot: string, data?: any) {
+  if (!slots || !Reflect.has(slots, slot)) {
+    return null;
+  }
+  if (!isFunction(slots[slot])) {
+    console.error(`${slot} is not a function!`);
+    return null;
+  }
+  const slotFn = slots[slot];
+  if (!slotFn) return null;
+  return slotFn({ data });
+}
+
+export default defineComponent({
+  name: 'Description',
+  props,
+  setup(props, { slots }) {
+    const propsRef = ref<null | Partial<DescriptionProps>>(null);
+
+    const prefixCls = 'description';
+    const attrs = useAttrs();
+
+    const getMergeProps = computed(() => {
+      return {
+        ...props,
+        ...(unref(propsRef) as any),
+      } as DescriptionProps;
+    });
+
+    const getProps = computed(() => {
+      const opt = {
+        ...unref(getMergeProps),
+      };
+      return opt as DescriptionProps;
+    });
+
+    const getDescriptionsProps = computed(() => {
+      return { ...unref(attrs), ...unref(getProps) } as DescriptionProps;
+    });
+
+    // 防止换行
+    function renderLabel({
+      label,
+      labelMinWidth,
+      labelStyle,
+    }: DescriptionItemSchema) {
+      if (!labelStyle && !labelMinWidth) {
+        return label;
       }
-      return item.field ? get(props.data, item.field) : null;
-    };
 
-    return () => (
-      <ElDescriptions
-        {...props}
-        border={props.componentProps?.border}
-        column={props.componentProps?.column}
-        direction={props.componentProps?.direction}
-        extra={props.componentProps?.extra}
-        size={props.componentProps?.size}
-        title={props.componentProps?.title}
-      >
-        {props.schema?.filter(shouldShowItem).map((item) => (
-          <ElDescriptionsItem
-            key={item.field || String(item.label)}
-            label={item.label as string}
-            span={item.span}
-          >
-            {renderContent(item)}
-          </ElDescriptionsItem>
-        ))}
-      </ElDescriptions>
-    );
+      const labelStyles: CSSProperties = {
+        ...labelStyle,
+        minWidth: `${labelMinWidth}px `,
+      };
+      return <div style={labelStyles}>{label}</div>;
+    }
+
+    function renderItem() {
+      const { data, schema } = unref(getProps);
+      return unref(schema)
+        .map((item) => {
+          const { contentMinWidth, field, render, show, span } = item;
+
+          if (show && isFunction(show) && !show(data)) {
+            return null;
+          }
+
+          function getContent() {
+            const _data = unref(getProps)?.data;
+            if (!_data) {
+              return null;
+            }
+            const getField = field.includes('.')
+              ? (getNestedValue(_data, field) ?? get(_data, field))
+              : get(_data, field);
+            // if (
+            //   getField &&
+            //   !Object.prototype.hasOwnProperty.call(toRefs(_data), field)
+            // ) {
+            //   return isFunction(render) ? render('', _data) : (getField ?? '');
+            // }
+            return isFunction(render)
+              ? render(getField, _data)
+              : (getField ?? '');
+          }
+
+          const width = contentMinWidth;
+          return (
+            <ElDescriptionsItem key={field} span={span}>
+              {{
+                label: () => {
+                  return renderLabel(item);
+                },
+                default: () => {
+                  if (item.slot) {
+                    return getSlot(slots, item.slot, data);
+                  }
+                  if (!contentMinWidth) {
+                    return getContent();
+                  }
+                  const style: CSSProperties = {
+                    minWidth: `${width}px`,
+                  };
+                  return <div style={style}>{getContent()}</div>;
+                },
+              }}
+            </ElDescriptionsItem>
+          );
+        })
+        .filter((item) => !!item);
+    }
+
+    function renderDesc() {
+      const extraSlot = getSlot(slots, 'extra');
+      const slotsObj: any = {
+        default: () => renderItem(),
+      };
+      if (extraSlot) {
+        slotsObj.extra = () => extraSlot;
+      }
+      return (
+        <ElDescriptions
+          class={`${prefixCls}`}
+          title={unref(getMergeProps).title}
+          {...(unref(getDescriptionsProps) as any)}
+        >
+          {slotsObj}
+        </ElDescriptions>
+      );
+    }
+
+    return () => renderDesc();
   },
 });
-
-// TODO @puhui999：from 5.0：emits: ['register'] 事件
-export default Description;
 </script>

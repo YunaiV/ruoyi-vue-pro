@@ -9,7 +9,6 @@ import { z } from '#/adapter/form';
 import { getTenantPackageList } from '#/api/system/tenant-package';
 import { getRangePickerDefaultProps } from '#/utils';
 
-// TODO @xingyu：这个不用 ref 么？
 let tenantPackageList: SystemTenantPackageApi.TenantPackage[] = [];
 
 async function getTenantPackageData() {
@@ -40,7 +39,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '租户套餐',
       component: 'ApiSelect',
       componentProps: {
-        api: () => getTenantPackageList(),
+        api: getTenantPackageList,
         labelField: 'name',
         valueField: 'id',
         placeholder: '请选择租户套餐',

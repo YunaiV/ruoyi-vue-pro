@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { PayOrderApi } from '#/api/pay/order';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -184,53 +183,46 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'status',
       label: '支付状态',
-      content: (data: any) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_ORDER_STATUS,
-          value: data?.status,
+          value: val,
         }),
     },
     {
       field: 'price',
       label: '支付金额',
-      content: (data: PayOrderApi.Order) =>
-        `￥${erpPriceInputFormatter(data?.price)}`,
+      render: (val) => `￥${erpPriceInputFormatter(val)}`,
     },
     {
       field: 'channelFeePrice',
       label: '手续费',
-      content: (data: PayOrderApi.Order) =>
-        `￥${erpPriceInputFormatter(data?.channelFeePrice)}`,
+      render: (val) => `￥${erpPriceInputFormatter(val)}`,
     },
     {
       field: 'channelFeeRate',
       label: '手续费比例',
-      content: (data: PayOrderApi.Order) =>
-        `${erpPriceInputFormatter(data?.channelFeeRate)}%`,
+      render: (val) => `${erpPriceInputFormatter(val)}%`,
     },
     {
       field: 'successTime',
       label: '支付时间',
-      content: (data: PayOrderApi.Order) =>
-        formatDateTime(data?.successTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'expireTime',
       label: '失效时间',
-      content: (data: PayOrderApi.Order) =>
-        formatDateTime(data?.expireTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'createTime',
       label: '创建时间',
-      content: (data: PayOrderApi.Order) =>
-        formatDateTime(data?.createTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'updateTime',
       label: '更新时间',
-      content: (data: PayOrderApi.Order) =>
-        formatDateTime(data?.updateTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'subject',
@@ -243,10 +235,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'channelCode',
       label: '支付渠道',
-      content: (data: PayOrderApi.Order) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_CHANNEL_CODE,
-          value: data?.channelCode,
+          value: val,
         }),
     },
     {
@@ -256,10 +248,7 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'channelOrderNo',
       label: '渠道单号',
-      content: (data: PayOrderApi.Order) =>
-        data?.channelOrderNo
-          ? h(Tag, { color: 'green' }, () => data.channelOrderNo)
-          : '',
+      render: (val) => (val ? h(Tag, { color: 'green' }, () => val) : ''),
     },
     {
       field: 'channelUserId',
@@ -268,8 +257,7 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'refundPrice',
       label: '退款金额',
-      content: (data: PayOrderApi.Order) =>
-        `￥${erpPriceInputFormatter(data?.refundPrice)}`,
+      render: (val) => `￥${erpPriceInputFormatter(val)}`,
     },
     {
       field: 'notifyUrl',

@@ -10,9 +10,11 @@ import { deleteDataSink, getDataSinkPage } from '#/api/iot/rule/data/sink';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
-import DataSinkForm from './DataSinkForm.vue';
+import DataSinkForm from './data-sink-form.vue';
 
-/** IoT 数据流转目的 列表 */
+// TODO @haohao：需要根据代码规范，在优化下这个模块。和别的模块的风格保持一致。
+
+/** IoT 数据流转目的列表 */
 defineOptions({ name: 'IotDataSink' });
 
 const [FormModal, formModalApi] = useVbenModal({
@@ -43,9 +45,7 @@ async function handleDelete(row: any) {
   });
   try {
     await deleteDataSink(row.id);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();

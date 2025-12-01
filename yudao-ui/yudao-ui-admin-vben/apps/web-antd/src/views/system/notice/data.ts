@@ -21,6 +21,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'title',
       label: '公告标题',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入公告标题',
+      },
       rules: 'required',
     },
     {

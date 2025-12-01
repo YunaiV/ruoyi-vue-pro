@@ -97,7 +97,10 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'createTime',
       label: '创建时间',
       component: 'RangePicker',
-      componentProps: getRangePickerDefaultProps(),
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        allowClear: true,
+      },
     },
   ];
 }

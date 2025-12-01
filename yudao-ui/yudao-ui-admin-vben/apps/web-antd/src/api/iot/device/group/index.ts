@@ -3,7 +3,7 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace IotDeviceGroupApi {
-  /** IoT 设备分组 VO */
+  /** 设备分组 */
   export interface DeviceGroup {
     id?: number; // 分组 ID
     name: string; // 分组名字

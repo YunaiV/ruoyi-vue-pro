@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { PayRefundApi } from '#/api/pay/refund';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -173,26 +172,22 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'merchantRefundId',
       label: '商户退款单号',
-      content: (data: PayRefundApi.Refund) =>
-        h(Tag, {}, () => data?.merchantRefundId || '-'),
+      render: (val) => h(Tag, {}, () => val || '-'),
     },
     {
       field: 'channelRefundNo',
       label: '渠道退款单号',
-      content: (data: PayRefundApi.Refund) =>
-        h(Tag, { color: 'success' }, () => data?.channelRefundNo || '-'),
+      render: (val) => h(Tag, { color: 'success' }, () => val || '-'),
     },
     {
       field: 'merchantOrderId',
       label: '商户支付单号',
-      content: (data: PayRefundApi.Refund) =>
-        h(Tag, {}, () => data?.merchantOrderId || '-'),
+      render: (val) => h(Tag, {}, () => val || '-'),
     },
     {
       field: 'channelOrderNo',
       label: '渠道支付单号',
-      content: (data: PayRefundApi.Refund) =>
-        h(Tag, { color: 'success' }, () => data?.channelOrderNo || '-'),
+      render: (val) => h(Tag, { color: 'success' }, () => val || '-'),
     },
     {
       field: 'appId',
@@ -205,58 +200,55 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'payPrice',
       label: '支付金额',
-      content: (data: PayRefundApi.Refund) =>
+      render: (val) =>
         h(
           Tag,
           { color: 'success' },
-          () => `￥${erpPriceInputFormatter(data?.payPrice || 0)}`,
+          () => `￥${erpPriceInputFormatter(val || 0)}`,
         ),
     },
     {
       field: 'refundPrice',
       label: '退款金额',
-      content: (data: PayRefundApi.Refund) =>
+      render: (val) =>
         h(
           Tag,
           { color: 'danger' },
-          () => `￥${erpPriceInputFormatter(data?.refundPrice || 0)}`,
+          () => `￥${erpPriceInputFormatter(val || 0)}`,
         ),
     },
     {
       field: 'status',
       label: '退款状态',
-      content: (data: any) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_REFUND_STATUS,
-          value: data?.status,
+          value: val,
         }),
     },
     {
       field: 'successTime',
       label: '退款时间',
-      content: (data: PayRefundApi.Refund) =>
-        formatDateTime(data?.successTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'createTime',
       label: '创建时间',
-      content: (data: PayRefundApi.Refund) =>
-        formatDateTime(data?.createTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'updateTime',
       label: '更新时间',
-      content: (data: PayRefundApi.Refund) =>
-        formatDateTime(data?.updateTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     // 渠道信息部分
     {
       field: 'channelCode',
       label: '退款渠道',
-      content: (data: PayRefundApi.Refund) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_CHANNEL_CODE,
-          value: data?.channelCode,
+          value: val,
         }),
     },
     {

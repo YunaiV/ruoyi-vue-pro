@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from 'radix-vue';
+import type { PrimitiveProps } from 'reka-ui';
 
 import type { ButtonVariants, ButtonVariantSize } from './types';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { Primitive } from 'radix-vue';
+import { Primitive } from 'reka-ui';
 
 import { buttonVariants } from './button';
 

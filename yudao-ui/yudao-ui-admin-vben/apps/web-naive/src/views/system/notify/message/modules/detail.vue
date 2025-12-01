@@ -12,11 +12,7 @@ import { useDetailSchema } from '../data';
 const formData = ref<SystemNotifyMessageApi.NotifyMessage>();
 
 const [Descriptions] = useDescription({
-  componentProps: {
-    bordered: true,
-    column: 1,
-    contentClass: 'mx-4',
-  },
+  column: 1,
   schema: useDetailSchema(),
 });
 

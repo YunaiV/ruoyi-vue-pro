@@ -1,24 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-// import { isHexColor } from '@/utils/color' // TODO @芋艿：【可优化】增加 cssClass 的处理 https://gitee.com/yudaocode/yudao-ui-admin-vben/blob/v2.4.1/src/components/DictTag/src/DictTag.vue#L60
+// import { isHexColor } from '@/utils/color' // TODO @芋艿：【可优化】增加 cssClass 的处理 https://gitee.com/yudaocode/yudao-ui-admin-vben/blob/v2.4.1/src/components/DictTag/src/DictTag.vue#L60 @xingyu：这个要适配掉 ele 版本里么？
 import { getDictObj } from '@vben/hooks';
 
 import { ElTag } from 'element-plus';
 
 interface DictTagProps {
-  /**
-   * 字典类型
-   */
-  type: string;
-  /**
-   * 字典值
-   */
-  value: any;
-  /**
-   * 图标
-   */
-  icon?: string;
+  type: string; // 字典类型
+  value: any; // 字典值
+  icon?: string; // 图标
 }
 
 const props = defineProps<DictTagProps>();

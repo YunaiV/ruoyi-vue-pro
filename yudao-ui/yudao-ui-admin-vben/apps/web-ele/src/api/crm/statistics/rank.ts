@@ -3,8 +3,8 @@ import type { PageParam } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace CrmStatisticsRankApi {
-  /** 排行统计数据 */
-  export interface Rank {
+  /** 排行统计响应 */
+  export interface RankRespVO {
     count: number;
     nickname: string;
     deptName: string;
@@ -45,7 +45,7 @@ export function getDatas(activeTabName: any, params: any) {
 
 /** 获得合同排行榜 */
 export function getContractPriceRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-contract-price-rank',
     { params },
   );
@@ -53,7 +53,7 @@ export function getContractPriceRank(params: PageParam) {
 
 /** 获得回款排行榜 */
 export function getReceivablePriceRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-receivable-price-rank',
     { params },
   );
@@ -61,7 +61,7 @@ export function getReceivablePriceRank(params: PageParam) {
 
 /** 签约合同排行 */
 export function getContractCountRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-contract-count-rank',
     { params },
   );
@@ -69,7 +69,7 @@ export function getContractCountRank(params: PageParam) {
 
 /** 产品销量排行 */
 export function getProductSalesRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-product-sales-rank',
     { params },
   );
@@ -77,7 +77,7 @@ export function getProductSalesRank(params: PageParam) {
 
 /** 新增客户数排行 */
 export function getCustomerCountRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-customer-count-rank',
     { params },
   );
@@ -85,7 +85,7 @@ export function getCustomerCountRank(params: PageParam) {
 
 /** 新增联系人数排行 */
 export function getContactsCountRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-contacts-count-rank',
     { params },
   );
@@ -93,7 +93,7 @@ export function getContactsCountRank(params: PageParam) {
 
 /** 跟进次数排行 */
 export function getFollowCountRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-follow-count-rank',
     { params },
   );
@@ -101,7 +101,7 @@ export function getFollowCountRank(params: PageParam) {
 
 /** 跟进客户数排行 */
 export function getFollowCustomerCountRank(params: PageParam) {
-  return requestClient.get<CrmStatisticsRankApi.Rank[]>(
+  return requestClient.get<CrmStatisticsRankApi.RankRespVO[]>(
     '/crm/statistics-rank/get-follow-customer-count-rank',
     { params },
   );

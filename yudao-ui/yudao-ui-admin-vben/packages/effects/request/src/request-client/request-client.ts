@@ -162,4 +162,21 @@ class RequestClient {
   }
 }
 
+/**
+ * 构建排序字段，处理 vxe 排序条件
+ *
+ * add by 芋艿
+ */
+export const buildSortingField = (sorts: any[]) => {
+  if (!sorts || sorts.length === 0) {
+    return {};
+  }
+  const result: Record<string, any> = {};
+  sorts.forEach((sort: any, index: number) => {
+    result[`sortingFields[${index}].field`] = sort.field;
+    result[`sortingFields[${index}].order`] = sort.order;
+  });
+  return result;
+};
+
 export { RequestClient };

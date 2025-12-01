@@ -1,10 +1,15 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { SystemUserApi } from '#/api/system/user';
 
 import { DICT_TYPE } from '@vben/constants';
 
 import { getSimpleUserList } from '#/api/system/user';
 import { getRangePickerDefaultProps } from '#/utils';
+
+/** 关联数据 */
+let userList: SystemUserApi.User[] = [];
+getSimpleUserList().then((data) => (userList = data));
 
 /** 列表的搜索表单 */
 export function useGridFormSchemaConversation(): VbenFormSchema[] {
@@ -13,11 +18,19 @@ export function useGridFormSchemaConversation(): VbenFormSchema[] {
       fieldName: 'userId',
       label: '用户编号',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入用户编号',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'title',
       label: '聊天标题',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入聊天标题',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'createTime',
@@ -49,7 +62,13 @@ export function useGridColumnsConversation(): VxeTableGridOptions['columns'] {
     {
       title: '用户',
       minWidth: 180,
-      slots: { default: 'userId' },
+      field: 'userId',
+      formatter: ({ cellValue }) => {
+        if (cellValue === 0) {
+          return '系统';
+        }
+        return userList.find((user) => user.id === cellValue)?.nickname || '-';
+      },
     },
     {
       field: 'roleName',
@@ -103,6 +122,10 @@ export function useGridFormSchemaMessage(): VbenFormSchema[] {
       fieldName: 'conversationId',
       label: '对话编号',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入对话编号',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'userId',
@@ -112,6 +135,8 @@ export function useGridFormSchemaMessage(): VbenFormSchema[] {
         api: getSimpleUserList,
         labelField: 'nickname',
         valueField: 'id',
+        placeholder: '请选择用户编号',
+        allowClear: true,
       },
     },
     {
@@ -144,7 +169,9 @@ export function useGridColumnsMessage(): VxeTableGridOptions['columns'] {
     {
       title: '用户',
       minWidth: 180,
-      slots: { default: 'userId' },
+      field: 'userId',
+      formatter: ({ cellValue }) =>
+        userList.find((user) => user.id === cellValue)?.nickname || '-',
     },
     {
       field: 'roleName',

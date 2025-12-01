@@ -62,6 +62,8 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         min: 0,
         placeholder: '请输入排序',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       rules: 'required',
     },
@@ -139,9 +141,9 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'status',
       minWidth: 150,
       cellRender: {
-        name: 'CellDictTag',
+        name: 'CellDict',
         props: {
-          dictType: DICT_TYPE.COMMON_STATUS,
+          type: DICT_TYPE.COMMON_STATUS,
         },
       },
     },
@@ -150,9 +152,9 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'position',
       minWidth: 150,
       cellRender: {
-        name: 'CellDictTag',
+        name: 'CellDict',
         props: {
-          dictType: DICT_TYPE.PROMOTION_BANNER_POSITION,
+          type: DICT_TYPE.PROMOTION_BANNER_POSITION,
         },
       },
     },

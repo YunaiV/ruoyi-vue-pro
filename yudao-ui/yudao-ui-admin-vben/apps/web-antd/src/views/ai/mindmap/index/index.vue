@@ -3,13 +3,15 @@ import type { AiMindmapApi } from '#/api/ai/mindmap';
 
 import { nextTick, onMounted, ref } from 'vue';
 
-import { alert, Page } from '@vben/common-ui';
+import { Page } from '@vben/common-ui';
 import { MindMapContentExample } from '@vben/constants';
+
+import { message } from 'ant-design-vue';
 
 import { generateMindMap } from '#/api/ai/mindmap';
 
-import Left from './modules/Left.vue';
-import Right from './modules/Right.vue';
+import Left from './modules/left.vue';
+import Right from './modules/right.vue';
 
 const ctrl = ref<AbortController>(); // 请求控制
 const isGenerating = ref(false); // 是否正在生成思维导图
@@ -26,8 +28,9 @@ function directGenerate(existPrompt: string) {
   generatedContent.value = existPrompt;
   isEnd.value = true;
 }
+
 /** 提交生成 */
-function submit(data: AiMindmapApi.AiMindMapGenerateReq) {
+function handleSubmit(data: AiMindmapApi.AiMindMapGenerateReqVO) {
   isGenerating.value = true;
   isStart.value = true;
   isEnd.value = false;
@@ -38,8 +41,8 @@ function submit(data: AiMindmapApi.AiMindMapGenerateReq) {
     onMessage: async (res: any) => {
       const { code, data, msg } = JSON.parse(res.data);
       if (code !== 0) {
-        alert(`生成思维导图异常! ${msg}`);
-        stopStream();
+        message.error(`生成思维导图异常! ${msg}`);
+        handleStopStream();
         return;
       }
       generatedContent.value = generatedContent.value + data;
@@ -49,19 +52,20 @@ function submit(data: AiMindmapApi.AiMindMapGenerateReq) {
     onClose() {
       isEnd.value = true;
       leftRef.value?.setGeneratedContent(generatedContent.value);
-      stopStream();
+      handleStopStream();
     },
     onError(err) {
       console.error('生成思维导图失败', err);
-      stopStream();
+      handleStopStream();
       // 需要抛出异常，禁止重试
       throw err;
     },
     ctrl: ctrl.value,
   });
 }
+
 /** 停止 stream 生成 */
-function stopStream() {
+function handleStopStream() {
   isGenerating.value = false;
   isStart.value = false;
   ctrl.value?.abort();
@@ -80,7 +84,7 @@ onMounted(() => {
         ref="leftRef"
         class="mr-4"
         :is-generating="isGenerating"
-        @submit="submit"
+        @submit="handleSubmit"
         @direct-generate="directGenerate"
       />
       <Right

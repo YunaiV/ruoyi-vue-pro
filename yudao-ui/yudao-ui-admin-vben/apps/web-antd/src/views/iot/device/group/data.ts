@@ -1,12 +1,13 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
-import { DICT_TYPE } from '@vben/constants';
+import { CommonStatusEnum, DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
 
 import { z } from '#/adapter/form';
-import { getSimpleDeviceGroupList } from '#/api/iot/device/group';
+import { getRangePickerDefaultProps } from '#/utils';
 
-/** 新增/修改设备分组的表单 */
+/** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
   return [
     {
@@ -30,18 +31,15 @@ export function useFormSchema(): VbenFormSchema[] {
         .max(64, '分组名称长度不能超过 64 个字符'),
     },
     {
-      fieldName: 'parentId',
-      label: '父级分组',
-      component: 'ApiTreeSelect',
+      fieldName: 'status',
+      label: '分组状态',
+      component: 'RadioGroup',
       componentProps: {
-        api: getSimpleDeviceGroupList,
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
-        placeholder: '请选择父级分组',
-        allowClear: true,
+        options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
+        buttonStyle: 'solid',
+        optionType: 'button',
       },
+      rules: z.number().default(CommonStatusEnum.ENABLE),
     },
     {
       fieldName: 'description',
@@ -67,6 +65,15 @@ export function useGridFormSchema(): VbenFormSchema[] {
         allowClear: true,
       },
     },
+    {
+      fieldName: 'createTime',
+      label: '创建时间',
+      component: 'RangePicker',
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        allowClear: true,
+      },
+    },
   ];
 }
 
@@ -74,14 +81,13 @@ export function useGridFormSchema(): VbenFormSchema[] {
 export function useGridColumns(): VxeTableGridOptions['columns'] {
   return [
     {
-      field: 'name',
-      title: '分组名称',
-      minWidth: 200,
-      treeNode: true,
+      field: 'id',
+      title: 'ID',
+      minWidth: 100,
     },
     {
-      field: 'description',
-      title: '分组描述',
+      field: 'name',
+      title: '分组名称',
       minWidth: 200,
     },
     {
@@ -94,15 +100,20 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       },
     },
     {
-      field: 'deviceCount',
-      title: '设备数量',
-      minWidth: 100,
+      field: 'description',
+      title: '分组描述',
+      minWidth: 200,
     },
     {
       field: 'createTime',
       title: '创建时间',
       minWidth: 180,
       formatter: 'formatDateTime',
+    },
+    {
+      field: 'deviceCount',
+      title: '设备数量',
+      minWidth: 100,
     },
     {
       title: '操作',

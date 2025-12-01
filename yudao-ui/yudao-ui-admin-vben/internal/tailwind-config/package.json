@@ -53,6 +53,7 @@
     "@tailwindcss/typography": "catalog:",
     "autoprefixer": "catalog:",
     "cssnano": "catalog:",
+    "jiti": "catalog:",
     "postcss": "catalog:",
     "postcss-antd-fixes": "catalog:",
     "postcss-import": "catalog:",

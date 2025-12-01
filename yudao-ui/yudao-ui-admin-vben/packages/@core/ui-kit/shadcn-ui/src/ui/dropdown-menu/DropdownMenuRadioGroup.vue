@@ -2,9 +2,9 @@
 import type {
   DropdownMenuRadioGroupEmits,
   DropdownMenuRadioGroupProps,
-} from 'radix-vue';
+} from 'reka-ui';
 
-import { DropdownMenuRadioGroup, useForwardPropsEmits } from 'radix-vue';
+import { DropdownMenuRadioGroup, useForwardPropsEmits } from 'reka-ui';
 
 const props = defineProps<DropdownMenuRadioGroupProps>();
 const emits = defineEmits<DropdownMenuRadioGroupEmits>();

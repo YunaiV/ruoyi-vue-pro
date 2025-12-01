@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<CropperAvatarProps>(), {
 const emit = defineEmits(['update:value', 'change']);
 
 const sourceValue = ref(props.value || '');
+// TODO @puhui999：这个有办法去掉么？
 const prefixCls = 'cropper-avatar';
 const [CropperModal, modalApi] = useVbenModal({
   connectedComponent: cropperModal,
@@ -73,12 +74,16 @@ defineExpose({
 </script>
 
 <template>
+  <!-- TODO @puhui999：html 部分，看看有没办法和 web-antd/src/components/cropper/cropper-avatar.vue 风格更接近 -->
+  <!-- 头像容器 -->
   <div :class="getClass" :style="getStyle">
+    <!-- 图片包装器 -->
     <div
       :class="`${prefixCls}-image-wrapper`"
       :style="getImageWrapperStyle"
       @click="openModal"
     >
+      <!-- 遮罩层 -->
       <div :class="`${prefixCls}-image-mask`" :style="getImageWrapperStyle">
         <span
           :style="{
@@ -90,8 +95,10 @@ defineExpose({
           class="icon-[ant-design--cloud-upload-outlined] text-[#d6d6d6]"
         ></span>
       </div>
+      <!-- 头像图片 -->
       <img v-if="sourceValue" :src="sourceValue" alt="avatar" />
     </div>
+    <!-- 上传按钮 -->
     <ElButton
       v-if="showBtn"
       :class="`${prefixCls}-upload-btn`"
@@ -111,6 +118,7 @@ defineExpose({
 </template>
 
 <style lang="scss" scoped>
+/* TODO @puhui999：要类似 web-antd/src/components/cropper/cropper-avatar.vue 减少 scss，通过 tindwind 么？ */
 .cropper-avatar {
   display: inline-block;
   text-align: center;

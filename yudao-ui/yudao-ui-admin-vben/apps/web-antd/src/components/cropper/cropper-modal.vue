@@ -284,7 +284,6 @@ async function handleOk() {
             class="h-full w-full object-cover"
           />
         </div>
-
         <!-- 头像组合预览 -->
         <template v-if="previewSource">
           <div

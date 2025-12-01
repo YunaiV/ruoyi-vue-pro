@@ -83,38 +83,36 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新采购退货项 */
-const handleUpdateItems = (
-  items: ErpPurchaseReturnApi.PurchaseReturnItem[],
-) => {
+function handleUpdateItems(items: ErpPurchaseReturnApi.PurchaseReturnItem[]) {
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 更新其他费用 */
-const handleUpdateOtherPrice = (otherPrice: number) => {
+function handleUpdateOtherPrice(otherPrice: number) {
   formApi.setValues({
     otherPrice,
   });
-};
+}
 
 /** 更新优惠金额 */
-const handleUpdateDiscountPrice = (discountPrice: number) => {
+function handleUpdateDiscountPrice(discountPrice: number) {
   formApi.setValues({
     discountPrice,
   });
-};
+}
 
 /** 更新总金额 */
-const handleUpdateTotalPrice = (totalPrice: number) => {
+function handleUpdateTotalPrice(totalPrice: number) {
   formApi.setValues({
     totalPrice,
   });
-};
+}
 
 /** 选择采购订单 */
-const handleUpdateOrder = (order: ErpPurchaseOrderApi.PurchaseOrder) => {
+function handleUpdateOrder(order: ErpPurchaseOrderApi.PurchaseOrder) {
   formData.value = {
     ...formData.value,
     orderId: order.id,
@@ -136,7 +134,7 @@ const handleUpdateOrder = (order: ErpPurchaseOrderApi.PurchaseOrder) => {
     (item) => item.count && item.count > 0,
   ) as ErpPurchaseReturnApi.PurchaseReturnItem[];
   formApi.setValues(formData.value, false);
-};
+}
 
 /** 创建或更新采购退货 */
 const [Modal, modalApi] = useVbenModal({
@@ -173,7 +171,7 @@ const [Modal, modalApi] = useVbenModal({
   },
   async onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      formData.value = undefined;
+      formData.value = {} as ErpPurchaseReturnApi.PurchaseReturn;
       return;
     }
     // 加载数据

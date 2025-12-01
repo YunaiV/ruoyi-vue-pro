@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DialogContentEmits, DialogContentProps } from 'radix-vue';
+import type { DialogContentEmits, DialogContentProps } from 'reka-ui';
 
 import type { SheetVariants } from './sheet';
 
@@ -7,7 +7,7 @@ import { computed, ref } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { DialogContent, useForwardPropsEmits } from 'radix-vue';
+import { DialogContent, useForwardPropsEmits } from 'reka-ui';
 
 import { sheetVariants } from './sheet';
 import SheetOverlay from './SheetOverlay.vue';

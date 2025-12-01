@@ -3,7 +3,6 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { IotDeviceGroupApi } from '#/api/iot/device/group';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { handleTree } from '@vben/utils';
 
 import { message } from 'ant-design-vue';
 
@@ -44,9 +43,7 @@ async function handleDelete(row: IotDeviceGroupApi.DeviceGroup) {
   });
   try {
     await deleteDeviceGroup(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
@@ -56,30 +53,19 @@ async function handleDelete(row: IotDeviceGroupApi.DeviceGroup) {
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     schema: useGridFormSchema(),
-    showCollapseButton: true,
   },
   gridOptions: {
     columns: useGridColumns(),
     height: 'auto',
     keepSource: true,
-    treeConfig: {
-      transform: true,
-      rowField: 'id',
-      parentField: 'parentId',
-    },
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
-          const data = await getDeviceGroupPage({
+          return await getDeviceGroupPage({
             pageNo: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
           });
-          // 转换为树形结构
-          return {
-            ...data,
-            list: handleTree(data.list, 'id', 'parentId'),
-          };
         },
       },
     },

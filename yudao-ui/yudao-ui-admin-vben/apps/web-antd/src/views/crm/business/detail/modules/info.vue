@@ -12,31 +12,27 @@ defineProps<{
   business: CrmBusinessApi.Business; // 商机信息
 }>();
 
-const [BaseDescriptions] = useDescription({
-  componentProps: {
-    title: '基本信息',
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+const [BaseDescription] = useDescription({
+  title: '基本信息',
+  bordered: false,
+  column: 4,
+  class: 'mx-4',
   schema: useDetailBaseSchema(),
 });
 
-const [SystemDescriptions] = useDescription({
-  componentProps: {
-    title: '系统信息',
-    bordered: false,
-    column: 3,
-    class: 'mx-4',
-  },
+const [SystemDescription] = useDescription({
+  title: '系统信息',
+  bordered: false,
+  column: 3,
+  class: 'mx-4',
   schema: useFollowUpDetailSchema(),
 });
 </script>
 
 <template>
-  <div class="p-4">
-    <BaseDescriptions :data="business" />
+  <div>
+    <BaseDescription :data="business" />
     <Divider />
-    <SystemDescriptions :data="business" />
+    <SystemDescription :data="business" />
   </div>
 </template>

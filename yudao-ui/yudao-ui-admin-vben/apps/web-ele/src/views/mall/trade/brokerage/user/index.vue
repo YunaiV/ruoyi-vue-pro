@@ -93,18 +93,14 @@ async function handleBrokerageEnabledChange(
     })
       .then(async () => {
         // 更新推广资格
-        const res = await updateBrokerageEnabled({
+        await updateBrokerageEnabled({
           id: row.id!,
           enabled: newEnabled,
         });
-        if (res) {
-          // 提示并返回成功
-          ElMessage.success($t('ui.actionMessage.operationSuccess'));
-          handleRefresh();
-          resolve(true);
-        } else {
-          reject(new Error('更新失败'));
-        }
+        // 提示并返回成功
+        ElMessage.success($t('ui.actionMessage.operationSuccess'));
+        handleRefresh();
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));

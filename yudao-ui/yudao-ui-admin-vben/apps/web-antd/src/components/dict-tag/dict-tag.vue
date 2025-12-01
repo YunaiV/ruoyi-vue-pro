@@ -7,18 +7,9 @@ import { isValidColor, TinyColor } from '@vben/utils';
 import { Tag } from 'ant-design-vue';
 
 interface DictTagProps {
-  /**
-   * 字典类型
-   */
-  type: string;
-  /**
-   * 字典值
-   */
-  value: any;
-  /**
-   * 图标
-   */
-  icon?: string;
+  type: string; // 字典类型
+  value: any; // 字典值
+  icon?: string; // 图标
 }
 
 const props = defineProps<DictTagProps>();

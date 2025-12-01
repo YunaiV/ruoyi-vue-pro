@@ -131,7 +131,6 @@ export function useGridColumns(): VxeGridPropTypes.Columns {
     {
       field: 'user.nickname',
       title: '买家',
-      align: 'center',
       minWidth: 120,
     },
     {
@@ -144,11 +143,10 @@ export function useGridColumns(): VxeGridPropTypes.Columns {
       field: 'status',
       title: '售后状态',
       width: 100,
-      align: 'center',
       cellRender: {
-        name: 'CellDictTag',
+        name: 'CellDict',
         props: {
-          dictType: DICT_TYPE.TRADE_AFTER_SALE_STATUS,
+          type: DICT_TYPE.TRADE_AFTER_SALE_STATUS,
         },
       },
     },
@@ -156,11 +154,10 @@ export function useGridColumns(): VxeGridPropTypes.Columns {
       field: 'way',
       title: '售后方式',
       width: 100,
-      align: 'center',
       cellRender: {
-        name: 'CellDictTag',
+        name: 'CellDict',
         props: {
-          dictType: DICT_TYPE.TRADE_AFTER_SALE_WAY,
+          type: DICT_TYPE.TRADE_AFTER_SALE_WAY,
         },
       },
     },

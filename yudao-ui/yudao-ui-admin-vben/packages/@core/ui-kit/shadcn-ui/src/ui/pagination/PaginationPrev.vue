@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { PaginationPrevProps } from 'radix-vue';
+import type { PaginationPrevProps } from 'reka-ui';
 
 import { computed } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
 import { ChevronLeft } from 'lucide-vue-next';
-import { PaginationPrev } from 'radix-vue';
+import { PaginationPrev } from 'reka-ui';
 
 import { Button } from '../button';
 

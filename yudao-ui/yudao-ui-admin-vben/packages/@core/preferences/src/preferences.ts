@@ -221,12 +221,8 @@ class PreferenceManager {
       const dom = document.documentElement;
       const COLOR_WEAK = 'invert-mode';
       const COLOR_GRAY = 'grayscale-mode';
-      colorWeakMode
-        ? dom.classList.add(COLOR_WEAK)
-        : dom.classList.remove(COLOR_WEAK);
-      colorGrayMode
-        ? dom.classList.add(COLOR_GRAY)
-        : dom.classList.remove(COLOR_GRAY);
+      dom.classList.toggle(COLOR_WEAK, colorWeakMode);
+      dom.classList.toggle(COLOR_GRAY, colorGrayMode);
     }
   }
 }

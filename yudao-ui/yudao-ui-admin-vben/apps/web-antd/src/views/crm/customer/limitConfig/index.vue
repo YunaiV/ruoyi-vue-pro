@@ -114,8 +114,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
     <FormModal @success="handleRefresh" />
     <Grid>
-      <template #top>
-        <Tabs class="-mt-11" @change="handleChangeConfigType">
+      <template #toolbar-actions>
+        <Tabs class="w-full" @change="handleChangeConfigType">
           <Tabs.TabPane
             tab="拥有客户数限制"
             :key="LimitConfType.CUSTOMER_QUANTITY_LIMIT"
@@ -156,7 +156,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
               icon: ACTION_ICON.DELETE,
               auth: ['crm:customer-limit-config:delete'],
               popConfirm: {
-                title: $t('ui.actionMessage.deleteConfirm', [row.name]),
+                title: $t('ui.actionMessage.deleteConfirm', [row.id]),
                 confirm: handleDelete.bind(null, row),
               },
             },
@@ -166,8 +166,3 @@ const [Grid, gridApi] = useVbenVxeGrid({
     </Grid>
   </Page>
 </template>
-<style scoped>
-:deep(.vxe-toolbar div) {
-  z-index: 1;
-}
-</style>

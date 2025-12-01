@@ -1,1 +1,1 @@
-export { default as DataDefinition } from './DataDefinition.vue';
+export { default as DataDefinition } from './data-definition.vue';

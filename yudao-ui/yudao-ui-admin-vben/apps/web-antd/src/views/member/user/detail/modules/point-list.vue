@@ -2,54 +2,43 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { MemberPointRecordApi } from '#/api/member/point/record';
 
-import { DICT_TYPE } from '@vben/constants';
-import { getDictOptions } from '@vben/hooks';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getRecordPage } from '#/api/member/point/record';
-import { getRangePickerDefaultProps } from '#/utils';
-import { useGridColumns } from '#/views/member/point/record/data';
+import {
+  useGridColumns as usePointGridColumns,
+  useGridFormSchema as usePointGridFormSchema,
+} from '#/views/member/point/record/data';
 
 const props = defineProps<{
   userId: number;
 }>();
 
+/** 列表的搜索表单（过滤掉用户相关字段） */
+function useGridFormSchema() {
+  const excludeFields = new Set(['nickname']);
+  return usePointGridFormSchema().filter(
+    (item) => !excludeFields.has(item.fieldName),
+  );
+}
+
+/** 列表的字段（过滤掉用户相关字段） */
+function useGridColumns() {
+  const excludeFields = new Set(['nickname']);
+  return usePointGridColumns()?.filter(
+    (item) => item.field && !excludeFields.has(item.field),
+  );
+}
+
 const [Grid] = useVbenVxeGrid({
   formOptions: {
-    schema: [
-      {
-        fieldName: 'bizType',
-        label: '业务类型',
-        component: 'Select',
-        componentProps: {
-          options: getDictOptions(DICT_TYPE.MEMBER_POINT_BIZ_TYPE, 'number'),
-          placeholder: '请选择业务类型',
-          allowClear: true,
-        },
-      },
-      {
-        fieldName: 'title',
-        label: '积分标题',
-        component: 'Input',
-        componentProps: {
-          placeholder: '请输入积分标题',
-          allowClear: true,
-        },
-      },
-      {
-        fieldName: 'createDate',
-        label: '获得时间',
-        component: 'RangePicker',
-        componentProps: {
-          ...getRangePickerDefaultProps(),
-          allowClear: true,
-        },
-      },
-    ],
+    schema: useGridFormSchema(),
   },
   gridOptions: {
     columns: useGridColumns(),
     keepSource: true,
+    pagerConfig: {
+      pageSize: 10,
+    },
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
@@ -71,7 +60,6 @@ const [Grid] = useVbenVxeGrid({
       search: true,
     },
   } as VxeTableGridOptions<MemberPointRecordApi.Record>,
-  separator: false,
 });
 </script>
 

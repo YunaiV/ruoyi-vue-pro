@@ -1,0 +1,172 @@
+name: Deploy Website on push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-playground-ftp:
+    name: Deploy Push Playground Ftp
+    if: github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, '[skip ci]') && github.repository == 'vbenjs/vue-vben-admin'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sed Config Base
+        shell: bash
+        run: |
+          sed -i  "s#VITE_COMPRESS\s*=.*#VITE_COMPRESS = gzip#g" ./playground/.env.production
+          sed -i  "s#VITE_PWA\s*=.*#VITE_PWA = true#g" ./playground/.env.production
+          cat ./playground/.env.production
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: pnpm build:play
+
+      - name: Sync Playground files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRO_FTP_HOST }}
+          username: ${{ secrets.WEB_PLAYGROUND_FTP_ACCOUNT }}
+          password: ${{ secrets.WEB_PLAYGROUND_FTP_PWSSWORD }}
+          local-dir: ./playground/dist/
+
+  deploy-docs-ftp:
+    name: Deploy Push Docs Ftp
+    if: github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, '[skip ci]') && github.repository == 'vbenjs/vue-vben-admin'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: pnpm build:docs
+
+      - name: Sync Docs files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRO_FTP_HOST }}
+          username: ${{ secrets.WEBSITE_FTP_ACCOUNT }}
+          password: ${{ secrets.WEBSITE_FTP_PASSWORD }}
+          local-dir: ./docs/.vitepress/dist/
+
+  deploy-antd-ftp:
+    name: Deploy Push Antd Ftp
+    if: github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, '[skip ci]') && github.repository == 'vbenjs/vue-vben-admin'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sed Config Base
+        shell: bash
+        run: |
+          sed -i  "s#VITE_COMPRESS\s*=.*#VITE_COMPRESS = gzip#g" ./apps/web-antd/.env.production
+          sed -i  "s#VITE_PWA\s*=.*#VITE_PWA = true#g" ./apps/web-antd/.env.production
+          cat ./apps/web-antd/.env.production
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: pnpm run build:antd
+
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRO_FTP_HOST }}
+          username: ${{ secrets.WEB_ANTD_FTP_ACCOUNT }}
+          password: ${{ secrets.WEB_ANTD_FTP_PASSWORD }}
+          local-dir: ./apps/web-antd/dist/
+
+  deploy-ele-ftp:
+    name: Deploy Push Element Ftp
+    if: github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, '[skip ci]') && github.repository == 'vbenjs/vue-vben-admin'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sed Config Base
+        shell: bash
+        run: |
+          sed -i  "s#VITE_COMPRESS\s*=.*#VITE_COMPRESS = gzip#g" ./apps/web-ele/.env.production
+          sed -i  "s#VITE_PWA\s*=.*#VITE_PWA = true#g" ./apps/web-ele/.env.production
+          cat ./apps/web-ele/.env.production
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: pnpm run build:ele
+
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRO_FTP_HOST }}
+          username: ${{ secrets.WEB_ELE_FTP_ACCOUNT }}
+          password: ${{ secrets.WEB_ELE_FTP_PASSWORD }}
+          local-dir: ./apps/web-ele/dist/
+
+  deploy-naive-ftp:
+    name: Deploy Push Naive Ftp
+    if: github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, '[skip ci]') && github.repository == 'vbenjs/vue-vben-admin'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sed Config Base
+        shell: bash
+        run: |
+          sed -i  "s#VITE_COMPRESS\s*=.*#VITE_COMPRESS = gzip#g" ./apps/web-naive/.env.production
+          sed -i  "s#VITE_PWA\s*=.*#VITE_PWA = true#g" ./apps/web-naive/.env.production
+          cat ./apps/web-naive/.env.production
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: pnpm run build:naive
+
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.PRO_FTP_HOST }}
+          username: ${{ secrets.WEB_NAIVE_FTP_ACCOUNT }}
+          password: ${{ secrets.WEB_NAIVE_FTP_PASSWORD }}
+          local-dir: ./apps/web-naive/dist/
+
+  rerun-on-failure:
+    name: Rerun on failure
+    needs:
+      - deploy-playground-ftp
+      - deploy-docs-ftp
+      - deploy-antd-ftp
+      - deploy-ele-ftp
+      - deploy-naive-ftp
+    if: failure() && fromJSON(github.run_attempt) < 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retry ${{ fromJSON(github.run_attempt) }} of 10
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run rerun.yml -F run_id=${{ github.run_id }}

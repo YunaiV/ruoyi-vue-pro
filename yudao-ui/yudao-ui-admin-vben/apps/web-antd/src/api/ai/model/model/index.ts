@@ -18,7 +18,7 @@ export namespace AiModelModelApi {
   }
 }
 
-// 查询模型分页
+/** 查询模型分页 */
 export function getModelPage(params: PageParam) {
   return requestClient.get<PageResult<AiModelModelApi.Model>>(
     '/ai/model/page',
@@ -26,7 +26,7 @@ export function getModelPage(params: PageParam) {
   );
 }
 
-// 获得模型列表
+/** 获得模型列表 */
 export function getModelSimpleList(type?: number) {
   return requestClient.get<AiModelModelApi.Model[]>('/ai/model/simple-list', {
     params: {
@@ -35,21 +35,22 @@ export function getModelSimpleList(type?: number) {
   });
 }
 
-// 查询模型详情
+/** 查询模型详情 */
 export function getModel(id: number) {
   return requestClient.get<AiModelModelApi.Model>(`/ai/model/get?id=${id}`);
 }
-// 新增模型
+
+/** 新增模型 */
 export function createModel(data: AiModelModelApi.Model) {
   return requestClient.post('/ai/model/create', data);
 }
 
-// 修改模型
+/** 修改模型 */
 export function updateModel(data: AiModelModelApi.Model) {
   return requestClient.put('/ai/model/update', data);
 }
 
-// 删除模型
+/** 删除模型 */
 export function deleteModel(id: number) {
   return requestClient.delete(`/ai/model/delete?id=${id}`);
 }

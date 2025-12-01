@@ -1,16 +1,8 @@
 import type { PageParam, PageResult } from '@vben/request';
 
-import type { MallSpuApi } from '#/api/mall/product/spu';
-
 import { requestClient } from '#/api/request';
 
 export namespace MallCombinationActivityApi {
-  /** 拼团活动所需属性 */
-  export interface CombinationProduct {
-    spuId: number; // 商品 SPU 编号
-    skuId: number; // 商品 SKU 编号
-    combinationPrice: number; // 拼团价格
-  }
   /** 拼团活动 */
   export interface CombinationActivity {
     id?: number; // 活动编号
@@ -31,14 +23,11 @@ export namespace MallCombinationActivityApi {
     products: CombinationProduct[]; // 商品列表
   }
 
-  /** 扩展 SKU 配置 */
-  export type SkuExtension = {
-    productConfig: CombinationProduct; // 拼团活动配置
-  } & MallSpuApi.Sku;
-
-  /** 扩展 SPU 配置 */
-  export interface SpuExtension extends MallSpuApi.Spu {
-    skus: SkuExtension[]; // SKU 列表
+  /** 拼团活动所需属性 */
+  export interface CombinationProduct {
+    spuId: number; // 商品 SPU 编号
+    skuId: number; // 商品 SKU 编号
+    combinationPrice: number; // 拼团价格
   }
 }
 

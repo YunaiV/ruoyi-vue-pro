@@ -6,8 +6,8 @@ import { requestClient } from '#/api/request';
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 const accessStore = useAccessStore();
+
 export namespace AiMindmapApi {
-  // AI 思维导图
   export interface MindMap {
     id: number; // 编号
     userId: number; // 用户编号
@@ -18,12 +18,12 @@ export namespace AiMindmapApi {
     errorMessage: string; // 错误信息
   }
 
-  // AI 思维导图生成
-  export interface AiMindMapGenerateReq {
+  export interface AiMindMapGenerateReqVO {
     prompt: string;
   }
 }
 
+/** 生成思维导图 Stream */
 export function generateMindMap({
   data,
   onClose,
@@ -32,7 +32,7 @@ export function generateMindMap({
   ctrl,
 }: {
   ctrl: AbortController;
-  data: AiMindmapApi.AiMindMapGenerateReq;
+  data: AiMindmapApi.AiMindMapGenerateReqVO;
   onClose?: (...args: any[]) => void;
   onError?: (...args: any[]) => void;
   onMessage?: (res: any) => void;
@@ -53,12 +53,12 @@ export function generateMindMap({
   });
 }
 
-// 查询思维导图分页
+/** 查询思维导图分页 */
 export function getMindMapPage(params: any) {
   return requestClient.get(`/ai/mind-map/page`, { params });
 }
 
-// 删除思维导图
+/** 删除思维导图 */
 export function deleteMindMap(id: number) {
   return requestClient.delete(`/ai/mind-map/delete?id=${id}`);
 }

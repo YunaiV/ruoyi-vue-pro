@@ -1,0 +1,8 @@
+export const ErpBizType = {
+  PURCHASE_ORDER: 10,
+  PURCHASE_IN: 11,
+  PURCHASE_RETURN: 12,
+  SALE_ORDER: 20,
+  SALE_OUT: 21,
+  SALE_RETURN: 22,
+};

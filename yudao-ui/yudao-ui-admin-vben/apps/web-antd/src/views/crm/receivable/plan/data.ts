@@ -28,11 +28,9 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '负责人',
       component: 'ApiSelect',
       componentProps: {
-        api: () => getSimpleUserList(),
-        fieldNames: {
-          label: 'nickname',
-          value: 'id',
-        },
+        api: getSimpleUserList,
+        labelField: 'nickname',
+        valueField: 'id',
       },
       dependencies: {
         triggerFields: ['id'],
@@ -47,12 +45,11 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'ApiSelect',
       rules: 'required',
       componentProps: {
-        api: () => getCustomerSimpleList(),
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
+        api: getCustomerSimpleList,
+        labelField: 'name',
+        valueField: 'id',
         placeholder: '请选择客户',
+        allowClear: true,
       },
     },
     {
@@ -63,6 +60,7 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         options: [],
         placeholder: '请选择合同',
+        allowClear: true,
       },
       dependencies: {
         triggerFields: ['customerId'],
@@ -155,11 +153,9 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '客户',
       component: 'ApiSelect',
       componentProps: {
-        api: () => getCustomerSimpleList(),
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
+        api: getCustomerSimpleList,
+        labelField: 'name',
+        valueField: 'id',
         placeholder: '请选择客户',
         allowClear: true,
       },

@@ -20,7 +20,7 @@ export namespace AiModelChatRoleApi {
   }
 
   // AI 聊天角色 分页请求
-  export interface ChatRolePageReq {
+  export interface ChatRolePageReqVO {
     name?: string; // 角色名称
     category?: string; // 角色类别
     publicStatus: boolean; // 是否公开
@@ -29,7 +29,7 @@ export namespace AiModelChatRoleApi {
   }
 }
 
-// 查询聊天角色分页
+/** 查询聊天角色分页 */
 export function getChatRolePage(params: PageParam) {
   return requestClient.get<PageResult<AiModelChatRoleApi.ChatRole>>(
     '/ai/chat-role/page',
@@ -37,49 +37,49 @@ export function getChatRolePage(params: PageParam) {
   );
 }
 
-// 查询聊天角色详情
+/** 查询聊天角色详情 */
 export function getChatRole(id: number) {
   return requestClient.get<AiModelChatRoleApi.ChatRole>(
     `/ai/chat-role/get?id=${id}`,
   );
 }
-// 新增聊天角色
+
+/** 新增聊天角色 */
 export function createChatRole(data: AiModelChatRoleApi.ChatRole) {
   return requestClient.post('/ai/chat-role/create', data);
 }
 
-// 修改聊天角色
+/** 修改聊天角色 */
 export function updateChatRole(data: AiModelChatRoleApi.ChatRole) {
   return requestClient.put('/ai/chat-role/update', data);
 }
 
-// 删除聊天角色
+/** 删除聊天角色 */
 export function deleteChatRole(id: number) {
   return requestClient.delete(`/ai/chat-role/delete?id=${id}`);
 }
 
-// ======= chat 聊天
-// 获取 my role
-export function getMyPage(params: AiModelChatRoleApi.ChatRolePageReq) {
+/** 获取 my role */
+export function getMyPage(params: AiModelChatRoleApi.ChatRolePageReqVO) {
   return requestClient.get('/ai/chat-role/my-page', { params });
 }
 
-// 获取角色分类
+/** 获取角色分类 */
 export function getCategoryList() {
   return requestClient.get('/ai/chat-role/category-list');
 }
 
-// 创建角色
+/** 创建角色 */
 export function createMy(data: AiModelChatRoleApi.ChatRole) {
   return requestClient.post('/ai/chat-role/create-my', data);
 }
 
-// 更新角色
+/** 更新角色 */
 export function updateMy(data: AiModelChatRoleApi.ChatRole) {
   return requestClient.put('/ai/chat-role/update', data);
 }
 
-// 删除角色 my
+/** 删除角色 my */
 export function deleteMy(id: number) {
   return requestClient.delete(`/ai/chat-role/delete-my?id=${id}`);
 }

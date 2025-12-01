@@ -15,12 +15,16 @@ import {
 } from '@vben/constants';
 import { useTabs } from '@vben/hooks';
 
-import { Card, message, Tag } from 'ant-design-vue';
+import { message, Tag } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import * as DeliveryExpressApi from '#/api/mall/trade/delivery/express';
-import * as DeliveryPickUpStoreApi from '#/api/mall/trade/delivery/pickUpStore';
-import * as TradeOrderApi from '#/api/mall/trade/order';
+import { getSimpleDeliveryExpressList } from '#/api/mall/trade/delivery/express';
+import { getDeliveryPickUpStore } from '#/api/mall/trade/delivery/pickUpStore';
+import {
+  getExpressTrackList,
+  getOrder,
+  pickUpOrder,
+} from '#/api/mall/trade/order';
 import { useDescription } from '#/components/description';
 import { DictTag } from '#/components/dict-tag';
 import { TableAction } from '#/components/table-action';
@@ -50,45 +54,41 @@ const orderId = ref(0);
 const order = ref<MallOrderApi.Order>({
   logs: [],
 });
-const deliveryExpressList = ref<MallDeliveryExpressApi.SimpleDeliveryExpress[]>(
-  [],
-);
+const deliveryExpressList = ref<MallDeliveryExpressApi.DeliveryExpress[]>([]);
 const expressTrackList = ref<any[]>([]);
-const pickUpStore = ref<MallDeliveryPickUpStoreApi.PickUpStore | undefined>();
+const pickUpStore = ref<
+  MallDeliveryPickUpStoreApi.DeliveryPickUpStore | undefined
+>();
 
 const [OrderInfoDescriptions] = useDescription({
-  componentProps: {
-    title: '订单信息',
-    bordered: false,
-    column: 3,
-  },
+  title: '订单信息',
+  bordered: false,
+  column: 3,
+  class: 'mx-4',
   schema: useOrderInfoSchema(),
 });
 
 const [OrderStatusDescriptions] = useDescription({
-  componentProps: {
-    title: '订单状态',
-    bordered: false,
-    column: 1,
-  },
+  title: '订单状态',
+  bordered: false,
+  column: 1,
+  class: 'mx-4',
   schema: useOrderStatusSchema(),
 });
 
 const [OrderPriceDescriptions] = useDescription({
-  componentProps: {
-    title: '费用信息',
-    bordered: false,
-    column: 4,
-  },
+  title: '费用信息',
+  bordered: false,
+  column: 4,
+  class: 'mx-4',
   schema: useOrderPriceSchema(),
 });
 
 const [DeliveryInfoDescriptions] = useDescription({
-  componentProps: {
-    title: '收货信息',
-    bordered: false,
-    column: 3,
-  },
+  title: '收货信息',
+  bordered: false,
+  column: 3,
+  class: 'mx-4',
   schema: useDeliveryInfoSchema(),
 });
 
@@ -165,7 +165,7 @@ const [PriceFormModal, priceFormModalApi] = useVbenModal({
 async function getDetail() {
   loading.value = true;
   try {
-    const res = await TradeOrderApi.getOrder(orderId.value);
+    const res = await getOrder(orderId.value);
     if (res === null) {
       message.error('交易订单不存在');
       handleBack();
@@ -177,12 +177,9 @@ async function getDetail() {
 
     // 如果配送方式为快递，则查询物流公司
     if (res.deliveryType === DeliveryTypeEnum.EXPRESS.type) {
-      deliveryExpressList.value =
-        await DeliveryExpressApi.getSimpleDeliveryExpressList();
+      deliveryExpressList.value = await getSimpleDeliveryExpressList();
       if (res.logisticsId) {
-        expressTrackList.value = await TradeOrderApi.getExpressTrackList(
-          res.id!,
-        );
+        expressTrackList.value = await getExpressTrackList(res.id!);
         expressTrackGridApi.setGridOptions({
           data: expressTrackList.value || [],
         });
@@ -191,9 +188,7 @@ async function getDetail() {
       res.deliveryType === DeliveryTypeEnum.PICK_UP.type &&
       res.pickUpStoreId
     ) {
-      pickUpStore.value = await DeliveryPickUpStoreApi.getDeliveryPickUpStore(
-        res.pickUpStoreId,
-      );
+      pickUpStore.value = await getDeliveryPickUpStore(res.pickUpStoreId);
     }
   } finally {
     loading.value = false;
@@ -225,7 +220,7 @@ const handlePickUp = async () => {
     duration: 0,
   });
   try {
-    await TradeOrderApi.pickUpOrder(order.value.id!);
+    await pickUpOrder(order.value.id!);
     message.success('核销成功');
     await getDetail();
   } finally {
@@ -236,7 +231,7 @@ const handlePickUp = async () => {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/mall/trade/order');
+  router.push({ name: 'TradeOrder' });
 }
 
 /** 初始化 */
@@ -303,13 +298,13 @@ onMounted(async () => {
     <PriceFormModal @success="getDetail" />
 
     <!-- 订单信息 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <OrderInfoDescriptions :data="order" />
-    </Card>
+    </div>
     <!-- 订单状态 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <OrderStatusDescriptions :data="order" />
-    </Card>
+    </div>
     <!-- 商品信息 -->
     <div class="mb-4">
       <ProductGrid table-title="商品信息">
@@ -330,15 +325,15 @@ onMounted(async () => {
       </ProductGrid>
     </div>
     <!-- 费用信息 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <OrderPriceDescriptions :data="order" />
-    </Card>
+    </div>
     <!-- 收货信息 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <DeliveryInfoDescriptions :data="order" />
-    </Card>
+    </div>
     <!-- 物流详情 -->
-    <div v-if="expressTrackList.length > 0" class="mt-4">
+    <div v-if="expressTrackList.length > 0" class="mb-4">
       <ExpressTrackGrid table-title="物流详情" />
     </div>
     <!-- 操作日志 -->
@@ -346,7 +341,7 @@ onMounted(async () => {
       <OperateLogGrid table-title="操作日志">
         <template #userType="{ row }">
           <Tag v-if="row.userType === 0" color="default"> 系统 </Tag>
-          <DictTag :type="DICT_TYPE.USER_TYPE" :value="row.userType" />
+          <DictTag v-else :type="DICT_TYPE.USER_TYPE" :value="row.userType" />
         </template>
       </OperateLogGrid>
     </div>

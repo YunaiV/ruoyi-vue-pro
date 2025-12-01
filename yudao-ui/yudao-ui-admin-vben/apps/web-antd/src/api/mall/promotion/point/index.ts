@@ -36,16 +36,6 @@ export namespace MallPointActivityApi {
     price: number; // 兑换金额，单位：分
   }
 
-  /** 扩展 SKU 配置 */
-  export type SkuExtension = {
-    productConfig: PointProduct; // 积分商城商品配置
-  } & MallSpuApi.Sku;
-
-  /** 扩展 SPU 配置 */
-  export interface SpuExtension extends MallSpuApi.Spu {
-    skus: SkuExtension[]; // SKU 列表
-  }
-
   /** 扩展 SPU 配置（带积分信息） */
   export interface SpuExtensionWithPoint extends MallSpuApi.Spu {
     pointStock: number; // 积分商城活动库存

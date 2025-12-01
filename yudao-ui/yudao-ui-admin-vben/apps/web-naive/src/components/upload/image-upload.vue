@@ -9,11 +9,16 @@ import { computed, ref, toRefs, watch } from 'vue';
 
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
-import { isFunction, isObject, isString } from '@vben/utils';
+import {
+  defaultImageAccepts,
+  isFunction,
+  isImage,
+  isObject,
+  isString,
+} from '@vben/utils';
 
 import { NImage, NImageGroup, NModal, NUpload, useMessage } from 'naive-ui';
 
-import { checkImgType, defaultImageAccepts } from './helper';
 import { useUpload, useUploadType } from './use-upload';
 
 defineOptions({ name: 'ImageUpload', inheritAttrs: false });
@@ -152,7 +157,7 @@ function beforeUpload(options: {
   }
 
   const { maxSize, accept } = props;
-  const isAct = checkImgType(file, accept);
+  const isAct = isImage(file.name, accept);
   if (!isAct) {
     message.error($t('ui.upload.acceptUpload', [accept]));
     isActMsg.value = false;
@@ -309,9 +314,9 @@ function handleChange() {
       class="mt-2 flex flex-wrap items-center text-sm text-gray-600"
     >
       请上传不超过
-      <div class="text-primary mx-1 font-bold">{{ maxSize }}MB</div>
+      <div class="mx-1 font-bold text-primary">{{ maxSize }}MB</div>
       的
-      <div class="text-primary mx-1 font-bold">{{ accept.join('/') }}</div>
+      <div class="mx-1 font-bold text-primary">{{ accept.join('/') }}</div>
       格式文件
     </div>
     <NModal

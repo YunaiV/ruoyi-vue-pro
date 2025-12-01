@@ -16,9 +16,7 @@ import { $t } from '#/locales';
 
 import { useFormSchema } from '../data';
 
-/** 提交表单 */
 const emit = defineEmits(['success']);
-
 const formData = ref<MallDiyTemplateApi.DiyTemplate>();
 const getTitle = computed(() => {
   return formData.value?.id
@@ -47,15 +45,6 @@ const [Modal, modalApi] = useVbenModal({
     modalApi.lock();
     // 提交表单
     const data = (await formApi.getValues()) as MallDiyTemplateApi.DiyTemplate;
-
-    // 确保必要的默认值
-    if (!data.previewPicUrls) {
-      data.previewPicUrls = [];
-    }
-    if (data.used === undefined) {
-      data.used = false;
-    }
-
     try {
       await (formData.value?.id
         ? updateDiyTemplate(data)
@@ -91,7 +80,7 @@ const [Modal, modalApi] = useVbenModal({
 </script>
 
 <template>
-  <Modal class="w-2/5" :title="getTitle">
+  <Modal :title="getTitle" class="w-2/5">
     <Form />
   </Modal>
 </template>

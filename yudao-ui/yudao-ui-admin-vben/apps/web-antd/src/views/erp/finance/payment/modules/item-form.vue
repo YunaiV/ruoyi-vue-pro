@@ -59,7 +59,7 @@ const summaries = computed(() => {
 /** 表格配置 */
 const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions: {
-    columns: useFormItemColumns(),
+    columns: useFormItemColumns(props.disabled),
     data: tableData.value,
     minHeight: 250,
     autoResize: true,
@@ -212,81 +212,88 @@ defineExpose({ validate });
 </script>
 
 <template>
-  <Grid class="w-full">
-    <template #paymentPrice="{ row }">
-      <InputNumber
-        v-model:value="row.paymentPrice"
-        :precision="2"
-        :disabled="disabled"
-        :formatter="erpPriceInputFormatter"
-        placeholder="请输入本次付款"
-        @change="handleRowChange(row)"
-      />
-    </template>
-    <template #remark="{ row }">
-      <Input
-        v-model:value="row.remark"
-        :disabled="disabled"
-        placeholder="请输入备注"
-        @change="handleRowChange(row)"
-      />
-    </template>
-    <template #actions="{ row }">
-      <TableAction
-        v-if="!disabled"
-        :actions="[
-          {
-            label: '删除',
-            type: 'link',
-            danger: true,
-            popConfirm: {
-              title: '确认删除该付款明细吗？',
-              confirm: handleDelete.bind(null, row),
+  <div>
+    <Grid class="w-full">
+      <template #paymentPrice="{ row }">
+        <InputNumber
+          v-model:value="row.paymentPrice"
+          :precision="2"
+          :disabled="disabled"
+          :formatter="erpPriceInputFormatter"
+          placeholder="请输入本次付款"
+          @change="handleRowChange(row)"
+        />
+      </template>
+      <template #remark="{ row }">
+        <Input
+          v-model:value="row.remark"
+          :disabled="disabled"
+          placeholder="请输入备注"
+          @change="handleRowChange(row)"
+        />
+      </template>
+      <template #actions="{ row }">
+        <TableAction
+          :actions="[
+            {
+              label: '删除',
+              type: 'link',
+              danger: true,
+              popConfirm: {
+                title: '确认删除该付款明细吗？',
+                confirm: handleDelete.bind(null, row),
+              },
             },
-          },
-        ]"
-      />
-    </template>
+          ]"
+        />
+      </template>
 
-    <template #bottom>
-      <div class="border-border bg-muted mt-2 rounded border p-2">
-        <div class="text-muted-foreground flex justify-between text-sm">
-          <span class="text-foreground font-medium">合计：</span>
-          <div class="flex space-x-4">
-            <span>
-              合计付款：{{ erpPriceInputFormatter(summaries.totalPrice) }}
-            </span>
-            <span>
-              已付金额：{{ erpPriceInputFormatter(summaries.paidPrice) }}
-            </span>
-            <span>
-              本次付款：
-              {{ erpPriceInputFormatter(summaries.paymentPrice) }}
-            </span>
+      <template #bottom>
+        <div class="mt-2 rounded border border-border bg-muted p-2">
+          <div class="flex justify-between text-sm text-muted-foreground">
+            <span class="font-medium text-foreground">合计：</span>
+            <div class="flex space-x-4">
+              <span>
+                合计付款：{{ erpPriceInputFormatter(summaries.totalPrice) }}
+              </span>
+              <span>
+                已付金额：{{ erpPriceInputFormatter(summaries.paidPrice) }}
+              </span>
+              <span>
+                本次付款：
+                {{ erpPriceInputFormatter(summaries.paymentPrice) }}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-      <TableAction
-        v-if="!disabled"
-        class="mt-2 flex justify-center"
-        :actions="[
-          {
-            label: '添加采购入库单',
-            type: 'default',
-            onClick: handleOpenPurchaseIn,
-          },
-          {
-            label: '添加采购退货单',
-            type: 'default',
-            onClick: handleOpenSaleReturn,
-          },
-        ]"
-      />
-    </template>
-  </Grid>
+        <TableAction
+          v-if="!disabled"
+          class="mt-2 flex justify-center"
+          :actions="[
+            {
+              label: '添加采购入库单',
+              type: 'default',
+              onClick: handleOpenPurchaseIn,
+            },
+            {
+              label: '添加采购退货单',
+              type: 'default',
+              onClick: handleOpenSaleReturn,
+            },
+          ]"
+        />
+      </template>
+    </Grid>
 
-  <!-- 采购入库单选择组件 -->
-  <PurchaseInSelect ref="purchaseInSelectRef" @success="handleAddPurchaseIn" />
-  <!-- 采购退货单选择组件 -->
-  <SaleReturnSelect ref="saleReturnSelectRef" @success="handleAddSaleReturn" />
+    <!-- 采购入库单选择组件 -->
+    <PurchaseInSelect
+      ref="purchaseInSelectRef"
+      @success="handleAddPurchaseIn"
+    />
+    <!-- 采购退货单选择组件 -->
+    <SaleReturnSelect
+      ref="saleReturnSelectRef"
+      @success="handleAddSaleReturn"
+    />
+  </div>
 </template>

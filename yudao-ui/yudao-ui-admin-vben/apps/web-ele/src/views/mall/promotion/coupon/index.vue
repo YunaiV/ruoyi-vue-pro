@@ -7,7 +7,6 @@ import { ref } from 'vue';
 import { DocAlert, Page } from '@vben/common-ui';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
-import { $t } from '@vben/locales';
 
 import { ElLoading, ElMessage, ElTabPane, ElTabs } from 'element-plus';
 
@@ -32,7 +31,7 @@ function handleRefresh() {
 /** 删除优惠券 */
 async function handleDelete(row: MallCouponApi.Coupon) {
   const loadingInstance = ElLoading.service({
-    text: $t('ui.actionMessage.deleting', [row.name]),
+    text: '回收中...',
   });
   try {
     await deleteCoupon(row.id!);
@@ -112,10 +111,10 @@ const [Grid, gridApi] = useVbenVxeGrid({
     </template>
 
     <Grid>
-      <template #top>
+      <template #toolbar-actions>
         <ElTabs
           :model-value="activeTab"
-          class="-mt-11"
+          class="w-full"
           @tab-change="handleTabChange"
         >
           <ElTabPane
@@ -147,8 +146,3 @@ const [Grid, gridApi] = useVbenVxeGrid({
     </Grid>
   </Page>
 </template>
-<style scoped>
-:deep(.vxe-toolbar div) {
-  z-index: 1;
-}
-</style>

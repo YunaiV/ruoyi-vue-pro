@@ -36,39 +36,10 @@ export namespace PayRefundApi {
     createTime: Date;
     updateTime: Date;
   }
-
-  /** 退款订单分页请求 */
-  export interface RefundPageReqVO extends PageParam {
-    merchantId?: number;
-    appId?: number;
-    channelId?: number;
-    channelCode?: string;
-    orderId?: string;
-    tradeNo?: string;
-    merchantOrderId?: string;
-    merchantRefundNo?: string;
-    notifyUrl?: string;
-    notifyStatus?: number;
-    status?: number;
-    type?: number;
-    payAmount?: number;
-    refundAmount?: number;
-    reason?: string;
-    userIp?: string;
-    channelOrderNo?: string;
-    channelRefundNo?: string;
-    channelErrorCode?: string;
-    channelErrorMsg?: string;
-    channelExtras?: string;
-    expireTime?: Date[];
-    successTime?: Date[];
-    notifyTime?: Date[];
-    createTime?: Date[];
-  }
 }
 
 /** 查询退款订单列表 */
-export function getRefundPage(params: PayRefundApi.RefundPageReqVO) {
+export function getRefundPage(params: PageParam) {
   return requestClient.get<PageResult<PayRefundApi.Refund>>(
     '/pay/refund/page',
     {

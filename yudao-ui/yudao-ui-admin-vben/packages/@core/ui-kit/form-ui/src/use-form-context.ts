@@ -13,7 +13,7 @@ import { useForm } from 'vee-validate';
 import { object, ZodIntersection, ZodNumber, ZodObject, ZodString } from 'zod';
 import { getDefaultsForSchema } from 'zod-defaults';
 
-type ExtendFormProps = VbenFormProps & { formApi: ExtendedFormApi };
+type ExtendFormProps = VbenFormProps & { formApi?: ExtendedFormApi };
 
 export const [injectFormProps, provideFormProps] =
   createContext<[ComputedRef<ExtendFormProps> | ExtendFormProps, FormActions]>(

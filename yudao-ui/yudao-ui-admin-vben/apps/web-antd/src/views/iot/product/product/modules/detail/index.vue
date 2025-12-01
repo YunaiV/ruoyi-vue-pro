@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { IotProductApi } from '#/api/iot/product/product';
 
+// TODO @haohao：detail 挪到 yudao-ui-admin-vben-v5/apps/web-antd/src/views/iot/product/product/detail 下。独立一个，不放在 modules 里。
 import { onMounted, provide, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -12,8 +13,8 @@ import { getDeviceCount } from '#/api/iot/device/device';
 import { getProduct } from '#/api/iot/product/product';
 import IoTProductThingModel from '#/views/iot/thingmodel/index.vue';
 
-import ProductDetailsHeader from './ProductDetailsHeader.vue';
-import ProductDetailsInfo from './ProductDetailsInfo.vue';
+import ProductDetailsHeader from './product-details-header.vue';
+import ProductDetailsInfo from './product-details-info.vue';
 
 defineOptions({ name: 'IoTProductDetail' });
 
@@ -25,8 +26,7 @@ const loading = ref(true);
 const product = ref<IotProductApi.Product>({} as IotProductApi.Product);
 const activeTab = ref('info');
 
-// 提供产品信息给子组件
-provide('product', product);
+provide('product', product); // 提供产品信息给子组件
 
 /** 获取产品详情 */
 async function getProductData(productId: number) {
@@ -44,13 +44,8 @@ async function getProductData(productId: number) {
 async function getDeviceCountData(productId: number) {
   try {
     return await getDeviceCount(productId);
-  } catch (error) {
-    console.error(
-      'Error fetching device count:',
-      error,
-      'productId:',
-      productId,
-    );
+  } catch {
+    message.error('获取设备数量失败');
     return 0;
   }
 }
@@ -62,7 +57,6 @@ onMounted(async () => {
     router.back();
     return;
   }
-
   await getProductData(id);
 
   // 处理 tab 参数
@@ -70,7 +64,6 @@ onMounted(async () => {
   if (tab) {
     activeTab.value = tab as string;
   }
-
   // 查询设备数量
   if (product.value.id) {
     product.value.deviceCount = await getDeviceCountData(product.value.id);
@@ -85,7 +78,6 @@ onMounted(async () => {
       :product="product"
       @refresh="() => getProductData(id)"
     />
-
     <Tabs v-model:active-key="activeTab" class="mt-4">
       <Tabs.TabPane key="info" tab="产品信息">
         <ProductDetailsInfo v-if="activeTab === 'info'" :product="product" />

@@ -22,6 +22,7 @@ exports[`defaultPreferences immutability test > should not modify the config obj
     "enableCheckUpdates": true,
     "enablePreferences": true,
     "enableRefreshToken": false,
+    "enableStickyPreferencesNavigationBar": true,
     "isMobile": false,
     "layout": "sidebar-nav",
     "locale": "zh-CN",
@@ -29,6 +30,7 @@ exports[`defaultPreferences immutability test > should not modify the config obj
     "name": "Vben Admin",
     "preferencesButtonPosition": "auto",
     "watermark": false,
+    "watermarkContent": "",
     "zIndex": 200,
   },
   "breadcrumb": {
@@ -131,6 +133,7 @@ exports[`defaultPreferences immutability test > should not modify the config obj
     "refresh": true,
     "sidebarToggle": true,
     "themeToggle": true,
+    "timezone": true,
   },
 }
 `;

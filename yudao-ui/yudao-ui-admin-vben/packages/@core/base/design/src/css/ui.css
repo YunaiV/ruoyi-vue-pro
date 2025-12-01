@@ -1,5 +1,5 @@
 .side-content {
-  animation-duration: 0.2s;
+  animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -37,7 +37,7 @@
 @keyframes slide-down {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(50px);
   }
 
   to {
@@ -49,7 +49,7 @@
 @keyframes slide-left {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-50px);
   }
 
   to {
@@ -61,7 +61,7 @@
 @keyframes slide-right {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(50px);
   }
 
   to {
@@ -73,7 +73,7 @@
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(-50px);
   }
 
   to {

@@ -47,11 +47,8 @@ const logList = ref<SystemOperateLogApi.OperateLog[]>([]); // 操作日志
 const permissionListRef = ref<InstanceType<typeof PermissionList>>(); // 团队成员列表 Ref
 
 const [Descriptions] = useDescription({
-  componentProps: {
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  bordered: false,
+  column: 4,
   schema: useDetailSchema(),
 });
 
@@ -89,7 +86,7 @@ async function loadCustomerDetail() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/crm/customer');
+  router.push({ name: 'CrmCustomer' });
 }
 
 /** 编辑客户 */
@@ -109,13 +106,11 @@ function handleLock(lockStatus: boolean): Promise<boolean | undefined> {
       content: `确定锁定客户【${customer.value.name}】吗？`,
     })
       .then(async () => {
-        const res = await lockCustomer(customerId.value, lockStatus);
-        if (res) {
-          message.success(lockStatus ? '锁定客户成功' : '解锁客户成功');
-          resolve(true);
-        } else {
-          reject(new Error(lockStatus ? '锁定客户失败' : '解锁客户失败'));
-        }
+        // 锁定客户
+        await lockCustomer(customerId.value, lockStatus);
+        // 提示并返回成功
+        message.success(lockStatus ? '锁定客户成功' : '解锁客户成功');
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));
@@ -130,13 +125,11 @@ function handleReceive(): Promise<boolean | undefined> {
       content: `确定领取客户【${customer.value.name}】吗？`,
     })
       .then(async () => {
-        const res = await receiveCustomer([customerId.value]);
-        if (res) {
-          message.success('领取客户成功');
-          resolve(true);
-        } else {
-          reject(new Error('领取客户失败'));
-        }
+        // 领取客户
+        await receiveCustomer([customerId.value]);
+        // 提示并返回成功
+        message.success('领取客户成功');
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));
@@ -156,13 +149,11 @@ function handlePutPool(): Promise<boolean | undefined> {
       content: `确定将客户【${customer.value.name}】放入公海吗？`,
     })
       .then(async () => {
-        const res = await putCustomerPool(customerId.value);
-        if (res) {
-          message.success('放入公海成功');
-          resolve(true);
-        } else {
-          reject(new Error('放入公海失败'));
-        }
+        // 放入公海
+        await putCustomerPool(customerId.value);
+        // 提示并返回成功
+        message.success('放入公海成功');
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));
@@ -178,16 +169,11 @@ async function handleUpdateDealStatus(): Promise<boolean | undefined> {
       content: `确定更新成交状态为【${dealStatus ? '已成交' : '未成交'}】吗？`,
     })
       .then(async () => {
-        const res = await updateCustomerDealStatus(
-          customerId.value,
-          dealStatus,
-        );
-        if (res) {
-          message.success('更新成交状态成功');
-          resolve(true);
-        } else {
-          reject(new Error('更新成交状态失败'));
-        }
+        // 更新成交状态
+        await updateCustomerDealStatus(customerId.value, dealStatus);
+        // 提示并返回成功
+        message.success('更新成交状态成功');
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));

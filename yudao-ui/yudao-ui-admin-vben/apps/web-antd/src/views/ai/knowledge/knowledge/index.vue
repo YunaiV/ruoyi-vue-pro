@@ -28,33 +28,32 @@ function handleRefresh() {
   gridApi.query();
 }
 
-/** 创建 */
+/** 创建知识库 */
 function handleCreate() {
   formModalApi.setData(null).open();
 }
 
-/** 编辑 */
+/** 编辑知识库 */
 function handleEdit(row: AiKnowledgeKnowledgeApi.Knowledge) {
   formModalApi.setData(row).open();
 }
 
-/** 删除 */
+/** 删除知识库 */
 async function handleDelete(row: AiKnowledgeKnowledgeApi.Knowledge) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteKnowledge(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteKnowledge(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
   }
 }
-/** 文档按钮操作 */
+
+/** 跳转到知识库文档页面 */
 const router = useRouter();
 function handleDocument(id: number) {
   router.push({
@@ -92,6 +91,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
@@ -131,23 +131,25 @@ const [Grid, gridApi] = useVbenVxeGrid({
               auth: ['ai:knowledge:update'],
               onClick: handleEdit.bind(null, row),
             },
-          ]"
-          :drop-down-actions="[
             {
               label: $t('ui.widgets.document'),
               type: 'link',
+              icon: ACTION_ICON.BOOK,
               auth: ['ai:knowledge:query'],
               onClick: handleDocument.bind(null, row.id),
             },
             {
               label: '召回测试',
               type: 'link',
+              icon: ACTION_ICON.SEARCH,
               auth: ['ai:knowledge:query'],
               onClick: handleRetrieval.bind(null, row.id),
             },
             {
               label: $t('common.delete'),
               type: 'link',
+              danger: true,
+              icon: ACTION_ICON.DELETE,
               auth: ['ai:knowledge:delete'],
               popConfirm: {
                 title: $t('ui.actionMessage.deleteConfirm', [row.name]),

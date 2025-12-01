@@ -37,7 +37,7 @@
   "dependencies": {
     "@vben-core/shared": "workspace:*",
     "@vueuse/core": "catalog:",
-    "radix-vue": "catalog:",
+    "reka-ui": "catalog:",
     "sortablejs": "catalog:",
     "vue": "catalog:"
   },

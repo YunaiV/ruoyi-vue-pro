@@ -36,11 +36,8 @@ const logList = ref<SystemOperateLogApi.OperateLog[]>([]); // 操作日志
 const permissionListRef = ref<InstanceType<typeof PermissionList>>(); // 团队成员列表 Ref
 
 const [Descriptions] = useDescription({
-  componentProps: {
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  bordered: false,
+  column: 4,
   schema: useDetailSchema(),
 });
 
@@ -73,7 +70,7 @@ async function getContactDetail() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/crm/contact');
+  router.push({ name: 'CrmContact' });
 }
 
 /** 编辑联系人 */

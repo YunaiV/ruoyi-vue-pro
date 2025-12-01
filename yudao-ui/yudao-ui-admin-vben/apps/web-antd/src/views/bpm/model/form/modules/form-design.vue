@@ -21,7 +21,7 @@ import {
   Tooltip,
 } from 'ant-design-vue';
 
-import { getFormDetail } from '#/api/bpm/form';
+import { getForm } from '#/api/bpm/form';
 import { setConfAndFields2 } from '#/components/form-create';
 
 const props = defineProps({
@@ -33,10 +33,7 @@ const props = defineProps({
 
 const formRef = ref();
 
-// 创建本地数据副本
-const modelData = defineModel<any>();
-
-// 表单预览数据
+const modelData = defineModel<any>(); // 创建本地数据副本
 const formPreview = ref({
   formData: {} as any,
   rule: [],
@@ -45,25 +42,7 @@ const formPreview = ref({
     resetBtn: false,
     formData: {},
   },
-});
-
-/** 监听表单ID变化，加载表单数据 */
-watch(
-  () => modelData.value.formId,
-  async (newFormId) => {
-    if (newFormId && modelData.value.formType === BpmModelFormType.NORMAL) {
-      const data = await getFormDetail(newFormId);
-      setConfAndFields2(formPreview.value, data.conf, data.fields);
-      // 设置只读
-      formPreview.value.rule.forEach((item: any) => {
-        item.props = { ...item.props, disabled: true };
-      });
-    } else {
-      formPreview.value.rule = [];
-    }
-  },
-  { immediate: true },
-);
+}); // 表单预览数据
 
 const rules: Record<string, Rule[]> = {
   formType: [{ required: true, message: '表单类型不能为空', trigger: 'blur' }],
@@ -75,6 +54,24 @@ const rules: Record<string, Rule[]> = {
     { required: true, message: '表单查看地址不能为空', trigger: 'blur' },
   ],
 };
+
+/** 监听表单 ID 变化，加载表单数据 */
+watch(
+  () => modelData.value.formId,
+  async (newFormId) => {
+    if (newFormId && modelData.value.formType === BpmModelFormType.NORMAL) {
+      const data = await getForm(newFormId);
+      setConfAndFields2(formPreview.value, data.conf, data.fields);
+      // 设置只读
+      formPreview.value.rule.forEach((item: any) => {
+        item.props = { ...item.props, disabled: true };
+      });
+    } else {
+      formPreview.value.rule = [];
+    }
+  },
+  { immediate: true },
+);
 
 /** 表单校验 */
 async function validate() {

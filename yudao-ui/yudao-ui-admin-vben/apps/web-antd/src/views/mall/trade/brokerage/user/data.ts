@@ -23,7 +23,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
     {
       fieldName: 'brokerageEnabled',
       label: '推广资格',
-      component: 'Select',
+      component: 'RadioGroup',
       componentProps: {
         placeholder: '请选择推广资格',
         allowClear: true,
@@ -160,12 +160,18 @@ export function useCreateFormSchema(): VbenFormSchema[] {
       fieldName: 'userId',
       label: '分销员编号',
       component: 'InputSearch',
+      componentProps: {
+        placeholder: '请输入分销员编号',
+      },
       rules: 'required',
     },
     {
       fieldName: 'bindUserId',
       label: '上级推广员编号',
       component: 'InputSearch',
+      componentProps: {
+        placeholder: '请输入上级推广员编号',
+      },
       rules: 'required',
     },
   ];
@@ -178,6 +184,9 @@ export function useUpdateFormSchema(): VbenFormSchema[] {
       fieldName: 'bindUserId',
       label: '上级推广员编号',
       component: 'InputSearch',
+      componentProps: {
+        placeholder: '请输入上级推广员编号',
+      },
       rules: 'required',
     },
   ];

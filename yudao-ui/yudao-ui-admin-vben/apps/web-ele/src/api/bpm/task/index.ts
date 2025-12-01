@@ -5,7 +5,7 @@ import type { BpmProcessInstanceApi } from '../processInstance';
 import { requestClient } from '#/api/request';
 
 export namespace BpmTaskApi {
-  /** BPM 流程监听器 */
+  /** 流程任务 */
   export interface Task {
     id: number; // 编号
     name: string; // 监听器名字
@@ -13,6 +13,7 @@ export namespace BpmTaskApi {
     status: number; // 监听器状态
     event: string; // 监听事件
     valueType: string; // 监听器值类型
+    processInstance?: BpmProcessInstanceApi.ProcessInstance; // 流程实例
   }
 
   // 流程任务
@@ -87,46 +88,46 @@ export const getTaskListByReturn = async (id: string) => {
   return await requestClient.get(`/bpm/task/list-by-return?id=${id}`);
 };
 
-/** 退回 */
+/** 退回任务 */
 export const returnTask = async (data: any) => {
   return await requestClient.put('/bpm/task/return', data);
 };
 
-// 委派
+/** 委派任务 */
 export const delegateTask = async (data: any) => {
   return await requestClient.put('/bpm/task/delegate', data);
 };
 
-// 转派
+/** 转派任务 */
 export const transferTask = async (data: any) => {
   return await requestClient.put('/bpm/task/transfer', data);
 };
 
-// 加签
+/** 加签任务 */
 export const signCreateTask = async (data: any) => {
   return await requestClient.put('/bpm/task/create-sign', data);
 };
 
-// 减签
+/** 减签任务 */
 export const signDeleteTask = async (data: any) => {
   return await requestClient.delete('/bpm/task/delete-sign', data);
 };
 
-// 抄送
+/** 抄送任务 */
 export const copyTask = async (data: any) => {
   return await requestClient.put('/bpm/task/copy', data);
 };
 
-// 获取我的待办任务
-export const myTodoTask = async (processInstanceId: string) => {
-  return await requestClient.get(
-    `/bpm/task/my-todo?processInstanceId=${processInstanceId}`,
-  );
-};
-
-// 获取加签任务列表
+/** 获取加签任务列表 */
 export const getChildrenTaskList = async (id: string) => {
   return await requestClient.get(
     `/bpm/task/list-by-parent-task-id?parentTaskId=${id}`,
   );
+};
+
+/** 撤回任务 */
+export const withdrawTask = async (taskId: string) => {
+  return await requestClient.put('/bpm/task/withdraw', null, {
+    params: { taskId },
+  });
 };

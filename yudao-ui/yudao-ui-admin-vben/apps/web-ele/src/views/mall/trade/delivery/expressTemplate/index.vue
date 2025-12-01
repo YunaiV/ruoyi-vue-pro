@@ -32,13 +32,15 @@ function handleCreate() {
 }
 
 /** 编辑快递模板 */
-function handleEdit(row: MallDeliveryExpressTemplateApi.ExpressTemplate) {
+function handleEdit(
+  row: MallDeliveryExpressTemplateApi.DeliveryExpressTemplate,
+) {
   formModalApi.setData(row).open();
 }
 
 /** 删除快递模板 */
 async function handleDelete(
-  row: MallDeliveryExpressTemplateApi.ExpressTemplate,
+  row: MallDeliveryExpressTemplateApi.DeliveryExpressTemplate,
 ) {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting', [row.name]),
@@ -79,7 +81,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       refresh: true,
       search: true,
     },
-  } as VxeTableGridOptions<MallDeliveryExpressTemplateApi.ExpressTemplate>,
+  } as VxeTableGridOptions<MallDeliveryExpressTemplateApi.DeliveryExpressTemplate>,
 });
 </script>
 

@@ -4,35 +4,34 @@ import type { MemberSignInRecordApi } from '#/api/member/signin/record';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getSignInRecordPage } from '#/api/member/signin/record';
-import { getRangePickerDefaultProps } from '#/utils';
-import { useGridColumns } from '#/views/member/signin/record/data';
+import {
+  useGridColumns as useSignInGridColumns,
+  useGridFormSchema as useSignInGridFormSchema,
+} from '#/views/member/signin/record/data';
 
 const props = defineProps<{
   userId: number;
 }>();
 
+/** 列表的搜索表单（过滤掉用户相关字段） */
+function useGridFormSchema() {
+  const excludeFields = new Set(['nickname']);
+  return useSignInGridFormSchema().filter(
+    (item) => !excludeFields.has(item.fieldName),
+  );
+}
+
+/** 列表的字段（过滤掉用户相关字段） */
+function useGridColumns() {
+  const excludeFields = new Set(['nickname']);
+  return useSignInGridColumns()?.filter(
+    (item) => item.field && !excludeFields.has(item.field),
+  );
+}
+
 const [Grid] = useVbenVxeGrid({
   formOptions: {
-    schema: [
-      {
-        fieldName: 'day',
-        label: '签到天数',
-        component: 'Input',
-        componentProps: {
-          placeholder: '请输入签到天数',
-          allowClear: true,
-        },
-      },
-      {
-        fieldName: 'createTime',
-        label: '签到时间',
-        component: 'RangePicker',
-        componentProps: {
-          ...getRangePickerDefaultProps(),
-          allowClear: true,
-        },
-      },
-    ],
+    schema: useGridFormSchema(),
   },
   gridOptions: {
     columns: useGridColumns(),
@@ -58,7 +57,6 @@ const [Grid] = useVbenVxeGrid({
       search: true,
     },
   } as VxeTableGridOptions<MemberSignInRecordApi.SignInRecord>,
-  separator: false,
 });
 </script>
 

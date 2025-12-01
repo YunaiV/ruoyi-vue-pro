@@ -10,7 +10,7 @@ import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteAlertConfig, getAlertConfigPage } from '#/api/iot/alert/config';
 import { $t } from '#/locales';
 
-import AlertConfigForm from '../modules/AlertConfigForm.vue';
+import AlertConfigForm from '../modules/alert-config-form.vue';
 import { useGridColumns, useGridFormSchema } from './data';
 
 defineOptions({ name: 'IoTAlertConfig' });

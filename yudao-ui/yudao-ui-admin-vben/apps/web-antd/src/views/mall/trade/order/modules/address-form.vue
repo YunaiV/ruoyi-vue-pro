@@ -40,7 +40,7 @@ const [Modal, modalApi] = useVbenModal({
     // 提交表单
     const data = await formApi.getValues();
     try {
-      await updateOrderAddress(data as MallOrderApi.AddressRequest);
+      await updateOrderAddress(data as MallOrderApi.OrderUpdateAddressReqVO);
       // 关闭并提示
       await modalApi.close();
       emit('success');

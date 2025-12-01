@@ -66,7 +66,8 @@ const [Modal, modalApi] = useVbenModal({
     }
     modalApi.lock();
     // 提交表单
-    const data = (await formApi.getValues()) as CrmPermissionApi.TransferReq;
+    const data =
+      (await formApi.getValues()) as CrmPermissionApi.BusinessTransferReqVO;
     try {
       switch (bizType.value) {
         case BizTypeEnum.CRM_BUSINESS: {

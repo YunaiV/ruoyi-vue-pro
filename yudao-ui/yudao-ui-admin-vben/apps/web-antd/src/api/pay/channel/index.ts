@@ -1,5 +1,3 @@
-import type { PageParam, PageResult } from '@vben/request';
-
 import { requestClient } from '#/api/request';
 
 export namespace PayChannelApi {
@@ -14,16 +12,6 @@ export namespace PayChannelApi {
     appId: number;
     createTime: Date;
   }
-}
-
-/** 查询支付渠道列表 */
-export function getChannelPage(params: PageParam) {
-  return requestClient.get<PageResult<PayChannelApi.Channel>>(
-    '/pay/channel/page',
-    {
-      params,
-    },
-  );
 }
 
 /** 查询支付渠道详情 */
@@ -41,14 +29,4 @@ export function createChannel(data: PayChannelApi.Channel) {
 /** 修改支付渠道 */
 export function updateChannel(data: PayChannelApi.Channel) {
   return requestClient.put('/pay/channel/update', data);
-}
-
-/** 删除支付渠道 */
-export function deleteChannel(id: number) {
-  return requestClient.delete(`/pay/channel/delete?id=${id}`);
-}
-
-/** 导出支付渠道 */
-export function exportChannel(params: PageParam) {
-  return requestClient.download('/pay/channel/export-excel', { params });
 }

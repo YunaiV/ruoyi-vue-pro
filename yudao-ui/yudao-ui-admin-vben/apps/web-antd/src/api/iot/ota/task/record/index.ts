@@ -22,6 +22,7 @@ export namespace IoTOtaTaskRecordApi {
   }
 }
 
+// TODO @AI：这里应该拿到 IoTOtaTaskRecordApi 里
 /** IoT OTA 升级任务记录 */
 export interface OtaTaskRecord {
   id?: number;
@@ -95,7 +96,7 @@ export function getOtaTaskRecordStatusStatistics(
   taskId?: number,
 ) {
   return requestClient.get<Record<string, number>>(
-    '/iot/ota/task/record/status-statistics',
+    '/iot/ota/task/record/get-status-statistics',
     { params: { firmwareId, taskId } },
   );
 }

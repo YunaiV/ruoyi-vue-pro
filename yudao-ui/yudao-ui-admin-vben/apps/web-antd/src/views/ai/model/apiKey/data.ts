@@ -5,6 +5,7 @@ import { CommonStatusEnum, DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
 import { z } from '#/adapter/form';
+
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -25,24 +26,33 @@ export function useFormSchema(): VbenFormSchema[] {
         options: getDictOptions(DICT_TYPE.AI_PLATFORM, 'string'),
         allowClear: true,
       },
-      rules: z.string().min(1, { message: '请输入平台' }),
+      rules: 'required',
     },
     {
       component: 'Input',
       fieldName: 'name',
       label: '名称',
       rules: 'required',
+      componentProps: {
+        placeholder: '请输入名称',
+      },
     },
     {
       component: 'Input',
       fieldName: 'apiKey',
       label: '密钥',
       rules: 'required',
+      componentProps: {
+        placeholder: '请输入密钥',
+      },
     },
     {
       component: 'Input',
       fieldName: 'url',
       label: '自定义 API URL',
+      componentProps: {
+        placeholder: '请输入自定义 API URL',
+      },
     },
     {
       fieldName: 'status',
@@ -65,6 +75,10 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入名称',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'platform',
@@ -72,6 +86,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'Select',
       componentProps: {
         allowClear: true,
+        placeholder: '请选择平台',
         options: getDictOptions(DICT_TYPE.AI_PLATFORM, 'string'),
       },
     },
@@ -81,6 +96,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'Select',
       componentProps: {
         allowClear: true,
+        placeholder: '请选择状态',
         options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
       },
     },
@@ -97,18 +113,22 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
         name: 'CellDict',
         props: { type: DICT_TYPE.AI_PLATFORM },
       },
+      minWidth: 100,
     },
     {
       field: 'name',
       title: '名称',
+      minWidth: 120,
     },
     {
       field: 'apiKey',
       title: '密钥',
+      minWidth: 140,
     },
     {
       field: 'url',
       title: '自定义 API URL',
+      minWidth: 180,
     },
     {
       field: 'status',
@@ -117,6 +137,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
         name: 'CellDict',
         props: { type: DICT_TYPE.COMMON_STATUS },
       },
+      minWidth: 80,
     },
     {
       title: '操作',

@@ -10,9 +10,11 @@ import { useUserStore } from '@vben/stores';
 import { getSimpleDeliveryPickUpStoreList } from '#/api/mall/trade/delivery/pickUpStore';
 import { getRangePickerDefaultProps } from '#/utils';
 
-/** 关联数据 **/
+/** 关联数据 */
 const userStore = useUserStore();
-const pickUpStoreList = ref<MallDeliveryPickUpStoreApi.PickUpStore[]>([]);
+const pickUpStoreList = ref<MallDeliveryPickUpStoreApi.DeliveryPickUpStore[]>(
+  [],
+);
 getSimpleDeliveryPickUpStoreList().then((res) => {
   pickUpStoreList.value = res;
   // 移除自己无法核销的门店
@@ -40,10 +42,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'Select',
       componentProps: {
         options: pickUpStoreList,
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
+        labelField: 'name',
+        valueField: 'id',
         placeholder: '请选择自提门店',
       },
       defaultValue: pickUpStoreList.value[0]?.id,

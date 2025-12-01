@@ -5,28 +5,12 @@ import { requestClient } from '#/api/request';
 export namespace MallDeliveryExpressApi {
   /** 快递公司 */
   export interface DeliveryExpress {
-    /** 编号 */
-    id: number;
-    /** 快递公司编码 */
-    code: string;
-    /** 快递公司名称 */
-    name: string;
-    /** 快递公司 logo */
-    logo: string;
-    /** 排序 */
-    sort: number;
-    /** 状态 */
-    status: number;
-  }
-
-  /** 快递公司精简信息 */
-  export interface SimpleDeliveryExpress {
-    /** 编号 */
-    id: number;
-    /** 快递公司编码 */
-    code: string;
-    /** 快递公司名称 */
-    name: string;
+    id: number; // 编号
+    code: string; // 快递公司编码
+    name: string; // 快递公司名称
+    logo: string; // 快递公司 logo
+    sort: number; // 排序
+    status: number; // 状态
   }
 }
 
@@ -47,7 +31,7 @@ export function getDeliveryExpress(id: number) {
 
 /** 获得快递公司精简信息列表 */
 export function getSimpleDeliveryExpressList() {
-  return requestClient.get<MallDeliveryExpressApi.SimpleDeliveryExpress[]>(
+  return requestClient.get<MallDeliveryExpressApi.DeliveryExpress[]>(
     '/trade/delivery/express/list-all-simple',
   );
 }

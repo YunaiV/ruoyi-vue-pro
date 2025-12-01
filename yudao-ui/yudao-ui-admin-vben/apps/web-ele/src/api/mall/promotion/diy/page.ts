@@ -5,18 +5,12 @@ import { requestClient } from '#/api/request';
 export namespace MallDiyPageApi {
   /** 装修页面 */
   export interface DiyPage {
-    /** 页面编号 */
-    id?: number;
-    /** 模板编号 */
-    templateId?: number;
-    /** 页面名称 */
-    name: string;
-    /** 备注 */
-    remark: string;
-    /** 预览图片地址数组 */
-    previewPicUrls: string[];
-    /** 页面属性 */
-    property: string;
+    id?: number; // 页面编号
+    templateId?: number; // 模板编号
+    name: string; // 页面名称
+    remark: string; // 备注
+    previewPicUrls: string[]; // 预览图片地址数组
+    property: string; // 页面属性
   }
 }
 

@@ -43,7 +43,6 @@ function handleEdit(row: MallDiyTemplateApi.DiyTemplate) {
   formModalApi.setData(row).open();
 }
 
-// TODO @xingyu：装修未实现
 /** 装修模板 */
 function handleDecorate(row: MallDiyTemplateApi.DiyTemplate) {
   router.push({ name: 'DiyTemplateDecorate', params: { id: row.id } });
@@ -51,20 +50,33 @@ function handleDecorate(row: MallDiyTemplateApi.DiyTemplate) {
 
 /** 使用模板 */
 async function handleUse(row: MallDiyTemplateApi.DiyTemplate) {
-  confirm({
-    content: `是否使用模板"${row.name}"?`,
-  }).then(async () => {
-    // 发起删除
+  await confirm(`是否使用模板"${row.name}"?`);
+  const hideLoading = message.loading({
+    content: `正在使用模板"${row.name}"...`,
+    duration: 0,
+  });
+  try {
     await useDiyTemplate(row.id as number);
     message.success('使用成功');
     handleRefresh();
-  });
+  } finally {
+    hideLoading();
+  }
 }
 
-/** 删除DIY模板 */
+/** 删除 DIY 模板 */
 async function handleDelete(row: MallDiyTemplateApi.DiyTemplate) {
-  await deleteDiyTemplate(row.id as number);
-  handleRefresh();
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.name]),
+    duration: 0,
+  });
+  try {
+    await deleteDiyTemplate(row.id as number);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
+    handleRefresh();
+  } finally {
+    hideLoading();
+  }
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
@@ -142,14 +154,14 @@ const [Grid, gridApi] = useVbenVxeGrid({
             },
             {
               label: '使用',
-              type: 'link' as const,
+              type: 'link',
               auth: ['promotion:diy-template:use'],
               ifShow: !row.used,
               onClick: handleUse.bind(null, row),
             },
             {
               label: $t('common.delete'),
-              type: 'link' as const,
+              type: 'link',
               danger: true,
               icon: ACTION_ICON.DELETE,
               auth: ['promotion:diy-template:delete'],

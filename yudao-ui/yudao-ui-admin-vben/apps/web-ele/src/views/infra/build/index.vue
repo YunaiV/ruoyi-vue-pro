@@ -27,7 +27,7 @@ const designer = ref(); // 表单设计器
 const designerConfig = ref({
   switchType: [], // 是否可以切换组件类型,或者可以相互切换的字段
   autoActive: true, // 是否自动选中拖入的组件
-  useTemplate: false, // 是否生成vue2语法的模板组件
+  useTemplate: false, // 是否生成 Vue 语法的模板组件
   formOptions: {
     form: {
       labelWidth: '100px', // 设置默认的 label 宽度为 100px

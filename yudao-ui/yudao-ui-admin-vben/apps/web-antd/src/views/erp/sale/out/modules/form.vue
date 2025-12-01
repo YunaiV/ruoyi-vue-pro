@@ -79,36 +79,36 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新销售出库项 */
-const handleUpdateItems = (items: ErpSaleOutApi.SaleOutItem[]) => {
+function handleUpdateItems(items: ErpSaleOutApi.SaleOutItem[]) {
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 更新其他费用 */
-const handleUpdateOtherPrice = (otherPrice: number) => {
+function handleUpdateOtherPrice(otherPrice: number) {
   formApi.setValues({
     otherPrice,
   });
-};
+}
 
 /** 更新优惠金额 */
-const handleUpdateDiscountPrice = (discountPrice: number) => {
+function handleUpdateDiscountPrice(discountPrice: number) {
   formApi.setValues({
     discountPrice,
   });
-};
+}
 
 /** 更新总金额 */
-const handleUpdateTotalPrice = (totalPrice: number) => {
+function handleUpdateTotalPrice(totalPrice: number) {
   formApi.setValues({
     totalPrice,
   });
-};
+}
 
 /** 选择销售订单 */
-const handleUpdateOrder = (order: ErpSaleOrderApi.SaleOrder) => {
+function handleUpdateOrder(order: ErpSaleOrderApi.SaleOrder) {
   formData.value = {
     ...formData.value,
     orderId: order.id,
@@ -130,7 +130,7 @@ const handleUpdateOrder = (order: ErpSaleOrderApi.SaleOrder) => {
     (item) => item.count && item.count > 0,
   ) as ErpSaleOutApi.SaleOutItem[];
   formApi.setValues(formData.value, false);
-};
+}
 
 /** 创建或更新销售出库 */
 const [Modal, modalApi] = useVbenModal({
@@ -166,7 +166,7 @@ const [Modal, modalApi] = useVbenModal({
   },
   async onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      formData.value = undefined;
+      formData.value = {} as ErpSaleOutApi.SaleOut;
       return;
     }
     // 加载数据

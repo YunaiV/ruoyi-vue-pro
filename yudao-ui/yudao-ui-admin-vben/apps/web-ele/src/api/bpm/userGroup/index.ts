@@ -3,7 +3,7 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace BpmUserGroupApi {
-  /** BPM 用户组 */
+  /** 用户组 */
   export interface UserGroup {
     id: number;
     name: string;

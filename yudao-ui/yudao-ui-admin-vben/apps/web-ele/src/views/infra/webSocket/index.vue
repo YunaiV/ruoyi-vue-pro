@@ -47,7 +47,7 @@ const { status, data, send, close, open } = useWebSocket(server.value, {
 const messageList = ref(
   [] as { text: string; time: number; type?: string; userId?: string }[],
 ); // 消息列表
-const messageReverseList = computed(() => [...messageList.value].reverse());
+const messageReverseList = computed(() => [...messageList.value].toReversed());
 watchEffect(() => {
   if (!data.value) {
     return;

@@ -19,7 +19,6 @@ const DEFAULT_CONFIG = {
   ],
   // 需要忽略的包
   ignorePackages: [
-    '@vben/backend-mock',
     '@vben/commitlint-config',
     '@vben/eslint-config',
     '@vben/node-utils',

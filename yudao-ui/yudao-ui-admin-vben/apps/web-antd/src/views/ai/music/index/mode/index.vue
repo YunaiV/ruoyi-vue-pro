@@ -16,11 +16,6 @@ const generateMode = ref('lyric');
 
 const modeRef = ref<Nullable<{ formData: Recordable<any> }>>(null);
 
-/*
- *@Description: 根据信息生成音乐
- *@MethodAuthor: xiaohong
- *@Date: 2024-06-27 16:40:16
- */
 function generateMusic() {
   emits('generateMusic', { formData: unref(modeRef)?.formData });
 }

@@ -20,6 +20,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '秒杀时段名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入秒杀时段名称',
+      },
       rules: 'required',
     },
     {

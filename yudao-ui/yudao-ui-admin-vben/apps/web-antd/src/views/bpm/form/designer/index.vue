@@ -2,18 +2,20 @@
 import { computed, onMounted, ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
+import { useTabs } from '@vben/hooks';
 import { IconifyIcon } from '@vben/icons';
 
 import FcDesigner from '@form-create/antd-designer';
-import { Button, message } from 'ant-design-vue';
+import { Button, message, Spin } from 'ant-design-vue';
 
-import { getFormDetail } from '#/api/bpm/form';
+import { getForm } from '#/api/bpm/form';
 import {
   setConfAndFields,
   useFormCreateDesigner,
 } from '#/components/form-create';
 import { router } from '#/router';
-import Form from '#/views/bpm/form/modules/form.vue';
+
+import Form from './modules/form.vue';
 
 defineOptions({ name: 'BpmFormEditor' });
 
@@ -23,21 +25,20 @@ const props = defineProps<{
   type: 'copy' | 'create' | 'edit';
 }>();
 
-/** 流程表单详情 */
+const loading = ref(false);
+const tabs = useTabs();
 const flowFormConfig = ref();
+const designerRef = ref<InstanceType<typeof FcDesigner>>();
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
 
-const designerRef = ref<InstanceType<typeof FcDesigner>>();
-
-/** 表单设计器配置 */
 const designerConfig = ref({
   switchType: [], // 是否可以切换组件类型,或者可以相互切换的字段
   autoActive: true, // 是否自动选中拖入的组件
-  useTemplate: false, // 是否生成vue2语法的模板组件
+  useTemplate: false, // 是否生成 Vue 语法的模板组件
   formOptions: {
     form: {
       labelWidth: '100px', // 设置默认的 label 宽度为 100px
@@ -61,11 +62,11 @@ const designerConfig = ref({
   showInputData: true, // 是否显示录入按钮
   showDevice: true, // 是否显示多端适配选项
   appendConfigData: [], // 定义渲染规则所需的formData
-});
+}); // 表单设计器配置
 
 useFormCreateDesigner(designerRef); // 表单设计器增强
 
-// 计算属性：获取当前需要加载的表单ID
+/** 计算属性：获取当前需要加载的表单 ID */
 const currentFormId = computed(() => {
   switch (props.type) {
     case 'copy': {
@@ -81,28 +82,27 @@ const currentFormId = computed(() => {
   }
 });
 
-// 加载表单配置
+/** 加载表单配置 */
 async function loadFormConfig(id: number) {
+  loading.value = true;
   try {
-    const formDetail = await getFormDetail(id);
+    const formDetail = await getForm(id);
     flowFormConfig.value = formDetail;
     if (designerRef.value) {
       setConfAndFields(designerRef, formDetail.conf, formDetail.fields);
     }
-  } catch {
-    message.error('加载表单配置失败');
+  } finally {
+    loading.value = false;
   }
 }
 
-// 初始化设计器
+/** 初始化设计器 */
 async function initializeDesigner() {
   const id = currentFormId.value;
-
   if (props.type === 'copy' && !id) {
-    message.error('复制ID不能为空');
+    message.error('复制 ID 不能为空');
     return;
   }
-
   if (id) {
     await loadFormConfig(Number(id));
   }
@@ -120,15 +120,14 @@ function handleSave() {
 }
 
 /** 返回列表页 */
-function onBack() {
+function handleBack() {
+  tabs.closeCurrentTab();
   router.push({
-    path: '/bpm/manager/form',
-    query: {
-      refresh: '1',
-    },
+    name: 'BpmForm',
   });
 }
 
+/** 初始化 */
 onMounted(() => {
   initializeDesigner();
 });
@@ -136,19 +135,17 @@ onMounted(() => {
 
 <template>
   <Page auto-content-height>
-    <FormModal @success="onBack" />
+    <FormModal @success="handleBack" />
 
-    <FcDesigner
-      class="h-full min-h-[500px]"
-      ref="designerRef"
-      :config="designerConfig"
-    >
-      <template #handle>
-        <Button size="small" type="primary" @click="handleSave">
-          <IconifyIcon icon="mdi:content-save" />
-          保存
-        </Button>
-      </template>
-    </FcDesigner>
+    <Spin :spinning="loading">
+      <FcDesigner ref="designerRef" height="90vh" :config="designerConfig">
+        <template #handle>
+          <Button size="small" type="primary" @click="handleSave">
+            <IconifyIcon icon="mdi:content-save" />
+            保存
+          </Button>
+        </template>
+      </FcDesigner>
+    </Spin>
   </Page>
 </template>

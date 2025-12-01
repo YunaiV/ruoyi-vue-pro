@@ -11,7 +11,7 @@ import { TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { sendCoupon } from '#/api/mall/promotion/coupon/coupon';
 import { getCouponTemplatePage } from '#/api/mall/promotion/coupon/couponTemplate';
 
-import { useFormSchema, useGridColumns } from './data';
+import { useFormSchema, useGridColumns } from './send-form-data';
 
 /** 发送优惠券 */
 async function handleSendCoupon(row: MallCouponTemplateApi.CouponTemplate) {

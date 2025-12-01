@@ -1,11 +1,10 @@
 import type { VbenFormSchema } from '#/adapter/form';
 
 import { useUserStore } from '@vben/stores';
-import { beginOfDay, endOfDay, formatDateTime, handleTree } from '@vben/utils';
+import { handleTree } from '@vben/utils';
 
 import { getSimpleDeptList } from '#/api/system/dept';
 import { getSimpleUserList } from '#/api/system/user';
-import { getRangePickerDefaultProps } from '#/utils';
 
 const userStore = useUserStore();
 
@@ -28,20 +27,16 @@ export const customerSummaryTabs = [
 export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
-      fieldName: 'times',
-      label: '时间范围',
-      component: 'RangePicker',
+      fieldName: 'time',
+      label: '选择年份',
+      component: 'DatePicker',
       componentProps: {
-        ...getRangePickerDefaultProps(),
         picker: 'year',
-        showTime: false,
         format: 'YYYY',
-        ranges: {},
+        valueFormat: 'YYYY',
+        placeholder: '请选择年份',
       },
-      defaultValue: [
-        formatDateTime(beginOfDay(new Date(new Date().getFullYear(), 0, 1))),
-        formatDateTime(endOfDay(new Date(new Date().getFullYear(), 11, 31))),
-      ] as [Date, Date],
+      defaultValue: new Date().getFullYear().toString(),
     },
     {
       fieldName: 'deptId',
@@ -56,6 +51,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
         valueField: 'id',
         childrenField: 'children',
         treeDefaultExpandAll: true,
+        placeholder: '请选择归属部门',
       },
       defaultValue: userStore.userInfo?.deptId,
     },

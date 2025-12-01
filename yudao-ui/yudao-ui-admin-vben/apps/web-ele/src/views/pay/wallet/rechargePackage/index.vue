@@ -37,7 +37,9 @@ function handleEdit(row: WalletRechargePackageApi.WalletRechargePackage) {
 }
 
 /** 删除套餐 */
-async function handleDelete(row: WalletRechargePackageApi.WalletRechargePackage) {
+async function handleDelete(
+  row: WalletRechargePackageApi.WalletRechargePackage,
+) {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting', [row.name]),
   });

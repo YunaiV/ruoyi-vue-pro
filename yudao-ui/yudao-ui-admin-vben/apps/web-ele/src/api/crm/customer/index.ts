@@ -16,6 +16,7 @@ export namespace CrmCustomerApi {
     ownerUserId: number; // 负责人的用户编号
     ownerUserName?: string; // 负责人的用户名称
     ownerUserDept?: string; // 负责人的部门名称
+    ownerUserDeptName?: string; // 负责人的部门名称
     lockStatus?: boolean;
     dealStatus?: boolean;
     mobile: string; // 手机号
@@ -34,8 +35,11 @@ export namespace CrmCustomerApi {
     creatorName?: string; // 创建人名称
     createTime: Date; // 创建时间
     updateTime: Date; // 更新时间
+    poolDay?: number; // 距离进入公海天数
   }
-  export interface CustomerImport {
+
+  /** 客户导入请求 */
+  export interface CustomerImportReqVO {
     ownerUserId: number;
     file: File;
     updateSupport: boolean;
@@ -83,7 +87,7 @@ export function importCustomerTemplate() {
 }
 
 /** 导入客户 */
-export function importCustomer(data: CrmCustomerApi.CustomerImport) {
+export function importCustomer(data: CrmCustomerApi.CustomerImportReqVO) {
   return requestClient.upload('/crm/customer/import', data);
 }
 
@@ -95,7 +99,7 @@ export function getCustomerSimpleList() {
 }
 
 /** 客户转移 */
-export function transferCustomer(data: CrmPermissionApi.TransferReq) {
+export function transferCustomer(data: CrmPermissionApi.BusinessTransferReqVO) {
   return requestClient.put('/crm/customer/transfer', data);
 }
 

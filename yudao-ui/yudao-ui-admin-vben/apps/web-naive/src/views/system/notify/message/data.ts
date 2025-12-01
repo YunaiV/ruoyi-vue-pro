@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { SystemNotifyMessageApi } from '#/api/system/notify/message';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -166,10 +165,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'userType',
       label: '用户类型',
-      content: (data: SystemNotifyMessageApi.NotifyMessage) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.USER_TYPE,
-          value: data?.userType,
+          value: val,
         });
       },
     },
@@ -196,9 +195,9 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'templateParams',
       label: '模版参数',
-      content: (data: SystemNotifyMessageApi.NotifyMessage) => {
+      render: (val) => {
         try {
-          return JSON.stringify(data?.templateParams);
+          return JSON.stringify(val);
         } catch {
           return '';
         }
@@ -207,36 +206,32 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'templateType',
       label: '模版类型',
-      content: (data: SystemNotifyMessageApi.NotifyMessage) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.SYSTEM_NOTIFY_TEMPLATE_TYPE,
-          value: data?.templateType,
+          value: val,
         });
       },
     },
     {
       field: 'readStatus',
       label: '是否已读',
-      content: (data: SystemNotifyMessageApi.NotifyMessage) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.INFRA_BOOLEAN_STRING,
-          value: data?.readStatus,
+          value: val,
         });
       },
     },
     {
       field: 'readTime',
       label: '阅读时间',
-      content: (data: SystemNotifyMessageApi.NotifyMessage) => {
-        return formatDateTime(data?.readTime || '') as string;
-      },
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'createTime',
       label: '创建时间',
-      content: (data: SystemNotifyMessageApi.NotifyMessage) => {
-        return formatDateTime(data?.createTime || '') as string;
-      },
+      render: (val) => formatDateTime(val) as string,
     },
   ];
 }

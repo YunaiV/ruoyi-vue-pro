@@ -1,80 +1,198 @@
 <script lang="tsx">
-import type { DescriptionsProps } from 'naive-ui';
+import type { DescriptionsProps as NDescriptionsProps } from 'naive-ui';
 
-import type { PropType } from 'vue';
+import type { CSSProperties, PropType, Slots } from 'vue';
 
-import type { DescriptionItemSchema, DescriptionsOptions } from './typing';
+import type { DescriptionItemSchema, DescriptionProps } from './typing';
 
-import { defineComponent } from 'vue';
+import { computed, defineComponent, ref, unref, useAttrs } from 'vue';
 
-import { get } from '@vben/utils';
+import { get, getNestedValue, isFunction } from '@vben/utils';
 
-import { NDescriptions, NDescriptionsItem } from 'naive-ui';
+import { NCard, NDescriptions, NDescriptionsItem } from 'naive-ui';
 
-/** 对 Descriptions 进行二次封装 */
-const Description = defineComponent({
-  name: 'Descriptions',
-  props: {
-    data: {
-      type: Object as PropType<Record<string, any>>,
-      default: () => ({}),
+const props = {
+  bordered: { default: true, type: Boolean },
+  column: {
+    default: () => {
+      return { lg: 3, md: 3, sm: 2, xl: 3, xs: 1, xxl: 4 };
     },
-    schema: {
-      type: Array as PropType<DescriptionItemSchema[]>,
-      default: () => [],
-    },
-    // Descriptions 原生 props
-    componentProps: {
-      type: Object as PropType<DescriptionsProps>,
-      default: () => ({}),
-    },
+    type: [Number, Object],
   },
+  data: { type: Object },
+  schema: {
+    default: () => [],
+    type: Array as PropType<DescriptionItemSchema[]>,
+  },
+  size: {
+    default: 'small',
+    type: String,
+    validator: (v: string) =>
+      ['default', 'middle', 'small', undefined].includes(v),
+  },
+  title: { default: '', type: String },
+  useCard: { default: true, type: Boolean },
+  labelPlacement: { default: 'left', type: String as PropType<'left' | 'top'> },
+};
 
-  setup(props: DescriptionsOptions) {
-    // TODO @xingyu：每个 field 的 slot 的考虑
-    // TODO @xingyu：from 5.0：extra: () => getSlot(slots, 'extra')
-    /** 过滤掉不需要展示的 */
-    const shouldShowItem = (item: DescriptionItemSchema) => {
-      if (item.hidden === undefined) return true;
-      return typeof item.hidden === 'function'
-        ? !item.hidden(props.data)
-        : !item.hidden;
-    };
-    /** 渲染内容 */
-    const renderContent = (item: DescriptionItemSchema) => {
-      if (item.content) {
-        return typeof item.content === 'function'
-          ? item.content(props.data)
-          : item.content;
+function getSlot(slots: Slots, slot: string, data?: any) {
+  if (!slots || !Reflect.has(slots, slot)) {
+    return null;
+  }
+  if (!isFunction(slots[slot])) {
+    console.error(`${slot} is not a function!`);
+    return null;
+  }
+  const slotFn = slots[slot];
+  if (!slotFn) return null;
+  return slotFn({ data });
+}
+
+export default defineComponent({
+  name: 'Description',
+  props,
+  setup(props, { slots }) {
+    const propsRef = ref<null | Partial<DescriptionProps>>(null);
+
+    const prefixCls = 'description';
+    const attrs = useAttrs();
+
+    // Custom title component: get title
+    const getMergeProps = computed(() => {
+      return {
+        ...props,
+        ...(unref(propsRef) as any),
+      } as DescriptionProps;
+    });
+
+    const getProps = computed(() => {
+      const opt = {
+        ...unref(getMergeProps),
+        title: undefined,
+      };
+      return opt as DescriptionProps;
+    });
+
+    const useWrapper = computed(() => !!unref(getMergeProps).title);
+
+    const getDescriptionsProps = computed(() => {
+      return { ...unref(attrs), ...unref(getProps) } as NDescriptionsProps;
+    });
+
+    // 防止换行
+    function renderLabel({
+      label,
+      labelMinWidth,
+      labelStyle,
+    }: DescriptionItemSchema) {
+      if (!labelStyle && !labelMinWidth) {
+        return label;
       }
-      return item.field ? get(props.data, item.field) : null;
-    };
 
-    return () => (
-      <NDescriptions
-        {...props}
-        bordered={props.componentProps?.bordered}
-        column={props.componentProps?.column}
-        labelPlacement={props.componentProps?.labelPlacement || 'left'}
-        size={props.componentProps?.size}
-        title={props.componentProps?.title}
-      >
-        {props.schema?.filter(shouldShowItem).map((item) => (
-          <NDescriptionsItem
-            contentStyle={item.contentStyle}
-            key={item.field || String(item.label)}
-            label={item.label as string}
-            labelStyle={item.labelStyle}
-            span={item.span}
-          >
-            {renderContent(item)}
-          </NDescriptionsItem>
-        ))}
-      </NDescriptions>
-    );
+      const labelStyles: CSSProperties = {
+        ...labelStyle,
+        minWidth: `${labelMinWidth}px `,
+      };
+      return <div style={labelStyles}>{label}</div>;
+    }
+
+    function renderItem() {
+      const { data, schema } = unref(getProps);
+      return unref(schema)
+        .map((item) => {
+          const { contentMinWidth, field, render, show, span } = item;
+
+          if (show && isFunction(show) && !show(data)) {
+            return null;
+          }
+
+          function getContent() {
+            const _data = unref(getProps)?.data;
+            if (!_data) {
+              return null;
+            }
+            const getField = field.includes('.')
+              ? (getNestedValue(_data, field) ?? get(_data, field))
+              : get(_data, field);
+            // if (
+            //   getField &&
+            //   !Object.prototype.hasOwnProperty.call(toRefs(_data), field)
+            // ) {
+            //   return isFunction(render) ? render('', _data) : (getField ?? '');
+            // }
+            return isFunction(render)
+              ? render(getField, _data)
+              : (getField ?? '');
+          }
+
+          const width = contentMinWidth;
+          return (
+            <NDescriptionsItem key={field} span={span}>
+              {{
+                label: () => {
+                  return renderLabel(item);
+                },
+                default: () => {
+                  if (item.slot) {
+                    const slotContent = getSlot(slots, item.slot, data);
+                    return slotContent;
+                  }
+                  if (!contentMinWidth) {
+                    return getContent();
+                  }
+                  const style: CSSProperties = {
+                    minWidth: `${width}px`,
+                  };
+                  return <div style={style}>{getContent()}</div>;
+                },
+              }}
+            </NDescriptionsItem>
+          );
+        })
+        .filter((item) => !!item);
+    }
+
+    function renderDesc() {
+      return (
+        <NDescriptions
+          class={`${prefixCls}`}
+          {...(unref(getDescriptionsProps) as any)}
+        >
+          {renderItem()}
+        </NDescriptions>
+      );
+    }
+
+    function renderCard() {
+      const content = props.useCard ? renderDesc() : <div>{renderDesc()}</div>;
+      // Reduce the dom level
+      if (!props.useCard) {
+        return content;
+      }
+
+      const { title } = unref(getMergeProps);
+      const extraSlot = getSlot(slots, 'extra');
+
+      return (
+        <NCard
+          contentStyle={{ padding: '8px 0' }}
+          headerStyle={{
+            padding: '8px 16px',
+            fontSize: '14px',
+            minHeight: '24px',
+          }}
+          style={{ margin: 0 }}
+          title={title}
+        >
+          {{
+            default: () => content,
+            extra: () => extraSlot && <div>{extraSlot}</div>,
+          }}
+        </NCard>
+      );
+    }
+
+    return () => (unref(useWrapper) ? renderCard() : renderDesc());
   },
 });
-
-// TODO @xingyu：from 5.0：emits: ['register'] 事件
-export default Description;
 </script>

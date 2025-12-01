@@ -24,11 +24,6 @@ export namespace MallKefuMessageApi {
     contentType: number; // 消息类型
     content: string; // 消息内容
   }
-
-  /** 消息列表查询参数 */
-  export interface MessageQuery extends PageParam {
-    conversationId: number; // 会话编号
-  }
 }
 
 /** 发送客服消息 */
@@ -44,7 +39,7 @@ export function updateKeFuMessageReadStatus(conversationId: number) {
 }
 
 /** 获得消息列表（流式加载） */
-export function getKeFuMessageList(params: MallKefuMessageApi.MessageQuery) {
+export function getKeFuMessageList(params: PageParam) {
   return requestClient.get<PageResult<MallKefuMessageApi.Message>>(
     '/promotion/kefu-message/list',
     { params },

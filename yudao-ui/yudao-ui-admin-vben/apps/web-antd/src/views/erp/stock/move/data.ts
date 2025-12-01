@@ -85,7 +85,9 @@ export function useFormSchema(formType: string): VbenFormSchema[] {
 }
 
 /** 表单的明细表格列 */
-export function useFormItemColumns(): VxeTableGridOptions['columns'] {
+export function useFormItemColumns(
+  disabled: boolean,
+): VxeTableGridOptions['columns'] {
   return [
     { type: 'seq', title: '序号', minWidth: 50, fixed: 'left' },
     {
@@ -154,6 +156,7 @@ export function useFormItemColumns(): VxeTableGridOptions['columns'] {
       width: 50,
       fixed: 'right',
       slots: { default: 'actions' },
+      visible: !disabled,
     },
   ];
 }
@@ -179,10 +182,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
         allowClear: true,
         showSearch: true,
         api: getProductSimpleList,
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
+        labelField: 'name',
+        valueField: 'id',
       },
     },
     {
@@ -203,10 +204,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
         allowClear: true,
         showSearch: true,
         api: getWarehouseSimpleList,
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
+        labelField: 'name',
+        valueField: 'id',
       },
     },
     {
@@ -218,10 +217,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
         allowClear: true,
         showSearch: true,
         api: getWarehouseSimpleList,
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
+        labelField: 'name',
+        valueField: 'id',
       },
     },
     {
@@ -233,10 +230,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
         allowClear: true,
         showSearch: true,
         api: getSimpleUserList,
-        fieldNames: {
-          label: 'nickname',
-          value: 'id',
-        },
+        labelField: 'nickname',
+        valueField: 'id',
       },
     },
     {
@@ -315,7 +310,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     },
     {
       title: '操作',
-      width: 220,
+      width: 260,
       fixed: 'right',
       slots: { default: 'actions' },
     },

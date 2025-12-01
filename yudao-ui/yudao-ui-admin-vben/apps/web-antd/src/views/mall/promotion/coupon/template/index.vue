@@ -66,14 +66,10 @@ async function handleStatusChange(
     })
       .then(async () => {
         // 更新优惠券模板状态
-        const res = await updateCouponTemplateStatus(row.id!, newStatus);
-        if (res) {
-          // 提示并返回成功
-          message.success($t('ui.actionMessage.operationSuccess'));
-          resolve(true);
-        } else {
-          reject(new Error('更新失败'));
-        }
+        await updateCouponTemplateStatus(row.id!, newStatus);
+        // 提示并返回成功
+        message.success($t('ui.actionMessage.operationSuccess'));
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));

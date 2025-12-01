@@ -17,7 +17,7 @@ import { $t } from '#/locales';
 import { useBindFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
-const formData = ref<MallDeliveryPickUpStoreApi.PickUpStore>();
+const formData = ref<MallDeliveryPickUpStoreApi.DeliveryPickUpStore>();
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {

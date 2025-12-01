@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { DropdownMenuLabelProps } from 'radix-vue';
+import type { DropdownMenuLabelProps } from 'reka-ui';
 
 import { computed } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { DropdownMenuLabel, useForwardProps } from 'radix-vue';
+import { DropdownMenuLabel, useForwardProps } from 'reka-ui';
 
 const props = defineProps<
   DropdownMenuLabelProps & { class?: any; inset?: boolean }

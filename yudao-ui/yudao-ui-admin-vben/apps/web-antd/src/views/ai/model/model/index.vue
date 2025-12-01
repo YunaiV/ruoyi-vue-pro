@@ -1,23 +1,18 @@
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { AiModelApiKeyApi } from '#/api/ai/model/apiKey';
 import type { AiModelModelApi } from '#/api/ai/model/model';
-
-import { onMounted, ref } from 'vue';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getApiKeySimpleList } from '#/api/ai/model/apiKey';
 import { deleteModel, getModelPage } from '#/api/ai/model/model';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 
-const apiKeyList = ref([] as AiModelApiKeyApi.ApiKey[]);
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
@@ -28,27 +23,25 @@ function handleRefresh() {
   gridApi.query();
 }
 
-/** 创建 */
+/** 创建模型配置 */
 function handleCreate() {
   formModalApi.setData(null).open();
 }
 
-/** 编辑 */
+/** 编辑模型配置 */
 function handleEdit(row: AiModelModelApi.Model) {
   formModalApi.setData(row).open();
 }
 
-/** 删除 */
+/** 删除模型配置 */
 async function handleDelete(row: AiModelModelApi.Model) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteModel(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteModel(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
@@ -76,16 +69,13 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
       search: true,
     },
   } as VxeTableGridOptions<AiModelModelApi.Model>,
-});
-onMounted(async () => {
-  // 获得下拉数据
-  apiKeyList.value = await getApiKeySimpleList();
 });
 </script>
 
@@ -108,15 +98,6 @@ onMounted(async () => {
             },
           ]"
         />
-      </template>
-      <template #keyId="{ row }">
-        <span>
-          {{
-            apiKeyList.find(
-              (item: AiModelApiKeyApi.ApiKey) => item.id === row.keyId,
-            )?.name
-          }}
-        </span>
       </template>
       <template #actions="{ row }">
         <TableAction

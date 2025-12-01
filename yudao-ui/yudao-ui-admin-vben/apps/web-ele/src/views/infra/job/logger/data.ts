@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { InfraJobLogApi } from '#/api/infra/job-log';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -37,6 +36,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
           format: 'HH:mm:ss',
           defaultValue: dayjs('00:00:00', 'HH:mm:ss'),
         },
+        class: '!w-full',
       },
     },
     {
@@ -154,9 +154,9 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'beginTime',
       label: '执行时间',
-      content: (data: InfraJobLogApi.JobLog) => {
-        if (data?.beginTime && data?.endTime) {
-          return `${formatDateTime(data.beginTime)} ~ ${formatDateTime(data.endTime)}`;
+      render: (val, data) => {
+        if (val && data?.endTime) {
+          return `${formatDateTime(val)} ~ ${formatDateTime(data.endTime)}`;
         }
         return '';
       },
@@ -164,17 +164,17 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'duration',
       label: '执行时长',
-      content: (data: InfraJobLogApi.JobLog) => {
-        return data?.duration ? `${data.duration} 毫秒` : '';
+      render: (val) => {
+        return val ? `${val} 毫秒` : '';
       },
     },
     {
       field: 'status',
       label: '任务状态',
-      content: (data: InfraJobLogApi.JobLog) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.INFRA_JOB_LOG_STATUS,
-          value: data?.status,
+          value: val,
         });
       },
     },

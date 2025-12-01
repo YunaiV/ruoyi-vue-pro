@@ -31,6 +31,8 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入排序',
         min: 0,
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       rules: 'required',
     },

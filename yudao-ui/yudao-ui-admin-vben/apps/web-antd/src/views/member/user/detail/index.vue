@@ -17,9 +17,14 @@ import { $t } from '#/locales';
 import Form from '../modules/form.vue';
 import AccountInfo from './modules/account-info.vue';
 import AddressList from './modules/address-list.vue';
+import AfterSaleList from './modules/after-sale-list.vue';
 import BalanceList from './modules/balance-list.vue';
 import BasicInfo from './modules/basic-info.vue';
+import BrokerageList from './modules/brokerage-list.vue';
+import CouponList from './modules/coupon-list.vue';
 import ExperienceRecordList from './modules/experience-record-list.vue';
+import FavoriteList from './modules/favorite-list.vue';
+import OrderList from './modules/order-list.vue';
 import PointList from './modules/point-list.vue';
 import SignList from './modules/sign-list.vue';
 
@@ -100,34 +105,19 @@ onMounted(async () => {
             <AddressList class="h-full" :user-id="userId" />
           </TabPane>
           <TabPane tab="订单管理" key="OrderList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <h1>订单管理</h1>
-            </div>
+            <OrderList class="h-full" :user-id="userId" />
           </TabPane>
           <TabPane tab="售后管理" key="AfterSaleList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <h1>售后管理</h1>
-            </div>
+            <AfterSaleList class="h-full" :user-id="userId" />
           </TabPane>
           <TabPane tab="收藏记录" key="FavoriteList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <h1>收藏记录</h1>
-            </div>
+            <FavoriteList class="h-full" :user-id="userId" />
           </TabPane>
           <TabPane tab="优惠劵" key="CouponList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <h1>优惠劵</h1>
-            </div>
+            <CouponList class="h-full" :user-id="userId" />
           </TabPane>
           <TabPane tab="推广用户" key="BrokerageList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <h1>推广用户</h1>
-            </div>
+            <BrokerageList class="h-full" :user-id="userId" />
           </TabPane>
         </Tabs>
       </Card>

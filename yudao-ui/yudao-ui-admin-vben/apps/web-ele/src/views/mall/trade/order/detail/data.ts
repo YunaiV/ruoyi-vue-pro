@@ -1,5 +1,4 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { MallOrderApi } from '#/api/mall/trade/order';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -23,19 +22,19 @@ export function useOrderInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'type',
       label: '订单类型',
-      content: (data: MallOrderApi.Order) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_ORDER_TYPE,
-          value: data?.type,
+          value: val,
         }),
     },
     {
       field: 'terminal',
       label: '订单来源',
-      content: (data: MallOrderApi.Order) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TERMINAL,
-          value: data?.terminal,
+          value: val,
         }),
     },
     {
@@ -53,10 +52,10 @@ export function useOrderInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'payChannelCode',
       label: '付款方式',
-      content: (data: MallOrderApi.Order) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_CHANNEL_CODE,
-          value: data?.payChannelCode,
+          value: val,
         }),
     },
     {
@@ -72,16 +71,16 @@ export function useOrderStatusSchema(): DescriptionItemSchema[] {
     {
       field: 'status',
       label: '订单状态',
-      content: (data: MallOrderApi.Order) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_ORDER_STATUS,
-          value: data?.status,
+          value: val,
         }),
     },
     {
       field: 'reminder',
       label: '提醒',
-      content: () =>
+      render: () =>
         h('div', { class: 'space-y-1' }, [
           h('div', '买家付款成功后，货款将直接进入您的商户号（微信、支付宝）'),
           h('div', '请及时关注你发出的包裹状态，确保可以配送至买家手中'),
@@ -100,66 +99,46 @@ export function useOrderPriceSchema(): DescriptionItemSchema[] {
     {
       field: 'totalPrice',
       label: '商品总额',
-      content: (data: MallOrderApi.Order) =>
-        `${fenToYuan(data?.totalPrice ?? 0)} 元`,
+      render: (val) => `${fenToYuan(val ?? 0)} 元`,
     },
     {
       field: 'deliveryPrice',
       label: '运费金额',
-      content: (data: MallOrderApi.Order) =>
-        `${fenToYuan(data?.deliveryPrice ?? 0)} 元`,
+      render: (val) => `${fenToYuan(val ?? 0)} 元`,
     },
     {
       field: 'adjustPrice',
       label: '订单调价',
-      content: (data: MallOrderApi.Order) =>
-        `${fenToYuan(data?.adjustPrice ?? 0)} 元`,
+      render: (val) => `${fenToYuan(val ?? 0)} 元`,
     },
     {
       field: 'couponPrice',
       label: '优惠劵优惠',
-      content: (data: MallOrderApi.Order) =>
-        h(
-          'span',
-          { class: 'text-red-500' },
-          `${fenToYuan(data?.couponPrice ?? 0)} 元`,
-        ),
+      render: (val) =>
+        h('span', { class: 'text-red-500' }, `${fenToYuan(val ?? 0)} 元`),
     },
     {
       field: 'vipPrice',
       label: 'VIP 优惠',
-      content: (data: MallOrderApi.Order) =>
-        h(
-          'span',
-          { class: 'text-red-500' },
-          `${fenToYuan(data?.vipPrice ?? 0)} 元`,
-        ),
+      render: (val) =>
+        h('span', { class: 'text-red-500' }, `${fenToYuan(val ?? 0)} 元`),
     },
     {
       field: 'discountPrice',
       label: '活动优惠',
-      content: (data: MallOrderApi.Order) =>
-        h(
-          'span',
-          { class: 'text-red-500' },
-          `${fenToYuan(data?.discountPrice ?? 0)} 元`,
-        ),
+      render: (val) =>
+        h('span', { class: 'text-red-500' }, `${fenToYuan(val ?? 0)} 元`),
     },
     {
       field: 'pointPrice',
       label: '积分抵扣',
-      content: (data: MallOrderApi.Order) =>
-        h(
-          'span',
-          { class: 'text-red-500' },
-          `${fenToYuan(data?.pointPrice ?? 0)} 元`,
-        ),
+      render: (val) =>
+        h('span', { class: 'text-red-500' }, `${fenToYuan(val ?? 0)} 元`),
     },
     {
       field: 'payPrice',
       label: '应付金额',
-      content: (data: MallOrderApi.Order) =>
-        `${fenToYuan(data?.payPrice ?? 0)} 元`,
+      render: (val) => `${fenToYuan(val ?? 0)} 元`,
     },
   ];
 }
@@ -170,10 +149,10 @@ export function useDeliveryInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'deliveryType',
       label: '配送方式',
-      content: (data: MallOrderApi.Order) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_DELIVERY_TYPE,
-          value: data?.deliveryType,
+          value: val,
         }),
     },
     {
@@ -187,14 +166,12 @@ export function useDeliveryInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'receiverAddress',
       label: '收货地址',
-      content: (data: MallOrderApi.Order) =>
-        `${data?.receiverAreaName} ${data?.receiverDetailAddress}`.trim(),
+      render: (val, data) => `${data?.receiverAreaName} ${val}`.trim(),
     },
     {
       field: 'deliveryTime',
       label: '发货时间',
-      content: (data: MallOrderApi.Order) =>
-        formatDateTime(data?.deliveryTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
   ];
 }

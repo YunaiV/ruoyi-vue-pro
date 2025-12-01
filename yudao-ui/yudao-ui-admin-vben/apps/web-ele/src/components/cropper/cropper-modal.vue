@@ -121,7 +121,9 @@ async function handleOk() {
     class="w-[800px]"
   >
     <div :class="prefixCls">
+      <!-- 左侧区域 -->
       <div :class="`${prefixCls}-left`" class="w-full">
+        <!-- 裁剪器容器 -->
         <div :class="`${prefixCls}-cropper`">
           <CropperImage
             v-if="src"
@@ -133,6 +135,7 @@ async function handleOk() {
           />
         </div>
 
+        <!-- 工具栏 -->
         <div :class="`${prefixCls}-toolbar`">
           <ElUpload
             :before-upload="handleBeforeUpload"
@@ -276,7 +279,10 @@ async function handleOk() {
           </ElSpace>
         </div>
       </div>
+
+      <!-- 右侧区域 -->
       <div :class="`${prefixCls}-right`">
+        <!-- 预览区域 -->
         <div :class="`${prefixCls}-preview`">
           <img
             v-if="previewSource"
@@ -284,6 +290,7 @@ async function handleOk() {
             :src="previewSource"
           />
         </div>
+        <!-- 头像组合预览 -->
         <template v-if="previewSource">
           <div :class="`${prefixCls}-group`">
             <ElAvatar :src="previewSource" size="large" />
@@ -298,6 +305,7 @@ async function handleOk() {
 </template>
 
 <style lang="scss">
+/* TODO @puhui999：要类似 web-antd/src/components/cropper/cropper-avatar.vue 减少 scss，通过 tindwind 么？ */
 .cropper-am {
   display: flex;
 

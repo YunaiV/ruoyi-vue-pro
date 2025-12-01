@@ -20,22 +20,6 @@ export * from './upload';
 export * from './util';
 export * from './uuid'; // add by 芋艿：从 vben2.0 复制
 export * from './window';
+export { get, isEqual, set } from 'es-toolkit/compat';
+// export { cloneDeep } from 'es-toolkit/object';
 export { default as cloneDeep } from 'lodash.clonedeep';
-export { default as get } from 'lodash.get';
-export { default as isEqual } from 'lodash.isequal';
-export { default as set } from 'lodash.set';
-
-/**
- * 构建排序字段
- * @param prop 字段名称
- * @param order 顺序
- */
-export const buildSortingField = ({
-  prop,
-  order,
-}: {
-  order: 'ascending' | 'descending';
-  prop: string;
-}) => {
-  return { field: prop, order: order === 'ascending' ? 'asc' : 'desc' };
-};

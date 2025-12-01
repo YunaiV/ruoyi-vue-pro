@@ -13,28 +13,24 @@ defineProps<{
 }>();
 
 const [BaseDescriptions] = useDescription({
-  componentProps: {
-    title: '基本信息',
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  title: '基本信息',
+  bordered: false,
+  column: 4,
+  class: 'mx-4',
   schema: useDetailBaseSchema(),
 });
 
 const [SystemDescriptions] = useDescription({
-  componentProps: {
-    title: '系统信息',
-    bordered: false,
-    column: 3,
-    class: 'mx-4',
-  },
+  title: '系统信息',
+  bordered: false,
+  column: 3,
+  class: 'mx-4',
   schema: useFollowUpDetailSchema(),
 });
 </script>
 
 <template>
-  <div class="p-4">
+  <div>
     <BaseDescriptions :data="customer" />
     <Divider />
     <SystemDescriptions :data="customer" />

@@ -60,4 +60,8 @@ export const MenuOutlined = createIconifyIcon('ant-design:menu-outlined');
 
 export const PlusOutlined = createIconifyIcon('ant-design:plus-outlined');
 
+export const CloseCircleFilled = createIconifyIcon(
+  'ant-design:close-circle-filled',
+);
+
 export const SelectOutlined = createIconifyIcon('ant-design:select-outlined');

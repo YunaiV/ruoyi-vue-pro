@@ -37,6 +37,8 @@ export function useFormSchema(): VbenFormSchema[] {
         precision: 2,
         step: 0.01,
         placeholder: '请输入支付金额',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
     },
     {
@@ -49,6 +51,8 @@ export function useFormSchema(): VbenFormSchema[] {
         precision: 2,
         step: 0.01,
         placeholder: '请输入赠送金额',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
     },
     {

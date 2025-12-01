@@ -35,6 +35,7 @@ async function bootstrap(namespace: string) {
   // });
 
   const app = createApp(App);
+  app.use(VueDOMPurifyHTML);
 
   // 注册v-loading指令
   registerLoadingDirective(app, {
@@ -60,10 +61,6 @@ async function bootstrap(namespace: string) {
 
   // formCreate
   setupFormCreate(app);
-
-  // vue-dompurify-html
-  // TODO @dhb52：VueDOMPurifyHTML 是不是不用引入哈？
-  app.use(VueDOMPurifyHTML);
 
   // 配置Motion插件
   const { MotionPlugin } = await import('@vben/plugins/motion');

@@ -38,7 +38,7 @@ const show = ref(false);
     />
     <template v-if="passwordStrength">
       <PasswordStrength :password="modelValue" />
-      <p v-if="slots.strengthText" class="text-muted-foreground mt-1.5 text-xs">
+      <p v-if="slots.strengthText" class="mt-1.5 text-xs text-muted-foreground">
         <slot name="strengthText"> </slot>
       </p>
     </template>
@@ -47,7 +47,7 @@ const show = ref(false);
         'top-3': !!passwordStrength,
         'top-1/2 -translate-y-1/2 items-center': !passwordStrength,
       }"
-      class="hover:text-foreground text-foreground/60 absolute inset-y-0 right-0 flex cursor-pointer pr-3 text-lg leading-5"
+      class="absolute inset-y-0 right-0 flex cursor-pointer pr-3 text-lg leading-5 text-foreground/60 hover:text-foreground"
       @click="show = !show"
     >
       <Eye v-if="show" class="size-4" />

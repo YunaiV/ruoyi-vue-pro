@@ -3,7 +3,7 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace IotProductApi {
-  /** IoT 产品 VO */
+  /** 产品 */
   export interface Product {
     id?: number; // 产品编号
     name: string; // 产品名称
@@ -26,6 +26,8 @@ export namespace IotProductApi {
     createTime?: Date; // 创建时间
   }
 }
+
+// TODO @haohao：packages/constants/src/biz-iot-enum.ts 枚举；
 
 /** IOT 产品设备类型枚举类 */
 export enum DeviceTypeEnum {

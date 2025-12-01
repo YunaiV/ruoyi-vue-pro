@@ -3,10 +3,10 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
 import { h } from 'vue';
 
-import { Tag } from 'ant-design-vue';
-
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
+
+import { Tag } from 'ant-design-vue';
 
 import { getRangePickerDefaultProps } from '#/utils';
 

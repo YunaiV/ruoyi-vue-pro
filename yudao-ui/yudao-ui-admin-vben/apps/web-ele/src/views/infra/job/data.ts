@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { InfraJobApi } from '#/api/infra/job';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h, markRaw } from 'vue';
@@ -197,10 +196,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'status',
       label: '任务状态',
-      content: (data: InfraJobApi.Job) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.INFRA_JOB_STATUS,
-          value: data?.status,
+          value: val,
         });
       },
     },
@@ -222,27 +221,27 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     },
     {
       label: '重试间隔',
-      content: (data: InfraJobApi.Job) => {
-        return data?.retryInterval ? `${data.retryInterval} 毫秒` : '无间隔';
+      field: 'retryInterval',
+      render: (val) => {
+        return val ? `${val} 毫秒` : '无间隔';
       },
     },
     {
       label: '监控超时时间',
-      content: (data: InfraJobApi.Job) => {
-        return data?.monitorTimeout && data.monitorTimeout > 0
-          ? `${data.monitorTimeout} 毫秒`
-          : '未开启';
+      field: 'monitorTimeout',
+      render: (val) => {
+        return val && val > 0 ? `${val} 毫秒` : '未开启';
       },
     },
     {
       field: 'nextTimes',
       label: '后续执行时间',
-      content: (data: InfraJobApi.Job) => {
-        if (!data?.nextTimes || data.nextTimes.length === 0) {
+      render: (val) => {
+        if (!val || val.length === 0) {
           return '无后续执行时间';
         }
         return h(ElTimeline, {}, () =>
-          data.nextTimes?.map((time: Date) =>
+          val?.map((time: Date) =>
             h(ElTimelineItem, {}, () => formatDateTime(time)),
           ),
         );

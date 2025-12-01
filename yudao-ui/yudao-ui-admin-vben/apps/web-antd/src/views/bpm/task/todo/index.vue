@@ -14,11 +14,10 @@ defineOptions({ name: 'BpmTodoTask' });
 
 /** 办理任务 */
 function handleAudit(row: BpmTaskApi.Task) {
-  console.warn(row);
   router.push({
     name: 'BpmProcessInstanceDetail',
     query: {
-      id: row.processInstance.id,
+      id: row.processInstance!.id,
       taskId: row.id,
     },
   });
@@ -45,13 +44,11 @@ const [Grid] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
       search: true,
-    },
-    cellConfig: {
-      height: 64,
     },
   } as VxeTableGridOptions<BpmTaskApi.Task>,
 });

@@ -23,7 +23,7 @@ import ChargeItemForm from './charge-item-form.vue';
 import FreeItemForm from './free-item-form.vue';
 
 const emit = defineEmits(['success']);
-const formData = ref<MallDeliveryExpressTemplateApi.ExpressTemplate>();
+const formData = ref<MallDeliveryExpressTemplateApi.DeliveryExpressTemplate>();
 const chargeItemFormRef = ref<InstanceType<typeof ChargeItemForm>>();
 const freeItemFormRef = ref<InstanceType<typeof FreeItemForm>>();
 const areaTree = ref<SystemAreaApi.Area[]>([]);
@@ -55,10 +55,10 @@ const [Form, formApi] = useVbenForm({
 
 /** 更新运费设置 */
 const handleUpdateCharges = async (
-  charges: MallDeliveryExpressTemplateApi.TemplateCharge[],
+  charges: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateCharge[],
 ) => {
   formData.value =
-    await formApi.getValues<MallDeliveryExpressTemplateApi.ExpressTemplate>();
+    await formApi.getValues<MallDeliveryExpressTemplateApi.DeliveryExpressTemplate>();
   formData.value.charges = charges;
   await formApi.setValues({
     charges,
@@ -67,10 +67,10 @@ const handleUpdateCharges = async (
 
 /** 更新包邮设置 */
 const handleUpdateFrees = async (
-  frees: MallDeliveryExpressTemplateApi.TemplateFree[],
+  frees: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateFree[],
 ) => {
   formData.value =
-    await formApi.getValues<MallDeliveryExpressTemplateApi.ExpressTemplate>();
+    await formApi.getValues<MallDeliveryExpressTemplateApi.DeliveryExpressTemplate>();
   formData.value.frees = frees;
   await formApi.setValues({
     frees,
@@ -102,17 +102,19 @@ const [Modal, modalApi] = useVbenModal({
     // 提交表单
     const data = cloneDeep(
       await formApi.getValues(),
-    ) as MallDeliveryExpressTemplateApi.ExpressTemplate;
+    ) as MallDeliveryExpressTemplateApi.DeliveryExpressTemplate;
     try {
       // 转换金额单位
       data.charges?.forEach(
-        (item: MallDeliveryExpressTemplateApi.TemplateCharge) => {
+        (
+          item: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateCharge,
+        ) => {
           item.startPrice = yuanToFen(item.startPrice);
           item.extraPrice = yuanToFen(item.extraPrice);
         },
       );
       data.frees?.forEach(
-        (item: MallDeliveryExpressTemplateApi.TemplateFree) => {
+        (item: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateFree) => {
           item.freePrice = yuanToFen(item.freePrice);
         },
       );
@@ -134,7 +136,7 @@ const [Modal, modalApi] = useVbenModal({
     }
     // 加载数据
     const data =
-      modalApi.getData<MallDeliveryExpressTemplateApi.ExpressTemplate>();
+      modalApi.getData<MallDeliveryExpressTemplateApi.DeliveryExpressTemplate>();
     if (!data || !data.id) {
       return;
     }
@@ -143,13 +145,15 @@ const [Modal, modalApi] = useVbenModal({
       formData.value = await getDeliveryExpressTemplate(data.id);
       // 转换金额单位
       formData.value.charges?.forEach(
-        (item: MallDeliveryExpressTemplateApi.TemplateCharge) => {
+        (
+          item: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateCharge,
+        ) => {
           item.startPrice = Number.parseFloat(fenToYuan(item.startPrice));
           item.extraPrice = Number.parseFloat(fenToYuan(item.extraPrice));
         },
       );
       formData.value.frees?.forEach(
-        (item: MallDeliveryExpressTemplateApi.TemplateFree) => {
+        (item: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateFree) => {
           item.freePrice = Number.parseFloat(fenToYuan(item.freePrice));
         },
       );

@@ -16,17 +16,17 @@ import { $t } from '#/locales';
 
 import Form from '../modules/form.vue';
 import AccountInfo from './modules/account-info.vue';
+import AddressList from './modules/address-list.vue';
+import AfterSaleList from './modules/after-sale-list.vue';
 import BalanceList from './modules/balance-list.vue';
 import BasicInfo from './modules/basic-info.vue';
+import BrokerageList from './modules/brokerage-list.vue';
+import CouponList from './modules/coupon-list.vue';
 import ExperienceRecordList from './modules/experience-record-list.vue';
+import FavoriteList from './modules/favorite-list.vue';
+import OrderList from './modules/order-list.vue';
 import PointList from './modules/point-list.vue';
 import SignList from './modules/sign-list.vue';
-import UserAddressList from './modules/user-address-list.vue';
-import UserAfterSaleList from './modules/user-after-sale-list.vue';
-import UserBrokerageList from './modules/user-brokerage-list.vue';
-import UserCouponList from './modules/user-coupon-list.vue';
-import UserFavoriteList from './modules/user-favorite-list.vue';
-import UserOrderList from './modules/user-order-list.vue';
 
 const route = useRoute();
 const { closeCurrentTab, refreshTab } = useTabs();
@@ -103,37 +103,22 @@ onMounted(async () => {
             <BalanceList class="h-full" :wallet-id="wallet?.id" />
           </ElTabPane>
           <ElTabPane label="收货地址" name="AddressList">
-            <UserAddressList class="h-full" :user-id="userId" />
+            <AddressList class="h-full" :user-id="userId" />
           </ElTabPane>
           <ElTabPane label="订单管理" name="OrderList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <UserOrderList class="h-full" :user-id="userId" />
-            </div>
+            <OrderList class="h-full" :user-id="userId" />
           </ElTabPane>
           <ElTabPane label="售后管理" name="AfterSaleList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <UserAfterSaleList class="h-full" :user-id="userId" />
-            </div>
+            <AfterSaleList class="h-full" :user-id="userId" />
           </ElTabPane>
           <ElTabPane label="收藏记录" name="FavoriteList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <UserFavoriteList class="h-full" :user-id="userId" />
-            </div>
+            <FavoriteList class="h-full" :user-id="userId" />
           </ElTabPane>
           <ElTabPane label="优惠劵" name="CouponList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <UserCouponList class="h-full" :user-id="userId" />
-            </div>
+            <CouponList class="h-full" :user-id="userId" />
           </ElTabPane>
           <ElTabPane label="推广用户" name="BrokerageList">
-            <!-- Todo: 商城模块 -->
-            <div class="h-full">
-              <UserBrokerageList class="h-full" :user-id="userId" />
-            </div>
+            <BrokerageList class="h-full" :user-id="userId" />
           </ElTabPane>
         </ElTabs>
       </ElCard>

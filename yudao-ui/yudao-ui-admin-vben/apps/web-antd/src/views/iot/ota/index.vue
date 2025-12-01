@@ -11,7 +11,7 @@ import { deleteOtaFirmware, getOtaFirmwarePage } from '#/api/iot/ota/firmware';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
-import OtaFirmwareForm from './modules/OtaFirmwareForm.vue';
+import OtaFirmwareForm from './modules/ota-firmware-form.vue';
 
 defineOptions({ name: 'IoTOtaFirmware' });
 

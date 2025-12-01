@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { AlertDialogTitleProps } from 'radix-vue';
+import type { AlertDialogTitleProps } from 'reka-ui';
 
 import { computed } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { AlertDialogTitle, useForwardProps } from 'radix-vue';
+import { AlertDialogTitle, useForwardProps } from 'reka-ui';
 
 const props = defineProps<AlertDialogTitleProps & { class?: any }>();
 

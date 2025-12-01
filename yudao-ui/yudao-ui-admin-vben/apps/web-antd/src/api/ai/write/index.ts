@@ -9,8 +9,10 @@ import { requestClient } from '#/api/request';
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 const accessStore = useAccessStore();
+
 export namespace AiWriteApi {
   export interface Write {
+    id?: number;
     type: AiWriteTypeEnum.REPLY | AiWriteTypeEnum.WRITING; // 1:撰写 2:回复
     prompt: string; // 写作内容提示 1。撰写 2回复
     originalContent: string; // 原文
@@ -26,31 +28,15 @@ export namespace AiWriteApi {
     createTime?: Date; // 创建时间
   }
 
-  export interface AiWritePageReq extends PageParam {
+  export interface AiWritePageReqVO extends PageParam {
     userId?: number; // 用户编号
     type?: AiWriteTypeEnum; //  写作类型
     platform?: string; // 平台
     createTime?: [string, string]; // 创建时间
   }
-
-  export interface AiWriteResp {
-    id: number;
-    userId: number;
-    type: number;
-    platform: string;
-    model: string;
-    prompt: string;
-    generatedContent: string;
-    originalContent: string;
-    length: number;
-    format: number;
-    tone: number;
-    language: number;
-    errorMessage: string;
-    createTime: string;
-  }
 }
 
+/** 写作 Stream */
 export function writeStream({
   data,
   onClose,
@@ -80,15 +66,14 @@ export function writeStream({
   });
 }
 
-// 获取写作列表
-export function getWritePage(params: any) {
-  return requestClient.get<PageResult<AiWriteApi.AiWritePageReq>>(
-    `/ai/write/page`,
-    { params },
-  );
+/** 获取写作列表 */
+export function getWritePage(params: AiWriteApi.AiWritePageReqVO) {
+  return requestClient.get<PageResult<AiWriteApi.Write>>(`/ai/write/page`, {
+    params,
+  });
 }
 
-// 删除音乐
+/** 删除写作记录 */
 export function deleteWrite(id: number) {
   return requestClient.delete(`/ai/write/delete`, { params: { id } });
 }

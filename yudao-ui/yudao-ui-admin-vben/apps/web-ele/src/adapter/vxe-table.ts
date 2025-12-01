@@ -16,6 +16,7 @@ import {
   erpCountInputFormatter,
   erpNumberFormatter,
   fenToYuan,
+  formatFileSize,
   formatPast2,
   isFunction,
   isString,
@@ -84,6 +85,10 @@ setupVbenVxeTable({
           src,
           previewSrcList: [src],
           class: props?.class,
+          style: {
+            width: props?.width ? `${props.width}px` : undefined,
+            height: props?.height ? `${props.height}px` : undefined,
+          },
           previewTeleported: true,
         });
       },
@@ -344,12 +349,7 @@ setupVbenVxeTable({
     // add by 星语：文件大小格式化
     vxeUI.formats.add('formatFileSize', {
       tableCellFormatMethod({ cellValue }, digits = 2) {
-        if (!cellValue) return '0 B';
-        const unitArr = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        const index = Math.floor(Math.log(cellValue) / Math.log(1024));
-        const size = cellValue / 1024 ** index;
-        const formattedSize = size.toFixed(digits);
-        return `${formattedSize} ${unitArr[index]}`;
+        return formatFileSize(cellValue, digits);
       },
     });
   },

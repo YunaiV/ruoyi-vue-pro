@@ -146,6 +146,8 @@ interface LogoPreferences {
   fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
   /** logo地址 */
   source: string;
+  /** 暗色主题logo地址 (可选，若不设置则使用 source) */
+  sourceDark?: string;
 }
 
 interface NavigationPreferences {
@@ -275,6 +277,8 @@ interface WidgetPreferences {
   sidebarToggle: boolean;
   /** 是否显示主题切换部件 */
   themeToggle: boolean;
+  /** 是否显示时区部件 */
+  timezone: boolean;
 }
 
 interface Preferences {

@@ -1,11 +1,16 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { SystemUserApi } from '#/api/system/user';
 
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
 import { getSimpleUserList } from '#/api/system/user';
 import { getRangePickerDefaultProps } from '#/utils';
+
+/** 关联数据 */
+let userList: SystemUserApi.User[] = [];
+getSimpleUserList().then((data) => (userList = data));
 
 /** 列表的搜索表单 */
 export function useGridFormSchema(): VbenFormSchema[] {
@@ -18,18 +23,25 @@ export function useGridFormSchema(): VbenFormSchema[] {
         api: getSimpleUserList,
         labelField: 'nickname',
         valueField: 'id',
+        placeholder: '请选择用户编号',
+        allowClear: true,
       },
     },
     {
       fieldName: 'title',
       label: '音乐名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入音乐名称',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'status',
       label: '绘画状态',
       component: 'Select',
       componentProps: {
+        placeholder: '请选择绘画状态',
         allowClear: true,
         options: getDictOptions(DICT_TYPE.AI_MUSIC_STATUS, 'number'),
       },
@@ -39,6 +51,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '生成模式',
       component: 'Select',
       componentProps: {
+        placeholder: '请选择生成模式',
         allowClear: true,
         options: getDictOptions(DICT_TYPE.AI_GENERATE_MODE, 'number'),
       },
@@ -57,15 +70,21 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '是否发布',
       component: 'Select',
       componentProps: {
-        options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
+        placeholder: '请选择是否发布',
         allowClear: true,
+        options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
       },
     },
   ];
 }
 
 /** 列表的字段 */
-export function useGridColumns(): VxeTableGridOptions['columns'] {
+export function useGridColumns(
+  onPublicStatusChange?: (
+    newStatus: boolean,
+    row: any,
+  ) => PromiseLike<boolean | undefined>,
+): VxeTableGridOptions['columns'] {
   return [
     {
       field: 'id',
@@ -82,7 +101,10 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     {
       minWidth: 180,
       title: '用户',
-      slots: { default: 'userId' },
+      field: 'userId',
+      formatter: ({ cellValue }) => {
+        return userList.find((user) => user.id === cellValue)?.nickname || '-';
+      },
     },
     {
       field: 'status',
@@ -143,7 +165,16 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     {
       minWidth: 100,
       title: '是否发布',
-      slots: { default: 'publicStatus' },
+      field: 'publicStatus',
+      align: 'center',
+      cellRender: {
+        attrs: { beforeChange: onPublicStatusChange },
+        name: 'CellSwitch',
+        props: {
+          checkedValue: true,
+          unCheckedValue: false,
+        },
+      },
     },
     {
       field: 'taskId',

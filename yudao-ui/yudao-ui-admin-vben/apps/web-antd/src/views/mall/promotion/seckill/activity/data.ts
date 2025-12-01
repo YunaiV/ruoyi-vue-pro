@@ -4,6 +4,9 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
+import { z } from '#/adapter/form';
+import { getSimpleSeckillConfigList } from '#/api/mall/promotion/seckill/seckillConfig';
+
 /** 列表的搜索表单 */
 export function useGridFormSchema(): VbenFormSchema[] {
   return [
@@ -25,6 +28,114 @@ export function useGridFormSchema(): VbenFormSchema[] {
         allowClear: true,
         options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
       },
+    },
+  ];
+}
+
+/** 新增/编辑的表单 */
+export function useFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      fieldName: 'id',
+      dependencies: {
+        triggerFields: [''],
+        show: () => false,
+      },
+    },
+    {
+      fieldName: 'name',
+      label: '秒杀活动名称',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入活动名称',
+      },
+      rules: 'required',
+      formItemClass: 'col-span-2',
+    },
+    {
+      fieldName: 'startTime',
+      label: '活动开始时间',
+      component: 'DatePicker',
+      componentProps: {
+        placeholder: '请选择活动开始时间',
+        showTime: false,
+        format: 'YYYY-MM-DD',
+        valueFormat: 'x',
+        class: 'w-full',
+      },
+      rules: 'required',
+    },
+    {
+      fieldName: 'endTime',
+      label: '活动结束时间',
+      component: 'DatePicker',
+      componentProps: {
+        placeholder: '请选择活动结束时间',
+        showTime: false,
+        format: 'YYYY-MM-DD',
+        valueFormat: 'x',
+        class: 'w-full',
+      },
+      rules: 'required',
+    },
+    {
+      fieldName: 'configIds',
+      label: '秒杀时段',
+      component: 'ApiSelect',
+      componentProps: {
+        placeholder: '请选择秒杀时段',
+        mode: 'multiple',
+        api: getSimpleSeckillConfigList,
+        labelField: 'name',
+        valueField: 'id',
+        class: 'w-full',
+      },
+      rules: 'required',
+      formItemClass: 'col-span-2',
+    },
+    {
+      fieldName: 'totalLimitCount',
+      label: '总限购数量',
+      component: 'InputNumber',
+      componentProps: {
+        placeholder: '请输入总限购数量',
+        min: 0,
+        class: 'w-full',
+      },
+      rules: z.number().min(0).default(0),
+    },
+    {
+      fieldName: 'singleLimitCount',
+      label: '单次限购数量',
+      component: 'InputNumber',
+      componentProps: {
+        placeholder: '请输入单次限购数量',
+        min: 0,
+        class: 'w-full',
+      },
+      rules: z.number().min(0).default(0),
+    },
+    {
+      fieldName: 'sort',
+      label: '排序',
+      component: 'InputNumber',
+      componentProps: {
+        placeholder: '请输入排序',
+        min: 0,
+        class: 'w-full',
+      },
+      rules: z.number().min(0).default(0),
+    },
+    {
+      fieldName: 'remark',
+      label: '备注',
+      component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入备注',
+        rows: 4,
+      },
+      formItemClass: 'col-span-2',
     },
   ];
 }

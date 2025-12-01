@@ -1,20 +1,78 @@
 <script setup lang="ts">
-import { Page } from '@vben/common-ui';
+// TODO @芋艿
+import type { StatsData } from './data';
+
+import { onMounted, ref } from 'vue';
+
+import { ComparisonCard, Page } from '@vben/common-ui';
 
 import { Col, Row } from 'ant-design-vue';
 
-// 导入业务逻辑
-import { useIotHome } from './data';
-// 导入组件
-import ComparisonCard from './modules/ComparisonCard.vue';
-import DeviceCountCard from './modules/DeviceCountCard.vue';
-import DeviceStateCountCard from './modules/DeviceStateCountCard.vue';
-import MessageTrendCard from './modules/MessageTrendCard.vue';
+import { getStatisticsSummary } from '#/api/iot/statistics';
+
+import { defaultStatsData } from './data';
+import DeviceCountCard from './modules/device-count-card.vue';
+import DeviceStateCountCard from './modules/device-state-count-card.vue';
+import MessageTrendCard from './modules/message-trend-card.vue';
 
 defineOptions({ name: 'IoTHome' });
 
-// 使用业务逻辑 Hook
-const { loading, statsData } = useIotHome();
+const loading = ref(true);
+const statsData = ref<StatsData>(defaultStatsData);
+
+/** 加载统计数据 */
+async function loadStatisticsData(): Promise<StatsData> {
+  try {
+    return await getStatisticsSummary();
+  } catch (error) {
+    // TODO @haohao：后续记得删除下哈。catch 部分可以删除
+    // 开发环境：记录错误信息，便于调试
+    console.error('获取统计数据出错:', error);
+    // 开发环境：提示使用 Mock 数据，提醒检查后端接口
+    console.warn('使用 Mock 数据，请检查后端接口是否已实现');
+
+    // TODO @haohao：后续记得删除下哈。
+    // 开发调试：返回 Mock 数据，确保前端功能正常开发
+    // 生产环境：建议移除 Mock 数据，直接抛出错误或返回空数据
+    return {
+      productCategoryCount: 12,
+      productCount: 45,
+      deviceCount: 328,
+      deviceMessageCount: 15_678,
+      productCategoryTodayCount: 2,
+      productTodayCount: 5,
+      deviceTodayCount: 23,
+      deviceMessageTodayCount: 1234,
+      deviceOnlineCount: 256,
+      deviceOfflineCount: 48,
+      deviceInactiveCount: 24,
+      productCategoryDeviceCounts: {
+        智能家居: 120,
+        工业设备: 98,
+        环境监测: 65,
+        智能穿戴: 45,
+      },
+    };
+  }
+}
+
+/** 加载数据 */
+async function loadData() {
+  loading.value = true;
+  try {
+    statsData.value = await loadStatisticsData();
+  } catch (error) {
+    // TODO @haohao：后续记得删除下哈。catch 部分可以删除
+    console.error('获取统计数据出错:', error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+/** 组件挂载时加载数据 */
+onMounted(() => {
+  loadData();
+});
 </script>
 
 <template>

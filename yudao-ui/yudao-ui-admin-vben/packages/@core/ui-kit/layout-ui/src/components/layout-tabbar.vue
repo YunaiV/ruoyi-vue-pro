@@ -23,7 +23,7 @@ const style = computed((): CSSProperties => {
 <template>
   <section
     :style="style"
-    class="border-border bg-background flex w-full border-b transition-all"
+    class="flex w-full border-b border-border bg-background transition-all"
   >
     <slot></slot>
   </section>

@@ -5,6 +5,7 @@ import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
 import { z } from '#/adapter/form';
+import { getSimpleDeviceList } from '#/api/iot/device/device';
 import { getSimpleDeviceGroupList } from '#/api/iot/device/group';
 import {
   DeviceTypeEnum,
@@ -55,12 +56,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '网关设备',
       component: 'ApiSelect',
       componentProps: {
-        api: async () => {
-          const { getSimpleDeviceList } = await import(
-            '#/api/iot/device/device'
-          );
-          return getSimpleDeviceList(DeviceTypeEnum.GATEWAY);
-        },
+        api: () => getSimpleDeviceList(DeviceTypeEnum.GATEWAY),
         labelField: 'nickname',
         valueField: 'id',
         placeholder: '子设备可选择父设备',
@@ -113,16 +109,16 @@ export function useFormSchema(): VbenFormSchema[] {
         .optional()
         .or(z.literal('')),
     },
-    // {
-    //   fieldName: 'locationType',
-    //   label: '定位类型',
-    //   component: 'RadioGroup',
-    //   componentProps: {
-    //     options: getDictOptions(DICT_TYPE.IOT_LOCATION_TYPE, 'number'),
-    //     buttonStyle: 'solid',
-    //     optionType: 'button',
-    //   },
-    // },
+    {
+      fieldName: 'locationType',
+      label: '定位类型',
+      component: 'RadioGroup',
+      componentProps: {
+        options: getDictOptions(DICT_TYPE.IOT_LOCATION_TYPE, 'number'),
+        buttonStyle: 'solid',
+        optionType: 'button',
+      },
+    },
     {
       fieldName: 'longitude',
       label: '设备经度',
@@ -243,7 +239,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '设备状态',
       component: 'Select',
       componentProps: {
-        options: getDictOptions(DICT_TYPE.IOT_DEVICE_STATUS, 'number'),
+        options: getDictOptions(DICT_TYPE.IOT_DEVICE_STATE, 'number'),
         placeholder: '请选择设备状态',
         allowClear: true,
       },
@@ -299,12 +295,12 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       slots: { default: 'groups' },
     },
     {
-      field: 'status',
+      field: 'state',
       title: '设备状态',
       minWidth: 100,
       cellRender: {
         name: 'CellDict',
-        props: { type: DICT_TYPE.IOT_DEVICE_STATUS },
+        props: { type: DICT_TYPE.IOT_DEVICE_STATE },
       },
     },
     {

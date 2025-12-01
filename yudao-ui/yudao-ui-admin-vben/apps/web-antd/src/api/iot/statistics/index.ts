@@ -1,7 +1,8 @@
 import { requestClient } from '#/api/request';
 
 export namespace IotStatisticsApi {
-  /** IoT 统计摘要数据 */
+  // TODO @haohao：需要跟后端对齐，必要的 ReqVO、RespVO
+  /** 统计摘要数据 */
   export interface StatisticsSummary {
     productCategoryCount: number;
     productCount: number;
@@ -22,7 +23,7 @@ export namespace IotStatisticsApi {
     [key: string]: number;
   }
 
-  /** IoT 消息统计数据类型 */
+  /** 消息统计数据类型 */
   export interface DeviceMessageSummary {
     statType: number;
     upstreamCounts: TimeValueItem[];
@@ -60,6 +61,7 @@ export function getDeviceMessageSummaryByDate(
   );
 }
 
+// TODO @haohao：貌似这里，没用到？是不是后面哪里用，或者可以删除哈？
 /** 获取设备消息统计摘要 */
 export function getDeviceMessageSummary(statType: number) {
   return requestClient.get<IotStatisticsApi.DeviceMessageSummary>(

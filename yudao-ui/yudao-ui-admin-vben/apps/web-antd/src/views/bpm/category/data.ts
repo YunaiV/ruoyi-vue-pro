@@ -62,8 +62,22 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         min: 0,
         placeholder: '请输入分类排序',
-        class: 'w-full',
       },
+    },
+  ];
+}
+
+/** 重命名的表单 */
+export function useRenameFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'name',
+      label: '分类名',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入分类名',
+      },
+      rules: 'required',
     },
   ];
 }
@@ -142,6 +156,11 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
         name: 'CellDict',
         props: { type: DICT_TYPE.COMMON_STATUS },
       },
+    },
+    {
+      field: 'sort',
+      title: '分类排序',
+      minWidth: 100,
     },
     {
       field: 'createTime',

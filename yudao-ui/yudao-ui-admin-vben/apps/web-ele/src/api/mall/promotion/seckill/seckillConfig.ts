@@ -5,26 +5,12 @@ import { requestClient } from '#/api/request';
 export namespace MallSeckillConfigApi {
   /** 秒杀时段 */
   export interface SeckillConfig {
-    /** 编号 */
-    id: number;
-    /** 秒杀时段名称 */
-    name: string;
-    /** 开始时间点 */
-    startTime: string;
-    /** 结束时间点 */
-    endTime: string;
-    /** 秒杀轮播图 */
-    sliderPicUrls: string[];
-    /** 活动状态 */
-    status: number;
-  }
-
-  /** 时段配置状态更新 */
-  export interface StatusUpdate {
-    /** 编号 */
-    id: number;
-    /** 状态 */
-    status: number;
+    id: number; // 编号
+    name: string; // 秒杀时段名称
+    startTime: string; // 开始时间点
+    endTime: string; // 结束时间点
+    sliderPicUrls: string[]; // 秒杀轮播图
+    status: number; // 活动状态
   }
 }
 

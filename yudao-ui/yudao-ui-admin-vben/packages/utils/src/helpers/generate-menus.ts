@@ -83,7 +83,7 @@ function generateMenus(
   });
 
   // 对菜单进行排序，避免order=0时被替换成999的问题
-  menus = menus.sort((a, b) => (a?.order ?? 999) - (b?.order ?? 999));
+  menus = menus.toSorted((a, b) => (a?.order ?? 999) - (b?.order ?? 999));
 
   // 过滤掉隐藏的菜单项
   return filterTree(menus, (menu) => !!menu.show);
@@ -93,11 +93,13 @@ function generateMenus(
  * 转换后端菜单数据为路由数据
  * @param menuList 后端菜单数据
  * @param parent 父级菜单
+ * @param nameSet 用于跟踪已使用的 name，防止重复
  * @returns 路由数据
  */
 function convertServerMenuToRouteRecordStringComponent(
   menuList: AppRouteRecordRaw[],
   parent = '',
+  nameSet: Set<string> = new Set(),
 ): RouteRecordStringComponent[] {
   const menus: RouteRecordStringComponent[] = [];
   menuList.forEach((menu) => {
@@ -139,6 +141,14 @@ function convertServerMenuToRouteRecordStringComponent(
       menu.path = `/${menu.path}`;
     }
 
+    // add by 芋艿：防止 name 重复，只有在 name 重复时，才自动添加 id
+    let finalName = menu.componentName || menu.name;
+    if (nameSet.has(finalName)) {
+      finalName = menu.name + menu.id;
+      console.error(`menu name duplicate: ${menu.name}, id: ${menu.id}`, menu);
+    }
+    nameSet.add(finalName);
+
     const buildMenu: RouteRecordStringComponent = {
       component: menu.component,
       meta: {
@@ -148,7 +158,7 @@ function convertServerMenuToRouteRecordStringComponent(
         orderNo: menu.sort,
         title: menu.name,
       },
-      name: menu.name + menu.id, // add by 芋艿：防止 name 重复，加上 id
+      name: finalName,
       path: menu.path,
     };
 
@@ -156,6 +166,7 @@ function convertServerMenuToRouteRecordStringComponent(
       buildMenu.children = convertServerMenuToRouteRecordStringComponent(
         menu.children,
         menu.path,
+        nameSet,
       );
     }
 

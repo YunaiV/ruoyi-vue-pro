@@ -21,13 +21,6 @@ export namespace MpUserApi {
     tagIds?: number[];
     createTime?: Date;
   }
-
-  /** 用户分页查询参数 */
-  export interface UserPageQuery extends PageParam {
-    accountId?: number;
-    nickname?: string;
-    tagId?: number;
-  }
 }
 
 /** 更新公众号粉丝 */
@@ -43,7 +36,7 @@ export function getUser(id: number) {
 }
 
 /** 获取公众号粉丝分页 */
-export function getUserPage(params: MpUserApi.UserPageQuery) {
+export function getUserPage(params: PageParam) {
   return requestClient.get<PageResult<MpUserApi.User>>('/mp/user/page', {
     params,
   });

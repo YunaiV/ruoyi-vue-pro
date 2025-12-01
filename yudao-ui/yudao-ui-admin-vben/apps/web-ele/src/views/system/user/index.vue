@@ -142,14 +142,10 @@ async function handleStatusChange(
     })
       .then(async () => {
         // 更新用户状态
-        const res = await updateUserStatus(row.id!, newStatus);
-        if (res) {
-          // 提示并返回成功
-          ElMessage.success($t('ui.actionMessage.operationSuccess'));
-          resolve(true);
-        } else {
-          reject(new Error('更新失败'));
-        }
+        await updateUserStatus(row.id!, newStatus);
+        // 提示并返回成功
+        ElMessage.success($t('ui.actionMessage.operationSuccess'));
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));

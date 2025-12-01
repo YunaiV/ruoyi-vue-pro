@@ -23,14 +23,15 @@ const formData = ref<ErpStockCheckApi.StockCheck>();
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof ItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['库存盘点单'])
-    : formType.value === 'edit'
-      ? $t('ui.actionTitle.edit', ['库存盘点单'])
-      : '库存盘点单详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['库存盘点单']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['库存盘点单']);
+  } else {
+    return '库存盘点单详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -46,13 +47,13 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新盘点单项 */
-const handleUpdateItems = (items: ErpStockCheckApi.StockCheckItem[]) => {
+function handleUpdateItems(items: ErpStockCheckApi.StockCheckItem[]) {
   formData.value = modalApi.getData<ErpStockCheckApi.StockCheck>();
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 创建或更新库存盘点单 */
 const [Modal, modalApi] = useVbenModal({

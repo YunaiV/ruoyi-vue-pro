@@ -38,13 +38,13 @@ export namespace CrmContactApi {
   }
 
   /** 联系人商机关联请求 */
-  export interface ContactBusinessReq {
+  export interface ContactBusinessReqVO {
     contactId: number;
     businessIds: number[];
   }
 
   /** 商机联系人关联请求 */
-  export interface BusinessContactReq {
+  export interface BusinessContactReqVO {
     businessId: number;
     contactIds: number[];
   }
@@ -108,33 +108,33 @@ export function getSimpleContactList() {
 
 /** 批量新增联系人商机关联 */
 export function createContactBusinessList(
-  data: CrmContactApi.ContactBusinessReq,
+  data: CrmContactApi.ContactBusinessReqVO,
 ) {
   return requestClient.post('/crm/contact/create-business-list', data);
 }
 
 /** 批量新增商机联系人关联 */
 export function createBusinessContactList(
-  data: CrmContactApi.BusinessContactReq,
+  data: CrmContactApi.BusinessContactReqVO,
 ) {
   return requestClient.post('/crm/contact/create-business-list2', data);
 }
 
 /** 解除联系人商机关联 */
 export function deleteContactBusinessList(
-  data: CrmContactApi.ContactBusinessReq,
+  data: CrmContactApi.ContactBusinessReqVO,
 ) {
   return requestClient.delete('/crm/contact/delete-business-list', { data });
 }
 
 /** 解除商机联系人关联 */
 export function deleteBusinessContactList(
-  data: CrmContactApi.BusinessContactReq,
+  data: CrmContactApi.BusinessContactReqVO,
 ) {
   return requestClient.delete('/crm/contact/delete-business-list2', { data });
 }
 
 /** 联系人转移 */
-export function transferContact(data: CrmPermissionApi.TransferReq) {
+export function transferContact(data: CrmPermissionApi.BusinessTransferReqVO) {
   return requestClient.put('/crm/contact/transfer', data);
 }

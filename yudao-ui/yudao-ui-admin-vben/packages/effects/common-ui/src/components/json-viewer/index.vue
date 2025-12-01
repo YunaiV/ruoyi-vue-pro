@@ -55,16 +55,12 @@ function handleClick(event: MouseEvent) {
       return;
     }
     const param: JsonViewerValue = {
-      path: '',
-      value: '',
-      depth: 0,
       el: event.target,
+      path: pathNode.getAttribute('path') || '',
+      depth: Number(pathNode.getAttribute('depth')) || 0,
+      value: event.target.textContent || undefined,
     };
 
-    param.path = pathNode.getAttribute('path') || '';
-    param.depth = Number(pathNode.getAttribute('depth')) || 0;
-
-    param.value = event.target.textContent || undefined;
     param.value = JSON.parse(param.value);
     emit('valueClick', param);
   }

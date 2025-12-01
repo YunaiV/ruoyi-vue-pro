@@ -1,0 +1,168 @@
+{
+  "folders": [
+    {
+      "name": "@vben/web-antd",
+      "path": "apps/web-antd",
+    },
+    {
+      "name": "@vben/web-ele",
+      "path": "apps/web-ele",
+    },
+    {
+      "name": "@vben/web-naive",
+      "path": "apps/web-naive",
+    },
+    {
+      "name": "@vben/web-tdesign",
+      "path": "apps/web-tdesign",
+    },
+    {
+      "name": "@vben/docs",
+      "path": "docs",
+    },
+    {
+      "name": "@vben/commitlint-config",
+      "path": "internal/lint-configs/commitlint-config",
+    },
+    {
+      "name": "@vben/eslint-config",
+      "path": "internal/lint-configs/eslint-config",
+    },
+    {
+      "name": "@vben/prettier-config",
+      "path": "internal/lint-configs/prettier-config",
+    },
+    {
+      "name": "@vben/stylelint-config",
+      "path": "internal/lint-configs/stylelint-config",
+    },
+    {
+      "name": "@vben/node-utils",
+      "path": "internal/node-utils",
+    },
+    {
+      "name": "@vben/tailwind-config",
+      "path": "internal/tailwind-config",
+    },
+    {
+      "name": "@vben/tsconfig",
+      "path": "internal/tsconfig",
+    },
+    {
+      "name": "@vben/vite-config",
+      "path": "internal/vite-config",
+    },
+    {
+      "name": "@vben-core/design",
+      "path": "packages/@core/base/design",
+    },
+    {
+      "name": "@vben-core/icons",
+      "path": "packages/@core/base/icons",
+    },
+    {
+      "name": "@vben-core/shared",
+      "path": "packages/@core/base/shared",
+    },
+    {
+      "name": "@vben-core/typings",
+      "path": "packages/@core/base/typings",
+    },
+    {
+      "name": "@vben-core/composables",
+      "path": "packages/@core/composables",
+    },
+    {
+      "name": "@vben-core/preferences",
+      "path": "packages/@core/preferences",
+    },
+    {
+      "name": "@vben-core/form-ui",
+      "path": "packages/@core/ui-kit/form-ui",
+    },
+    {
+      "name": "@vben-core/layout-ui",
+      "path": "packages/@core/ui-kit/layout-ui",
+    },
+    {
+      "name": "@vben-core/menu-ui",
+      "path": "packages/@core/ui-kit/menu-ui",
+    },
+    {
+      "name": "@vben-core/popup-ui",
+      "path": "packages/@core/ui-kit/popup-ui",
+    },
+    {
+      "name": "@vben-core/shadcn-ui",
+      "path": "packages/@core/ui-kit/shadcn-ui",
+    },
+    {
+      "name": "@vben-core/tabs-ui",
+      "path": "packages/@core/ui-kit/tabs-ui",
+    },
+    {
+      "name": "@vben/constants",
+      "path": "packages/constants",
+    },
+    {
+      "name": "@vben/access",
+      "path": "packages/effects/access",
+    },
+    {
+      "name": "@vben/common-ui",
+      "path": "packages/effects/common-ui",
+    },
+    {
+      "name": "@vben/hooks",
+      "path": "packages/effects/hooks",
+    },
+    {
+      "name": "@vben/layouts",
+      "path": "packages/effects/layouts",
+    },
+    {
+      "name": "@vben/plugins",
+      "path": "packages/effects/plugins",
+    },
+    {
+      "name": "@vben/request",
+      "path": "packages/effects/request",
+    },
+    {
+      "name": "@vben/icons",
+      "path": "packages/icons",
+    },
+    {
+      "name": "@vben/locales",
+      "path": "packages/locales",
+    },
+    {
+      "name": "@vben/preferences",
+      "path": "packages/preferences",
+    },
+    {
+      "name": "@vben/stores",
+      "path": "packages/stores",
+    },
+    {
+      "name": "@vben/styles",
+      "path": "packages/styles",
+    },
+    {
+      "name": "@vben/types",
+      "path": "packages/types",
+    },
+    {
+      "name": "@vben/utils",
+      "path": "packages/utils",
+    },
+    {
+      "name": "@vben/turbo-run",
+      "path": "scripts/turbo-run",
+    },
+    {
+      "name": "@vben/vsh",
+      "path": "scripts/vsh",
+    },
+  ],
+}

@@ -60,6 +60,8 @@ The execution command is: `pnpm run [script]` or `npm run [script]`.
     "build:ele": "pnpm run build --filter=@vben/web-ele",
     // Build the web-naive application separately
     "build:naive": "pnpm run build --filter=@vben/naive",
+    // Build the web-tdesign application separately
+    "build:tdesign": "pnpm run build --filter=@vben/web-tdesign",
     // Build the playground application separately
     "build:play": "pnpm run build --filter=@vben/playground",
     // Changeset version management

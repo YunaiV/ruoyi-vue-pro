@@ -11,7 +11,7 @@ import { Avatar, Card, Col, Row } from 'ant-design-vue';
 import { useDescription } from '#/components/description';
 import { DictTag } from '#/components/dict-tag';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{ mode?: 'kefu' | 'member'; user: MemberUserApi.User }>(),
   {
     mode: 'member',
@@ -19,6 +19,8 @@ withDefaults(
 );
 
 const [Descriptions] = useDescription({
+  bordered: false,
+  column: props.mode === 'member' ? 2 : 1,
   schema: [
     {
       field: 'name',
@@ -35,10 +37,10 @@ const [Descriptions] = useDescription({
     {
       field: 'sex',
       label: '性别',
-      content: (data) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.SYSTEM_USER_SEX,
-          value: data.sex,
+          value: val,
         }),
     },
     {
@@ -52,17 +54,17 @@ const [Descriptions] = useDescription({
     {
       field: 'birthday',
       label: '生日',
-      content: (data) => formatDate(data.birthday)?.toString() || '-',
+      render: (val) => formatDate(val)?.toString() || '-',
     },
     {
       field: 'createTime',
       label: '注册时间',
-      content: (data) => formatDate(data.createTime)?.toString() || '-',
+      render: (val) => formatDate(val)?.toString() || '-',
     },
     {
       field: 'loginDate',
       label: '最后登录时间',
-      content: (data) => formatDate(data.loginDate)?.toString() || '-',
+      render: (val) => formatDate(val)?.toString() || '-',
     },
   ],
 });

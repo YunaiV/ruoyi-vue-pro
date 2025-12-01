@@ -1,5 +1,6 @@
 <!-- add by 星语：参考 vben2 的方式，增加 TableAction 组件 -->
 <script setup lang="ts">
+// TODO @xingyu：要不要和 apps/web-antd/src/components/table-action/table-action.vue 代码风格，进一步风格对齐？现在每个方法，会有一些差异
 import type { PropType } from 'vue';
 
 import type { ActionItem, PopConfirm } from './typing';
@@ -42,20 +43,24 @@ const props = defineProps({
 
 const { hasAccessByCodes } = useAccess();
 
+/** 检查是否显示 */
 function isIfShow(action: ActionItem): boolean {
   const ifShow = action.ifShow;
-
   let isIfShow = true;
-
   if (isBoolean(ifShow)) {
     isIfShow = ifShow;
   }
   if (isFunction(ifShow)) {
     isIfShow = ifShow(action);
   }
+  if (isIfShow) {
+    isIfShow =
+      hasAccessByCodes(action.auth || []) || (action.auth || []).length === 0;
+  }
   return isIfShow;
 }
 
+/** 处理按钮 actions */
 const getActions = computed(() => {
   return (toRaw(props.actions) || [])
     .filter((action) => {

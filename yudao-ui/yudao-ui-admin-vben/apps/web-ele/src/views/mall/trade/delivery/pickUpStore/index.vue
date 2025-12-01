@@ -38,17 +38,19 @@ function handleCreate() {
 }
 
 /** 编辑门店 */
-function handleEdit(row: MallDeliveryPickUpStoreApi.PickUpStore) {
+function handleEdit(row: MallDeliveryPickUpStoreApi.DeliveryPickUpStore) {
   formModalApi.setData(row).open();
 }
 
 /** 绑定店员 */
-function handleBind(row: MallDeliveryPickUpStoreApi.PickUpStore) {
+function handleBind(row: MallDeliveryPickUpStoreApi.DeliveryPickUpStore) {
   bindFormModalApi.setData(row).open();
 }
 
 /** 删除门店 */
-async function handleDelete(row: MallDeliveryPickUpStoreApi.PickUpStore) {
+async function handleDelete(
+  row: MallDeliveryPickUpStoreApi.DeliveryPickUpStore,
+) {
   const loadingInstance = ElLoading.service({
     text: $t('ui.actionMessage.deleting', [row.name]),
   });
@@ -88,7 +90,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       refresh: true,
       search: true,
     },
-  } as VxeTableGridOptions<MallDeliveryPickUpStoreApi.PickUpStore>,
+  } as VxeTableGridOptions<MallDeliveryPickUpStoreApi.DeliveryPickUpStore>,
 });
 </script>
 

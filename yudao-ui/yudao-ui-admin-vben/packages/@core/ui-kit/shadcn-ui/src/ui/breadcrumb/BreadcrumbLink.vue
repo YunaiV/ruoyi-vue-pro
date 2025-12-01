@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { PrimitiveProps } from 'radix-vue';
+import type { PrimitiveProps } from 'reka-ui';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { Primitive } from 'radix-vue';
+import { Primitive } from 'reka-ui';
 
 const props = withDefaults(defineProps<PrimitiveProps & { class?: any }>(), {
   as: 'a',
@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<PrimitiveProps & { class?: any }>(), {
   <Primitive
     :as="as"
     :as-child="asChild"
-    :class="cn('hover:text-foreground transition-colors', props.class)"
+    :class="cn('transition-colors hover:text-foreground', props.class)"
   >
     <slot></slot>
   </Primitive>

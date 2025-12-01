@@ -122,7 +122,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
                 {{ item.spuName }}
                 <ElTag
                   v-for="property in item.properties"
-                  :key="property.id"
+                  :key="property.propertyId"
                   class="ml-1"
                   size="small"
                 >
@@ -133,7 +133,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
                 class="flex items-center justify-between text-xs text-gray-500"
               >
                 <span>
-                  原价：{{ fenToYuan(item.price) }} 元 / 数量：{{
+                  原价：{{ fenToYuan(item.price!) }} 元 / 数量：{{
                     item.count
                   }}个
                 </span>

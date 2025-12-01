@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
 
+import { message } from 'ant-design-vue';
+
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteDiyPage, getDiyPagePage } from '#/api/mall/promotion/diy/page';
 import { $t } from '#/locales';
@@ -37,7 +39,6 @@ function handleEdit(row: MallDiyPageApi.DiyPage) {
   formModalApi.setData(row).open();
 }
 
-// TODO @xingyu：装修未实现
 /** 装修页面 */
 function handleDecorate(row: MallDiyPageApi.DiyPage) {
   push({ name: 'DiyPageDecorate', params: { id: row.id } });
@@ -45,8 +46,17 @@ function handleDecorate(row: MallDiyPageApi.DiyPage) {
 
 /** 删除 DIY 页面 */
 async function handleDelete(row: MallDiyPageApi.DiyPage) {
-  await deleteDiyPage(row.id as number);
-  handleRefresh();
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.name]),
+    duration: 0,
+  });
+  try {
+    await deleteDiyPage(row.id as number);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
+    handleRefresh();
+  } finally {
+    hideLoading();
+  }
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({

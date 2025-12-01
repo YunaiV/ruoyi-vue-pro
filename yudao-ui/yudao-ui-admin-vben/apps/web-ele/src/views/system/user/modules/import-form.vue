@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type { UploadRawFile } from 'element-plus';
-
 import { useVbenModal } from '@vben/common-ui';
 import { downloadFileFromBlobPart } from '@vben/utils';
 
@@ -45,10 +43,11 @@ const [Modal, modalApi] = useVbenModal({
   },
 });
 
-/** 上传前 */
-function beforeUpload(file: UploadRawFile) {
-  formApi.setFieldValue('file', file);
-  return false;
+/** 文件改变时 */
+function handleChange(file: any) {
+  if (file.raw) {
+    formApi.setFieldValue('file', file.raw);
+  }
 }
 
 /** 下载模版 */
@@ -64,10 +63,10 @@ async function handleDownload() {
       <template #file>
         <div class="w-full">
           <ElUpload
-            :max-count="1"
+            :limit="1"
             accept=".xls,.xlsx"
+            :on-change="handleChange"
             :auto-upload="false"
-            :before-upload="beforeUpload"
           >
             <ElButton type="primary"> 选择 Excel 文件 </ElButton>
           </ElUpload>

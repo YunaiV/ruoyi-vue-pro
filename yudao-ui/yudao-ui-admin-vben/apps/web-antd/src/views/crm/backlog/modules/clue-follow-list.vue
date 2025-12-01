@@ -26,7 +26,7 @@ const [Grid] = useVbenVxeGrid({
       {
         fieldName: 'followUpStatus',
         label: '状态',
-        component: 'Select',
+        component: 'RadioGroup',
         componentProps: {
           allowClear: true,
           options: FOLLOWUP_STATUS,

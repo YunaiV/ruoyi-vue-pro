@@ -17,35 +17,29 @@ import {
 import { getModelList } from '#/api/bpm/model';
 import { router } from '#/router';
 
-// 流程分类对话框
 import CategoryForm from '../category/modules/form.vue';
 import CategoryDraggableModel from './modules/category-draggable-model.vue';
 
-// 新建流程分类对话框
 const [CategoryFormModal, categoryFormModalApi] = useVbenModal({
   connectedComponent: CategoryForm,
   destroyOnClose: true,
 });
-// 模型列表加载状态
-const modelListSpinning = ref(false);
-// 保存排序状态
-const saveSortLoading = ref(false);
-// 按照 category 分组的数据
-const categoryGroup = ref<ModelCategoryInfo[]>([]);
-// 未排序前的原始数据
-const originalData = ref<ModelCategoryInfo[]>([]);
-// 可以排序元素的容器
-const sortable = useTemplateRef<HTMLElement>('categoryGroupRef');
-// 排序引用，以便后续启用或禁用排序
-const sortableInstance = ref<any>(null);
-// 分类排序状态
-const isCategorySorting = ref(false);
-// 查询参数
+
+const modelListSpinning = ref(false); // 模型列表加载状态
+
+const saveSortLoading = ref(false); // 保存排序状态
+const categoryGroup = ref<ModelCategoryInfo[]>([]); // 按照 category 分组的数据
+const originalData = ref<ModelCategoryInfo[]>([]); // 未排序前的原始数据
+
+const sortable = useTemplateRef<HTMLElement>('categoryGroupRef'); // 可以排序元素的容器
+const sortableInstance = ref<any>(null); // 排序引用，以便后续启用或禁用排序
+const isCategorySorting = ref(false); // 分类排序状态
+
 const queryParams = reactive({
   name: '',
-});
+}); // 查询参数
 
-// 监听分类排序模式切换
+/** 监听分类排序模式切换 */
 watch(
   () => isCategorySorting.value,
   (newValue) => {
@@ -131,10 +125,10 @@ async function handleCategorySortSubmit() {
     // 保存排序逻辑
     const ids = categoryGroup.value.map((item: any) => item.id);
     await updateCategorySortBatch(ids);
+    message.success('分类排序成功');
   } finally {
     saveSortLoading.value = false;
   }
-  message.success('分类排序成功');
   isCategorySorting.value = false;
   // 刷新列表
   await getList();
@@ -156,44 +150,44 @@ async function handleCategorySortSubmit() {
       v-spinning="modelListSpinning"
     >
       <template #extra>
-        <Input
-          v-model:value="queryParams.name"
-          placeholder="搜索流程"
-          allow-clear
-          @press-enter="getList"
-          class="!w-60"
-        />
-        <Button class="ml-2" type="primary" @click="createModel">
-          <IconifyIcon icon="lucide:plus" /> 新建模型
-        </Button>
-        <Dropdown class="ml-2" placement="bottomRight" arrow>
-          <Button>
-            <template #icon>
-              <div class="flex items-center justify-center">
-                <IconifyIcon icon="lucide:settings" />
-              </div>
-            </template>
+        <div v-if="!isCategorySorting">
+          <Input
+            v-model:value="queryParams.name"
+            placeholder="搜索流程"
+            allow-clear
+            @press-enter="getList"
+            class="!w-60"
+          />
+          <Button class="ml-2" type="primary" @click="createModel">
+            <IconifyIcon icon="lucide:plus" /> 新建模型
           </Button>
-          <template #overlay>
-            <Menu @click="(e) => handleCommand(e.key as string)">
-              <Menu.Item key="handleCategoryAdd">
-                <div class="flex items-center gap-1">
-                  <IconifyIcon icon="lucide:plus" />
-                  新建分类
+          <Dropdown class="ml-2" placement="bottomRight" arrow>
+            <Button>
+              <template #icon>
+                <div class="flex items-center justify-center">
+                  <IconifyIcon icon="lucide:settings" />
                 </div>
-              </Menu.Item>
-              <Menu.Item key="handleCategorySort">
-                <div class="flex items-center gap-1">
-                  <IconifyIcon icon="lucide:align-start-vertical" />
-                  分类排序
-                </div>
-              </Menu.Item>
-            </Menu>
-          </template>
-        </Dropdown>
-      </template>
-      <div class="flex h-full items-center justify-between pl-5">
-        <div class="mb-4 mr-6" v-if="isCategorySorting">
+              </template>
+            </Button>
+            <template #overlay>
+              <Menu @click="(e) => handleCommand(e.key as string)">
+                <Menu.Item key="handleCategoryAdd">
+                  <div class="flex items-center gap-1">
+                    <IconifyIcon icon="lucide:plus" />
+                    新建分类
+                  </div>
+                </Menu.Item>
+                <Menu.Item key="handleCategorySort">
+                  <div class="flex items-center gap-1">
+                    <IconifyIcon icon="lucide:align-start-vertical" />
+                    分类排序
+                  </div>
+                </Menu.Item>
+              </Menu>
+            </template>
+          </Dropdown>
+        </div>
+        <div class="flex h-full items-center justify-between" v-else>
           <Button @click="handleCategorySortCancel" class="mr-3">
             取 消
           </Button>
@@ -205,7 +199,7 @@ async function handleCategorySortSubmit() {
             保存排序
           </Button>
         </div>
-      </div>
+      </template>
 
       <!-- 按照分类，展示其所属的模型列表 -->
       <div class="px-3" ref="categoryGroupRef">

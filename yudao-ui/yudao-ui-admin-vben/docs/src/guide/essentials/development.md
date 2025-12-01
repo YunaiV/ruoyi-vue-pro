@@ -60,6 +60,8 @@ npm 脚本是项目常见的配置，用于执行一些常见的任务，比如�
     "build:ele": "pnpm run build --filter=@vben/web-ele",
     // 单独构建 web-naive 应用
     "build:naive": "pnpm run build --filter=@vben/naive",
+    // 单独构建 web-tdesign 应用
+    "build:tdesign": "pnpm run build --filter=@vben/web-tdesign",
     // 单独构建 playground 应用
     "build:play": "pnpm run build --filter=@vben/playground",
     // changeset 版本管理

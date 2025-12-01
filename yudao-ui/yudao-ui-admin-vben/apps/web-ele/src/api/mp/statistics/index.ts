@@ -1,17 +1,14 @@
-import type { PageParam } from '@vben/request';
-
 import { requestClient } from '#/api/request';
 
 export namespace MpStatisticsApi {
   /** 统计查询参数 */
-  export interface StatisticsQuery extends PageParam {
+  export interface StatisticsGetReqVO {
     accountId: number;
-    beginDate: string;
-    endDate: string;
+    date: Date[];
   }
 
   /** 消息发送概况数据 */
-  export interface UpstreamMessage {
+  export interface StatisticsUpstreamMessageRespVO {
     refDate: string;
     msgType: string;
     msgUser: number;
@@ -19,7 +16,7 @@ export namespace MpStatisticsApi {
   }
 
   /** 用户增减数据 */
-  export interface UserSummary {
+  export interface StatisticsUserSummaryRespVO {
     refDate: string;
     userSource: number;
     newUser: number;
@@ -28,13 +25,13 @@ export namespace MpStatisticsApi {
   }
 
   /** 用户累计数据 */
-  export interface UserCumulate {
+  export interface StatisticsUserCumulateRespVO {
     refDate: string;
     cumulateUser: number;
   }
 
   /** 接口分析数据 */
-  export interface InterfaceSummary {
+  export interface StatisticsInterfaceSummaryRespVO {
     refDate: string;
     callbackCount: number;
     failCount: number;
@@ -44,8 +41,8 @@ export namespace MpStatisticsApi {
 }
 
 /** 获取消息发送概况数据 */
-export function getUpstreamMessage(params: MpStatisticsApi.StatisticsQuery) {
-  return requestClient.get<MpStatisticsApi.UpstreamMessage[]>(
+export function getUpstreamMessage(params: MpStatisticsApi.StatisticsGetReqVO) {
+  return requestClient.get<MpStatisticsApi.StatisticsUpstreamMessageRespVO[]>(
     '/mp/statistics/upstream-message',
     {
       params,
@@ -54,8 +51,8 @@ export function getUpstreamMessage(params: MpStatisticsApi.StatisticsQuery) {
 }
 
 /** 获取用户增减数据 */
-export function getUserSummary(params: MpStatisticsApi.StatisticsQuery) {
-  return requestClient.get<MpStatisticsApi.UserSummary[]>(
+export function getUserSummary(params: MpStatisticsApi.StatisticsGetReqVO) {
+  return requestClient.get<MpStatisticsApi.StatisticsUserSummaryRespVO[]>(
     '/mp/statistics/user-summary',
     {
       params,
@@ -64,8 +61,8 @@ export function getUserSummary(params: MpStatisticsApi.StatisticsQuery) {
 }
 
 /** 获取用户累计数据 */
-export function getUserCumulate(params: MpStatisticsApi.StatisticsQuery) {
-  return requestClient.get<MpStatisticsApi.UserCumulate[]>(
+export function getUserCumulate(params: MpStatisticsApi.StatisticsGetReqVO) {
+  return requestClient.get<MpStatisticsApi.StatisticsUserCumulateRespVO[]>(
     '/mp/statistics/user-cumulate',
     {
       params,
@@ -74,8 +71,10 @@ export function getUserCumulate(params: MpStatisticsApi.StatisticsQuery) {
 }
 
 /** 获取接口分析数据 */
-export function getInterfaceSummary(params: MpStatisticsApi.StatisticsQuery) {
-  return requestClient.get<MpStatisticsApi.InterfaceSummary[]>(
+export function getInterfaceSummary(
+  params: MpStatisticsApi.StatisticsGetReqVO,
+) {
+  return requestClient.get<MpStatisticsApi.StatisticsInterfaceSummaryRespVO[]>(
     '/mp/statistics/interface-summary',
     {
       params,

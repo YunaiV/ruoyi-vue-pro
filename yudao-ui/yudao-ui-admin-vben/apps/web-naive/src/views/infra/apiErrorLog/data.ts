@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { InfraApiErrorLogApi } from '#/api/infra/api-error-log';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -158,10 +157,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'userType',
       label: '用户类型',
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.USER_TYPE,
-          value: data.userType,
+          value: val,
         });
       },
     },
@@ -176,9 +175,9 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'requestMethod',
       label: '请求信息',
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
-        if (data?.requestMethod && data?.requestUrl) {
-          return `${data.requestMethod} ${data.requestUrl}`;
+      render: (val, data) => {
+        if (val && data?.requestUrl) {
+          return `${val} ${data.requestUrl}`;
         }
         return '';
       },
@@ -186,10 +185,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'requestParams',
       label: '请求参数',
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
-        if (data.requestParams) {
+      render: (val) => {
+        if (val) {
           return h(JsonViewer, {
-            value: JSON.parse(data.requestParams),
+            value: JSON.parse(val),
             previewMode: true,
           });
         }
@@ -199,8 +198,8 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'exceptionTime',
       label: '异常时间',
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
-        return formatDateTime(data?.exceptionTime || '') as string;
+      render: (val) => {
+        return formatDateTime(val) as string;
       },
     },
     {
@@ -210,12 +209,11 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'exceptionStackTrace',
       label: '异常堆栈',
-      hidden: (data: InfraApiErrorLogApi.ApiErrorLog) =>
-        !data?.exceptionStackTrace,
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
-        if (data?.exceptionStackTrace) {
+      show: (val) => !val,
+      render: (val) => {
+        if (val) {
           return h('textarea', {
-            value: data.exceptionStackTrace,
+            value: val,
             style:
               'width: 100%; min-height: 200px; max-height: 400px; resize: vertical;',
             readonly: true,
@@ -227,24 +225,24 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'processStatus',
       label: '处理状态',
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS,
-          value: data?.processStatus,
+          value: val,
         });
       },
     },
     {
       field: 'processUserId',
       label: '处理人',
-      hidden: (data: InfraApiErrorLogApi.ApiErrorLog) => !data?.processUserId,
+      show: (val) => !val,
     },
     {
       field: 'processTime',
       label: '处理时间',
-      hidden: (data: InfraApiErrorLogApi.ApiErrorLog) => !data?.processTime,
-      content: (data: InfraApiErrorLogApi.ApiErrorLog) => {
-        return formatDateTime(data?.processTime || '') as string;
+      show: (val) => !val,
+      render: (val) => {
+        return formatDateTime(val) as string;
       },
     },
   ];

@@ -2,8 +2,7 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { BpmFormApi } from '#/api/bpm/form';
 
-import { watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { onActivated } from 'vue';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
 import { $t } from '@vben/locales';
@@ -24,7 +23,7 @@ function handleRefresh() {
   gridApi.query();
 }
 
-/** 新增 */
+/** 新增表单 */
 function handleCreate() {
   router.push({
     name: 'BpmFormEditor',
@@ -34,7 +33,7 @@ function handleCreate() {
   });
 }
 
-/** 编辑 */
+/** 编辑表单 */
 function handleEdit(row: BpmFormApi.Form) {
   router.push({
     name: 'BpmFormEditor',
@@ -45,7 +44,7 @@ function handleEdit(row: BpmFormApi.Form) {
   });
 }
 
-/** 复制 */
+/** 复制表单 */
 function handleCopy(row: BpmFormApi.Form) {
   router.push({
     name: 'BpmFormEditor',
@@ -56,34 +55,30 @@ function handleCopy(row: BpmFormApi.Form) {
   });
 }
 
-/** 删除 */
+/** 删除表单 */
 async function handleDelete(row: BpmFormApi.Form) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteForm(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteForm(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
   }
 }
+
+/** 查看表单详情 */
 async function handleDetail(row: BpmFormApi.Form) {
   detailModalApi.setData(row).open();
 }
 
-/** 详情弹窗 */
 const [DetailModal, detailModalApi] = useVbenModal({
   connectedComponent: Detail,
   destroyOnClose: true,
 });
-
-/** 检测路由参数 */
-const route = useRoute();
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
@@ -106,26 +101,19 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
       search: true,
     },
-    cellConfig: {
-      height: 64,
-    },
   } as VxeTableGridOptions<BpmFormApi.Form>,
 });
 
-watch(
-  () => route.query.refresh,
-  (val) => {
-    if (val === '1') {
-      handleRefresh();
-    }
-  },
-  { immediate: true },
-);
+/** 激活时 */
+onActivated(() => {
+  handleRefresh();
+});
 </script>
 
 <template>

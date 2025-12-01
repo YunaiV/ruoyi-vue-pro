@@ -5,7 +5,7 @@ import {
   makeRequiredRule,
 } from '#/components/form-create/helpers';
 
-export const useUploadImageRule = () => {
+export function useUploadImageRule() {
   const label = '单图上传';
   const name = 'ImageUpload';
   return {
@@ -47,7 +47,7 @@ export const useUploadImageRule = () => {
             { label: 'image/x-icon', value: 'image/x-icon' },
           ],
           props: {
-            multiple: false,
+            multiple: true,
           },
         },
         {
@@ -90,4 +90,4 @@ export const useUploadImageRule = () => {
       ]);
     },
   };
-};
+}

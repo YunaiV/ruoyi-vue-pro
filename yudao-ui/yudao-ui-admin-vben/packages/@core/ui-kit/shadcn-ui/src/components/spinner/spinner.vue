@@ -63,7 +63,7 @@ function onTransitionEnd() {
   <div
     :class="
       cn(
-        'flex-center z-100 bg-overlay-content absolute left-0 top-0 size-full backdrop-blur-sm transition-all duration-500',
+        'flex-center absolute left-0 top-0 z-100 size-full bg-overlay-content backdrop-blur-sm transition-all duration-500',
         {
           'invisible opacity-0': !showSpinner,
         },
@@ -75,7 +75,7 @@ function onTransitionEnd() {
     <div
       :class="{ paused: !renderSpinner }"
       v-if="renderSpinner"
-      class="loader before:bg-primary/50 after:bg-primary relative size-12 before:absolute before:left-0 before:top-[60px] before:h-[5px] before:w-12 before:rounded-[50%] before:content-[''] after:absolute after:left-0 after:top-0 after:h-full after:w-full after:rounded after:content-['']"
+      class="loader relative size-12 before:absolute before:left-0 before:top-[60px] before:h-[5px] before:w-12 before:rounded-[50%] before:bg-primary/50 before:content-[''] after:absolute after:left-0 after:top-0 after:h-full after:w-full after:rounded after:bg-primary after:content-['']"
     ></div>
   </div>
 </template>

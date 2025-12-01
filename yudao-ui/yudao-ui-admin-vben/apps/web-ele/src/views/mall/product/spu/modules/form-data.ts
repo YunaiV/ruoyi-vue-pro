@@ -50,7 +50,7 @@ export function useInfoFormSchema(): VbenFormSchema[] {
       label: '商品品牌',
       component: 'ApiSelect',
       componentProps: {
-        api: () => getSimpleBrandList(),
+        api: getSimpleBrandList,
         labelField: 'name',
         valueField: 'id',
         allowClear: true,
@@ -237,6 +237,8 @@ export function useOtherFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       rules: z.number().min(0).optional().default(0),
     },
@@ -246,6 +248,8 @@ export function useOtherFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       rules: z.number().min(0).optional().default(0),
     },
@@ -255,6 +259,8 @@ export function useOtherFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       rules: z.number().min(0).optional().default(0),
     },

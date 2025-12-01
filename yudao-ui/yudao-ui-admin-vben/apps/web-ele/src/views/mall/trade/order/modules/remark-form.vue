@@ -10,11 +10,12 @@ import { ElMessage } from 'element-plus';
 import { useVbenForm } from '#/adapter/form';
 import { updateOrderRemark } from '#/api/mall/trade/order';
 import { $t } from '#/locales';
+
 import { useRemarkFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
 
-const formData = ref<MallOrderApi.DeliveryRequest>();
+const formData = ref<MallOrderApi.OrderUpdateDeliveryReqVO>();
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -37,7 +38,8 @@ const [Modal, modalApi] = useVbenModal({
     }
     modalApi.lock();
     // 提交表单
-    const data = (await formApi.getValues()) as MallOrderApi.RemarkRequest;
+    const data =
+      (await formApi.getValues()) as MallOrderApi.OrderUpdateRemarkReqVO;
     try {
       await updateOrderRemark(data);
       // 关闭并提示

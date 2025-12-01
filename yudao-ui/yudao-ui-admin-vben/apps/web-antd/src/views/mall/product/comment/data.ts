@@ -3,7 +3,6 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { MallCommentApi } from '#/api/mall/product/comment';
 
 import { z } from '#/adapter/form';
-import { getSpuSimpleList } from '#/api/mall/product/spu';
 import { getRangePickerDefaultProps } from '#/utils';
 
 /** 新增/修改的表单 */
@@ -17,15 +16,11 @@ export function useFormSchema(): VbenFormSchema[] {
         show: () => false,
       },
     },
-    // TODO @puhui999：商品的选择
     {
       fieldName: 'spuId',
       label: '商品',
-      component: 'ApiSelect',
+      component: 'Input',
       componentProps: {
-        api: getSpuSimpleList,
-        labelField: 'name',
-        valueField: 'id',
         placeholder: '请选择商品',
       },
       rules: 'required',
@@ -101,7 +96,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
     {
       fieldName: 'replyStatus',
       label: '回复状态',
-      component: 'Select',
+      component: 'RadioGroup',
       componentProps: {
         options: [
           { label: '已回复', value: true },

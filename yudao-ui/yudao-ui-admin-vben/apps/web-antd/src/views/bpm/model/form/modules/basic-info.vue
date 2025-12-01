@@ -53,21 +53,15 @@ const [DeptSelectModalComp, deptSelectModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
-// 表单引用
-const formRef = ref();
+const formRef = ref(); // 表单引用
+const modelData = defineModel<any>(); // 创建本地数据副本
 
-// 选中的发起人
-const selectedStartUsers = ref<SystemUserApi.User[]>([]);
+const selectedStartUsers = ref<SystemUserApi.User[]>([]); // 选中的发起人
+const selectedStartDepts = ref<SystemDeptApi.Dept[]>([]); // 选中的发起部门
 
-// 选中的发起部门
-const selectedStartDepts = ref<SystemDeptApi.Dept[]>([]);
-
-// 选中的流程管理员
-const selectedManagerUsers = ref<SystemUserApi.User[]>([]);
+const selectedManagerUsers = ref<SystemUserApi.User[]>([]); // 选中的流程管理员
 const currentSelectType = ref<'manager' | 'start'>('start');
-// 选中的用户
-const selectedUsers = ref<number[]>();
-
+const selectedUsers = ref<number[]>(); // 选中的用户
 const rules: Record<string, Rule[]> = {
   name: [{ required: true, message: '流程名称不能为空', trigger: 'blur' }],
   key: [
@@ -99,10 +93,7 @@ const rules: Record<string, Rule[]> = {
   ],
 };
 
-// 创建本地数据副本
-const modelData = defineModel<any>();
-
-// 初始化选中的用户
+/** 初始化选中的用户 */
 watch(
   () => modelData.value,
   (newVal) => {
@@ -140,6 +131,7 @@ function openStartUserSelect() {
 function openStartDeptSelect() {
   deptSelectModalApi.setData({ selectedList: selectedStartDepts.value }).open();
 }
+
 /** 处理部门选择确认 */
 function handleDeptSelectConfirm(depts: SystemDeptApi.Dept[]) {
   modelData.value = {
@@ -191,7 +183,6 @@ function handleStartUserTypeChange(value: SelectValue) {
         startUserIds: [],
         startDeptIds: [],
       };
-
       break;
     }
     case 1: {
@@ -199,7 +190,6 @@ function handleStartUserTypeChange(value: SelectValue) {
         ...modelData.value,
         startDeptIds: [],
       };
-
       break;
     }
     case 2: {
@@ -207,7 +197,6 @@ function handleStartUserTypeChange(value: SelectValue) {
         ...modelData.value,
         startUserIds: [],
       };
-
       break;
     }
   }
@@ -259,9 +248,8 @@ defineExpose({ validate });
       :rules="rules"
       :label-col="{ span: 4 }"
       :wrapper-col="{ span: 20 }"
-      class="mt-5"
     >
-      <Form.Item label="流程标识" name="key" class="mb-5">
+      <Form.Item label="流程标识" name="key">
         <div class="flex items-center">
           <Input
             class="w-full"
@@ -275,14 +263,11 @@ defineExpose({ validate });
             "
             placement="top"
           >
-            <IconifyIcon
-              icon="lucide:circle-help"
-              class="ml-1 size-5 text-gray-900"
-            />
+            <IconifyIcon icon="lucide:circle-help" class="ml-1 size-5" />
           </Tooltip>
         </div>
       </Form.Item>
-      <Form.Item label="流程名称" name="name" class="mb-5">
+      <Form.Item label="流程名称" name="name">
         <Input
           v-model:value="modelData.name"
           :disabled="!!modelData.id"
@@ -290,7 +275,7 @@ defineExpose({ validate });
           placeholder="请输入流程名称"
         />
       </Form.Item>
-      <Form.Item label="流程分类" name="category" class="mb-5">
+      <Form.Item label="流程分类" name="category">
         <Select
           class="w-full"
           v-model:value="modelData.category"
@@ -306,13 +291,13 @@ defineExpose({ validate });
           </Select.Option>
         </Select>
       </Form.Item>
-      <Form.Item label="流程图标" class="mb-5">
+      <Form.Item label="流程图标">
         <ImageUpload v-model:value="modelData.icon" />
       </Form.Item>
-      <Form.Item label="流程描述" name="description" class="mb-5">
+      <Form.Item label="流程描述" name="description">
         <Input.TextArea v-model:value="modelData.description" allow-clear />
       </Form.Item>
-      <Form.Item label="流程类型" name="type" class="mb-5">
+      <Form.Item label="流程类型" name="type">
         <Radio.Group v-model:value="modelData.type">
           <Radio
             v-for="dict in getDictOptions(DICT_TYPE.BPM_MODEL_TYPE, 'number')"
@@ -323,7 +308,7 @@ defineExpose({ validate });
           </Radio>
         </Radio.Group>
       </Form.Item>
-      <Form.Item label="是否可见" name="visible" class="mb-5">
+      <Form.Item label="是否可见" name="visible">
         <Radio.Group v-model:value="modelData.visible">
           <Radio
             v-for="dict in getDictOptions(
@@ -337,7 +322,7 @@ defineExpose({ validate });
           </Radio>
         </Radio.Group>
       </Form.Item>
-      <Form.Item label="谁可以发起" name="startUserType" class="mb-5">
+      <Form.Item label="谁可以发起" name="startUserType">
         <Select
           v-model:value="modelData.startUserType"
           placeholder="请选择谁可以发起"
@@ -354,15 +339,10 @@ defineExpose({ validate });
           <div
             v-for="user in selectedStartUsers"
             :key="user.id"
-            class="relative flex h-9 items-center rounded-full bg-gray-100 pr-2 hover:bg-gray-200 dark:border dark:border-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600"
+            class="relative flex h-8 items-center rounded-lg bg-gray-100 pr-2 hover:bg-gray-200 dark:border dark:border-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600"
           >
-            <Avatar
-              class="m-1"
-              :size="28"
-              v-if="user.avatar"
-              :src="user.avatar"
-            />
-            <Avatar class="m-1" :size="28" v-else>
+            <Avatar class="m-1 size-7" v-if="user.avatar" :src="user.avatar" />
+            <Avatar class="m-1 size-7" v-else>
               {{ user.nickname?.substring(0, 1) }}
             </Avatar>
             <span class="text-gray-700 dark:text-gray-200">
@@ -370,7 +350,7 @@ defineExpose({ validate });
             </span>
             <IconifyIcon
               icon="lucide:x"
-              class="ml-2 size-4 cursor-pointer text-gray-400 hover:text-red-500"
+              class="ml-2 size-4 cursor-pointer text-gray-400 hover:text-red-500 dark:text-gray-200"
               @click="handleRemoveStartUser(user)"
             />
           </div>
@@ -392,7 +372,7 @@ defineExpose({ validate });
           <div
             v-for="dept in selectedStartDepts"
             :key="dept.id"
-            class="relative flex h-9 items-center rounded-full bg-gray-100 pr-2 shadow-sm hover:bg-gray-200 dark:border dark:border-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600"
+            class="relative flex h-8 items-center rounded-lg bg-gray-100 pr-2 shadow-sm hover:bg-gray-200 dark:border dark:border-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600"
           >
             <IconifyIcon icon="lucide:building" class="size-6 px-1" />
             <span class="text-gray-700 dark:text-gray-200">
@@ -416,20 +396,15 @@ defineExpose({ validate });
           </Button>
         </div>
       </Form.Item>
-      <Form.Item label="流程管理员" name="managerUserIds" class="mb-5">
+      <Form.Item label="流程管理员" name="managerUserIds">
         <div class="flex flex-wrap gap-1">
           <div
             v-for="user in selectedManagerUsers"
             :key="user.id"
             class="relative flex h-9 items-center rounded-full bg-gray-100 pr-2 hover:bg-gray-200 dark:border dark:border-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600"
           >
-            <Avatar
-              class="m-1"
-              :size="28"
-              v-if="user.avatar"
-              :src="user.avatar"
-            />
-            <Avatar class="m-1" :size="28" v-else>
+            <Avatar class="m-1 size-7" v-if="user.avatar" :src="user.avatar" />
+            <Avatar class="m-1 size-7" v-else>
               {{ user.nickname?.substring(0, 1) }}
             </Avatar>
             <span class="text-gray-700 dark:text-gray-200">

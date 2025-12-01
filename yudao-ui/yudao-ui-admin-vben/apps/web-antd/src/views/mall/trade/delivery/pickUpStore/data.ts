@@ -65,7 +65,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'ApiTreeSelect',
       rules: 'required',
       componentProps: {
-        api: () => getAreaTree(),
+        api: getAreaTree,
         fieldNames: { label: 'name', value: 'id', children: 'children' },
         placeholder: '请选择省市区',
       },
@@ -146,8 +146,9 @@ export function useBindFormSchema(): VbenFormSchema[] {
       label: '门店店员',
       rules: 'required',
       componentProps: {
-        api: () => getSimpleUserList(),
-        fieldNames: { label: 'nickname', value: 'id' },
+        api: getSimpleUserList,
+        labelField: 'nickname',
+        valueField: 'id',
         mode: 'tags',
         allowClear: true,
         placeholder: '请选择门店店员',

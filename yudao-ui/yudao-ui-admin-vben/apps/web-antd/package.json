@@ -43,9 +43,11 @@
     "@vben/styles": "workspace:*",
     "@vben/types": "workspace:*",
     "@vben/utils": "workspace:*",
+    "@videojs-player/vue": "catalog:",
     "@vueuse/core": "catalog:",
     "@vueuse/integrations": "catalog:",
     "ant-design-vue": "catalog:",
+    "benz-amr-recorder": "catalog:",
     "bpmn-js": "catalog:",
     "bpmn-js-properties-panel": "catalog:",
     "bpmn-js-token-simulation": "catalog:",
@@ -58,9 +60,12 @@
     "pinia": "catalog:",
     "steady-xml": "catalog:",
     "tinymce": "catalog:",
+    "video.js": "catalog:",
     "vue": "catalog:",
     "vue-dompurify-html": "catalog:",
     "vue-router": "catalog:",
-    "vue3-signature": "catalog:"
+    "vue3-print-nb": "catalog:",
+    "vue3-signature": "catalog:",
+    "vuedraggable": "catalog:"
   }
 }

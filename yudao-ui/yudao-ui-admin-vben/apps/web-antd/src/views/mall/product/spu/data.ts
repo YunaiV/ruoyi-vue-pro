@@ -2,10 +2,16 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { MallSpuApi } from '#/api/mall/product/spu';
 
-import { handleTree } from '@vben/utils';
+import { fenToYuan, handleTree, treeToString } from '@vben/utils';
 
 import { getCategoryList } from '#/api/mall/product/category';
 import { getRangePickerDefaultProps } from '#/utils';
+
+/** 关联数据 */
+let categoryList: any[] = [];
+getCategoryList({}).then((data) => {
+  categoryList = handleTree(data, 'id', 'parentId', 'children');
+});
 
 /** 列表的搜索表单 */
 export function useGridFormSchema(): VbenFormSchema[] {
@@ -14,16 +20,19 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '商品名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入商品名称',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'categoryId',
       label: '商品分类',
       component: 'ApiTreeSelect',
       componentProps: {
-        api: async () => {
-          const res = await getCategoryList({});
-          return handleTree(res, 'id', 'parentId', 'children');
-        },
+        placeholder: '请选择商品分类',
+        allowClear: true,
+        options: categoryList,
         fieldNames: { label: 'name', value: 'id', children: 'children' },
       },
     },
@@ -48,15 +57,10 @@ export function useGridColumns(
 ): VxeTableGridOptions['columns'] {
   return [
     {
-      type: 'expand',
-      width: 80,
-      slots: { content: 'expand_content' },
-      fixed: 'left',
-    },
-    {
       field: 'id',
       title: '商品编号',
       fixed: 'left',
+      minWidth: 100,
     },
     {
       field: 'name',
@@ -67,30 +71,23 @@ export function useGridColumns(
     {
       field: 'picUrl',
       title: '商品图片',
+      minWidth: 100,
       cellRender: {
         name: 'CellImage',
       },
     },
     {
-      field: 'price',
-      title: '价格',
-      formatter: 'formatAmount2',
-    },
-    {
-      field: 'salesCount',
-      title: '销量',
-    },
-    {
-      field: 'stock',
-      title: '库存',
-    },
-    {
-      field: 'sort',
-      title: '排序',
+      field: 'categoryId',
+      title: '商品分类',
+      minWidth: 150,
+      formatter: ({ row }) => {
+        return treeToString(categoryList, row.categoryId);
+      },
     },
     {
       field: 'status',
       title: '销售状态',
+      minWidth: 100,
       cellRender: {
         attrs: { beforeChange: onStatusChange },
         name: 'CellSwitch',
@@ -103,8 +100,56 @@ export function useGridColumns(
       },
     },
     {
+      field: 'price',
+      title: '价格',
+      minWidth: 100,
+      formatter: 'formatAmount2',
+    },
+    {
+      field: 'marketPrice',
+      title: '市场价',
+      minWidth: 100,
+      formatter: ({ row }) => {
+        return `${fenToYuan(row.marketPrice)} 元`;
+      },
+    },
+    {
+      field: 'costPrice',
+      title: '成本价',
+      minWidth: 100,
+      formatter: ({ row }) => {
+        return `${fenToYuan(row.costPrice)} 元`;
+      },
+    },
+    {
+      field: 'salesCount',
+      title: '销量',
+      minWidth: 80,
+    },
+    {
+      field: 'virtualSalesCount',
+      title: '虚拟销量',
+      minWidth: 100,
+    },
+    {
+      field: 'stock',
+      title: '库存',
+      minWidth: 80,
+    },
+    {
+      field: 'browseCount',
+      title: '浏览量',
+      minWidth: 100,
+    },
+    {
+      field: 'sort',
+      title: '排序',
+      minWidth: 80,
+    },
+    {
       field: 'createTime',
       title: '创建时间',
+      minWidth: 160,
       formatter: 'formatDateTime',
     },
     {

@@ -13,7 +13,7 @@ export namespace AiModelApiKeyApi {
   }
 }
 
-// 查询 API 密钥分页
+/** 查询 API 密钥分页 */
 export function getApiKeyPage(params: PageParam) {
   return requestClient.get<PageResult<AiModelApiKeyApi.ApiKey>>(
     '/ai/api-key/page',
@@ -21,28 +21,29 @@ export function getApiKeyPage(params: PageParam) {
   );
 }
 
-// 获得 API 密钥列表
+/** 获得 API 密钥列表 */
 export function getApiKeySimpleList() {
   return requestClient.get<AiModelApiKeyApi.ApiKey[]>(
     '/ai/api-key/simple-list',
   );
 }
 
-// 查询 API 密钥详情
+/** 查询 API 密钥详情 */
 export function getApiKey(id: number) {
   return requestClient.get<AiModelApiKeyApi.ApiKey>(`/ai/api-key/get?id=${id}`);
 }
-// 新增 API 密钥
+
+/** 新增 API 密钥 */
 export function createApiKey(data: AiModelApiKeyApi.ApiKey) {
   return requestClient.post('/ai/api-key/create', data);
 }
 
-// 修改 API 密钥
+/** 修改 API 密钥 */
 export function updateApiKey(data: AiModelApiKeyApi.ApiKey) {
   return requestClient.put('/ai/api-key/update', data);
 }
 
-// 删除 API 密钥
+/** 删除 API 密钥 */
 export function deleteApiKey(id: number) {
   return requestClient.delete(`/ai/api-key/delete?id=${id}`);
 }

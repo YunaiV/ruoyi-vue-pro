@@ -8,6 +8,7 @@ import { requestClient } from '#/api/request';
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 const accessStore = useAccessStore();
+
 export namespace AiChatMessageApi {
   export interface ChatMessage {
     id: number; // 编号
@@ -18,6 +19,7 @@ export namespace AiChatMessageApi {
     model: number; // 模型标志
     modelId: number; // 模型编号
     content: string; // 聊天内容
+    reasoningContent?: string; // 推理内容（深度思考）
     tokens: number; // 消耗 Token 数量
     segmentIds?: number[]; // 段落编号
     segments?: {
@@ -26,13 +28,25 @@ export namespace AiChatMessageApi {
       documentName: string; // 文档名称
       id: number; // 段落编号
     }[];
+    webSearchPages?: WebSearchPage[]; // 联网搜索结果
+    attachmentUrls?: string[]; // 附件 URL 数组
     createTime: Date; // 创建时间
     roleAvatar: string; // 角色头像
     userAvatar: string; // 用户头像
   }
+
+  /** 联网搜索页面接口 */
+  export interface WebSearchPage {
+    name: string; // 网站名称
+    icon: string; // 网站图标 URL
+    title: string; // 页面标题
+    url: string; // 页面 URL
+    snippet: string; // 简短描述
+    summary: string; // 内容摘要
+  }
 }
 
-// 消息列表
+/** 消息列表 */
 export function getChatMessageListByConversationId(
   conversationId: null | number,
 ) {
@@ -41,15 +55,17 @@ export function getChatMessageListByConversationId(
   );
 }
 
-// 发送 Stream 消息
+/** 发送 Stream 消息 */
 export function sendChatMessageStream(
   conversationId: number,
   content: string,
   ctrl: any,
   enableContext: boolean,
+  enableWebSearch: boolean,
   onMessage: any,
   onError: any,
   onClose: any,
+  attachmentUrls?: string[],
 ) {
   const token = accessStore.accessToken;
   return fetchEventSource(`${apiURL}/ai/chat/message/send-stream`, {
@@ -63,6 +79,8 @@ export function sendChatMessageStream(
       conversationId,
       content,
       useContext: enableContext,
+      useSearch: enableWebSearch,
+      attachmentUrls: attachmentUrls || [],
     }),
     onmessage: onMessage,
     onerror: onError,
@@ -71,25 +89,27 @@ export function sendChatMessageStream(
   });
 }
 
-// 删除消息
+/** 删除消息 */
 export function deleteChatMessage(id: number) {
   return requestClient.delete(`/ai/chat/message/delete?id=${id}`);
 }
 
-// 删除指定对话的消息
+/** 删除指定对话的消息 */
 export function deleteByConversationId(conversationId: number) {
   return requestClient.delete(
     `/ai/chat/message/delete-by-conversation-id?conversationId=${conversationId}`,
   );
 }
-// 获得消息分页
+
+/** 获得消息分页 */
 export function getChatMessagePage(params: any) {
   return requestClient.get<PageResult<AiChatMessageApi.ChatMessage>>(
     '/ai/chat/message/page',
     { params },
   );
 }
-// 管理员删除消息
+
+/** 管理员删除消息 */
 export function deleteChatMessageByAdmin(id: number) {
   return requestClient.delete(`/ai/chat/message/delete-by-admin?id=${id}`);
 }

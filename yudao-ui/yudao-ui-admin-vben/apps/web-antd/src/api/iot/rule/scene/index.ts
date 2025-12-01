@@ -3,7 +3,7 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace RuleSceneApi {
-  /** IoT 场景联动规则 VO */
+  /** 场景联动规则 */
   export interface SceneRule {
     id?: number;
     name: string;
@@ -14,7 +14,7 @@ export namespace RuleSceneApi {
     createTime?: Date;
   }
 
-  /** IoT 场景联动规则触发器 */
+  /** 场景联动规则的触发器 */
   export interface Trigger {
     type?: string;
     productId?: number;
@@ -26,13 +26,13 @@ export namespace RuleSceneApi {
     conditionGroups?: TriggerConditionGroup[];
   }
 
-  /** IoT 场景联动规则触发条件组 */
+  /** 场景联动规则的触发条件组 */
   export interface TriggerConditionGroup {
     conditions?: TriggerCondition[];
     operator?: string;
   }
 
-  /** IoT 场景联动规则触发条件 */
+  /**  场景联动规则的触发条件 */
   export interface TriggerCondition {
     productId?: number;
     deviceId?: number;
@@ -42,7 +42,7 @@ export namespace RuleSceneApi {
     type?: string;
   }
 
-  /** IoT 场景联动规则动作 */
+  /** 场景联动规则的动作 */
   export interface Action {
     type?: string;
     productId?: number;
@@ -53,6 +53,7 @@ export namespace RuleSceneApi {
   }
 }
 
+// TODO @haohao：貌似下面的，和 RuleSceneApi 重复了。
 /** IoT 场景联动规则 */
 export interface IotSceneRule {
   id?: number;
@@ -101,6 +102,7 @@ export interface Action {
   identifier?: string;
   value?: any;
   alertConfigId?: number;
+  params?: string;
 }
 
 /** 查询场景联动规则分页 */
@@ -134,6 +136,7 @@ export function deleteSceneRule(id: number) {
 }
 
 /** 批量删除场景联动规则 */
+// TODO @haohao：貌似用上。
 export function deleteSceneRuleList(ids: number[]) {
   return requestClient.delete('/iot/scene-rule/delete-list', {
     params: { ids: ids.join(',') },

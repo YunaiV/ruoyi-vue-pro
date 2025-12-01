@@ -10,4 +10,5 @@ export * from './notification';
 export * from './preferences';
 export * from './tenant-dropdown';
 export * from './theme-toggle';
+export * from './timezone';
 export * from './user-dropdown';

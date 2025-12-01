@@ -64,6 +64,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Select',
       componentProps: {
         options: getDictOptions(DICT_TYPE.BPM_PROCESS_LISTENER_TYPE, 'string'),
+        placeholder: '请选择类型',
         allowClear: true,
       },
       rules: 'required',
@@ -74,6 +75,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Select',
       componentProps: {
         options: EVENT_OPTIONS,
+        placeholder: '请选择事件',
         allowClear: true,
       },
       rules: 'required',
@@ -97,6 +99,7 @@ export function useFormSchema(): VbenFormSchema[] {
           DICT_TYPE.BPM_PROCESS_LISTENER_VALUE_TYPE,
           'string',
         ),
+        placeholder: '请选择值类型',
         allowClear: true,
       },
       rules: 'required',
@@ -166,6 +169,15 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       },
     },
     {
+      field: 'status',
+      title: '状态',
+      minWidth: 100,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.COMMON_STATUS },
+      },
+    },
+    {
       field: 'event',
       title: '事件',
       minWidth: 200,
@@ -191,9 +203,8 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       formatter: 'formatDateTime',
     },
     {
-      field: 'actions',
       title: '操作',
-      minWidth: 180,
+      width: 180,
       fixed: 'right',
       slots: { default: 'actions' },
     },

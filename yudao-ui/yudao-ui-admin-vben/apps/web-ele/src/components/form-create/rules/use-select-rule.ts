@@ -13,7 +13,7 @@ import { selectRule } from '#/components/form-create/rules/data';
  *
  * @param option 规则配置
  */
-export const useSelectRule = (option: SelectRuleOption) => {
+export function useSelectRule(option: SelectRuleOption) {
   const label = option.label;
   const name = option.name;
   const rules = cloneDeep(selectRule);
@@ -42,4 +42,4 @@ export const useSelectRule = (option: SelectRuleOption) => {
       ]);
     },
   };
-};
+}

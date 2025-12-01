@@ -140,16 +140,8 @@ export function getThingModel(id: number) {
 /** 根据产品 ID 查询物模型列表 */
 export function getThingModelListByProductId(productId: number) {
   return requestClient.get<ThingModelApi.ThingModel[]>(
-    '/iot/thing-model/list-by-product-id',
+    '/iot/thing-model/list',
     { params: { productId } },
-  );
-}
-
-/** 根据产品标识查询物模型列表 */
-export function getThingModelListByProductKey(productKey: string) {
-  return requestClient.get<ThingModelApi.ThingModel[]>(
-    '/iot/thing-model/list-by-product-key',
-    { params: { productKey } },
   );
 }
 
@@ -168,24 +160,27 @@ export function deleteThingModel(id: number) {
   return requestClient.delete(`/iot/thing-model/delete?id=${id}`);
 }
 
-/** 批量删除物模型 */
-export function deleteThingModelList(ids: number[]) {
-  return requestClient.delete('/iot/thing-model/delete-list', {
-    params: { ids: ids.join(',') },
-  });
+/** 获取物模型 TSL */
+export function getThingModelTSL(productId: number) {
+  return requestClient.get<ThingModelApi.ThingModel[]>(
+    '/iot/thing-model/get-tsl',
+    { params: { productId } },
+  );
 }
 
-/** 导入物模型 TSL */
+/** 导入物模型 TSL
 export function importThingModelTSL(productId: number, tslData: any) {
   return requestClient.post('/iot/thing-model/import-tsl', {
     productId,
     tslData,
   });
 }
+ */
 
-/** 导出物模型 TSL */
+/** 导出物模型 TSL
 export function exportThingModelTSL(productId: number) {
   return requestClient.get<any>('/iot/thing-model/export-tsl', {
     params: { productId },
   });
 }
+ */

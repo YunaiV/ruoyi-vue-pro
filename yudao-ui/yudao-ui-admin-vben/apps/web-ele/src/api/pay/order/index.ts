@@ -38,21 +38,10 @@ export namespace PayOrderApi {
     createTime: Date;
     updateTime: Date;
   }
-
-  /** 支付订单分页请求 */
-  export interface OrderPageReqVO extends PageParam {
-    appId?: number;
-    channelCode?: string;
-    merchantOrderId?: string;
-    channelOrderNo?: string;
-    no?: string;
-    status?: number;
-    createTime?: Date[];
-  }
 }
 
 /** 查询支付订单列表 */
-export function getOrderPage(params: PayOrderApi.OrderPageReqVO) {
+export function getOrderPage(params: PageParam) {
   return requestClient.get<PageResult<PayOrderApi.Order>>('/pay/order/page', {
     params,
   });

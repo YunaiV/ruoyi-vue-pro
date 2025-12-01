@@ -5,44 +5,24 @@ import { requestClient } from '#/api/request';
 export namespace MallKefuMessageApi {
   /** 客服消息 */
   export interface Message {
-    /** 编号 */
-    id: number;
-    /** 会话编号 */
-    conversationId: number;
-    /** 发送人编号 */
-    senderId: number;
-    /** 发送人头像 */
-    senderAvatar: string;
-    /** 发送人类型 */
-    senderType: number;
-    /** 接收人编号 */
-    receiverId: number;
-    /** 接收人类型 */
-    receiverType: number;
-    /** 消息类型 */
-    contentType: number;
-    /** 消息内容 */
-    content: string;
-    /** 是否已读 */
-    readStatus: boolean;
-    /** 创建时间 */
-    createTime: Date;
+    id: number; // 编号
+    conversationId: number; // 会话编号
+    senderId: number; // 发送人编号
+    senderAvatar: string; // 发送人头像
+    senderType: number; // 发送人类型
+    receiverId: number; // 接收人编号
+    receiverType: number; // 接收人类型
+    contentType: number; // 消息类型
+    content: string; // 消息内容
+    readStatus: boolean; // 是否已读
+    createTime: Date; // 创建时间
   }
 
   /** 发送消息请求 */
   export interface MessageSend {
-    /** 会话编号 */
-    conversationId: number;
-    /** 消息类型 */
-    contentType: number;
-    /** 消息内容 */
-    content: string;
-  }
-
-  /** 消息列表查询参数 */
-  export interface MessageQuery extends PageParam {
-    /** 会话编号 */
-    conversationId: number;
+    conversationId: number; // 会话编号
+    contentType: number; // 消息类型
+    content: string; // 消息内容
   }
 }
 
@@ -59,7 +39,7 @@ export function updateKeFuMessageReadStatus(conversationId: number) {
 }
 
 /** 获得消息列表（流式加载） */
-export function getKeFuMessageList(params: MallKefuMessageApi.MessageQuery) {
+export function getKeFuMessageList(params: PageParam) {
   return requestClient.get<PageResult<MallKefuMessageApi.Message>>(
     '/promotion/kefu-message/list',
     { params },

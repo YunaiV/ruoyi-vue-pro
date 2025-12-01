@@ -60,11 +60,9 @@ export function useFormSchema(): VbenFormSchema[] {
         disabled: (values) => values.id,
       },
       componentProps: {
-        api: () => getSimpleUserList(),
-        fieldNames: {
-          label: 'nickname',
-          value: 'id',
-        },
+        api: getSimpleUserList,
+        labelField: 'nickname',
+        valueField: 'id',
         placeholder: '请选择负责人',
         allowClear: true,
       },
@@ -132,7 +130,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '地址',
       component: 'ApiTreeSelect',
       componentProps: {
-        api: () => getAreaTree(),
+        api: getAreaTree,
         fieldNames: { label: 'name', value: 'id', children: 'children' },
         placeholder: '请选择地址',
         allowClear: true,
@@ -222,11 +220,9 @@ export function useImportFormSchema(): VbenFormSchema[] {
       label: '负责人',
       component: 'ApiSelect',
       componentProps: {
-        api: () => getSimpleUserList(),
-        fieldNames: {
-          label: 'nickname',
-          value: 'id',
-        },
+        api: getSimpleUserList,
+        labelField: 'nickname',
+        valueField: 'id',
         placeholder: '请选择负责人',
         allowClear: true,
         class: 'w-full',

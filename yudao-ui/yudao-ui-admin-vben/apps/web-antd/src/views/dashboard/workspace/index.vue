@@ -49,12 +49,12 @@ const projectItems: WorkbenchProjectItem[] = [
   },
   {
     color: '#ff4d4f',
-    content: 'github.com/yudaocode/yudao-ui-mall-uniapp',
+    content: 'github.com/yudaocode/yudao-mall-uniapp',
     date: '2025-03-04',
     group: 'Vue3 + uniapp 商城手机端',
     icon: 'icon-park-outline:mall-bag',
-    title: 'yudao-ui-mall-uniapp',
-    url: 'https://github.com/yudaocode/yudao-ui-mall-uniapp',
+    title: 'yudao-mall-uniapp',
+    url: 'https://github.com/yudaocode/yudao-mall-uniapp',
   },
   {
     color: '#1890ff',

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { MallArticleCategoryApi } from '#/api/mall/promotion/articleCategory';
+import type { MallArticleCategoryApi } from '#/api/mall/promotion/article/category';
 
 import { computed, ref } from 'vue';
 
@@ -12,7 +12,7 @@ import {
   createArticleCategory,
   getArticleCategory,
   updateArticleCategory,
-} from '#/api/mall/promotion/articleCategory';
+} from '#/api/mall/promotion/article/category';
 import { $t } from '#/locales';
 
 import { useFormSchema } from '../data';

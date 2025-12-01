@@ -25,23 +25,10 @@ export namespace PayTransferApi {
     notifyUrl: string;
     channelNotifyData: string;
   }
-
-  /** 转账单分页请求 */
-  export interface TransferPageReqVO extends PageParam {
-    no?: string;
-    appId?: number;
-    channelCode?: string;
-    merchantOrderId?: string;
-    status?: number;
-    userName?: string;
-    userAccount?: string;
-    channelTransferNo?: string;
-    createTime?: Date[];
-  }
 }
 
 /** 查询转账单列表 */
-export function getTransferPage(params: PayTransferApi.TransferPageReqVO) {
+export function getTransferPage(params: PageParam) {
   return requestClient.get<PageResult<PayTransferApi.Transfer>>(
     '/pay/transfer/page',
     {

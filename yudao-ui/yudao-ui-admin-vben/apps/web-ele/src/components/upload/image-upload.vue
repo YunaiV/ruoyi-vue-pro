@@ -11,20 +11,26 @@ import type { UploadListType } from './typing';
 
 import type { AxiosProgressEvent } from '#/api/infra/file';
 
-import { nextTick, ref, toRefs, watch } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
-import { isFunction, isObject, isString } from '@vben/utils';
+import {
+  defaultImageAccepts,
+  isFunction,
+  isImage,
+  isObject,
+  isString,
+} from '@vben/utils';
 
 import { ElMessage, ElUpload } from 'element-plus';
 
-import { checkImgType, defaultImageAccepts } from './helper';
 import { UploadResultStatus } from './typing';
 import { useUpload, useUploadType } from './use-upload';
 
 defineOptions({ name: 'ImageUpload', inheritAttrs: false });
 
+// TODO @xingyu：这个要不要抽时间看看，upload 组件，和 antd 要不要进一步对齐下；（主要是代码风格。微信沟通~~~）
 const props = withDefaults(
   defineProps<{
     // 根据后缀，或者其他
@@ -172,7 +178,7 @@ const handleRemove = async (file: UploadFile) => {
 
 const beforeUpload = async (file: File) => {
   const { maxSize, accept } = props;
-  const isAct = checkImgType(file, accept);
+  const isAct = isImage(file.name, accept);
   if (!isAct) {
     ElMessage.error($t('ui.upload.acceptUpload', [accept]));
     isActMsg.value = false;
@@ -208,6 +214,20 @@ async function customRequest(options: UploadRequestOptions) {
       } as unknown as UploadProgressEvent);
     };
     const res = await api?.(options.file, progressEvent);
+
+    // TODO @xingyu：看看有没更好的实现代码。
+    // 更新 fileList 中对应文件的 URL 为服务器返回的真实 URL
+    const uploadedFile = fileList.value.find(
+      (file) => file.uid === (options.file as any).uid,
+    );
+    if (uploadedFile) {
+      const responseData = res?.data || res;
+      uploadedFile.url =
+        props.resultField && responseData[props.resultField]
+          ? responseData[props.resultField]
+          : responseData.url || responseData;
+    }
+
     options.onSuccess!(res);
     ElMessage.success($t('ui.upload.uploadSuccess'));
 
@@ -237,21 +257,6 @@ function getValue() {
   }
   return list;
 }
-
-// 编辑按钮：触发文件选择
-const triggerEdit = () => {
-  if (props.disabled) return;
-  // 只查找当前 upload-box 下的 input
-  nextTick(() => {
-    const uploadBox = document.querySelector('.upload-box');
-    if (uploadBox) {
-      const input = uploadBox.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement | null;
-      if (input) input.click();
-    }
-  });
-};
 </script>
 
 <template>
@@ -276,10 +281,6 @@ const triggerEdit = () => {
           <div class="handle-icon" @click="handlePreview(fileList[0]!)">
             <IconifyIcon icon="lucide:circle-plus" />
             <span>详情</span>
-          </div>
-          <div v-if="!disabled" class="handle-icon" @click="triggerEdit">
-            <IconifyIcon icon="lucide:edit" />
-            <span>编辑</span>
           </div>
           <div
             v-if="!disabled"
@@ -317,6 +318,7 @@ const triggerEdit = () => {
         </div>
       </ElUpload>
     </template>
+    <!-- TODO @xingyu：相比 antd 来说，EL 有点丑；貌似是这里展示的位置不太对； -->
     <div v-if="showDescription" class="mt-2 text-xs text-gray-500">
       {{ getStringAccept }}
     </div>

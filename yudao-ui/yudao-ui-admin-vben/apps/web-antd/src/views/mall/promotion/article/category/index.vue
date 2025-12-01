@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { MallArticleCategoryApi } from '#/api/mall/promotion/articleCategory';
+import type { MallArticleCategoryApi } from '#/api/mall/promotion/article/category';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
 
@@ -10,7 +10,7 @@ import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   deleteArticleCategory,
   getArticleCategoryPage,
-} from '#/api/mall/promotion/articleCategory';
+} from '#/api/mall/promotion/article/category';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';

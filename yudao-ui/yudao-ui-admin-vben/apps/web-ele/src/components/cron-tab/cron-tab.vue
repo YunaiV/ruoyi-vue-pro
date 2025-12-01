@@ -31,6 +31,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
+// TODO @puhui999：可以参考 apps/web-antd/src/components/cron-tab/cron-tab.vue 简化到 types；ps：可以用 idea 对比两个 ts 或者 vue 文件，看看差异的地方。差异的地方越少越好（容易维护）
 interface shortcutsType {
   text: string;
   value: string;
@@ -46,6 +47,7 @@ const getYear = () => {
   }
   return v;
 };
+// TODO @puhui999：可以参考 apps/web-antd/src/components/cron-tab/cron-tab.vue 简化到 types
 const cronValue = reactive({
   second: {
     type: '0',
@@ -275,6 +277,7 @@ const value_second = computed(() => {
     }
   }
 });
+
 const value_minute = computed(() => {
   const v = cronValue.minute;
   switch (v.type) {
@@ -295,6 +298,7 @@ const value_minute = computed(() => {
     }
   }
 });
+
 const value_hour = computed(() => {
   const v = cronValue.hour;
   switch (v.type) {
@@ -315,6 +319,7 @@ const value_hour = computed(() => {
     }
   }
 });
+
 const value_day = computed(() => {
   const v = cronValue.day;
   switch (v.type) {
@@ -341,6 +346,7 @@ const value_day = computed(() => {
     }
   }
 });
+
 const value_month = computed(() => {
   const v = cronValue.month;
   switch (v.type) {
@@ -361,6 +367,7 @@ const value_month = computed(() => {
     }
   }
 });
+
 const value_week = computed(() => {
   const v = cronValue.week;
   switch (v.type) {
@@ -387,6 +394,7 @@ const value_week = computed(() => {
     }
   }
 });
+
 const value_year = computed(() => {
   const v = cronValue.year;
   switch (v.type) {
@@ -410,48 +418,56 @@ const value_year = computed(() => {
     }
   }
 });
+
 watch(
   () => cronValue.week.type,
-  (val) => {
+  (val: string) => {
     if (val !== '5') {
       cronValue.day.type = '5';
     }
   },
 );
+
 watch(
   () => cronValue.day.type,
-  (val) => {
+  (val: string) => {
     if (val !== '5') {
       cronValue.week.type = '5';
     }
   },
 );
+
 watch(
   () => props.modelValue,
   () => {
     defaultValue.value = props.modelValue;
   },
 );
+
 onMounted(() => {
   defaultValue.value = props.modelValue;
 });
-const select = ref();
+
+const select = ref<string>();
+
 watch(
   () => select.value,
   () => {
     if (select.value === 'custom') {
       open();
     } else {
-      defaultValue.value = select.value;
+      defaultValue.value = select.value || '';
       emit('update:modelValue', defaultValue.value);
     }
   },
 );
-const open = () => {
+
+function open() {
   set();
   dialogVisible.value = true;
-};
-const set = () => {
+}
+
+function set() {
   defaultValue.value = props.modelValue;
   let arr = (props.modelValue || '* * * * * ?').split(' ');
   // 简单检查
@@ -463,145 +479,149 @@ const set = () => {
   // 秒
   if (arr[0] === '*') {
     cronValue.second.type = '0';
-  } else if (arr[0]!.includes('-')) {
+  } else if (arr[0]?.includes('-')) {
     cronValue.second.type = '1';
-    cronValue.second.range.start = Number(arr[0]!.split('-')[0]);
-    cronValue.second.range.end = Number(arr[0]!.split('-')[1]);
-  } else if (arr[0]!.includes('/')) {
+    cronValue.second.range.start = Number(arr[0].split('-')[0]);
+    cronValue.second.range.end = Number(arr[0].split('-')[1]);
+  } else if (arr[0]?.includes('/')) {
     cronValue.second.type = '2';
-    cronValue.second.loop.start = Number(arr[0]!.split('/')[0]);
-    cronValue.second.loop.end = Number(arr[0]!.split('/')[1]);
+    cronValue.second.loop.start = Number(arr[0].split('/')[0]);
+    cronValue.second.loop.end = Number(arr[0].split('/')[1]);
   } else {
     cronValue.second.type = '3';
-    cronValue.second.appoint = arr[0]!.split(',');
+    cronValue.second.appoint = arr[0]?.split(',') || [];
   }
+
   // 分
   if (arr[1] === '*') {
     cronValue.minute.type = '0';
-  } else if (arr[1]!.includes('-')) {
+  } else if (arr[1]?.includes('-')) {
     cronValue.minute.type = '1';
-    cronValue.minute.range.start = Number(arr[1]!.split('-')[0]);
-    cronValue.minute.range.end = Number(arr[1]!.split('-')[1]);
-  } else if (arr[1]!.includes('/')) {
+    cronValue.minute.range.start = Number(arr[1].split('-')[0]);
+    cronValue.minute.range.end = Number(arr[1].split('-')[1]);
+  } else if (arr[1]?.includes('/')) {
     cronValue.minute.type = '2';
-    cronValue.minute.loop.start = Number(arr[1]!.split('/')[0]);
-    cronValue.minute.loop.end = Number(arr[1]!.split('/')[1]);
+    cronValue.minute.loop.start = Number(arr[1].split('/')[0]);
+    cronValue.minute.loop.end = Number(arr[1].split('/')[1]);
   } else {
     cronValue.minute.type = '3';
-    cronValue.minute.appoint = arr[1]!.split(',');
+    cronValue.minute.appoint = arr[1]?.split(',') || [];
   }
+
   // 小时
   if (arr[2] === '*') {
     cronValue.hour.type = '0';
-  } else if (arr[2]!.includes('-')) {
+  } else if (arr[2]?.includes('-')) {
     cronValue.hour.type = '1';
-    cronValue.hour.range.start = Number(arr[2]!.split('-')[0]);
-    cronValue.hour.range.end = Number(arr[2]!.split('-')[1]);
-  } else if (arr[2]!.includes('/')) {
+    cronValue.hour.range.start = Number(arr[2].split('-')[0]);
+    cronValue.hour.range.end = Number(arr[2].split('-')[1]);
+  } else if (arr[2]?.includes('/')) {
     cronValue.hour.type = '2';
-    cronValue.hour.loop.start = Number(arr[2]!.split('/')[0]);
-    cronValue.hour.loop.end = Number(arr[2]!.split('/')[1]);
+    cronValue.hour.loop.start = Number(arr[2].split('/')[0]);
+    cronValue.hour.loop.end = Number(arr[2].split('/')[1]);
   } else {
     cronValue.hour.type = '3';
-    cronValue.hour.appoint = arr[2]!.split(',');
+    cronValue.hour.appoint = arr[2]?.split(',') || [];
   }
+
   // 日
   switch (arr[3]) {
     case '*': {
       cronValue.day.type = '0';
-
       break;
     }
     case '?': {
       cronValue.day.type = '5';
-
       break;
     }
     case 'L': {
       cronValue.day.type = '4';
-
       break;
     }
     default: {
-      if (arr[3]!.includes('-')) {
+      if (arr[3]?.includes('-')) {
         cronValue.day.type = '1';
-        cronValue.day.range.start = Number(arr[3]!.split('-')[0]);
-        cronValue.day.range.end = Number(arr[3]!.split('-')[1]);
-      } else if (arr[3]!.includes('/')) {
+        cronValue.day.range.start = Number(arr[3].split('-')[0]);
+        cronValue.day.range.end = Number(arr[3].split('-')[1]);
+      } else if (arr[3]?.includes('/')) {
         cronValue.day.type = '2';
-        cronValue.day.loop.start = Number(arr[3]!.split('/')[0]);
-        cronValue.day.loop.end = Number(arr[3]!.split('/')[1]);
+        cronValue.day.loop.start = Number(arr[3].split('/')[0]);
+        cronValue.day.loop.end = Number(arr[3].split('/')[1]);
       } else {
         cronValue.day.type = '3';
-        cronValue.day.appoint = arr[3]!.split(',');
+        cronValue.day.appoint = arr[3]?.split(',') || [];
       }
     }
   }
+
   // 月
   if (arr[4] === '*') {
     cronValue.month.type = '0';
-  } else if (arr[4]!.includes('-')) {
+  } else if (arr[4]?.includes('-')) {
     cronValue.month.type = '1';
-    cronValue.month.range.start = Number(arr[4]!.split('-')[0]);
-    cronValue.month.range.end = Number(arr[4]!.split('-')[1]);
-  } else if (arr[4]!.includes('/')) {
+    cronValue.month.range.start = Number(arr[4].split('-')[0]);
+    cronValue.month.range.end = Number(arr[4].split('-')[1]);
+  } else if (arr[4]?.includes('/')) {
     cronValue.month.type = '2';
-    cronValue.month.loop.start = Number(arr[4]!.split('/')[0]);
-    cronValue.month.loop.end = Number(arr[4]!.split('/')[1]);
+    cronValue.month.loop.start = Number(arr[4].split('/')[0]);
+    cronValue.month.loop.end = Number(arr[4].split('/')[1]);
   } else {
     cronValue.month.type = '3';
-    cronValue.month.appoint = arr[4]!.split(',');
+    cronValue.month.appoint = arr[4]?.split(',') || [];
   }
+
   // 周
   if (arr[5] === '*') {
     cronValue.week.type = '0';
   } else if (arr[5] === '?') {
     cronValue.week.type = '5';
-  } else if (arr[5]!.includes('-')) {
+  } else if (arr[5]?.includes('-')) {
     cronValue.week.type = '1';
-    cronValue.week.range.start = arr[5]!.split('-')[0]!;
-    cronValue.week.range.end = arr[5]!.split('-')[1]!;
-  } else if (arr[5]!.includes('#')) {
+    cronValue.week.range.start = arr[5].split('-')[0] || '';
+    cronValue.week.range.end = arr[5].split('-')[1] || '';
+  } else if (arr[5]?.includes('#')) {
     cronValue.week.type = '2';
-    cronValue.week.loop.start = Number(arr[5]!.split('#')[1]);
-    cronValue.week.loop.end = arr[5]!.split('#')[0]!;
-  } else if (arr[5]!.includes('L')) {
+    cronValue.week.loop.start = Number(arr[5].split('#')[1]);
+    cronValue.week.loop.end = arr[5].split('#')[0] || '';
+  } else if (arr[5]?.includes('L')) {
     cronValue.week.type = '4';
-    cronValue.week.last = arr[5]!.split('L')[0]!;
+    cronValue.week.last = arr[5].split('L')[0] || '';
   } else {
     cronValue.week.type = '3';
-    cronValue.week.appoint = arr[5]!.split(',');
+    cronValue.week.appoint = arr[5]?.split(',') || [];
   }
+
   // 年
   if (!arr[6]) {
     cronValue.year.type = '-1';
   } else if (arr[6] === '*') {
     cronValue.year.type = '0';
-  } else if (arr[6].includes('-')) {
+  } else if (arr[6]?.includes('-')) {
     cronValue.year.type = '1';
     cronValue.year.range.start = Number(arr[6].split('-')[0]);
     cronValue.year.range.end = Number(arr[6].split('-')[1]);
-  } else if (arr[6].includes('/')) {
+  } else if (arr[6]?.includes('/')) {
     cronValue.year.type = '2';
     cronValue.year.loop.start = Number(arr[6].split('/')[1]);
     cronValue.year.loop.end = Number(arr[6].split('/')[0]);
   } else {
     cronValue.year.type = '3';
-    cronValue.year.appoint = arr[6].split(',');
+    cronValue.year.appoint = arr[6]?.split(',') || [];
   }
-};
-const submit = () => {
+}
+
+function submit() {
   const year = value_year.value ? ` ${value_year.value}` : '';
   defaultValue.value = `${value_second.value} ${value_minute.value} ${
     value_hour.value
   } ${value_day.value} ${value_month.value} ${value_week.value}${year}`;
   emit('update:modelValue', defaultValue.value);
   dialogVisible.value = false;
-};
+}
 
-const inputChange = () => {
+function inputChange() {
   emit('update:modelValue', defaultValue.value);
-};
+}
 </script>
 <template>
   <ElInput

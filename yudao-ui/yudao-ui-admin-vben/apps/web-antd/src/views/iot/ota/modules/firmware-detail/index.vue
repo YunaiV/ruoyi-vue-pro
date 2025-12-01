@@ -8,11 +8,11 @@ import { formatDate } from '@vben/utils';
 
 import { Card, Col, Descriptions, Row } from 'ant-design-vue';
 
-import * as IoTOtaFirmwareApi from '#/api/iot/ota/firmware';
-import * as IoTOtaTaskRecordApi from '#/api/iot/ota/task/record';
+import { getOtaFirmware } from '#/api/iot/ota/firmware';
+import { getOtaTaskRecordStatusStatistics } from '#/api/iot/ota/task/record';
 import { IoTOtaTaskRecordStatusEnum } from '#/views/iot/utils/constants';
 
-import OtaTaskList from '../task/OtaTaskList.vue';
+import OtaTaskList from '../task/ota-task-list.vue';
 
 /** IoT OTA 固件详情 */
 defineOptions({ name: 'IoTOtaFirmwareDetail' });
@@ -30,7 +30,7 @@ const firmwareStatistics = ref<Record<string, number>>({});
 async function getFirmwareInfo() {
   firmwareLoading.value = true;
   try {
-    firmware.value = await IoTOtaFirmwareApi.getOtaFirmware(firmwareId.value);
+    firmware.value = await getOtaFirmware(firmwareId.value);
   } finally {
     firmwareLoading.value = false;
   }
@@ -40,10 +40,9 @@ async function getFirmwareInfo() {
 async function getStatistics() {
   firmwareStatisticsLoading.value = true;
   try {
-    firmwareStatistics.value =
-      await IoTOtaTaskRecordApi.getOtaTaskRecordStatusStatistics(
-        firmwareId.value,
-      );
+    firmwareStatistics.value = await getOtaTaskRecordStatusStatistics(
+      firmwareId.value,
+    );
   } finally {
     firmwareStatisticsLoading.value = false;
   }

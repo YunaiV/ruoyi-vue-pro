@@ -2,21 +2,14 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { MallOrderApi } from '#/api/mall/trade/order';
 
-import { h, ref } from 'vue';
+import { ref } from 'vue';
 
-import { Page, prompt } from '@vben/common-ui';
+import { Page, prompt, SummaryCard } from '@vben/common-ui';
 import { DeliveryTypeEnum } from '@vben/constants';
 import { $t } from '@vben/locales';
 import { fenToYuan } from '@vben/utils';
 
-import {
-  ElCard,
-  ElImage,
-  ElInput,
-  ElLoading,
-  ElMessage,
-  ElTag,
-} from 'element-plus';
+import { ElCard, ElImage, ElLoading, ElMessage, ElTag } from 'element-plus';
 
 import { TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -24,7 +17,6 @@ import {
   getOrderSummary,
   pickUpOrderByVerifyCode,
 } from '#/api/mall/trade/order';
-import { SummaryCard } from '#/components/summary-card';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
@@ -45,35 +37,40 @@ async function getOrderSum() {
 /** 核销订单 */
 async function handlePickup(pickUpVerifyCode?: string) {
   // 如果没有传核销码，则弹窗输入
-  // TODO @xingyu：这个貌似不太行，帮忙看看~
-  if (!pickUpVerifyCode) {
-    await prompt({
-      component: () => {
-        return h(ElInput, {});
-      },
-      content: '请输入核销码',
+  if (pickUpVerifyCode) {
+    // 执行核销
+    const loadingInstance = ElLoading.service({
+      text: '订单核销中 ...',
+    });
+    try {
+      await pickUpOrderByVerifyCode(pickUpVerifyCode);
+      ElMessage.success($t('ui.actionMessage.operationSuccess'));
+      handleRefresh();
+    } finally {
+      loadingInstance.close();
+    }
+  } else {
+    prompt<string>({
+      componentProps: { placeholder: '输入核销码' },
+      content: '输入核销码',
       title: '核销订单',
-      modelPropName: 'value',
-    }).then(async (val) => {
-      if (val) {
-        pickUpVerifyCode = val;
+      icon: 'question',
+      overlayBlur: 3,
+    }).then(async (res) => {
+      if (res) {
+        // 执行核销
+        const loadingInstance = ElLoading.service({
+          text: '订单核销中 ...',
+        });
+        try {
+          await pickUpOrderByVerifyCode(res);
+          ElMessage.success($t('ui.actionMessage.operationSuccess'));
+          handleRefresh();
+        } finally {
+          loadingInstance.close();
+        }
       }
     });
-  }
-  if (!pickUpVerifyCode) {
-    return;
-  }
-
-  // 执行核销
-  const loadingInstance = ElLoading.service({
-    text: '订单核销中 ...',
-  });
-  try {
-    await pickUpOrderByVerifyCode(pickUpVerifyCode);
-    ElMessage.success($t('ui.actionMessage.operationSuccess'));
-    handleRefresh();
-  } finally {
-    loadingInstance.close();
   }
 }
 

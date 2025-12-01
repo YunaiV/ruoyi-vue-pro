@@ -11,12 +11,6 @@ export namespace MpTagApi {
     count?: number;
     createTime?: Date;
   }
-
-  /** 标签分页查询参数 */
-  export interface TagPageQuery extends PageParam {
-    accountId?: number;
-    name?: string;
-  }
 }
 
 /** 创建公众号标签 */
@@ -44,7 +38,7 @@ export function getTag(id: number) {
 }
 
 /** 获取公众号标签分页 */
-export function getTagPage(params: MpTagApi.TagPageQuery) {
+export function getTagPage(params: PageParam) {
   return requestClient.get<PageResult<MpTagApi.Tag>>('/mp/tag/page', {
     params,
   });

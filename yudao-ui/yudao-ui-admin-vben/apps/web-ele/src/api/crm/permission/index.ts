@@ -17,14 +17,15 @@ export namespace CrmPermissionApi {
   }
 
   /** 数据权限转移请求 */
-  export interface TransferReq {
+  export interface BusinessTransferReqVO {
     id: number; // 模块编号
     newOwnerUserId: number; // 新负责人的用户编号
     oldOwnerPermissionLevel?: number; // 老负责人加入团队后的权限级别
     toBizTypes?: number[]; // 转移客户时，需要额外有【联系人】【商机】【合同】的 checkbox 选择
   }
 
-  export interface PermissionListReq {
+  /** 权限列表请求 */
+  export interface PermissionListReqVO {
     bizId: number; // 模块数据编号
     bizType: number; // 模块类型
   }
@@ -54,7 +55,9 @@ export enum PermissionLevelEnum {
 }
 
 /** 获得数据权限列表（查询团队成员列表） */
-export function getPermissionList(params: CrmPermissionApi.PermissionListReq) {
+export function getPermissionList(
+  params: CrmPermissionApi.PermissionListReqVO,
+) {
   return requestClient.get<CrmPermissionApi.Permission[]>(
     '/crm/permission/list',
     { params },

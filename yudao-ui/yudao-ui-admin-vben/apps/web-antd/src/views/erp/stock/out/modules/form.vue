@@ -23,14 +23,15 @@ const formData = ref<ErpStockOutApi.StockOut>();
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof ItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['其它出库单'])
-    : formType.value === 'edit'
-      ? $t('ui.actionTitle.edit', ['其它出库单'])
-      : '其它出库单详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['其它出库单']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['其它出库单']);
+  } else {
+    return '其它出库单详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -46,13 +47,13 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新出库单项 */
-const handleUpdateItems = (items: ErpStockOutApi.StockOutItem[]) => {
+function handleUpdateItems(items: ErpStockOutApi.StockOutItem[]) {
   formData.value = modalApi.getData<ErpStockOutApi.StockOut>();
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 创建或更新其它出库单 */
 const [Modal, modalApi] = useVbenModal({

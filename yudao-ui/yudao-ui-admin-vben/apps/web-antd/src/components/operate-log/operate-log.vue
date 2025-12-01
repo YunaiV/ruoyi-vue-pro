@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// TODO @xingyu：要不要改成 yudao-ui-admin-vue3/src/components/OperateLogV2/src/OperateLogV2.vue 这种；一行：时间、userType、userName、action
 import type { OperateLogProps } from './typing';
 
 import { DICT_TYPE } from '@vben/constants';

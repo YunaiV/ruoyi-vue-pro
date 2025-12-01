@@ -23,7 +23,6 @@ export function useFormSchema(formApi?: any): VbenFormSchema[] {
         show: () => false,
       },
     },
-    // 创建时的 ProductKey 字段（带生成按钮）
     {
       fieldName: 'productKey',
       label: 'ProductKey',
@@ -34,7 +33,6 @@ export function useFormSchema(formApi?: any): VbenFormSchema[] {
       dependencies: {
         triggerFields: ['id'],
         if(values) {
-          // 仅在创建时显示（没有 id）
           return !values.id;
         },
       },
@@ -43,6 +41,7 @@ export function useFormSchema(formApi?: any): VbenFormSchema[] {
         .min(1, 'ProductKey 不能为空')
         .max(32, 'ProductKey 长度不能超过 32 个字符'),
       suffix: () => {
+        // 创建时的 ProductKey 字段（带生成按钮）
         return h(
           Button,
           {
@@ -55,19 +54,17 @@ export function useFormSchema(formApi?: any): VbenFormSchema[] {
         );
       },
     },
-    // 编辑时的 ProductKey 字段（禁用，无按钮）
     {
       fieldName: 'productKey',
       label: 'ProductKey',
       component: 'Input',
       componentProps: {
         placeholder: '请输入 ProductKey',
-        disabled: true,
+        disabled: true, // 编辑时的 ProductKey 字段（禁用，无按钮）
       },
       dependencies: {
         triggerFields: ['id'],
         if(values) {
-          // 仅在编辑时显示（有 id）
           return !!values.id;
         },
       },
@@ -176,7 +173,6 @@ export function useBasicFormSchema(formApi?: any): VbenFormSchema[] {
         show: () => false,
       },
     },
-    // 创建时的 ProductKey 字段（带生成按钮）
     {
       fieldName: 'productKey',
       label: 'ProductKey',
@@ -187,7 +183,6 @@ export function useBasicFormSchema(formApi?: any): VbenFormSchema[] {
       dependencies: {
         triggerFields: ['id'],
         if(values) {
-          // 仅在创建时显示（没有 id）
           return !values.id;
         },
       },
@@ -208,7 +203,6 @@ export function useBasicFormSchema(formApi?: any): VbenFormSchema[] {
         );
       },
     },
-    // 编辑时的 ProductKey 字段（禁用，无按钮）
     {
       fieldName: 'productKey',
       label: 'ProductKey',
@@ -220,7 +214,6 @@ export function useBasicFormSchema(formApi?: any): VbenFormSchema[] {
       dependencies: {
         triggerFields: ['id'],
         if(values) {
-          // 仅在编辑时显示（有 id）
           return !!values.id;
         },
       },
@@ -341,6 +334,7 @@ export function useAdvancedFormSchema(): VbenFormSchema[] {
 }
 
 /** 列表的搜索表单 */
+// TODO @haohao：貌似用不上？
 export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
@@ -367,7 +361,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
 /** 列表的字段 */
 export function useGridColumns(): VxeTableGridOptions['columns'] {
   return [
-    { type: 'checkbox', width: 40 },
     {
       field: 'id',
       title: 'ID',
@@ -413,7 +406,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     },
     {
       title: '操作',
-      width: 180,
+      width: 220,
       fixed: 'right',
       slots: { default: 'actions' },
     },
@@ -421,6 +414,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
 }
 
 /** 查询产品列表 */
+// TODO @haohao：貌似可以删除？
 export async function queryProductList({ page }: any, searchParams: any) {
   return await getProductPage({
     pageNo: page.currentPage,
@@ -430,6 +424,7 @@ export async function queryProductList({ page }: any, searchParams: any) {
 }
 
 /** 创建图片预览状态 */
+// TODO @haohao：可能不一定用的上；
 export function useImagePreview() {
   const previewVisible = ref(false);
   const previewImage = ref('');
@@ -446,6 +441,7 @@ export function useImagePreview() {
   };
 }
 
+// TODO @haohao：放到对应的 form 里
 /** 生成 ProductKey（包含大小写字母和数字） */
 export function generateProductKey(): string {
   const chars =

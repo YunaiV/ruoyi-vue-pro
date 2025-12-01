@@ -11,7 +11,6 @@ defineOptions({ name: 'AiMusicAudioBarIndex' });
 const currentSong = inject<any>('currentSong', {});
 
 const audioRef = ref<HTMLAudioElement | null>(null);
-// 音频相关属性https://www.runoob.com/tags/ref-av-dom.html
 const audioProps = reactive<any>({
   autoplay: true,
   paused: false,
@@ -19,7 +18,7 @@ const audioProps = reactive<any>({
   duration: '00:00',
   muted: false,
   volume: 50,
-});
+}); // 音频相关属性https://www.runoob.com/tags/ref-av-dom.html
 
 function toggleStatus(type: string) {
   audioProps[type] = !audioProps[type];
@@ -32,7 +31,7 @@ function toggleStatus(type: string) {
   }
 }
 
-// 更新播放位置
+/** 更新播放位置 */
 function audioTimeUpdate(args: any) {
   audioProps.currentTime = formatPast(new Date(args.timeStamp), 'mm:ss');
 }
@@ -40,7 +39,7 @@ function audioTimeUpdate(args: any) {
 
 <template>
   <div
-    class="b-1 b-l-none h-18 bg-card flex items-center justify-between border border-solid border-rose-100 px-2"
+    class="b-1 b-l-none h-18 flex items-center justify-between border border-solid border-rose-100 bg-card px-2"
   >
     <!-- 歌曲信息 -->
     <div class="flex gap-2.5">

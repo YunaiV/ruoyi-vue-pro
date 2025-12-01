@@ -17,10 +17,9 @@ const props = defineProps({
     type: Boolean,
   },
   fullscreen: {
-    // 图片上传，是否放到全屏的位置
     default: false,
     type: Boolean,
-  },
+  }, // 图片上传，是否放到全屏的位置
 });
 
 const emit = defineEmits(['uploading', 'done', 'error']);

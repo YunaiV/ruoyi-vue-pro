@@ -23,9 +23,9 @@ import { PermissionList, TransferForm } from '#/views/crm/permission';
 import { ProductDetailsList } from '#/views/crm/product/components';
 
 import Form from '../modules/form.vue';
-import UpStatusForm from './modules/status-form.vue';
 import { useDetailSchema } from './data';
 import BusinessDetailsInfo from './modules/info.vue';
+import UpStatusForm from './modules/status-form.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -38,11 +38,8 @@ const logList = ref<SystemOperateLogApi.OperateLog[]>([]);
 const permissionListRef = ref<InstanceType<typeof PermissionList>>(); // 团队成员列表 Ref
 
 const [Descriptions] = useDescription({
-  componentProps: {
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  bordered: false,
+  column: 4,
   schema: useDetailSchema(),
 });
 
@@ -80,7 +77,7 @@ async function getBusinessDetail() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/crm/business');
+  router.push({ name: 'CrmBusiness' });
 }
 
 /** 编辑商机 */

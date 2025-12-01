@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ToggleEmits, ToggleProps } from 'radix-vue';
+import type { ToggleEmits, ToggleProps } from 'reka-ui';
 
 import type { ToggleVariants } from './toggle';
 
@@ -7,7 +7,7 @@ import { computed } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { Toggle, useForwardPropsEmits } from 'radix-vue';
+import { Toggle, useForwardPropsEmits } from 'reka-ui';
 
 import { toggleVariants } from './toggle';
 

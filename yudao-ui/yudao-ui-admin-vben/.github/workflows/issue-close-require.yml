@@ -1,0 +1,31 @@
+# 每天零点运行一次，它会检查所有带有 "need reproduction" 标签的 Issues。如果这些 Issues 在过去的 3 天内没有任何活动，它们将会被自动关闭。这有助于保持 Issue 列表的整洁，并且提醒用户在必要时提供更多的信息。
+name: Issue Close Require
+
+# 触发条件：每天零点
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  pull-requests: write
+  contents: write
+  issues: write
+
+jobs:
+  close-issues:
+    if: github.repository == 'vbenjs/vue-vben-admin'
+    runs-on: ubuntu-latest
+    steps:
+      # 关闭未活动的 Issues
+      - name: Close Inactive Issues
+        uses: actions/stale@v9
+        with:
+          days-before-stale: -1 # Issues and PR will never be flagged stale automatically.
+          stale-issue-label: needs-reproduction # Label that flags an issue as stale.
+          only-labels: needs-reproduction # Only process these issues
+          days-before-issue-close: 3
+          ignore-updates: true
+          remove-stale-when-updated: false
+          close-issue-message: This issue was closed because it was open for 3 days without a valid reproduction.
+          close-issue-label: closed-by-action

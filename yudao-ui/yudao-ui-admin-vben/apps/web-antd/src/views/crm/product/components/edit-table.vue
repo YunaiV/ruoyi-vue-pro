@@ -126,10 +126,8 @@ watch(
   },
 );
 
-/** 产品下拉选项 */
-const productOptions = ref<CrmProductApi.Product[]>([]);
-
 /** 初始化 */
+const productOptions = ref<CrmProductApi.Product[]>([]); // 产品下拉选项
 onMounted(async () => {
   productOptions.value = await getProductSimpleList();
 });

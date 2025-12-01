@@ -1,8 +1,12 @@
+import type { Rule } from '@form-create/element-ui';
+
 import type { Ref } from 'vue';
 
 import type { Menu } from '#/components/form-create/typing';
 
 import { isRef, nextTick, onMounted } from 'vue';
+
+import formCreate from '@form-create/element-ui';
 
 import { apiSelectRule } from '#/components/form-create/rules/data';
 
@@ -15,43 +19,49 @@ import {
   useUploadImagesRule,
 } from './rules';
 
-// 编码表单 Conf
+/** 编码表单 Conf */
 export function encodeConf(designerRef: any) {
-  return JSON.stringify(designerRef.value.getOption());
+  // 关联案例：https://gitee.com/yudaocode/yudao-ui-admin-vue3/pulls/834/
+  return formCreate.toJson(designerRef.value.getOption());
 }
 
-// 编码表单 Fields
+/** 解码表单 Conf */
+export function decodeConf(conf: string) {
+  return formCreate.parseJson(conf);
+}
+
+/** 编码表单 Fields */
 export function encodeFields(designerRef: any) {
-  const rule = JSON.parse(designerRef.value.getJson());
+  const rule = designerRef.value.getRule();
   const fields: string[] = [];
-  rule.forEach((item: unknown) => {
-    fields.push(JSON.stringify(item));
+  rule.forEach((item: any) => {
+    fields.push(formCreate.toJson(item));
   });
   return fields;
 }
 
-// 解码表单 Fields
+/** 解码表单 Fields */
 export function decodeFields(fields: string[]) {
-  const rule: object[] = [];
+  const rule: Rule[] = [];
   fields.forEach((item) => {
-    rule.push(JSON.parse(item));
+    rule.push(formCreate.parseJson(item));
   });
   return rule;
 }
 
-// 设置表单的 Conf 和 Fields，适用 FcDesigner 场景
+/** 设置表单的 Conf 和 Fields，适用 FcDesigner 场景 */
 export function setConfAndFields(
   designerRef: any,
   conf: string,
   fields: string | string[],
 ) {
-  designerRef.value.setOption(JSON.parse(conf));
+  designerRef.value.setOption(decodeConf(conf));
   // 处理 fields 参数类型，确保传入 decodeFields 的是 string[] 类型
   const fieldsArray = Array.isArray(fields) ? fields : [fields];
   designerRef.value.setRule(decodeFields(fieldsArray));
 }
 
-// 设置表单的 Conf 和 Fields，适用 form-create 场景
+/** 设置表单的 Conf 和 Fields，适用 form-create 场景 */
 export function setConfAndFields2(
   detailPreview: any,
   conf: string,
@@ -61,7 +71,7 @@ export function setConfAndFields2(
   if (isRef(detailPreview)) {
     detailPreview = detailPreview.value;
   }
-  detailPreview.option = JSON.parse(conf);
+  detailPreview.option = decodeConf(conf);
   detailPreview.rule = decodeFields(fields);
   if (value) {
     detailPreview.value = value;
@@ -151,9 +161,7 @@ export async function useFormCreateDesigner(designer: Ref) {
   const uploadImageRule = useUploadImageRule();
   const uploadImagesRule = useUploadImagesRule();
 
-  /**
-   * 构建表单组件
-   */
+  /** 构建表单组件 */
   function buildFormComponents() {
     // 移除自带的上传组件规则，使用 uploadFileRule、uploadImgRule、uploadImgsRule 替代
     designer.value?.removeMenuItem('upload');
@@ -186,6 +194,18 @@ export async function useFormCreateDesigner(designer: Ref) {
     name: 'DeptSelect',
     label: '部门选择器',
     icon: 'icon-tree',
+    props: [
+      {
+        type: 'select',
+        field: 'returnType',
+        title: '返回值类型',
+        value: 'id',
+        options: [
+          { label: '部门编号', value: 'id' },
+          { label: '部门名称', value: 'name' },
+        ],
+      },
+    ],
   });
   const dictSelectRule = useDictSelectRule();
   const apiSelectRule0 = useSelectRule({
@@ -196,9 +216,7 @@ export async function useFormCreateDesigner(designer: Ref) {
     event: ['click', 'change', 'visibleChange', 'clear', 'blur', 'focus'],
   });
 
-  /**
-   * 构建系统字段菜单
-   */
+  /** 构建系统字段菜单 */
   function buildSystemMenu() {
     // 移除自带的下拉选择器组件，使用 currencySelectRule 替代
     // designer.value?.removeMenuItem('select')

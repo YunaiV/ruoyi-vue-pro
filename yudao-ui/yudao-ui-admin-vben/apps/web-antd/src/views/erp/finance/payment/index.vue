@@ -196,6 +196,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
             {
               label: row.status === 10 ? '审批' : '反审批',
               type: 'link',
+              icon: ACTION_ICON.AUDIT,
               auth: ['erp:finance-payment:update-status'],
               popConfirm: {
                 title: `确认${row.status === 10 ? '审批' : '反审批'}${row.no}吗？`,
@@ -210,7 +211,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
               label: $t('common.delete'),
               type: 'link',
               danger: true,
-              color: 'error',
+              icon: ACTION_ICON.DELETE,
               auth: ['erp:finance-payment:delete'],
               popConfirm: {
                 title: $t('ui.actionMessage.deleteConfirm', [row.no]),

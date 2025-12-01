@@ -1,13 +1,12 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import type { IotDeviceApi } from '#/api/iot/device/device';
 import type { IotProductApi } from '#/api/iot/product/product';
 import type { ThingModelData } from '#/api/iot/thingmodel';
 
-import { onMounted, ref, unref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { Page } from '@vben/common-ui';
-import { useTabbarStore } from '@vben/stores';
 
 import { message, Tabs } from 'ant-design-vue';
 
@@ -15,38 +14,47 @@ import { getDevice } from '#/api/iot/device/device';
 import { DeviceTypeEnum, getProduct } from '#/api/iot/product/product';
 import { getThingModelListByProductId } from '#/api/iot/thingmodel';
 
-import DeviceDetailConfig from './DeviceDetailConfig.vue';
-import DeviceDetailsHeader from './DeviceDetailsHeader.vue';
-import DeviceDetailsInfo from './DeviceDetailsInfo.vue';
-import DeviceDetailsMessage from './DeviceDetailsMessage.vue';
-import DeviceDetailsSimulator from './DeviceDetailsSimulator.vue';
-import DeviceDetailsThingModel from './DeviceDetailsThingModel.vue';
+import DeviceDetailConfig from './device-detail-config.vue';
+import DeviceDetailsHeader from './device-details-header.vue';
+import DeviceDetailsInfo from './device-details-info.vue';
+import DeviceDetailsMessage from './device-details-message.vue';
+import DeviceDetailsSimulator from './device-details-simulator.vue';
+import DeviceDetailsSubDevice from './device-details-sub-device.vue';
+import DeviceDetailsThingModel from './device-details-thing-model.vue';
 
 defineOptions({ name: 'IoTDeviceDetail' });
 
 const route = useRoute();
-const id = Number(route.params.id); // 将字符串转换为数字
-const loading = ref(true); // 加载中
-const product = ref<IotProductApi.Product>({} as IotProductApi.Product); // 产品详情
-const device = ref<IotDeviceApi.Device>({} as IotDeviceApi.Device); // 设备详情
-const activeTab = ref('info'); // 默认激活的标签页
-const thingModelList = ref<ThingModelData[]>([]); // 物模型列表数据
+const router = useRouter();
+
+const id = Number(route.params.id);
+const loading = ref(true);
+const product = ref<IotProductApi.Product>({} as IotProductApi.Product);
+const device = ref<IotDeviceApi.Device>({} as IotDeviceApi.Device);
+const activeTab = ref('info');
+const thingModelList = ref<ThingModelData[]>([]);
 
 /** 获取设备详情 */
-async function getDeviceData() {
+async function getDeviceData(deviceId: number) {
   loading.value = true;
   try {
-    device.value = await getDevice(id);
+    device.value = await getDevice(deviceId);
     await getProductData(device.value.productId);
     await getThingModelList(device.value.productId);
+  } catch {
+    message.error('获取设备详情失败');
   } finally {
     loading.value = false;
   }
 }
 
 /** 获取产品详情 */
-async function getProductData(id: number) {
-  product.value = await getProduct(id);
+async function getProductData(productId: number) {
+  try {
+    product.value = await getProduct(productId);
+  } catch (error) {
+    console.error('获取产品详情失败:', error);
+  }
 }
 
 /** 获取物模型列表 */
@@ -61,17 +69,20 @@ async function getThingModelList(productId: number) {
 }
 
 /** 初始化 */
-const tabbarStore = useTabbarStore(); // 视图操作
-const router = useRouter(); // 路由
-const { currentRoute } = router;
 onMounted(async () => {
   if (!id) {
-    message.warning({ content: '参数错误，产品不能为空！' });
-    await tabbarStore.closeTab(unref(currentRoute), router);
+    message.warning('参数错误，设备不能为空！');
+    router.back();
     return;
   }
-  await getDeviceData();
-  activeTab.value = (route.query.tab as string) || 'info';
+
+  await getDeviceData(id);
+
+  // 处理 tab 参数
+  const { tab } = route.query;
+  if (tab) {
+    activeTab.value = tab as string;
+  }
 });
 </script>
 <template>
@@ -80,50 +91,55 @@ onMounted(async () => {
       :loading="loading"
       :product="product"
       :device="device"
-      @refresh="getDeviceData"
+      @refresh="() => getDeviceData(id)"
     />
 
-    <Tabs v-model:active-key="activeTab" class="device-detail-tabs mt-4">
-      <Tabs.Pane key="info" tab="设备信息">
+    <Tabs v-model:active-key="activeTab" class="mt-4">
+      <Tabs.TabPane key="info" tab="设备信息">
         <DeviceDetailsInfo
           v-if="activeTab === 'info'"
           :product="product"
           :device="device"
         />
-      </Tabs.Pane>
-      <Tabs.Pane key="model" tab="物模型数据">
+      </Tabs.TabPane>
+      <Tabs.TabPane key="model" tab="物模型数据">
         <DeviceDetailsThingModel
           v-if="activeTab === 'model' && device.id"
           :device-id="device.id"
           :thing-model-list="thingModelList"
         />
-      </Tabs.Pane>
-      <Tabs.Pane
+      </Tabs.TabPane>
+      <Tabs.TabPane
         v-if="product.deviceType === DeviceTypeEnum.GATEWAY"
         key="sub-device"
         tab="子设备管理"
-      />
-      <Tabs.Pane key="log" tab="设备消息">
+      >
+        <DeviceDetailsSubDevice
+          v-if="activeTab === 'sub-device' && device.id"
+          :device-id="device.id"
+        />
+      </Tabs.TabPane>
+      <Tabs.TabPane key="log" tab="设备消息">
         <DeviceDetailsMessage
           v-if="activeTab === 'log' && device.id"
           :device-id="device.id"
         />
-      </Tabs.Pane>
-      <Tabs.Pane key="simulator" tab="模拟设备">
+      </Tabs.TabPane>
+      <Tabs.TabPane key="simulator" tab="模拟设备">
         <DeviceDetailsSimulator
           v-if="activeTab === 'simulator'"
           :product="product"
           :device="device"
           :thing-model-list="thingModelList"
         />
-      </Tabs.Pane>
-      <Tabs.Pane key="config" tab="设备配置">
+      </Tabs.TabPane>
+      <Tabs.TabPane key="config" tab="设备配置">
         <DeviceDetailConfig
           v-if="activeTab === 'config'"
           :device="device"
-          @success="getDeviceData"
+          @success="() => getDeviceData(id)"
         />
-      </Tabs.Pane>
+      </Tabs.TabPane>
     </Tabs>
   </Page>
 </template>

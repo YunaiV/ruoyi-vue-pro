@@ -11,7 +11,7 @@ import { DICT_TYPE } from '@vben/constants';
 import { useTabs } from '@vben/hooks';
 import { $t } from '@vben/locales';
 
-import { Card, message, Tag } from 'ant-design-vue';
+import { message, Tag } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -49,29 +49,26 @@ const afterSale = ref<MallAfterSaleApi.AfterSale>({
 });
 
 const [OrderDescriptions] = useDescription({
-  componentProps: {
-    title: '订单信息',
-    bordered: false,
-    column: 3,
-  },
+  title: '订单信息',
+  bordered: false,
+  column: 3,
+  class: 'mx-4',
   schema: useOrderInfoSchema(),
 });
 
 const [AfterSaleDescriptions] = useDescription({
-  componentProps: {
-    title: '售后信息',
-    bordered: false,
-    column: 3,
-  },
+  title: '售后信息',
+  bordered: false,
+  column: 3,
+  class: 'mx-4',
   schema: useAfterSaleInfoSchema(),
 });
 
 const [RefundStatusDescriptions] = useDescription({
-  componentProps: {
-    title: '退款状态',
-    bordered: false,
-    column: 1,
-  },
+  title: '退款状态',
+  bordered: false,
+  column: 1,
+  class: 'mx-4',
   schema: useRefundStatusSchema(),
 });
 
@@ -206,7 +203,7 @@ async function handleRefund() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/mall/trade/afterSale');
+  router.push({ name: 'TradeAfterSale' });
 }
 
 /** 初始化 */
@@ -267,17 +264,17 @@ onMounted(() => {
     <DisagreeModal @success="getDetail" />
 
     <!-- 订单信息 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <OrderDescriptions :data="afterSale" />
-    </Card>
+    </div>
     <!-- 售后信息 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <AfterSaleDescriptions :data="afterSale" />
-    </Card>
+    </div>
     <!-- 退款状态 -->
-    <Card class="mb-4">
+    <div class="mb-4">
       <RefundStatusDescriptions :data="afterSale" />
-    </Card>
+    </div>
     <!-- 商品信息 -->
     <div class="mb-4">
       <ProductGrid table-title="商品信息">

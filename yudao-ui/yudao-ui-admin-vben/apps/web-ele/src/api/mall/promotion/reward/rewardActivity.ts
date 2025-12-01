@@ -5,48 +5,30 @@ import { requestClient } from '#/api/request';
 export namespace MallRewardActivityApi {
   /** 优惠规则 */
   export interface RewardRule {
-    /** 满足金额 */
-    limit?: number;
-    /** 优惠金额 */
-    discountPrice?: number;
-    /** 是否包邮 */
-    freeDelivery?: boolean;
-    /** 赠送积分 */
-    point: number;
-    /** 赠送优惠券数量 */
+    limit?: number; // 满足金额
+    discountPrice?: number; // 优惠金额
+    freeDelivery?: boolean; // 是否包邮
+    point: number; // 赠送积分
     giveCouponTemplateCounts?: {
       [key: number]: number;
-    };
+    }; // 赠送优惠券数量
   }
 
   /** 满减送活动 */
   export interface RewardActivity {
-    /** 活动编号 */
-    id?: number;
-    /** 活动名称 */
-    name?: string;
-    /** 开始时间 */
-    startTime?: Date;
-    /** 结束时间 */
-    endTime?: Date;
-    /** 开始和结束时间（仅前端使用） */
-    startAndEndTime?: Date[];
-    /** 备注 */
-    remark?: string;
-    /** 条件类型 */
-    conditionType?: number;
-    /** 商品范围 */
-    productScope?: number;
-    /** 优惠规则列表 */
-    rules: RewardRule[];
-    /** 商品范围值（仅表单使用）：值为品类编号列表、商品编号列表 */
-    productScopeValues?: number[];
-    /** 商品分类编号列表（仅表单使用） */
-    productCategoryIds?: number[];
-    /** 商品 SPU 编号列表（仅表单使用） */
-    productSpuIds?: number[];
-    /** 状态 */
-    status?: number;
+    id?: number; // 活动编号
+    name?: string; // 活动名称
+    status?: number; // 活动状态
+    startTime?: Date; // 开始时间
+    endTime?: Date; // 结束时间
+    startAndEndTime?: Date[]; // 开始和结束时间（仅前端使用）
+    remark?: string; // 备注
+    conditionType?: number; // 条件类型
+    productScope?: number; // 商品范围
+    rules: RewardRule[]; // 优惠规则列表
+    productScopeValues?: number[]; // 商品范围值（仅表单使用）：值为品类编号列表、商品编号列表
+    productCategoryIds?: number[]; // 商品分类编号列表（仅表单使用）
+    productSpuIds?: number[]; // 商品 SPU 编号列表（仅表单使用）
   }
 }
 

@@ -4,7 +4,7 @@ import type { MallOrderApi } from '#/api/mall/trade/order';
 
 import { h, ref } from 'vue';
 
-import { Page, prompt } from '@vben/common-ui';
+import { Page, prompt, SummaryCard } from '@vben/common-ui';
 import { DeliveryTypeEnum } from '@vben/constants';
 import { $t } from '@vben/locales';
 import { fenToYuan } from '@vben/utils';
@@ -17,11 +17,10 @@ import {
   getOrderSummary,
   pickUpOrderByVerifyCode,
 } from '#/api/mall/trade/order';
-import { SummaryCard } from '#/components/summary-card';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
-const summary = ref<MallOrderApi.OrderSummary>();
+const summary = ref<MallOrderApi.OrderSummaryRespVO>();
 
 /** 刷新表格 */
 function handleRefresh() {

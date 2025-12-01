@@ -10,15 +10,15 @@ import { BpmModelFormType } from '@vben/constants';
 
 import { message } from 'ant-design-vue';
 
-import { getFormDetail } from '#/api/bpm/form';
+import { getForm } from '#/api/bpm/form';
 import {
   MyProcessDesigner,
   MyProcessPenal,
-} from '#/components/bpmn-process-designer/package';
+} from '#/views/bpm/components/bpmn-process-designer/package';
 // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
-import CustomContentPadProvider from '#/components/bpmn-process-designer/package/designer/plugins/content-pad';
+import CustomContentPadProvider from '#/views/bpm/components/bpmn-process-designer/package/designer/plugins/content-pad';
 // 自定义左侧菜单（修改 默认任务 为 用户任务）
-import CustomPaletteProvider from '#/components/bpmn-process-designer/package/designer/plugins/palette';
+import CustomPaletteProvider from '#/views/bpm/components/bpmn-process-designer/package/designer/plugins/palette';
 
 defineOptions({ name: 'BpmModelEditor' });
 
@@ -31,17 +31,13 @@ defineProps<{
 
 const emit = defineEmits(['success', 'init-finished']);
 
-// 表单信息
-const formFields = ref<string[]>([]);
-// 表单类型，暂仅限流程表单
-const formType = ref(BpmModelFormType.NORMAL);
+const formFields = ref<string[]>([]); // 表单信息
+const formType = ref(BpmModelFormType.NORMAL); // 表单类型，暂仅限流程表单 TODO @jason：是不是已经支持 业务表单 了？
 provide('formFields', formFields);
 provide('formType', formType);
 
-// 注入流程数据
-const xmlString = inject('processData') as Ref;
-// 注入模型数据
-const modelData = inject('modelData') as Ref;
+const xmlString = inject('processData') as Ref; // 注入流程数据
+const modelData = inject('modelData') as Ref; // 注入模型数据
 
 const modeler = shallowRef(); // BPMN Modeler
 const processDesigner = ref();
@@ -57,7 +53,6 @@ const model = ref<BpmModelApi.Model>(); // 流程模型的信息
 
 /** 初始化 modeler */
 const initModeler = async (item: any) => {
-  // 先初始化模型数据
   model.value = modelData.value;
   modeler.value = item;
 };
@@ -78,7 +73,7 @@ watch(
   () => modelData.value.formId,
   async (newFormId) => {
     if (newFormId && modelData.value.formType === BpmModelFormType.NORMAL) {
-      const data = await getFormDetail(newFormId);
+      const data = await getForm(newFormId);
       formFields.value = data.fields;
     } else {
       formFields.value = [];
@@ -87,7 +82,7 @@ watch(
   { immediate: true },
 );
 
-// 在组件卸载时清理
+/** 在组件卸载时清理 */
 onBeforeUnmount(() => {
   modeler.value = null;
   // 清理全局实例
@@ -126,10 +121,9 @@ onBeforeUnmount(() => {
     />
   </ContentWrap>
 </template>
-<style lang="scss">
-.process-panel__container {
-  position: absolute;
-  top: 172px;
-  right: 70px;
+
+<style scoped>
+:deep(.process-panel__container) {
+  @apply absolute right-[20px] top-[70px];
 }
 </style>

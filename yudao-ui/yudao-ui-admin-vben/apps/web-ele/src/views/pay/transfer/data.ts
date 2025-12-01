@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { PayTransferApi } from '#/api/pay/transfer';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -191,14 +190,12 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'merchantTransferId',
       label: '商户单号',
-      content: (data: PayTransferApi.Transfer) =>
-        h(ElTag, {}, () => data?.merchantTransferId),
+      render: (val) => h(ElTag, {}, () => val),
     },
     {
       field: 'no',
       label: '转账单号',
-      content: (data: PayTransferApi.Transfer) =>
-        h(ElTag, { color: 'orange' }, () => data?.no),
+      render: (val) => h(ElTag, { color: 'orange' }, () => val),
     },
     {
       field: 'appId',
@@ -207,33 +204,31 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'status',
       label: '转账状态',
-      content: (data: any) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_TRANSFER_STATUS,
-          value: data?.status,
+          value: val,
         }),
     },
     {
       field: 'price',
       label: '转账金额',
-      content: (data: PayTransferApi.Transfer) =>
+      render: (val) =>
         h(
           ElTag,
           { color: 'success' },
-          () => `￥${erpPriceInputFormatter(data?.price || 0)}`,
+          () => `￥${erpPriceInputFormatter(val || 0)}`,
         ),
     },
     {
       field: 'successTime',
       label: '转账时间',
-      content: (data: PayTransferApi.Transfer) =>
-        formatDateTime(data?.successTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'createTime',
       label: '创建时间',
-      content: (data: PayTransferApi.Transfer) =>
-        formatDateTime(data?.createTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'userName',
@@ -246,10 +241,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'channelCode',
       label: '支付渠道',
-      content: (data: PayTransferApi.Transfer) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_CHANNEL_CODE,
-          value: data?.channelCode,
+          value: val,
         }),
     },
     {
@@ -259,10 +254,7 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'channelTransferNo',
       label: '渠道单号',
-      content: (data: PayTransferApi.Transfer) =>
-        data?.channelTransferNo
-          ? h(ElTag, { color: 'success' }, () => data.channelTransferNo)
-          : '',
+      render: (val) => (val ? h(ElTag, { color: 'success' }, () => val) : ''),
     },
     {
       field: 'notifyUrl',

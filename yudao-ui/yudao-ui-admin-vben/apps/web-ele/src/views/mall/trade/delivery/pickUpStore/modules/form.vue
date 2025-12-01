@@ -6,7 +6,7 @@ import { computed, ref } from 'vue';
 import { useVbenModal } from '@vben/common-ui';
 
 import dayjs from 'dayjs';
-import { ElButton, ElMessage } from 'element-plus';
+import { ElButton, ElDialog, ElMessage } from 'element-plus';
 
 import { useVbenForm } from '#/adapter/form';
 import { getTradeConfig } from '#/api/mall/trade/config';
@@ -20,7 +20,7 @@ import { $t } from '#/locales';
 import { useFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
-const formData = ref<MallDeliveryPickUpStoreApi.PickUpStore>();
+const formData = ref<MallDeliveryPickUpStoreApi.DeliveryPickUpStore>();
 const getTitle = computed(() => {
   return formData.value?.id
     ? $t('ui.actionTitle.edit', ['门店'])
@@ -94,7 +94,7 @@ const [Modal, modalApi] = useVbenModal({
     modalApi.lock();
     // 提交表单
     const data =
-      (await formApi.getValues()) as MallDeliveryPickUpStoreApi.PickUpStore;
+      (await formApi.getValues()) as MallDeliveryPickUpStoreApi.DeliveryPickUpStore;
     try {
       await (formData.value?.id
         ? updateDeliveryPickUpStore(data)
@@ -113,7 +113,8 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    const data = modalApi.getData<MallDeliveryPickUpStoreApi.PickUpStore>();
+    const data =
+      modalApi.getData<MallDeliveryPickUpStoreApi.DeliveryPickUpStore>();
     if (!data || !data.id) {
       // 初始化地图
       await initTencentLbsMap();
@@ -146,16 +147,11 @@ const [Modal, modalApi] = useVbenModal({
   </Modal>
 
   <!-- 地图弹窗 -->
-  <el-dialog
-    v-model="mapVisible"
-    title="获取经纬度"
-    :width="800"
-    :footer="null"
-  >
+  <ElDialog v-model="mapVisible" title="获取经纬度" :width="800" :footer="null">
     <iframe
       v-if="mapVisible && tencentLbsUrl"
       :src="tencentLbsUrl"
       class="h-[600px] w-full border-0"
     ></iframe>
-  </el-dialog>
+  </ElDialog>
 </template>

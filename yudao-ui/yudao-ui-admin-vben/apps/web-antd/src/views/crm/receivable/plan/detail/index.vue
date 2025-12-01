@@ -34,16 +34,11 @@ const receivablePlan = ref<CrmReceivablePlanApi.Plan>(
 );
 const logList = ref<SystemOperateLogApi.OperateLog[]>([]); // 操作日志
 const permissionListRef = ref<InstanceType<typeof PermissionList>>(); // 团队成员列表 Ref
-
-// 校验编辑权限
-const validateWrite = () => permissionListRef.value?.validateWrite;
+const validateWrite = () => permissionListRef.value?.validateWrite; // 校验编辑权限
 
 const [Descriptions] = useDescription({
-  componentProps: {
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  bordered: false,
+  column: 4,
   schema: useDetailSchema(),
 });
 
@@ -71,7 +66,7 @@ async function getReceivablePlanDetail() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/crm/receivablePlan');
+  router.push({ name: 'CrmReceivablePlan' });
 }
 
 /** 编辑收款 */

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { SelectItemTextProps } from 'radix-vue';
+import type { SelectItemTextProps } from 'reka-ui';
 
-import { SelectItemText } from 'radix-vue';
+import { SelectItemText } from 'reka-ui';
 
 const props = defineProps<SelectItemTextProps>();
 </script>

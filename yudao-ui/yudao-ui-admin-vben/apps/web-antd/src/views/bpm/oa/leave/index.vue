@@ -5,19 +5,91 @@ import type { BpmOALeaveApi } from '#/api/bpm/oa/leave';
 import { h } from 'vue';
 
 import { DocAlert, Page, prompt } from '@vben/common-ui';
+import { BpmProcessInstanceStatus } from '@vben/constants';
 
 import { message, Textarea } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getLeavePage } from '#/api/bpm/oa/leave';
 import { cancelProcessInstanceByStartUser } from '#/api/bpm/processInstance';
+import { $t } from '#/locales';
 import { router } from '#/router';
 
-import { GridFormSchema, useGridColumns } from './data';
+import { useGridColumns, useGridFormSchema } from './data';
+
+/** 刷新表格 */
+function handleRefresh() {
+  gridApi.query();
+}
+
+/** 创建请假 */
+function handleCreate() {
+  router.push({
+    name: 'OALeaveCreate',
+    query: {
+      formType: 'create',
+    },
+  });
+}
+
+/** 取消请假 */
+function handleCancel(row: BpmOALeaveApi.Leave) {
+  prompt({
+    title: '取消流程',
+    content: '请输入取消原因',
+    modelPropName: 'value',
+    component: () => {
+      return h(Textarea, {
+        placeholder: '请输入取消原因',
+        allowClear: true,
+        rows: 2,
+        rules: [{ required: true, message: '请输入取消原因' }],
+      });
+    },
+    async beforeClose(scope) {
+      if (!scope.isConfirm) {
+        return;
+      }
+      if (!scope.value) {
+        message.error('请输入取消原因');
+        return false;
+      }
+      const hideLoading = message.loading({
+        content: '正在取消中...',
+        duration: 0,
+      });
+      try {
+        await cancelProcessInstanceByStartUser(row.id, scope.value);
+        message.success('取消成功');
+        handleRefresh();
+      } catch {
+        return false;
+      } finally {
+        hideLoading();
+      }
+    },
+  });
+}
+
+/** 查看请假详情 */
+function handleDetail(row: BpmOALeaveApi.Leave) {
+  router.push({
+    name: 'OALeaveDetail',
+    query: { id: row.id },
+  });
+}
+
+/** 审批进度 */
+function handleProgress(row: BpmOALeaveApi.Leave) {
+  router.push({
+    name: 'BpmProcessInstanceDetail',
+    query: { id: row.processInstanceId },
+  });
+}
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
-    schema: GridFormSchema(),
+    schema: useGridFormSchema(),
   },
   gridOptions: {
     columns: useGridColumns(),
@@ -36,6 +108,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
@@ -43,70 +116,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
   } as VxeTableGridOptions<BpmOALeaveApi.Leave>,
 });
-
-/** 创建请假 */
-function handleCreate() {
-  router.push({
-    name: 'OALeaveCreate',
-    query: {
-      formType: 'create',
-    },
-  });
-}
-
-/** 查看请假详情 */
-function handleDetail(row: BpmOALeaveApi.Leave) {
-  router.push({
-    name: 'OALeaveDetail',
-    query: { id: row.id },
-  });
-}
-
-/** 取消请假 */
-function handleCancel(row: BpmOALeaveApi.Leave) {
-  prompt({
-    async beforeClose(scope) {
-      if (scope.isConfirm) {
-        if (scope.value) {
-          try {
-            await cancelProcessInstanceByStartUser(row.id, scope.value);
-            message.success('取消成功');
-            handleRefresh();
-          } catch {
-            return false;
-          }
-        } else {
-          message.error('请输入取消原因');
-          return false;
-        }
-      }
-    },
-    component: () => {
-      return h(Textarea, {
-        placeholder: '请输入取消原因',
-        allowClear: true,
-        rows: 2,
-        rules: [{ required: true, message: '请输入取消原因' }],
-      });
-    },
-    content: '请输入取消原因',
-    title: '取消流程',
-    modelPropName: 'value',
-  });
-}
-
-/** 审批进度 */
-function handleProgress(row: BpmOALeaveApi.Leave) {
-  router.push({
-    name: 'BpmProcessInstanceDetail',
-    query: { id: row.processInstanceId },
-  });
-}
-
-/** 刷新表格 */
-function handleRefresh() {
-  gridApi.query();
-}
 </script>
 
 <template>
@@ -126,7 +135,6 @@ function handleRefresh() {
               label: '发起请假',
               type: 'primary',
               icon: ACTION_ICON.ADD,
-              auth: ['bpm:oa-leave:create'],
               onClick: handleCreate,
             },
           ]"
@@ -139,14 +147,12 @@ function handleRefresh() {
               label: $t('common.detail'),
               type: 'link',
               icon: ACTION_ICON.VIEW,
-              auth: ['bpm:oa-leave:query'],
               onClick: handleDetail.bind(null, row),
             },
             {
               label: '审批进度',
               type: 'link',
               icon: ACTION_ICON.VIEW,
-              auth: ['bpm:oa-leave:query'],
               onClick: handleProgress.bind(null, row),
             },
             {
@@ -154,11 +160,8 @@ function handleRefresh() {
               type: 'link',
               danger: true,
               icon: ACTION_ICON.DELETE,
-              auth: ['bpm:user-group:query'],
-              popConfirm: {
-                title: '取消流程',
-                confirm: handleCancel.bind(null, row),
-              },
+              ifShow: row.result === BpmProcessInstanceStatus.RUNNING,
+              onClick: handleCancel.bind(null, row),
             },
           ]"
         />

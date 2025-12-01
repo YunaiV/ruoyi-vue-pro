@@ -62,6 +62,8 @@ export function useFormSchema(): VbenFormSchema[] {
         placeholder: '请输入 SMTP 服务器端口',
         min: 0,
         max: 65_535,
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       rules: 'required',
     },

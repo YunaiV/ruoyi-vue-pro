@@ -50,7 +50,7 @@ const [Modal, modalApi] = useVbenModal({
       data.logisticsNo = '';
     }
     try {
-      await deliveryOrder(data as MallOrderApi.DeliveryRequest);
+      await deliveryOrder(data as MallOrderApi.OrderUpdateDeliveryReqVO);
       // 关闭并提示
       await modalApi.close();
       emit('success');

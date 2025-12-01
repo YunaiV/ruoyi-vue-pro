@@ -50,6 +50,7 @@ export function useFormSchema(
         showTime: true,
         format: 'YYYY-MM-DD HH:mm:ss',
         valueFormat: 'x',
+        placeholder: '请选择下次联系时间',
       },
       rules: 'required',
     },
@@ -85,8 +86,9 @@ export function useFormSchema(
           });
           return res.list;
         },
+        labelField: 'name',
+        valueField: 'id',
         mode: 'multiple',
-        fieldNames: { label: 'name', value: 'id' },
       },
     },
     {
@@ -105,8 +107,9 @@ export function useFormSchema(
           });
           return res.list;
         },
+        labelField: 'name',
+        valueField: 'id',
         mode: 'multiple',
-        fieldNames: { label: 'name', value: 'id' },
       },
     },
   ];
@@ -171,7 +174,7 @@ export function useFollowUpDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'contactLastTime',
       label: '最后跟进时间',
-      content: (data) => formatDateTime(data?.contactLastTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'creatorName',
@@ -180,12 +183,12 @@ export function useFollowUpDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'createTime',
       label: '创建时间',
-      content: (data) => formatDateTime(data?.createTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'updateTime',
       label: '更新时间',
-      content: (data) => formatDateTime(data?.updateTime) as string,
+      render: (val) => formatDateTime(val) as string,
     },
   ];
 }

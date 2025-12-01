@@ -18,9 +18,10 @@ import { useTabs } from '@vben/hooks';
 import { ElCard, ElLoading, ElMessage, ElTag } from 'element-plus';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import * as DeliveryExpressApi from '#/api/mall/trade/delivery/express';
-import * as DeliveryPickUpStoreApi from '#/api/mall/trade/delivery/pickUpStore';
+import { getSimpleDeliveryExpressList } from '#/api/mall/trade/delivery/express';
+import { getDeliveryPickUpStore } from '#/api/mall/trade/delivery/pickUpStore';
 import * as TradeOrderApi from '#/api/mall/trade/order';
+import { getExpressTrackList } from '#/api/mall/trade/order';
 import { useDescription } from '#/components/description';
 import { DictTag } from '#/components/dict-tag';
 import { TableAction } from '#/components/table-action';
@@ -50,45 +51,37 @@ const orderId = ref(0);
 const order = ref<MallOrderApi.Order>({
   logs: [],
 });
-const deliveryExpressList = ref<MallDeliveryExpressApi.SimpleDeliveryExpress[]>(
-  [],
-);
+const deliveryExpressList = ref<MallDeliveryExpressApi.DeliveryExpress[]>([]);
 const expressTrackList = ref<any[]>([]);
-const pickUpStore = ref<MallDeliveryPickUpStoreApi.PickUpStore | undefined>();
+const pickUpStore = ref<
+  MallDeliveryPickUpStoreApi.DeliveryPickUpStore | undefined
+>();
 
 const [OrderInfoDescriptions] = useDescription({
-  componentProps: {
-    title: '订单信息',
-    border: false,
-    column: 3,
-  },
+  title: '订单信息',
+  border: false,
+  column: 3,
   schema: useOrderInfoSchema(),
 });
 
 const [OrderStatusDescriptions] = useDescription({
-  componentProps: {
-    title: '订单状态',
-    border: false,
-    column: 1,
-  },
+  title: '订单状态',
+  border: false,
+  column: 1,
   schema: useOrderStatusSchema(),
 });
 
 const [OrderPriceDescriptions] = useDescription({
-  componentProps: {
-    title: '费用信息',
-    border: false,
-    column: 4,
-  },
+  title: '费用信息',
+  border: false,
+  column: 4,
   schema: useOrderPriceSchema(),
 });
 
 const [DeliveryInfoDescriptions] = useDescription({
-  componentProps: {
-    title: '收货信息',
-    border: false,
-    column: 3,
-  },
+  title: '收货信息',
+  border: false,
+  column: 3,
   schema: useDeliveryInfoSchema(),
 });
 
@@ -177,12 +170,9 @@ async function getDetail() {
 
     // 如果配送方式为快递，则查询物流公司
     if (res.deliveryType === DeliveryTypeEnum.EXPRESS.type) {
-      deliveryExpressList.value =
-        await DeliveryExpressApi.getSimpleDeliveryExpressList();
+      deliveryExpressList.value = await getSimpleDeliveryExpressList();
       if (res.logisticsId) {
-        expressTrackList.value = await TradeOrderApi.getExpressTrackList(
-          res.id!,
-        );
+        expressTrackList.value = await getExpressTrackList(res.id!);
         expressTrackGridApi.setGridOptions({
           data: expressTrackList.value || [],
         });
@@ -191,9 +181,7 @@ async function getDetail() {
       res.deliveryType === DeliveryTypeEnum.PICK_UP.type &&
       res.pickUpStoreId
     ) {
-      pickUpStore.value = await DeliveryPickUpStoreApi.getDeliveryPickUpStore(
-        res.pickUpStoreId,
-      );
+      pickUpStore.value = await getDeliveryPickUpStore(res.pickUpStoreId);
     }
   } finally {
     loading.value = false;
@@ -235,7 +223,7 @@ const handlePickUp = async () => {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/mall/trade/order');
+  router.push({ name: 'TradeOrder' });
 }
 
 /** 初始化 */

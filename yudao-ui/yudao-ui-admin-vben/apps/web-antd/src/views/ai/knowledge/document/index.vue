@@ -5,11 +5,11 @@ import type { AiKnowledgeDocumentApi } from '#/api/ai/knowledge/document';
 import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { useAccess } from '@vben/access';
 import { confirm, Page } from '@vben/common-ui';
-import { CommonStatusEnum } from '@vben/constants';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictLabel } from '@vben/hooks';
 
-import { message, Switch } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -21,18 +21,18 @@ import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
-/** AI 知识库文档 列表 */
+/** AI 知识库文档列表 */
 defineOptions({ name: 'AiKnowledgeDocument' });
-const { hasAccessByCodes } = useAccess();
 
-const route = useRoute(); // 路由
-const router = useRouter(); // 路由
+const route = useRoute();
+const router = useRouter();
+
 /** 刷新表格 */
 function handleRefresh() {
   gridApi.query();
 }
 
-/** 创建 */
+/** 创建知识库文档 */
 function handleCreate() {
   router.push({
     name: 'AiKnowledgeDocumentCreate',
@@ -40,7 +40,7 @@ function handleCreate() {
   });
 }
 
-/** 编辑 */
+/** 编辑知识库文档 */
 function handleEdit(id: number) {
   router.push({
     name: 'AiKnowledgeDocumentUpdate',
@@ -48,56 +48,60 @@ function handleEdit(id: number) {
   });
 }
 
-/** 删除 */
+/** 删除知识库文档 */
 async function handleDelete(row: AiKnowledgeDocumentApi.KnowledgeDocument) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteKnowledgeDocument(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteKnowledgeDocument(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
   }
 }
+
 /** 跳转到知识库分段页面 */
-const handleSegment = (id: number) => {
+function handleSegment(id: number) {
   router.push({
     name: 'AiKnowledgeSegment',
     query: { documentId: id },
   });
-};
-/** 修改是否发布 */
-const handleStatusChange = async (
+}
+
+/** 更新文档状态 */
+async function handleStatusChange(
+  newStatus: number,
   row: AiKnowledgeDocumentApi.KnowledgeDocument,
-) => {
-  try {
-    // 修改状态的二次确认
-    const text = row.status ? '启用' : '禁用';
-    await confirm(`确认要"${text}"${row.name}文档吗?`).then(async () => {
-      await updateKnowledgeDocumentStatus({
-        id: row.id,
-        status: row.status,
+): Promise<boolean | undefined> {
+  return new Promise((resolve, reject) => {
+    confirm({
+      content: `你要将${row.name}的状态切换为【${getDictLabel(DICT_TYPE.COMMON_STATUS, newStatus)}】吗？`,
+    })
+      .then(async () => {
+        // 更新文档状态
+        await updateKnowledgeDocumentStatus({
+          id: row.id,
+          status: newStatus,
+        });
+        // 提示并返回成功
+        message.success($t('ui.actionMessage.operationSuccess'));
+        resolve(true);
+      })
+      .catch(() => {
+        reject(new Error('取消操作'));
       });
-      handleRefresh();
-    });
-  } catch {
-    row.status =
-      row.status === CommonStatusEnum.ENABLE
-        ? CommonStatusEnum.DISABLE
-        : CommonStatusEnum.ENABLE;
-  }
-};
+  });
+}
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     schema: useGridFormSchema(),
   },
   gridOptions: {
-    columns: useGridColumns(),
+    columns: useGridColumns(handleStatusChange),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -114,6 +118,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
@@ -121,6 +126,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
   } as VxeTableGridOptions<AiKnowledgeDocumentApi.KnowledgeDocument>,
 });
+
 /** 初始化 */
 onMounted(() => {
   // 如果知识库 ID 不存在，显示错误提示并关闭页面
@@ -148,15 +154,6 @@ onMounted(() => {
           ]"
         />
       </template>
-      <template #status="{ row }">
-        <Switch
-          v-model:checked="row.status"
-          :checked-value="0"
-          :un-checked-value="1"
-          @change="handleStatusChange(row)"
-          :disabled="!hasAccessByCodes(['ai:knowledge:update'])"
-        />
-      </template>
       <template #actions="{ row }">
         <TableAction
           :actions="[
@@ -167,17 +164,18 @@ onMounted(() => {
               auth: ['ai:knowledge:update'],
               onClick: handleEdit.bind(null, row.id),
             },
-          ]"
-          :drop-down-actions="[
             {
               label: '分段',
               type: 'link',
+              icon: ACTION_ICON.BOOK,
               auth: ['ai:knowledge:query'],
               onClick: handleSegment.bind(null, row.id),
             },
             {
               label: $t('common.delete'),
               type: 'link',
+              danger: true,
+              icon: ACTION_ICON.DELETE,
               auth: ['ai:knowledge:delete'],
               popConfirm: {
                 title: $t('ui.actionMessage.deleteConfirm', [row.name]),

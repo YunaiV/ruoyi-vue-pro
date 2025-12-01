@@ -3,22 +3,22 @@ import type { PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace CrmStatisticsFunnelApi {
-  /** 销售漏斗统计数据 */
-  export interface FunnelSummary {
+  /** 销售漏斗统计数据响应 */
+  export interface FunnelSummaryRespVO {
     customerCount: number; // 客户数
     businessCount: number; // 商机数
     businessWinCount: number; // 赢单数
   }
 
-  /** 商机分析(按日期) */
-  export interface BusinessSummaryByDate {
+  /** 商机分析(按日期)响应 */
+  export interface BusinessSummaryByDateRespVO {
     time: string; // 时间
     businessCreateCount: number; // 商机数
     totalPrice: number | string; // 商机金额
   }
 
-  /** 商机转化率分析(按日期) */
-  export interface BusinessInversionRateSummaryByDate {
+  /** 商机转化率分析(按日期)响应 */
+  export interface BusinessInversionRateSummaryByDateRespVO {
     time: string; // 时间
     businessCount: number; // 商机数量
     businessWinCount: number; // 赢单商机数
@@ -61,7 +61,7 @@ export function getChartDatas(activeTabName: any, params: any) {
 
 /** 获取销售漏斗统计数据 */
 export function getFunnelSummary(params: any) {
-  return requestClient.get<CrmStatisticsFunnelApi.FunnelSummary>(
+  return requestClient.get<CrmStatisticsFunnelApi.FunnelSummaryRespVO>(
     '/crm/statistics-funnel/get-funnel-summary',
     { params },
   );
@@ -77,16 +77,15 @@ export function getBusinessSummaryByEndStatus(params: any) {
 
 /** 获取新增商机分析(按日期) */
 export function getBusinessSummaryByDate(params: any) {
-  return requestClient.get<CrmStatisticsFunnelApi.BusinessSummaryByDate[]>(
-    '/crm/statistics-funnel/get-business-summary-by-date',
-    { params },
-  );
+  return requestClient.get<
+    CrmStatisticsFunnelApi.BusinessSummaryByDateRespVO[]
+  >('/crm/statistics-funnel/get-business-summary-by-date', { params });
 }
 
 /** 获取商机转化率分析(按日期) */
 export function getBusinessInversionRateSummaryByDate(params: any) {
   return requestClient.get<
-    CrmStatisticsFunnelApi.BusinessInversionRateSummaryByDate[]
+    CrmStatisticsFunnelApi.BusinessInversionRateSummaryByDateRespVO[]
   >('/crm/statistics-funnel/get-business-inversion-rate-summary-by-date', {
     params,
   });

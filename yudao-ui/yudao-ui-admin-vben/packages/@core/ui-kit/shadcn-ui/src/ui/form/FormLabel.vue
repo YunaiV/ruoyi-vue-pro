@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { LabelProps } from 'radix-vue';
+import type { LabelProps } from 'reka-ui';
 
 import { cn } from '@vben-core/shared/utils';
 

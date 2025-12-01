@@ -23,14 +23,15 @@ const formData = ref<ErpStockMoveApi.StockMove>();
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof ItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['库存调拨单'])
-    : formType.value === 'edit'
-      ? $t('ui.actionTitle.edit', ['库存调拨单'])
-      : '库存调拨单详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['库存调拨单']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['库存调拨单']);
+  } else {
+    return '库存调拨单详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -46,13 +47,13 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新调拨单项 */
-const handleUpdateItems = (items: ErpStockMoveApi.StockMoveItem[]) => {
+function handleUpdateItems(items: ErpStockMoveApi.StockMoveItem[]) {
   formData.value = modalApi.getData<ErpStockMoveApi.StockMove>();
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 创建或更新库存调拨单 */
 const [Modal, modalApi] = useVbenModal({

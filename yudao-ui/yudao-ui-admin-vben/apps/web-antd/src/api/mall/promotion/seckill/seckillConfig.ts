@@ -12,12 +12,6 @@ export namespace MallSeckillConfigApi {
     sliderPicUrls: string[]; // 秒杀轮播图
     status: number; // 活动状态
   }
-
-  /** 时段配置状态更新 */
-  export interface StatusUpdate {
-    id: number; // 编号
-    status: number; // 状态
-  }
 }
 
 /** 查询秒杀时段分页 */

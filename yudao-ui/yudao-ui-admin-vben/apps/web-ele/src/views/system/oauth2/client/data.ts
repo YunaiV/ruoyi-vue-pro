@@ -147,7 +147,6 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入权限',
       },
-      rules: 'required',
     },
     {
       fieldName: 'resourceIds',
@@ -156,7 +155,6 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入资源',
       },
-      rules: 'required',
     },
     {
       fieldName: 'additionalInformation',

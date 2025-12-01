@@ -7,48 +7,34 @@ import { requestClient } from '#/api/request';
 export namespace MallDiscountActivityApi {
   /** 限时折扣相关属性 */
   export interface DiscountProduct {
-    /** 商品 SPU 编号 */
-    spuId: number;
-    /** 商品 SKU 编号 */
-    skuId: number;
-    /** 折扣类型 */
-    discountType: number;
-    /** 折扣百分比 */
-    discountPercent: number;
-    /** 折扣价格 */
-    discountPrice: number;
+    spuId: number; // 商品 SPU 编号
+    skuId: number; // 商品 SKU 编号
+    discountType: number; // 折扣类型
+    discountPercent: number; // 折扣百分比
+    discountPrice: number; // 折扣价格
   }
 
   /** 限时折扣活动 */
   export interface DiscountActivity {
-    /** 活动编号 */
-    id?: number;
-    /** 商品 SPU 编号 */
-    spuId?: number;
-    /** 活动名称 */
-    name?: string;
-    /** 状态 */
-    status?: number;
-    /** 备注 */
-    remark?: string;
-    /** 开始时间 */
-    startTime?: Date;
-    /** 结束时间 */
-    endTime?: Date;
-    /** 商品列表 */
-    products?: DiscountProduct[];
+    id?: number; // 活动编号
+    spuId?: number; // 商品 SPU 编号
+    name?: string; // 活动名称
+    status?: number; // 状态
+    remark?: string; // 备注
+    startTime?: Date; // 开始时间
+    endTime?: Date; // 结束时间
+    products?: DiscountProduct[]; // 商品列表
   }
 
+  // TODO @puhui999：要不要删除？
   /** 扩展 SKU 配置 */
   export type SkuExtension = {
-    /** 限时折扣配置 */
-    productConfig: DiscountProduct;
+    productConfig: DiscountProduct; // 限时折扣配置
   } & MallSpuApi.Sku;
 
   /** 扩展 SPU 配置 */
   export interface SpuExtension extends MallSpuApi.Spu {
-    /** SKU 列表 */
-    skus: SkuExtension[];
+    skus: SkuExtension[]; // SKU 列表
   }
 }
 

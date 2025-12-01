@@ -42,7 +42,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '邮箱账号',
       component: 'ApiSelect',
       componentProps: {
-        api: async () => await getSimpleMailAccountList(),
+        api: getSimpleMailAccountList,
         labelField: 'mail',
         valueField: 'id',
         placeholder: '请选择邮箱账号',
@@ -177,7 +177,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '邮箱账号',
       component: 'ApiSelect',
       componentProps: {
-        api: async () => await getSimpleMailAccountList(),
+        api: getSimpleMailAccountList,
         labelField: 'mail',
         valueField: 'id',
         clearable: true,

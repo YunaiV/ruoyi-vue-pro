@@ -11,33 +11,34 @@ export namespace AiModelToolApi {
   }
 }
 
-// 查询工具分页
+/** 查询工具分页 */
 export function getToolPage(params: PageParam) {
   return requestClient.get<PageResult<AiModelToolApi.Tool>>('/ai/tool/page', {
     params,
   });
 }
 
-// 查询工具详情
+/** 查询工具详情 */
 export function getTool(id: number) {
   return requestClient.get<AiModelToolApi.Tool>(`/ai/tool/get?id=${id}`);
 }
-// 新增工具
+
+/** 新增工具 */
 export function createTool(data: AiModelToolApi.Tool) {
   return requestClient.post('/ai/tool/create', data);
 }
 
-// 修改工具
+/** 修改工具 */
 export function updateTool(data: AiModelToolApi.Tool) {
   return requestClient.put('/ai/tool/update', data);
 }
 
-// 删除工具
+/** 删除工具 */
 export function deleteTool(id: number) {
   return requestClient.delete(`/ai/tool/delete?id=${id}`);
 }
 
-// 获取工具简单列表
+/** 获取工具简单列表 */
 export function getToolSimpleList() {
   return requestClient.get<AiModelToolApi.Tool[]>('/ai/tool/simple-list');
 }

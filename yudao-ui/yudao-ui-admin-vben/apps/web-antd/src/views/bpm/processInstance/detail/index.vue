@@ -4,13 +4,21 @@ import type { SystemUserApi } from '#/api/system/user';
 
 import { nextTick, onMounted, ref, shallowRef, watch } from 'vue';
 
-import { Page } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 import {
+  BpmFieldPermissionType,
   BpmModelFormType,
   BpmModelType,
   BpmTaskStatusEnum,
   DICT_TYPE,
 } from '@vben/constants';
+import {
+  IconifyIcon,
+  SvgBpmApproveIcon,
+  SvgBpmCancelIcon,
+  SvgBpmRejectIcon,
+  SvgBpmRunningIcon,
+} from '@vben/icons';
 import { formatDateTime } from '@vben/utils';
 
 import { Avatar, Card, Col, message, Row, TabPane, Tabs } from 'ant-design-vue';
@@ -23,15 +31,10 @@ import { getSimpleUserList } from '#/api/system/user';
 import DictTag from '#/components/dict-tag/dict-tag.vue';
 import { setConfAndFields2 } from '#/components/form-create';
 import { registerComponent } from '#/utils';
-import {
-  SvgBpmApproveIcon,
-  SvgBpmCancelIcon,
-  SvgBpmRejectIcon,
-  SvgBpmRunningIcon,
-} from '#/views/bpm/processInstance/detail/modules/icons';
 
 import ProcessInstanceBpmnViewer from './modules/bpm-viewer.vue';
 import ProcessInstanceOperationButton from './modules/operation-button.vue';
+import ProcessssPrint from './modules/process-print.vue';
 import ProcessInstanceSimpleViewer from './modules/simple-bpm-viewer.vue';
 import BpmProcessInstanceTaskList from './modules/task-list.vue';
 import ProcessInstanceTimeline from './modules/time-line.vue';
@@ -44,29 +47,13 @@ const props = defineProps<{
   taskId?: string; // 任务编号
 }>();
 
-enum FieldPermissionType {
-  /**
-   * 隐藏
-   */
-  // eslint-disable-next-line no-unused-vars
-  NONE = '3',
-  /**
-   * 只读
-   */
-  // eslint-disable-next-line no-unused-vars
-  READ = '1',
-  /**
-   * 编辑
-   */
-  // eslint-disable-next-line no-unused-vars
-  WRITE = '2',
-}
-
 const processInstanceLoading = ref(false); // 流程实例的加载中
 const processInstance = ref<BpmProcessInstanceApi.ProcessInstance>(); // 流程实例
 const processDefinition = ref<any>({}); // 流程定义
 const processModelView = ref<any>({}); // 流程模型视图
 const operationButtonRef = ref(); // 操作按钮组件 ref
+const activeTab = ref('form');
+const taskListRef = ref();
 const auditIconsMap: {
   [key: string]:
     | typeof SvgBpmApproveIcon
@@ -82,29 +69,28 @@ const auditIconsMap: {
   [BpmTaskStatusEnum.RETURN]: SvgBpmRejectIcon,
   [BpmTaskStatusEnum.WAIT]: SvgBpmRunningIcon,
 };
+const activityNodes = ref<BpmProcessInstanceApi.ApprovalNodeInfo[]>([]); // 审批节点信息
+const userOptions = ref<SystemUserApi.User[]>([]); // 用户列表
 
-// ========== 申请信息 ==========
-const fApi = ref<any>(); //
+const fApi = ref<any>();
 const detailForm = ref({
   rule: [],
   option: {},
   value: {},
 }); // 流程实例的表单详情
-
 const writableFields: Array<string> = []; // 表单可以编辑的字段
 
-/** 加载流程实例 */
-const BusinessFormComponent = shallowRef<any>(null); // 异步组件
+const BusinessFormComponent = shallowRef<any>(null); // 异步组件(业务表单）
 
 /** 获取详情 */
 async function getDetail() {
   // 获得审批详情
-  getApprovalDetail();
-
+  await getApprovalDetail();
   // 获得流程模型视图
-  getProcessModelView();
+  await getProcessModelView();
 }
 
+/** 获得审批详情 */
 async function getApprovalDetail() {
   processInstanceLoading.value = true;
   try {
@@ -114,11 +100,9 @@ async function getApprovalDetail() {
       taskId: props.taskId,
     };
     const data = await getApprovalDetailApi(param);
-
     if (!data) {
       message.error('查询不到审批详情信息！');
     }
-
     if (!data.processDefinition || !data.processInstance) {
       message.error('查询不到流程信息！');
     }
@@ -143,17 +127,16 @@ async function getApprovalDetail() {
           processInstance.value.formVariables,
         );
       }
-      nextTick().then(() => {
-        fApi.value?.btn.show(false);
-        fApi.value?.resetBtn.show(false);
-        fApi.value?.disabled(true);
-        // 设置表单字段权限
-        if (formFieldsPermission) {
-          Object.keys(data.formFieldsPermission).forEach((item) => {
-            setFieldPermission(item, formFieldsPermission[item]);
-          });
-        }
-      });
+      await nextTick();
+      fApi.value?.btn.show(false);
+      fApi.value?.resetBtn.show(false);
+      fApi.value?.disabled(true);
+      // 设置表单字段权限
+      if (formFieldsPermission) {
+        Object.keys(data.formFieldsPermission).forEach((item) => {
+          setFieldPermission(item, formFieldsPermission[item]);
+        });
+      }
     } else {
       // 注意：data.processDefinition.formCustomViewPath 是组件的全路径，例如说：/crm/contract/detail/index.vue
       BusinessFormComponent.value = registerComponent(
@@ -187,52 +170,50 @@ async function getProcessModelView() {
   }
 }
 
-// 审批节点信息
-const activityNodes = ref<BpmProcessInstanceApi.ApprovalNodeInfo[]>([]);
-/**
- * 设置表单权限
- */
+/** 设置表单权限 */
 function setFieldPermission(field: string, permission: string) {
-  if (permission === FieldPermissionType.READ) {
+  if (permission === BpmFieldPermissionType.READ) {
     fApi.value?.disabled(true, field);
   }
-  if (permission === FieldPermissionType.WRITE) {
+  if (permission === BpmFieldPermissionType.WRITE) {
     fApi.value?.disabled(false, field);
     // 加入可以编辑的字段
     writableFields.push(field);
   }
-  if (permission === FieldPermissionType.NONE) {
+  if (permission === BpmFieldPermissionType.NONE) {
     fApi.value?.hidden(true, field);
   }
 }
 
-/**
- * 操作成功后刷新
- */
-// const refresh = () => {
-//   // 重新获取详情
-//   getDetail();
-// };
+/** 操作成功后刷新 */
+const refresh = () => {
+  // 重新获取详情
+  getDetail();
+};
 
-/** 当前的Tab */
-const activeTab = ref('form');
-const taskListRef = ref();
+const [PrintModal, printModalApi] = useVbenModal({
+  connectedComponent: ProcessssPrint,
+  destroyOnClose: true,
+});
+
+/** 打开打印对话框 */
+function handlePrint() {
+  printModalApi.setData({ processInstanceId: props.id }).open();
+}
 
 /** 监听 Tab 切换，当切换到 "record" 标签时刷新任务列表 */
 watch(
   () => activeTab.value,
-  (newVal) => {
+  async (newVal) => {
     if (newVal === 'record') {
       // 如果切换到流转记录标签，刷新任务列表
-      nextTick(() => {
-        taskListRef.value?.refresh();
-      });
+      await nextTick();
+      taskListRef.value?.refresh();
     }
   },
 );
 
 /** 初始化 */
-const userOptions = ref<SystemUserApi.User[]>([]); // 用户列表
 onMounted(async () => {
   await getDetail();
   // 获得用户列表
@@ -249,7 +230,14 @@ onMounted(async () => {
       }"
     >
       <template #title>
-        <span class="text-gray-500">编号：{{ id || '-' }}</span>
+        <div class="flex items-center gap-4">
+          <span class="text-gray-500">编号：{{ id || '-' }}</span>
+          <IconifyIcon
+            icon="lucide:printer"
+            class="cursor-pointer hover:text-primary"
+            @click="handlePrint"
+          />
+        </div>
       </template>
 
       <div class="flex h-full flex-col">
@@ -281,9 +269,9 @@ onMounted(async () => {
               >
                 {{ processInstance?.startUser?.nickname.substring(0, 1) }}
               </Avatar>
-              <span class="text-sm">{{
-                processInstance?.startUser?.nickname
-              }}</span>
+              <span class="text-sm">
+                {{ processInstance?.startUser?.nickname }}
+              </span>
             </div>
             <div class="text-gray-500">
               {{ formatDateTime(processInstance?.startTime) }} 提交
@@ -324,9 +312,8 @@ onMounted(async () => {
                       :rule="detailForm.rule"
                     />
                   </div>
-
                   <div
-                    v-if="
+                    v-else-if="
                       processDefinition?.formType === BpmModelFormType.CUSTOM
                     "
                     class="h-full"
@@ -341,7 +328,6 @@ onMounted(async () => {
                 </Col>
               </Row>
             </TabPane>
-
             <TabPane
               tab="流程图"
               key="diagram"
@@ -367,7 +353,6 @@ onMounted(async () => {
                 />
               </div>
             </TabPane>
-
             <TabPane tab="流转记录" key="record" class="tab-pane-content">
               <div class="h-full">
                 <BpmProcessInstanceTaskList
@@ -377,7 +362,6 @@ onMounted(async () => {
                 />
               </div>
             </TabPane>
-
             <!-- TODO 待开发 -->
             <TabPane
               tab="流转评论"
@@ -401,15 +385,18 @@ onMounted(async () => {
             :normal-form="detailForm"
             :normal-form-api="fApi"
             :writable-fields="writableFields"
-            @success="getDetail"
+            @success="refresh"
           />
         </div>
       </template>
     </Card>
+    <!-- 打印对话框 -->
+    <PrintModal />
   </Page>
 </template>
 
 <style lang="scss" scoped>
+// @jason：看看能不能通过 tailwindcss 简化下
 .ant-tabs-content {
   height: 100%;
 }

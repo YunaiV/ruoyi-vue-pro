@@ -5,21 +5,16 @@ import { requestClient } from '#/api/request';
 export namespace MpAccountApi {
   /** 公众号账号信息 */
   export interface Account {
-    id?: number;
+    id: number;
     name: string;
-    account: string;
-    appId: string;
-    appSecret: string;
-    token: string;
+    account?: string;
+    appId?: string;
+    appSecret?: string;
+    token?: string;
     aesKey?: string;
     qrCodeUrl?: string;
     remark?: string;
     createTime?: Date;
-  }
-
-  export interface AccountSimple {
-    id: number;
-    name: string;
   }
 }
 
@@ -40,7 +35,7 @@ export function getAccount(id: number) {
 
 /** 查询公众号账号列表 */
 export function getSimpleAccountList() {
-  return requestClient.get<MpAccountApi.AccountSimple[]>(
+  return requestClient.get<MpAccountApi.Account[]>(
     '/mp/account/list-all-simple',
   );
 }
@@ -67,5 +62,5 @@ export function generateAccountQrCode(id: number) {
 
 /** 清空公众号账号 API 配额 */
 export function clearAccountQuota(id: number) {
-  return requestClient.post(`/mp/account/clear-quota?id=${id}`);
+  return requestClient.put(`/mp/account/clear-quota?id=${id}`);
 }

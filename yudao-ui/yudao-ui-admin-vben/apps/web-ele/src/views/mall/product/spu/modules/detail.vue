@@ -41,8 +41,8 @@ interface Brand {
   name: string;
 }
 
-const { push } = useRouter(); // 路由
-const { params } = useRoute(); // 查询参数
+const { push } = useRouter();
+const { params } = useRoute();
 
 const formLoading = ref(false); // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
 const activeTab = ref('basic'); // 当前激活的标签页

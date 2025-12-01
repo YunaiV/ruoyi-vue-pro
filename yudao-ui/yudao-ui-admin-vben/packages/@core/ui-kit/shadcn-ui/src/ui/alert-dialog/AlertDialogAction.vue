@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { AlertDialogActionProps } from 'radix-vue';
+import type { AlertDialogActionProps } from 'reka-ui';
 
-import { AlertDialogAction } from 'radix-vue';
+import { AlertDialogAction } from 'reka-ui';
 
 const props = defineProps<AlertDialogActionProps>();
 </script>

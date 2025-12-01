@@ -13,7 +13,7 @@ export namespace AiKnowledgeKnowledgeApi {
   }
 }
 
-// 查询知识库分页
+/** 查询知识库分页 */
 export function getKnowledgePage(params: PageParam) {
   return requestClient.get<PageResult<AiKnowledgeKnowledgeApi.Knowledge>>(
     '/ai/knowledge/page',
@@ -21,28 +21,29 @@ export function getKnowledgePage(params: PageParam) {
   );
 }
 
-// 查询知识库详情
+/** 查询知识库详情 */
 export function getKnowledge(id: number) {
   return requestClient.get<AiKnowledgeKnowledgeApi.Knowledge>(
     `/ai/knowledge/get?id=${id}`,
   );
 }
-// 新增知识库
+
+/** 新增知识库 */
 export function createKnowledge(data: AiKnowledgeKnowledgeApi.Knowledge) {
   return requestClient.post('/ai/knowledge/create', data);
 }
 
-// 修改知识库
+/** 修改知识库 */
 export function updateKnowledge(data: AiKnowledgeKnowledgeApi.Knowledge) {
   return requestClient.put('/ai/knowledge/update', data);
 }
 
-// 删除知识库
+/** 删除知识库 */
 export function deleteKnowledge(id: number) {
   return requestClient.delete(`/ai/knowledge/delete?id=${id}`);
 }
 
-// 获取知识库简单列表
+/** 获取知识库简单列表 */
 export function getSimpleKnowledgeList() {
   return requestClient.get<AiKnowledgeKnowledgeApi.Knowledge[]>(
     '/ai/knowledge/simple-list',

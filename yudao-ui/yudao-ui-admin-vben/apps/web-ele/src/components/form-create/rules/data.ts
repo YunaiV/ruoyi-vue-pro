@@ -121,7 +121,7 @@ const apiSelectRule = [
             field: 'data',
             title: '请求参数 JSON 格式',
             props: {
-              autosize: true,
+              autosize: true, // TODO @puhui999：这里时 autoSize 还是 autosize 哈？和 antd 不同
               type: 'textarea',
               placeholder: '{"type": 1}',
             },
@@ -155,7 +155,7 @@ const apiSelectRule = [
     info: `data 为接口返回值,需要写一个匿名函数解析返回值为选择器 options 列表
     (data: any)=>{ label: string; value: any }[]`,
     props: {
-      autosize: true,
+      autosize: true, // TODO @puhui999：这里时 autoSize 还是 autosize 哈？和 antd 不同
       rows: { minRows: 2, maxRows: 6 },
       type: 'textarea',
       placeholder: `

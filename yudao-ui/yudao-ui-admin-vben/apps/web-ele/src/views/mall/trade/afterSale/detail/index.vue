@@ -49,38 +49,29 @@ const afterSale = ref<MallAfterSaleApi.AfterSale>({
 });
 
 const [OrderDescriptions] = useDescription({
-  componentProps: {
-    title: '订单信息',
-    border: false,
-    column: 3,
-    direction: 'horizontal',
-    labelWidth: 140,
-    extra: '',
-  },
+  title: '订单信息',
+  border: false,
+  column: 3,
+  direction: 'horizontal',
+  labelWidth: 140,
   schema: useOrderInfoSchema(),
 });
 
 const [AfterSaleDescriptions] = useDescription({
-  componentProps: {
-    title: '售后信息',
-    border: false,
-    column: 3,
-    direction: 'horizontal',
-    labelWidth: 140,
-    extra: '',
-  },
+  title: '售后信息',
+  border: false,
+  column: 3,
+  direction: 'horizontal',
+  labelWidth: 140,
   schema: useAfterSaleInfoSchema(),
 });
 
 const [RefundStatusDescriptions] = useDescription({
-  componentProps: {
-    title: '退款状态',
-    border: false,
-    column: 1,
-    direction: 'horizontal',
-    labelWidth: 140,
-    extra: '',
-  },
+  title: '退款状态',
+  border: false,
+  column: 1,
+  direction: 'horizontal',
+  labelWidth: 140,
   schema: useRefundStatusSchema(),
 });
 
@@ -211,7 +202,7 @@ async function handleRefund() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/mall/trade/afterSale');
+  router.push({ name: 'TradeAfterSale' });
 }
 
 /** 初始化 */

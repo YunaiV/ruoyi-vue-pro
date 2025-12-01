@@ -26,12 +26,18 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '角色名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入角色名称',
+      },
       rules: 'required',
     },
     {
       fieldName: 'code',
       label: '角色标识',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入角色标识',
+      },
       rules: 'required',
     },
     {
@@ -59,6 +65,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'remark',
       label: '角色备注',
       component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入角色备注',
+      },
     },
   ];
 }

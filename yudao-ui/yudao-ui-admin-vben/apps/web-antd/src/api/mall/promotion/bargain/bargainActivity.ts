@@ -1,7 +1,5 @@
 import type { PageParam, PageResult } from '@vben/request';
 
-import type { MallSpuApi } from '#/api/mall/product/spu';
-
 import { requestClient } from '#/api/request';
 
 export namespace MallBargainActivityApi {
@@ -31,16 +29,6 @@ export namespace MallBargainActivityApi {
     bargainFirstPrice: number; // 砍价起始价格，单位分
     bargainMinPrice: number; // 砍价底价
     stock: number; // 活动库存
-  }
-
-  /** 扩展 SKU 配置 */
-  export type SkuExtension = {
-    productConfig: BargainProduct; // 砍价活动配置
-  } & MallSpuApi.Sku;
-
-  /** 扩展 SPU 配置 */
-  export interface SpuExtension extends MallSpuApi.Spu {
-    skus: SkuExtension[]; // SKU 列表
   }
 }
 

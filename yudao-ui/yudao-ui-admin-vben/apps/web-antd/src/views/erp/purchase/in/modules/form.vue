@@ -49,14 +49,15 @@ const formData = ref<
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof ItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['采购入库'])
-    : formType.value === 'edit'
-      ? $t('ui.actionTitle.edit', ['采购入库'])
-      : '采购入库详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['采购入库']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['采购入库']);
+  } else {
+    return '采购入库详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -170,7 +171,7 @@ const [Modal, modalApi] = useVbenModal({
   },
   async onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      formData.value = undefined;
+      formData.value = {} as ErpPurchaseInApi.PurchaseIn;
       return;
     }
     // 加载数据

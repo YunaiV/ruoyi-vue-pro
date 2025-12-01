@@ -3,7 +3,7 @@ import type { AvatarVariants } from './avatar';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { AvatarRoot } from 'radix-vue';
+import { AvatarRoot } from 'reka-ui';
 
 import { avatarVariant } from './avatar';
 

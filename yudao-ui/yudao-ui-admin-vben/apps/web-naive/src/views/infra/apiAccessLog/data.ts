@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { InfraApiAccessLogApi } from '#/api/infra/api-access-log';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -181,10 +180,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'userType',
       label: '用户类型',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.USER_TYPE,
-          value: data.userType,
+          value: val,
         });
       },
     },
@@ -197,10 +196,11 @@ export function useDetailSchema(): DescriptionItemSchema[] {
       label: '用户 UA',
     },
     {
+      field: 'requestMethod',
       label: '请求信息',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
-        if (data?.requestMethod && data?.requestUrl) {
-          return `${data.requestMethod} ${data.requestUrl}`;
+      render: (val, data) => {
+        if (val && data?.requestUrl) {
+          return `${val} ${data.requestUrl}`;
         }
         return '';
       },
@@ -208,10 +208,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'requestParams',
       label: '请求参数',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
-        if (data.requestParams) {
+      render: (val) => {
+        if (val) {
           return h(JsonViewer, {
-            value: JSON.parse(data.requestParams),
+            value: JSON.parse(val),
             previewMode: true,
           });
         }
@@ -224,26 +224,29 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     },
     {
       label: '请求时间',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
-        if (data?.beginTime && data?.endTime) {
-          return `${formatDateTime(data.beginTime)} ~ ${formatDateTime(data.endTime)}`;
+      field: 'beginTime',
+      render: (val, data) => {
+        if (val && data?.endTime) {
+          return `${formatDateTime(val)} ~ ${formatDateTime(data.endTime)}`;
         }
         return '';
       },
     },
     {
       label: '请求耗时',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
-        return data?.duration ? `${data.duration} ms` : '';
+      field: 'duration',
+      render: (val) => {
+        return val ? `${val} ms` : '';
       },
     },
     {
       label: '操作结果',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
-        if (data?.resultCode === 0) {
+      field: 'resultCode',
+      render: (val, data) => {
+        if (val === 0) {
           return '正常';
-        } else if (data && data.resultCode > 0) {
-          return `失败 | ${data.resultCode} | ${data.resultMsg}`;
+        } else if (val > 0 && data?.resultMsg) {
+          return `失败 | ${val} | ${data.resultMsg}`;
         }
         return '';
       },
@@ -259,10 +262,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'operateType',
       label: '操作类型',
-      content: (data: InfraApiAccessLogApi.ApiAccessLog) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.INFRA_OPERATE_TYPE,
-          value: data?.operateType,
+          value: val,
         });
       },
     },

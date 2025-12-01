@@ -3,14 +3,6 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace CrmReceivableApi {
-  /** 合同信息 */
-  export interface Contract {
-    id?: number;
-    name?: string;
-    no: string;
-    totalPrice: number;
-  }
-
   /** 回款信息 */
   export interface Receivable {
     id: number;
@@ -35,20 +27,17 @@ export namespace CrmReceivableApi {
     updateTime: Date; // 更新时间
   }
 
-  export interface ReceivablePageParam extends PageParam {
-    no?: string;
-    planId?: number;
-    customerId?: number;
-    contractId?: number;
-    sceneType?: number;
-    auditStatus?: number;
+  /** 合同信息 */
+  export interface Contract {
+    id?: number;
+    name?: string;
+    no: string;
+    totalPrice: number;
   }
 }
 
 /** 查询回款列表 */
-export function getReceivablePage(
-  params: CrmReceivableApi.ReceivablePageParam,
-) {
+export function getReceivablePage(params: PageParam) {
   return requestClient.get<PageResult<CrmReceivableApi.Receivable>>(
     '/crm/receivable/page',
     { params },
@@ -56,9 +45,7 @@ export function getReceivablePage(
 }
 
 /** 查询回款列表，基于指定客户 */
-export function getReceivablePageByCustomer(
-  params: CrmReceivableApi.ReceivablePageParam,
-) {
+export function getReceivablePageByCustomer(params: PageParam) {
   return requestClient.get<PageResult<CrmReceivableApi.Receivable>>(
     '/crm/receivable/page-by-customer',
     { params },

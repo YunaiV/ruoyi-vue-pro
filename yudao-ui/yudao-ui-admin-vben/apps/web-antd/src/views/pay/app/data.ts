@@ -258,9 +258,7 @@ export function useAppFormSchema(): VbenFormSchema[] {
 
 /** 渠道新增/修改的表单 */
 export function useChannelFormSchema(formType: string = ''): VbenFormSchema[] {
-  const schema: VbenFormSchema[] = [];
-  // 添加通用字段
-  schema.push(
+  const schema: VbenFormSchema[] = [
     {
       component: 'Input',
       fieldName: 'id',
@@ -309,7 +307,8 @@ export function useChannelFormSchema(formType: string = ''): VbenFormSchema[] {
         optionType: 'button',
       },
     },
-  );
+  ];
+  // 添加通用字段
   // 根据类型添加特定字段
   if (formType.includes('alipay_')) {
     schema.push(

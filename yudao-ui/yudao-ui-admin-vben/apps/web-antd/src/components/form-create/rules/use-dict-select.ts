@@ -1,29 +1,29 @@
+import type { SystemDictTypeApi } from '#/api/system/dict/type';
+
 import { onMounted, ref } from 'vue';
 
 import { buildUUID, cloneDeep } from '@vben/utils';
 
-import * as DictDataApi from '#/api/system/dict/type';
+import { getSimpleDictTypeList } from '#/api/system/dict/type';
 import {
   localeProps,
   makeRequiredRule,
 } from '#/components/form-create/helpers';
 import { selectRule } from '#/components/form-create/rules/data';
 
-/**
- * 字典选择器规则，如果规则使用到动态数据则需要单独配置不能使用 useSelectRule
- */
+/** 字典选择器规则，如果规则使用到动态数据则需要单独配置不能使用 useSelectRule */
 export function useDictSelectRule() {
   const label = '字典选择器';
   const name = 'DictSelect';
   const rules = cloneDeep(selectRule);
   const dictOptions = ref<{ label: string; value: string }[]>([]); // 字典类型下拉数据
   onMounted(async () => {
-    const data = await DictDataApi.getSimpleDictTypeList();
+    const data = await getSimpleDictTypeList();
     if (!data || data.length === 0) {
       return;
     }
     dictOptions.value =
-      data?.map((item: DictDataApi.SystemDictTypeApi.DictType) => ({
+      data?.map((item: SystemDictTypeApi.DictType) => ({
         label: item.name,
         value: item.type,
       })) ?? [];

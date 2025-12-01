@@ -1,35 +1,41 @@
 import type { PageParam, PageResult } from '@vben/request';
 
-import { requestClient } from '#/api/request';
+import { MessageType } from '@vben/constants';
 
-/** 消息类型枚举 */
-export enum MessageType {
-  IMAGE = 'image', // 图片消息
-  MPNEWS = 'mpnews', // 公众号图文消息
-  MUSIC = 'music', // 音乐消息
-  NEWS = 'news', // 图文消息
-  TEXT = 'text', // 文本消息
-  VIDEO = 'video', // 视频消息
-  VOICE = 'voice', // 语音消息
-  WXCARD = 'wxcard', // 卡券消息
-}
+import { requestClient } from '#/api/request';
 
 export namespace MpMessageApi {
   /** 消息信息 */
   export interface Message {
     id?: number;
     accountId: number;
-    type: MessageType;
+    type: MessageType | string;
     openid: string;
     content: string;
     mediaId?: string;
     status: number;
     remark?: string;
     createTime?: Date;
+    sendFrom?: number;
+    userId?: number;
+    event?: string;
+    eventKey?: string;
+    mediaUrl?: string;
+    recognition?: string;
+    url?: string;
+    title?: string;
+    label?: string;
+    locationX?: number;
+    locationY?: number;
+    thumbMediaUrl?: string;
+    musicUrl?: string;
+    hqMusicUrl?: string;
+    description?: string;
+    articles?: any[];
   }
 
   /** 发送消息请求 */
-  export interface SendMessageRequest {
+  export interface MessageSendRequestVO {
     accountId: number;
     openid: string;
     type: MessageType;
@@ -49,6 +55,6 @@ export function getMessagePage(params: PageParam) {
 }
 
 /** 发送消息 */
-export function sendMessage(data: MpMessageApi.SendMessageRequest) {
+export function sendMessage(data: MpMessageApi.MessageSendRequestVO) {
   return requestClient.post('/mp/message/send', data);
 }

@@ -16,14 +16,13 @@ import { Card } from 'ant-design-vue';
 
 import { getKnowledgeDocument } from '#/api/ai/knowledge/document';
 
-import ProcessStep from './ProcessStep.vue';
-import SplitStep from './SplitStep.vue';
-import UploadStep from './UploadStep.vue';
+import ProcessStep from './modules/process-step.vue';
+import SplitStep from './modules/split-step.vue';
+import UploadStep from './modules/upload-step.vue';
 
-const route = useRoute(); // 路由
-const router = useRouter(); // 路由
+const route = useRoute();
+const router = useRouter();
 
-// 组件引用
 const uploadDocumentRef = ref();
 const documentSegmentRef = ref();
 const processCompleteRef = ref();
@@ -59,9 +58,9 @@ const tabs = useTabs();
 function handleBack() {
   // 关闭当前页签
   tabs.closeCurrentTab();
-  // 跳转到列表页，使用路径， 目前后端的路由 name： 'name'+ menuId
+  // 跳转到列表页
   router.push({
-    path: `/ai/knowledge/document`,
+    name: 'AiKnowledgeDocument',
     query: {
       knowledgeId: route.query.knowledgeId,
     },
@@ -92,6 +91,7 @@ async function initData() {
     goToNextStep();
   }
 }
+
 /** 切换到下一步 */
 function goToNextStep() {
   if (currentStep.value < steps.length - 1) {
@@ -106,11 +106,6 @@ function goToPrevStep() {
   }
 }
 
-/** 初始化 */
-onMounted(async () => {
-  await initData();
-});
-
 /** 添加组件卸载前的清理代码 */
 onBeforeUnmount(() => {
   // 清理所有的引用
@@ -118,11 +113,17 @@ onBeforeUnmount(() => {
   documentSegmentRef.value = null;
   processCompleteRef.value = null;
 });
+
 /** 暴露方法给子组件使用 */
 defineExpose({
   goToNextStep,
   goToPrevStep,
   handleBack,
+});
+
+/** 初始化 */
+onMounted(async () => {
+  await initData();
 });
 </script>
 
@@ -131,7 +132,7 @@ defineExpose({
     <div class="mx-auto">
       <!-- 头部导航栏 -->
       <div
-        class="bg-card absolute left-0 right-0 top-0 z-10 flex h-12 items-center border-b px-4"
+        class="absolute left-0 right-0 top-0 z-10 flex h-12 items-center border-b bg-card px-4"
       >
         <!-- 左侧标题 -->
         <div class="flex w-48 items-center overflow-hidden">
@@ -168,13 +169,14 @@ defineExpose({
               >
                 {{ index + 1 }}
               </div>
-              <span class="whitespace-nowrap text-base font-bold">{{
-                step.title
-              }}</span>
+              <span class="whitespace-nowrap text-base font-bold">
+                {{ step.title }}
+              </span>
             </div>
           </div>
         </div>
       </div>
+
       <!-- 主体内容 -->
       <Card :body-style="{ padding: '10px' }" class="mb-4">
         <div class="mt-12">

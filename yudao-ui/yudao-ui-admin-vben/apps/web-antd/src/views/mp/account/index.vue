@@ -45,10 +45,8 @@ async function handleDelete(row: MpAccountApi.Account) {
     duration: 0,
   });
   try {
-    await deleteAccount(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteAccount(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
@@ -58,14 +56,12 @@ async function handleDelete(row: MpAccountApi.Account) {
 /** 生成二维码 */
 async function handleGenerateQrCode(row: MpAccountApi.Account) {
   const hideLoading = message.loading({
-    content: '生成二维码',
+    content: '正在生成二维码中...',
     duration: 0,
   });
   try {
-    await generateAccountQrCode(row.id as number);
-    message.success({
-      content: '生成二维码成功',
-    });
+    await generateAccountQrCode(row.id!);
+    message.success($t('ui.actionMessage.operationSuccess'));
     handleRefresh();
   } finally {
     hideLoading();
@@ -79,10 +75,8 @@ async function handleCleanQuota(row: MpAccountApi.Account) {
     duration: 0,
   });
   try {
-    await clearAccountQuota(row.id as number);
-    message.success({
-      content: '清空 API 配额成功',
-    });
+    await clearAccountQuota(row.id!);
+    message.success($t('ui.actionMessage.operationSuccess'));
   } finally {
     hideLoading();
   }
@@ -109,6 +103,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
@@ -135,22 +130,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
           ]"
         />
       </template>
-      <template #qrCodeUrl="{ row }">
-        <a v-if="row.qrCodeUrl" :href="row.qrCodeUrl" target="_blank">
-          <img :src="row.qrCodeUrl" alt="二维码" />
-        </a>
-        <TableAction
-          :actions="[
-            {
-              label: '生成二维码',
-              type: 'link',
-              icon: 'qrcode',
-              auth: ['mp:account:qr-code'],
-              onClick: handleGenerateQrCode.bind(null, row),
-            },
-          ]"
-        />
-      </template>
       <template #actions="{ row }">
         <TableAction
           :actions="[
@@ -172,14 +151,23 @@ const [Grid, gridApi] = useVbenVxeGrid({
                 confirm: handleDelete.bind(null, row),
               },
             },
+          ]"
+          :drop-down-actions="[
+            {
+              label: '生成二维码',
+              type: 'link',
+              icon: 'qrcode',
+              auth: ['mp:account:qr-code'],
+              onClick: handleGenerateQrCode.bind(null, row),
+            },
             {
               label: '清空 API 配额',
               type: 'link',
               danger: true,
-              icon: ACTION_ICON.DELETE,
+              icon: 'clear',
               auth: ['mp:account:clear-quota'],
               popConfirm: {
-                title: '清空 API 配额',
+                title: '你确认要清空 API 配额？',
                 confirm: handleCleanQuota.bind(null, row),
               },
             },

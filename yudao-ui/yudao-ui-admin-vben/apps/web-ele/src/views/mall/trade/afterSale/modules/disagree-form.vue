@@ -9,7 +9,7 @@ import { $t } from '@vben/locales';
 import { ElMessage } from 'element-plus';
 
 import { useVbenForm } from '#/adapter/form';
-import * as AfterSaleApi from '#/api/mall/trade/afterSale/index';
+import { disagreeAfterSale } from '#/api/mall/trade/afterSale';
 
 import { useDisagreeFormSchema } from '../data';
 
@@ -39,8 +39,8 @@ const [Modal, modalApi] = useVbenModal({
     // 提交表单
     try {
       const data =
-        (await formApi.getValues()) as MallAfterSaleApi.DisagreeRequest;
-      await AfterSaleApi.disagreeAfterSale(data);
+        (await formApi.getValues()) as MallAfterSaleApi.AfterSaleDisagreeReqVO;
+      await disagreeAfterSale(data);
       // 关闭并提示
       await modalApi.close();
       emit('success');

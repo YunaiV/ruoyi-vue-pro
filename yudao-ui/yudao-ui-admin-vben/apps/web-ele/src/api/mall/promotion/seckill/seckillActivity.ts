@@ -7,68 +7,43 @@ import { requestClient } from '#/api/request';
 export namespace MallSeckillActivityApi {
   /** 秒杀商品 */
   export interface SeckillProduct {
-    /** 商品 SKU 编号 */
-    skuId: number;
-    /** 商品 SPU 编号 */
-    spuId: number;
-    /** 秒杀价格 */
-    seckillPrice: number;
-    /** 秒杀库存 */
-    stock: number;
+    skuId: number; // 商品 SKU 编号
+    spuId: number; // 商品 SPU 编号
+    seckillPrice: number; // 秒杀价格
+    stock: number; // 秒杀库存
   }
 
   /** 秒杀活动 */
   export interface SeckillActivity {
-    /** 活动编号 */
-    id?: number;
-    /** 商品 SPU 编号 */
-    spuId?: number;
-    /** 活动名称 */
-    name?: string;
-    /** 活动状态 */
-    status?: number;
-    /** 备注 */
-    remark?: string;
-    /** 开始时间 */
-    startTime: Date;
-    /** 结束时间 */
-    endTime: Date;
-    /** 排序 */
-    sort?: number;
-    /** 配置编号 */
-    configIds?: number[];
-    /** 订单数量 */
-    orderCount?: number;
-    /** 用户数量 */
-    userCount?: number;
-    /** 总金额 */
-    totalPrice?: number;
-    /** 总限购数量 */
-    totalLimitCount?: number;
-    /** 单次限购数量 */
-    singleLimitCount?: number;
-    /** 秒杀库存 */
-    stock?: number;
-    /** 秒杀总库存 */
-    totalStock?: number;
-    /** 秒杀价格 */
-    seckillPrice?: number;
-    /** 秒杀商品列表 */
-    products?: SeckillProduct[];
-    /** 图片 */
-    picUrl?: string;
+    id?: number; // 活动编号
+    spuId?: number; // 商品 SPU 编号
+    name?: string; // 活动名称
+    status?: number; // 活动状态
+    remark?: string; // 备注
+    startTime?: Date; // 开始时间
+    endTime?: Date; // 结束时间
+    sort?: number; // 排序
+    configIds?: string; // 配置编号
+    orderCount?: number; // 订单数量
+    userCount?: number; // 用户数量
+    totalPrice?: number; // 总金额
+    totalLimitCount?: number; // 总限购数量
+    singleLimitCount?: number; // 单次限购数量
+    stock?: number; // 秒杀库存
+    totalStock?: number; // 秒杀总库存
+    seckillPrice?: number; // 秒杀价格
+    products?: SeckillProduct[]; // 秒杀商品列表
   }
 
+  // TODO @puhui999：这些还需要么？
   /** 扩展 SKU 配置 */
   export type SkuExtension = {
-    /** 秒杀商品配置 */
-    productConfig: SeckillProduct;
+    productConfig: SeckillProduct; // 秒杀商品配置
   } & MallSpuApi.Sku;
 
   /** 扩展 SPU 配置 */
   export interface SpuExtension extends MallSpuApi.Spu {
-    /** SKU 列表 */
-    skus: SkuExtension[];
+    skus: SkuExtension[]; // SKU 列表
   }
 }
 

@@ -6,7 +6,7 @@ import { h } from 'vue';
 
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
-import { formatDateTime } from '@vben/utils';
+import { formatDate } from '@vben/utils';
 
 import { DictTag } from '#/components/dict-tag';
 import { getRangePickerDefaultProps } from '#/utils';
@@ -71,7 +71,7 @@ export function useFormSchema(): VbenFormSchema[] {
 }
 
 /** 列表的搜索表单 */
-export function GridFormSchema(): VbenFormSchema[] {
+export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
       fieldName: 'type',
@@ -84,16 +84,25 @@ export function GridFormSchema(): VbenFormSchema[] {
       },
     },
     {
+      fieldName: 'createTime',
+      label: '创建时间',
+      component: 'RangePicker',
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        allowClear: true,
+      },
+    },
+    {
       fieldName: 'status',
       label: '审批结果',
       component: 'Select',
       componentProps: {
         placeholder: '请选择审批结果',
+        allowClear: true,
         options: getDictOptions(
           DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS,
           'number',
         ),
-        allowClear: true,
       },
     },
     {
@@ -102,14 +111,7 @@ export function GridFormSchema(): VbenFormSchema[] {
       component: 'Input',
       componentProps: {
         placeholder: '请输入原因',
-      },
-    },
-    {
-      fieldName: 'createTime',
-      label: '创建时间',
-      component: 'RangePicker',
-      componentProps: {
-        ...getRangePickerDefaultProps(),
+        allowClear: true,
       },
     },
   ];
@@ -136,13 +138,13 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'startTime',
       title: '开始时间',
       minWidth: 180,
-      formatter: 'formatDateTime',
+      formatter: 'formatDate',
     },
     {
       field: 'endTime',
       title: '结束时间',
       minWidth: 180,
-      formatter: 'formatDateTime',
+      formatter: 'formatDate',
     },
     {
       field: 'type',
@@ -179,21 +181,21 @@ export function useDetailFormSchema(): DescriptionItemSchema[] {
     {
       label: '请假类型',
       field: 'type',
-      content: (data) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.BPM_OA_LEAVE_TYPE,
-          value: data?.type,
+          value: val,
         }),
     },
     {
       label: '开始时间',
       field: 'startTime',
-      content: (data) => formatDateTime(data?.startTime) as string,
+      render: (val) => formatDate(val) as string,
     },
     {
       label: '结束时间',
       field: 'endTime',
-      content: (data) => formatDateTime(data?.endTime) as string,
+      render: (val) => formatDate(val) as string,
     },
     {
       label: '原因',

@@ -37,7 +37,7 @@ const style = computed((): CSSProperties => {
 <template>
   <footer
     :style="style"
-    class="bg-background-deep bottom-0 w-full transition-all duration-200"
+    class="bottom-0 w-full bg-background-deep transition-all duration-200"
   >
     <slot></slot>
   </footer>

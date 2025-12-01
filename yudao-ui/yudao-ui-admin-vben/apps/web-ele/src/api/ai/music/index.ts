@@ -26,19 +26,19 @@ export namespace AiMusicApi {
   }
 }
 
-// 查询音乐分页
+/** 查询音乐分页 */
 export function getMusicPage(params: PageParam) {
   return requestClient.get<PageResult<AiMusicApi.Music>>(`/ai/music/page`, {
     params,
   });
 }
 
-// 更新音乐
+/** 更新音乐 */
 export function updateMusic(data: any) {
   return requestClient.put('/ai/music/update', data);
 }
 
-// 删除音乐
+/** 删除音乐 */
 export function deleteMusic(id: number) {
   return requestClient.delete(`/ai/music/delete?id=${id}`);
 }

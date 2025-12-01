@@ -2,48 +2,8 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
 import { DICT_TYPE } from '@vben/constants';
-
-/** 表单配置 */
-export function useFormSchema(): VbenFormSchema[] {
-  return [
-    {
-      fieldName: 'id',
-      component: 'Input',
-      dependencies: {
-        triggerFields: [''],
-        show: () => false,
-      },
-    },
-    {
-      fieldName: 'spuId',
-      label: '积分商城活动商品',
-      component: 'Input',
-      componentProps: {
-        placeholder: '请选择商品',
-      },
-      rules: 'required',
-    },
-    {
-      fieldName: 'sort',
-      label: '排序',
-      component: 'InputNumber',
-      componentProps: {
-        placeholder: '请输入排序',
-        min: 0,
-      },
-      rules: 'required',
-    },
-    {
-      fieldName: 'remark',
-      label: '备注',
-      component: 'Textarea',
-      componentProps: {
-        placeholder: '请输入备注',
-        rows: 4,
-      },
-    },
-  ];
-}
+import { getDictOptions } from '@vben/hooks';
+import { fenToYuan } from '@vben/utils';
 
 /** 列表的搜索表单 */
 export function useGridFormSchema(): VbenFormSchema[] {
@@ -53,15 +13,15 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '活动状态',
       component: 'Select',
       componentProps: {
+        options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
         placeholder: '请选择活动状态',
         allowClear: true,
-        dictType: DICT_TYPE.COMMON_STATUS,
       },
     },
   ];
 }
 
-/** 列表的字段 */
+/** 列表的表格列 */
 export function useGridColumns(): VxeTableGridOptions['columns'] {
   return [
     {
@@ -75,6 +35,9 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       minWidth: 80,
       cellRender: {
         name: 'CellImage',
+        props: {
+          height: 40,
+        },
       },
     },
     {
@@ -86,18 +49,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'marketPrice',
       title: '原价',
       minWidth: 100,
-      formatter: 'formatAmount2',
-    },
-    {
-      field: 'point',
-      title: '兑换积分',
-      minWidth: 100,
-    },
-    {
-      field: 'price',
-      title: '兑换金额',
-      minWidth: 100,
-      formatter: 'formatAmount2',
+      formatter: ({ row }) => `￥${fenToYuan(row.marketPrice)}`,
     },
     {
       field: 'status',
@@ -122,7 +74,9 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'redeemedQuantity',
       title: '已兑换数量',
       minWidth: 100,
-      slots: { default: 'redeemedQuantity' },
+      formatter: ({ row }) => {
+        return (row.totalStock || 0) - (row.stock || 0);
+      },
     },
     {
       field: 'createTime',
@@ -135,6 +89,52 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       width: 150,
       fixed: 'right',
       slots: { default: 'actions' },
+    },
+  ];
+}
+
+/** 新增/修改的表单 */
+export function useFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      fieldName: 'id',
+      dependencies: {
+        triggerFields: [''],
+        show: () => false,
+      },
+    },
+    {
+      fieldName: 'sort',
+      label: '排序',
+      component: 'InputNumber',
+      componentProps: {
+        min: 0,
+        placeholder: '请输入排序',
+        class: '!w-full',
+      },
+      defaultValue: 0,
+      rules: 'required',
+    },
+    {
+      fieldName: 'remark',
+      label: '备注',
+      component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入备注',
+        rows: 4,
+      },
+      formItemClass: 'col-span-2',
+    },
+    {
+      fieldName: 'spuId',
+      label: '活动商品',
+      component: 'Input',
+      rules: 'required',
+      formItemClass: 'col-span-2',
+      renderComponentContent: () => ({
+        default: () => null,
+      }),
     },
   ];
 }

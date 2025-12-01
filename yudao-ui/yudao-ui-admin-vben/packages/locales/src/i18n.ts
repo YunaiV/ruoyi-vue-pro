@@ -108,7 +108,7 @@ async function setupI18n(app: App, options: LocaleSetupOptions = {}) {
 
   // 在控制台打印警告
   i18n.global.setMissingHandler((locale, key) => {
-    if (options.missingWarn && key.includes('.')) {
+    if (options.missingWarn && key !== 'OAuth 2.0' && key.includes('.')) {
       console.warn(
         `[intlify] Not found '${key}' key in '${locale}' locale messages.`,
       );

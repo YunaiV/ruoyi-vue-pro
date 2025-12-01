@@ -26,30 +26,32 @@ const formData = ref<
   }
 >({
   id: undefined,
-  no: undefined,
+  no: '',
   supplierId: undefined,
   accountId: undefined,
   financeUserId: undefined,
   paymentTime: undefined,
-  remark: undefined,
+  remark: '',
   fileUrl: undefined,
   totalPrice: 0,
   discountPrice: 0,
   paymentPrice: 0,
   items: [],
+  status: 0,
 });
 
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof ItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['付款单'])
-    : formType.value === 'edit'
-      ? $t('ui.actionTitle.edit', ['付款单'])
-      : '付款单详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['付款单']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['付款单']);
+  } else {
+    return '付款单详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -81,30 +83,28 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新付款项 */
-const handleUpdateItems = (
-  items: ErpFinancePaymentApi.FinancePaymentItem[],
-) => {
+function handleUpdateItems(items: ErpFinancePaymentApi.FinancePaymentItem[]) {
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 更新总金额 */
-const handleUpdateTotalPrice = (totalPrice: number) => {
+function handleUpdateTotalPrice(totalPrice: number) {
   formData.value.totalPrice = totalPrice;
   formApi.setValues({
     totalPrice: formData.value.totalPrice,
   });
-};
+}
 
 /** 更新付款金额 */
-const handleUpdatePaymentPrice = (paymentPrice: number) => {
+function handleUpdatePaymentPrice(paymentPrice: number) {
   formData.value.paymentPrice = paymentPrice;
   formApi.setValues({
     paymentPrice: formData.value.paymentPrice,
   });
-};
+}
 
 /** 创建或更新付款单 */
 const [Modal, modalApi] = useVbenModal({
@@ -141,7 +141,7 @@ const [Modal, modalApi] = useVbenModal({
   },
   async onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      formData.value = undefined;
+      formData.value = {} as ErpFinancePaymentApi.FinancePayment;
       return;
     }
     // 加载数据
@@ -187,6 +187,7 @@ const [Modal, modalApi] = useVbenModal({
           @update:items="handleUpdateItems"
           @update:total-price="handleUpdateTotalPrice"
           @update:payment-price="handleUpdatePaymentPrice"
+          class="w-full"
         />
       </template>
     </Form>

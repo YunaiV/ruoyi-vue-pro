@@ -65,7 +65,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 });
 
 /** 打开弹窗 */
-const openModal = (id: number) => {
+function openModal(id: number) {
   // 重置数据
   customerId.value = id;
   open.value = true;
@@ -74,17 +74,17 @@ const openModal = (id: number) => {
   gridApi.formApi?.resetForm();
   gridApi.formApi?.setValues({ customerId: id });
   gridApi.query();
-};
+}
 
 /** 确认选择销售出库单 */
-const handleOk = () => {
+function handleOk() {
   if (selectedRows.value.length === 0) {
     message.warning('请选择要添加的销售出库单');
     return;
   }
   emit('success', selectedRows.value);
   open.value = false;
-};
+}
 
 defineExpose({ open: openModal });
 </script>

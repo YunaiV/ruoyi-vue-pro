@@ -85,7 +85,7 @@ export function useGridColumns(): VxeTableGridOptions<CrmProductCategoryApi.Prod
     {
       field: 'actions',
       title: '操作',
-      width: 200,
+      width: 250,
       fixed: 'right',
       slots: {
         default: 'actions',

@@ -20,21 +20,14 @@ export namespace PayAppApi {
   }
 
   /** 更新状态请求 */
-  export interface UpdateStatusReq {
+  export interface AppUpdateStatusReqVO {
     id: number;
     status: number;
-  }
-
-  export interface AppPageReqVO extends PageParam {
-    name?: string;
-    appKey?: string;
-    status?: number;
-    createTime?: Date[];
   }
 }
 
 /** 查询支付应用列表 */
-export function getAppPage(params: PayAppApi.AppPageReqVO) {
+export function getAppPage(params: PageParam) {
   return requestClient.get<PageResult<PayAppApi.App>>('/pay/app/page', {
     params,
   });
@@ -56,7 +49,7 @@ export function updateApp(data: PayAppApi.App) {
 }
 
 /** 修改支付应用状态 */
-export function updateAppStatus(data: PayAppApi.UpdateStatusReq) {
+export function updateAppStatus(data: PayAppApi.AppUpdateStatusReqVO) {
   return requestClient.put('/pay/app/update-status', data);
 }
 

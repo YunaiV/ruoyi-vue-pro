@@ -5,7 +5,7 @@ import {
   makeRequiredRule,
 } from '#/components/form-create/helpers';
 
-export const useEditorRule = () => {
+export function useEditorRule() {
   const label = '富文本';
   const name = 'Tinymce';
   return {
@@ -33,4 +33,4 @@ export const useEditorRule = () => {
       ]);
     },
   };
-};
+}

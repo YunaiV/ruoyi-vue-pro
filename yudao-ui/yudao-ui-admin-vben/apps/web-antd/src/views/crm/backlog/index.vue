@@ -5,11 +5,18 @@ import { Page } from '@vben/common-ui';
 
 import { Badge, Card, List } from 'ant-design-vue';
 
-import * as ClueApi from '#/api/crm/clue';
-import * as ContractApi from '#/api/crm/contract';
-import * as CustomerApi from '#/api/crm/customer';
-import * as ReceivableApi from '#/api/crm/receivable';
-import * as ReceivablePlanApi from '#/api/crm/receivable/plan';
+import { getFollowClueCount } from '#/api/crm/clue';
+import {
+  getAuditContractCount,
+  getRemindContractCount,
+} from '#/api/crm/contract';
+import {
+  getFollowCustomerCount,
+  getPutPoolRemindCustomerCount,
+  getTodayContactCustomerCount,
+} from '#/api/crm/customer';
+import { getAuditReceivableCount } from '#/api/crm/receivable';
+import { getReceivablePlanRemindCount } from '#/api/crm/receivable/plan';
 
 import { useLeftSides } from './data';
 import ClueFollowList from './modules/clue-follow-list.vue';
@@ -64,17 +71,14 @@ function sideClick(item: { menu: string }) {
 
 /** 获取数量 */
 async function getCount() {
-  customerTodayContactCount.value =
-    await CustomerApi.getTodayContactCustomerCount();
-  customerPutPoolRemindCount.value =
-    await CustomerApi.getPutPoolRemindCustomerCount();
-  customerFollowCount.value = await CustomerApi.getFollowCustomerCount();
-  clueFollowCount.value = await ClueApi.getFollowClueCount();
-  contractAuditCount.value = await ContractApi.getAuditContractCount();
-  contractRemindCount.value = await ContractApi.getRemindContractCount();
-  receivableAuditCount.value = await ReceivableApi.getAuditReceivableCount();
-  receivablePlanRemindCount.value =
-    await ReceivablePlanApi.getReceivablePlanRemindCount();
+  customerTodayContactCount.value = await getTodayContactCustomerCount();
+  customerPutPoolRemindCount.value = await getPutPoolRemindCustomerCount();
+  customerFollowCount.value = await getFollowCustomerCount();
+  clueFollowCount.value = await getFollowClueCount();
+  contractAuditCount.value = await getAuditContractCount();
+  contractRemindCount.value = await getRemindContractCount();
+  receivableAuditCount.value = await getAuditReceivableCount();
+  receivablePlanRemindCount.value = await getReceivablePlanRemindCount();
 }
 
 /** 激活时 */

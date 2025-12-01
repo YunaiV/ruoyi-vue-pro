@@ -5,10 +5,10 @@ import { DocAlert, Page } from '@vben/common-ui';
 
 import { Col, Row, Spin } from 'ant-design-vue';
 
-import SummaryCard from './modules/SummaryCard.vue';
-import TimeSummaryChart from './modules/TimeSummaryChart.vue';
+import SummaryCard from './modules/summary-card.vue';
+import TimeSummaryChart from './modules/time-summary-chart.vue';
 
-/** ERP首页 */
+/** ERP 首页 */
 defineOptions({ name: 'ErpHome' });
 
 const loading = ref(false); // 加载中

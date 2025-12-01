@@ -31,12 +31,14 @@ async function getList() {
     loading.value = false;
   }
 }
+
 const debounceGetList = useDebounceFn(getList, 80);
+
 /** 搜索按钮操作 */
-const handleQuery = () => {
+function handleQuery() {
   queryParams.pageNo = 1;
   getList();
-};
+}
 
 /** 初始化 */
 onMounted(async () => {
@@ -54,12 +56,12 @@ onMounted(async () => {
         @keyup.enter="handleQuery"
       />
       <div
-        class="bg-card grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2.5 shadow-sm"
+        class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2.5 bg-card shadow-sm"
       >
         <div
           v-for="item in list"
           :key="item.id"
-          class="bg-card relative cursor-pointer overflow-hidden transition-transform duration-300 hover:scale-105"
+          class="relative cursor-pointer overflow-hidden bg-card transition-transform duration-300 hover:scale-105"
         >
           <Image
             :src="item.picUrl"

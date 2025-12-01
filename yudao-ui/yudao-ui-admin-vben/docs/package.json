@@ -22,7 +22,7 @@
     "ant-design-vue": "catalog:",
     "lucide-vue-next": "catalog:",
     "medium-zoom": "catalog:",
-    "radix-vue": "catalog:",
+    "reka-ui": "catalog:",
     "vitepress-plugin-group-icons": "catalog:"
   },
   "devDependencies": {

@@ -61,7 +61,7 @@ const summaries = computed(() => {
 /** 表格配置 */
 const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions: {
-    columns: useFormItemColumns(),
+    columns: useFormItemColumns(props.disabled),
     data: tableData.value,
     minHeight: 250,
     autoResize: true,
@@ -142,6 +142,7 @@ function handleAdd() {
 
 /** 处理删除 */
 function handleDelete(row: ErpPurchaseOrderApi.PurchaseOrderItem) {
+  // TODO 芋艿
   const index = tableData.value.findIndex((item) => item.seq === row.seq);
   if (index !== -1) {
     tableData.value.splice(index, 1);
@@ -179,14 +180,14 @@ function handleRowChange(row: any) {
 }
 
 /** 初始化行数据 */
-const initRow = (row: ErpPurchaseOrderApi.PurchaseOrderItem): void => {
+function initRow(row: ErpPurchaseOrderApi.PurchaseOrderItem) {
   if (row.productPrice && row.count) {
     row.totalProductPrice = erpPriceMultiply(row.productPrice, row.count) ?? 0;
     row.taxPrice =
       erpPriceMultiply(row.totalProductPrice, (row.taxPercent || 0) / 100) ?? 0;
     row.totalPrice = row.totalProductPrice + row.taxPrice;
   }
-};
+}
 
 /** 表单校验 */
 function validate() {
@@ -270,7 +271,6 @@ onMounted(async () => {
     </template>
     <template #actions="{ row }">
       <TableAction
-        v-if="!disabled"
         :actions="[
           {
             label: '删除',
@@ -286,9 +286,9 @@ onMounted(async () => {
     </template>
 
     <template #bottom>
-      <div class="border-border bg-muted mt-2 rounded border p-2">
-        <div class="text-muted-foreground flex justify-between text-sm">
-          <span class="text-foreground font-medium">合计：</span>
+      <div class="mt-2 rounded border border-border bg-muted p-2">
+        <div class="flex justify-between text-sm text-muted-foreground">
+          <span class="font-medium text-foreground">合计：</span>
           <div class="flex space-x-4">
             <span>数量：{{ erpCountInputFormatter(summaries.count) }}</span>
             <span>

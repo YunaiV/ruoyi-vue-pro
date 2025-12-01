@@ -7,6 +7,7 @@ import type {
 } from 'echarts/charts';
 import type {
   DatasetComponentOption,
+  DataZoomComponentOption,
   GeoComponentOption,
   GridComponentOption,
   // 组件类型的定义后缀都为 ComponentOption
@@ -18,6 +19,7 @@ import type { ComposeOption } from 'echarts/core';
 
 import {
   BarChart,
+  FunnelChart,
   GaugeChart,
   LineChart,
   MapChart,
@@ -27,6 +29,9 @@ import {
 import {
   // 数据集组件
   DatasetComponent,
+  DataZoomComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
   GeoComponent,
   GridComponent,
   LegendComponent,
@@ -45,6 +50,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 export type ECOption = ComposeOption<
   | BarSeriesOption
   | DatasetComponentOption
+  | DataZoomComponentOption
   | GaugeSeriesOption
   | GeoComponentOption
   | GridComponentOption
@@ -63,9 +69,13 @@ echarts.use([
   TooltipComponent,
   GridComponent,
   DatasetComponent,
+  DataZoomComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
   TransformComponent,
   BarChart,
   LineChart,
+  FunnelChart,
   GaugeChart,
   LabelLayout,
   UniversalTransition,

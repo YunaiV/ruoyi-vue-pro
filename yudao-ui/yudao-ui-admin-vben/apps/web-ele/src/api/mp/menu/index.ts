@@ -1,19 +1,6 @@
-import { requestClient } from '#/api/request';
+import { MenuType } from '@vben/constants';
 
-/** 菜单类型枚举 */
-export enum MenuType {
-  CLICK = 'click', // 点击推事件
-  LOCATION_SELECT = 'location_select', // 发送位置
-  MEDIA_ID = 'media_id', // 下发消息
-  MINIPROGRAM = 'miniprogram', // 小程序
-  PIC_PHOTO_OR_ALBUM = 'pic_photo_or_album', // 拍照或者相册发图
-  PIC_SYSPHOTO = 'pic_sysphoto', // 系统拍照发图
-  PIC_WEIXIN = 'pic_weixin', // 微信相册发图
-  SCANCODE_PUSH = 'scancode_push', // 扫码推事件
-  SCANCODE_WAITMSG = 'scancode_waitmsg', // 扫码带提示
-  VIEW = 'view', // 跳转URL
-  VIEW_LIMITED = 'view_limited', // 跳转图文消息URL
-}
+import { requestClient } from '#/api/request';
 
 export namespace MpMenuApi {
   /** 菜单按钮信息 */

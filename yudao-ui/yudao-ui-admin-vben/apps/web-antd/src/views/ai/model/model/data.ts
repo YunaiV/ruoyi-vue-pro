@@ -1,11 +1,17 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { AiModelApiKeyApi } from '#/api/ai/model/apiKey';
 
 import { AiModelTypeEnum, CommonStatusEnum, DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 
 import { z } from '#/adapter/form';
 import { getApiKeySimpleList } from '#/api/ai/model/apiKey';
+
+/** 关联数据 */
+let apiKeyList: AiModelApiKeyApi.ApiKey[] = [];
+getApiKeySimpleList().then((data) => (apiKeyList = data));
+
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -26,7 +32,7 @@ export function useFormSchema(): VbenFormSchema[] {
         options: getDictOptions(DICT_TYPE.AI_PLATFORM, 'string'),
         allowClear: true,
       },
-      rules: z.string().min(1, { message: '请输入平台' }),
+      rules: 'required',
     },
     {
       fieldName: 'type',
@@ -47,7 +53,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: 'API 秘钥',
       component: 'ApiSelect',
       componentProps: {
-        placeholder: '请选择API 秘钥',
+        placeholder: '请选择 API 秘钥',
         api: getApiKeySimpleList,
         labelField: 'name',
         valueField: 'id',
@@ -60,12 +66,18 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '模型名字',
       rules: 'required',
+      componentProps: {
+        placeholder: '请输入模型名字',
+      },
     },
     {
       component: 'Input',
       fieldName: 'model',
       label: '模型标识',
       rules: 'required',
+      componentProps: {
+        placeholder: '请输入模型标识',
+      },
     },
     {
       fieldName: 'sort',
@@ -73,7 +85,6 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         placeholder: '请输入模型排序',
-        class: 'w-full',
       },
       rules: 'required',
     },
@@ -94,7 +105,6 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         placeholder: '请输入温度参数',
-        class: 'w-full',
         min: 0,
         max: 2,
       },
@@ -114,7 +124,6 @@ export function useFormSchema(): VbenFormSchema[] {
         min: 0,
         max: 8192,
         placeholder: '请输入回复数 Token 数',
-        class: 'w-full',
       },
       dependencies: {
         triggerFields: ['type'],
@@ -132,7 +141,6 @@ export function useFormSchema(): VbenFormSchema[] {
         min: 0,
         max: 20,
         placeholder: '请输入上下文数量',
-        class: 'w-full',
       },
       dependencies: {
         triggerFields: ['type'],
@@ -152,16 +160,28 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '模型名字',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入模型名字',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'model',
       label: '模型标识',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入模型标识',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'platform',
       label: '模型平台',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入模型平台',
+        allowClear: true,
+      },
     },
   ];
 }
@@ -199,7 +219,12 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     },
     {
       title: 'API 秘钥',
-      slots: { default: 'keyId' },
+      field: 'keyId',
+      formatter: ({ cellValue }) => {
+        return (
+          apiKeyList.find((apiKey) => apiKey.id === cellValue)?.name || '-'
+        );
+      },
       minWidth: 140,
     },
     {
@@ -219,7 +244,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     {
       field: 'temperature',
       title: '温度参数',
-      minWidth: 80,
+      minWidth: 100,
     },
     {
       title: '回复数 Token 数',
@@ -229,7 +254,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     {
       title: '上下文数量',
       field: 'maxContexts',
-      minWidth: 100,
+      minWidth: 120,
     },
     {
       title: '操作',

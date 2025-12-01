@@ -33,6 +33,7 @@ const imgElRef = ref<ElRef<HTMLImageElement>>();
 const cropper = ref<Cropper | null>();
 const isReady = ref(false);
 
+// TODO @puhui999：这个有办法去掉么？
 const prefixCls = 'cropper-image';
 const debounceRealTimeCropped = useDebounceFn(realTimeCropped, 80);
 

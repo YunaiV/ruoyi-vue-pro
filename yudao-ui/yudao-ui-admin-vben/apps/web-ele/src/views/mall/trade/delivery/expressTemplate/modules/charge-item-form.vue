@@ -11,7 +11,7 @@ import { TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { CHARGE_MODE_TITLE_MAP, useChargesColumns } from '../data';
 
 interface Props {
-  items?: MallDeliveryExpressTemplateApi.TemplateCharge[];
+  items?: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateCharge[];
   chargeMode?: number;
   areaTree?: SystemAreaApi.Area[];
 }

@@ -34,11 +34,8 @@ const logList = ref<SystemOperateLogApi.OperateLog[]>([]); // 操作日志
 const permissionListRef = ref<InstanceType<typeof PermissionList>>(); // 团队成员列表 Ref
 
 const [Descriptions] = useDescription({
-  componentProps: {
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  bordered: false,
+  column: 4,
   schema: useDetailSchema(),
 });
 
@@ -71,7 +68,7 @@ async function getClueDetail() {
 /** 返回列表页 */
 function handleBack() {
   tabs.closeCurrentTab();
-  router.push('/crm/clue');
+  router.push({ name: 'CrmClue' });
 }
 
 /** 编辑线索 */
@@ -91,13 +88,11 @@ async function handleTransform(): Promise<boolean | undefined> {
       content: '确定将该线索转化为客户吗？',
     })
       .then(async () => {
-        const res = await transformClue(clueId.value);
-        if (res) {
-          message.success('转化客户成功');
-          resolve(true);
-        } else {
-          reject(new Error('转化失败'));
-        }
+        // 转化为客户
+        await transformClue(clueId.value);
+        // 提示并返回成功
+        message.success('转化客户成功');
+        resolve(true);
       })
       .catch(() => {
         reject(new Error('取消操作'));

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { MallBannerApi } from '#/api/mall/market/banner';
+import type { MallBannerApi } from '#/api/mall/promotion/banner';
+import type { SystemUserApi } from '#/api/system/user';
 
 import { computed, ref } from 'vue';
 
@@ -12,7 +13,7 @@ import {
   createBanner,
   getBanner,
   updateBanner,
-} from '#/api/mall/market/banner';
+} from '#/api/mall/promotion/banner';
 import { $t } from '#/locales';
 
 import { useFormSchema } from '../data';

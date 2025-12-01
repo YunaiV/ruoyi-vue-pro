@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { TooltipRootEmits, TooltipRootProps } from 'radix-vue';
+import type { TooltipRootEmits, TooltipRootProps } from 'reka-ui';
 
-import { TooltipRoot, useForwardPropsEmits } from 'radix-vue';
+import { TooltipRoot, useForwardPropsEmits } from 'reka-ui';
 
 const props = defineProps<TooltipRootProps>();
 const emits = defineEmits<TooltipRootEmits>();

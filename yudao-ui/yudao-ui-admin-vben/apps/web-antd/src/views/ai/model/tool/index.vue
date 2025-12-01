@@ -23,27 +23,25 @@ function handleRefresh() {
   gridApi.query();
 }
 
-/** 创建 */
+/** 创建工具 */
 function handleCreate() {
   formModalApi.setData(null).open();
 }
 
-/** 编辑 */
+/** 编辑工具 */
 function handleEdit(row: AiModelToolApi.Tool) {
   formModalApi.setData(row).open();
 }
 
-/** 删除 */
+/** 删除工具 */
 async function handleDelete(row: AiModelToolApi.Tool) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteTool(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteTool(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
@@ -71,6 +69,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,

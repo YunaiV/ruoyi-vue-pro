@@ -52,7 +52,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '短信渠道',
       component: 'ApiSelect',
       componentProps: {
-        api: async () => await getSimpleSmsChannelList(),
+        api: getSimpleSmsChannelList,
         labelField: 'signature',
         valueField: 'id',
         placeholder: '请选择短信渠道',
@@ -144,7 +144,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '短信渠道',
       component: 'ApiSelect',
       componentProps: {
-        api: async () => await getSimpleSmsChannelList(),
+        api: getSimpleSmsChannelList,
         labelField: 'signature',
         valueField: 'id',
         clearable: true,

@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 
-import { computed, ref, unref } from 'vue';
+import { computed, ref, unref, watch } from 'vue';
 
 /**
  * Paginates an array of items
@@ -22,7 +22,11 @@ function pagination<T = any>(list: T[], pageNo: number, pageSize: number): T[] {
   return ret;
 }
 
-export function usePagination<T = any>(list: Ref<T[]>, pageSize: number) {
+export function usePagination<T = any>(
+  list: Ref<T[]>,
+  pageSize: number,
+  totalChangeToFirstPage = true,
+) {
   const currentPage = ref(1);
   const pageSizeRef = ref(pageSize);
 
@@ -38,11 +42,21 @@ export function usePagination<T = any>(list: Ref<T[]>, pageSize: number) {
     return unref(list).length;
   });
 
+  if (totalChangeToFirstPage) {
+    watch(total, () => {
+      setCurrentPage(1);
+    });
+  }
+
   function setCurrentPage(page: number) {
-    if (page < 1 || page > unref(totalPages)) {
-      throw new Error('Invalid page number');
+    if (page === 1 && unref(totalPages) === 0) {
+      currentPage.value = 1;
+    } else {
+      if (page < 1 || page > unref(totalPages)) {
+        throw new Error('Invalid page number');
+      }
+      currentPage.value = page;
     }
-    currentPage.value = page;
   }
 
   function setPageSize(pageSize: number) {
@@ -54,5 +68,5 @@ export function usePagination<T = any>(list: Ref<T[]>, pageSize: number) {
     currentPage.value = 1;
   }
 
-  return { setCurrentPage, total, setPageSize, paginationList };
+  return { setCurrentPage, total, setPageSize, paginationList, currentPage };
 }

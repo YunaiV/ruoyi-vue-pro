@@ -3,7 +3,6 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace AiKnowledgeSegmentApi {
-  // AI 知识库分段
   export interface KnowledgeSegment {
     id: number; // 编号
     documentId: number; // 文档编号
@@ -18,7 +17,7 @@ export namespace AiKnowledgeSegmentApi {
   }
 }
 
-// 查询知识库分段分页
+/** 查询知识库分段分页 */
 export function getKnowledgeSegmentPage(params: PageParam) {
   return requestClient.get<PageResult<AiKnowledgeSegmentApi.KnowledgeSegment>>(
     '/ai/knowledge/segment/page',
@@ -26,50 +25,55 @@ export function getKnowledgeSegmentPage(params: PageParam) {
   );
 }
 
-// 查询知识库分段详情
+/** 查询知识库分段详情 */
 export function getKnowledgeSegment(id: number) {
   return requestClient.get<AiKnowledgeSegmentApi.KnowledgeSegment>(
     `/ai/knowledge/segment/get?id=${id}`,
   );
 }
-// 新增知识库分段
+
+/** 新增知识库分段 */
 export function createKnowledgeSegment(
   data: AiKnowledgeSegmentApi.KnowledgeSegment,
 ) {
   return requestClient.post('/ai/knowledge/segment/create', data);
 }
 
-// 修改知识库分段
+/** 修改知识库分段 */
 export function updateKnowledgeSegment(
   data: AiKnowledgeSegmentApi.KnowledgeSegment,
 ) {
   return requestClient.put('/ai/knowledge/segment/update', data);
 }
 
-// 修改知识库分段状态
-export function updateKnowledgeSegmentStatus(data: any) {
-  return requestClient.put('/ai/knowledge/segment/update-status', data);
+/** 修改知识库分段状态 */
+export function updateKnowledgeSegmentStatus(id: number, status: number) {
+  return requestClient.put('/ai/knowledge/segment/update-status', {
+    id,
+    status,
+  });
 }
-// 删除知识库分段
+
+/** 删除知识库分段 */
 export function deleteKnowledgeSegment(id: number) {
   return requestClient.delete(`/ai/knowledge/segment/delete?id=${id}`);
 }
 
-// 切片内容
+/** 切片内容 */
 export function splitContent(url: string, segmentMaxTokens: number) {
   return requestClient.get('/ai/knowledge/segment/split', {
     params: { url, segmentMaxTokens },
   });
 }
 
-// 获取文档处理列表
+/** 获取文档处理列表 */
 export function getKnowledgeSegmentProcessList(documentIds: number[]) {
   return requestClient.get('/ai/knowledge/segment/get-process-list', {
     params: { documentIds: documentIds.join(',') },
   });
 }
 
-// 搜索知识库分段
+/** 搜索知识库分段 */
 export function searchKnowledgeSegment(params: any) {
   return requestClient.get('/ai/knowledge/segment/search', {
     params,

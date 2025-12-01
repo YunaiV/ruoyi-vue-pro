@@ -71,7 +71,7 @@ export function exportClue(params: any) {
 }
 
 /** 线索转移 */
-export function transferClue(data: CrmPermissionApi.TransferReq) {
+export function transferClue(data: CrmPermissionApi.BusinessTransferReqVO) {
   return requestClient.put('/crm/clue/transfer', data);
 }
 

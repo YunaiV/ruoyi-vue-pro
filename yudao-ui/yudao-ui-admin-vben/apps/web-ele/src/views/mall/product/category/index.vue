@@ -63,7 +63,7 @@ function handleExpand() {
 }
 
 /** 查看商品操作 */
-const router = useRouter(); // 路由
+const router = useRouter();
 function handleViewSpu(id: number) {
   router.push({
     path: '/mall/product/spu',

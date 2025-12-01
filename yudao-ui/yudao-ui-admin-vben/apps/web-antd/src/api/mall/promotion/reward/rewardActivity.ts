@@ -18,6 +18,7 @@ export namespace MallRewardActivityApi {
   export interface RewardActivity {
     id?: number; // 活动编号
     name?: string; // 活动名称
+    status?: number; // 活动状态
     startTime?: Date; // 开始时间
     endTime?: Date; // 结束时间
     startAndEndTime?: Date[]; // 开始和结束时间（仅前端使用）

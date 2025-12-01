@@ -4,7 +4,8 @@
     "register": "注册",
     "codeLogin": "验证码登录",
     "qrcodeLogin": "二维码登录",
-    "forgetPassword": "忘记密码"
+    "forgetPassword": "忘记密码",
+    "profile": "个人中心"
   },
   "dashboard": {
     "title": "概览",
@@ -29,5 +30,14 @@
   "tenant": {
     "placeholder": "请选择租户",
     "success": "切换租户成功"
+  },
+  "mp": {
+    "upload": {
+      "invalidFormat": "上传{0}格式不对!",
+      "maxSize": "上传{0}大小不能超过{1}M!",
+      "image": "图片",
+      "video": "视频",
+      "voice": "语音"
+    }
   }
 }

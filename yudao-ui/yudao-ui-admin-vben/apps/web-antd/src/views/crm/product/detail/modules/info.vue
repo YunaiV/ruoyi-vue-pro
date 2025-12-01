@@ -6,22 +6,18 @@ import { useDescription } from '#/components/description';
 import { useDetailBaseSchema } from '../data';
 
 defineProps<{
-  product: CrmProductApi.Product; // 产品信息
+  product: CrmProductApi.Product;
 }>();
 
 const [ProductDescriptions] = useDescription({
-  componentProps: {
-    title: '基本信息',
-    bordered: false,
-    column: 4,
-    class: 'mx-4',
-  },
+  bordered: false,
+  column: 4,
   schema: useDetailBaseSchema(),
 });
 </script>
 
 <template>
-  <div class="p-4">
+  <div>
     <ProductDescriptions :data="product" />
   </div>
 </template>

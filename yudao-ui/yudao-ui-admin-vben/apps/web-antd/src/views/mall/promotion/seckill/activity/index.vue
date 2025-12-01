@@ -5,7 +5,6 @@ import type { MallSeckillActivityApi } from '#/api/mall/promotion/seckill/seckil
 import { onMounted } from 'vue';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
-import { $t } from '@vben/locales';
 
 import { message, Tag } from 'ant-design-vue';
 
@@ -16,6 +15,7 @@ import {
   getSeckillActivityPage,
 } from '#/api/mall/promotion/seckill/seckillActivity';
 import { getSimpleSeckillConfigList } from '#/api/mall/promotion/seckill/seckillConfig';
+import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
 import { formatConfigNames, formatTimeRange, setConfigList } from './formatter';

@@ -22,18 +22,6 @@ export namespace PayNotifyApi {
     updateTime: Date;
     logs?: any[];
   }
-
-  /** 支付通知任务分页请求 */
-  export interface NotifyTaskPageReqVO extends PageParam {
-    appId?: number;
-    type?: number;
-    dataId?: number;
-    status?: number;
-    merchantOrderId?: string;
-    merchantRefundId?: string;
-    merchantTransferId?: string;
-    createTime?: Date[];
-  }
 }
 
 /** 获得支付通知明细 */
@@ -42,7 +30,7 @@ export function getNotifyTaskDetail(id: number) {
 }
 
 /** 获得支付通知分页 */
-export function getNotifyTaskPage(params: PayNotifyApi.NotifyTaskPageReqVO) {
+export function getNotifyTaskPage(params: PageParam) {
   return requestClient.get<PageResult<PayNotifyApi.NotifyTask>>(
     '/pay/notify/page',
     {

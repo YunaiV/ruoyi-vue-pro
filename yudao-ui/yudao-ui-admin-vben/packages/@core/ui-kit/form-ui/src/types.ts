@@ -382,6 +382,10 @@ export interface VbenFormProps<
    */
   fieldMappingTime?: FieldMappingTime;
   /**
+   * 表单收起展开状态变化回调
+   */
+  handleCollapsedChange?: (collapsed: boolean) => void;
+  /**
    * 表单重置回调
    */
   handleReset?: HandleResetFn;

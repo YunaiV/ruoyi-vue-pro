@@ -5,10 +5,9 @@ import { useVbenModal } from '@vben/common-ui';
 
 import FormCreate from '@form-create/ant-design-vue';
 
-import { getFormDetail } from '#/api/bpm/form';
+import { getForm } from '#/api/bpm/form';
 import { setConfAndFields2 } from '#/components/form-create';
 
-/** 详情 */
 const formConfig = ref<any>({});
 
 const [Modal, modalApi] = useVbenModal({
@@ -24,7 +23,7 @@ const [Modal, modalApi] = useVbenModal({
     }
     modalApi.lock();
     try {
-      formConfig.value = await getFormDetail(data.id);
+      formConfig.value = await getForm(data.id);
       setConfAndFields2(
         formConfig.value,
         formConfig.value.conf,

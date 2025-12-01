@@ -1,12 +1,13 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
-import { DICT_TYPE } from '@vben/constants';
+import { CommonStatusEnum, DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
 
 import { z } from '#/adapter/form';
-import { getSimpleProductCategoryList } from '#/api/iot/product/category';
+import { getRangePickerDefaultProps } from '#/utils';
 
-/** 新增/修改产品分类的表单 */
+/** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
   return [
     {
@@ -19,53 +20,37 @@ export function useFormSchema(): VbenFormSchema[] {
     },
     {
       fieldName: 'name',
-      label: '分类名称',
+      label: '分类名字',
       component: 'Input',
       componentProps: {
-        placeholder: '请输入分类名称',
+        placeholder: '请输入分类名字',
       },
       rules: z
         .string()
-        .min(1, '分类名称不能为空')
-        .max(64, '分类名称长度不能超过 64 个字符'),
-    },
-    {
-      fieldName: 'parentId',
-      label: '父级分类',
-      component: 'ApiTreeSelect',
-      componentProps: {
-        api: getSimpleProductCategoryList,
-        fieldNames: {
-          label: 'name',
-          value: 'id',
-        },
-        placeholder: '请选择父级分类',
-        allowClear: true,
-      },
+        .min(1, '分类名字不能为空')
+        .max(64, '分类名字长度不能超过 64 个字符'),
     },
     {
       fieldName: 'sort',
-      label: '排序',
+      label: '分类排序',
       component: 'InputNumber',
       componentProps: {
-        placeholder: '请输入排序',
+        placeholder: '请输入分类排序',
         class: 'w-full',
         min: 0,
       },
-      rules: 'required',
+      rules: z.number().min(0, '分类排序不能为空'),
     },
     {
       fieldName: 'status',
-      label: '状态',
+      label: '分类状态',
       component: 'RadioGroup',
-      defaultValue: 1,
       componentProps: {
-        options: [
-          { label: '开启', value: 1 },
-          { label: '关闭', value: 0 },
-        ],
+        options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
+        buttonStyle: 'solid',
+        optionType: 'button',
       },
-      rules: 'required',
+      rules: z.number().default(CommonStatusEnum.ENABLE),
     },
     {
       fieldName: 'description',
@@ -84,10 +69,10 @@ export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
       fieldName: 'name',
-      label: '分类名称',
+      label: '分类名字',
       component: 'Input',
       componentProps: {
-        placeholder: '请输入分类名称',
+        placeholder: '请输入分类名字',
         allowClear: true,
       },
     },
@@ -96,9 +81,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '创建时间',
       component: 'RangePicker',
       componentProps: {
-        placeholder: ['开始日期', '结束日期'],
+        ...getRangePickerDefaultProps(),
         allowClear: true,
-        class: 'w-full',
       },
     },
   ];
@@ -116,7 +100,6 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'name',
       title: '名字',
       minWidth: 200,
-      treeNode: true,
     },
     {
       field: 'sort',

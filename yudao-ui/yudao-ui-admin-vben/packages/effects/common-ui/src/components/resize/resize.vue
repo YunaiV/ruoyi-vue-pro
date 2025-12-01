@@ -618,13 +618,11 @@ const stickStyles = computed(() => (stick: string) => {
   const stickStyle = {
     width: `${stickSize.value / parentScaleX.value}px`,
     height: `${stickSize.value / parentScaleY.value}px`,
+    [styleMapping.y[stick[0] as 'b' | 'm' | 't'] as 'height' | 'width']:
+      `${stickSize.value / parentScaleX.value / -2}px`,
+    [styleMapping.x[stick[1] as 'l' | 'm' | 'r'] as 'height' | 'width']:
+      `${stickSize.value / parentScaleX.value / -2}px`,
   };
-  stickStyle[
-    styleMapping.y[stick[0] as 'b' | 'm' | 't'] as 'height' | 'width'
-  ] = `${stickSize.value / parentScaleX.value / -2}px`;
-  stickStyle[
-    styleMapping.x[stick[1] as 'l' | 'm' | 'r'] as 'height' | 'width'
-  ] = `${stickSize.value / parentScaleX.value / -2}px`;
   return stickStyle;
 });
 

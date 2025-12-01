@@ -22,6 +22,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '工具名称',
       rules: 'required',
+      componentProps: {
+        placeholder: '请输入工具名称',
+      },
     },
     {
       component: 'Textarea',
@@ -52,6 +55,10 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '工具名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入工具名称',
+        allowClear: true,
+      },
     },
     {
       fieldName: 'status',
@@ -60,6 +67,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       componentProps: {
         allowClear: true,
         options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
+        placeholder: '请选择状态',
       },
     },
     {
@@ -80,14 +88,17 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     {
       field: 'id',
       title: '工具编号',
+      minWidth: 100,
     },
     {
       field: 'name',
       title: '工具名称',
+      minWidth: 120,
     },
     {
       field: 'description',
       title: '工具描述',
+      minWidth: 140,
     },
     {
       field: 'status',
@@ -96,6 +107,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
         name: 'CellDict',
         props: { type: DICT_TYPE.COMMON_STATUS },
       },
+      minWidth: 80,
     },
     {
       field: 'createTime',

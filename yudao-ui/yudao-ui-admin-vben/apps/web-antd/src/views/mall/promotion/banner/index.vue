@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { MallBannerApi } from '#/api/mall/market/banner';
+import type { MallBannerApi } from '#/api/mall/promotion/banner';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
-import { deleteBanner, getBannerPage } from '#/api/mall/market/banner';
+import { deleteBanner, getBannerPage } from '#/api/mall/promotion/banner';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';

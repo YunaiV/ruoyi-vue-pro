@@ -40,7 +40,7 @@ async function handleDelete(row: MallBrandApi.Brand) {
   });
   try {
     await deleteBrand(row.id!);
-    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     loadingInstance.close();

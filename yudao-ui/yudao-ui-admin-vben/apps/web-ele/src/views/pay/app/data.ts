@@ -256,9 +256,7 @@ export function useAppFormSchema(): VbenFormSchema[] {
 
 /** 渠道新增/修改的表单 */
 export function useChannelFormSchema(formType: string = ''): VbenFormSchema[] {
-  const schema: VbenFormSchema[] = [];
-  // 添加通用字段
-  schema.push(
+  const schema: VbenFormSchema[] = [
     {
       component: 'Input',
       fieldName: 'id',
@@ -293,6 +291,8 @@ export function useChannelFormSchema(formType: string = ''): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入渠道费率',
         addonAfter: '%',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
       defaultValue: 0,
     },
@@ -305,7 +305,8 @@ export function useChannelFormSchema(formType: string = ''): VbenFormSchema[] {
         options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
       },
     },
-  );
+  ];
+  // 添加通用字段
   // 根据类型添加特定字段
   if (formType.includes('alipay_')) {
     schema.push(
@@ -400,7 +401,10 @@ export function useChannelFormSchema(formType: string = ''): VbenFormSchema[] {
         fieldName: 'config.appCertContent',
         component: h(InputUpload, {
           inputType: 'textarea',
-          textareaProps: { rows: 3, placeholder: '请上传商户公钥应用证书' },
+          textareaProps: {
+            rows: 3,
+            placeholder: '请上传商户公钥应用证书',
+          },
           fileUploadProps: {
             accept: ['crt'],
           },

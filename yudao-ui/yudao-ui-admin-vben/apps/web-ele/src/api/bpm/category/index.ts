@@ -10,7 +10,7 @@ export namespace BpmCategoryApi {
     code: string;
     status: number;
     description?: string;
-    sort: number; // 分类排序
+    sort: number;
   }
 }
 

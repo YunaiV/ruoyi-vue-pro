@@ -104,6 +104,10 @@ const shouldDraggable = computed(
   () => draggable.value && !shouldFullscreen.value && header.value,
 );
 
+const shouldCentered = computed(
+  () => centered.value && !shouldFullscreen.value,
+);
+
 const getAppendTo = computed(() => {
   return appendToMain.value
     ? `#${ELEMENT_ID_MAIN_CONTENT}>div:not(.absolute)>div`
@@ -115,6 +119,7 @@ const { dragging, transform } = useModalDraggable(
   headerRef,
   shouldDraggable,
   getAppendTo,
+  shouldCentered,
 );
 
 const firstOpened = ref(false);
@@ -132,7 +137,9 @@ watch(
       dialogRef.value = innerContentRef.$el;
       // reopen modal reassign value
       const { offsetX, offsetY } = transform;
-      dialogRef.value.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      dialogRef.value.style.transform = shouldCentered.value
+        ? `translate(${offsetX}px, calc(-50% + ${offsetY}px))`
+        : `translate(${offsetX}px, ${offsetY}px)`;
     }
   },
   { immediate: true },
@@ -180,7 +187,7 @@ function escapeKeyDown(e: KeyboardEvent) {
   }
 }
 
-function handerOpenAutoFocus(e: Event) {
+function handleOpenAutoFocus(e: Event) {
   if (!openAutoFocus.value) {
     e?.preventDefault();
   }
@@ -209,6 +216,12 @@ const getForceMount = computed(() => {
   return !unref(destroyOnClose) && unref(firstOpened);
 });
 
+const handleOpened = () => {
+  requestAnimationFrame(() => {
+    props.modalApi?.onOpened();
+  });
+};
+
 function handleClosed() {
   isClosed.value = true;
   props.modalApi?.onClosed();
@@ -229,11 +242,11 @@ function handleClosed() {
           shouldFullscreen ? 'sm:rounded-none' : 'sm:rounded-[var(--radius)]',
           modalClass,
           {
-            'border-border border': bordered,
+            'border border-border': bordered,
             'shadow-3xl': !bordered,
             'left-0 top-0 size-full max-h-full !translate-x-0 !translate-y-0':
               shouldFullscreen,
-            'top-1/2 !-translate-y-1/2': centered && !shouldFullscreen,
+            'top-1/2': centered && !shouldFullscreen,
             'duration-300': !dragging,
             hidden: isClosed,
           },
@@ -253,8 +266,8 @@ function handleClosed() {
       @escape-key-down="escapeKeyDown"
       @focus-outside="handleFocusOutside"
       @interact-outside="interactOutside"
-      @open-auto-focus="handerOpenAutoFocus"
-      @opened="() => modalApi?.onOpened()"
+      @open-auto-focus="handleOpenAutoFocus"
+      @opened="handleOpened"
       @pointer-down-outside="pointerDownOutside"
     >
       <DialogHeader
@@ -305,7 +318,7 @@ function handleClosed() {
       <VbenLoading v-if="showLoading || submitting" spinning />
       <VbenIconButton
         v-if="fullscreenButton"
-        class="hover:bg-accent hover:text-accent-foreground text-foreground/80 flex-center absolute right-10 top-3 hidden size-6 rounded-full px-1 text-lg opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none sm:block"
+        class="flex-center absolute right-10 top-3 hidden size-6 rounded-full px-1 text-lg text-foreground/80 opacity-70 transition-opacity hover:bg-accent hover:text-accent-foreground hover:opacity-100 focus:outline-none disabled:pointer-events-none sm:block"
         @click="handleFullscreen"
       >
         <Shrink v-if="fullscreen" class="size-3.5" />

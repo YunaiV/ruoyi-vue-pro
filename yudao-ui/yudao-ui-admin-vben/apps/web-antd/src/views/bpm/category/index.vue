@@ -36,16 +36,14 @@ function handleEdit(row: BpmCategoryApi.Category) {
 /** 删除流程分类 */
 async function handleDelete(row: BpmCategoryApi.Category) {
   const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting', [row.code]),
+    content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
     await deleteCategory(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.code]),
-    });
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
-  } catch {
+  } finally {
     hideLoading();
   }
 }
@@ -71,6 +69,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,

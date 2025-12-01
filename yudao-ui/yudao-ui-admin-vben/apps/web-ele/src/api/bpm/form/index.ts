@@ -5,7 +5,7 @@ import { requestClient } from '#/api/request';
 export namespace BpmFormApi {
   /** 流程表单 */
   export interface Form {
-    id?: number | undefined;
+    id?: number;
     name: string;
     conf: string;
     fields: string[];
@@ -23,7 +23,7 @@ export async function getFormPage(params: PageParam) {
 }
 
 /** 获取表单详情 */
-export async function getFormDetail(id: number) {
+export async function getForm(id: number) {
   return requestClient.get<BpmFormApi.Form>(`/bpm/form/get?id=${id}`);
 }
 

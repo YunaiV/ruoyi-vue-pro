@@ -27,7 +27,7 @@ export namespace MallBrokerageWithdrawApi {
   }
 
   /** 驳回申请请求 */
-  export interface RejectRequest {
+  export interface BrokerageWithdrawRejectReqVO {
     id: number; // 编号
     auditReason: string; // 驳回原因
   }
@@ -40,13 +40,6 @@ export function getBrokerageWithdrawPage(params: PageParam) {
   >('/trade/brokerage-withdraw/page', { params });
 }
 
-/** 查询佣金提现详情 */
-export function getBrokerageWithdraw(id: number) {
-  return requestClient.get<MallBrokerageWithdrawApi.BrokerageWithdraw>(
-    `/trade/brokerage-withdraw/get?id=${id}`,
-  );
-}
-
 /** 佣金提现 - 通过申请 */
 export function approveBrokerageWithdraw(id: number) {
   return requestClient.put(`/trade/brokerage-withdraw/approve?id=${id}`);
@@ -54,7 +47,7 @@ export function approveBrokerageWithdraw(id: number) {
 
 /** 审核佣金提现 - 驳回申请 */
 export function rejectBrokerageWithdraw(
-  data: MallBrokerageWithdrawApi.RejectRequest,
+  data: MallBrokerageWithdrawApi.BrokerageWithdrawRejectReqVO,
 ) {
   return requestClient.put('/trade/brokerage-withdraw/reject', data);
 }

@@ -28,6 +28,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: '租户名称',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入租户名称',
+      },
       rules: 'required',
     },
     {
@@ -35,7 +38,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '租户套餐',
       component: 'ApiSelect',
       componentProps: {
-        api: () => getTenantPackageList(),
+        api: getTenantPackageList,
         labelField: 'name',
         valueField: 'id',
         placeholder: '请选择租户套餐',
@@ -46,18 +49,27 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'contactName',
       label: '联系人',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入联系人',
+      },
       rules: 'required',
     },
     {
       fieldName: 'contactMobile',
       label: '联系手机',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入联系手机',
+      },
       rules: 'mobile',
     },
     {
       label: '用户名称',
       fieldName: 'username',
       component: 'Input',
+      componentProps: {
+        placeholder: '请输入用户名称',
+      },
       rules: 'required',
       dependencies: {
         triggerFields: ['id'],
@@ -81,6 +93,11 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '账号额度',
       fieldName: 'accountCount',
       component: 'InputNumber',
+      componentProps: {
+        placeholder: '请输入账号额度',
+        controlsPosition: 'right',
+        class: '!w-full',
+      },
       rules: 'required',
     },
     {
@@ -91,6 +108,7 @@ export function useFormSchema(): VbenFormSchema[] {
         format: 'YYYY-MM-DD',
         valueFormat: 'x',
         placeholder: '请选择过期时间',
+        class: '!w-full',
       },
       rules: 'required',
     },

@@ -197,7 +197,7 @@ async function handleSubmit(values: Recordable<any>) {
     await smsResetPassword({ mobile, code, password });
     message.success($t('authentication.resetPasswordSuccess'));
     // 重置成功后跳转到首页
-    router.push('/');
+    await router.push('/');
   } catch (error) {
     console.error('重置密码失败:', error);
   } finally {

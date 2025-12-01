@@ -7,7 +7,7 @@ import { h } from 'vue';
 import { DocAlert, Page, prompt } from '@vben/common-ui';
 import { BpmProcessInstanceStatus } from '@vben/constants';
 
-import { message, Textarea } from 'ant-design-vue';
+import { Button, message, Textarea } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -26,15 +26,19 @@ function handleRefresh() {
   gridApi.query();
 }
 
-/** 点击任务 */
-function onTaskClick(task: BpmProcessInstanceApi.Task) {
-  // TODO 待实现
-  console.warn(task);
+/** 查看任务详情 */
+function handleTaskDetail(
+  row: BpmProcessInstanceApi.ProcessInstance,
+  task: BpmProcessInstanceApi.Task,
+) {
+  router.push({
+    name: 'BpmProcessInstanceDetail',
+    query: { id: row.id, taskId: task.id },
+  });
 }
 
 /** 查看流程实例 */
 function handleDetail(row: BpmProcessInstanceApi.ProcessInstance) {
-  console.warn(row);
   router.push({
     name: 'BpmProcessInstanceDetail',
     query: { id: row.id },
@@ -44,36 +48,23 @@ function handleDetail(row: BpmProcessInstanceApi.ProcessInstance) {
 /** 取消流程实例 */
 function handleCancel(row: BpmProcessInstanceApi.ProcessInstance) {
   prompt({
-    async beforeClose(scope) {
-      if (scope.isConfirm) {
-        if (scope.value) {
-          try {
-            await cancelProcessInstanceByAdmin(row.id, scope.value);
-            message.success('取消成功');
-            handleRefresh();
-          } catch {
-            return false;
-          }
-        } else {
-          message.error('请输入取消原因');
-          return false;
-        }
-      }
-    },
     component: () => {
       return h(Textarea, {
         placeholder: '请输入取消原因',
         allowClear: true,
         rows: 2,
-        rules: [{ required: true, message: '请输入取消原因' }],
       });
     },
     content: '请输入取消原因',
     title: '取消流程',
     modelPropName: 'value',
-  })
-    .then(() => {})
-    .catch(() => {});
+  }).then(async (reason) => {
+    if (reason) {
+      await cancelProcessInstanceByAdmin(row.id, reason);
+      message.success('取消成功');
+      handleRefresh();
+    }
+  });
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
@@ -81,7 +72,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     schema: useGridFormSchema(),
   },
   gridOptions: {
-    columns: useGridColumns(onTaskClick),
+    columns: useGridColumns(),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -97,6 +88,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
@@ -113,6 +105,19 @@ const [Grid, gridApi] = useVbenVxeGrid({
     </template>
 
     <Grid table-title="流程实例">
+      <template #tasks="{ row }">
+        <template v-if="row.tasks && row.tasks.length > 0">
+          <Button
+            v-for="task in row.tasks"
+            :key="task.id"
+            type="link"
+            @click="handleTaskDetail(row, task)"
+          >
+            {{ task.name }}
+          </Button>
+        </template>
+        <span v-else>-</span>
+      </template>
       <template #actions="{ row }">
         <TableAction
           :actions="[

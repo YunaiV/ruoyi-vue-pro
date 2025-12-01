@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VariantProps } from 'class-variance-authority';
-import type { ToggleGroupRootEmits, ToggleGroupRootProps } from 'radix-vue';
+import type { ToggleGroupRootEmits, ToggleGroupRootProps } from 'reka-ui';
 
 import type { toggleVariants } from '../toggle';
 
@@ -8,7 +8,7 @@ import { computed, provide } from 'vue';
 
 import { cn } from '@vben-core/shared/utils';
 
-import { ToggleGroupRoot, useForwardPropsEmits } from 'radix-vue';
+import { ToggleGroupRoot, useForwardPropsEmits } from 'reka-ui';
 
 type ToggleGroupVariants = VariantProps<typeof toggleVariants>;
 

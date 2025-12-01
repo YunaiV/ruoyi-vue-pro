@@ -114,7 +114,7 @@ function createCssOptions(injectGlobalScss = true): CSSOptions {
               }
               return content;
             },
-            api: 'modern',
+            // api: 'modern',
             importers: [new NodePackageImporter()],
           },
         }

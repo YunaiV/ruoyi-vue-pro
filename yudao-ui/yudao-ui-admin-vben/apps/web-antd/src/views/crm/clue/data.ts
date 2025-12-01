@@ -121,7 +121,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '地址',
       component: 'ApiTreeSelect',
       componentProps: {
-        api: () => getAreaTree(),
+        api: getAreaTree,
         fieldNames: { label: 'name', value: 'id', children: 'children' },
         placeholder: '请选择地址',
       },
@@ -171,7 +171,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
     {
       fieldName: 'transformStatus',
       label: '转化状态',
-      component: 'Select',
+      component: 'RadioGroup',
       componentProps: {
         options: [
           { label: '未转化', value: false },

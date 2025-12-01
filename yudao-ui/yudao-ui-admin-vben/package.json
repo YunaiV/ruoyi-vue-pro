@@ -32,7 +32,7 @@
     "build:docs": "pnpm run build --filter=@vben/docs",
     "build:ele": "pnpm run build --filter=@vben/web-ele",
     "build:naive": "pnpm run build --filter=@vben/web-naive",
-    "build:play": "pnpm run build --filter=@vben/playground",
+    "build:tdesign": "pnpm run build --filter=@vben/web-tdesign",
     "changeset": "pnpm exec changeset",
     "check": "pnpm run check:circular && pnpm run check:dep && pnpm run check:type && pnpm check:cspell",
     "check:circular": "vsh check-circular",
@@ -46,7 +46,7 @@
     "dev:docs": "pnpm -F @vben/docs run dev",
     "dev:ele": "pnpm -F @vben/web-ele run dev",
     "dev:naive": "pnpm -F @vben/web-naive run dev",
-    "dev:play": "pnpm -F @vben/playground run dev",
+    "dev:tdesign": "pnpm -F @vben/web-tdesign run dev",
     "format": "vsh lint --format",
     "lint": "vsh lint",
     "postinstall": "pnpm -r run stub --if-present",
@@ -95,10 +95,10 @@
     "vue-tsc": "catalog:"
   },
   "engines": {
-    "node": ">=20.10.0",
-    "pnpm": ">=9.12.0"
+    "node": ">=20.12.0",
+    "pnpm": ">=10.14.0"
   },
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.22.0",
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {
@@ -110,6 +110,7 @@
       "@ctrl/tinycolor": "catalog:",
       "clsx": "catalog:",
       "esbuild": "0.25.3",
+      "jiti": "catalog:",
       "pinia": "catalog:",
       "vue": "catalog:"
     },

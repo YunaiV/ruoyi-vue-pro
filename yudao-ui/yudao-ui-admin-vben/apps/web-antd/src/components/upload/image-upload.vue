@@ -10,11 +10,16 @@ import { computed, ref, toRefs, watch } from 'vue';
 
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
-import { isFunction, isObject, isString } from '@vben/utils';
+import {
+  defaultImageAccepts,
+  isFunction,
+  isImage,
+  isObject,
+  isString,
+} from '@vben/utils';
 
 import { message, Modal, Upload } from 'ant-design-vue';
 
-import { checkImgType, defaultImageAccepts } from './helper';
 import { UploadResultStatus } from './typing';
 import { useUpload, useUploadType } from './use-upload';
 
@@ -159,7 +164,7 @@ async function beforeUpload(file: File) {
   }
 
   const { maxSize, accept } = props;
-  const isAct = checkImgType(file, accept);
+  const isAct = isImage(file.name, accept);
   if (!isAct) {
     message.error($t('ui.upload.acceptUpload', [accept]));
     isActMsg.value = false;
@@ -241,7 +246,7 @@ function handleUploadSuccess(res: any, file: File) {
 // 处理上传错误
 function handleUploadError(error: any) {
   console.error('上传错误:', error);
-  message.error($t('ui.upload.uploadError'));
+  message.error('上传错误！！！');
   // 上传失败时减少计数器
   uploadNumber.value = Math.max(0, uploadNumber.value - 1);
 }
@@ -307,9 +312,9 @@ function getValue() {
       class="mt-2 flex flex-wrap items-center text-sm"
     >
       请上传不超过
-      <div class="text-primary mx-1 font-bold">{{ maxSize }}MB</div>
+      <div class="mx-1 font-bold text-primary">{{ maxSize }}MB</div>
       的
-      <div class="text-primary mx-1 font-bold">{{ accept.join('/') }}</div>
+      <div class="mx-1 font-bold text-primary">{{ accept.join('/') }}</div>
       格式文件
     </div>
     <Modal

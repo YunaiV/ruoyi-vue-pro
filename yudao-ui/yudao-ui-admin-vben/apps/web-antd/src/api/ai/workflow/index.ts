@@ -2,28 +2,48 @@ import type { PageParam, PageResult } from '@vben/request';
 
 import { requestClient } from '#/api/request';
 
-export function getWorkflowPage(params: PageParam) {
-  return requestClient.get<PageResult<any>>('/ai/workflow/page', {
-    params,
-  });
+export namespace AiWorkflowApi {
+  /** 工作流 */
+  export interface Workflow {
+    id?: number; // 编号
+    name: string; // 工作流名称
+    code: string; // 工作流标识
+    graph: string; // 工作流模型 JSON 数据
+    remark?: string; // 备注
+    status: number; // 状态
+    createTime?: Date; // 创建时间
+  }
 }
 
-export const getWorkflow = (id: number | string) => {
-  return requestClient.get(`/ai/workflow/get?id=${id}`);
-};
+/** 查询工作流管理列表 */
+export function getWorkflowPage(params: PageParam) {
+  return requestClient.get<PageResult<AiWorkflowApi.Workflow>>(
+    '/ai/workflow/page',
+    { params },
+  );
+}
 
-export const createWorkflow = (data: any) => {
+/** 查询工作流详情 */
+export function getWorkflow(id: number) {
+  return requestClient.get<AiWorkflowApi.Workflow>(`/ai/workflow/get?id=${id}`);
+}
+
+/** 新增工作流 */
+export function createWorkflow(data: AiWorkflowApi.Workflow) {
   return requestClient.post('/ai/workflow/create', data);
-};
+}
 
-export const updateWorkflow = (data: any) => {
+/** 修改工作流 */
+export function updateWorkflow(data: AiWorkflowApi.Workflow) {
   return requestClient.put('/ai/workflow/update', data);
-};
+}
 
-export const deleteWorkflow = (id: number | string) => {
+/** 删除工作流 */
+export function deleteWorkflow(id: number) {
   return requestClient.delete(`/ai/workflow/delete?id=${id}`);
-};
+}
 
-export const testWorkflow = (data: any) => {
+/** 测试工作流 */
+export function testWorkflow(data: any) {
   return requestClient.post('/ai/workflow/test', data);
-};
+}

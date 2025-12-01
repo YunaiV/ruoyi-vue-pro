@@ -60,7 +60,6 @@ function beforeUpload(file: FileType) {
     <Form class="mx-4">
       <template #file>
         <div class="w-full">
-          <!-- 上传区域 -->
           <Upload.Dragger
             name="file"
             :max-count="1"

@@ -3,7 +3,6 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { IotProductCategoryApi } from '#/api/iot/product/category';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { handleTree } from '@vben/utils';
 
 import { message } from 'ant-design-vue';
 
@@ -15,12 +14,12 @@ import {
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
-import Form from './modules/ProductCategoryForm.vue';
+import ProductCategoryForm from './modules/product-category-form.vue';
 
 defineOptions({ name: 'IoTProductCategory' });
 
 const [FormModal, formModalApi] = useVbenModal({
-  connectedComponent: Form,
+  connectedComponent: ProductCategoryForm,
   destroyOnClose: true,
 });
 
@@ -57,29 +56,19 @@ async function handleDelete(row: IotProductCategoryApi.ProductCategory) {
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     schema: useGridFormSchema(),
-    showCollapseButton: true,
-    collapsed: true,
   },
   gridOptions: {
     columns: useGridColumns(),
     height: 'auto',
     keepSource: true,
-    pagerConfig: {
-      enabled: true,
-    },
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
-          const data = await getProductCategoryPage({
+          return await getProductCategoryPage({
             pageNo: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
           });
-          // 转换为树形结构
-          return {
-            ...data,
-            list: handleTree(data.list, 'id', 'parentId'),
-          };
         },
       },
     },
@@ -90,16 +79,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
     toolbarConfig: {
       refresh: true,
       search: true,
-    },
-    treeConfig: {
-      parentField: 'parentId',
-      rowField: 'id',
-      transform: true,
-      expandAll: true,
-      reserve: true,
-      trigger: 'default',
-      iconOpen: '',
-      iconClose: '',
     },
   } as VxeTableGridOptions<IotProductCategoryApi.ProductCategory>,
 });
@@ -121,8 +100,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
           ]"
         />
       </template>
-
-      <!-- 操作列 -->
       <template #actions="{ row }">
         <TableAction
           :actions="[

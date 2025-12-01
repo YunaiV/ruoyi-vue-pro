@@ -36,6 +36,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Select',
       componentProps: {
         options: getDictOptions(DICT_TYPE.SYSTEM_SOCIAL_TYPE, 'number'),
+        placeholder: '请选择社交平台',
       },
       rules: 'required',
     },

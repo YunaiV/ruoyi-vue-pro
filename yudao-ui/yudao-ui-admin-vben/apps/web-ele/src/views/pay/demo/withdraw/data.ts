@@ -33,6 +33,8 @@ export function useFormSchema(): VbenFormSchema[] {
         precision: 2,
         step: 0.01,
         placeholder: '请输入提现金额',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
     },
     {

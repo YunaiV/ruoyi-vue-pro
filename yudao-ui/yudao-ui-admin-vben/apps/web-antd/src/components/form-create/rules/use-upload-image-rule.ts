@@ -47,7 +47,7 @@ export function useUploadImageRule() {
             { label: 'image/x-icon', value: 'image/x-icon' },
           ],
           props: {
-            multiple: false,
+            mode: 'multiple',
           },
         },
         {

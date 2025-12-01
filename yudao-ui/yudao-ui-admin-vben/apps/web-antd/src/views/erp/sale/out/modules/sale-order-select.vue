@@ -78,40 +78,42 @@ function handleSelectOrder(selectOrder: ErpSaleOrderApi.SaleOrder) {
 }
 
 /** 确认选择销售订单 */
-const handleOk = () => {
+function handleOk() {
   if (!order.value) {
     message.warning('请选择一个销售订单');
     return;
   }
   emit('update:order', order.value);
   open.value = false;
-};
+}
 </script>
 
 <template>
-  <Input
-    readonly
-    :value="orderNo"
-    :disabled="disabled"
-    @click="() => !disabled && (open = true)"
-  >
-    <template #addonAfter>
-      <div>
-        <IconifyIcon
-          class="h-full w-6 cursor-pointer"
-          icon="ant-design:setting-outlined"
-          :style="{ cursor: disabled ? 'not-allowed' : 'pointer' }"
-          @click="() => !disabled && (open = true)"
-        />
-      </div>
-    </template>
-  </Input>
-  <Modal
-    class="!w-[50vw]"
-    v-model:open="open"
-    title="选择关联订单"
-    @ok="handleOk"
-  >
-    <Grid class="max-h-[600px]" table-title="销售订单列表(仅展示可出库)" />
-  </Modal>
+  <div>
+    <Input
+      readonly
+      :value="orderNo"
+      :disabled="disabled"
+      @click="() => !disabled && (open = true)"
+    >
+      <template #addonAfter>
+        <div>
+          <IconifyIcon
+            class="h-full w-6 cursor-pointer"
+            icon="ant-design:setting-outlined"
+            :style="{ cursor: disabled ? 'not-allowed' : 'pointer' }"
+            @click="() => !disabled && (open = true)"
+          />
+        </div>
+      </template>
+    </Input>
+    <Modal
+      class="!w-[50vw]"
+      v-model:open="open"
+      title="选择关联订单"
+      @ok="handleOk"
+    >
+      <Grid class="max-h-[600px]" table-title="销售订单列表(仅展示可出库)" />
+    </Modal>
+  </div>
 </template>

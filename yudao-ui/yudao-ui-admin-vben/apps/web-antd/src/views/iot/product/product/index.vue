@@ -11,33 +11,29 @@ import { downloadFileFromBlobPart } from '@vben/utils';
 import { Button, Card, Image, Input, message, Space } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+import { getSimpleProductCategoryList } from '#/api/iot/product/category';
 import {
   deleteProduct,
   exportProduct,
   getProductPage,
 } from '#/api/iot/product/product';
-import { getSimpleProductCategoryList } from '#/api/iot/product/category';
 import { $t } from '#/locales';
 
 import { useGridColumns, useImagePreview } from './data';
-// @ts-ignore
-import ProductCardView from './modules/ProductCardView.vue';
-import ProductForm from './modules/ProductForm.vue';
+import ProductCardView from './modules/product-card-view.vue';
+import ProductForm from './modules/product-form.vue';
 
 defineOptions({ name: 'IoTProduct' });
 
 const router = useRouter();
-const categoryList = ref<any[]>([]);
+const categoryList = ref<any[]>([]); // TODO @haohao：category 类型
 const viewMode = ref<'card' | 'list'>('card');
 const cardViewRef = ref();
-
-// 搜索参数
 const searchParams = ref({
   name: '',
   productKey: '',
-});
+}); // 搜索参数
 
-// 图片预览
 const { previewVisible, previewImage, handlePreviewImage } = useImagePreview();
 
 const [FormModal, formModalApi] = useVbenModal({
@@ -45,18 +41,19 @@ const [FormModal, formModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
-// 加载产品分类列表
+/** 加载产品分类列表 */
 async function loadCategories() {
   categoryList.value = await getSimpleProductCategoryList();
 }
 
-// 获取分类名称
+/** 获取分类名称 */
 function getCategoryNameByValue(categoryId: number) {
   const category = categoryList.value.find((c: any) => c.id === categoryId);
   return category?.name || '未分类';
 }
 
-/** 搜索 */
+// TODO @haohao：要不要改成 handleRefresh，注释改成“刷新表格”，更加统一。
+/** 搜索产品 */
 function handleSearch() {
   if (viewMode.value === 'list') {
     gridApi.formApi.setValues(searchParams.value);
@@ -66,14 +63,14 @@ function handleSearch() {
   }
 }
 
-/** 重置 */
+/** 重置搜索 */
 function handleReset() {
   searchParams.value.name = '';
   searchParams.value.productKey = '';
   handleSearch();
 }
 
-/** 刷新 */
+/** 刷新表格 */
 function handleRefresh() {
   if (viewMode.value === 'list') {
     gridApi.query();
@@ -85,7 +82,7 @@ function handleRefresh() {
 /** 导出表格 */
 async function handleExport() {
   const data = await exportProduct(searchParams.value);
-  await downloadFileFromBlobPart({ fileName: '产品列表.xls', source: data });
+  downloadFileFromBlobPart({ fileName: '产品列表.xls', source: data });
 }
 
 /** 打开产品详情 */
@@ -118,12 +115,12 @@ function handleEdit(row: any) {
 /** 删除产品 */
 async function handleDelete(row: any) {
   const hideLoading = message.loading({
-    content: `正在删除 ${row.name}...`,
+    content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteProduct(row.id);
-    message.success(`删除 ${row.name} 成功`);
+    await deleteProduct(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess'));
     handleRefresh();
   } finally {
     hideLoading();
@@ -131,6 +128,7 @@ async function handleDelete(row: any) {
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
+  // TODO @haohao：这个不用，可以删除掉的
   formOptions: {
     schema: [],
   },
@@ -157,9 +155,10 @@ const [Grid, gridApi] = useVbenVxeGrid({
       refresh: true,
       search: true,
     },
-  } as VxeTableGridOptions,
+  } as VxeTableGridOptions, // TODO @haohao：这里有个 <> 泛型
 });
 
+/** 初始化 */
 onMounted(() => {
   loadCategories();
 });
@@ -173,22 +172,24 @@ onMounted(() => {
     <Card :body-style="{ padding: '16px' }" class="mb-4">
       <!-- 搜索表单 -->
       <div class="mb-3 flex items-center gap-3">
+        <!-- TODO @haohao：tindwind -->
         <Input
           v-model:value="searchParams.name"
           placeholder="请输入产品名称"
           allow-clear
-          style="width: 200px"
+          style="width: 220px"
           @press-enter="handleSearch"
         >
           <template #prefix>
             <span class="text-gray-400">产品名称</span>
           </template>
         </Input>
+        <!-- TODO @haohao：tindwind -->
         <Input
           v-model:value="searchParams.productKey"
           placeholder="请输入产品标识"
           allow-clear
-          style="width: 200px"
+          style="width: 220px"
           @press-enter="handleSearch"
         >
           <template #prefix>
@@ -204,20 +205,20 @@ onMounted(() => {
           重置
         </Button>
       </div>
-
       <!-- 操作按钮 -->
       <div class="flex items-center justify-between">
         <Space :size="12">
           <Button type="primary" @click="handleCreate">
+            <!-- TODO @haohao：按钮使用中立的，ACTION_ICON.ADD -->
             <IconifyIcon icon="ant-design:plus-outlined" class="mr-1" />
             新增产品
           </Button>
           <Button type="primary" @click="handleExport">
+            <!-- TODO @haohao：按钮使用中立的，ACTION_ICON.EXPORT -->
             <IconifyIcon icon="ant-design:download-outlined" class="mr-1" />
             导出
           </Button>
         </Space>
-
         <!-- 视图切换 -->
         <Space :size="4">
           <Button
@@ -237,16 +238,17 @@ onMounted(() => {
     </Card>
 
     <Grid v-show="viewMode === 'list'">
+      <!-- TODO @haohao：这里貌似可以删除掉 -->
       <template #toolbar-tools>
         <div></div>
       </template>
-
       <!-- 产品分类列 -->
+      <!-- TODO @haohao：这里应该可以拿到 data.ts，参考别的模块；类似 apps/web-antd/src/views/ai/image/manager/data.ts 里，里面查询 category ，和自己渲染-->
       <template #category="{ row }">
         <span>{{ getCategoryNameByValue(row.categoryId) }}</span>
       </template>
-
       <!-- 产品图标列 -->
+      <!-- TODO @haohao：直接用 Image 组件，就 ok 了呀。在 data.ts 里 -->
       <template #icon="{ row }">
         <Button
           v-if="row.icon"
@@ -258,7 +260,7 @@ onMounted(() => {
         </Button>
         <span v-else class="text-gray-400">-</span>
       </template>
-
+      <!-- TODO @haohao：直接用 Image 组件，就 ok 了呀。在 data.ts 里 -->
       <!-- 产品图片列 -->
       <template #picUrl="{ row }">
         <Button
@@ -271,8 +273,6 @@ onMounted(() => {
         </Button>
         <span v-else class="text-gray-400">-</span>
       </template>
-
-      <!-- 操作列 -->
       <template #actions="{ row }">
         <TableAction
           :actions="[
@@ -321,7 +321,9 @@ onMounted(() => {
     />
 
     <!-- 图片预览 -->
+    <!-- TODO @haohao：tindwind -->
     <div style="display: none">
+      <!-- TODO @haohao：是不是通过 Image 直接实现预览 -->
       <Image.PreviewGroup
         :preview="{
           visible: previewVisible,
@@ -334,6 +336,7 @@ onMounted(() => {
   </Page>
 </template>
 <style scoped>
+/** TODO @haohao：貌似这 2 个 css 没啥用？ */
 :deep(.vxe-toolbar div) {
   z-index: 1;
 }

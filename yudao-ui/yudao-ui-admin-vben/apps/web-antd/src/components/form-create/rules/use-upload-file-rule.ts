@@ -37,7 +37,7 @@ export function useUploadFileRule() {
             { label: 'pdf', value: 'pdf' },
           ],
           props: {
-            multiple: true,
+            mode: 'multiple',
           },
         },
         {

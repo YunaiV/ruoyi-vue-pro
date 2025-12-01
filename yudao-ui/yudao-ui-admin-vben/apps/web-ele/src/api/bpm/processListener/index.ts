@@ -3,7 +3,7 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace BpmProcessListenerApi {
-  /** BPM 流程监听器 */
+  /** 流程监听器 */
   export interface ProcessListener {
     id: number; // 编号
     name: string; // 监听器名字

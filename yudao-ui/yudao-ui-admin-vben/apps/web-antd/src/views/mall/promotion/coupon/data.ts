@@ -101,6 +101,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       formatter: 'formatDateTime',
     },
     {
+      field: 'actions',
       title: '操作',
       width: 100,
       fixed: 'right',

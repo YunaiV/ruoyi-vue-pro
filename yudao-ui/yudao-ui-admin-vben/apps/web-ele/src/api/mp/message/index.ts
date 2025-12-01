@@ -2,6 +2,7 @@ import type { PageParam, PageResult } from '@vben/request';
 
 import { requestClient } from '#/api/request';
 
+// TODO @dylan：这个类的代码，应该和对应的 antd 是一致的。调整下~看看相关的 vue 是不是也要调整掉。
 /** 消息类型枚举 */
 export enum MessageType {
   IMAGE = 'image', // 图片消息

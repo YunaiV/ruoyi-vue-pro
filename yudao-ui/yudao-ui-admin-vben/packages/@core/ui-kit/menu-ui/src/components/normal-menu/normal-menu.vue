@@ -125,16 +125,16 @@ $namespace: vben;
       border-color 0.15s ease;
 
     &.is-active {
-      @apply text-primary bg-primary dark:bg-accent;
+      @apply bg-primary text-primary dark:bg-accent;
 
       .#{$namespace}-normal-menu__name,
       .#{$namespace}-normal-menu__icon {
-        @apply text-primary-foreground font-semibold;
+        @apply font-semibold text-primary-foreground;
       }
     }
 
     &:not(.is-active):hover {
-      @apply dark:bg-accent text-primary bg-heavy dark:text-foreground;
+      @apply bg-heavy text-primary dark:bg-accent dark:text-foreground;
     }
 
     &:hover {

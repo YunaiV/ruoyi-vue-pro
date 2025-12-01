@@ -3,18 +3,6 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace CrmFollowUpApi {
-  /** 关联商机信息 */
-  export interface Business {
-    id: number;
-    name: string;
-  }
-
-  /** 关联联系人信息 */
-  export interface Contact {
-    id: number;
-    name: string;
-  }
-
   /** 跟进记录信息 */
   export interface FollowUpRecord {
     id: number; // 编号
@@ -31,6 +19,18 @@ export namespace CrmFollowUpApi {
     contacts: Contact[]; // 关联的联系人数组
     creator: string;
     creatorName?: string;
+  }
+
+  /** 关联商机信息 */
+  export interface Business {
+    id: number;
+    name: string;
+  }
+
+  /** 关联联系人信息 */
+  export interface Contact {
+    id: number;
+    name: string;
   }
 }
 

@@ -24,6 +24,7 @@ import {
 } from '#/api/bpm/processInstance';
 import { decodeFields, setConfAndFields2 } from '#/components/form-create';
 import { router } from '#/router';
+import ProcessInstanceBpmnViewer from '#/views/bpm/processInstance/detail/modules/bpm-viewer.vue';
 import ProcessInstanceSimpleViewer from '#/views/bpm/processInstance/detail/modules/simple-bpm-viewer.vue';
 import ProcessInstanceTimeline from '#/views/bpm/processInstance/detail/modules/time-line.vue';
 
@@ -49,10 +50,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['cancel']);
-
-// 增加表单就绪状态变量 表单就绪后再渲染form-create
-const isFormReady = ref(false);
-
 const { closeCurrentTab } = useTabs();
 
 const getTitle = computed(() => {
@@ -64,54 +61,50 @@ const detailForm = ref<ProcessFormData>({
   option: {},
   value: {},
 });
-
 const fApi = ref<any>();
+
 const startUserSelectTasks = ref<UserTask[]>([]);
 const startUserSelectAssignees = ref<Record<string, string[]>>({});
 const tempStartUserSelectAssignees = ref<Record<string, string[]>>({});
+
 const bpmnXML = ref<string | undefined>(undefined);
 const simpleJson = ref<string | undefined>(undefined);
+
 const timelineRef = ref<any>();
 const activeTab = ref('form');
 const activityNodes = ref<BpmProcessInstanceApi.ApprovalNodeInfo[]>([]);
 const processInstanceStartLoading = ref(false);
+
 /** 提交按钮 */
 async function submitForm() {
   if (!fApi.value || !props.selectProcessDefinition) {
     return;
   }
-
-  try {
-    // 流程表单校验
-    await fApi.value.validate();
-
-    // 校验指定审批人
-    if (startUserSelectTasks.value?.length > 0) {
-      for (const userTask of startUserSelectTasks.value) {
-        const assignees = startUserSelectAssignees.value[userTask.id];
-        if (Array.isArray(assignees) && assignees.length === 0) {
-          message.warning(`请选择${userTask.name}的候选人`);
-          return;
-        }
+  // 流程表单校验
+  await fApi.value.validate();
+  // 校验指定审批人
+  if (startUserSelectTasks.value?.length > 0) {
+    for (const userTask of startUserSelectTasks.value) {
+      const assignees = startUserSelectAssignees.value[userTask.id];
+      if (Array.isArray(assignees) && assignees.length === 0) {
+        message.warning(`请选择${userTask.name}的候选人`);
+        return;
       }
     }
+  }
 
+  processInstanceStartLoading.value = true;
+  try {
     // 提交请求
-    processInstanceStartLoading.value = true;
     await createProcessInstance({
       processDefinitionId: props.selectProcessDefinition.id,
       variables: detailForm.value.value,
       startUserSelectAssignees: startUserSelectAssignees.value,
     });
-
+    // 关闭并提示
     message.success('发起流程成功');
-
-    // TODO @ziye：有告警哈；
-    closeCurrentTab();
-
-    await router.push({ path: '/bpm/task/my' });
-  } catch (error) {
-    console.error('发起流程失败:', error);
+    await closeCurrentTab();
+    await router.push({ name: 'BpmTaskMy' });
   } finally {
     processInstanceStartLoading.value = false;
   }
@@ -129,20 +122,32 @@ async function initProcessInfo(row: any, formVariables?: any) {
     // 注意：需要从 formVariables 中，移除不在 row.formFields 的值。
     // 原因是：后端返回的 formVariables 里面，会有一些非表单的信息。例如说，某个流程节点的审批人。
     //        这样，就可能导致一个流程被审批不通过后，重新发起时，会直接后端报错！！！
-    const formApi = formCreate.create(decodeFields(row.formFields));
-    const allowedFields = formApi.fields();
-    for (const key in formVariables) {
-      if (!allowedFields.includes(key)) {
-        delete formVariables[key];
+
+    // 解析表单字段列表（不创建实例，避免重复渲染）
+    const decodedFields = decodeFields(row.formFields);
+    const allowedFields = new Set(
+      decodedFields.map((field: any) => field.field).filter(Boolean),
+    );
+
+    // 过滤掉不允许的字段
+    if (formVariables) {
+      for (const key in formVariables) {
+        if (!allowedFields.has(key)) {
+          delete formVariables[key];
+        }
       }
     }
+
     setConfAndFields2(detailForm, row.formConf, row.formFields, formVariables);
 
-    // 设置表单就绪状态
-    isFormReady.value = true;
+    // 在配置中禁用 form-create 自带的提交和重置按钮
+    detailForm.value.option = {
+      ...detailForm.value.option,
+      submitBtn: false,
+      resetBtn: false,
+    };
 
     await nextTick();
-    fApi.value?.btn.show(false); // 隐藏提交按钮
 
     // 获取流程审批信息,当再次发起时，流程审批节点要根据原始表单参数预测出来
     await getApprovalDetail({
@@ -159,30 +164,32 @@ async function initProcessInfo(row: any, formVariables?: any) {
     }
     // 情况二：业务表单
   } else if (row.formCustomCreatePath) {
+    // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
     await router.push({
       path: row.formCustomCreatePath,
     });
-    // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
+    // 返回选择流程
+    emit('cancel');
   }
 }
 
 /** 预测流程节点会因为输入的参数值而产生新的预测结果值，所以需重新预测一次 */
 watch(
-  detailForm.value,
+  () => detailForm.value.value,
   (newValue) => {
-    if (newValue && Object.keys(newValue.value).length > 0) {
+    if (newValue && Object.keys(newValue).length > 0) {
       // 记录之前的节点审批人
       tempStartUserSelectAssignees.value = startUserSelectAssignees.value;
       startUserSelectAssignees.value = {};
       // 加载最新的审批详情
       getApprovalDetail({
         id: props.selectProcessDefinition.id,
-        processVariablesStr: JSON.stringify(newValue.value), // 解决 GET 无法传递对象的问题，后端 String 再转 JSON
+        processVariablesStr: JSON.stringify(newValue), // 解决 GET 无法传递对象的问题，后端 String 再转 JSON
       });
     }
   },
   {
-    immediate: true,
+    deep: true,
   },
 );
 
@@ -191,53 +198,45 @@ async function getApprovalDetail(row: {
   id: string;
   processVariablesStr: string;
 }) {
-  try {
-    const data = await getApprovalDetailApi({
-      processDefinitionId: row.id,
-      activityId: BpmNodeIdEnum.START_USER_NODE_ID,
-      processVariablesStr: row.processVariablesStr,
+  const data = await getApprovalDetailApi({
+    processDefinitionId: row.id,
+    activityId: BpmNodeIdEnum.START_USER_NODE_ID,
+    processVariablesStr: row.processVariablesStr,
+  });
+  if (!data) {
+    message.error('查询不到审批详情信息！');
+    return;
+  }
+
+  // 获取审批节点
+  activityNodes.value = data.activityNodes;
+
+  // 获取发起人自选的任务
+  startUserSelectTasks.value = (data.activityNodes?.filter(
+    (node) =>
+      BpmCandidateStrategyEnum.START_USER_SELECT === node.candidateStrategy,
+  ) || []) as unknown as UserTask[];
+
+  // 恢复之前的选择审批人
+  if (startUserSelectTasks.value.length > 0) {
+    for (const node of startUserSelectTasks.value) {
+      const tempAssignees = tempStartUserSelectAssignees.value[node.id];
+      startUserSelectAssignees.value[node.id] = tempAssignees?.length
+        ? tempAssignees
+        : [];
+    }
+  }
+
+  // 设置表单字段权限
+  const formFieldsPermission = data.formFieldsPermission;
+  if (formFieldsPermission) {
+    Object.entries(formFieldsPermission).forEach(([field, permission]) => {
+      setFieldPermission(field, permission as string);
     });
-
-    if (!data) {
-      message.error('查询不到审批详情信息！');
-      return;
-    }
-
-    // 获取审批节点
-    activityNodes.value = data.activityNodes;
-
-    // 获取发起人自选的任务
-    startUserSelectTasks.value = (data.activityNodes?.filter(
-      (node) =>
-        BpmCandidateStrategyEnum.START_USER_SELECT === node.candidateStrategy,
-    ) || []) as unknown as UserTask[];
-
-    // 恢复之前的选择审批人
-    if (startUserSelectTasks.value.length > 0) {
-      for (const node of startUserSelectTasks.value) {
-        const tempAssignees = tempStartUserSelectAssignees.value[node.id];
-        startUserSelectAssignees.value[node.id] = tempAssignees?.length
-          ? tempAssignees
-          : [];
-      }
-    }
-
-    // 设置表单字段权限
-    const formFieldsPermission = data.formFieldsPermission;
-    if (formFieldsPermission) {
-      Object.entries(formFieldsPermission).forEach(([field, permission]) => {
-        setFieldPermission(field, permission as string);
-      });
-    }
-  } catch (error) {
-    message.error('获取审批详情失败');
-    console.error('获取审批详情失败:', error);
   }
 }
 
-/**
- * 设置表单权限
- */
+/** 设置表单权限 */
 function setFieldPermission(field: string, permission: string) {
   if (permission === BpmFieldPermissionType.READ) {
     fApi.value?.disabled(true, field);
@@ -297,7 +296,6 @@ defineExpose({ initProcessInfo });
             class="flex-1 overflow-auto"
           >
             <form-create
-              v-if="isFormReady"
               :rule="detailForm.rule"
               v-model:api="fApi"
               v-model="detailForm.value"
@@ -315,17 +313,21 @@ defineExpose({ initProcessInfo });
           </Col>
         </Row>
       </Tabs.TabPane>
-
       <Tabs.TabPane
         tab="流程图"
         key="flow"
         class="flex flex-1 overflow-hidden"
         :force-render="true"
       >
-        <div class="w-full">
+        <div class="h-full w-full">
+          <!-- BPMN 流程图预览 -->
+          <ProcessInstanceBpmnViewer
+            :bpmn-xml="bpmnXML"
+            v-if="BpmModelType.BPMN === selectProcessDefinition.modelType"
+          />
           <ProcessInstanceSimpleViewer
             :simple-json="simpleJson"
-            v-if="selectProcessDefinition.modelType === BpmModelType.SIMPLE"
+            v-if="BpmModelType.SIMPLE === selectProcessDefinition.modelType"
           />
         </div>
       </Tabs.TabPane>

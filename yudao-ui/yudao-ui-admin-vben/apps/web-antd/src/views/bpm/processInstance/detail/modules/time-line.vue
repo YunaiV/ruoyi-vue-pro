@@ -36,36 +36,23 @@ const emit = defineEmits<{
   selectUserConfirm: [activityId: string, userList: any[]];
 }>();
 
-const { push } = useRouter(); // 路由
+const { push } = useRouter();
 
-// 状态图标映射
 const statusIconMap: Record<
   string,
   { animation?: string; color: string; icon: string }
 > = {
-  // 跳过
-  '-2': { color: '#909398', icon: 'mdi:skip-forward-outline' },
-  // 审批未开始
-  '-1': { color: '#909398', icon: 'mdi:clock-outline' },
-  // 待审批
-  '0': { color: '#ff943e', icon: 'mdi:loading', animation: 'animate-spin' },
-  // 审批中
-  '1': { color: '#448ef7', icon: 'mdi:loading', animation: 'animate-spin' },
-  // 审批通过
-  '2': { color: '#00b32a', icon: 'mdi:check' },
-  // 审批不通过
-  '3': { color: '#f46b6c', icon: 'mdi:close' },
-  // 已取消
-  '4': { color: '#cccccc', icon: 'mdi:trash-can-outline' },
-  // 退回
-  '5': { color: '#f46b6c', icon: 'mdi:arrow-left' },
-  // 委派中
-  '6': { color: '#448ef7', icon: 'mdi:clock-outline' },
-  // 审批通过中
-  '7': { color: '#00b32a', icon: 'mdi:check' },
-};
-
-// 节点类型图标映射
+  '-2': { color: '#909398', icon: 'mdi:skip-forward-outline' }, // 跳过
+  '-1': { color: '#909398', icon: 'mdi:clock-outline' }, // 审批未开始
+  '0': { color: '#ff943e', icon: 'mdi:loading', animation: 'animate-spin' }, // 待审批
+  '1': { color: '#448ef7', icon: 'mdi:loading', animation: 'animate-spin' }, // 审批中
+  '2': { color: '#00b32a', icon: 'mdi:check' }, // 审批通过
+  '3': { color: '#f46b6c', icon: 'mdi:close' }, // 审批不通过
+  '4': { color: '#cccccc', icon: 'mdi:trash-can-outline' }, // 已取消
+  '5': { color: '#f46b6c', icon: 'mdi:arrow-left' }, // 退回
+  '6': { color: '#448ef7', icon: 'mdi:clock-outline' }, // 委派中
+  '7': { color: '#00b32a', icon: 'mdi:check' }, // 审批通过中
+}; // 状态图标映射
 const nodeTypeSvgMap = {
   // 结束节点
   [BpmNodeTypeEnum.END_EVENT_NODE]: {
@@ -107,40 +94,39 @@ const nodeTypeSvgMap = {
     color: '#14bb83',
     icon: 'icon-park-outline:tree-diagram',
   },
-} as Record<BpmNodeTypeEnum, { color: string; icon: string }>;
+} as Record<BpmNodeTypeEnum, { color: string; icon: string }>; // 节点类型图标映射
+const onlyStatusIconShow = [-1, 0, 1]; // 只有状态是 -1、0、1 才展示头像右小角状态小 icon
 
-// 只有状态是 -1、0、1 才展示头像右小角状态小icon
-const onlyStatusIconShow = [-1, 0, 1];
-
-// 获取审批节点类型图标
+/** 获取审批节点类型图标 */
 function getApprovalNodeTypeIcon(nodeType: BpmNodeTypeEnum) {
   return nodeTypeSvgMap[nodeType]?.icon;
 }
 
-// 获取审批节点图标
+/** 获取审批节点图标 */
 function getApprovalNodeIcon(taskStatus: number, nodeType: BpmNodeTypeEnum) {
   if (taskStatus === BpmTaskStatusEnum.NOT_START) {
     return statusIconMap[taskStatus]?.icon || 'mdi:clock-outline';
   }
-
   if (
-    nodeType === BpmNodeTypeEnum.START_USER_NODE ||
-    nodeType === BpmNodeTypeEnum.USER_TASK_NODE ||
-    nodeType === BpmNodeTypeEnum.TRANSACTOR_NODE ||
-    nodeType === BpmNodeTypeEnum.CHILD_PROCESS_NODE ||
-    nodeType === BpmNodeTypeEnum.END_EVENT_NODE
+    [
+      BpmNodeTypeEnum.CHILD_PROCESS_NODE,
+      BpmNodeTypeEnum.END_EVENT_NODE,
+      BpmNodeTypeEnum.START_USER_NODE,
+      BpmNodeTypeEnum.TRANSACTOR_NODE,
+      BpmNodeTypeEnum.USER_TASK_NODE,
+    ].includes(nodeType)
   ) {
     return statusIconMap[taskStatus]?.icon || 'mdi:clock-outline';
   }
   return 'mdi:clock-outline';
 }
 
-// 获取审批节点颜色
+/** 获取审批节点颜色 */
 function getApprovalNodeColor(taskStatus: number) {
   return statusIconMap[taskStatus]?.color;
 }
 
-// 获取审批节点时间
+/** 获取审批节点时间 */
 function getApprovalNodeTime(node: BpmProcessInstanceApi.ApprovalNodeInfo) {
   if (node.nodeType === BpmNodeTypeEnum.START_USER_NODE && node.startTime) {
     return formatDateTime(node.startTime);
@@ -154,7 +140,6 @@ function getApprovalNodeTime(node: BpmProcessInstanceApi.ApprovalNodeInfo) {
   return '';
 }
 
-// 选择自定义审批人
 const [UserSelectModalComp, userSelectModalApi] = useVbenModal({
   connectedComponent: UserSelectModal,
   destroyOnClose: true,
@@ -162,7 +147,7 @@ const [UserSelectModalComp, userSelectModalApi] = useVbenModal({
 const selectedActivityNodeId = ref<string>();
 const customApproveUsers = ref<Record<string, any[]>>({}); // key：activityId，value：用户列表
 
-// 打开选择用户弹窗
+/** 打开选择用户弹窗 */
 const handleSelectUser = (activityId: string, selectedList: any[]) => {
   selectedActivityNodeId.value = activityId;
   userSelectModalApi
@@ -170,7 +155,7 @@ const handleSelectUser = (activityId: string, selectedList: any[]) => {
     .open();
 };
 
-// 选择用户完成
+/** 选择用户完成 */
 const selectedUsers = ref<number[]>([]);
 function handleUserSelectConfirm(userList: any[]) {
   if (!selectedActivityNodeId.value) {
@@ -194,7 +179,7 @@ function handleChildProcess(activity: any) {
   });
 }
 
-// 判断是否需要显示自定义选择审批人
+/** 判断是否需要显示自定义选择审批人 */
 function shouldShowCustomUserSelect(
   activity: BpmProcessInstanceApi.ApprovalNodeInfo,
 ) {
@@ -209,7 +194,7 @@ function shouldShowCustomUserSelect(
   );
 }
 
-// 判断是否需要显示审批意见
+/** 判断是否需要显示审批意见 */
 function shouldShowApprovalReason(task: any, nodeType: BpmNodeTypeEnum) {
   return (
     task.reason &&
@@ -219,12 +204,12 @@ function shouldShowApprovalReason(task: any, nodeType: BpmNodeTypeEnum) {
   );
 }
 
-// 用户选择弹窗关闭
+/** 用户选择弹窗关闭 */
 function handleUserSelectClosed() {
   selectedUsers.value = [];
 }
 
-// 用户选择弹窗取消
+/** 用户选择弹窗取消 */
 function handleUserSelectCancel() {
   selectedUsers.value = [];
 }
@@ -241,7 +226,6 @@ const batchSetCustomApproveUsers = (data: Record<string, any[]>) => {
   });
 };
 
-// 暴露方法给父组件
 defineExpose({ setCustomApproveUsers, batchSetCustomApproveUsers });
 </script>
 
@@ -264,10 +248,9 @@ defineExpose({ setCustomApproveUsers, batchSetCustomApproveUsers });
                 class="size-6 text-white"
               />
             </div>
-
             <div
               v-if="showStatusIcon"
-              class="absolute right--2.5 top-4 flex size-5 items-center rounded-full border-2 border-solid border-white p-0.5"
+              class="absolute left-4 top-4 flex size-4 items-center rounded-full border-2 border-solid border-white p-0.5"
               :style="{
                 backgroundColor: getApprovalNodeColor(activity.status),
               }"
@@ -409,14 +392,14 @@ defineExpose({ setCustomApproveUsers, batchSetCustomApproveUsers });
                     v-if="
                       showStatusIcon && onlyStatusIconShow.includes(task.status)
                     "
-                    class="absolute left-6 top-5 flex items-center rounded-full border-2 border-solid border-white p-1"
+                    class="absolute left-5 top-5 flex items-center rounded-full border-2 border-solid border-white p-1"
                     :style="{
                       backgroundColor: statusIconMap[task.status]?.color,
                     }"
                   >
                     <IconifyIcon
                       :icon="statusIconMap[task.status]?.icon || 'lucide:clock'"
-                      class="size-2 text-white"
+                      class="size-1.5 text-white"
                       :class="[statusIconMap[task.status]?.animation]"
                     />
                   </div>

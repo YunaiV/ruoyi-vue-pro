@@ -1,4 +1,3 @@
-import type { MallAfterSaleApi } from '#/api/mall/trade/afterSale';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -20,19 +19,19 @@ export function useOrderInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'order.deliveryType',
       label: '配送方式',
-      content: (data: MallAfterSaleApi.AfterSale) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_DELIVERY_TYPE,
-          value: data?.order?.deliveryType,
+          value: val,
         }),
     },
     {
       field: 'order.type',
       label: '订单类型',
-      content: (data: MallAfterSaleApi.AfterSale) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_ORDER_TYPE,
-          value: data?.order?.type,
+          value: val,
         }),
     },
     {
@@ -46,10 +45,10 @@ export function useOrderInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'order.terminal',
       label: '订单来源',
-      content: (data: MallAfterSaleApi.AfterSale) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TERMINAL,
-          value: data?.order?.terminal,
+          value: val,
         }),
     },
     {
@@ -67,10 +66,10 @@ export function useOrderInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'order.payChannelCode',
       label: '付款方式',
-      content: (data: MallAfterSaleApi.AfterSale) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.PAY_CHANNEL_CODE,
-          value: data?.order?.payChannelCode,
+          value: val,
         }),
     },
     {
@@ -90,32 +89,30 @@ export function useAfterSaleInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'auditTime',
       label: '申请时间',
-      content: (data: MallAfterSaleApi.AfterSale) =>
-        formatDate(data?.auditTime) as string,
+      render: (val) => formatDate(val) as string,
     },
     {
       field: 'type',
       label: '售后类型',
-      content: (data: MallAfterSaleApi.AfterSale) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_AFTER_SALE_TYPE,
-          value: data?.type,
+          value: val,
         }),
     },
     {
       field: 'way',
       label: '售后方式',
-      content: (data: MallAfterSaleApi.AfterSale) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_AFTER_SALE_WAY,
-          value: data?.way,
+          value: val,
         }),
     },
     {
       field: 'refundPrice',
       label: '退款金额',
-      content: (data: MallAfterSaleApi.AfterSale) =>
-        fenToYuan(data?.refundPrice ?? 0),
+      render: (val) => fenToYuan(val ?? 0),
     },
     {
       field: 'applyReason',
@@ -128,8 +125,8 @@ export function useAfterSaleInfoSchema(): DescriptionItemSchema[] {
     {
       field: 'applyPicUrls',
       label: '凭证图片',
-      content: (data) => {
-        const images = data?.applyPicUrls || [];
+      render: (val) => {
+        const images = val || [];
         return h(
           'div',
           { class: 'flex gap-10px' },
@@ -153,16 +150,16 @@ export function useRefundStatusSchema(): DescriptionItemSchema[] {
     {
       field: 'status',
       label: '退款状态',
-      content: (data) =>
+      render: (val) =>
         h(DictTag, {
           type: DICT_TYPE.TRADE_AFTER_SALE_STATUS,
-          value: data?.status,
+          value: val,
         }),
     },
     {
       field: 'reminder',
       label: '提醒',
-      content: () =>
+      render: () =>
         h('div', { class: 'text-red-500 mb-10px' }, [
           h('div', '如果未发货，请点击同意退款给买家。'),
           h('div', '如果实际已发货，请主动与买家联系。'),

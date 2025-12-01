@@ -1,66 +1,69 @@
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { AiMusicApi } from '#/api/ai/music';
-import type { SystemUserApi } from '#/api/system/user';
-
-import { onMounted, ref } from 'vue';
 
 import { confirm, DocAlert, Page } from '@vben/common-ui';
-import { AiMusicStatusEnum } from '@vben/constants';
 
-import { Button, message, Switch } from 'ant-design-vue';
+import { Button, message } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteMusic, getMusicPage, updateMusic } from '#/api/ai/music';
-import { getSimpleUserList } from '#/api/system/user';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
-const userList = ref<SystemUserApi.User[]>([]); // 用户列表
 /** 刷新表格 */
 function handleRefresh() {
   gridApi.query();
 }
 
-/** 删除 */
+/** 删除音乐记录 */
 async function handleDelete(row: AiMusicApi.Music) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
   });
   try {
-    await deleteMusic(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-    });
+    await deleteMusic(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     handleRefresh();
   } finally {
     hideLoading();
   }
 }
+
 /** 修改是否发布 */
-const handleUpdatePublicStatusChange = async (row: AiMusicApi.Music) => {
-  try {
-    // 修改状态的二次确认
-    const text = row.publicStatus ? '公开' : '私有';
-    await confirm(`确认要"${text}"该图片吗?`).then(async () => {
-      await updateMusic({
-        id: row.id,
-        publicStatus: row.publicStatus,
+async function handleUpdatePublicStatusChange(
+  newStatus: boolean,
+  row: AiMusicApi.Music,
+): Promise<boolean | undefined> {
+  const text = newStatus ? '公开' : '私有';
+  return new Promise((resolve, reject) => {
+    confirm({
+      content: `确认要将该音乐切换为【${text}】吗？`,
+    })
+      .then(async () => {
+        // 更新音乐状态
+        await updateMusic({
+          id: row.id,
+          publicStatus: newStatus,
+        });
+        // 提示并返回成功
+        message.success($t('ui.actionMessage.operationSuccess'));
+        resolve(true);
+      })
+      .catch(() => {
+        reject(new Error('取消操作'));
       });
-      handleRefresh();
-    });
-  } catch {
-    row.publicStatus = !row.publicStatus;
-  }
-};
+  });
+}
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     schema: useGridFormSchema(),
   },
   gridOptions: {
-    columns: useGridColumns(),
+    columns: useGridColumns(handleUpdatePublicStatusChange),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -76,16 +79,13 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
       search: true,
     },
   } as VxeTableGridOptions<AiMusicApi.Music>,
-});
-onMounted(async () => {
-  // 获得下拉数据
-  userList.value = await getSimpleUserList();
 });
 </script>
 
@@ -99,11 +99,6 @@ onMounted(async () => {
         <TableAction :actions="[]" />
       </template>
 
-      <template #userId="{ row }">
-        <span>
-          {{ userList.find((item) => item.id === row.userId)?.nickname }}
-        </span>
-      </template>
       <template #content="{ row }">
         <Button
           type="link"
@@ -132,13 +127,6 @@ onMounted(async () => {
         >
           封面
         </Button>
-      </template>
-      <template #publicStatus="{ row }">
-        <Switch
-          v-model:checked="row.publicStatus"
-          @change="handleUpdatePublicStatusChange(row)"
-          :disabled="row.status !== AiMusicStatusEnum.SUCCESS"
-        />
       </template>
       <template #actions="{ row }">
         <TableAction

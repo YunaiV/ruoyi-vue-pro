@@ -39,7 +39,6 @@ import ProcessDesign from './modules/process-design.vue';
 
 defineOptions({ name: 'BpmModelCreate' });
 
-// 流程定义类型
 type BpmProcessDefinitionType = Omit<
   BpmProcessDefinitionApi.ProcessDefinition,
   'modelId' | 'modelType'
@@ -49,42 +48,17 @@ type BpmProcessDefinitionType = Omit<
 };
 
 const router = useRouter();
-
 const route = useRoute();
-
 const userStore = useUserStore();
+const tabs = useTabs();
 
-// 基础信息组件引用
-const basicInfoRef = ref<InstanceType<typeof BasicInfo>>();
-// 表单设计组件引用
-const formDesignRef = ref<InstanceType<typeof FormDesign>>();
-// 流程设计组件引用
-const processDesignRef = ref<InstanceType<typeof ProcessDesign>>();
-// 更多设置组件引用
-const extraSettingRef = ref<InstanceType<typeof ExtraSetting>>();
+const basicInfoRef = ref<InstanceType<typeof BasicInfo>>(); // 基础信息组件引用
+const formDesignRef = ref<InstanceType<typeof FormDesign>>(); // 表单设计组件引用
+const processDesignRef = ref<InstanceType<typeof ProcessDesign>>(); // 流程设计组件引用
+const extraSettingRef = ref<InstanceType<typeof ExtraSetting>>(); // 更多设置组件引用
 
-/** 步骤校验函数 */
-async function validateBasic() {
-  await basicInfoRef.value?.validate();
-}
-
-/** 表单设计校验 */
-async function validateForm() {
-  await formDesignRef.value?.validate();
-}
-
-/** 流程设计校验 */
-async function validateProcess() {
-  await processDesignRef.value?.validate();
-}
-
-/** 更多设置校验 */
-async function validateExtra() {
-  await extraSettingRef.value?.validate();
-}
-
+const actionType = route.params.type as string; // 操作类型：create、copy、update
 const currentStep = ref(-1); // 步骤控制。-1 用于，一开始全部不展示等当前页面数据初始化完成
-
 const steps = [
   { title: '基本信息', validator: validateBasic },
   { title: '表单设计', validator: validateForm },
@@ -92,7 +66,6 @@ const steps = [
   { title: '更多设置', validator: validateExtra },
 ];
 
-// 表单数据
 const formData: any = ref({
   id: undefined,
   name: '',
@@ -128,22 +101,38 @@ const formData: any = ref({
     summary: [],
   },
   allowWithdrawTask: false,
-});
+}); // 表单数据
+const processData = ref<any>(); // 流程数据
 
-// 流程数据
-const processData = ref<any>();
-
-provide('processData', processData);
-provide('modelData', formData);
-
-// 数据列表
 const formList = ref<BpmFormApi.Form[]>([]);
 const categoryList = ref<BpmCategoryApi.Category[]>([]);
 const userList = ref<SystemUserApi.User[]>([]);
 const deptList = ref<SystemDeptApi.Dept[]>([]);
 
+provide('processData', processData);
+provide('modelData', formData);
+
+/** 步骤校验函数 */
+async function validateBasic() {
+  await basicInfoRef.value?.validate();
+}
+
+/** 表单设计校验 */
+async function validateForm() {
+  await formDesignRef.value?.validate();
+}
+
+/** 流程设计校验 */
+async function validateProcess() {
+  await processDesignRef.value?.validate();
+}
+
+/** 更多设置校验 */
+async function validateExtra() {
+  await extraSettingRef.value?.validate();
+}
+
 /** 初始化数据 */
-const actionType = route.params.type as string;
 async function initData() {
   if (actionType === 'definition') {
     // 情况一：流程定义场景（恢复）
@@ -212,7 +201,6 @@ async function initData() {
 
   // 最终，设置 currentStep 切换到第一步
   currentStep.value = 0;
-
   // 以前未配置更多设置的流程
   extraSettingRef.value?.initData();
 }
@@ -291,7 +279,6 @@ async function handleSave() {
         formData.value.id = await createModel(modelData);
         // 提示成功
         message.success('复制成功，可点击【发布】按钮，进行发布模型');
-
         break;
       }
       case 'definition': {
@@ -299,15 +286,13 @@ async function handleSave() {
         await updateModel(modelData);
         // 提示成功
         message.success('恢复成功，可点击【发布】按钮，进行发布模型');
-
         break;
       }
       case 'update': {
-        // 修改场景
+        // 情况二：修改场景
         await updateModel(modelData);
         // 提示成功
         message.success('修改成功，可点击【发布】按钮，进行发布模型');
-
         break;
       }
       default: {
@@ -320,41 +305,40 @@ async function handleSave() {
 
     // 返回列表页（排除更新的情况）
     if (actionType !== 'update') {
-      router.push({ path: '/bpm/manager/model' });
+      await router.push({ name: 'BpmModel' });
     }
   } catch (error: any) {
     console.error('保存失败:', error);
-    // message.warning(error.msg || '请完善所有步骤的必填信息');
   }
 }
 
 /** 发布操作 */
 async function handleDeploy() {
   try {
-    // 修改场景下直接发布，新增场景下需要先确认
+    // 1.1 修改场景下直接发布，新增场景下需要先确认
     if (!formData.value.id) {
       await confirm('是否确认发布该流程？');
     }
-    // 校验所有步骤
+    // 1.2 校验所有步骤
     await validateAllSteps();
 
-    // 更新表单数据
+    // 2.1 更新表单数据
     const modelData = {
       ...formData.value,
     };
-
-    // 先保存所有数据
+    // 2.2 先保存所有数据
     if (formData.value.id) {
       await updateModel(modelData);
     } else {
       const result = await createModel(modelData);
       formData.value.id = result.id;
     }
-
-    // 发布
+    // 2.3 发布
     await deployModel(formData.value.id);
+
+    // 3. 路由并提示
     message.success('发布成功');
-    await router.push({ path: '/bpm/manager/model' });
+    await router.push({ name: 'BpmModel' });
   } catch (error: any) {
     console.error('发布失败:', error);
     message.warning(error.message || '发布失败');
@@ -386,14 +370,10 @@ async function handleStepClick(index: number) {
   }
 }
 
-const tabs = useTabs();
-
 /** 返回列表页 */
 function handleBack() {
-  // 关闭当前页签
   tabs.closeCurrentTab();
-  // 跳转到列表页，使用路径， 目前后端的路由 name： 'name'+ menuId
-  router.push({ path: '/bpm/manager/model' });
+  router.push({ name: 'BpmModel' });
 }
 
 /** 初始化 */
@@ -415,7 +395,7 @@ onBeforeUnmount(() => {
     <div class="mx-auto">
       <!-- 头部导航栏 -->
       <div
-        class="bg-card absolute inset-x-0 top-0 z-10 flex h-12 items-center border-b px-5"
+        class="absolute inset-x-0 top-0 z-10 flex h-12 items-center border-b bg-card px-5"
       >
         <!-- 左侧标题 -->
         <div class="flex w-48 items-center overflow-hidden">

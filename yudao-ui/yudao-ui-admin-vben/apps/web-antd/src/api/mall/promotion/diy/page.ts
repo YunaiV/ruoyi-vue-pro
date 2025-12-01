@@ -46,7 +46,7 @@ export function deleteDiyPage(id: number) {
 
 /** 获得装修页面属性 */
 export function getDiyPageProperty(id: number) {
-  return requestClient.get<string>(`/promotion/diy-page/get-property?id=${id}`);
+  return requestClient.get(`/promotion/diy-page/get-property?id=${id}`);
 }
 
 /** 更新装修页面属性 */

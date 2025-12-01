@@ -6,7 +6,6 @@ export async function vue(): Promise<Linter.Config[]> {
   const [pluginVue, parserVue, parserTs] = await Promise.all([
     interopDefault(import('eslint-plugin-vue')),
     interopDefault(import('vue-eslint-parser')),
-    // @ts-expect-error missing types
     interopDefault(import('@typescript-eslint/parser')),
   ] as const);
 

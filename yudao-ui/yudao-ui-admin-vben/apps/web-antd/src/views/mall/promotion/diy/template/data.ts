@@ -3,6 +3,8 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
 import { DICT_TYPE } from '@vben/constants';
 
+import { getRangePickerDefaultProps } from '#/utils';
+
 /** 表单配置 */
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -53,7 +55,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'Input',
       componentProps: {
         placeholder: '请输入模板名称',
-        allowClear: true,
+        clearable: true,
       },
     },
     {
@@ -61,9 +63,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '创建时间',
       component: 'RangePicker',
       componentProps: {
-        placeholder: ['开始时间', '结束时间'],
+        ...getRangePickerDefaultProps(),
         allowClear: true,
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
       },
     },
   ];

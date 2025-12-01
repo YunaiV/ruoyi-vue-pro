@@ -1,6 +1,5 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { SystemMailLogApi } from '#/api/system/mail/log';
 import type { DescriptionItemSchema } from '#/components/description';
 
 import { h } from 'vue';
@@ -59,7 +58,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '邮箱账号',
       component: 'ApiSelect',
       componentProps: {
-        api: async () => await getSimpleMailAccountList(),
+        api: getSimpleMailAccountList,
         labelField: 'mail',
         valueField: 'id',
         clearable: true,
@@ -164,9 +163,7 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'createTime',
       label: '创建时间',
-      content: (data: SystemMailLogApi.MailLog) => {
-        return formatDateTime(data?.createTime || '') as string;
-      },
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'fromMail',
@@ -175,12 +172,12 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'userId',
       label: '接收用户',
-      content: (data: SystemMailLogApi.MailLog) => {
-        if (data?.userType && data?.userId) {
+      render: (val, data) => {
+        if (val && data?.userId) {
           return h('div', [
             h(DictTag, {
               type: DICT_TYPE.USER_TYPE,
-              value: data.userType,
+              value: val,
             }),
             ` (${data.userId})`,
           ]);
@@ -191,10 +188,10 @@ export function useDetailSchema(): DescriptionItemSchema[] {
     {
       field: 'toMails',
       label: '接收信息',
-      content: (data: SystemMailLogApi.MailLog) => {
+      render: (val, data) => {
         const lines: string[] = [];
-        if (data?.toMails && data.toMails.length > 0) {
-          lines.push(`收件：${data.toMails.join('、')}`);
+        if (val && val.length > 0) {
+          lines.push(`收件：${val.join('、')}`);
         }
         if (data?.ccMails && data.ccMails.length > 0) {
           lines.push(`抄送：${data.ccMails.join('、')}`);
@@ -227,28 +224,22 @@ export function useDetailSchema(): DescriptionItemSchema[] {
       field: 'templateContent',
       label: '邮件内容',
       span: 2,
-      content: (data: SystemMailLogApi.MailLog) => {
-        return h('div', {
-          innerHTML: data?.templateContent || '',
-        });
-      },
+      render: (val) => h('div', { innerHTML: val || '' }),
     },
     {
       field: 'sendStatus',
       label: '发送状态',
-      content: (data: SystemMailLogApi.MailLog) => {
+      render: (val) => {
         return h(DictTag, {
           type: DICT_TYPE.SYSTEM_MAIL_SEND_STATUS,
-          value: data?.sendStatus,
+          value: val,
         });
       },
     },
     {
       field: 'sendTime',
       label: '发送时间',
-      content: (data: SystemMailLogApi.MailLog) => {
-        return formatDateTime(data?.sendTime || '') as string;
-      },
+      render: (val) => formatDateTime(val) as string,
     },
     {
       field: 'sendMessageId',

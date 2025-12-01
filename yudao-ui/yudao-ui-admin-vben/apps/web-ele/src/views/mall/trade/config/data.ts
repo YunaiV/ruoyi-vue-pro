@@ -56,7 +56,6 @@ export const schema: VbenFormSchema[] = [
       show: (values) => values.type === 'afterSale',
     },
   },
-  // TODO @xingyu：【缺陷】貌似 switch 在 schema 里报错了。直接。。。
   {
     fieldName: 'deliveryExpressFreeEnabled',
     label: '启用包邮',

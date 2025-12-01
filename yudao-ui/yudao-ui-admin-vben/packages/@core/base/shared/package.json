@@ -86,11 +86,9 @@
     "crypto-js": "catalog:",
     "dayjs": "catalog:",
     "defu": "catalog:",
+    "es-toolkit": "catalog:",
     "jsencrypt": "catalog:",
     "lodash.clonedeep": "catalog:",
-    "lodash.get": "catalog:",
-    "lodash.isequal": "catalog:",
-    "lodash.set": "catalog:",
     "nprogress": "catalog:",
     "tailwind-merge": "catalog:",
     "theme-colors": "catalog:"

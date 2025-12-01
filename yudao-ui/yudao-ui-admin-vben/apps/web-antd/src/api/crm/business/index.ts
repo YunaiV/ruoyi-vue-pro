@@ -5,19 +5,6 @@ import type { CrmPermissionApi } from '#/api/crm/permission';
 import { requestClient } from '#/api/request';
 
 export namespace CrmBusinessApi {
-  /** 商机产品信息 */
-  export interface BusinessProduct {
-    id: number;
-    productId: number;
-    productName: string;
-    productNo: string;
-    productUnit: number;
-    productPrice: number;
-    businessPrice: number;
-    count: number;
-    totalPrice: number;
-  }
-
   /** 商机信息 */
   export interface Business {
     id: number;
@@ -49,7 +36,21 @@ export namespace CrmBusinessApi {
     products?: BusinessProduct[];
   }
 
-  export interface BusinessStatus {
+  /** 商机产品信息 */
+  export interface BusinessProduct {
+    id: number;
+    productId: number;
+    productName: string;
+    productNo: string;
+    productUnit: number;
+    productPrice: number;
+    businessPrice: number;
+    count: number;
+    totalPrice: number;
+  }
+
+  /** 商机更新状态请求 */
+  export interface BusinessUpdateStatusReqVO {
     id: number;
     statusId: number | undefined;
     endStatus: number | undefined;
@@ -97,7 +98,9 @@ export function updateBusiness(data: CrmBusinessApi.Business) {
 }
 
 /** 修改商机状态 */
-export function updateBusinessStatus(data: CrmBusinessApi.BusinessStatus) {
+export function updateBusinessStatus(
+  data: CrmBusinessApi.BusinessUpdateStatusReqVO,
+) {
   return requestClient.put('/crm/business/update-status', data);
 }
 
@@ -120,6 +123,6 @@ export function getBusinessPageByContact(params: PageParam) {
 }
 
 /** 商机转移 */
-export function transferBusiness(data: CrmPermissionApi.TransferReq) {
+export function transferBusiness(data: CrmPermissionApi.BusinessTransferReqVO) {
   return requestClient.put('/crm/business/transfer', data);
 }

@@ -49,14 +49,15 @@ const formData = ref<
 const formType = ref(''); // 表单类型：'create' | 'edit' | 'detail'
 const itemFormRef = ref<InstanceType<typeof ItemForm>>();
 
-/* eslint-disable unicorn/no-nested-ternary */
-const getTitle = computed(() =>
-  formType.value === 'create'
-    ? $t('ui.actionTitle.create', ['销售退货'])
-    : formType.value === 'edit'
-      ? $t('ui.actionTitle.edit', ['销售退货'])
-      : '销售退货详情',
-);
+const getTitle = computed(() => {
+  if (formType.value === 'create') {
+    return $t('ui.actionTitle.create', ['销售退货']);
+  } else if (formType.value === 'edit') {
+    return $t('ui.actionTitle.edit', ['销售退货']);
+  } else {
+    return '销售退货详情';
+  }
+});
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -83,36 +84,36 @@ const [Form, formApi] = useVbenForm({
 });
 
 /** 更新销售退货项 */
-const handleUpdateItems = (items: ErpSaleReturnApi.SaleReturnItem[]) => {
+function handleUpdateItems(items: ErpSaleReturnApi.SaleReturnItem[]) {
   formData.value.items = items;
   formApi.setValues({
     items,
   });
-};
+}
 
 /** 更新其他费用 */
-const handleUpdateOtherPrice = (otherPrice: number) => {
+function handleUpdateOtherPrice(otherPrice: number) {
   formApi.setValues({
     otherPrice,
   });
-};
+}
 
 /** 更新优惠金额 */
-const handleUpdateDiscountPrice = (discountPrice: number) => {
+function handleUpdateDiscountPrice(discountPrice: number) {
   formApi.setValues({
     discountPrice,
   });
-};
+}
 
 /** 更新总金额 */
-const handleUpdateTotalPrice = (totalPrice: number) => {
+function handleUpdateTotalPrice(totalPrice: number) {
   formApi.setValues({
     totalPrice,
   });
-};
+}
 
 /** 选择销售订单 */
-const handleUpdateOrder = (order: ErpSaleOrderApi.SaleOrder) => {
+function handleUpdateOrder(order: ErpSaleOrderApi.SaleOrder) {
   formData.value = {
     ...formData.value,
     orderId: order.id,
@@ -134,7 +135,7 @@ const handleUpdateOrder = (order: ErpSaleOrderApi.SaleOrder) => {
     (item) => item.count && item.count > 0,
   ) as ErpSaleReturnApi.SaleReturnItem[];
   formApi.setValues(formData.value, false);
-};
+}
 
 /** 创建或更新销售退货 */
 const [Modal, modalApi] = useVbenModal({
@@ -170,7 +171,7 @@ const [Modal, modalApi] = useVbenModal({
   },
   async onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      formData.value = undefined;
+      formData.value = {} as ErpSaleReturnApi.SaleReturn;
       return;
     }
     // 加载数据

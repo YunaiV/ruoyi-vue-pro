@@ -117,7 +117,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
                   <Tag
                     color="blue"
                     v-for="property in item.properties"
-                    :key="property.id"
+                    :key="property.propertyId"
                   >
                     {{ property.propertyName }} : {{ property.valueName }}
                   </Tag>

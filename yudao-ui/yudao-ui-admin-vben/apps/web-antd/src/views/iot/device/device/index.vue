@@ -32,11 +32,10 @@ import { getSimpleProductList } from '#/api/iot/product/product';
 import { $t } from '#/locales';
 
 import { useGridColumns } from './data';
-// @ts-ignore
-import DeviceCardView from './modules/DeviceCardView.vue';
-import DeviceForm from './modules/DeviceForm.vue';
-import DeviceGroupForm from './modules/DeviceGroupForm.vue';
-import DeviceImportForm from './modules/DeviceImportForm.vue';
+import DeviceCardView from './modules/device-card-view.vue';
+import DeviceForm from './modules/device-form.vue';
+import DeviceGroupForm from './modules/device-group-form.vue';
+import DeviceImportForm from './modules/device-import-form.vue';
 
 /** IoT 设备列表 */
 defineOptions({ name: 'IoTDevice' });
@@ -49,6 +48,7 @@ const viewMode = ref<'card' | 'list'>('card');
 const cardViewRef = ref();
 
 // Modal instances
+// TODO @haohao：这个界面，等 product 改完，在一起看看怎么弄更好。
 const [DeviceFormModal, deviceFormModalApi] = useVbenModal({
   connectedComponent: DeviceForm,
   destroyOnClose: true,
@@ -308,7 +308,7 @@ onMounted(async () => {
           style="width: 200px"
         >
           <Select.Option
-            v-for="dict in getIntDictOptions(DICT_TYPE.IOT_DEVICE_STATUS)"
+            v-for="dict in getIntDictOptions(DICT_TYPE.IOT_DEVICE_STATE)"
             :key="dict.value"
             :value="dict.value"
           >
@@ -407,7 +407,7 @@ onMounted(async () => {
       <!-- 所属产品列 -->
       <template #product="{ row }">
         <a
-          class="text-primary cursor-pointer"
+          class="cursor-pointer text-primary"
           @click="openProductDetail(row.productId)"
         >
           {{ products.find((p: any) => p.id === row.productId)?.name || '-' }}

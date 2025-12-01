@@ -37,7 +37,7 @@ const date = useDateFormat(now, 'YYYY-MM-DD dddd', { locales: locale.value });
 const showUnlockForm = ref(false);
 const { lockScreenPassword } = storeToRefs(accessStore);
 
-const [Form, { form, validate }] = useVbenForm(
+const [Form, { form, validate, getFieldComponentRef }] = useVbenForm(
   reactive({
     commonConfig: {
       hideLabel: true,
@@ -75,6 +75,13 @@ async function handleSubmit() {
 
 function toggleUnlockForm() {
   showUnlockForm.value = !showUnlockForm.value;
+  if (showUnlockForm.value) {
+    requestAnimationFrame(() => {
+      getFieldComponentRef('password')
+        ?.$el?.querySelector('[name="password"]')
+        ?.focus();
+    });
+  }
 }
 
 useScrollLock();

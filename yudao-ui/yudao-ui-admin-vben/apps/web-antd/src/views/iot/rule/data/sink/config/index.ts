@@ -1,6 +1,6 @@
-export { default as HttpConfigForm } from './HttpConfigForm.vue';
-export { default as KafkaMQConfigForm } from './KafkaMQConfigForm.vue';
-export { default as MqttConfigForm } from './MqttConfigForm.vue';
-export { default as RabbitMQConfigForm } from './RabbitMQConfigForm.vue';
-export { default as RedisStreamConfigForm } from './RedisStreamConfigForm.vue';
-export { default as RocketMQConfigForm } from './RocketMQConfigForm.vue';
+export { default as HttpConfigForm } from './http-config-form.vue';
+export { default as KafkaMqConfigForm } from './kafka-mq-config-form.vue';
+export { default as MqttConfigForm } from './mqtt-config-form.vue';
+export { default as RabbitMqConfigForm } from './rabbit-mq-config-form.vue';
+export { default as RedisStreamConfigForm } from './redis-stream-config-form.vue';
+export { default as RocketMqConfigForm } from './rocket-mq-config-form.vue';

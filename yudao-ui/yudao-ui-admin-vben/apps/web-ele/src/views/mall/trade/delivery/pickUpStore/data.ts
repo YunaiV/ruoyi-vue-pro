@@ -65,7 +65,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'ApiTreeSelect',
       rules: 'required',
       componentProps: {
-        api: () => getAreaTree(),
+        api: getAreaTree,
         labelField: 'name',
         valueField: 'id',
         childrenField: 'children',
@@ -147,7 +147,7 @@ export function useBindFormSchema(): VbenFormSchema[] {
       label: '门店店员',
       rules: 'required',
       componentProps: {
-        api: () => getSimpleUserList(),
+        api: getSimpleUserList,
         labelField: 'nickname',
         valueField: 'id',
         multiple: true,

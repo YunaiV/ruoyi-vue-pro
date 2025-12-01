@@ -11,7 +11,7 @@ import { TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { FREE_MODE_TITLE_MAP, useFreesColumns } from '../data';
 
 interface Props {
-  items?: MallDeliveryExpressTemplateApi.TemplateFree[];
+  items?: MallDeliveryExpressTemplateApi.DeliveryExpressTemplateFree[];
   chargeMode?: number;
   areaTree?: SystemAreaApi.Area[];
 }

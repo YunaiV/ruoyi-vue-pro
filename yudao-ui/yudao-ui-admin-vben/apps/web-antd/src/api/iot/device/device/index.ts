@@ -3,7 +3,8 @@ import type { PageParam, PageResult } from '@vben/request';
 import { requestClient } from '#/api/request';
 
 export namespace IotDeviceApi {
-  /** IoT 设备 VO */
+  // TODO @haohao：需要跟后端对齐，必要的 ReqVO、RespVO
+  /** 设备 */
   export interface Device {
     id?: number; // 设备 ID，主键，自增
     deviceName: string; // 设备名称
@@ -48,7 +49,7 @@ export namespace IotDeviceApi {
     dataSpecsList: any[]; // 数据定义列表
   }
 
-  /** IoT 设备属性 VO */
+  /** 设备属性 VO */
   export interface DeviceProperty {
     identifier: string; // 属性标识符
     value: string; // 最新值
@@ -62,7 +63,7 @@ export namespace IotDeviceApi {
     password: string; // 密码
   }
 
-  /** IoT 设备发送消息 Request VO */
+  /** 设备发送消息 Request VO */
   export interface DeviceMessageSendReq {
     deviceId: number; // 设备编号
     method: string; // 请求方法
@@ -77,6 +78,7 @@ export namespace IotDeviceApi {
 }
 
 /** IoT 设备状态枚举 */
+// TODO @haohao：packages/constants/src/biz-iot-enum.ts 枚举；
 export enum DeviceStateEnum {
   INACTIVE = 0, // 未激活
   OFFLINE = 2, // 离线

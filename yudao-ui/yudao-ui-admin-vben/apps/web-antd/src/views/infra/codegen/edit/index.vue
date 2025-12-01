@@ -86,7 +86,7 @@ async function submitForm() {
 const tabs = useTabs();
 function close() {
   tabs.closeCurrentTab();
-  router.push('/infra/codegen');
+  router.push({ name: 'InfraCodegen' });
 }
 
 /** 下一步 */
@@ -120,7 +120,7 @@ getDetail();
 
 <template>
   <Page auto-content-height v-loading="loading">
-    <div class="bg-card flex h-[95%] flex-col rounded-md p-4">
+    <div class="flex h-[95%] flex-col rounded-md bg-card p-4">
       <Steps
         type="navigation"
         v-model:current="currentStep"

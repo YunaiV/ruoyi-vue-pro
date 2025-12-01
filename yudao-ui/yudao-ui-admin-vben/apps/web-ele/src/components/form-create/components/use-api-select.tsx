@@ -15,7 +15,7 @@ import {
 
 import { requestClient } from '#/api/request';
 
-export const useApiSelect = (option: ApiSelectProps) => {
+export function useApiSelect(option: ApiSelectProps) {
   return defineComponent({
     name: option.name,
     props: {
@@ -68,6 +68,11 @@ export const useApiSelect = (option: ApiSelectProps) => {
       remoteField: {
         type: String,
         default: 'label',
+      },
+      // 返回值类型（用于部门选择器等）：id 返回 ID，name 返回名称
+      returnType: {
+        type: String,
+        default: 'id',
       },
     },
     setup(props) {
@@ -129,10 +134,21 @@ export const useApiSelect = (option: ApiSelectProps) => {
 
       function parseOptions0(data: any[]) {
         if (Array.isArray(data)) {
-          options.value = data.map((item: any) => ({
-            label: parseExpression(item, props.labelField),
-            value: parseExpression(item, props.valueField),
-          }));
+          options.value = data.map((item: any) => {
+            const label = parseExpression(item, props.labelField);
+            let value = parseExpression(item, props.valueField);
+
+            // 根据 returnType 决定返回值
+            // 如果设置了 returnType 为 'name'，则返回 label 作为 value
+            if (props.returnType === 'name') {
+              value = label;
+            }
+
+            return {
+              label,
+              value,
+            };
+          });
           return;
         }
         console.warn(`接口[${props.url}] 返回结果不是一个数组`);
@@ -285,4 +301,4 @@ export const useApiSelect = (option: ApiSelectProps) => {
       );
     },
   });
-};
+}

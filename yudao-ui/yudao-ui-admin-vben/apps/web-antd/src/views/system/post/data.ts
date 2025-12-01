@@ -21,12 +21,18 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'name',
       label: '岗位名称',
+      componentProps: {
+        placeholder: '请输入岗位名称',
+      },
       rules: 'required',
     },
     {
       component: 'Input',
       fieldName: 'code',
       label: '岗位编码',
+      componentProps: {
+        placeholder: '请输入岗位编码',
+      },
       rules: 'required',
     },
     {
@@ -35,6 +41,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
+        placeholder: '请输入显示顺序',
       },
       rules: 'required',
     },
@@ -53,6 +60,9 @@ export function useFormSchema(): VbenFormSchema[] {
       fieldName: 'remark',
       label: '岗位备注',
       component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入岗位备注',
+      },
     },
   ];
 }

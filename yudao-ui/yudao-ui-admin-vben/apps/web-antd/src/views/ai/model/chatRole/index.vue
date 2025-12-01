@@ -4,7 +4,7 @@ import type { AiModelChatRoleApi } from '#/api/ai/model/chatRole';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
 
-import { Image, message } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteChatRole, getChatRolePage } from '#/api/ai/model/chatRole';
@@ -23,27 +23,25 @@ function handleRefresh() {
   gridApi.query();
 }
 
-/** 创建 */
+/** 创建聊天角色 */
 function handleCreate() {
   formModalApi.setData({ formType: 'create' }).open();
 }
 
-/** 编辑 */
+/** 编辑聊天角色 */
 function handleEdit(row: AiModelChatRoleApi.ChatRole) {
   formModalApi.setData({ formType: 'update', ...row }).open();
 }
 
-/** 删除 */
+/** 删除聊天角色 */
 async function handleDelete(row: AiModelChatRoleApi.ChatRole) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
     duration: 0,
   });
   try {
-    await deleteChatRole(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.name]),
-    });
+    await deleteChatRole(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.name]));
     handleRefresh();
   } finally {
     hideLoading();
@@ -71,6 +69,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: true,
@@ -99,17 +98,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
             },
           ]"
         />
-      </template>
-      <template #knowledgeIds="{ row }">
-        <span v-if="!row.knowledgeIds || row.knowledgeIds.length === 0">-</span>
-        <span v-else>引用 {{ row.knowledgeIds.length }} 个</span>
-      </template>
-      <template #toolIds="{ row }">
-        <span v-if="!row.toolIds || row.toolIds.length === 0">-</span>
-        <span v-else>引用 {{ row.toolIds.length }} 个</span>
-      </template>
-      <template #avatar="{ row }">
-        <Image :src="row.avatar" class="h-8 w-8" />
       </template>
       <template #actions="{ row }">
         <TableAction

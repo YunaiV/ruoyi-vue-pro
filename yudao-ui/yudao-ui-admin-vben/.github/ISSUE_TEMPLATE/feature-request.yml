@@ -1,0 +1,70 @@
+name: ✨ New Feature Proposal
+description: Propose a new feature to be added to Vben Admin
+title: 'FEATURE: '
+labels: ['enhancement: pending triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature for our project! Please fill out the information below to help us understand and implement your request!
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: What version of our software are you running?
+      options:
+        - Vben Admin V5
+        - Vben Admin V2
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A detailed description of the feature request.
+      placeholder: Please describe the feature you would like to see, and why it would be useful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: A clear and concise description of what you want to happen.
+      placeholder: Describe the solution you'd like to see
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: |
+        A clear and concise description of any alternative solutions or features you've considered.
+      placeholder: Describe any alternative solutions or features you've considered
+    validations:
+      required: false
+
+  - type: input
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context or screenshots about the feature request here.
+      placeholder: Any additional information
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Read the [docs](https://doc.vben.pro/)
+          required: true
+        - label: Ensure the code is up to date. (Some issues have been fixed in the latest version)
+          required: true
+        - label: I have searched the [existing issues](https://github.com/vbenjs/vue-vben-admin/issues) and checked that my issue does not duplicate any existing issues.
+          required: true
