@@ -14,12 +14,12 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2025.10-SNAPSHOT</revision>
+        <revision>2025.11-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.5.5</spring.boot.version>
+        <spring.boot.version>3.5.8</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.8.11</springdoc.version>
+        <springdoc.version>2.8.14</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
         <!-- DB 相关 -->
         <druid.version>1.2.27</druid.version>
@@ -28,54 +28,53 @@
         <mybatis-plus-join.version>1.5.4</mybatis-plus-join.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
-        <redisson.version>3.51.0</redisson.version>
+        <redisson.version>3.52.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
-        <taos.version>3.7.3</taos.version>
+        <taos.version>3.7.8</taos.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.4</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.5.0</skywalking.version>
-        <spring-boot-admin.version>3.5.2</spring-boot-admin.version>
+        <spring-boot-admin.version>3.5.6</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
-        <jedis-mock.version>1.1.11</jedis-mock.version>
+        <jedis-mock.version>1.1.12</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
-        <flowable.version>7.0.1</flowable.version>
+        <flowable.version>7.2.0</flowable.version>
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.21.2</jsoup.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.40</hutool-5.version>
+        <hutool-5.version>5.8.41</hutool-5.version>
         <hutool-6.version>6.0.0-M22</hutool-6.version>
         <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
-        <commons-net.version>3.11.1</commons-net.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
-        <jsch.version>2.27.3</jsch.version>
-        <tika-core.version>3.2.2</tika-core.version>
+        <commons-net.version>3.12.0</commons-net.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <jsch.version>2.27.6</jsch.version>
+        <tika-core.version>3.2.3</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.4.Final</netty.version>
+        <netty.version>4.2.7.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
-        <pf4j-spring.version>0.9.0</pf4j-spring.version>
-        <vertx.version>4.5.13</vertx.version>
+        <vertx.version>4.5.22</vertx.version>
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.30.14</awssdk.version>
+        <awssdk.version>2.39.2</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.1.1</jimureport.version>
-        <jimubi.version>2.1.0</jimubi.version>
-        <weixin-java.version>4.7.7-20250808.182223</weixin-java.version>
+        <jimureport.version>2.1.3</jimureport.version>
+        <jimubi.version>2.2.0</jimubi.version>
+        <weixin-java.version>4.7.8-20251117.120146</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -614,19 +613,6 @@
                     <exclusion>
                         <groupId>cn.hutool</groupId>
                         <artifactId>hutool-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- PF4J -->
-            <dependency>
-                <groupId>org.pf4j</groupId>
-                <artifactId>pf4j-spring</artifactId>
-                <version>${pf4j-spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

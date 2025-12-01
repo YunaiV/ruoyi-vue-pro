@@ -9,8 +9,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.ollama.api.OllamaModel;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class LlamaChatModelTests {
             .ollamaApi(OllamaApi.builder()
                     .baseUrl("http://127.0.0.1:11434")  // Ollama 服务地址
                     .build())
-            .defaultOptions(OllamaOptions.builder()
+            .defaultOptions(OllamaChatOptions.builder()
                     .model(OllamaModel.LLAMA3.getName()) // 模型
                     .build())
             .build();
@@ -70,7 +70,7 @@ public class LlamaChatModelTests {
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
-        OllamaOptions options = OllamaOptions.builder()
+        OllamaChatOptions options = OllamaChatOptions.builder()
                 .model("qwen3")
                 .build();
 
@@ -82,6 +82,5 @@ public class LlamaChatModelTests {
             System.out.println(response.getResult().getOutput());
         }).then().block();
     }
-
 
 }

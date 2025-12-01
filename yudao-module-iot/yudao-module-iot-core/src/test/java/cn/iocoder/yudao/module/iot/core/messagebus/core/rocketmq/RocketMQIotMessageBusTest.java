@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.TestMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.autoconfigure.RocketMQAutoConfiguration;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -28,12 +29,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = RocketMQIotMessageBusTest.class)
 @Import({RocketMQAutoConfiguration.class, IotMessageBusAutoConfiguration.class})
 @TestPropertySource(properties = {
-    "yudao.iot.message-bus.type=rocketmq",
-    "rocketmq.name-server=127.0.0.1:9876",
-    "rocketmq.producer.group=test-rocketmq-group",
-    "rocketmq.producer.send-message-timeout=10000"
+        "yudao.iot.message-bus.type=rocketmq",
+        "rocketmq.name-server=127.0.0.1:9876",
+        "rocketmq.producer.group=test-rocketmq-group",
+        "rocketmq.producer.send-message-timeout=10000"
 })
 @Slf4j
+@Disabled
 public class RocketMQIotMessageBusTest {
 
     @Resource

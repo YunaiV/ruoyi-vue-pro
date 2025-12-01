@@ -42,9 +42,6 @@ public class IotSceneRuleMessageHandler implements IotMessageSubscriber<IotDevic
 
     @Override
     public void onMessage(IotDeviceMessage message) {
-        if (true) {
-            return;
-        }
         log.info("[onMessage][消息内容({})]", message);
         sceneRuleService.executeSceneRuleByDevice(message);
     }

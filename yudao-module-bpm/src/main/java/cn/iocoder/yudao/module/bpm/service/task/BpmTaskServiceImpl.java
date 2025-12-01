@@ -69,7 +69,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
-//import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 
 /**
@@ -377,6 +376,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         // 2.2 过滤：只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
         previousUserList.removeIf(userTask -> !BpmnModelUtils.isSequentialReachable(source, userTask, null));
+
+        // 2.3 过滤：只能退回到已经处理过的节点（排除审批未经过的节点）。相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/982
+        List<HistoricTaskInstance> finishedTasks = getFinishedTaskListByProcessInstanceIdWithoutCancel(task.getProcessInstanceId());
+        Set<String> finishedTaskDefinitionKeys = convertSet(finishedTasks, HistoricTaskInstance::getTaskDefinitionKey);
+        previousUserList.removeIf(userTask -> !finishedTaskDefinitionKeys.contains(userTask.getId()));
         return previousUserList;
     }
 
@@ -545,6 +549,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO) {
         // 1.1 校验任务存在
         Task task = validateTask(userId, reqVO.getId());
@@ -604,11 +609,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 bpmnModel, reqVO.getNextAssignees(), instance);
         runtimeService.setVariables(task.getProcessInstanceId(), variables);
 
-        // 5. 移除辅助预测的流程变量，这些变量在回退操作中设置
-        // todo @jason：可以直接 + 拼接哈
-        String simulateVariableName = StrUtil.concat(false,
-                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, task.getTaskDefinitionKey());
-        runtimeService.removeVariable(task.getProcessInstanceId(), simulateVariableName);
+        // 5. 如果当前节点 Id 存在于需要预测的流程节点中，从中移除。 流程变量在回退操作中设置
+        Object needSimulateTaskIds = runtimeService.getVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS);
+        Set<String> needSimulateTaskIdsByReturn = Convert.toSet(String.class, needSimulateTaskIds);
+        if (needSimulateTaskIdsByReturn.contains(task.getTaskDefinitionKey())) {
+            needSimulateTaskIdsByReturn.remove(task.getTaskDefinitionKey());
+            runtimeService.setVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskIdsByReturn);
+        }
 
         // 6. 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
@@ -787,6 +794,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
         // 1.1 校验任务存在
         Task task = validateTask(userId, reqVO.getId());
@@ -854,6 +862,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void returnTask(Long userId, BpmTaskReturnReqVO reqVO) {
         // 1.1 当前任务 task
         Task task = validateTask(userId, reqVO.getId());
@@ -937,24 +946,21 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         });
 
         // 3. 构建需要预测的任务流程变量
-        // TODO @jason：【驳回预测相关】是不是搞成一个变量，里面是 set 更简洁一点呀？
         Set<String> needSimulateTaskDefinitionKeys = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
-        Map<String, Object> needSimulateVariables = convertMap(needSimulateTaskDefinitionKeys,
-                key -> StrUtil.concat(false, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_PREFIX, key), item -> Boolean.TRUE);
-
 
         // 4. 执行驳回
-        // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
-        // 当多实例任务回退的时候有问题。相关 issue: https://github.com/flowable/flowable-engine/issues/3944
+        // ① 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId。原因：当多实例任务回退的时候有问题。
+        //    相关 issue: https://github.com/flowable/flowable-engine/issues/3944
+        // ② flowable 7.2.0 版本后，继续使用 moveActivityIdsToSingleActivityId 方法。原因：flowable 7.2.0 版本修复了该问题。
+        //    相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1018
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
-                // 设置需要预测的任务流程变量，用于辅助预测
-                .processVariables(needSimulateVariables)
-                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
+                .moveActivityIdsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
+                // 设置需要预测的任务 ids 的流程变量，用于辅助预测
+                .processVariable(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskDefinitionKeys)
+                // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
                 .localVariable(reqVO.getTargetTaskDefinitionKey(),
-                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()),
-                        Boolean.TRUE)
+                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE)
                 .changeState();
     }
 
@@ -987,6 +993,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void delegateTask(Long userId, BpmTaskDelegateReqVO reqVO) {
         String taskId = reqVO.getId();
         // 1.1 校验任务
@@ -1016,6 +1023,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void transferTask(Long userId, BpmTaskTransferReqVO reqVO) {
         String taskId = reqVO.getId();
         // 1.1 校验任务
@@ -1046,6 +1055,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void moveTaskToEnd(String processInstanceId, String reason) {
         List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
         if (CollUtil.isEmpty(taskList)) {
@@ -1084,6 +1094,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void createSignTask(Long userId, BpmTaskSignCreateReqVO reqVO) {
         // 1. 获取和校验任务
         TaskEntityImpl taskEntity = validateTaskCanCreateSign(userId, reqVO);
@@ -1200,6 +1211,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     @SuppressWarnings("DataFlowIssue")
     public void deleteSignTask(Long userId, BpmTaskSignDeleteReqVO reqVO) {
         // 1.1 校验 task 可以被减签
@@ -1239,6 +1251,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void withdrawTask(Long userId, String taskId) {
         // 1.1 查询本人已办任务
         HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery()

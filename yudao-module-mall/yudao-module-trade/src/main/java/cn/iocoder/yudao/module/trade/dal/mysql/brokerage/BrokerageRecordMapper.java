@@ -44,7 +44,7 @@ public interface BrokerageRecordMapper extends BaseMapperX<BrokerageRecordDO> {
                 .lt(BrokerageRecordDO::getUnfreezeTime, unfreezeTime));
     }
 
-    default int updateByIdAndStatus(Integer id, Integer status, BrokerageRecordDO updateObj) {
+    default int updateByIdAndStatus(Long id, Integer status, BrokerageRecordDO updateObj) {
         return update(updateObj, new LambdaQueryWrapper<BrokerageRecordDO>()
                 .eq(BrokerageRecordDO::getId, id)
                 .eq(BrokerageRecordDO::getStatus, status));

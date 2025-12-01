@@ -16,7 +16,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.deepseek.DeepSeekAssistantMessage;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
@@ -68,6 +68,7 @@ public class AiUtils {
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
+            case GROK: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case AZURE_OPENAI:
@@ -77,7 +78,7 @@ public class AiUtils {
                 return AnthropicChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OLLAMA:
-                return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
+                return OllamaChatOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
