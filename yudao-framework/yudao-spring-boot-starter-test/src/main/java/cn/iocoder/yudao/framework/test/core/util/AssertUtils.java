@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -47,11 +49,18 @@ public class AssertUtils {
                 return;
             }
             // 比对
-            Assertions.assertEquals(
-                    ReflectUtil.getFieldValue(expected, expectedField),
-                    ReflectUtil.getFieldValue(actual, actualField),
-                    String.format("Field(%s) 不匹配", expectedField.getName())
-            );
+            Object expectedValue = ReflectUtil.getFieldValue(expected, expectedField);
+            Object actualValue = ReflectUtil.getFieldValue(actual, actualField);
+            // 特殊处理 LocalDateTime 类型，忽略纳秒/微秒精度差异（H2 数据库精度与 Java 存在差异）
+            if (expectedValue instanceof LocalDateTime && actualValue instanceof LocalDateTime) {
+                LocalDateTime expectedTime = ((LocalDateTime) expectedValue).truncatedTo(ChronoUnit.MILLIS);
+                LocalDateTime actualTime = ((LocalDateTime) actualValue).truncatedTo(ChronoUnit.MILLIS);
+                Assertions.assertEquals(expectedTime, actualTime,
+                        String.format("Field(%s) 不匹配", expectedField.getName()));
+            } else {
+                Assertions.assertEquals(expectedValue, actualValue,
+                        String.format("Field(%s) 不匹配", expectedField.getName()));
+            }
         });
     }
 
@@ -77,8 +86,15 @@ public class AssertUtils {
             if (actualField == null) {
                 return true;
             }
-            return Objects.equals(ReflectUtil.getFieldValue(expected, expectedField),
-                    ReflectUtil.getFieldValue(actual, actualField));
+            Object expectedValue = ReflectUtil.getFieldValue(expected, expectedField);
+            Object actualValue = ReflectUtil.getFieldValue(actual, actualField);
+            // 特殊处理 LocalDateTime 类型，忽略纳秒/微秒精度差异（H2 数据库精度与 Java 存在差异）
+            if (expectedValue instanceof LocalDateTime && actualValue instanceof LocalDateTime) {
+                LocalDateTime expectedTime = ((LocalDateTime) expectedValue).truncatedTo(ChronoUnit.MILLIS);
+                LocalDateTime actualTime = ((LocalDateTime) actualValue).truncatedTo(ChronoUnit.MILLIS);
+                return Objects.equals(expectedTime, actualTime);
+            }
+            return Objects.equals(expectedValue, actualValue);
         });
     }
 

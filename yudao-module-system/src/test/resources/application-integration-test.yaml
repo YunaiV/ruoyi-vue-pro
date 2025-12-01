@@ -1,0 +1,56 @@
+spring:
+  main:
+    lazy-initialization: true # 开启懒加载，加快速度
+    banner-mode: off # 集成测试，禁用 Banner
+
+--- #################### 数据库相关配置 ####################
+
+spring:
+  # 数据源配置项 - 连接真实 PostgreSQL 数据库
+  datasource:
+    name: ruoyi-vue-pro
+    url: jdbc:postgresql://127.0.0.1:5432/ruoyi-vue-pro?reWriteBatchedInserts=true&stringtype=unspecified
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: Pass1234
+    druid:
+      async-init: true # 异步初始化 Druid 连接池，提升启动速度
+      initial-size: 1 # 配置为 1，提升启动速度
+
+  # Redis 配置 - 连接真实 Redis
+  data:
+    redis:
+      host: 127.0.0.1 # 地址
+      port: 6379 # 端口（使用真实 Redis 端口）
+      database: 0 # 数据库索引
+
+mybatis:
+  lazy-initialization: true # 设置 MyBatis Mapper 延迟加载，加速每个测试
+
+mybatis-plus:
+  configuration:
+    # PostgreSQL 使用小写表名
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-value: true # PostgreSQL 使用 boolean true 表示已删除
+      logic-not-delete-value: false # PostgreSQL 使用 boolean false 表示未删除
+
+--- #################### 定时任务相关配置 ####################
+
+--- #################### 配置中心相关配置 ####################
+
+--- #################### 服务保障相关配置 ####################
+
+# Lock4j 配置项（集成测试，禁用 Lock4j）
+
+--- #################### 监控相关配置 ####################
+
+--- #################### 芋道相关配置 ####################
+
+# 芋道配置项，设置当前项目所有自定义的配置
+yudao:
+  info:
+    base-package: cn.iocoder.yudao.module
+  tenant:
+    enable: false # 集成测试时禁用多租户，避免干扰

@@ -330,6 +330,8 @@ CREATE TABLE pay_order
     app_id             int8          NOT NULL,
     channel_id         int8          NULL     DEFAULT NULL,
     channel_code       varchar(32)   NULL     DEFAULT NULL,
+    user_id            int8          NULL     DEFAULT NULL,
+    user_type          int4          NULL     DEFAULT NULL,
     merchant_order_id  varchar(64)   NOT NULL,
     subject            varchar(32)   NOT NULL,
     body               varchar(128)  NOT NULL,
@@ -360,6 +362,8 @@ COMMENT ON COLUMN pay_order.id IS '支付订单编号';
 COMMENT ON COLUMN pay_order.app_id IS '应用编号';
 COMMENT ON COLUMN pay_order.channel_id IS '渠道编号';
 COMMENT ON COLUMN pay_order.channel_code IS '渠道编码';
+COMMENT ON COLUMN pay_order.user_id IS '用户编号';
+COMMENT ON COLUMN pay_order.user_type IS '用户类型';
 COMMENT ON COLUMN pay_order.merchant_order_id IS '商户订单编号';
 COMMENT ON COLUMN pay_order.subject IS '商品标题';
 COMMENT ON COLUMN pay_order.body IS '商品描述';
@@ -457,6 +461,8 @@ CREATE TABLE pay_refund
     channel_code         varchar(32)   NOT NULL,
     order_id             int8          NOT NULL,
     order_no             varchar(64)   NOT NULL,
+    user_id              int8          NULL     DEFAULT NULL,
+    user_type            int4          NULL     DEFAULT NULL,
     merchant_order_id    varchar(64)   NOT NULL,
     merchant_refund_id   varchar(64)   NOT NULL,
     notify_url           varchar(1024) NOT NULL,
@@ -488,6 +494,8 @@ COMMENT ON COLUMN pay_refund.channel_id IS '渠道编号';
 COMMENT ON COLUMN pay_refund.channel_code IS '渠道编码';
 COMMENT ON COLUMN pay_refund.order_id IS '支付订单编号 pay_order 表id';
 COMMENT ON COLUMN pay_refund.order_no IS '支付订单 no';
+COMMENT ON COLUMN pay_refund.user_id IS '用户编号';
+COMMENT ON COLUMN pay_refund.user_type IS '用户类型';
 COMMENT ON COLUMN pay_refund.merchant_order_id IS '商户订单编号（商户系统生成）';
 COMMENT ON COLUMN pay_refund.merchant_refund_id IS '商户退款订单号（商户系统生成）';
 COMMENT ON COLUMN pay_refund.notify_url IS '异步通知商户地址';
