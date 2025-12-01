@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS `ai_workflow` (
   `updater` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code` (`code`,`deleted`) USING BTREE COMMENT '工作流标识唯一索引',
   KEY `idx_name` (`name`) USING BTREE COMMENT '工作流名称索引',

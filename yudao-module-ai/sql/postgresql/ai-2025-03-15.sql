@@ -39,7 +39,6 @@ CREATE TABLE ai_api_key (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -58,7 +57,6 @@ COMMENT ON COLUMN ai_api_key.create_time IS '创建时间';
 COMMENT ON COLUMN ai_api_key.updater IS '更新者';
 COMMENT ON COLUMN ai_api_key.update_time IS '更新时间';
 COMMENT ON COLUMN ai_api_key.deleted IS '是否删除';
-COMMENT ON COLUMN ai_api_key.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_model - AI 模型表
@@ -83,7 +81,6 @@ CREATE TABLE ai_model (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -109,7 +106,6 @@ COMMENT ON COLUMN ai_model.create_time IS '创建时间';
 COMMENT ON COLUMN ai_model.updater IS '更新者';
 COMMENT ON COLUMN ai_model.update_time IS '更新时间';
 COMMENT ON COLUMN ai_model.deleted IS '是否删除';
-COMMENT ON COLUMN ai_model.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_tool - AI 工具表
@@ -127,7 +123,6 @@ CREATE TABLE ai_tool (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -144,7 +139,6 @@ COMMENT ON COLUMN ai_tool.create_time IS '创建时间';
 COMMENT ON COLUMN ai_tool.updater IS '更新者';
 COMMENT ON COLUMN ai_tool.update_time IS '更新时间';
 COMMENT ON COLUMN ai_tool.deleted IS '是否删除';
-COMMENT ON COLUMN ai_tool.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_workflow - AI 工作流表
@@ -164,7 +158,6 @@ CREATE TABLE ai_workflow (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -184,7 +177,6 @@ COMMENT ON COLUMN ai_workflow.create_time IS '创建时间';
 COMMENT ON COLUMN ai_workflow.updater IS '更新者';
 COMMENT ON COLUMN ai_workflow.update_time IS '更新时间';
 COMMENT ON COLUMN ai_workflow.deleted IS '是否删除';
-COMMENT ON COLUMN ai_workflow.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_chat_role - AI 聊天角色表
@@ -212,7 +204,6 @@ CREATE TABLE ai_chat_role (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -242,7 +233,6 @@ COMMENT ON COLUMN ai_chat_role.create_time IS '创建时间';
 COMMENT ON COLUMN ai_chat_role.updater IS '更新者';
 COMMENT ON COLUMN ai_chat_role.update_time IS '更新时间';
 COMMENT ON COLUMN ai_chat_role.deleted IS '是否删除';
-COMMENT ON COLUMN ai_chat_role.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_knowledge - AI 知识库表
@@ -264,7 +254,6 @@ CREATE TABLE ai_knowledge (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -285,7 +274,6 @@ COMMENT ON COLUMN ai_knowledge.create_time IS '创建时间';
 COMMENT ON COLUMN ai_knowledge.updater IS '更新者';
 COMMENT ON COLUMN ai_knowledge.update_time IS '更新时间';
 COMMENT ON COLUMN ai_knowledge.deleted IS '是否删除';
-COMMENT ON COLUMN ai_knowledge.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_chat_conversation - AI 聊天对话表
@@ -311,7 +299,6 @@ CREATE TABLE ai_chat_conversation (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -338,7 +325,6 @@ COMMENT ON COLUMN ai_chat_conversation.create_time IS '创建时间';
 COMMENT ON COLUMN ai_chat_conversation.updater IS '更新者';
 COMMENT ON COLUMN ai_chat_conversation.update_time IS '更新时间';
 COMMENT ON COLUMN ai_chat_conversation.deleted IS '是否删除';
-COMMENT ON COLUMN ai_chat_conversation.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_knowledge_document - AI 知识库-文档表
@@ -362,7 +348,6 @@ CREATE TABLE ai_knowledge_document (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -385,7 +370,6 @@ COMMENT ON COLUMN ai_knowledge_document.create_time IS '创建时间';
 COMMENT ON COLUMN ai_knowledge_document.updater IS '更新者';
 COMMENT ON COLUMN ai_knowledge_document.update_time IS '更新时间';
 COMMENT ON COLUMN ai_knowledge_document.deleted IS '是否删除';
-COMMENT ON COLUMN ai_knowledge_document.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_chat_message - AI 聊天消息表
@@ -413,7 +397,6 @@ CREATE TABLE ai_chat_message (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -443,7 +426,6 @@ COMMENT ON COLUMN ai_chat_message.create_time IS '创建时间';
 COMMENT ON COLUMN ai_chat_message.updater IS '更新者';
 COMMENT ON COLUMN ai_chat_message.update_time IS '更新时间';
 COMMENT ON COLUMN ai_chat_message.deleted IS '是否删除';
-COMMENT ON COLUMN ai_chat_message.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_knowledge_segment - AI 知识库-文档分段表
@@ -466,7 +448,6 @@ CREATE TABLE ai_knowledge_segment (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -490,7 +471,6 @@ COMMENT ON COLUMN ai_knowledge_segment.create_time IS '创建时间';
 COMMENT ON COLUMN ai_knowledge_segment.updater IS '更新者';
 COMMENT ON COLUMN ai_knowledge_segment.update_time IS '更新时间';
 COMMENT ON COLUMN ai_knowledge_segment.deleted IS '是否删除';
-COMMENT ON COLUMN ai_knowledge_segment.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_image - AI 绘画表
@@ -520,7 +500,6 @@ CREATE TABLE ai_image (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -552,7 +531,6 @@ COMMENT ON COLUMN ai_image.create_time IS '创建时间';
 COMMENT ON COLUMN ai_image.updater IS '更新者';
 COMMENT ON COLUMN ai_image.update_time IS '更新时间';
 COMMENT ON COLUMN ai_image.deleted IS '是否删除';
-COMMENT ON COLUMN ai_image.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_music - AI 音乐表
@@ -583,7 +561,6 @@ CREATE TABLE ai_music (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -615,7 +592,6 @@ COMMENT ON COLUMN ai_music.create_time IS '创建时间';
 COMMENT ON COLUMN ai_music.updater IS '更新者';
 COMMENT ON COLUMN ai_music.update_time IS '更新时间';
 COMMENT ON COLUMN ai_music.deleted IS '是否删除';
-COMMENT ON COLUMN ai_music.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_write - AI 写作表
@@ -643,7 +619,6 @@ CREATE TABLE ai_write (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -672,7 +647,6 @@ COMMENT ON COLUMN ai_write.create_time IS '创建时间';
 COMMENT ON COLUMN ai_write.updater IS '更新者';
 COMMENT ON COLUMN ai_write.update_time IS '更新时间';
 COMMENT ON COLUMN ai_write.deleted IS '是否删除';
-COMMENT ON COLUMN ai_write.tenant_id IS '租户编号';
 
 -- ============================================================
 -- Table: ai_mind_map - AI 思维导图表
@@ -694,7 +668,6 @@ CREATE TABLE ai_mind_map (
   updater VARCHAR(64) NULL DEFAULT '',
   update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  tenant_id BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -716,7 +689,6 @@ COMMENT ON COLUMN ai_mind_map.create_time IS '创建时间';
 COMMENT ON COLUMN ai_mind_map.updater IS '更新者';
 COMMENT ON COLUMN ai_mind_map.update_time IS '更新时间';
 COMMENT ON COLUMN ai_mind_map.deleted IS '是否删除';
-COMMENT ON COLUMN ai_mind_map.tenant_id IS '租户编号';
 
 -- ============================================================
 -- 完成提示
