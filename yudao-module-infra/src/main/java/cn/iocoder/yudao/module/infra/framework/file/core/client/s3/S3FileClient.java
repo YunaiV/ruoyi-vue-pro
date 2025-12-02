@@ -116,7 +116,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     public String presignGetUrl(String url, Integer expirationSeconds) {
         // 1. 将 url 转换为 path
         String path = StrUtil.removePrefix(url, config.getDomain() + "/");
-        path = HttpUtils.removeUrlQuery(path);
+        path = HttpUtils.decodeUtf8(HttpUtils.removeUrlQuery(path));
 
         // 2.1 情况一：公开访问：无需签名
         // 考虑到老版本的兼容，所以必须是 config.getEnablePublicAccess() 为 false 时，才进行签名
