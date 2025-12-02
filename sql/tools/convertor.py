@@ -265,14 +265,20 @@ class Convertor(ABC):
             if table_name.lower().startswith("qrtz"):
                 continue
 
-            # 解析注释
+            # 解析注释（处理没有注释的情况）
             for column in table_ddl["columns"]:
-                column["comment"] = bytes(column["comment"], "utf-8").decode(
+                if column.get("comment"):
+                    column["comment"] = bytes(column["comment"], "utf-8").decode(
+                        r"unicode_escape"
+                    )[1:-1]
+                else:
+                    column["comment"] = ""
+            if table_ddl.get("comment"):
+                table_ddl["comment"] = bytes(table_ddl["comment"], "utf-8").decode(
                     r"unicode_escape"
                 )[1:-1]
-            table_ddl["comment"] = bytes(table_ddl["comment"], "utf-8").decode(
-                r"unicode_escape"
-            )[1:-1]
+            else:
+                table_ddl["comment"] = ""
 
             # 为每个表生成个6个基本部分
             create = self.gen_create(table_ddl)

@@ -12,7 +12,7 @@ public interface GoViewProjectMapper extends BaseMapperX<GoViewProjectDO> {
 
     default PageResult<GoViewProjectDO> selectPage(PageParam reqVO, Long userId) {
         return selectPage(reqVO, new LambdaQueryWrapperX<GoViewProjectDO>()
-                .eq(GoViewProjectDO::getCreator, userId)
+                .eq(GoViewProjectDO::getCreator, String.valueOf(userId))
                 .orderByDesc(GoViewProjectDO::getId));
     }
 

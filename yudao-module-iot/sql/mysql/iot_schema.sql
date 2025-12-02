@@ -323,3 +323,13 @@ CREATE TABLE `iot_ota_task_record` (
   PRIMARY KEY (`id`),
   KEY `idx_task_device` (`task_id`, `device_id`) USING BTREE COMMENT '任务设备索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='IoT OTA 升级任务记录表';
+
+-- ----------------------------
+-- 7. 隐藏未实现的 IoT 菜单
+-- ----------------------------
+-- 说明：以下菜单对应的前端组件和后端接口尚未开发完成
+-- - 插件管理 (id=4025): 组件路径 iot/plugin/index 未实现
+-- - 数据桥梁 (id=4051): 组件路径 iot/rule/databridge/index 未实现
+-- ----------------------------
+UPDATE system_menu SET visible = 0 WHERE id = 4025; -- 插件管理
+UPDATE system_menu SET visible = 0 WHERE id = 4051; -- 数据桥梁

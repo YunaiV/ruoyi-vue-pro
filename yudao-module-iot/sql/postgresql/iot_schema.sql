@@ -617,3 +617,13 @@ COMMENT ON COLUMN iot_ota_task_record.create_time IS '创建时间';
 COMMENT ON COLUMN iot_ota_task_record.updater IS '更新者';
 COMMENT ON COLUMN iot_ota_task_record.update_time IS '更新时间';
 COMMENT ON COLUMN iot_ota_task_record.deleted IS '是否删除';
+
+-- ----------------------------
+-- 7. 隐藏未实现的 IoT 菜单
+-- ----------------------------
+-- 说明：以下菜单对应的前端组件和后端接口尚未开发完成
+-- - 插件管理 (id=4025): 组件路径 iot/plugin/index 未实现
+-- - 数据桥梁 (id=4051): 组件路径 iot/rule/databridge/index 未实现
+-- ----------------------------
+UPDATE system_menu SET visible = '0' WHERE id = 4025; -- 插件管理
+UPDATE system_menu SET visible = '0' WHERE id = 4051; -- 数据桥梁

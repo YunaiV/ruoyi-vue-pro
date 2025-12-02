@@ -4,3 +4,9 @@
 [submodule "yudao-ui/yudao-ui-admin-vben"]
 	path = yudao-ui/yudao-ui-admin-vben
 	url = git@github.com:Yuchenhui/yudao-ui-admin-vben.git
+[submodule "yudao-ui/yudao-ui-go-view"]
+	path = yudao-ui/yudao-ui-go-view
+	url = git@github.com:Yuchenhui/yudao-ui-go-view.git
+[submodule "yudao-ui/yudao-ui-admin-vue3"]
+	path = yudao-ui/yudao-ui-admin-vue3
+	url = git@github.com:Yuchenhui/yudao-ui-admin-vue3.git

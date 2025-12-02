@@ -129,6 +129,17 @@
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
 
+        <!-- Spring Boot Admin Server 监控服务端（需要显式引入，因为 yudao-module-infra 中是 optional） -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-server</artifactId>
+        </dependency>
+        <!-- Spring Boot Admin Client 客户端（需要显式引入，因为 yudao-spring-boot-starter-monitor 中是 optional） -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
