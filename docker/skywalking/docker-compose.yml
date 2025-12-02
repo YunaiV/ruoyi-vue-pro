@@ -1,0 +1,64 @@
+# SkyWalking 链路追踪部署配置
+# 使用方式：
+#   cd docker/skywalking
+#   docker-compose up -d
+#
+# 服务端口：
+#   - SkyWalking UI: http://localhost:8080
+#   - SkyWalking OAP gRPC: 11800 (Agent 上报数据)
+#   - SkyWalking OAP REST: 12800
+
+services:
+  # SkyWalking OAP Server (后端分析服务)
+  skywalking-oap:
+    image: apache/skywalking-oap-server:9.7.0
+    container_name: skywalking-oap
+    restart: unless-stopped
+    environment:
+      # 使用内存存储（开发环境，生产环境建议使用 Elasticsearch）
+      SW_STORAGE: h2
+      SW_H2_URL: jdbc:h2:/skywalking/data/h2;AUTO_SERVER=TRUE
+      # 核心配置
+      SW_CORE_REST_HOST: 0.0.0.0
+      SW_CORE_REST_PORT: 12800
+      SW_CORE_GRPC_HOST: 0.0.0.0
+      SW_CORE_GRPC_PORT: 11800
+      # 时区
+      TZ: Asia/Shanghai
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+    ports:
+      - "11800:11800"  # gRPC 端口，Agent 上报数据
+      - "12800:12800"  # REST 端口
+    volumes:
+      - skywalking-data:/skywalking/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:12800/internal/l7check || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    networks:
+      - skywalking-net
+
+  # SkyWalking UI (前端界面)
+  skywalking-ui:
+    image: apache/skywalking-ui:9.7.0
+    container_name: skywalking-ui
+    restart: unless-stopped
+    depends_on:
+      - skywalking-oap
+    environment:
+      SW_OAP_ADDRESS: http://skywalking-oap:12800
+      TZ: Asia/Shanghai
+    ports:
+      - "8080:8080"  # UI 端口
+    networks:
+      - skywalking-net
+
+volumes:
+  skywalking-data:
+    driver: local
+
+networks:
+  skywalking-net:
+    driver: bridge
