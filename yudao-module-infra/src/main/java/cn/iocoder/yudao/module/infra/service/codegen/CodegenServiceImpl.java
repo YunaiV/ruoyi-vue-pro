@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,8 @@ public class CodegenServiceImpl implements CodegenService {
 
     @Resource
     private CodegenProperties codegenProperties;
+    @Resource
+    private SqlSessionFactory sqlSessionFactory;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -258,6 +261,13 @@ public class CodegenServiceImpl implements CodegenService {
         if (table == null) {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
+
+        // https://github.com/YunaiV/ruoyi-vue-pro/issues/1033
+        Map<String, Class<?>> typeAliases = sqlSessionFactory.getConfiguration().getTypeAliasRegistry().getTypeAliases();
+        if (typeAliases.containsKey(table.getClassName().toLowerCase())) {
+            throw exception(CODEGEN_CLASS_NAME_DUPLICATED);
+        }
+
         List<CodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);
         if (CollUtil.isEmpty(columns)) {
             throw exception(CODEGEN_COLUMN_NOT_EXISTS);

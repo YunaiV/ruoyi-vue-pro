@@ -47,6 +47,7 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_MASTER_TABLE_NOT_EXISTS = new ErrorCode(1_001_004_010, "主表(id={})定义不存在，请检查");
     ErrorCode CODEGEN_SUB_COLUMN_NOT_EXISTS = new ErrorCode(1_001_004_011, "子表的字段(id={})不存在，请检查");
     ErrorCode CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE = new ErrorCode(1_001_004_012, "主表生成代码失败，原因：它没有子表");
+    ErrorCode CODEGEN_CLASS_NAME_DUPLICATED = new ErrorCode(1_001_004_013, "类名称重复，请更换类名称");
 
     // ========== 文件配置 1-001-006-000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1_001_006_000, "文件配置不存在");
