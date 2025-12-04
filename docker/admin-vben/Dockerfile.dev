@@ -1,0 +1,44 @@
+# =============================================================================
+# 芋道前端 (Vben) - 开发环境 Dockerfile
+# 特点：支持热重载、实时编译、开发调试
+# =============================================================================
+
+FROM node:22-slim
+
+LABEL maintainer="yudao" \
+      description="Yudao Admin Vben Development Environment" \
+      version="1.0.0"
+
+# 设置环境变量
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV NODE_OPTIONS=--max-old-space-size=8192
+ENV TZ=Asia/Shanghai
+
+# 安装 pnpm 和基础工具
+RUN npm i -g corepack && corepack enable && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 复制 package 文件（利用缓存）
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web-antd/package.json ./apps/web-antd/
+COPY packages/ ./packages/
+COPY internal/ ./internal/
+
+# 安装依赖
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+
+# 暴露开发服务器端口
+EXPOSE 5173
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:5173 || exit 1
+
+# 启动开发服务器
+CMD ["pnpm", "run", "dev"]

@@ -1,0 +1,76 @@
+# =============================================================================
+# 芋道后端服务 - 生产环境 Dockerfile
+# 特点：多阶段构建、最小化镜像、安全加固
+# =============================================================================
+
+# ======================== 第一阶段：构建 ========================
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+# 复制 pom 文件，利用 Docker 缓存加速依赖下载
+COPY pom.xml .
+COPY yudao-dependencies/pom.xml yudao-dependencies/
+COPY yudao-framework/pom.xml yudao-framework/
+COPY yudao-module-*/pom.xml ./
+
+# 预下载依赖（可选，提高构建速度）
+# RUN mvn dependency:go-offline -B
+
+# 复制源代码
+COPY . .
+
+# 构建项目（跳过测试）
+RUN mvn clean package -DskipTests -Pprod -pl yudao-server -am
+
+# ======================== 第二阶段：运行 ========================
+FROM eclipse-temurin:21-jre-alpine
+
+LABEL maintainer="yudao" \
+      description="Yudao Server Production Environment" \
+      version="1.0.0"
+
+# 创建非 root 用户运行应用
+RUN addgroup -g 1001 -S yudao && \
+    adduser -u 1001 -S yudao -G yudao
+
+# 创建工作目录
+RUN mkdir -p /yudao-server && chown -R yudao:yudao /yudao-server
+WORKDIR /yudao-server
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN apk add --no-cache tzdata curl && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+
+# 从构建阶段复制 jar 文件
+COPY --from=builder --chown=yudao:yudao /build/yudao-server/target/yudao-server.jar app.jar
+
+# JVM 生产环境参数
+ENV JAVA_OPTS="-Xms1024m -Xmx2048m \
+    -XX:+UseG1GC \
+    -XX:MaxGCPauseMillis=200 \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/yudao-server/logs/heapdump.hprof \
+    -Djava.security.egd=file:/dev/./urandom \
+    -Dspring.profiles.active=prod"
+
+# 应用参数
+ENV ARGS=""
+
+# 创建日志目录
+RUN mkdir -p /yudao-server/logs && chown -R yudao:yudao /yudao-server/logs
+
+# 切换到非 root 用户
+USER yudao
+
+# 暴露端口
+EXPOSE 48080
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD curl -f http://localhost:48080/actuator/health || exit 1
+
+# 启动命令
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar ${ARGS}"]

@@ -1,0 +1,65 @@
+# =============================================================================
+# 芋道 - 生产环境 Docker Compose
+# 用途：生产部署（后端 + 前端）
+# 依赖：需先启动 docker-compose.infra.yml
+# 启动：docker compose -f docker/docker-compose.infra.yml -f docker/docker-compose.prod.yml up -d --build
+# =============================================================================
+
+name: yudao-prod
+
+services:
+  server:
+    container_name: yudao-server
+    build:
+      context: ..
+      dockerfile: docker/server/Dockerfile.prod
+    image: yudao-server:prod
+    restart: always
+    ports:
+      - "${SERVER_PORT:-48080}:48080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JAVA_OPTS: >-
+        -Xms1024m
+        -Xmx2048m
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+      ARGS: >-
+        --spring.datasource.dynamic.datasource.master.url=jdbc:postgresql://yudao-postgres:5432/${POSTGRES_DB:-ruoyi-vue-pro}
+        --spring.datasource.dynamic.datasource.master.username=${POSTGRES_USER:-postgres}
+        --spring.datasource.dynamic.datasource.master.password=${POSTGRES_PASSWORD}
+        --spring.data.redis.host=yudao-redis
+        --spring.data.redis.password=${REDIS_PASSWORD}
+    volumes:
+      - server_prod_logs:/yudao-server/logs
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+    networks:
+      - yudao-infra_yudao-network
+
+  admin:
+    container_name: yudao-admin
+    build:
+      context: ..
+      dockerfile: docker/admin-vben/Dockerfile.prod
+    image: yudao-admin-vben:prod
+    restart: always
+    ports:
+      - "${ADMIN_PORT:-80}:8080"
+    depends_on:
+      - server
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - yudao-infra_yudao-network
+
+volumes:
+  server_prod_logs:
+
+networks:
+  yudao-infra_yudao-network:
+    external: true

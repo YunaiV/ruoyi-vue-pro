@@ -1,0 +1,47 @@
+# =============================================================================
+# 芋道后端服务 - 开发环境 Dockerfile
+# 特点：支持热重载、远程调试、详细日志
+# =============================================================================
+
+FROM eclipse-temurin:21-jdk
+
+LABEL maintainer="yudao" \
+      description="Yudao Server Development Environment" \
+      version="1.0.0"
+
+# 创建工作目录
+RUN mkdir -p /yudao-server
+WORKDIR /yudao-server
+
+# 安装开发工具
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    vim \
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# JVM 开发环境参数（启用远程调试）
+ENV JAVA_OPTS="-Xms512m -Xmx1024m \
+    -Djava.security.egd=file:/dev/./urandom \
+    -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
+    -Dspring.profiles.active=local \
+    -Dlogging.level.root=DEBUG"
+
+# 应用参数
+ENV ARGS=""
+
+# 暴露端口
+# 48080: 应用端口
+# 5005: 远程调试端口
+EXPOSE 48080 5005
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:48080/actuator/health || exit 1
+
+# 启动命令（支持热重载挂载）
+CMD ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar ${ARGS}"]

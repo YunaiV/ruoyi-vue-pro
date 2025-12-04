@@ -1,0 +1,57 @@
+# =============================================================================
+# 芋道 - 基础设施 Docker Compose
+# 用途：PostgreSQL + Redis 基础服务
+# 启动：docker compose -f docker/docker-compose.infra.yml up -d
+# =============================================================================
+
+name: yudao-infra
+
+services:
+  postgres:
+    container_name: yudao-postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ruoyi-vue-pro}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      TZ: Asia/Shanghai
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../sql/postgresql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ruoyi-vue-pro}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yudao-network
+
+  redis:
+    container_name: yudao-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server --appendonly yes ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yudao-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  yudao-network:
+    driver: bridge
