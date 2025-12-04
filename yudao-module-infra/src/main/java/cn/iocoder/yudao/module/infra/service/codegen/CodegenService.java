@@ -87,6 +87,8 @@ public interface CodegenService {
      */
     List<CodegenColumnDO> getCodegenColumnListByTableId(Long tableId);
 
+    boolean isDuplicated(String className);
+
     /**
      * 执行指定表的代码生成
      *

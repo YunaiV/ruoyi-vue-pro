@@ -255,6 +255,14 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
+    public boolean isDuplicated(String className) {
+        // https://github.com/YunaiV/ruoyi-vue-pro/issues/1033
+        Map<String, Class<?>> typeAliases = sqlSessionFactory.getConfiguration().getTypeAliasRegistry().getTypeAliases();
+        String key = (className + "DO").toLowerCase();
+        return typeAliases.containsKey(key);
+    }
+
+    @Override
     public Map<String, String> generationCodes(Long tableId, Boolean ignoreDuplicatedClassName) {
         // 校验是否已经存在
         CodegenTableDO table = codegenTableMapper.selectById(tableId);
@@ -262,12 +270,8 @@ public class CodegenServiceImpl implements CodegenService {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
 
-        if (!ignoreDuplicatedClassName) {
-            // https://github.com/YunaiV/ruoyi-vue-pro/issues/1033
-            Map<String, Class<?>> typeAliases = sqlSessionFactory.getConfiguration().getTypeAliasRegistry().getTypeAliases();
-            if (typeAliases.containsKey(table.getClassName().toLowerCase())) {
-                throw exception(CODEGEN_CLASS_NAME_DUPLICATED);
-            }
+        if (!ignoreDuplicatedClassName && isDuplicated(table.getClassName())) {
+            throw exception(CODEGEN_CLASS_NAME_DUPLICATED);
         }
 
         List<CodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);

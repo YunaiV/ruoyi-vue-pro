@@ -138,6 +138,14 @@ public class CodegenController {
         return success(CodegenConvert.INSTANCE.convert(codes));
     }
 
+    @Operation(summary = "检查类名称是否重复")
+    @GetMapping("/is-class-name-duplicated")
+    @Parameter(name = "className", description = "待检查的类名称", example = "CodegenTable")
+    @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
+    public CommonResult<Boolean> isClassNameDuplicated(@RequestParam String className) {
+        return success(codegenService.isDuplicated(className));
+    }
+
     @Operation(summary = "下载生成代码")
     @GetMapping("/download")
     @PreAuthorize("@ss.hasPermission('infra:codegen:download')")

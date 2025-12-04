@@ -475,6 +475,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         // mock 数据（CodegenTableDO）
         CodegenTableDO table = randomPojo(CodegenTableDO.class,
                 o -> o.setScene(CodegenSceneEnum.ADMIN.getScene())
+                        .setClassName("CodegenTable")
                         .setTemplateType(CodegenTemplateTypeEnum.MASTER_NORMAL.getType()));
         codegenTableMapper.insert(table);
         // mock 数据（CodegenColumnDO）
@@ -514,9 +515,13 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         Long tableId = table.getId();
 
         // 调用
-        Map<String, String> result = codegenService.generationCodes(tableId, false);
+        // 主动忽略类名重复异常后可以正常生成代码
+        Map<String, String> result = codegenService.generationCodes(tableId, true);
         // 断言
         assertSame(codes, result);
+
+        // 再次生成代码时默认不忽略类名重复异常
+        assertServiceException(() -> codegenService.generationCodes(tableId, false), CODEGEN_CLASS_NAME_DUPLICATED);
     }
 
     @Test
