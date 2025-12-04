@@ -5,10 +5,7 @@ import cn.hutool.core.util.ZipUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenDetailRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenPreviewRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.*;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTableRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
@@ -134,20 +131,19 @@ public class CodegenController {
     @Operation(summary = "预览生成代码")
     @GetMapping("/preview")
     @Parameter(name = "tableId", description = "表编号", required = true, example = "1024")
+    @Parameter(name = "ignoreDuplicatedClassName", description = "忽略类名称重复问题，默认不忽略。", example = "false")
     @PreAuthorize("@ss.hasPermission('infra:codegen:preview')")
-    public CommonResult<List<CodegenPreviewRespVO>> previewCodegen(@RequestParam("tableId") Long tableId) {
-        Map<String, String> codes = codegenService.generationCodes(tableId);
+    public CommonResult<List<CodegenPreviewRespVO>> previewCodegen(@Valid CodegenPreviewReqVO reqVO) {
+        Map<String, String> codes = codegenService.generationCodes(reqVO.getTableId(), reqVO.getIgnoreDuplicatedClassName());
         return success(CodegenConvert.INSTANCE.convert(codes));
     }
 
     @Operation(summary = "下载生成代码")
     @GetMapping("/download")
-    @Parameter(name = "tableId", description = "表编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('infra:codegen:download')")
-    public void downloadCodegen(@RequestParam("tableId") Long tableId,
-                                HttpServletResponse response) throws IOException {
+    public void downloadCodegen(@Valid CodegenPreviewReqVO reqVO, HttpServletResponse response) throws IOException {
         // 生成代码
-        Map<String, String> codes = codegenService.generationCodes(tableId);
+        Map<String, String> codes = codegenService.generationCodes(reqVO.getTableId(), reqVO.getIgnoreDuplicatedClassName());
         // 构建 zip 包
         String[] paths = codes.keySet().toArray(new String[0]);
         ByteArrayInputStream[] ins = codes.values().stream().map(IoUtil::toUtf8Stream).toArray(ByteArrayInputStream[]::new);

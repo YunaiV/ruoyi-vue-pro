@@ -255,17 +255,19 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public Map<String, String> generationCodes(Long tableId) {
+    public Map<String, String> generationCodes(Long tableId, Boolean ignoreDuplicatedClassName) {
         // 校验是否已经存在
         CodegenTableDO table = codegenTableMapper.selectById(tableId);
         if (table == null) {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
 
-        // https://github.com/YunaiV/ruoyi-vue-pro/issues/1033
-        Map<String, Class<?>> typeAliases = sqlSessionFactory.getConfiguration().getTypeAliasRegistry().getTypeAliases();
-        if (typeAliases.containsKey(table.getClassName().toLowerCase())) {
-            throw exception(CODEGEN_CLASS_NAME_DUPLICATED);
+        if (!ignoreDuplicatedClassName) {
+            // https://github.com/YunaiV/ruoyi-vue-pro/issues/1033
+            Map<String, Class<?>> typeAliases = sqlSessionFactory.getConfiguration().getTypeAliasRegistry().getTypeAliases();
+            if (typeAliases.containsKey(table.getClassName().toLowerCase())) {
+                throw exception(CODEGEN_CLASS_NAME_DUPLICATED);
+            }
         }
 
         List<CodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);

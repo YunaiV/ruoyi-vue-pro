@@ -378,7 +378,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGenerationCodes_tableNotExists() {
-        assertServiceException(() -> codegenService.generationCodes(randomLongId()),
+        assertServiceException(() -> codegenService.generationCodes(randomLongId(), false),
                 CODEGEN_TABLE_NOT_EXISTS);
     }
 
@@ -393,7 +393,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         Long tableId = table.getId();
 
         // 调用，并断言
-        assertServiceException(() -> codegenService.generationCodes(tableId),
+        assertServiceException(() -> codegenService.generationCodes(tableId, false),
                 CODEGEN_COLUMN_NOT_EXISTS);
     }
 
@@ -411,7 +411,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         Long tableId = table.getId();
 
         // 调用，并断言
-        assertServiceException(() -> codegenService.generationCodes(tableId),
+        assertServiceException(() -> codegenService.generationCodes(tableId, false),
                 CODEGEN_MASTER_GENERATION_FAIL_NO_SUB_TABLE);
     }
 
@@ -435,7 +435,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         Long tableId = table.getId();
 
         // 调用，并断言
-        assertServiceException(() -> codegenService.generationCodes(tableId),
+        assertServiceException(() -> codegenService.generationCodes(tableId, false),
                 CODEGEN_SUB_COLUMN_NOT_EXISTS, subTable.getId());
     }
 
@@ -465,7 +465,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         Long tableId = table.getId();
 
         // 调用
-        Map<String, String> result = codegenService.generationCodes(tableId);
+        Map<String, String> result = codegenService.generationCodes(tableId, false);
         // 断言
         assertSame(codes, result);
     }
@@ -514,7 +514,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         Long tableId = table.getId();
 
         // 调用
-        Map<String, String> result = codegenService.generationCodes(tableId);
+        Map<String, String> result = codegenService.generationCodes(tableId, false);
         // 断言
         assertSame(codes, result);
     }
