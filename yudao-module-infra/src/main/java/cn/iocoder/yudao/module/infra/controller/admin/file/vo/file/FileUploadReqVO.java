@@ -22,7 +22,7 @@ public class FileUploadReqVO {
     @AssertTrue(message = "文件目录不正确")
     @JsonIgnore
     public boolean isDirectoryValid() {
-        return !StrUtil.containsAny(directory, "..", "/", "\\");
+        return !StrUtil.containsAny(directory, "..", "\\");
     }
 
 }
