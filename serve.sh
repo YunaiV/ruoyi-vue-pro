@@ -52,12 +52,12 @@ check_dependencies() {
         exit 1
     fi
 
-    # 检查 MySQL
-    log_info "检查 MySQL 容器..."
-    if ! docker ps --format '{{.Names}}' | grep -q "mysql"; then
-        log_warn "MySQL 容器未运行，请确保 MySQL 服务可用"
+    # 检查 PostgreSQL
+    log_info "检查 PostgreSQL 容器..."
+    if ! docker ps --format '{{.Names}}' | grep -q "postgres"; then
+        log_warn "PostgreSQL 容器未运行，请确保 PostgreSQL 服务可用"
     else
-        log_info "✓ MySQL 容器运行中"
+        log_info "✓ PostgreSQL 容器运行中"
     fi
 
     # 检查 Redis
@@ -228,9 +228,12 @@ show_help() {
     前端地址:   启动后显示 (通常是 http://localhost:5173)
 
 依赖服务:
-    - MySQL:    localhost:3306  (数据库: ruoyi-vue-pro)
-    - Redis:    127.0.0.1:6379  (database: 6)
-    - Qdrant:   localhost:6334  (可选，AI 功能需要)
+    - PostgreSQL: localhost:5432  (数据库: ruoyi-vue-pro)
+    - Redis:      localhost:6379
+    - Qdrant:     localhost:6334  (可选，AI 功能需要)
+
+启动基础设施:
+    docker compose -f docker/docker-compose.infra.yml up -d
 
 停止服务:
     - 前端: Ctrl+C
