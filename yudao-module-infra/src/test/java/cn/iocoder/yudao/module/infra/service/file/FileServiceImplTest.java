@@ -192,7 +192,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     public void testGenerateUploadPath_AllEnabled() {
         // 准备参数
         String name = "test.jpg";
-        String directory = "avatar";
+        String directory = "/avatar";
         FileServiceImpl.PATH_PREFIX_DATE_ENABLE = true;
         FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = true;
 
@@ -201,16 +201,16 @@ public class FileServiceImplTest extends BaseDbUnitTest {
 
         // 断言
         // 格式为：avatar/yyyyMMdd/test_timestamp.jpg
-        assertTrue(path.startsWith(directory + "/"));
+        assertTrue(path.startsWith("avatar/"));
         // 包含日期格式：8 位数字，如 20240517
-        assertTrue(path.matches(directory + "/\\d{8}/test_\\d+\\.jpg"));
+        assertTrue(path.matches("avatar/\\d{8}/test_\\d+\\.jpg"));
     }
 
     @Test
     public void testGenerateUploadPath_PrefixEnabled_SuffixDisabled() {
         // 准备参数
         String name = "test.jpg";
-        String directory = "avatar";
+        String directory = "avatar//"; // 模拟前端填写路径时出现失误
         FileServiceImpl.PATH_PREFIX_DATE_ENABLE = true;
         FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = false;
 
@@ -219,9 +219,9 @@ public class FileServiceImplTest extends BaseDbUnitTest {
 
         // 断言
         // 格式为：avatar/yyyyMMdd/test.jpg
-        assertTrue(path.startsWith(directory + "/"));
+        assertTrue(path.startsWith("avatar/"));
         // 包含日期格式：8 位数字，如 20240517
-        assertTrue(path.matches(directory + "/\\d{8}/test\\.jpg"));
+        assertTrue(path.matches("avatar/\\d{8}/test\\.jpg"));
     }
 
     @Test

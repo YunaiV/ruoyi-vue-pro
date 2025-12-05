@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresignedUrlRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import jakarta.validation.constraints.NotEmpty;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public interface FileService {
      * @return 文件路径
      */
     String createFile(@NotEmpty(message = "文件内容不能为空") byte[] content,
-                      String name, String directory, String type);
+                      String name, @Nullable String directory, String type);
 
     /**
      * 生成文件预签名地址信息，用于上传
@@ -45,10 +46,11 @@ public interface FileService {
      */
     FilePresignedUrlRespVO presignPutUrl(@NotEmpty(message = "文件名不能为空") String name,
                                          String directory);
+
     /**
      * 生成文件预签名地址信息，用于读取
      *
-     * @param url 完整的文件访问地址
+     * @param url               完整的文件访问地址
      * @param expirationSeconds 访问有效期，单位秒
      * @return 文件预签名地址
      */

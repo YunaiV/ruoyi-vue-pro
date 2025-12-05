@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,13 +37,13 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 上传文件的前缀，是否包含日期（yyyyMMdd）
-     *
+     * <p>
      * 目的：按照日期，进行分目录
      */
     static boolean PATH_PREFIX_DATE_ENABLE = true;
     /**
      * 上传文件的后缀，是否包含时间戳
-     *
+     * <p>
      * 目的：保证文件的唯一性，避免覆盖
      * 定制：可按需调整成 UUID、或者其他方式
      */
@@ -61,7 +62,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @SneakyThrows
-    public String createFile(byte[] content, String name, String directory, String type) {
+    public String createFile(byte[] content, String name, @Nullable String directory, String type) {
         // 1.1 处理 type 为空的情况
         if (StrUtil.isEmpty(type)) {
             type = FileTypeUtils.getMineType(content, name);
@@ -93,7 +94,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @VisibleForTesting
-    String generateUploadPath(String name, String directory) {
+    String generateUploadPath(String name, @Nullable String directory) {
         // 1. 生成前缀、后缀
         String prefix = null;
         if (PATH_PREFIX_DATE_ENABLE) {
@@ -116,6 +117,11 @@ public class FileServiceImpl implements FileService {
         // 2.2 再拼接 prefix 前缀
         if (StrUtil.isNotEmpty(prefix)) {
             name = prefix + StrUtil.SLASH + name;
+        }
+        if (directory != null) {
+            directory = directory.replaceAll("/+", "/");
+            if (directory.startsWith("/")) directory = directory.substring(1);
+            if (directory.endsWith("/")) directory = directory.substring(0, directory.length() - 1);
         }
         // 2.3 最后拼接 directory 目录
         if (StrUtil.isNotEmpty(directory)) {
