@@ -103,7 +103,6 @@ public class YudaoWebAutoConfiguration {
     /**
      * 创建 CorsFilter Bean，解决跨域问题
      */
-    @Order(value = WebFilterOrderEnum.CORS_FILTER)
     @Bean
     @Order(value = WebFilterOrderEnum.CORS_FILTER) // 特殊：修复因执行顺序影响到跨域配置不生效问题
     public FilterRegistrationBean<CorsFilter> corsFilterBean() {
