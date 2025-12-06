@@ -72,11 +72,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             if (StrUtil.isNotBlank(config.getPublicKeyContent())) {
                 payConfig.setPublicKeyPath(FileUtils.createTempFile(config.getPublicKeyContent()).getPath());
             }
-            // 兼容微信支付公钥模式(BeanUtil.copyProperties忽略了该字段，当切换为公钥模式时，需要手动设置该值)
-            // 解决当商户切换到公钥，废弃平台证书，导致报错无可用平台证书的问题
-            if (StrUtil.isNotBlank(config.getPublicKeyId()) && StrUtil.startWith(config.getPublicKeyId(), "PUB_KEY_ID")) {
-                payConfig.setPublicKeyContent(StrUtil.bytes(config.getPublicKeyContent()));
-            }
             // 特殊：强制使用微信公钥模式，避免灰度期间的问题！！！
             payConfig.setStrictlyNeedWechatPaySerial(true);
         }
