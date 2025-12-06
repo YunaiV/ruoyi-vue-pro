@@ -56,6 +56,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- 强制指定quartz版本 -->
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>2.5.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
