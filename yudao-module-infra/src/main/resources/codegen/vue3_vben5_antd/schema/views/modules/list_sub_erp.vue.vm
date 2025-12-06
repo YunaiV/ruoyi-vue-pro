@@ -82,7 +82,7 @@ async function handleDeleteBatch() {
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
     checkedIds.value = [];
-    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    message.success($t('ui.actionMessage.deleteSuccess'));
     handleRefresh();
   } finally {
     hideLoading();
@@ -134,7 +134,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 #else
   columns: use${subSimpleClassName}GridColumns(),
   pagerConfig: {
-    nabled: false,
+    enabled: false,
   },
   toolbarConfig: {
     enabled: false,

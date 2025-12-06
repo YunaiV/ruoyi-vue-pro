@@ -147,9 +147,10 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             userAccount = wallet.getId().toString();
         }
         // 1.2 构建请求
+        Integer transferPrice = withdraw.getPrice() - withdraw.getFeePrice(); // 计算实际转账金额（提现金额 - 手续费）
         PayTransferCreateReqDTO transferReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey()).setChannelCode(channelCode)
-                .setMerchantTransferId(withdraw.getId().toString()).setSubject("佣金提现").setPrice(withdraw.getPrice())
+                .setMerchantTransferId(withdraw.getId().toString()).setSubject("佣金提现").setPrice(transferPrice)
                 .setUserAccount(userAccount).setUserName(userName).setUserIp(getClientIP())
                 .setUserId(withdraw.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue()) // 用户信息
                 .setChannelExtras(channelExtras);
@@ -280,9 +281,10 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             throw exception(BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_STATUS_NOT_SUCCESS_OR_CLOSED);
         }
         // 2.2 校验转账金额一致
-        if (ObjectUtil.notEqual(payTransfer.getPrice(), withdraw.getPrice())) {
-            log.error("[validateBrokerageTransferStatusCanUpdate][withdraw({}) payTransfer({}) 转账金额不匹配，请进行处理！withdraw 数据是：{}，payTransfer 数据是：{}]",
-                    withdraw.getId(), payTransferId, JsonUtils.toJsonString(withdraw), JsonUtils.toJsonString(payTransfer));
+        Integer expectedTransferPrice = withdraw.getPrice() - withdraw.getFeePrice(); // 转账金额 = 提现金额 - 手续费
+        if (ObjectUtil.notEqual(payTransfer.getPrice(), expectedTransferPrice)) {
+            log.error("[validateBrokerageTransferStatusCanUpdate][withdraw({}) payTransfer({}) 转账金额不匹配，请进行处理！withdraw 数据是：{}，payTransfer 数据是：{}，期望转账金额：{}]",
+                    withdraw.getId(), payTransferId, JsonUtils.toJsonString(withdraw), JsonUtils.toJsonString(payTransfer), expectedTransferPrice);
             throw exception(BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_PRICE_NOT_MATCH);
         }
         // 2.3 校验转账订单匹配

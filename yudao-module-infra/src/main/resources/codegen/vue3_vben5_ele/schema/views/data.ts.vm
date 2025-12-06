@@ -114,6 +114,7 @@ export function useFormSchema(): VbenFormSchema[] {
         showTime: true,
         format: 'YYYY-MM-DD HH:mm:ss',
         valueFormat: 'x',
+        class: '!w-full',
       },
   #elseif($column.htmlType == "textarea")## 文本域
       component: 'Textarea',
@@ -317,6 +318,7 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                     showTime: true,
                                     format: 'YYYY-MM-DD HH:mm:ss',
                                     valueFormat: 'x',
+                                    class: '!w-full',
                                 },
                             #elseif($column.htmlType == "textarea")## 文本域
                                 component: 'Textarea',
@@ -552,6 +554,7 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
                                         showTime: true,
                                         format: 'YYYY-MM-DD HH:mm:ss',
                                         valueFormat: 'x',
+                                        class: '!w-full',
                                     },
                                 #elseif($column.htmlType == "textarea")## 文本域
                                     component: 'Textarea',
