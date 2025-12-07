@@ -20,6 +20,14 @@ public interface ApiAccessLogService {
     void createApiAccessLog(ApiAccessLogCreateReqDTO createReqDTO);
 
     /**
+     * 获得 API 访问日志
+     *
+     * @param id 编号
+     * @return API 访问日志
+     */
+    ApiAccessLogDO getApiAccessLog(Long id);
+
+    /**
      * 获得 API 访问日志分页
      *
      * @param pageReqVO 分页查询
