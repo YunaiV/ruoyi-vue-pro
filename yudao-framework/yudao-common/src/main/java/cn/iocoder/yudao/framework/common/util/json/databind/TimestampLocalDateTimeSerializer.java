@@ -23,16 +23,18 @@ public class TimestampLocalDateTimeSerializer extends JsonSerializer<LocalDateTi
 
     @Override
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        String fieldName = gen.getOutputContext().getCurrentName();
-        Class<?> clazz = gen.getOutputContext().getCurrentValue().getClass();
-        Field field = ReflectUtil.getField(clazz, fieldName);
         // 情况一：有 JsonFormat 自定义注解，则使用它。https://github.com/YunaiV/ruoyi-vue-pro/pull/1019
-        JsonFormat[] jsonFormats = field.getAnnotationsByType(JsonFormat.class);
-        if (jsonFormats.length > 0) {
-            String pattern = jsonFormats[0].pattern();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-            gen.writeString(formatter.format(value));
-            return;
+        String fieldName = gen.getOutputContext().getCurrentName();
+        if (fieldName != null) {
+            Class<?> clazz = gen.getOutputContext().getCurrentValue().getClass();
+            Field field = ReflectUtil.getField(clazz, fieldName);
+            JsonFormat[] jsonFormats = field.getAnnotationsByType(JsonFormat.class);
+            if (jsonFormats.length > 0) {
+                String pattern = jsonFormats[0].pattern();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                gen.writeString(formatter.format(value));
+                return;
+            }
         }
 
         // 情况二：默认将 LocalDateTime 对象，转换为 Long 时间戳

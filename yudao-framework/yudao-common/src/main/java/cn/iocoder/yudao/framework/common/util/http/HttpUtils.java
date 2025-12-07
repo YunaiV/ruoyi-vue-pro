@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,16 @@ public class HttpUtils {
     @SneakyThrows
     public static String encodeUtf8(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+    }
+
+    /**
+     * 解码 URL 参数
+     *
+     * @param value 参数
+     * @return 解码后的参数
+     */
+    public static String decodeUtf8(String value) {
+        return URLDecoder.decode(value, StandardCharsets.UTF_8);
     }
 
     @SuppressWarnings("unchecked")
