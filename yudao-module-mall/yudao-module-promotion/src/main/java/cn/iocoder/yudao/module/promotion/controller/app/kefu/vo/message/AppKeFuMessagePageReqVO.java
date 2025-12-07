@@ -27,7 +27,7 @@ public class AppKeFuMessagePageReqVO {
     @Schema(description = "每次查询条数，最大值为 100", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "每次查询条数不能为空")
     @Min(value = 1, message = "每次查询条数最小值为 1")
-    @Max(value = 100, message = "每次查询最大值为 100")
+    @Max(value = 200, message = "每次查询最大值为 200")
     private Integer limit = LIMIT;
 
 }
