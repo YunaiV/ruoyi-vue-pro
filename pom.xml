@@ -57,14 +57,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <!-- 强制指定quartz版本 -->
-            <!-- TODO @芋艿：临时兼容 spring boot 3.x 的 quartz 引入版本过低的问题，后续要调整下 -->
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz</artifactId>
-                <version>2.5.2</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

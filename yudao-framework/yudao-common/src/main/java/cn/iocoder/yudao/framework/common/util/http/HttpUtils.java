@@ -44,8 +44,9 @@ public class HttpUtils {
      * @param value 参数
      * @return 解码后的参数
      */
+    @SneakyThrows
     public static String decodeUtf8(String value) {
-        return URLDecoder.decode(value, StandardCharsets.UTF_8);
+        return URLDecoder.decode(value, StandardCharsets.UTF_8.name());
     }
 
     @SuppressWarnings("unchecked")
