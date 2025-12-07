@@ -339,6 +339,7 @@ CREATE TABLE IF NOT EXISTS "system_social_client" (
   "user_type" int NOT NULL,
   "client_id" varchar(255) NOT NULL,
   "client_secret" varchar(255) NOT NULL,
+  "public_key" varchar(2048) NOT NULL,
   "agent_id" varchar(255) NOT NULL,
   "status" int NOT NULL,
   "creator" varchar(64) DEFAULT '',
