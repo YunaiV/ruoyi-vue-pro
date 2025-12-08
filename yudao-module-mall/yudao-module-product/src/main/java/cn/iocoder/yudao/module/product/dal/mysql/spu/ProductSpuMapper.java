@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
 import cn.iocoder.yudao.module.product.controller.admin.spu.vo.ProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.spu.vo.AppProductSpuPageReqVO;
 import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
@@ -21,11 +22,12 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
     /**
      * 查询商品 SPU（包含已删除）
-     * 注意：使用 @Results 手动指定 typeHandler，否则 @Select 不会应用 autoResultMap，sliderPicUrls 字段无法解析 JSON
+     * 注意：使用 @Results 手动指定 typeHandler，否则 @Select 不会应用 autoResultMap，sliderPicUrls，deliveryTypes 字段无法解析 JSON
      */
     @Select("SELECT * FROM product_spu WHERE id = #{id}")
     @Results({
             @Result(column = "slider_pic_urls", property = "sliderPicUrls", typeHandler = JacksonTypeHandler.class),
+            @Result(column = "delivery_types", property = "deliveryTypes", typeHandler = IntegerListTypeHandler.class),
     })
     ProductSpuDO selectByIdIncludeDeleted(@Param("id") Long id);
 
