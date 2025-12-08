@@ -10,9 +10,8 @@ import cn.iocoder.yudao.module.product.dal.dataobject.spu.ProductSpuDO;
 import cn.iocoder.yudao.module.product.enums.ProductConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Objects;
 import java.util.Set;
@@ -20,7 +19,14 @@ import java.util.Set;
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
 
+    /**
+     * 查询商品 SPU（包含已删除）
+     * 注意：使用 @Results 手动指定 typeHandler，否则 @Select 不会应用 autoResultMap，sliderPicUrls 字段无法解析 JSON
+     */
     @Select("SELECT * FROM product_spu WHERE id = #{id}")
+    @Results({
+            @Result(column = "slider_pic_urls", property = "sliderPicUrls", typeHandler = JacksonTypeHandler.class),
+    })
     ProductSpuDO selectByIdIncludeDeleted(@Param("id") Long id);
 
     /**
