@@ -13,11 +13,13 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
 import com.fhs.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -37,6 +39,15 @@ public class OperateLogController {
 
     @Resource
     private OperateLogService operateLogService;
+
+    @GetMapping("/get")
+    @Operation(summary = "查看操作日志")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('system:operate-log:query')")
+    public CommonResult<OperateLogRespVO> getOperateLog(@RequestParam("id") Long id) {
+        OperateLogDO operateLog = operateLogService.getOperateLog(id);
+        return success(BeanUtils.toBean(operateLog, OperateLogRespVO.class));
+    }
 
     @GetMapping("/page")
     @Operation(summary = "查看操作日志分页列表")

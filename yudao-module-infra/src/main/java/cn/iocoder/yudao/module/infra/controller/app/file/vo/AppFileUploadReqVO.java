@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.app.file.vo;
 
-import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileUploadReqVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class AppFileUploadReqVO {
     @AssertTrue(message = "文件目录不正确")
     @JsonIgnore
     public boolean isDirectoryValid() {
-        return !StrUtil.containsAny(directory, "..", "/", "\\");
+        return FileUploadReqVO.isDirectoryValid(directory);
     }
 
 }

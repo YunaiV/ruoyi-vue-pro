@@ -50,6 +50,15 @@ public class ApiErrorLogController {
         return success(true);
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得 API 错误日志")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('infra:api-error-log:query')")
+    public CommonResult<ApiErrorLogRespVO> getApiErrorLog(@RequestParam("id") Long id) {
+        ApiErrorLogDO apiErrorLog = apiErrorLogService.getApiErrorLog(id);
+        return success(BeanUtils.toBean(apiErrorLog, ApiErrorLogRespVO.class));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得 API 错误日志分页")
     @PreAuthorize("@ss.hasPermission('infra:api-error-log:query')")

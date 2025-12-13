@@ -220,9 +220,8 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateWalletRechargeRefunded(Long id, Long refundId, Long payRefundId) {
+    public void updateWalletRechargeRefunded(Long id, String refundId, Long payRefundId) {
         // 1.1 获取钱包充值记录
-        // 说明：因为 id 和 refundId 是相同的，所以直接使用 id 查询即可！
         PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
         if (walletRecharge == null) {
             log.error("[updateWalletRechargerPaid][钱包充值记录不存在，钱包充值记录 id({})]", id);
@@ -274,8 +273,8 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
                     walletRecharge.getId(), payRefundId, toJsonString(walletRecharge), toJsonString(payRefund));
             throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
-        // 2.3 校验退款订单商户订单是否匹配
-        if (notEqual(payRefund.getMerchantRefundId(), walletRecharge.getId().toString())) {
+        // 2.3 校验退款订单商户退款单是否匹配
+        if (notEqual(payRefund.getMerchantRefundId(), walletRecharge.getId() + "-refund")) {
             log.error("[validateWalletRechargeCanRefunded][钱包({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     walletRecharge.getId(), payRefundId, toJsonString(payRefund));
             throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR);

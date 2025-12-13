@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,8 +16,11 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
+import cn.iocoder.yudao.module.ai.enums.AiDocumentSplitStrategyEnum;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
+import cn.iocoder.yudao.module.ai.service.knowledge.splitter.MarkdownQaSplitter;
+import cn.iocoder.yudao.module.ai.service.knowledge.splitter.SemanticTextSplitter;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
@@ -39,8 +43,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_CONTENT_TOO_LONG;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 import static org.springframework.ai.vectorstore.SearchRequest.SIMILARITY_THRESHOLD_ACCEPT_ALL;
 
 /**
@@ -95,8 +98,9 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         AiKnowledgeDO knowledgeDO = knowledgeService.validateKnowledgeExists(documentDO.getKnowledgeId());
         VectorStore vectorStore = getVectorStoreById(knowledgeDO);
 
-        // 2. 文档切片
-        List<Document> documentSegments = splitContentByToken(content, documentDO.getSegmentMaxTokens());
+        // 2. 文档切片（使用自动检测策略）
+        List<Document> documentSegments = splitContentByStrategy(content, documentDO.getSegmentMaxTokens(),
+                AiDocumentSplitStrategyEnum.AUTO, documentDO.getUrl());
 
         // 3.1 存储切片
         List<AiKnowledgeSegmentDO> segmentDOs = convertList(documentSegments, segment -> {
@@ -295,8 +299,10 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         // 1. 读取 URL 内容
         String content = knowledgeDocumentService.readUrl(url);
 
-        // 2. 文档切片
-        List<Document> documentSegments = splitContentByToken(content, segmentMaxTokens);
+        // 2.1 自动检测文档类型并选择策略
+        AiDocumentSplitStrategyEnum strategy = detectDocumentStrategy(content, url);
+        // 2.2 文档切片
+        List<Document> documentSegments = splitContentByStrategy(content, segmentMaxTokens, strategy, url);
 
         // 3. 转换为段落对象
         return convertList(documentSegments, segment -> {
@@ -333,11 +339,103 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         return getVectorStoreById(knowledge);
     }
 
-    private static List<Document> splitContentByToken(String content, Integer segmentMaxTokens) {
-        TextSplitter textSplitter = buildTokenTextSplitter(segmentMaxTokens);
+    /**
+     * 根据策略切分内容
+     *
+     * @param content 文档内容
+     * @param segmentMaxTokens 分段的最大 Token 数
+     * @param strategy 切片策略
+     * @param url 文档 URL（用于自动检测文件类型）
+     * @return 切片后的文档列表
+     */
+    @SuppressWarnings("EnhancedSwitchMigration")
+    private List<Document> splitContentByStrategy(String content, Integer segmentMaxTokens,
+                                                  AiDocumentSplitStrategyEnum strategy, String url) {
+        // 自动检测策略
+        if (strategy == AiDocumentSplitStrategyEnum.AUTO) {
+            strategy = detectDocumentStrategy(content, url);
+            log.info("[splitContentByStrategy][自动检测到文档策略: {}]", strategy.getName());
+        }
+        // 根据策略切分
+        TextSplitter textSplitter;
+        switch (strategy) {
+            case MARKDOWN_QA:
+                textSplitter = new MarkdownQaSplitter(segmentMaxTokens);
+                break;
+            case SEMANTIC:
+                textSplitter = new SemanticTextSplitter(segmentMaxTokens);
+                break;
+            case PARAGRAPH:
+                textSplitter = new SemanticTextSplitter(segmentMaxTokens, 0); // 段落切分，无重叠
+                break;
+            case TOKEN:
+            default:
+                textSplitter = buildTokenTextSplitter(segmentMaxTokens);
+                break;
+        }
+        // 执行切分
         return textSplitter.apply(Collections.singletonList(new Document(content)));
     }
 
+    /**
+     * 自动检测文档类型并选择切片策略
+     *
+     * @param content 文档内容
+     * @param url 文档 URL
+     * @return 推荐的切片策略
+     */
+    private AiDocumentSplitStrategyEnum detectDocumentStrategy(String content, String url) {
+        if (StrUtil.isEmpty(content)) {
+            return AiDocumentSplitStrategyEnum.TOKEN;
+        }
+        // 1. 检测 Markdown QA 格式
+        if (isMarkdownQaFormat(content, url)) {
+            return AiDocumentSplitStrategyEnum.MARKDOWN_QA;
+        }
+        // 2. 检测普通 Markdown 文档
+        if (isMarkdownDocument(url)) {
+            return AiDocumentSplitStrategyEnum.SEMANTIC;
+        }
+        // 3. 默认使用语义切分（比 Token 切分更智能）
+        return AiDocumentSplitStrategyEnum.SEMANTIC;
+    }
+
+    /**
+     * 检测是否为 Markdown QA 格式
+     * 特征：包含多个二级标题（## ）且标题后紧跟答案内容
+     */
+    private boolean isMarkdownQaFormat(String content, String url) {
+        // 文件扩展名判断
+        if (StrUtil.isNotEmpty(url) && !url.toLowerCase().endsWith(".md")) {
+            return false;
+        }
+
+        // 统计二级标题数量
+        long h2Count = content.lines()
+                .filter(line -> line.trim().startsWith("## "))
+                .count();
+
+        // 要求一：至少包含 2 个二级标题才认为是 QA 格式
+        if (h2Count < 2) {
+            return false;
+        }
+
+        // 要求二：检查标题占比（QA 文档标题行数相对较多），如果二级标题占比超过 10%，认为是 QA 格式
+        long totalLines = content.lines().count();
+        double h2Ratio = (double) h2Count / totalLines;
+        return h2Ratio > 0.1;
+    }
+
+    /**
+     * 检测是否为 Markdown 文档
+     */
+    private boolean isMarkdownDocument(String url) {
+        return StrUtil.endWithAnyIgnoreCase(url, ".md", ".markdown");
+    }
+
+    /**
+     * 构建基于 Token 的文本切片器（原有逻辑保留）
+     */
     private static TextSplitter buildTokenTextSplitter(Integer segmentMaxTokens) {
         return TokenTextSplitter.builder()
                 .withChunkSize(segmentMaxTokens)

@@ -56,9 +56,9 @@ public interface PayWalletRechargeService {
      * 更新钱包充值记录为已退款
      *
      * @param id          钱包充值记录编号
-     * @param refundId    钱包充值退款编号（实际和 id 相同）
+     * @param refundId    钱包充值退款编号（格式：{id}-refund）
      * @param payRefundId 退款单id
      */
-    void updateWalletRechargeRefunded(Long id, Long refundId, Long payRefundId);
+    void updateWalletRechargeRefunded(Long id, String refundId, Long payRefundId);
 
 }
