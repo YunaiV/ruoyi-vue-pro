@@ -5,9 +5,8 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +14,14 @@ import java.util.List;
 @Mapper
 public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
 
+    /**
+     * 查询商品 SKU（包含已删除）
+     * 注意：使用 @Results 手动指定 typeHandler，否则 @Select 不会应用 autoResultMap，properties 字段无法解析 JSON
+     */
     @Select("SELECT * FROM product_sku WHERE id = #{id}")
+    @Results({
+            @Result(column = "properties", property = "properties", typeHandler = JacksonTypeHandler.class),
+    })
     ProductSkuDO selectByIdIncludeDeleted(@Param("id") Long id);
 
     default List<ProductSkuDO> selectListBySpuId(Long spuId) {
