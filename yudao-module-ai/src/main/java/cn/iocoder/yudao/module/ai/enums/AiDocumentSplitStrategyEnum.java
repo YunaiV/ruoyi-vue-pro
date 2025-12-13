@@ -50,16 +50,4 @@ public enum AiDocumentSplitStrategyEnum {
      */
     private final String name;
 
-    /**
-     * 根据代码获取枚举
-     */
-    public static AiDocumentSplitStrategyEnum fromCode(String code) {
-        for (AiDocumentSplitStrategyEnum strategy : values()) {
-            if (strategy.getCode().equals(code)) {
-                return strategy;
-            }
-        }
-        return AUTO; // 默认返回自动识别
-    }
-
 }

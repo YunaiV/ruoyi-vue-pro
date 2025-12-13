@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -72,12 +73,14 @@ public class SemanticTextSplitter extends TextSplitter {
         if (StrUtil.isEmpty(text)) {
             return Collections.emptyList();
         }
-
         return splitTextRecursive(text);
     }
 
     /**
      * 切分文本（递归策略）
+     *
+     * @param text 待切分文本
+     * @return 切分后的文本块列表
      */
     private List<String> splitTextRecursive(String text) {
         List<String> chunks = new ArrayList<>();
@@ -92,7 +95,6 @@ public class SemanticTextSplitter extends TextSplitter {
         // 尝试按不同分隔符切分
         List<String> splits = null;
         String usedSeparator = null;
-
         for (String separator : PARAGRAPH_SEPARATORS) {
             if (text.contains(separator)) {
                 splits = Arrays.asList(text.split(Pattern.quote(separator)));
@@ -109,18 +111,20 @@ public class SemanticTextSplitter extends TextSplitter {
 
         // 合并小片段
         chunks = mergeSplits(splits, usedSeparator);
-
         return chunks;
     }
 
     /**
      * 按句子切分
+     *
+     * @param text 待切分文本
+     * @return 句子列表
      */
     private List<String> splitBySentences(String text) {
+        // 使用正则表达式匹配句子结束位置
         List<String> sentences = new ArrayList<>();
         int lastEnd = 0;
-
-        java.util.regex.Matcher matcher = SENTENCE_END_PATTERN.matcher(text);
+        Matcher matcher = SENTENCE_END_PATTERN.matcher(text);
         while (matcher.find()) {
             String sentence = text.substring(lastEnd, matcher.end()).trim();
             if (StrUtil.isNotEmpty(sentence)) {
@@ -136,12 +140,15 @@ public class SemanticTextSplitter extends TextSplitter {
                 sentences.add(remaining);
             }
         }
-
         return sentences.isEmpty() ? Collections.singletonList(text) : sentences;
     }
 
     /**
      * 合并切分后的小片段
+     *
+     * @param splits 切分后的片段列表
+     * @param separator 片段间的分隔符
+     * @return 合并后的文本块列表
      */
     private List<String> mergeSplits(List<String> splits, String separator) {
         List<String> chunks = new ArrayList<>();
@@ -152,9 +159,7 @@ public class SemanticTextSplitter extends TextSplitter {
             if (StrUtil.isEmpty(split)) {
                 continue;
             }
-
             int splitTokens = tokenEstimator.estimate(split);
-
             // 如果单个片段就超过限制，进一步递归切分
             if (splitTokens > chunkSize) {
                 // 先保存当前累积的块
@@ -164,7 +169,6 @@ public class SemanticTextSplitter extends TextSplitter {
                     currentChunks.clear();
                     currentLength = 0;
                 }
-
                 // 递归切分大片段
                 if (!separator.isEmpty()) {
                     // 如果是段落分隔符，尝试按句子切分
@@ -175,10 +179,8 @@ public class SemanticTextSplitter extends TextSplitter {
                 }
                 continue;
             }
-
             // 计算加上分隔符的 Token 数
             int separatorTokens = StrUtil.isEmpty(separator) ? 0 : tokenEstimator.estimate(separator);
-
             // 如果加上这个片段会超过限制
             if (!currentChunks.isEmpty() && currentLength + splitTokens + separatorTokens > chunkSize) {
                 // 保存当前块
@@ -189,7 +191,7 @@ public class SemanticTextSplitter extends TextSplitter {
                 currentChunks = getOverlappingChunks(currentChunks, separator);
                 currentLength = estimateTokens(currentChunks, separator);
             }
-
+            // 添加当前片段
             currentChunks.add(split);
             currentLength += splitTokens + separatorTokens;
         }
@@ -199,39 +201,43 @@ public class SemanticTextSplitter extends TextSplitter {
             String chunkText = String.join(separator, currentChunks);
             chunks.add(chunkText.trim());
         }
-
         return chunks;
     }
 
     /**
      * 获取重叠的片段（用于保持上下文）
+     *
+     * @param chunks 当前片段列表
+     * @param separator 片段间的分隔符
+     * @return 重叠的片段列表
      */
     private List<String> getOverlappingChunks(List<String> chunks, String separator) {
         if (chunkOverlap == 0 || chunks.isEmpty()) {
             return new ArrayList<>();
         }
 
+        // 从后往前取片段，直到达到重叠大小
         List<String> overlapping = new ArrayList<>();
         int tokens = 0;
-
-        // 从后往前取片段，直到达到重叠大小
         for (int i = chunks.size() - 1; i >= 0; i--) {
             String chunk = chunks.get(i);
             int chunkTokens = tokenEstimator.estimate(chunk);
-
             if (tokens + chunkTokens > chunkOverlap) {
                 break;
             }
-
+            // 添加到重叠列表前端
             overlapping.add(0, chunk);
             tokens += chunkTokens + (StrUtil.isEmpty(separator) ? 0 : tokenEstimator.estimate(separator));
         }
-
         return overlapping;
     }
 
     /**
      * 估算片段列表的总 Token 数
+     *
+     * @param chunks 片段列表
+     * @param separator 片段间的分隔符
+     * @return 总 Token 数
      */
     private int estimateTokens(List<String> chunks, String separator) {
         int total = 0;
@@ -246,17 +252,18 @@ public class SemanticTextSplitter extends TextSplitter {
 
     /**
      * 强制切分长文本（当语义切分失败时）
+     *
+     * @param text 待切分文本
+     * @return 切分后的文本块列表
      */
     private List<String> forceSplitLongText(String text) {
         List<String> chunks = new ArrayList<>();
         int charsPerChunk = (int) (chunkSize * 0.8); // 保守估计
-
         for (int i = 0; i < text.length(); i += charsPerChunk) {
             int end = Math.min(i + charsPerChunk, text.length());
             String chunk = text.substring(i, end);
             chunks.add(chunk.trim());
         }
-
         log.warn("文本过长，已强制按字符切分，可能影响语义完整性");
         return chunks;
     }
@@ -265,6 +272,7 @@ public class SemanticTextSplitter extends TextSplitter {
      * 简单的 Token 估算器实现
      */
     private static class SimpleTokenEstimator implements MarkdownQaSplitter.TokenEstimator {
+
         @Override
         public int estimate(String text) {
             if (StrUtil.isEmpty(text)) {
@@ -273,21 +281,21 @@ public class SemanticTextSplitter extends TextSplitter {
 
             int chineseChars = 0;
             int englishWords = 0;
-
+            // 简单统计中英文
             for (char c : text.toCharArray()) {
                 if (c >= 0x4E00 && c <= 0x9FA5) {
                     chineseChars++;
                 }
             }
-
+            // 英文单词估算
             String[] words = text.split("\\s+");
             for (String word : words) {
                 if (word.matches(".*[a-zA-Z].*")) {
                     englishWords++;
                 }
             }
-
             return chineseChars + (int) (englishWords * 1.3);
         }
     }
+
 }

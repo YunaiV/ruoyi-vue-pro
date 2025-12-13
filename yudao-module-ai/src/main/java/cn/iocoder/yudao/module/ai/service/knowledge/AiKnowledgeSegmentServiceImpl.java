@@ -107,11 +107,8 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             if (StrUtil.isEmpty(segment.getText())) {
                 return null;
             }
-            return new AiKnowledgeSegmentDO()
-                    .setKnowledgeId(documentDO.getKnowledgeId())
-                    .setDocumentId(documentId)
-                    .setContent(segment.getText())
-                    .setContentLength(segment.getText().length())
+            return new AiKnowledgeSegmentDO().setKnowledgeId(documentDO.getKnowledgeId()).setDocumentId(documentId)
+                    .setContent(segment.getText()).setContentLength(segment.getText().length())
                     .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY)
                     .setTokens(tokenCountEstimator.estimate(segment.getText()))
                     .setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -302,13 +299,12 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         // 1. 读取 URL 内容
         String content = knowledgeDocumentService.readUrl(url);
 
-        // 2. 自动检测文档类型并选择策略
+        // 2.1 自动检测文档类型并选择策略
         AiDocumentSplitStrategyEnum strategy = detectDocumentStrategy(content, url);
-
-        // 3. 文档切片
+        // 2.2 文档切片
         List<Document> documentSegments = splitContentByStrategy(content, segmentMaxTokens, strategy, url);
 
-        // 4. 转换为段落对象
+        // 3. 转换为段落对象
         return convertList(documentSegments, segment -> {
             if (StrUtil.isEmpty(segment.getText())) {
                 return null;
@@ -352,6 +348,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
      * @param url 文档 URL（用于自动检测文件类型）
      * @return 切片后的文档列表
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private List<Document> splitContentByStrategy(String content, Integer segmentMaxTokens,
                                                   AiDocumentSplitStrategyEnum strategy, String url) {
         // 自动检测策略
@@ -359,7 +356,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             strategy = detectDocumentStrategy(content, url);
             log.info("[splitContentByStrategy][自动检测到文档策略: {}]", strategy.getName());
         }
-
+        // 根据策略切分
         TextSplitter textSplitter;
         switch (strategy) {
             case MARKDOWN_QA:
@@ -376,7 +373,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
                 textSplitter = buildTokenTextSplitter(segmentMaxTokens);
                 break;
         }
-
+        // 执行切分
         return textSplitter.apply(Collections.singletonList(new Document(content)));
     }
 
@@ -391,17 +388,14 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         if (StrUtil.isEmpty(content)) {
             return AiDocumentSplitStrategyEnum.TOKEN;
         }
-
         // 1. 检测 Markdown QA 格式
         if (isMarkdownQaFormat(content, url)) {
             return AiDocumentSplitStrategyEnum.MARKDOWN_QA;
         }
-
         // 2. 检测普通 Markdown 文档
         if (isMarkdownDocument(url)) {
             return AiDocumentSplitStrategyEnum.SEMANTIC;
         }
-
         // 3. 默认使用语义切分（比 Token 切分更智能）
         return AiDocumentSplitStrategyEnum.SEMANTIC;
     }
@@ -421,16 +415,14 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
                 .filter(line -> line.trim().startsWith("## "))
                 .count();
 
-        // 至少包含 2 个二级标题才认为是 QA 格式
+        // 要求一：至少包含 2 个二级标题才认为是 QA 格式
         if (h2Count < 2) {
             return false;
         }
 
-        // 检查标题占比（QA 文档标题行数相对较多）
+        // 要求二：检查标题占比（QA 文档标题行数相对较多），如果二级标题占比超过 10%，认为是 QA 格式
         long totalLines = content.lines().count();
         double h2Ratio = (double) h2Count / totalLines;
-
-        // 如果二级标题占比超过 10%，认为是 QA 格式
         return h2Ratio > 0.1;
     }
 
@@ -438,7 +430,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
      * 检测是否为 Markdown 文档
      */
     private boolean isMarkdownDocument(String url) {
-        return StrUtil.isNotEmpty(url) && url.toLowerCase().endsWith(".md");
+        return StrUtil.endWithAnyIgnoreCase(url, ".md", ".markdown");
     }
 
     /**
