@@ -20,6 +20,14 @@ public interface ApiErrorLogService {
     void createApiErrorLog(ApiErrorLogCreateReqDTO createReqDTO);
 
     /**
+     * 获得 API 错误日志
+     *
+     * @param id 编号
+     * @return API 错误日志
+     */
+    ApiErrorLogDO getApiErrorLog(Long id);
+
+    /**
      * 获得 API 错误日志分页
      *
      * @param pageReqVO 分页查询

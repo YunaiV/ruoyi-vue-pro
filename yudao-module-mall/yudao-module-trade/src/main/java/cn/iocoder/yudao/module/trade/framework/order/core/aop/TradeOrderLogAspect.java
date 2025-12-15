@@ -109,6 +109,9 @@ public class TradeOrderLogAspect {
      * @return 用户类型
      */
     private static Long getUserId() {
+        if (USER_ID.get() != null) {
+            return USER_ID.get();
+        }
         return ObjectUtil.defaultIfNull(WebFrameworkUtils.getLoginUserId(), TradeOrderLogDO.USER_ID_SYSTEM);
     }
 

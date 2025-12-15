@@ -51,7 +51,7 @@ public class PayWalletRechargeController {
     public CommonResult<Boolean> updateWalletRechargeRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
         walletRechargeService.updateWalletRechargeRefunded(
                 Long.valueOf(notifyReqDTO.getMerchantOrderId()),
-                Long.valueOf(notifyReqDTO.getMerchantRefundId()),
+                notifyReqDTO.getMerchantRefundId(),
                 notifyReqDTO.getPayRefundId());
         return success(true);
     }

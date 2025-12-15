@@ -58,13 +58,22 @@ public class PayWalletServiceImpl implements PayWalletService {
     private PayRefundService refundService;
 
     @Override
+    @SneakyThrows
     public PayWalletDO getOrCreateWallet(Long userId, Integer userType) {
         PayWalletDO wallet = walletMapper.selectByUserIdAndType(userId, userType);
         if (wallet == null) {
-            wallet = new PayWalletDO().setUserId(userId).setUserType(userType)
-                    .setBalance(0).setTotalExpense(0).setTotalRecharge(0);
-            wallet.setCreateTime(LocalDateTime.now());
-            walletMapper.insert(wallet);
+            // 使用双重检查锁，保证钱包创建并发问题
+            // https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1475/files
+            wallet = lockRedisDAO.lock(userId, UPDATE_TIMEOUT_MILLIS, () -> {
+                PayWalletDO newWallet = walletMapper.selectByUserIdAndType(userId, userType);
+                if (newWallet == null) {
+                    newWallet = new PayWalletDO().setUserId(userId).setUserType(userType)
+                            .setBalance(0).setTotalExpense(0).setTotalRecharge(0);
+                    newWallet.setCreateTime(LocalDateTime.now());
+                    walletMapper.insert(newWallet);
+                }
+                return newWallet;
+            });
         }
         return wallet;
     }

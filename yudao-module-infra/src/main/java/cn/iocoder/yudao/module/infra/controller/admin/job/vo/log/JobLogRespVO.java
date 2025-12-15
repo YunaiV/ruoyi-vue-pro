@@ -49,7 +49,7 @@ public class JobLogRespVO {
 
     @Schema(description = "任务状态，参见 JobLogStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty(value = "任务状态", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.JOB_STATUS)
+    @DictFormat(DictTypeConstants.JOB_LOG_STATUS)
     private Integer status;
 
     @Schema(description = "结果数据", example = "执行成功")

@@ -45,6 +45,9 @@ public class SocialClientSaveReqVO {
     @Schema(description = "授权方的网页应用编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2000045")
     private String agentId;
 
+    @Schema(description = "publicKey 公钥", example = "2000045")
+    private String publicKey;
+
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)
@@ -56,6 +59,14 @@ public class SocialClientSaveReqVO {
         // 如果是企业微信，必须填写 agentId 属性
         return !Objects.equals(socialType, SocialTypeEnum.WECHAT_ENTERPRISE.getType())
                 || !StrUtil.isEmpty(agentId);
+    }
+
+    @AssertTrue(message = "publicKey 不能为空")
+    @JsonIgnore
+    public boolean isPublicKeyValid() {
+        // 如果是支付宝，必须填写 publicKey 属性
+        return !Objects.equals(socialType, SocialTypeEnum.ALIPAY_MINI_PROGRAM.getType())
+                || !StrUtil.isEmpty(publicKey);
     }
 
 }

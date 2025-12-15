@@ -198,6 +198,12 @@ justauth:
       client-id: ${wx.mp.app-id}
       client-secret: ${wx.mp.secret}
       ignore-check-redirect-uri: true
+    ALIPAY: # 支付宝小程序
+      client-id: xx
+      client-secret: xx
+      alipay-public-key: xx
+      ignore-check-redirect-uri: true
+      ignore-check-state: true
   cache:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::

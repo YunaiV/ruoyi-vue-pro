@@ -922,15 +922,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<UserTask> returnUserTaskList = BpmnModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
         List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
-        List<String> runExecutionIds = new ArrayList<>();
         // 2. 给当前要被退回的 task 数组，设置退回意见
         taskList.forEach(task -> {
             // 需要排除掉，不需要设置退回意见的任务
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
-            }
-            if (task.getExecutionId() != null) {
-                runExecutionIds.add(task.getExecutionId());
             }
 
             // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
@@ -955,7 +951,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         //    相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1018
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())
+                .moveActivityIdsToSingleActivityId(returnTaskKeyList, reqVO.getTargetTaskDefinitionKey())
                 // 设置需要预测的任务 ids 的流程变量，用于辅助预测
                 .processVariable(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskDefinitionKeys)
                 // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
@@ -1467,7 +1463,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     return;
                 }
 
-                // 自动去重，通过自动审批的方式 TODO @芋艿 驳回的情况得考虑一下；@lesan：驳回后，又自动审批么？
+                // 自动去重，通过自动审批的方式
                 BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(task.getProcessDefinitionId());
                 if (processDefinitionInfo == null) {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程定义({})]", task.getId(), task.getProcessDefinitionId());

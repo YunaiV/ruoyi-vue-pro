@@ -73,4 +73,12 @@ public class SocialClientDO extends TenantBaseDO {
      */
     private String agentId;
 
+    /**
+     * publicKey 公钥
+     *
+     * 目前只有部分“社交类型”在使用：
+     * 1. 支付宝：支付宝公钥
+     */
+    private String publicKey;
+
 }
