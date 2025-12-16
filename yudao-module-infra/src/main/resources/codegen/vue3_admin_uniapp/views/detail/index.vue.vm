@@ -1,11 +1,13 @@
 <template>
   <view class="page-container">
+    <!-- 顶部导航栏 -->
     <wd-navbar
       title="${table.classComment}详情"
       left-arrow placeholder safe-area-inset-top fixed
       @click-left="handleBack"
     />
 
+    <!-- 详情内容 -->
     <view>
       <wd-cell-group border>
 #foreach($column in $columns)
@@ -26,6 +28,7 @@
       </wd-cell-group>
     </view>
 
+    <!-- 底部操作按钮 -->
     <view class="fixed bottom-0 left-0 right-0 bg-white p-24rpx">
       <view class="w-full flex gap-24rpx">
         <wd-button
@@ -46,26 +49,26 @@
 </template>
 
 <script lang="ts" setup>
-import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
-import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
-import { delete${simpleClassName}, get${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
-import { useAccess } from '@/hooks/useAccess'
-import { navigateBackPlus } from '@/utils'
 #set ($hasDict = 0)
 #foreach($column in $columns)
   #if ($hasDict == 0 && $column.dictType && "" != $column.dictType)
     #set ($hasDict = 1)
   #end
 #end
-#if ($hasDict == 1)
-import { DICT_TYPE } from '@/utils/constants'
-#end
 #set ($hasDateTime = 0)
 #foreach($column in $columns)
   #if ($hasDateTime == 0 && $column.javaType == "LocalDateTime")
     #set ($hasDateTime = 1)
   #end
+#end
+import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { onMounted, ref } from 'vue'
+import { useToast } from 'wot-design-uni'
+import { delete${simpleClassName}, get${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
 #end
 #if ($hasDateTime == 1)
 import { formatDateTime } from '@/utils/date'
@@ -84,13 +87,15 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
-const formData = ref<${simpleClassName}>()
-const deleting = ref(false)
+const formData = ref<${simpleClassName}>() // 详情数据
+const deleting = ref(false) // 删除中
 
+/** 返回上一页 */
 function handleBack() {
   navigateBackPlus('/pages-${table.moduleName}/${table.businessName}/index')
 }
 
+/** 加载${table.classComment}详情 */
 async function getDetail() {
   if (!props.id) {
     return
@@ -103,12 +108,14 @@ async function getDetail() {
   }
 }
 
+/** 编辑${table.classComment} */
 function handleEdit() {
   uni.navigateTo({
-    url: '/pages-${table.moduleName}/${table.businessName}/form/index?id=' + props.id,
+    url: `/pages-${table.moduleName}/${table.businessName}/form/index?id=\${props.id}`,
   })
 }
 
+/** 删除${table.classComment} */
 function handleDelete() {
   if (!props.id) {
     return
@@ -134,6 +141,7 @@ function handleDelete() {
   })
 }
 
+/** 初始化 */
 onMounted(() => {
   getDetail()
 })

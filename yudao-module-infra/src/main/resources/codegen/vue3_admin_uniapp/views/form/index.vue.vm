@@ -1,11 +1,13 @@
 <template>
   <view class="page-container">
+    <!-- 顶部导航栏 -->
     <wd-navbar
       :title="getTitle"
       left-arrow placeholder safe-area-inset-top fixed
       @click-left="handleBack"
     />
 
+    <!-- 表单区域 -->
     <view>
       <wd-form ref="formRef" :model="formData" :rules="formRules">
         <wd-cell-group border>
@@ -23,18 +25,46 @@
     #elseif ($javaType == "Boolean")
       #set ($dictMethod = "getBoolDictOptions")
     #end
-
-    #if (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
+    ## 优先判断是否有字典，有字典则使用 radio-group
+    #if (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
+          <wd-cell title="${comment}" title-width="180rpx" prop="${javaField}" center>
+            <wd-radio-group v-model="formData.${javaField}" shape="button" size="medium">
+              <wd-radio
+                v-for="dict in $dictMethod(DICT_TYPE.${dictType.toUpperCase()})"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-cell>
+    ## 数字类型（无字典）
+    #elseif (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
           <wd-cell title="${comment}" title-width="180rpx" prop="${javaField}" center>
             <wd-input-number
               v-model="formData.${javaField}"
               :min="0"
             />
           </wd-cell>
+    ## 布尔类型
     #elseif (${javaType.toLowerCase()} == "boolean")
           <wd-cell title="${comment}" title-width="180rpx" prop="${javaField}" center>
             <wd-switch v-model="formData.${javaField}" />
           </wd-cell>
+    ## 日期时间类型
+    #elseif (${javaType.toLowerCase()} == "date" || ${javaType.toLowerCase()} == "localdate" || ${javaType.toLowerCase()} == "localdatetime")
+      #set ($pickerType = "date")
+      #if (${javaType.toLowerCase()} == "localdatetime")
+        #set ($pickerType = "datetime")
+      #end
+          <wd-datetime-picker
+            v-model="formData.${javaField}"
+            type="${pickerType}"
+            label="${comment}"
+            label-width="180rpx"
+            prop="${javaField}"
+          />
+    ## 文本域
     #elseif ($column.htmlType == "textarea")
           <wd-textarea
             v-model="formData.${javaField}"
@@ -45,18 +75,7 @@
             show-word-limit
             clearable
           />
-    #elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
-          <wd-cell title="${comment}" title-width="180rpx" prop="${javaField}" center>
-            <wd-radio-group v-model="formData.${javaField}" shape="button" size="medium">
-              <wd-radio
-                v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-                :key="dict.value"
-                :value="dict.value"
-              >
-                {{ dict.label }}
-              </wd-radio>
-            </wd-radio-group>
-          </wd-cell>
+    ## 默认：文本输入
     #else
           <wd-input
             v-model="formData.${javaField}"
@@ -73,6 +92,7 @@
       </wd-form>
     </view>
 
+    <!-- 底部保存按钮 -->
     <view class="fixed bottom-0 left-0 right-0 bg-white p-24rpx">
       <wd-button
         type="primary"
@@ -87,19 +107,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
-import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
-import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
-import { navigateBackPlus } from '@/utils'
-
 #set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
 #if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
 #set ($primaryTsType = "number")
 #else
 #set ($primaryTsType = "string")
 #end
-
 #set ($hasDict = 0)
 #set ($hasGetDictOptions = 0)
 #set ($hasGetIntDictOptions = 0)
@@ -121,22 +134,31 @@ import { navigateBackPlus } from '@/utils'
     #end
   #end
 #end
+import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { computed, onMounted, ref } from 'vue'
+import { useToast } from 'wot-design-uni'
+import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 #if ($hasDict == 1)
-import { DICT_TYPE } from '@/utils/constants'
-import {
+  #set ($dictImportNames = "")
   #if ($hasGetDictOptions == 1)
-  getDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getDictOptions, ")
   #end
   #if ($hasGetIntDictOptions == 1)
-  getIntDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getIntDictOptions, ")
   #end
   #if ($hasGetStrDictOptions == 1)
-  getStrDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getStrDictOptions, ")
   #end
   #if ($hasGetBoolDictOptions == 1)
-  getBoolDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getBoolDictOptions, ")
   #end
-} from '@/hooks/useDict'
+  #set ($dictImportNames = $dictImportNames.trim())
+  #set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
+import { $dictImportNames } from '@/hooks/useDict'
+#end
+import { navigateBackPlus } from '@/utils'
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
 #end
 
 const props = defineProps<{
@@ -153,39 +175,43 @@ definePage({
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑${table.classComment}' : '新增${table.classComment}')
 const formLoading = ref(false)
-
-// TODO @AI：date + 时间范围，需要特殊处理；参考 /Users/yunai/Java/yudao-ui-admin-uniapp-next-v4/src/pages/message/components/search-form.vue 里的开始结束时间的处理；注意，index.vue.vm 也要调整；
 const formData = ref<${simpleClassName}>({
 #foreach($column in $columns)
   #if (($column.createOperation || $column.updateOperation) || $column.primaryKey)
     #set ($javaType = $column.javaType.toLowerCase())
+    #set ($javaFieldLower = $column.javaField.toLowerCase())
+    #set ($optional = $column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime")
     #if ($column.primaryKey)
   ${column.javaField}: undefined,
     #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}: 0,
     #elseif(${javaType} == "boolean")
   ${column.javaField}: false,
+    #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
+  ${column.javaField}: undefined,
     #else
   ${column.javaField}: '',
     #end
   #end
 #end
 })
-
 const formRules = {
 #foreach($column in $columns)
-  #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey)
+  #set ($javaFieldLower = $column.javaField.toLowerCase())
+  #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey
+        && $javaFieldLower != "createtime" && $javaFieldLower != "updatetime")
   ${column.javaField}: [{ required: true, message: '${column.columnComment}不能为空' }],
   #end
 #end
 }
-
 const formRef = ref()
 
+/** 返回上一页 */
 function handleBack() {
   navigateBackPlus('/pages-${table.moduleName}/${table.businessName}/index')
 }
 
+/** 加载${table.classComment}详情 */
 async function getDetail() {
   if (!props.id) {
     return
@@ -193,6 +219,7 @@ async function getDetail() {
   formData.value = await get${simpleClassName}(props.id)
 }
 
+/** 提交表单 */
 async function handleSubmit() {
   const { valid } = await formRef.value.validate()
   if (!valid) {
@@ -216,6 +243,7 @@ async function handleSubmit() {
   }
 }
 
+/** 初始化 */
 onMounted(() => {
   getDetail()
 })
