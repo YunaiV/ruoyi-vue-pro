@@ -137,6 +137,16 @@ public class CodegenEngine {
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}List.vue"))
             .put(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("api/api.ts"),
+                    vue3UniappFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("views/index.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("components/search-form.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/components/search-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("views/form/index.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/form/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("views/detail/index.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/detail/index.vue"))
             // VUE3_VBEN2_ANTD_SCHEMA
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("views/data.ts"),
                     vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/${classNameVar}.data.ts"))
@@ -614,6 +624,15 @@ public class CodegenEngine {
 
     private static String vue3FilePath(String path) {
         return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3AdminUniappTemplatePath(String path) {
+        return "codegen/vue3_admin_uniapp/" + path + ".vm";
+    }
+
+    private static String vue3UniappFilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-uniapp/" + // 顶级目录
                 "src/" + path;
     }
 

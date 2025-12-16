@@ -1,0 +1,257 @@
+<template>
+  <wd-search
+    :placeholder="searchPlaceholder"
+    :hide-cancel="true"
+    disabled
+    @click="visible = true"
+  />
+
+  <wd-popup
+    v-model="visible"
+    position="top"
+    custom-style="border-radius: 0 0 24rpx 24rpx;"
+    safe-area-inset-top
+    @close="visible = false"
+  >
+    <view class="p-32rpx">
+      <view class="mb-24rpx text-32rpx text-[#333] font-semibold">
+        搜索${table.classComment}
+      </view>
+
+#set ($hasDict = 0)
+#foreach ($column in $columns)
+  #if ($hasDict == 0 && $column.listOperation && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+  #end
+#end
+
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($dictType = $column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($javaType = $column.javaType)
+    #set ($comment = $column.columnComment)
+    #set ($dictMethod = "getDictOptions")
+    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+      #set ($dictMethod = "getIntDictOptions")
+    #elseif ($javaType == "String")
+      #set ($dictMethod = "getStrDictOptions")
+    #elseif ($javaType == "Boolean")
+      #set ($dictMethod = "getBoolDictOptions")
+    #end
+
+    #if ($column.htmlType == "input")
+      <view class="mb-24rpx">
+        <view class="mb-12rpx text-28rpx text-[#666]">
+          ${comment}
+        </view>
+        <wd-input
+          v-model="formData.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+        />
+      </view>
+    #elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
+      <view class="mb-32rpx">
+        <view class="mb-12rpx text-28rpx text-[#666]">
+          ${comment}
+        </view>
+        <wd-radio-group v-model="formData.${javaField}" shape="button" size="medium">
+          <wd-radio :value="-1">
+            全部
+          </wd-radio>
+          <wd-radio
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :value="dict.value"
+          >
+            {{ dict.label }}
+          </wd-radio>
+        </wd-radio-group>
+      </view>
+    #else
+      <view class="mb-24rpx">
+        <view class="mb-12rpx text-28rpx text-[#666]">
+          ${comment}
+        </view>
+        <wd-input
+          v-model="formData.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+        />
+      </view>
+    #end
+  #end
+#end
+
+      <view class="w-full flex justify-center gap-24rpx">
+        <wd-button class="flex-1" plain @click="handleReset">
+          重置
+        </wd-button>
+        <wd-button class="flex-1" type="primary" @click="handleSearch">
+          搜索
+        </wd-button>
+      </view>
+    </view>
+  </wd-popup>
+</template>
+
+<script lang="ts" setup>
+import { computed, reactive, ref, watch } from 'vue'
+
+#set ($hasDict = 0)
+#set ($hasGetDictOptions = 0)
+#set ($hasGetIntDictOptions = 0)
+#set ($hasGetStrDictOptions = 0)
+#set ($hasGetBoolDictOptions = 0)
+#foreach($column in $columns)
+  #if ($column.listOperation && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+    #if ($column.htmlType == "select" || $column.htmlType == "radio")
+      #if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+        #set ($hasGetIntDictOptions = 1)
+      #elseif ($column.javaType == "String")
+        #set ($hasGetStrDictOptions = 1)
+      #elseif ($column.javaType == "Boolean")
+        #set ($hasGetBoolDictOptions = 1)
+      #else
+        #set ($hasGetDictOptions = 1)
+      #end
+    #end
+  #end
+#end
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
+import {
+  #if ($hasGetDictOptions == 1)
+  getDictOptions,
+  #end
+  #if ($hasGetIntDictOptions == 1)
+  getIntDictOptions,
+  #end
+  #if ($hasGetStrDictOptions == 1)
+  getStrDictOptions,
+  #end
+  #if ($hasGetBoolDictOptions == 1)
+  getBoolDictOptions,
+  #end
+  getDictLabel,
+} from '@/hooks/useDict'
+#end
+
+/** 搜索表单数据 */
+export interface SearchFormData {
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($javaType = $column.javaType.toLowerCase())
+    #if ($column.dictType && "" != $column.dictType)
+      #if(${javaType} == "string")
+  ${column.javaField}?: string | number
+      #elseif(${javaType} == "boolean")
+  ${column.javaField}?: boolean | number
+      #else
+  ${column.javaField}?: number
+      #end
+    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+  ${column.javaField}?: number
+    #elseif(${javaType} == "boolean")
+  ${column.javaField}?: boolean
+    #else
+  ${column.javaField}?: string
+    #end
+  #end
+#end
+}
+
+const props = defineProps<{
+  searchParams?: Partial<SearchFormData>
+}>()
+
+const emit = defineEmits<{
+  search: [data: SearchFormData]
+  reset: []
+}>()
+
+const visible = ref(false)
+
+/** 搜索条件 placeholder 拼接 */
+const searchPlaceholder = computed(() => {
+  const conditions: string[] = []
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($dictType = $column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($javaType = $column.javaType.toLowerCase())
+    #set ($comment = $column.columnComment)
+    #if ($dictType && "" != $dictType)
+  if (props.searchParams?.${javaField} !== undefined && props.searchParams.${javaField} !== -1) {
+    conditions.push('${comment}:' + getDictLabel(DICT_TYPE.$dictType.toUpperCase(), props.searchParams.${javaField}))
+  }
+    #else
+  #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte" || ${javaType} == "boolean")
+  if (props.searchParams?.${javaField} !== undefined) {
+    conditions.push('${comment}:' + props.searchParams.${javaField})
+  }
+  #else
+  if (props.searchParams?.${javaField}) {
+    conditions.push('${comment}:' + props.searchParams.${javaField})
+  }
+  #end
+    #end
+  #end
+#end
+  return conditions.length > 0 ? conditions.join(' | ') : '搜索${table.classComment}'
+})
+
+const formData = reactive<SearchFormData>({
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #if ($column.dictType && "" != $column.dictType)
+      #set ($javaType = $column.javaType.toLowerCase())
+      #if(${javaType} == "string")
+  ${column.javaField}: -1 as number | string,
+      #elseif(${javaType} == "boolean")
+  ${column.javaField}: -1 as number | boolean,
+      #else
+  ${column.javaField}: -1 as number,
+      #end
+    #else
+  ${column.javaField}: undefined,
+    #end
+  #end
+#end
+})
+
+watch(visible, (val) => {
+  if (val && props.searchParams) {
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #if ($column.dictType && "" != $column.dictType)
+    formData.${column.javaField} = props.searchParams.${column.javaField} ?? -1
+    #else
+    formData.${column.javaField} = props.searchParams.${column.javaField}
+    #end
+  #end
+#end
+  }
+})
+
+function handleSearch() {
+  visible.value = false
+  emit('search', { ...formData } as SearchFormData)
+}
+
+function handleReset() {
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #if ($column.dictType && "" != $column.dictType)
+  formData.${column.javaField} = -1
+    #else
+  formData.${column.javaField} = undefined
+    #end
+  #end
+#end
+  visible.value = false
+  emit('reset')
+}
+</script>

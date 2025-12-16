@@ -1,0 +1,220 @@
+<template>
+  <view class="page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="${table.classComment}管理"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 搜索组件 -->
+    <SearchForm
+      :search-params="queryParams"
+      @search="handleQuery"
+      @reset="handleReset"
+    />
+
+    <!-- ${table.classComment}列表 -->
+    <view class="p-24rpx">
+      <view
+        v-for="item in list"
+        :key="item.${primaryColumn.javaField}"
+        class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
+        @click="handleDetail(item)"
+      >
+        <!-- TODO @AI：下面的 view 部分代码，缩进可能不太对； -->
+        <view class="p-24rpx">
+#set ($titleField = "")
+#set ($statusField = "")
+#set ($statusDictType = "")
+#foreach($column in $columns)
+  #if ($titleField == "" && !$column.primaryKey && $column.listOperationResult)
+    #set ($titleField = $column.javaField)
+    #set ($titleComment = $column.columnComment)
+  #end
+  #if ($statusField == "" && $column.listOperationResult && $column.dictType && "" != $column.dictType)
+    #set ($statusField = $column.javaField)
+    #set ($statusDictType = $column.dictType)
+  #end
+#end
+          <view class="mb-16rpx flex items-center justify-between">
+            <view class="text-32rpx text-[#333] font-semibold">
+              {{ item.#if($titleField != "")${titleField}#else ${primaryColumn.javaField}#end }}
+            </view>
+#if($statusField != "")
+            <dict-tag :type="DICT_TYPE.$statusDictType.toUpperCase()" :value="item.$statusField" />
+#end
+          </view>
+#set ($infoCount = 0)
+#foreach($column in $columns)
+  #if ($column.listOperationResult && !$column.primaryKey && $column.javaField != $titleField && $column.javaField != $statusField)
+    #if ($infoCount < 2)
+      <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+        <text class="mr-8rpx text-[#999]">${column.columnComment}：</text>
+        <text class="line-clamp-1">{{ item.${column.javaField} }}</text>
+      </view>
+      #set ($infoCount = $infoCount + 1)
+    #end
+  #end
+#end
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
+        <wd-status-tip image="content" tip="暂无${table.classComment}数据" />
+      </view>
+      <wd-loadmore
+        v-if="list.length > 0"
+        :state="loadMoreState"
+        @reload="loadMore"
+      />
+    </view>
+
+    <!-- 新增按钮 -->
+    <wd-fab
+      v-if="hasAccessByCodes(['${permissionPrefix}:create'])"
+      position="right-bottom"
+      type="primary"
+      :expandable="false"
+      @click="handleAdd"
+    />
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { SearchFormData } from './components/search-form.vue'
+import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import type { LoadMoreState } from '@/http/types'
+import { onReachBottom } from '@dcloudio/uni-app'
+import { onMounted, reactive, ref } from 'vue'
+import { get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+import SearchForm from './components/search-form.vue'
+#set ($hasDict = 0)
+#foreach($column in $columns)
+  #if ($hasDict == 0 && $column.listOperationResult && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+  #end
+#end
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
+#end
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const total = ref(0)
+const list = ref<${simpleClassName}[]>([])
+const loadMoreState = ref<LoadMoreState>('loading') // 加载更多状态
+
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($javaType = $column.javaType.toLowerCase())
+    #if ($column.dictType && "" != $column.dictType)
+      #if(${javaType} == "string")
+  ${column.javaField}: -1 as number | string, // -1 表示全部
+      #elseif(${javaType} == "boolean")
+  ${column.javaField}: -1 as number | boolean, // -1 表示全部
+      #else
+  ${column.javaField}: -1 as number, // -1 表示全部
+      #end
+    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+  ${column.javaField}: undefined as number | undefined,
+    #elseif(${javaType} == "boolean")
+  ${column.javaField}: undefined as boolean | undefined,
+    #else
+  ${column.javaField}: undefined as string | undefined,
+    #end
+  #end
+#end
+})
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus()
+}
+
+/** 查询${table.classComment}列表 */
+async function getList() {
+  loadMoreState.value = 'loading'
+  try {
+    const data = await get${simpleClassName}Page({
+      ...queryParams,
+#foreach($column in $columns)
+  #if ($column.listOperation && $column.dictType && "" != $column.dictType)
+      ${column.javaField}: queryParams.${column.javaField} === -1 ? undefined : queryParams.${column.javaField},
+  #end
+#end
+    })
+    list.value = [...list.value, ...data.list]
+    total.value = data.total
+    loadMoreState.value = list.value.length >= total.value ? 'finished' : 'loading'
+  } catch {
+    queryParams.pageNo = queryParams.pageNo > 1 ? queryParams.pageNo - 1 : 1
+    loadMoreState.value = 'error'
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery(data?: SearchFormData) {
+#foreach($column in $columns)
+  #if ($column.listOperation)
+  queryParams.${column.javaField} = data?.${column.javaField}#if ($column.dictType && "" != $column.dictType) ?? -1#end
+  #end
+#end
+  queryParams.pageNo = 1
+  list.value = []
+  getList()
+}
+
+/** 重置按钮操作 */
+function handleReset() {
+  handleQuery()
+}
+
+/** 加载更多 */
+function loadMore() {
+  if (loadMoreState.value === 'finished') {
+    return
+  }
+  queryParams.pageNo++
+  getList()
+}
+
+/** 新增${table.classComment} */
+function handleAdd() {
+  uni.navigateTo({
+    url: '/pages-${table.moduleName}/${table.businessName}/form/index',
+  })
+}
+
+/** 查看详情 */
+function handleDetail(item: ${simpleClassName}) {
+  uni.navigateTo({
+    url: '/pages-${table.moduleName}/${table.businessName}/detail/index?id=' + item.${primaryColumn.javaField},
+  })
+}
+
+/** 触底加载更多 */
+onReachBottom(() => {
+  loadMore()
+})
+
+/** 初始化 */
+onMounted(() => {
+  getList()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

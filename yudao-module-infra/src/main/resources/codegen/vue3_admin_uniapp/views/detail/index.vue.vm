@@ -1,0 +1,143 @@
+<template>
+  <view class="page-container">
+    <wd-navbar
+      title="${table.classComment}详情"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <view>
+      <wd-cell-group border>
+#foreach($column in $columns)
+  #if ($column.primaryKey || $column.listOperationResult || $column.createOperation || $column.updateOperation)
+    #set ($javaField = $column.javaField)
+    #set ($comment = $column.columnComment)
+    #if ($column.dictType && "" != $column.dictType)
+        <wd-cell title="${comment}">
+          <dict-tag :type="DICT_TYPE.${column.dictType.toUpperCase()}" :value="formData?.${javaField}" />
+        </wd-cell>
+    #elseif ($column.javaType == "LocalDateTime")
+        <wd-cell title="${comment}" :value="formatDateTime(formData?.${javaField}) || '-'" />
+    #else
+        <wd-cell title="${comment}" :value="String(formData?.${javaField} ?? '-')" />
+    #end
+  #end
+#end
+      </wd-cell-group>
+    </view>
+
+    <view class="fixed bottom-0 left-0 right-0 bg-white p-24rpx">
+      <view class="w-full flex gap-24rpx">
+        <wd-button
+          v-if="hasAccessByCodes(['${permissionPrefix}:update'])"
+          class="flex-1" type="warning" @click="handleEdit"
+        >
+          编辑
+        </wd-button>
+        <wd-button
+          v-if="hasAccessByCodes(['${permissionPrefix}:delete'])"
+          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+        >
+          删除
+        </wd-button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { onMounted, ref } from 'vue'
+import { useToast } from 'wot-design-uni'
+import { delete${simpleClassName}, get${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+#set ($hasDict = 0)
+#foreach($column in $columns)
+  #if ($hasDict == 0 && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+  #end
+#end
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
+#end
+#set ($hasDateTime = 0)
+#foreach($column in $columns)
+  #if ($hasDateTime == 0 && $column.javaType == "LocalDateTime")
+    #set ($hasDateTime = 1)
+  #end
+#end
+#if ($hasDateTime == 1)
+import { formatDateTime } from '@/utils/date'
+#end
+
+const props = defineProps<{
+  id?: number | any
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const toast = useToast()
+const formData = ref<${simpleClassName}>()
+const deleting = ref(false)
+
+function handleBack() {
+  navigateBackPlus('/pages-${table.moduleName}/${table.businessName}/index')
+}
+
+async function getDetail() {
+  if (!props.id) {
+    return
+  }
+  try {
+    toast.loading('加载中...')
+    formData.value = await get${simpleClassName}(props.id)
+  } finally {
+    toast.close()
+  }
+}
+
+function handleEdit() {
+  uni.navigateTo({
+    url: '/pages-${table.moduleName}/${table.businessName}/form/index?id=' + props.id,
+  })
+}
+
+function handleDelete() {
+  if (!props.id) {
+    return
+  }
+  uni.showModal({
+    title: '提示',
+    content: '确定要删除该${table.classComment}吗？',
+    success: async (res) => {
+      if (!res.confirm) {
+        return
+      }
+      deleting.value = true
+      try {
+        await delete${simpleClassName}(props.id)
+        toast.success('删除成功')
+        setTimeout(() => {
+          handleBack()
+        }, 500)
+      } finally {
+        deleting.value = false
+      }
+    },
+  })
+}
+
+onMounted(() => {
+  getDetail()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>
