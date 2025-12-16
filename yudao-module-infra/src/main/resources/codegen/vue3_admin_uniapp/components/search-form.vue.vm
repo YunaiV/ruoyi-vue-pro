@@ -1,4 +1,5 @@
 <template>
+  <!-- 搜索框入口 -->
   <wd-search
     :placeholder="searchPlaceholder"
     :hide-cancel="true"
@@ -6,6 +7,7 @@
     @click="visible = true"
   />
 
+  <!-- 搜索弹窗 -->
   <wd-popup
     v-model="visible"
     position="top"
@@ -17,14 +19,12 @@
       <view class="mb-24rpx text-32rpx text-[#333] font-semibold">
         搜索${table.classComment}
       </view>
-
 #set ($hasDict = 0)
 #foreach ($column in $columns)
   #if ($hasDict == 0 && $column.listOperation && $column.dictType && "" != $column.dictType)
     #set ($hasDict = 1)
   #end
 #end
-
 #foreach($column in $columns)
   #if ($column.listOperation)
     #set ($dictType = $column.dictType)
@@ -39,7 +39,6 @@
     #elseif ($javaType == "Boolean")
       #set ($dictMethod = "getBoolDictOptions")
     #end
-
     #if ($column.htmlType == "input")
       <view class="mb-24rpx">
         <view class="mb-12rpx text-28rpx text-[#666]">
@@ -83,7 +82,6 @@
     #end
   #end
 #end
-
       <view class="w-full flex justify-center gap-24rpx">
         <wd-button class="flex-1" plain @click="handleReset">
           重置
@@ -97,8 +95,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref, watch } from 'vue'
-
 #set ($hasDict = 0)
 #set ($hasGetDictOptions = 0)
 #set ($hasGetIntDictOptions = 0)
@@ -120,23 +116,25 @@ import { computed, reactive, ref, watch } from 'vue'
     #end
   #end
 #end
+import { computed, reactive, ref, watch } from 'vue'
 #if ($hasDict == 1)
-import { DICT_TYPE } from '@/utils/constants'
-import {
+  #set ($dictImportNames = "getDictLabel, ")
   #if ($hasGetDictOptions == 1)
-  getDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getDictOptions, ")
   #end
   #if ($hasGetIntDictOptions == 1)
-  getIntDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getIntDictOptions, ")
   #end
   #if ($hasGetStrDictOptions == 1)
-  getStrDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getStrDictOptions, ")
   #end
   #if ($hasGetBoolDictOptions == 1)
-  getBoolDictOptions,
+    #set ($dictImportNames = "${dictImportNames}getBoolDictOptions, ")
   #end
-  getDictLabel,
-} from '@/hooks/useDict'
+  #set ($dictImportNames = $dictImportNames.trim())
+  #set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
+import { $dictImportNames } from '@/hooks/useDict'
+import { DICT_TYPE } from '@/utils/constants'
 #end
 
 /** 搜索表单数据 */
@@ -185,16 +183,16 @@ const searchPlaceholder = computed(() => {
     #set ($comment = $column.columnComment)
     #if ($dictType && "" != $dictType)
   if (props.searchParams?.${javaField} !== undefined && props.searchParams.${javaField} !== -1) {
-    conditions.push('${comment}:' + getDictLabel(DICT_TYPE.$dictType.toUpperCase(), props.searchParams.${javaField}))
+    conditions.push(`${comment}:#[[${]]#getDictLabel(DICT_TYPE.${dictType.toUpperCase()}, props.searchParams.${javaField})#[[}]]#`)
   }
     #else
   #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte" || ${javaType} == "boolean")
   if (props.searchParams?.${javaField} !== undefined) {
-    conditions.push('${comment}:' + props.searchParams.${javaField})
+    conditions.push(`${comment}:#[[${]]#props.searchParams.${javaField}#[[}]]#`)
   }
   #else
   if (props.searchParams?.${javaField}) {
-    conditions.push('${comment}:' + props.searchParams.${javaField})
+    conditions.push(`${comment}:#[[${]]#props.searchParams.${javaField}#[[}]]#`)
   }
   #end
     #end
@@ -222,6 +220,7 @@ const formData = reactive<SearchFormData>({
 #end
 })
 
+/** 监听弹窗打开，同步外部参数 */
 watch(visible, (val) => {
   if (val && props.searchParams) {
 #foreach($column in $columns)
@@ -236,11 +235,13 @@ watch(visible, (val) => {
   }
 })
 
+/** 搜索 */
 function handleSearch() {
   visible.value = false
   emit('search', { ...formData } as SearchFormData)
 }
 
+/** 重置 */
 function handleReset() {
 #foreach($column in $columns)
   #if ($column.listOperation)

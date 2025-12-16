@@ -21,7 +21,7 @@
     #elseif ($column.javaType == "LocalDateTime")
         <wd-cell title="${comment}" :value="formatDateTime(formData?.${javaField}) || '-'" />
     #else
-        <wd-cell title="${comment}" :value="String(formData?.${javaField} ?? '-')" />
+        <wd-cell title="${comment}" :value="formData?.${javaField} ?? '-'" />
     #end
   #end
 #end
@@ -87,8 +87,8 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
-const formData = ref<${simpleClassName}>() // 详情数据
-const deleting = ref(false) // 删除中
+const formData = ref<${simpleClassName}>()
+const deleting = ref(false)
 
 /** 返回上一页 */
 function handleBack() {
@@ -111,7 +111,7 @@ async function getDetail() {
 /** 编辑${table.classComment} */
 function handleEdit() {
   uni.navigateTo({
-    url: `/pages-${table.moduleName}/${table.businessName}/form/index?id=\${props.id}`,
+    url: `/pages-${table.moduleName}/${table.businessName}/form/index?id=#[[${]]#props.id#[[}]]#`,
   })
 }
 
