@@ -28,7 +28,7 @@
     ## 优先判断是否有字典，有字典则使用 radio-group
     #if (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
           <wd-cell title="${comment}" title-width="180rpx" prop="${javaField}" center>
-            <wd-radio-group v-model="formData.${javaField}" shape="button" size="medium">
+            <wd-radio-group v-model="formData.${javaField}" shape="button">
               <wd-radio
                 v-for="dict in $dictMethod(DICT_TYPE.${dictType.toUpperCase()})"
                 :key="dict.value"

@@ -55,7 +55,7 @@
         <view class="mb-12rpx text-28rpx text-[#666]">
           ${comment}
         </view>
-        <wd-radio-group v-model="formData.${javaField}" shape="button" size="medium">
+        <wd-radio-group v-model="formData.${javaField}" shape="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -171,6 +171,24 @@ const emit = defineEmits<{
 }>()
 
 const visible = ref(false)
+const formData = reactive<SearchFormData>({
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #if ($column.dictType && "" != $column.dictType)
+      #set ($javaType = $column.javaType.toLowerCase())
+      #if(${javaType} == "string")
+  ${column.javaField}: -1 as number | string,
+      #elseif(${javaType} == "boolean")
+  ${column.javaField}: -1 as number | boolean,
+      #else
+  ${column.javaField}: -1 as number,
+      #end
+    #else
+  ${column.javaField}: undefined,
+    #end
+  #end
+#end
+})
 
 /** 搜索条件 placeholder 拼接 */
 const searchPlaceholder = computed(() => {
@@ -199,25 +217,6 @@ const searchPlaceholder = computed(() => {
   #end
 #end
   return conditions.length > 0 ? conditions.join(' | ') : '搜索${table.classComment}'
-})
-
-const formData = reactive<SearchFormData>({
-#foreach($column in $columns)
-  #if ($column.listOperation)
-    #if ($column.dictType && "" != $column.dictType)
-      #set ($javaType = $column.javaType.toLowerCase())
-      #if(${javaType} == "string")
-  ${column.javaField}: -1 as number | string,
-      #elseif(${javaType} == "boolean")
-  ${column.javaField}: -1 as number | boolean,
-      #else
-  ${column.javaField}: -1 as number,
-      #end
-    #else
-  ${column.javaField}: undefined,
-    #end
-  #end
-#end
 })
 
 /** 监听弹窗打开，同步外部参数 */
