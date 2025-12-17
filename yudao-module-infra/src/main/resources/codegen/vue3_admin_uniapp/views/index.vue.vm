@@ -111,7 +111,7 @@
     #end
   #end
 #end
-import type { SearchFormData } from './components/search-form.vue'
+import type { SearchFormData } from './modules/search-form.vue'
 import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import type { LoadMoreState } from '@/http/types'
 import { onReachBottom } from '@dcloudio/uni-app'
@@ -125,7 +125,7 @@ import { DICT_TYPE } from '@/utils/constants'
 #if ($hasDateTime == 1)
 import { formatDateTime } from '@/utils/date'
 #end
-import SearchForm from './components/search-form.vue'
+import SearchForm from './modules/search-form.vue'
 
 definePage({
   style: {
