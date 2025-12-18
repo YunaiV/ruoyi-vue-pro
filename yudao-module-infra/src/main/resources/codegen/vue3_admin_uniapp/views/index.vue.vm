@@ -8,11 +8,7 @@
     />
 
     <!-- 搜索组件 -->
-    <SearchForm
-      :search-params="queryParams"
-      @search="handleQuery"
-      @reset="handleReset"
-    />
+    <SearchForm @search="handleQuery" @reset="handleReset" />
 
     <!-- ${table.classComment}列表 -->
     <view class="p-24rpx">
@@ -111,17 +107,10 @@
     #end
   #end
 #end
-#set ($hasDateTimeBetween = 0)
-#foreach($column in $columns)
-  #if ($hasDateTimeBetween == 0 && $column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-    #set ($hasDateTimeBetween = 1)
-  #end
-#end
-import type { SearchFormData } from './components/search-form.vue'
 import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import type { LoadMoreState } from '@/http/types'
 import { onReachBottom } from '@dcloudio/uni-app'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'
@@ -130,9 +119,6 @@ import { DICT_TYPE } from '@/utils/constants'
 #end
 #if ($hasDateTime == 1)
 import { formatDateTime } from '@/utils/date'
-#end
-#if ($hasDateTimeBetween == 1)
-import { formatDateRange } from '@/utils/date'
 #end
 import SearchForm from './components/search-form.vue'
 
@@ -147,31 +133,9 @@ const { hasAccessByCodes } = useAccess()
 const total = ref(0)
 const list = ref<${simpleClassName}[]>([])
 const loadMoreState = ref<LoadMoreState>('loading')
-const queryParams = reactive({
+const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-#foreach($column in $columns)
-  #if ($column.listOperation)
-    #set ($javaType = $column.javaType.toLowerCase())
-    #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-  ${column.javaField}: [undefined, undefined] as [number | undefined, number | undefined],
-    #elseif ($column.dictType && "" != $column.dictType)
-      #if(${javaType} == "string")
-  ${column.javaField}: -1 as number | string, // -1 表示全部
-      #elseif(${javaType} == "boolean")
-  ${column.javaField}: -1 as number | boolean, // -1 表示全部
-      #else
-  ${column.javaField}: -1 as number, // -1 表示全部
-      #end
-    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
-  ${column.javaField}: undefined as number | undefined,
-    #elseif(${javaType} == "boolean")
-  ${column.javaField}: undefined as boolean | undefined,
-    #else
-  ${column.javaField}: undefined as string | undefined,
-    #end
-  #end
-#end
 })
 
 /** 返回上一页 */
@@ -183,41 +147,23 @@ function handleBack() {
 async function getList() {
   loadMoreState.value = 'loading'
   try {
-    const params: any = { ...queryParams }
-#foreach($column in $columns)
-  #if ($column.listOperation && $column.dictType && "" != $column.dictType)
-    params.${column.javaField} = queryParams.${column.javaField} === -1 ? undefined : queryParams.${column.javaField}
-  #end
-#end
-#foreach($column in $columns)
-  #if ($column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-    params.${column.javaField} = formatDateRange(queryParams.${column.javaField})
-  #end
-#end
-    const data = await get${simpleClassName}Page(params)
+    const data = await get${simpleClassName}Page(queryParams.value)
     list.value = [...list.value, ...data.list]
     total.value = data.total
     loadMoreState.value = list.value.length >= total.value ? 'finished' : 'loading'
   } catch {
-    queryParams.pageNo = queryParams.pageNo > 1 ? queryParams.pageNo - 1 : 1
+    queryParams.value.pageNo = queryParams.value.pageNo > 1 ? queryParams.value.pageNo - 1 : 1
     loadMoreState.value = 'error'
   }
 }
 
 /** 搜索按钮操作 */
-function handleQuery(data?: SearchFormData) {
-#foreach($column in $columns)
-  #if ($column.listOperation)
-    #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-  queryParams.${column.javaField} = data?.${column.javaField} ?? [undefined, undefined]
-    #elseif ($column.dictType && "" != $column.dictType)
-  queryParams.${column.javaField} = data?.${column.javaField} ?? -1
-    #else
-  queryParams.${column.javaField} = data?.${column.javaField}
-    #end
-  #end
-#end
-  queryParams.pageNo = 1
+function handleQuery(data?: Record<string, any>) {
+  queryParams.value = {
+    ...data,
+    pageNo: 1,
+    pageSize: queryParams.value.pageSize,
+  }
   list.value = []
   getList()
 }
@@ -232,7 +178,7 @@ function loadMore() {
   if (loadMoreState.value === 'finished') {
     return
   }
-  queryParams.pageNo++
+  queryParams.value.pageNo++
   getList()
 }
 
