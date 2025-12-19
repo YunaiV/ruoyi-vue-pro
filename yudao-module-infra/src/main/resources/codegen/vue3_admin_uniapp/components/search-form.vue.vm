@@ -1,24 +1,12 @@
 <template>
   <!-- 搜索框入口 -->
-  <wd-search
-    :placeholder="placeholder"
-    :hide-cancel="true"
-    disabled
-    @click="visible = true"
-  />
+  <view @click="visible = true">
+    <wd-search :placeholder="placeholder" hide-cancel disabled />
+  </view>
 
   <!-- 搜索弹窗 -->
-  <wd-popup
-    v-model="visible"
-    position="top"
-    custom-style="border-radius: 0 0 24rpx 24rpx;"
-    safe-area-inset-top
-    @close="visible = false"
-  >
-    <view class="p-32rpx">
-      <view class="mb-24rpx text-32rpx text-[#333] font-semibold">
-        搜索${table.classComment}
-      </view>
+  <wd-popup v-model="visible" position="top" @close="visible = false">
+    <view class="yd-search-form-container" :style="{ paddingTop: `#[[${]]#getNavbarHeight()#[[}]]#px` }">
 #set ($hasDict = 0)
 #foreach ($column in $columns)
   #if ($hasDict == 0 && $column.listOperation && $column.dictType && "" != $column.dictType)
@@ -41,8 +29,8 @@
       #set ($dictMethod = "getBoolDictOptions")
     #end
     #if ($column.htmlType == "input")
-      <view class="mb-24rpx">
-        <view class="mb-12rpx text-28rpx text-[#666]">
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
           ${comment}
         </view>
         <wd-input
@@ -53,49 +41,35 @@
       </view>
     #elseif ($column.htmlType == "datetime" && $listOperationCondition == "BETWEEN")
       #set ($AttrName = $javaField.substring(0,1).toUpperCase() + ${javaField.substring(1)})
-      <view class="mb-32rpx">
-        <view class="mb-12rpx text-28rpx text-[#666]">
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
           ${comment}
         </view>
-        <view class="flex items-center gap-16rpx">
-          <view class="flex-1" @click="visible${AttrName}[0] = true">
-            <view
-              class="h-72rpx flex items-center justify-center rounded-8rpx bg-[#f5f5f5] px-24rpx text-28rpx"
-            >
+        <view class="yd-search-form-date-range-container">
+          <view @click="visible${AttrName}[0] = true">
+            <view class="yd-search-form-date-range-picker">
               {{ formatDate(formData.${javaField}?.[0]) || '开始日期' }}
             </view>
           </view>
-          <text class="text-28rpx text-[#999]">至</text>
-          <view class="flex-1" @click="visible${AttrName}[1] = true">
-            <view
-              class="h-72rpx flex items-center justify-center rounded-8rpx bg-[#f5f5f5] px-24rpx text-28rpx"
-            >
+          -
+          <view @click="visible${AttrName}[1] = true">
+            <view class="yd-search-form-date-range-picker">
               {{ formatDate(formData.${javaField}?.[1]) || '结束日期' }}
             </view>
           </view>
         </view>
-        <wd-datetime-picker-view
-          v-if="visible${AttrName}[0]"
-          v-model="temp${AttrName}[0]"
-          type="date"
-          :columns-height="200"
-        />
-        <view v-if="visible${AttrName}[0]" class="mt-16rpx flex justify-end gap-16rpx">
-          <wd-button size="small" plain @click="handle${AttrName}0Cancel">
+        <wd-datetime-picker-view v-if="visible${AttrName}[0]" v-model="temp${AttrName}[0]" type="date" />
+        <view v-if="visible${AttrName}[0]" class="yd-search-form-date-range-actions">
+          <wd-button size="small" plain @click="visible${AttrName}[0] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handle${AttrName}0Confirm">
             确定
           </wd-button>
         </view>
-        <wd-datetime-picker-view
-          v-if="visible${AttrName}[1]"
-          v-model="temp${AttrName}[1]"
-          type="date"
-          :columns-height="200"
-        />
-        <view v-if="visible${AttrName}[1]" class="mt-16rpx flex justify-end gap-16rpx">
-          <wd-button size="small" plain @click="handle${AttrName}1Cancel">
+        <wd-datetime-picker-view v-if="visible${AttrName}[1]" v-model="temp${AttrName}[1]" type="date" />
+        <view v-if="visible${AttrName}[1]" class="yd-search-form-date-range-actions">
+          <wd-button size="small" plain @click="visible${AttrName}[1] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handle${AttrName}1Confirm">
@@ -104,8 +78,8 @@
         </view>
       </view>
     #elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
-      <view class="mb-32rpx">
-        <view class="mb-12rpx text-28rpx text-[#666]">
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
           ${comment}
         </view>
         <wd-radio-group v-model="formData.${javaField}" shape="button">
@@ -122,8 +96,8 @@
         </wd-radio-group>
       </view>
     #else
-      <view class="mb-24rpx">
-        <view class="mb-12rpx text-28rpx text-[#666]">
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
           ${comment}
         </view>
         <wd-input
@@ -135,7 +109,7 @@
     #end
   #end
 #end
-      <view class="w-full flex justify-center gap-24rpx">
+      <view class="yd-search-form-actions">
         <wd-button class="flex-1" plain @click="handleReset">
           重置
         </wd-button>
@@ -174,6 +148,7 @@
   #end
 #end
 import { computed, reactive, ref } from 'vue'
+import { getNavbarHeight } from '@/utils'
 #if ($hasDateTimeBetween == 1)
 import { formatDate, formatDateRange } from '@/utils/date'
 #end
@@ -276,19 +251,9 @@ function handle${AttrName}0Confirm() {
   visible${AttrName}.value[0] = false
 }
 
-/** ${column.columnComment}[0]取消 */
-function handle${AttrName}0Cancel() {
-  visible${AttrName}.value[0] = false
-}
-
 /** ${column.columnComment}[1]确认 */
 function handle${AttrName}1Confirm() {
   formData.${javaField} = [formData.${javaField}?.[0], temp${AttrName}.value[1]]
-  visible${AttrName}.value[1] = false
-}
-
-/** ${column.columnComment}[1]取消 */
-function handle${AttrName}1Cancel() {
   visible${AttrName}.value[1] = false
 }
   #end

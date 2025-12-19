@@ -1,5 +1,5 @@
 <template>
-  <view class="page-container">
+  <view class="yd-page-container">
     <!-- 顶部导航栏 -->
     <wd-navbar
       :title="getTitle"
