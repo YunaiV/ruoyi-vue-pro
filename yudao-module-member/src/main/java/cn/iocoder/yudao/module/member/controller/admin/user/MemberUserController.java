@@ -82,7 +82,17 @@ public class MemberUserController {
     @PreAuthorize("@ss.hasPermission('member:user:query')")
     public CommonResult<MemberUserRespVO> getUser(@RequestParam("id") Long id) {
         MemberUserDO user = memberUserService.getUser(id);
-        return success(MemberUserConvert.INSTANCE.convert03(user));
+        if (user == null) {
+            return success(null);
+        }
+        MemberUserRespVO userVO = MemberUserConvert.INSTANCE.convert03(user);
+        if (user.getLevelId() != null) {
+            MemberLevelDO level = memberLevelService.getLevel(userVO.getId());
+            if (level != null) {
+                userVO.setLevelName(level.getName());
+            }
+        }
+        return success(userVO);
     }
 
     @GetMapping("/page")
