@@ -125,6 +125,7 @@ public class BpmTaskCandidateInvoker {
         });
     }
 
+    @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致找不到候选人
     public Set<Long> calculateUsersByActivity(BpmnModel bpmnModel, String activityId,
                                               Long startUserId, String processDefinitionId, Map<String, Object> processVariables) {
         // 如果是 CallActivity 子流程，不进行计算候选人
