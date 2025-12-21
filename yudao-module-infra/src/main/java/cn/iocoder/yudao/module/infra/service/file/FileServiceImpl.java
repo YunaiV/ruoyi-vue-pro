@@ -153,6 +153,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public FileDO getFile(Long id) {
+        return validateFileExists(id);
+    }
+
+    @Override
     public void deleteFile(Long id) throws Exception {
         // 校验存在
         FileDO file = validateFileExists(id);

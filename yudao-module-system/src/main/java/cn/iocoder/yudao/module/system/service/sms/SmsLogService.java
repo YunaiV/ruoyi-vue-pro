@@ -59,6 +59,14 @@ public interface SmsLogService {
                                 LocalDateTime receiveTime, String apiReceiveCode, String apiReceiveMsg);
 
     /**
+     * 获得短信日志
+     *
+     * @param id 日志编号
+     * @return 短信日志
+     */
+    SmsLogDO getSmsLog(Long id);
+
+    /**
      * 获得短信日志分页
      *
      * @param pageReqVO 分页查询

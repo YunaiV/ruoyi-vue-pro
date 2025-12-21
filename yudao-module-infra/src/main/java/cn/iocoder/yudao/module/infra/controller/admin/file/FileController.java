@@ -72,6 +72,14 @@ public class FileController {
         return success(fileService.createFile(createReqVO));
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得文件")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:file:query')")
+    public CommonResult<FileRespVO> getFile(@RequestParam("id") Long id) {
+        return success(BeanUtils.toBean(fileService.getFile(id), FileRespVO.class));
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除文件")
     @Parameter(name = "id", description = "编号", required = true)
