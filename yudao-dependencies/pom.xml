@@ -29,7 +29,7 @@
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.5</mybatis-plus-join.version>
-        <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
+        <dynamic-datasource.version>4.5.0</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
         <redisson.version>3.52.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
