@@ -11,14 +11,14 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -152,7 +152,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         String regex = "(?s)<pre[^>]*>(.*?)</pre>";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             // 提取 <pre> 标签内的内容
             String innerContent = matcher.group(1);
@@ -192,7 +192,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 匹配 <pre><code> 标签的代码块
         Pattern codeBlockPattern = Pattern.compile("<pre\\s*.*?><code\\s*.*?>(.*?)</code></pre>", Pattern.DOTALL);
         Matcher matcher = codeBlockPattern.matcher(content);
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             // 获取代码块内容
             String codeBlock = matcher.group(1);
