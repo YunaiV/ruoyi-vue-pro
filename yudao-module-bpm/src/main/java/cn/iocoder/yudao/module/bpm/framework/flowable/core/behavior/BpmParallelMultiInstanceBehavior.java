@@ -34,6 +34,12 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
     public BpmParallelMultiInstanceBehavior(Activity activity,
                                             AbstractBpmnActivityBehavior innerActivityBehavior) {
         super(activity, innerActivityBehavior);
+        // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1483
+        // 在解析/构造阶段基于 activityId 初始化与 activity 绑定且不变的字段，避免在运行期修改 Behavior 实例状态
+        super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(activity.getId());
+        // 从 execution.getVariable() 读取当前所有任务处理的人的 key
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(activity.getId());
     }
 
     /**
@@ -50,14 +56,7 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
     protected int resolveNrOfInstances(DelegateExecution execution) {
         // 情况一：UserTask 节点
         if (execution.getCurrentFlowElement() instanceof UserTask) {
-            // 第一步，设置 collectionVariable 和 CollectionVariable
-            // 从  execution.getVariable() 读取所有任务处理人的 key
-            super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
-            super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
-            // 从 execution.getVariable() 读取当前所有任务处理的人的 key
-            super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
-
-            // 第二步，获取任务的所有处理人
+            // 获取任务的所有处理人
             @SuppressWarnings("unchecked")
             Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
             if (assigneeUserIds == null) {

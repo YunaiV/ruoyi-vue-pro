@@ -79,6 +79,11 @@ public class SmsLogServiceImpl implements SmsLogService {
     }
 
     @Override
+    public SmsLogDO getSmsLog(Long id) {
+        return smsLogMapper.selectById(id);
+    }
+
+    @Override
     public PageResult<SmsLogDO> getSmsLogPage(SmsLogPageReqVO pageReqVO) {
         return smsLogMapper.selectPage(pageReqVO);
     }

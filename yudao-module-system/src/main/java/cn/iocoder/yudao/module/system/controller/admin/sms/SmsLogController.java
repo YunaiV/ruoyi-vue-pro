@@ -11,10 +11,12 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsLogService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,6 +44,15 @@ public class SmsLogController {
     public CommonResult<PageResult<SmsLogRespVO>> getSmsLogPage(@Valid SmsLogPageReqVO pageReqVO) {
         PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, SmsLogRespVO.class));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得短信日志")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('system:sms-log:query')")
+    public CommonResult<SmsLogRespVO> getSmsLog(@RequestParam("id") Long id) {
+        SmsLogDO smsLog = smsLogService.getSmsLog(id);
+        return success(BeanUtils.toBean(smsLog, SmsLogRespVO.class));
     }
 
     @GetMapping("/export-excel")

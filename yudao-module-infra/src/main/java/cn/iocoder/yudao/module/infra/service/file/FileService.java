@@ -61,6 +61,7 @@ public interface FileService {
      * @return 编号
      */
     Long createFile(FileCreateReqVO createReqVO);
+    FileDO getFile(Long id);
 
     /**
      * 删除文件

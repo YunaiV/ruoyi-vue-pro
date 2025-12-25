@@ -96,7 +96,7 @@ public class CodegenEngine {
             .build();
 
     /**
-     * 后端的配置模版
+     * 前端的配置模版
      *
      * key1：UI 模版的类型 {@link CodegenFrontTypeEnum#getType()}
      * key2：模板在 resources 的地址
@@ -137,6 +137,16 @@ public class CodegenEngine {
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/components/${subSimpleClassName}List.vue"))
             .put(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType(), vue3TemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("api/api.ts"),
+                    vue3UniappFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("views/index.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("components/search-form.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/components/search-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("views/form/index.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/form/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType(), vue3AdminUniappTemplatePath("views/detail/index.vue"),
+                    vue3UniappFilePath("pages-${table.moduleName}/${table.businessName}/detail/index.vue"))
             // VUE3_VBEN2_ANTD_SCHEMA
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("views/data.ts"),
                     vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/${classNameVar}.data.ts"))
@@ -387,8 +397,8 @@ public class CodegenEngine {
      * @return 格式化后的代码
      */
     private String prettyCode(String content, String vmPath) {
-        // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错（需要排除 vben5）
-        if (!StrUtil.contains(vmPath, "vben5")) {
+        // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错（需要排除 vben5、vue3_admin_uniapp）
+        if (!StrUtil.containsAny(vmPath, "vben5", "vue3_admin_uniapp")) {
             content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
         }
         // Vue 界面：去除多的 dateFormatter，只有一个的情况下，说明没使用到
@@ -614,6 +624,15 @@ public class CodegenEngine {
 
     private static String vue3FilePath(String path) {
         return "yudao-ui-${sceneEnum.basePackage}-vue3/" + // 顶级目录
+                "src/" + path;
+    }
+
+    private static String vue3AdminUniappTemplatePath(String path) {
+        return "codegen/vue3_admin_uniapp/" + path + ".vm";
+    }
+
+    private static String vue3UniappFilePath(String path) {
+        return "yudao-ui-${sceneEnum.basePackage}-uniapp/" + // 顶级目录
                 "src/" + path;
     }
 
