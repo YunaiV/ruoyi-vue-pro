@@ -131,52 +131,47 @@ public class MailTemplateServiceImpl implements MailTemplateService {
 
     @Override
     public String formatMailTemplateContent(String content, Map<String, Object> params) {
-        // 先替换模板变量
+        // 1. 先替换模板变量
         String formattedContent = StrUtil.format(content, params);
 
-        // 反转义HTML特殊字符
+        // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1461 讨论
+        // 2.1 反转义HTML特殊字符
         formattedContent = unescapeHtml(formattedContent);
-
-        // 处理代码块（确保<pre><code>标签格式正确）
+        // 2.2 处理代码块（确保<pre><code>标签格式正确）
         formattedContent = formatHtmlCodeBlocks(formattedContent);
-
-        // 将最外层的pre标签替换为div标签
+        // 2.3 将最外层的 pre 标签替换为 div 标签
         formattedContent = replaceOuterPreWithDiv(formattedContent);
-
         return formattedContent;
     }
 
     private String replaceOuterPreWithDiv(String content) {
-        if (content == null) {
-            return null;
+        if (StrUtil.isEmpty(content)) {
+            return content;
         }
-
-        // 使用正则表达式匹配所有的<pre>标签，包括嵌套的<code>标签
+        // 使用正则表达式匹配所有的 <pre> 标签，包括嵌套的 <code> 标签
         String regex = "(?s)<pre[^>]*>(.*?)</pre>";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
-
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
-            // 提取<pre>标签内的内容
+            // 提取 <pre> 标签内的内容
             String innerContent = matcher.group(1);
-            // 返回div标签包裹的内容
+            // 返回 div 标签包裹的内容
             matcher.appendReplacement(sb, "<div>" + innerContent + "</div>");
         }
         matcher.appendTail(sb);
-
         return sb.toString();
     }
 
     /**
-     * 反转义HTML特殊字符
+     * 反转义 HTML 特殊字符
      *
      * @param input 输入字符串
      * @return 反转义后的字符串
      */
     private String unescapeHtml(String input) {
-        if (input == null) {
-            return null;
+        if (StrUtil.isEmpty(input)) {
+            return input;
         }
         return input
                 .replace("&amp;", "&")
@@ -188,27 +183,24 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     }
 
     /**
-     * 格式化HTML中的代码块
+     * 格式化 HTML 中的代码块
      *
      * @param content 邮件内容
      * @return 格式化后的邮件内容
      */
     private String formatHtmlCodeBlocks(String content) {
-        // 匹配<pre><code>标签的代码块
+        // 匹配 <pre><code> 标签的代码块
         Pattern codeBlockPattern = Pattern.compile("<pre\\s*.*?><code\\s*.*?>(.*?)</code></pre>", Pattern.DOTALL);
         Matcher matcher = codeBlockPattern.matcher(content);
-
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
             // 获取代码块内容
             String codeBlock = matcher.group(1);
-
             // 为代码块添加样式
             String replacement = "<pre style=\"background-color: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;\"><code>" + codeBlock + "</code></pre>";
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
-
         return sb.toString();
     }
 
@@ -216,6 +208,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     public long getMailTemplateCountByAccountId(Long accountId) {
         return mailTemplateMapper.selectCountByAccountId(accountId);
     }
+
     /**
      * 解析标题和内容中的参数
      */
@@ -223,7 +216,6 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     public List<String> parseTemplateTitleAndContentParams(String title, String content) {
         List<String> titleParams = ReUtil.findAllGroup1(PATTERN_PARAMS, title);
         List<String> contentParams = ReUtil.findAllGroup1(PATTERN_PARAMS, content);
-
         // 合并参数并去重
         List<String> allParams = new ArrayList<>(titleParams);
         for (String param : contentParams) {
