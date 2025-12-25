@@ -75,7 +75,7 @@
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>2.1.3</jimureport.version>
-        <jimubi.version>2.2.0</jimubi.version>
+        <jimubi.version>2.3.0</jimubi.version>
         <weixin-java.version>4.7.9-20251224.161447</weixin-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
