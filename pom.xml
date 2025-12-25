@@ -42,7 +42,7 @@
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- maven-surefire-plugin 暂时无法通过 bom 的依赖读取（兼容老版本 IDEA 2024 及以前版本） -->
         <lombok.version>1.18.42</lombok.version>
-        <spring.boot.version>3.5.5</spring.boot.version>
+        <spring.boot.version>3.5.9</spring.boot.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -55,14 +55,6 @@
                 <version>${revision}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- 强制指定quartz版本 -->
-            <!-- TODO @芋艿：临时兼容 spring boot 3.x 的 quartz 引入版本过低的问题，后续要调整下 -->
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz</artifactId>
-                <version>2.5.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

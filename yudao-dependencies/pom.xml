@@ -17,7 +17,7 @@
         <revision>2025.11-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.5.8</spring.boot.version>
+        <spring.boot.version>3.5.9</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>2.8.14</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
