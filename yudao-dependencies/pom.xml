@@ -27,17 +27,17 @@
         <!-- DB 相关 -->
         <druid.version>1.2.27</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-plus.version>3.5.14</mybatis-plus.version>
-        <mybatis-plus-join.version>1.5.4</mybatis-plus-join.version>
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
+        <mybatis-plus-join.version>1.5.5</mybatis-plus-join.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
         <redisson.version>3.52.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
-        <taos.version>3.7.8</taos.version>
+        <taos.version>3.7.9</taos.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.4</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.5</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
@@ -55,7 +55,7 @@
         <jsoup.version>1.21.2</jsoup.version>
         <lombok.version>1.18.42</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.41</hutool-5.version>
+        <hutool-5.version>5.8.42</hutool-5.version>
         <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
         <fastjson.version>1.2.83</fastjson.version>
@@ -63,20 +63,20 @@
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.12.0</commons-net.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
-        <jsch.version>2.27.6</jsch.version>
+        <jsch.version>2.27.7</jsch.version>
         <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.7.Final</netty.version>
+        <netty.version>4.2.9.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.22</vertx.version>
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.39.2</awssdk.version>
+        <awssdk.version>2.40.15</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>2.1.3</jimureport.version>
         <jimubi.version>2.2.0</jimubi.version>
-        <weixin-java.version>4.7.8-20251117.120146</weixin-java.version>
+        <weixin-java.version>4.7.9-20251224.161447</weixin-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
     </properties>
