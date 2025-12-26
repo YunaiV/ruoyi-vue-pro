@@ -56,7 +56,14 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
     protected int resolveNrOfInstances(DelegateExecution execution) {
         // 情况一：UserTask 节点
         if (execution.getCurrentFlowElement() instanceof UserTask) {
-            // 获取任务的所有处理人
+            // 第一步，设置 collectionVariable 和 CollectionVariable
+            // 从  execution.getVariable() 读取所有任务处理人的 key
+            super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
+            super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
+            // 从 execution.getVariable() 读取当前所有任务处理的人的 key
+            super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
+
+            // 第二步，获取任务的所有处理人
             @SuppressWarnings("unchecked")
             Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
             if (assigneeUserIds == null) {
