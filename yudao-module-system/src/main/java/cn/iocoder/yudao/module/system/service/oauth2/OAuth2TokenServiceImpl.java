@@ -180,7 +180,13 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
                 .setClientId(clientDO.getClientId()).setScopes(refreshTokenDO.getScopes())
                 .setRefreshToken(refreshTokenDO.getRefreshToken())
                 .setExpiresTime(LocalDateTime.now().plusSeconds(clientDO.getAccessTokenValiditySeconds()));
-        accessTokenDO.setTenantId(TenantContextHolder.getTenantId()); // 手动设置租户编号，避免缓存到 Redis 的时候，无对应的租户编号
+        // 优先从 refreshToken 获取租户编号，避免 ThreadLocal 被污染时导致 tenantId 为 null
+        // 可能关联的 issue：https://t.zsxq.com/JIi5G
+        Long tenantId = refreshTokenDO.getTenantId();
+        if (tenantId == null) {
+            tenantId = TenantContextHolder.getTenantId();
+        }
+        accessTokenDO.setTenantId(tenantId);
         oauth2AccessTokenMapper.insert(accessTokenDO);
         // 记录到 Redis 中
         oauth2AccessTokenRedisDAO.set(accessTokenDO);
