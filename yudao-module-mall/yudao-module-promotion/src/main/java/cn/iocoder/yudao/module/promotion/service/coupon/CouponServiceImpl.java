@@ -285,8 +285,8 @@ public class CouponServiceImpl implements CouponService {
         // 校验剩余发放数量是否充足（仅在 CouponTakeTypeEnum.USER 用户领取时）
         // 关联案例：https://t.zsxq.com/mElGQ、https://t.zsxq.com/6pLzr
         if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeType())
-                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TAKE_LIMIT_COUNT_MAX) // 校验不限制领取数
-                && couponTemplate.getTakeCount() > couponTemplate.getTotalCount()) { // 已领取数量 >= 总发放数量
+                && !couponTemplateService.isTotalCountUnlimited(couponTemplate.getTotalCount()) // 校验不限制总发放数量
+                && couponTemplate.getTakeCount() > couponTemplate.getTotalCount()) { // 已领取数量 > 总发放数量
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
         // 校验"固定日期"的有效期类型是否过期
@@ -304,7 +304,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponTemplate 优惠劵模版
      */
     private void removeTakeLimitUser(Set<Long> userIds, CouponTemplateDO couponTemplate) {
-        if (couponTemplate.getTakeLimitCount() <= 0) {
+        if (couponTemplateService.isTakeLimitCountUnlimited(couponTemplate.getTakeLimitCount())) {
             return;
         }
         // 查询已领过券的用户
@@ -360,7 +360,8 @@ public class CouponServiceImpl implements CouponService {
         }
 
         // 2.1 过滤领取数量无限制的
-        Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId, template -> template.getTakeLimitCount() != -1);
+        Set<Long> templateIds = convertSet(templates, CouponTemplateDO::getId,
+                template -> !couponTemplateService.isTakeLimitCountUnlimited(template.getTakeLimitCount()));
         // 2.2 检查用户领取的数量是否超过限制
         if (CollUtil.isNotEmpty(templateIds)) {
             Map<Long, Integer> couponTakeCountMap = this.getTakeCountMapByTemplateIds(templateIds, userId);
