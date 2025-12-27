@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import com.baomidou.mybatisplus.annotation.DbType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ public class CodegenEngineVue2Test extends CodegenEngineAbstractTest {
         List<CodegenColumnDO> columns = getColumnList("student");
 
         // 调用
-        Map<String, String> result = codegenEngine.execute(table, columns, null, null);
+        Map<String, String> result = codegenEngine.execute(DbType.MYSQL, table, columns, null, null);
         // 生成测试文件
         //writeResult(result, resourcesPath + "/vue2_one");
         // 断言
@@ -44,7 +45,7 @@ public class CodegenEngineVue2Test extends CodegenEngineAbstractTest {
         List<CodegenColumnDO> columns = getColumnList("category");
 
         // 调用
-        Map<String, String> result = codegenEngine.execute(table, columns, null, null);
+        Map<String, String> result = codegenEngine.execute(DbType.MYSQL, table, columns, null, null);
         // 生成测试文件
         //writeResult(result, resourcesPath + "/vue2_tree");
         // 断言
@@ -88,7 +89,7 @@ public class CodegenEngineVue2Test extends CodegenEngineAbstractTest {
         List<CodegenColumnDO> teacherColumns = getColumnList("teacher");
 
         // 调用
-        Map<String, String> result = codegenEngine.execute(table, columns,
+        Map<String, String> result = codegenEngine.execute(DbType.MYSQL, table, columns,
                 Arrays.asList(contactTable, teacherTable), Arrays.asList(contactColumns, teacherColumns));
         // 生成测试文件
         //writeResult(result, resourcesPath + path);

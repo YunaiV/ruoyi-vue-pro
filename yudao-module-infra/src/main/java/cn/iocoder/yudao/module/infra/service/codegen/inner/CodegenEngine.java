@@ -33,6 +33,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenVOTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
@@ -310,16 +311,17 @@ public class CodegenEngine {
     /**
      * 生成代码
      *
+     * @param dbType         数据库类型
      * @param table          表定义
      * @param columns        table 的字段定义数组
      * @param subTables      子表数组，当且仅当主子表时使用
      * @param subColumnsList subTables 的字段定义数组
      * @return 生成的代码，key 是路径，value 是对应代码
      */
-    public Map<String, String> execute(CodegenTableDO table, List<CodegenColumnDO> columns,
+    public Map<String, String> execute(DbType dbType, CodegenTableDO table, List<CodegenColumnDO> columns,
                                        List<CodegenTableDO> subTables, List<List<CodegenColumnDO>> subColumnsList) {
         // 1.1 初始化 bindMap 上下文
-        Map<String, Object> bindingMap = initBindingMap(table, columns, subTables, subColumnsList);
+        Map<String, Object> bindingMap = initBindingMap(dbType, table, columns, subTables, subColumnsList);
         // 1.2 获得模版
         Map<String, String> templates = getTemplates(table.getFrontType());
 
@@ -425,10 +427,11 @@ public class CodegenEngine {
         return content;
     }
 
-    private Map<String, Object> initBindingMap(CodegenTableDO table, List<CodegenColumnDO> columns,
+    private Map<String, Object> initBindingMap(DbType dbType, CodegenTableDO table, List<CodegenColumnDO> columns,
                                                List<CodegenTableDO> subTables, List<List<CodegenColumnDO>> subColumnsList) {
         // 创建 bindingMap
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
+        bindingMap.put("dbType", dbType);
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, CodegenColumnDO::getPrimaryKey)); // 主键字段

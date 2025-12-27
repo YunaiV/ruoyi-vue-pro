@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.promotion.service.coupon;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
@@ -42,6 +41,16 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     private ProductSpuApi productSpuApi;
 
     @Override
+    public boolean isTakeLimitCountUnlimited(Integer takeLimitCount) {
+        return CouponTemplateDO.TAKE_LIMIT_COUNT_MAX.equals(takeLimitCount);
+    }
+
+    @Override
+    public boolean isTotalCountUnlimited(Integer totalCount) {
+        return CouponTemplateDO.TOTAL_COUNT_MAX.equals(totalCount);
+    }
+
+    @Override
     public Long createCouponTemplate(CouponTemplateCreateReqVO createReqVO) {
         // 校验商品范围
         validateProductScope(createReqVO.getProductScope(), createReqVO.getProductScopeValues());
@@ -59,7 +68,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
         CouponTemplateDO couponTemplate = validateCouponTemplateExists(updateReqVO.getId());
         // 校验发放数量不能过小（仅在 CouponTakeTypeEnum.USER 用户领取时）
         if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeType())
-                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TAKE_LIMIT_COUNT_MAX) // 非不限制
+                && !isTotalCountUnlimited(updateReqVO.getTotalCount()) // 非不限制总发放数量
                 && updateReqVO.getTotalCount() < couponTemplate.getTakeCount()) {
             throw exception(COUPON_TEMPLATE_TOTAL_COUNT_TOO_SMALL, couponTemplate.getTakeCount());
         }

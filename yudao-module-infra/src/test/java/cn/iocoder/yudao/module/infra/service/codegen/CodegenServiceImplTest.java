@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTa
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
@@ -19,7 +20,9 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
+import cn.iocoder.yudao.module.infra.service.db.DataSourceConfigService;
 import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import org.junit.jupiter.api.Test;
@@ -62,6 +65,8 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private DatabaseTableService databaseTableService;
+    @MockitoBean
+    private DataSourceConfigService dataSourceConfigService;
 
     @MockBean
     private CodegenBuilder codegenBuilder;
@@ -453,9 +458,12 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         CodegenColumnDO column02 = randomPojo(CodegenColumnDO.class, o -> o.setTableId(table.getId())
                 .setOrdinalPosition(2));
         codegenColumnMapper.insert(column02);
+        // mock 数据（DataSourceConfigDO）
+        when(dataSourceConfigService.getDataSourceConfig(eq(table.getDataSourceConfigId())))
+                .thenReturn(randomPojo(DataSourceConfigDO.class, o -> o.setUrl("jdbc:mysql://")));
         // mock 执行生成
         Map<String, String> codes = MapUtil.of(randomString(), randomString());
-        when(codegenEngine.execute(eq(table), argThat(columns -> {
+        when(codegenEngine.execute(eq(DbType.MYSQL), eq(table), argThat(columns -> {
             assertEquals(2, columns.size());
             assertEquals(column01, columns.get(0));
             assertEquals(column02, columns.get(1));
@@ -494,9 +502,12 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         // mock 数据（sub CodegenColumnDO）
         CodegenColumnDO subColumn01 = randomPojo(CodegenColumnDO.class, o -> o.setId(1024L).setTableId(subTable.getId()));
         codegenColumnMapper.insert(subColumn01);
+        // mock 数据（DataSourceConfigDO）
+        when(dataSourceConfigService.getDataSourceConfig(eq(table.getDataSourceConfigId())))
+                .thenReturn(randomPojo(DataSourceConfigDO.class, o -> o.setUrl("jdbc:mysql://")));
         // mock 执行生成
         Map<String, String> codes = MapUtil.of(randomString(), randomString());
-        when(codegenEngine.execute(eq(table), argThat(columns -> {
+        when(codegenEngine.execute(eq(DbType.MYSQL), eq(table), argThat(columns -> {
             assertEquals(2, columns.size());
             assertEquals(column01, columns.get(0));
             assertEquals(column02, columns.get(1));
