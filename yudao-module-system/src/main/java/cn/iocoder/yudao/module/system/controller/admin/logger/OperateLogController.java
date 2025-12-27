@@ -61,6 +61,7 @@ public class OperateLogController {
     @Operation(summary = "导出操作日志")
     @GetMapping("/export-excel")
     @PreAuthorize("@ss.hasPermission('system:operate-log:export')")
+    @TransMethodResult
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperateLog(HttpServletResponse response, @Valid OperateLogPageReqVO exportReqVO) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
