@@ -36,7 +36,6 @@ import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -285,14 +285,12 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
         // 如果有角色编号，查询角色对应的用户编号
-        Set<Long> userIds;
+        Set<Long> userIds = null;
         if (reqVO.getRoleId() != null) {
             userIds = permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId()));
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }
-        } else {
-            userIds = null;
         }
 
         // 分页查询
@@ -497,8 +495,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             try {
                 ValidationUtils.validate(BeanUtils.toBean(importUser, UserSaveReqVO.class).setPassword(initPassword));
             } catch (ConstraintViolationException ex) {
-                String key = importUser.getUsername();
-                if (StrUtil.isBlank(key)) key = "第" + currentIndex + "行";
+                String key = StrUtil.blankToDefault(importUser.getUsername(), "第 " + currentIndex + " 行");
                 respVO.getFailureUsernames().put(key, ex.getMessage());
                 return;
             }
