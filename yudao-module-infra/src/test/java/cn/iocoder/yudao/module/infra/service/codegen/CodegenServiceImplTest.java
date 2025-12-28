@@ -65,7 +65,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private DatabaseTableService databaseTableService;
-    @MockitoBean
+    @MockBean
     private DataSourceConfigService dataSourceConfigService;
 
     @MockBean
