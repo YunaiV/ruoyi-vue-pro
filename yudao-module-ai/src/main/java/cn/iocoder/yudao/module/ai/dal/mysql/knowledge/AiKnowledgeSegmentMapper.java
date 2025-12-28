@@ -51,8 +51,7 @@ public interface AiKnowledgeSegmentMapper extends BaseMapperX<AiKnowledgeSegment
         MPJLambdaWrapper<AiKnowledgeSegmentDO> wrapper = new MPJLambdaWrapperX<AiKnowledgeSegmentDO>()
                 .selectAs(AiKnowledgeSegmentDO::getDocumentId, AiKnowledgeSegmentProcessRespVO::getDocumentId)
                 .selectCount(AiKnowledgeSegmentDO::getId, "count")
-                .select("COUNT(CASE WHEN vector_id > '" + AiKnowledgeSegmentDO.VECTOR_ID_EMPTY
-                        + "' THEN 1 ELSE NULL END) AS embeddingCount")
+                .select("COUNT(CASE WHEN vector_id IS NOT NULL AND vector_id <> '" + AiKnowledgeSegmentDO.VECTOR_ID_EMPTY + "' THEN 1 ELSE NULL END) AS embeddingCount")
                 .in(AiKnowledgeSegmentDO::getDocumentId, documentIds)
                 .groupBy(AiKnowledgeSegmentDO::getDocumentId);
         return selectJoinList(AiKnowledgeSegmentProcessRespVO.class, wrapper);
