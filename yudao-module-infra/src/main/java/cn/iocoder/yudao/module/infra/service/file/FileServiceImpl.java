@@ -88,7 +88,7 @@ public class FileServiceImpl implements FileService {
         // 3. 保存到数据库
         fileMapper.insert(new FileDO().setConfigId(client.getId())
                 .setName(name).setPath(path).setUrl(url)
-                .setType(type).setSize(content.length));
+                .setType(type).setSize((long) content.length));
         return url;
     }
 
