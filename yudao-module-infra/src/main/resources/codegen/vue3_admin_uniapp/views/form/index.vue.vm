@@ -107,6 +107,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
 #set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
 #if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
 #set ($primaryTsType = "number")
@@ -204,7 +205,7 @@ const formRules = {
   #end
 #end
 }
-const formRef = ref()
+const formRef = ref<FormInstance>()
 
 /** 返回上一页 */
 function handleBack() {
