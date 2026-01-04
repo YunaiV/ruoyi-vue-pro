@@ -31,4 +31,7 @@ public class IotDevicePageReqVO extends PageParam {
     @Schema(description = "设备分组编号", example = "1024")
     private Long groupId;
 
+    @Schema(description = "网关设备 ID", example = "16380")
+    private Long gatewayId;
+
 }
