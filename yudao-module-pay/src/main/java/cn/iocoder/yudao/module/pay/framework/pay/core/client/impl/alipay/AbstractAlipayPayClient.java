@@ -234,6 +234,10 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         if (reqDTO.getChannelExtras() != null) {
             model.setBusinessParams(JsonUtils.toJsonString(reqDTO.getChannelExtras()));
         }
+        String sceneName = MapUtil.getStr(reqDTO.getChannelExtras(), "sceneName");
+        if (StrUtil.isNotBlank(sceneName)) {
+            model.setTransferSceneName(sceneName);
+        }
         // ② 个性化的参数
         Participant payeeInfo = new Participant();
         payeeInfo.setIdentityType("ALIPAY_LOGON_ID"); // 暂时只考虑转账到支付宝，银行没有权限 https://opendocs.alipay.com/open/02byvc?scene=66dd06f5a923403393b85de68d3c0055

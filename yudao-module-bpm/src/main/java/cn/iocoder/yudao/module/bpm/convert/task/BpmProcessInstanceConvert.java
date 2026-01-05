@@ -1,23 +1,29 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceBpmnModelViewRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessPrintDataRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
@@ -35,10 +41,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -291,6 +294,49 @@ public interface BpmProcessInstanceConvert {
                 .setFormFieldsPermission(formFieldsPermission)
                 .setTodoTask(todoTask)
                 .setActivityNodes(activityNodes);
+    }
+
+    default BpmProcessPrintDataRespVO buildProcessInstancePrintData(HistoricProcessInstance historicProcessInstance,
+                                                                    BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                                    List<HistoricTaskInstance> tasks,
+                                                                    Map<Long, AdminUserRespDTO> userMap,
+                                                                    UserSimpleBaseVO startUser) {
+        BpmModelMetaInfoVO.PrintTemplateSetting printTemplateSetting = processDefinitionInfo.getPrintTemplateSetting();
+        BpmProcessPrintDataRespVO printData = new BpmProcessPrintDataRespVO();
+        // 打印模板是否开启
+        printData.setPrintTemplateEnable(printTemplateSetting != null && Boolean.TRUE.equals(printTemplateSetting.getEnable()));
+        // 流程相关数据
+        BpmProcessInstanceRespVO processInstance = new BpmProcessInstanceRespVO()
+                .setId(historicProcessInstance.getId()).setName(historicProcessInstance.getName())
+                .setBusinessKey(historicProcessInstance.getBusinessKey())
+                .setStartTime(DateUtils.of(historicProcessInstance.getStartTime()))
+                .setEndTime(DateUtils.of(historicProcessInstance.getEndTime()))
+                .setStartUser(startUser).setStatus(FlowableUtils.getProcessInstanceStatus(historicProcessInstance))
+                .setFormVariables(historicProcessInstance.getProcessVariables())
+                .setProcessDefinition(BeanUtils.toBean(processDefinitionInfo, BpmProcessDefinitionRespVO.class));
+        printData.setProcessInstance(processInstance);
+        // 审批历史
+        List<BpmProcessPrintDataRespVO.Task> approveTasks = new ArrayList<>(tasks.size());
+        tasks.forEach(item -> {
+            Map<String, Object> taskLocalVariables = item.getTaskLocalVariables();
+            BpmProcessPrintDataRespVO.Task approveTask = new BpmProcessPrintDataRespVO.Task();
+            approveTask.setName(item.getName());
+            approveTask.setId(item.getId());
+            approveTask.setSignPicUrl((String) taskLocalVariables.get(BpmnVariableConstants.TASK_SIGN_PIC_URL));
+            approveTask.setDescription(StrUtil.format("{} / {} / {} / {} / {}",
+                    userMap.get(Long.valueOf(item.getAssignee())).getNickname(),
+                    item.getName(),
+                    DateUtil.formatDateTime(item.getEndTime()),
+                    BpmTaskStatusEnum.valueOf((Integer) taskLocalVariables.get(BpmnVariableConstants.TASK_VARIABLE_STATUS)).getName(),
+                    taskLocalVariables.get(BpmnVariableConstants.TASK_VARIABLE_REASON)));
+            approveTasks.add(approveTask);
+        });
+        printData.setTasks(approveTasks);
+        // 自定义模板
+        if (printData.getPrintTemplateEnable() && printTemplateSetting != null) {
+            printData.setPrintTemplateHtml(printTemplateSetting.getTemplate());
+        }
+        return printData;
     }
 
 }

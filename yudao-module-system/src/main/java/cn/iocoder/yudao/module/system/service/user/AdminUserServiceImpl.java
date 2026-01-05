@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -26,6 +27,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.google.common.annotations.VisibleForTesting;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -75,6 +78,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     @Lazy // 延迟，避免循环依赖报错
     private TenantService tenantService;
+    @Resource
+    @Lazy // 懒加载，避免循环依赖
+    private OAuth2TokenService oauth2TokenService;
 
     @Resource
     private UserPostMapper userPostMapper;
@@ -227,6 +233,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         updateObj.setId(id);
         updateObj.setStatus(status);
         userMapper.updateById(updateObj);
+
+        // 如果是禁用用户，则删除其 Token 信息
+        if (CommonStatusEnum.isDisable(status)) {
+            oauth2TokenService.removeAccessToken(id, UserTypeEnum.ADMIN.getValue());
+        }
     }
 
     @Override
@@ -274,8 +285,13 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
         // 如果有角色编号，查询角色对应的用户编号
-        Set<Long> userIds = reqVO.getRoleId() != null ?
-                permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId())) : null;
+        Set<Long> userIds = null;
+        if (reqVO.getRoleId() != null) {
+            userIds = permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId()));
+            if (CollUtil.isEmpty(userIds)) {
+                return PageResult.empty();
+            }
+        }
 
         // 分页查询
         return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()), userIds);
@@ -472,12 +488,15 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 2. 遍历，逐个创建 or 更新
         UserImportRespVO respVO = UserImportRespVO.builder().createUsernames(new ArrayList<>())
                 .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
+        AtomicInteger index = new AtomicInteger(1);
         importUsers.forEach(importUser -> {
+            int currentIndex = index.getAndIncrement();
             // 2.1.1 校验字段是否符合要求
             try {
                 ValidationUtils.validate(BeanUtils.toBean(importUser, UserSaveReqVO.class).setPassword(initPassword));
-            } catch (ConstraintViolationException ex){
-                respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
+            } catch (ConstraintViolationException ex) {
+                String key = StrUtil.blankToDefault(importUser.getUsername(), "第 " + currentIndex + " 行");
+                respVO.getFailureUsernames().put(key, ex.getMessage());
                 return;
             }
             // 2.1.2 校验，判断是否有不符合的原因

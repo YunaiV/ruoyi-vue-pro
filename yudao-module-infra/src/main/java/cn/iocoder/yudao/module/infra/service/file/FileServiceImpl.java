@@ -88,7 +88,7 @@ public class FileServiceImpl implements FileService {
         // 3. 保存到数据库
         fileMapper.insert(new FileDO().setConfigId(client.getId())
                 .setName(name).setPath(path).setUrl(url)
-                .setType(type).setSize(content.length));
+                .setType(type).setSize((long) content.length));
         return url;
     }
 
@@ -150,6 +150,11 @@ public class FileServiceImpl implements FileService {
         FileDO file = BeanUtils.toBean(createReqVO, FileDO.class);
         fileMapper.insert(file);
         return file.getId();
+    }
+
+    @Override
+    public FileDO getFile(Long id) {
+        return validateFileExists(id);
     }
 
     @Override

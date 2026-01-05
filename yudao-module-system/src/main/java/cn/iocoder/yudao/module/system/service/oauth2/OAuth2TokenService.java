@@ -70,6 +70,17 @@ public interface OAuth2TokenService {
     OAuth2AccessTokenDO removeAccessToken(String accessToken);
 
     /**
+     * 移除访问令牌
+     * 注意：该流程中，会移除相关的刷新令牌
+     *
+     * 参考 DefaultTokenServices 的 revokeToken 方法
+     *
+     * @param userId 用户编号
+     * @param userType 用户类型
+     */
+    void removeAccessToken(Long userId, Integer userType);
+
+    /**
      * 获得访问令牌分页
      *
      * @param reqVO 请求

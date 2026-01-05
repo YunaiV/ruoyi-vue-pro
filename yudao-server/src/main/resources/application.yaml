@@ -187,7 +187,7 @@ spring:
       api-key: sk-47aa124781be4bfb95244cc62f6xxxx
     minimax: # Minimax：https://www.minimaxi.com/
       api-key: xxxx
-    moonshot: # 月之暗灭（KIMI）
+    moonshot: # 月之暗面（KIMI）
       api-key: sk-abc
     deepseek: # DeepSeek
       api-key: sk-e94db327cc7d457d99a8de8810fc6b12
@@ -211,6 +211,8 @@ spring:
             filesystem:
               url: http://127.0.0.1:8089
               sse-endpoint: /sse
+        annotation-scanner:
+          enabled: false # TODO @芋艿：有 bug https://github.com/spring-projects/spring-ai/issues/4917 需要官方修复
 
 yudao:
   ai:

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -126,7 +127,7 @@ public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
     private IotDeviceMessage buildPropertySetMessage(IotSceneRuleDO.Action actionConfig, IotDeviceDO device) {
         try {
             // 属性设置参数格式: {"properties": {"identifier": value}}
-            Object params = Map.of("properties", Map.of(actionConfig.getIdentifier(), actionConfig.getParams()));
+            Object params = MapUtil.of("properties", MapUtil.of(actionConfig.getIdentifier(), actionConfig.getParams()));
             return IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), params);
         } catch (Exception e) {
             log.error("[buildPropertySetMessage][构建属性设置消息异常]", e);

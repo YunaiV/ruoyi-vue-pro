@@ -136,7 +136,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
 //            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",
 //                    loginUser.getId(), tableName, tableAlias.getName()));
-            return EXPRESSION_NULL;
+            return new EqualsTo(null, null); // WHERE null = null，可以保证返回的数据为空
         }
         if (deptExpression == null) {
             return userExpression;

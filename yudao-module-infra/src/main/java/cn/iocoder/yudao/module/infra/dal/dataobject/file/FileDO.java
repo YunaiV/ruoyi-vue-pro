@@ -52,6 +52,6 @@ public class FileDO extends BaseDO {
     /**
      * 文件大小
      */
-    private Integer size;
+    private Long size;
 
 }

@@ -1,17 +1,16 @@
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
-import { z } from '#/adapter/form';
-import {
-    DICT_TYPE,
-    getDictOptions,
-    getRangePickerDefaultProps,
-} from '#/utils';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
 #if(${table.templateType} == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
 import { handleTree } from '@vben/utils';
 #end
+
+import { getRangePickerDefaultProps } from '#/utils';
 
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
@@ -30,7 +29,7 @@ export function useFormSchema(): VbenFormSchema[] {
       label: '上级${table.classComment}',
       component: 'ApiTreeSelect',
       componentProps: {
-        allowClear: true,
+        clearable: true,
         api: async () => {
           const data = await get${simpleClassName}List({});
           data.unshift({
@@ -115,6 +114,7 @@ export function useFormSchema(): VbenFormSchema[] {
         showTime: true,
         format: 'YYYY-MM-DD HH:mm:ss',
         valueFormat: 'x',
+        class: '!w-full',
       },
   #elseif($column.htmlType == "textarea")## 文本域
       component: 'Textarea',
@@ -125,8 +125,9 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
-        controlsPosition: 'right',
         placeholder: '请输入${comment}',
+        controlsPosition: 'right',
+        class: '!w-full',
       },
   #end
     },
@@ -158,13 +159,13 @@ export function useGridFormSchema(): VbenFormSchema[] {
   #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
       component: 'Input',
       componentProps: {
-        allowClear: true,
+        clearable: true,
         placeholder: '请输入${comment}',
       },
   #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
       component: 'Select',
       componentProps: {
-        allowClear: true,
+        clearable: true,
         #if ("" != $dictType)## 设置了 dictType 数据字典的情况
         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
         #else## 未设置 dictType 数据字典的情况
@@ -176,7 +177,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'RangePicker',
       componentProps: {
         ...getRangePickerDefaultProps(),
-        allowClear: true,
+        clearable: true,
       },
   #end
     },
@@ -186,7 +187,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
 }
 
 /** 列表的字段 */
-export function useGridColumns(): VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>['columns'] {
+export function useGridColumns(): VxeTableGridOptions<${apiName}.${simpleClassName}>['columns'] {
   return [
 #if ($table.templateType != 2 && $deleteBatchEnable)
   { type: 'checkbox', width: 40 },
@@ -317,6 +318,7 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                     showTime: true,
                                     format: 'YYYY-MM-DD HH:mm:ss',
                                     valueFormat: 'x',
+                                    class: '!w-full',
                                 },
                             #elseif($column.htmlType == "textarea")## 文本域
                                 component: 'Textarea',
@@ -327,8 +329,9 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                 component: 'InputNumber',
                                 componentProps: {
                                     min: 0,
-                                    controlsPosition: 'right',
                                     placeholder: '请输入${comment}',
+                                    controlsPosition: 'right',
+                                    class: '!w-full',
                                 },
                             #end
                         },
@@ -361,13 +364,13 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
                     #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
                         component: 'Input',
                         componentProps: {
-                            allowClear: true,
+                            clearable: true,
                             placeholder: '请输入${comment}',
                         },
                     #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
                         component: 'Select',
                         componentProps: {
-                            allowClear: true,
+                            clearable: true,
                             #if ("" != $dictType)## 设置了 dictType 数据字典的情况
                                 options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
                             #else## 未设置 dictType 数据字典的情况
@@ -379,7 +382,7 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
                         component: 'RangePicker',
                         componentProps: {
                             ...getRangePickerDefaultProps(),
-                            allowClear: true,
+                            clearable: true,
                         },
                     #end
                 },
@@ -389,7 +392,7 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
 }
 
 /** 列表的字段 */
-export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
+export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${apiName}.${subSimpleClassName}>['columns'] {
     return [
         #if ($table.templateType != 2 && $deleteBatchEnable)
             { type: 'checkbox', width: 40 },
@@ -426,7 +429,7 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${sim
 #else
     #if ($subTable.subJoinMany) ## 一对多
     /** 新增/修改列表的字段 */
-    export function use${subSimpleClassName}GridEditColumns(): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
+    export function use${subSimpleClassName}GridEditColumns(): VxeTableGridOptions<${apiName}.${subSimpleClassName}>['columns'] {
         return [
             #foreach($column in $subColumns)
                 #if ($column.createOperation || $column.updateOperation)
@@ -551,6 +554,7 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${sim
                                         showTime: true,
                                         format: 'YYYY-MM-DD HH:mm:ss',
                                         valueFormat: 'x',
+                                        class: '!w-full',
                                     },
                                 #elseif($column.htmlType == "textarea")## 文本域
                                     component: 'Textarea',
@@ -561,8 +565,9 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${sim
                                     component: 'InputNumber',
                                     componentProps: {
                                         min: 0,
-                                        controlsPosition: 'right',
                                         placeholder: '请输入${comment}',
+                                        controlsPosition: 'right',
+                                        class: '!w-full',
                                     },
                                 #end
                             },

@@ -1,0 +1,44 @@
+### 请求 /mp/message-template/get 接口 => 成功
+GET {{baseUrl}}/mp/message-template/get?id=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /mp/message-template/list 接口 => 成功
+GET {{baseUrl}}/mp/message-template/list?accountId=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /mp/message-template/delete 接口 => 成功
+DELETE {{baseUrl}}/mp/message-template/delete?id=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /mp/message-template/sync 接口 => 成功
+POST {{baseUrl}}/mp/message-template/sync?accountId=5
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /mp/message-template/send 接口 => 成功
+POST {{baseUrl}}/mp/message-template/send
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "id": 66,
+  "userId": 65,
+  "url": "https://example.com",
+  "data": {
+    "result": "领奖成功",
+    "withdrawMoney": "1000.00元",
+    "withdrawTime": "2024-01-01 10:00:00",
+    "cardInfo": "工商银行(尾号1234)",
+    "arrivedTime": "2024-01-01 10:30:00"
+  }
+}
+
+//  "miniprogram": "{\"appid\":\"wx1234567890\",\"pagepath\":\"pages/index/index\"}",

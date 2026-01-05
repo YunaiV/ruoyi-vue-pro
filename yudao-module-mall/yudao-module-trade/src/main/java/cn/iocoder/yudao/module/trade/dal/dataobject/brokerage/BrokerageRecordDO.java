@@ -29,7 +29,7 @@ public class BrokerageRecordDO extends BaseDO {
      * 编号
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 用户编号
      * <p>

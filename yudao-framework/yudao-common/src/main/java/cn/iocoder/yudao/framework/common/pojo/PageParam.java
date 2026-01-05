@@ -27,10 +27,10 @@ public class PageParam implements Serializable {
     @Min(value = 1, message = "页码最小值为 1")
     private Integer pageNo = PAGE_NO;
 
-    @Schema(description = "每页条数，最大值为 100", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    @Schema(description = "每页条数，最大值为 200", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "每页条数不能为空")
     @Min(value = 1, message = "每页条数最小值为 1")
-    @Max(value = 100, message = "每页条数最大值为 100")
+    @Max(value = 200, message = "每页条数最大值为 200")
     private Integer pageSize = PAGE_SIZE;
 
 }

@@ -22,8 +22,6 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,10 +91,10 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @Override
     public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable {
         // 1. 执行请求
-        // 参考链接 https://api.aliyun.com/document/Dysmsapi/2017-05-25/QuerySmsTemplate
+        // 参考链接 https://api.aliyun.com/document/Dysmsapi/2017-05-25/GetSmsTemplate
         TreeMap<String, Object> queryParam = new TreeMap<>();
         queryParam.put("TemplateCode", apiTemplateId);
-        JSONObject response = request("QuerySmsTemplate", queryParam);
+        JSONObject response = request("GetSmsTemplate", queryParam);
 
         // 2.1 请求失败
         String code = response.getStr("Code");

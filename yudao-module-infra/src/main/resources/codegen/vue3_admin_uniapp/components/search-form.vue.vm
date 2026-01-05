@@ -1,0 +1,296 @@
+<template>
+  <!-- 搜索框入口 -->
+  <view @click="visible = true">
+    <wd-search :placeholder="placeholder" hide-cancel disabled />
+  </view>
+
+  <!-- 搜索弹窗 -->
+  <wd-popup v-model="visible" position="top" @close="visible = false">
+    <view class="yd-search-form-container" :style="{ paddingTop: `#[[${]]#getNavbarHeight()#[[}]]#px` }">
+#set ($hasDict = 0)
+#foreach ($column in $columns)
+  #if ($hasDict == 0 && $column.listOperation && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+  #end
+#end
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($dictType = $column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($javaType = $column.javaType)
+    #set ($listOperationCondition = $column.listOperationCondition)
+    #set ($comment = $column.columnComment)
+    #set ($dictMethod = "getDictOptions")
+    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+      #set ($dictMethod = "getIntDictOptions")
+    #elseif ($javaType == "String")
+      #set ($dictMethod = "getStrDictOptions")
+    #elseif ($javaType == "Boolean")
+      #set ($dictMethod = "getBoolDictOptions")
+    #end
+    #if ($column.htmlType == "input")
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
+          ${comment}
+        </view>
+        <wd-input
+          v-model="formData.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+        />
+      </view>
+    #elseif ($column.htmlType == "datetime" && $listOperationCondition == "BETWEEN")
+      #set ($AttrName = $javaField.substring(0,1).toUpperCase() + ${javaField.substring(1)})
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
+          ${comment}
+        </view>
+        <view class="yd-search-form-date-range-container">
+          <view @click="visible${AttrName}[0] = true">
+            <view class="yd-search-form-date-range-picker">
+              {{ formatDate(formData.${javaField}?.[0]) || '开始日期' }}
+            </view>
+          </view>
+          -
+          <view @click="visible${AttrName}[1] = true">
+            <view class="yd-search-form-date-range-picker">
+              {{ formatDate(formData.${javaField}?.[1]) || '结束日期' }}
+            </view>
+          </view>
+        </view>
+        <wd-datetime-picker-view v-if="visible${AttrName}[0]" v-model="temp${AttrName}[0]" type="date" />
+        <view v-if="visible${AttrName}[0]" class="yd-search-form-date-range-actions">
+          <wd-button size="small" plain @click="visible${AttrName}[0] = false">
+            取消
+          </wd-button>
+          <wd-button size="small" type="primary" @click="handle${AttrName}0Confirm">
+            确定
+          </wd-button>
+        </view>
+        <wd-datetime-picker-view v-if="visible${AttrName}[1]" v-model="temp${AttrName}[1]" type="date" />
+        <view v-if="visible${AttrName}[1]" class="yd-search-form-date-range-actions">
+          <wd-button size="small" plain @click="visible${AttrName}[1] = false">
+            取消
+          </wd-button>
+          <wd-button size="small" type="primary" @click="handle${AttrName}1Confirm">
+            确定
+          </wd-button>
+        </view>
+      </view>
+    #elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
+          ${comment}
+        </view>
+        <wd-radio-group v-model="formData.${javaField}" shape="button">
+          <wd-radio :value="-1">
+            全部
+          </wd-radio>
+          <wd-radio
+            v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+            :key="dict.value"
+            :value="dict.value"
+          >
+            {{ dict.label }}
+          </wd-radio>
+        </wd-radio-group>
+      </view>
+    #else
+      <view class="yd-search-form-item">
+        <view class="yd-search-form-label">
+          ${comment}
+        </view>
+        <wd-input
+          v-model="formData.${javaField}"
+          placeholder="请输入${comment}"
+          clearable
+        />
+      </view>
+    #end
+  #end
+#end
+      <view class="yd-search-form-actions">
+        <wd-button class="flex-1" plain @click="handleReset">
+          重置
+        </wd-button>
+        <wd-button class="flex-1" type="primary" @click="handleSearch">
+          搜索
+        </wd-button>
+      </view>
+    </view>
+  </wd-popup>
+</template>
+
+<script lang="ts" setup>
+#set ($hasDict = 0)
+#set ($hasGetDictOptions = 0)
+#set ($hasGetIntDictOptions = 0)
+#set ($hasGetStrDictOptions = 0)
+#set ($hasGetBoolDictOptions = 0)
+#set ($hasDateTimeBetween = 0)
+#foreach($column in $columns)
+  #if ($column.listOperation && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+    #if ($column.htmlType == "select" || $column.htmlType == "radio")
+      #if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+        #set ($hasGetIntDictOptions = 1)
+      #elseif ($column.javaType == "String")
+        #set ($hasGetStrDictOptions = 1)
+      #elseif ($column.javaType == "Boolean")
+        #set ($hasGetBoolDictOptions = 1)
+      #else
+        #set ($hasGetDictOptions = 1)
+      #end
+    #end
+  #end
+  #if ($hasDateTimeBetween == 0 && $column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+    #set ($hasDateTimeBetween = 1)
+  #end
+#end
+import { computed, reactive, ref } from 'vue'
+import { getNavbarHeight } from '@/utils'
+#if ($hasDateTimeBetween == 1)
+import { formatDate, formatDateRange } from '@/utils/date'
+#end
+#if ($hasDict == 1)
+  #set ($dictImportNames = "getDictLabel, ")
+  #if ($hasGetDictOptions == 1)
+    #set ($dictImportNames = "${dictImportNames}getDictOptions, ")
+  #end
+  #if ($hasGetIntDictOptions == 1)
+    #set ($dictImportNames = "${dictImportNames}getIntDictOptions, ")
+  #end
+  #if ($hasGetStrDictOptions == 1)
+    #set ($dictImportNames = "${dictImportNames}getStrDictOptions, ")
+  #end
+  #if ($hasGetBoolDictOptions == 1)
+    #set ($dictImportNames = "${dictImportNames}getBoolDictOptions, ")
+  #end
+  #set ($dictImportNames = $dictImportNames.trim())
+  #set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
+import { $dictImportNames } from '@/hooks/useDict'
+import { DICT_TYPE } from '@/utils/constants'
+#end
+
+const emit = defineEmits<{
+  search: [data: Record<string, any>]
+  reset: []
+}>()
+
+const visible = ref(false)
+const formData = reactive({
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($javaType = $column.javaType.toLowerCase())
+    #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+  ${column.javaField}: [undefined, undefined] as [number | undefined, number | undefined],
+    #elseif ($column.dictType && "" != $column.dictType)
+      #if(${javaType} == "string")
+  ${column.javaField}: -1 as -1 | string, // -1 表示全部
+      #elseif(${javaType} == "boolean")
+  ${column.javaField}: -1 as -1 | boolean, // -1 表示全部
+      #else
+  ${column.javaField}: -1, // -1 表示全部
+      #end
+    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+  ${column.javaField}: undefined as number | undefined,
+    #elseif(${javaType} == "boolean")
+  ${column.javaField}: undefined as boolean | undefined,
+    #else
+  ${column.javaField}: undefined as string | undefined,
+    #end
+  #end
+#end
+})
+
+/** 搜索条件 placeholder 拼接 */
+const placeholder = computed(() => {
+  const conditions: string[] = []
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #set ($dictType = $column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($javaType = $column.javaType.toLowerCase())
+    #set ($comment = $column.columnComment)
+    #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+  if (formData.${javaField}?.[0] && formData.${javaField}?.[1]) {
+    conditions.push(`${comment}:#[[${]]#formatDate(formData.${javaField}[0])#[[}]]#~#[[${]]#formatDate(formData.${javaField}[1])#[[}]]#`)
+  }
+    #elseif ($dictType && "" != $dictType)
+  if (formData.${javaField} !== -1) {
+    conditions.push(`${comment}:#[[${]]#getDictLabel(DICT_TYPE.${dictType.toUpperCase()}, formData.${javaField})#[[}]]#`)
+  }
+    #else
+      #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte" || ${javaType} == "boolean")
+  if (formData.${javaField} !== undefined) {
+    conditions.push(`${comment}:#[[${]]#formData.${javaField}#[[}]]#`)
+  }
+      #else
+  if (formData.${javaField}) {
+    conditions.push(`${comment}:#[[${]]#formData.${javaField}#[[}]]#`)
+  }
+      #end
+    #end
+  #end
+#end
+  return conditions.length > 0 ? conditions.join(' | ') : '搜索${table.classComment}'
+})
+
+#if ($hasDateTimeBetween == 1)
+// 时间范围选择器状态
+#foreach($column in $columns)
+  #if ($column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+    #set ($javaField = $column.javaField)
+    #set ($AttrName = $javaField.substring(0,1).toUpperCase() + ${javaField.substring(1)})
+const visible${AttrName} = ref<[boolean, boolean]>([false, false])
+const temp${AttrName} = ref<[number, number]>([Date.now(), Date.now()])
+
+/** ${column.columnComment}[0]确认 */
+function handle${AttrName}0Confirm() {
+  formData.${javaField} = [temp${AttrName}.value[0], formData.${javaField}?.[1]]
+  visible${AttrName}.value[0] = false
+}
+
+/** ${column.columnComment}[1]确认 */
+function handle${AttrName}1Confirm() {
+  formData.${javaField} = [formData.${javaField}?.[0], temp${AttrName}.value[1]]
+  visible${AttrName}.value[1] = false
+}
+  #end
+#end
+#end
+
+/** 搜索 */
+function handleSearch() {
+  visible.value = false
+  emit('search', {
+    ...formData,
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #if ($column.dictType && "" != $column.dictType)
+    ${column.javaField}: formData.${column.javaField} === -1 ? undefined : formData.${column.javaField},
+    #elseif ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+    ${column.javaField}: formatDateRange(formData.${column.javaField}),
+    #end
+  #end
+#end
+  })
+}
+
+/** 重置 */
+function handleReset() {
+#foreach($column in $columns)
+  #if ($column.listOperation)
+    #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+  formData.${column.javaField} = [undefined, undefined]
+    #elseif ($column.dictType && "" != $column.dictType)
+  formData.${column.javaField} = -1
+    #else
+  formData.${column.javaField} = undefined
+    #end
+  #end
+#end
+  visible.value = false
+  emit('reset')
+}
+</script>

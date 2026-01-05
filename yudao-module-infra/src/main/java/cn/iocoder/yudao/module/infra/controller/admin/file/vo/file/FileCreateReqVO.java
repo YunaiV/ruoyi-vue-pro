@@ -28,6 +28,6 @@ public class FileCreateReqVO {
     private String type;
 
     @Schema(description = "文件大小", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Integer size;
+    private Long size;
 
 }

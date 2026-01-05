@@ -1,0 +1,53 @@
+import type { PageParam, PageResult } from '@/http/types'
+import { http } from '@/http/http'
+
+#set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#set ($primaryTsType = "number")
+#else
+#set ($primaryTsType = "string")
+#end
+/** ${table.classComment}信息 */
+export interface ${simpleClassName} {
+#foreach ($column in $columns)
+  #if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
+    #set ($javaType = $column.javaType.toLowerCase())
+    #set ($javaFieldLower = $column.javaField.toLowerCase())
+    #set ($optional = $column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime")
+    #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+  ${column.javaField}#if($optional)?#end: number
+    #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
+  ${column.javaField}#if($optional)?#end: Date
+    #elseif(${javaType} == "boolean")
+  ${column.javaField}#if($optional)?#end: boolean
+    #else
+  ${column.javaField}#if($optional)?#end: string
+    #end
+  #end
+#end
+}
+
+/** 获取${table.classComment}分页列表 */
+export function get${simpleClassName}Page(params: PageParam) {
+  return http.get<PageResult<${simpleClassName}>>('/${table.moduleName}/${simpleClassName_strikeCase}/page', params)
+}
+
+/** 获取${table.classComment}详情 */
+export function get${simpleClassName}(id: ${primaryTsType}) {
+  return http.get<${simpleClassName}>(`/${table.moduleName}/${simpleClassName_strikeCase}/get?id=${id}`)
+}
+
+/** 创建${table.classComment} */
+export function create${simpleClassName}(data: ${simpleClassName}) {
+  return http.post<number>('/${table.moduleName}/${simpleClassName_strikeCase}/create', data)
+}
+
+/** 更新${table.classComment} */
+export function update${simpleClassName}(data: ${simpleClassName}) {
+  return http.put<boolean>('/${table.moduleName}/${simpleClassName_strikeCase}/update', data)
+}
+
+/** 删除${table.classComment} */
+export function delete${simpleClassName}(id: ${primaryTsType}) {
+  return http.delete<boolean>(`/${table.moduleName}/${simpleClassName_strikeCase}/delete?id=${id}`)
+}

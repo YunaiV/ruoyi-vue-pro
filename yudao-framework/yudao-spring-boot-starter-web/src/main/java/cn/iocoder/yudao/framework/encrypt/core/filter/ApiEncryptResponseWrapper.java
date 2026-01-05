@@ -42,15 +42,16 @@ public class ApiEncryptResponseWrapper extends HttpServletResponseWrapper {
         this.flushBuffer();
         byte[] body = byteArrayOutputStream.toByteArray();
 
-        // 2. 加密 body
-        String encryptedBody = symmetricEncryptor != null ? symmetricEncryptor.encryptBase64(body)
-                : asymmetricEncryptor.encryptBase64(body, KeyType.PublicKey);
-        response.getWriter().write(encryptedBody);
-
-        // 3. 添加加密 header 标识
+        // 2. 添加加密 header 标识
         this.addHeader(properties.getHeader(), "true");
         // 特殊：特殊：https://juejin.cn/post/6867327674675625992
         this.addHeader("Access-Control-Expose-Headers", properties.getHeader());
+
+        // 3.1 加密 body
+        String encryptedBody = symmetricEncryptor != null ? symmetricEncryptor.encryptBase64(body)
+                : asymmetricEncryptor.encryptBase64(body, KeyType.PublicKey);
+        // 3.2 输出加密后的 body：（设置 header 要放在 response 的 write 之前）
+        response.getWriter().write(encryptedBody);
     }
 
     @Override

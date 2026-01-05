@@ -6,12 +6,12 @@ Author: dhb52 (https://gitee.com/dhb52)
 pip install simple-ddl-parser
 
 or with uv
-uv run --with simple-ddl-parser convertor.py postgres > ../postgresql/ruoyi-vue-pro.sql                                         239ms  四  5/22 21:03:16 2025
-uv run --with simple-ddl-parser convertor.py sqlserver > ../sqlserver/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py kingbase > ../kingbase/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py opengauss > ../opengauss/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py oracle > ../oracle/ruoyi-vue-pro.sql
-uv run --with simple-ddl-parser convertor.py dm8 > ../dm/ruoyi-vue-pro-dm8.sql
+uv run --with simple-ddl-parser convertor.py postgres ../mysql/ruoyi-vue-pro.sql > ../postgresql/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py sqlserver ../mysql/ruoyi-vue-pro.sql > ../sqlserver/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py kingbase ../mysql/ruoyi-vue-pro.sql > ../kingbase/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py opengauss ../mysql/ruoyi-vue-pro.sql > ../opengauss/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py oracle ../mysql/ruoyi-vue-pro.sql > ../oracle/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py dm8 ../mysql/ruoyi-vue-pro.sql > ../dm/ruoyi-vue-pro-dm8.sql
 """
 
 import argparse
@@ -23,6 +23,9 @@ from abc import ABC, abstractmethod
 from typing import Dict, Generator, Optional, Tuple, Union
 
 from simple_ddl_parser import DDLParser
+
+# 避免 Windows 系统使用默认的 GBK 编码
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
 
 PREAMBLE = """/*
  Yudao Database Transfer Tool
@@ -49,6 +52,7 @@ def load_and_clean(sql_file: str) -> str:
     REPLACE_PAIR_LIST = (
         (")\nVALUES ", ") VALUES "),
         (" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ", " "),
+        (" CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ", " "),
         (" KEY `", " INDEX `"),
         ("UNIQUE INDEX", "UNIQUE KEY"),
         ("b'0'", "'0'"),
@@ -58,6 +62,11 @@ def load_and_clean(sql_file: str) -> str:
     content = open(sql_file, encoding="utf-8").read()
     for replace_pair in REPLACE_PAIR_LIST:
         content = content.replace(*replace_pair)
+    # 移除索引字段的前缀长度定义，例如: `name`(32) -> `name`
+    # 移除索引定义上的 USING BTREE COMMENT 部分
+    # 相关 issue：https://t.zsxq.com/96IFc 、https://t.zsxq.com/rC3A3
+    content = re.sub(r'`([^`]+)`\(\d+\)', r'`\1`', content)
+    content = re.sub(r'\s+USING\s+BTREE\s+COMMENT\s+\'[^\']+\'', '', content)
     content = re.sub(r"ENGINE.*COMMENT", "COMMENT", content)
     content = re.sub(r"ENGINE.*;", ";", content)
     return content
@@ -259,10 +268,10 @@ class Convertor(ABC):
             # 解析注释
             for column in table_ddl["columns"]:
                 column["comment"] = bytes(column["comment"], "utf-8").decode(
-                    "unicode_escape"
+                    r"unicode_escape"
                 )[1:-1]
             table_ddl["comment"] = bytes(table_ddl["comment"], "utf-8").decode(
-                "unicode_escape"
+                r"unicode_escape"
             )[1:-1]
 
             # 为每个表生成个6个基本部分
@@ -919,9 +928,15 @@ def main():
         help="目标数据库类型",
         choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
     )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="源数据库脚本路径",
+        default="../mysql/ruoyi-vue-pro.sql"
+    )
     args = parser.parse_args()
 
-    sql_file = pathlib.Path("../mysql/ruoyi-vue-pro.sql").resolve().as_posix()
+    sql_file = pathlib.Path(args.path).resolve().as_posix()
     convertor = None
     if args.type == "postgres":
         convertor = PostgreSQLConvertor(sql_file)

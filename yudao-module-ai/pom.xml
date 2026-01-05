@@ -19,9 +19,10 @@
           国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
     </description>
     <properties>
-        <spring-ai.version>1.0.1</spring-ai.version>
-        <alibaba-ai.version>1.0.0.3</alibaba-ai.version>
-        <tinyflow.version>1.0.2</tinyflow.version>
+        <spring-ai.version>1.1.2</spring-ai.version>
+        <!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba -->
+        <alibaba-ai.version>1.1.0.0-RC2</alibaba-ai.version>
+        <tinyflow.version>1.2.6</tinyflow.version>
     </properties>
 
     <dependencies>
@@ -136,7 +137,7 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <!-- 月之暗灭 -->
+            <!-- 月之暗面 -->
             <groupId>org.springaicommunity</groupId>
             <artifactId>moonshot-spring-boot-starter</artifactId>
             <version>1.0.0</version>
@@ -225,6 +226,11 @@
                     <!-- 解决 https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1318/ 问题 -->
                     <groupId>com.agentsflex</groupId>
                     <artifactId>agents-flex-store-elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- 解决 https://t.zsxq.com/pCBZC 问题 -->
+                    <groupId>com.agentsflex</groupId>
+                    <artifactId>agents-flex-search-engine-es</artifactId>
                 </exclusion>
                 <exclusion>
                     <!-- TODO @芋艿：暂时移除 groovy，和 iot 冲突 -->

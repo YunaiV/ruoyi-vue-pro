@@ -130,4 +130,18 @@ public class PayTransferCreateReqDTO {
         return channelExtras;
     }
 
+    // ========== 支付宝场景 ==========
+
+    /**
+     * 【支付宝】构建转账渠道额外参数
+     *
+     * @param sceneName 转账场景名称，用于描述转账用途
+     * @return channelExtras
+     */
+    public static Map<String, String> buildAlipayChannelExtra(String sceneName) {
+        Map<String, String> channelExtras = new HashMap<>();
+        channelExtras.put("sceneName", sceneName);
+        return channelExtras;
+    }
+
 }

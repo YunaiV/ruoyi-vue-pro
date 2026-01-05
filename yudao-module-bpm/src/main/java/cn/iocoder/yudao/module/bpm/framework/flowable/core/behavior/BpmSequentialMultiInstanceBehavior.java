@@ -30,6 +30,12 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
 
     public BpmSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
         super(activity, innerActivityBehavior);
+        // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1483
+        // 在解析/构造阶段基于 activityId 初始化与 activity 绑定且不变的字段，避免在运行期修改 Behavior 实例状态
+        super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(activity.getId());
+        // 从 execution.getVariable() 读取当前所有任务处理的人的 key
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(activity.getId());
     }
 
     /**
@@ -88,10 +94,6 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
             super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             return;
         }
-        // 参见 https://gitee.com/zhijiantianya/yudao-cloud/issues/IC239F
-        super.collectionExpression = null;
-        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
-        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
         super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
     }
 

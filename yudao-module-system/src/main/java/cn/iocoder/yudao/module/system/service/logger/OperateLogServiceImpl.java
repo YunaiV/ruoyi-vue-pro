@@ -32,6 +32,11 @@ public class OperateLogServiceImpl implements OperateLogService {
     }
 
     @Override
+    public OperateLogDO getOperateLog(Long id) {
+        return operateLogMapper.selectById(id);
+    }
+
+    @Override
     public PageResult<OperateLogDO> getOperateLogPage(OperateLogPageReqVO pageReqVO) {
         return operateLogMapper.selectPage(pageReqVO);
     }

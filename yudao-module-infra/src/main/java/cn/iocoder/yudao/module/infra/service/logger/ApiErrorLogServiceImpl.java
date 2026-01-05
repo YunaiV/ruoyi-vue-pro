@@ -59,6 +59,11 @@ public class ApiErrorLogServiceImpl implements ApiErrorLogService {
     }
 
     @Override
+    public ApiErrorLogDO getApiErrorLog(Long id) {
+        return apiErrorLogMapper.selectById(id);
+    }
+
+    @Override
     public void updateApiErrorLogProcess(Long id, Integer processStatus, Long processUserId) {
         ApiErrorLogDO errorLog = apiErrorLogMapper.selectById(id);
         if (errorLog == null) {
