@@ -253,7 +253,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 5. 发送设备上线消息
             sendOnlineMessage(device);
-
         } catch (Exception e) {
             log.error("[handleConnect][处理 CONNECT 消息失败，socketId: {}]", socketId, e);
             sendConnAck(socket, MqttConnectReturnCode.CONNECTION_REFUSED_SERVER_UNAVAILABLE);
@@ -311,7 +310,6 @@ public class IotMqttWsUpstreamHandler {
                 sendPubRec(socket, messageId);
             }
             // QoS 0 无需确认
-
         } catch (Exception e) {
             log.error("[handlePublish][处理 PUBLISH 消息失败，deviceId: {}]", device.getId(), e);
         }
@@ -323,7 +321,6 @@ public class IotMqttWsUpstreamHandler {
     private void handlePubAck(ServerWebSocket socket, MqttMessage message) {
         String socketId = socketIdMap.get(socket);
         IotDeviceRespDTO device = socketDeviceMap.get(socketId);
-
         if (device == null) {
             log.warn("[handlePubAck][设备未认证，socketId: {}]", socketId);
             socket.close();
@@ -340,7 +337,6 @@ public class IotMqttWsUpstreamHandler {
     private void handlePubRec(ServerWebSocket socket, MqttMessage message) {
         String socketId = socketIdMap.get(socket);
         IotDeviceRespDTO device = socketDeviceMap.get(socketId);
-
         if (device == null) {
             log.warn("[handlePubRec][设备未认证，socketId: {}]", socketId);
             socket.close();
@@ -349,7 +345,6 @@ public class IotMqttWsUpstreamHandler {
 
         int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
         log.debug("[handlePubRec][收到 PUBREC，messageId: {}，deviceId: {}]", messageId, device.getId());
-
         // 发送 PUBREL
         sendPubRel(socket, messageId);
     }
@@ -369,7 +364,6 @@ public class IotMqttWsUpstreamHandler {
 
         int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
         log.debug("[handlePubRel][收到 PUBREL，messageId: {}，deviceId: {}]", messageId, device.getId());
-
         // 发送 PUBCOMP
         sendPubComp(socket, messageId);
     }
@@ -397,7 +391,6 @@ public class IotMqttWsUpstreamHandler {
     private void handleSubscribe(ServerWebSocket socket, MqttSubscribeMessage message) {
         String socketId = socketIdMap.get(socket);
         IotDeviceRespDTO device = socketDeviceMap.get(socketId);
-
         if (device == null) {
             log.warn("[handleSubscribe][设备未认证，socketId: {}]", socketId);
             socket.close();
@@ -429,7 +422,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 3. 发送 SUBACK
             sendSubAck(socket, messageId, grantedQosList);
-
         } catch (Exception e) {
             log.error("[handleSubscribe][处理 SUBSCRIBE 消息失败，deviceId: {}]", device.getId(), e);
         }
@@ -441,7 +433,6 @@ public class IotMqttWsUpstreamHandler {
     private void handleUnsubscribe(ServerWebSocket socket, MqttUnsubscribeMessage message) {
         String socketId = socketIdMap.get(socket);
         IotDeviceRespDTO device = socketDeviceMap.get(socketId);
-
         if (device == null) {
             log.warn("[handleUnsubscribe][设备未认证，socketId: {}]", socketId);
             socket.close();
@@ -465,7 +456,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 3. 发送 UNSUBACK
             sendUnsubAck(socket, messageId);
-
         } catch (Exception e) {
             log.error("[handleUnsubscribe][处理 UNSUBSCRIBE 消息失败，deviceId: {}]", device.getId(), e);
         }
@@ -477,7 +467,6 @@ public class IotMqttWsUpstreamHandler {
     private void handlePingReq(ServerWebSocket socket) {
         String socketId = socketIdMap.get(socket);
         IotDeviceRespDTO device = socketDeviceMap.get(socketId);
-
         if (device == null) {
             log.warn("[handlePingReq][设备未认证，socketId: {}]", socketId);
             socket.close();
@@ -485,7 +474,6 @@ public class IotMqttWsUpstreamHandler {
         }
 
         log.debug("[handlePingReq][收到心跳请求，deviceId: {}]", device.getId());
-
         // 发送 PINGRESP
         sendPingResp(socket);
     }
@@ -496,7 +484,6 @@ public class IotMqttWsUpstreamHandler {
     private void handleDisconnect(ServerWebSocket socket) {
         String socketId = socketIdMap.get(socket);
         IotDeviceRespDTO device = socketDeviceMap.remove(socketId);
-
         if (device != null) {
             String deviceKey = device.getProductKey() + ":" + device.getDeviceName();
             connectionManager.removeConnection(deviceKey);
@@ -600,7 +587,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, connAckMessage);
-
             log.debug("[sendConnAck][发送 CONNACK 消息，returnCode: {}]", returnCode);
         } catch (Exception e) {
             log.error("[sendConnAck][发送 CONNACK 消息失败]", e);
@@ -620,7 +606,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, pubAckMessage);
-
             log.debug("[sendPubAck][发送 PUBACK 消息，messageId: {}]", messageId);
         } catch (Exception e) {
             log.error("[sendPubAck][发送 PUBACK 消息失败，messageId: {}]", messageId, e);
@@ -640,7 +625,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, pubRecMessage);
-
             log.debug("[sendPubRec][发送 PUBREC 消息，messageId: {}]", messageId);
         } catch (Exception e) {
             log.error("[sendPubRec][发送 PUBREC 消息失败，messageId: {}]", messageId, e);
@@ -660,7 +644,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, pubRelMessage);
-
             log.debug("[sendPubRel][发送 PUBREL 消息，messageId: {}]", messageId);
         } catch (Exception e) {
             log.error("[sendPubRel][发送 PUBREL 消息失败，messageId: {}]", messageId, e);
@@ -680,7 +663,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, pubCompMessage);
-
             log.debug("[sendPubComp][发送 PUBCOMP 消息，messageId: {}]", messageId);
         } catch (Exception e) {
             log.error("[sendPubComp][发送 PUBCOMP 消息失败，messageId: {}]", messageId, e);
@@ -701,7 +683,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, subAckMessage);
-
             log.debug("[sendSubAck][发送 SUBACK 消息，messageId: {}，主题数量: {}]", messageId, grantedQosList.length);
         } catch (Exception e) {
             log.error("[sendSubAck][发送 SUBACK 消息失败，messageId: {}]", messageId, e);
@@ -721,7 +702,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, unsubAckMessage);
-
             log.debug("[sendUnsubAck][发送 UNSUBACK 消息，messageId: {}]", messageId);
         } catch (Exception e) {
             log.error("[sendUnsubAck][发送 UNSUBACK 消息失败，messageId: {}]", messageId, e);
@@ -740,7 +720,6 @@ public class IotMqttWsUpstreamHandler {
 
             // 编码并发送
             sendMqttMessage(socket, pingRespMessage);
-
             log.debug("[sendPingResp][发送 PINGRESP 消息]");
         } catch (Exception e) {
             log.error("[sendPingResp][发送 PINGRESP 消息失败]", e);

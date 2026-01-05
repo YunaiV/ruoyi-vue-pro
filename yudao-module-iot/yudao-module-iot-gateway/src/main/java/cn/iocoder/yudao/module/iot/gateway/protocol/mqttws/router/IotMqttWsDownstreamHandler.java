@@ -148,7 +148,7 @@ public class IotMqttWsDownstreamHandler {
         try {
             int messageId = qos > 0 ? generateMessageId() : 0;
 
-            // 手动编码MQTT PUBLISH消息
+            // 手动编码 MQTT PUBLISH 消息
             io.netty.buffer.ByteBuf byteBuf = io.netty.buffer.Unpooled.buffer();
 
             // 固定头：消息类型(PUBLISH=3) + DUP(0) + QoS + RETAIN
@@ -159,11 +159,11 @@ public class IotMqttWsDownstreamHandler {
             int topicLength = topic.getBytes().length;
             int remainingLength = 2 + topicLength + (qos > 0 ? 2 : 0) + payload.length;
 
-            // 写入剩余长度（简化版本，假设小于128字节）
+            // 写入剩余长度（简化版本，假设小于 128 字节）
             if (remainingLength < 128) {
                 byteBuf.writeByte(remainingLength);
             } else {
-                // 处理大于127的情况
+                // 处理大于 127 的情况
                 int x = remainingLength;
                 do {
                     int encodedByte = x % 128;
@@ -179,7 +179,7 @@ public class IotMqttWsDownstreamHandler {
             byteBuf.writeShort(topicLength);
             byteBuf.writeBytes(topic.getBytes());
 
-            // 可变头：消息ID（仅QoS>0时）
+            // 可变头：消息 ID（仅 QoS > 0 时）
             if (qos > 0) {
                 byteBuf.writeShort(messageId);
             }
@@ -191,7 +191,6 @@ public class IotMqttWsDownstreamHandler {
             byte[] bytes = new byte[byteBuf.readableBytes()];
             byteBuf.readBytes(bytes);
             byteBuf.release();
-
             socket.writeBinaryMessage(Buffer.buffer(bytes));
 
             log.info("[sendMessageToDevice][消息已发送到设备，deviceKey: {}，topic: {}，qos: {}，messageId: {}]",
@@ -211,6 +210,7 @@ public class IotMqttWsDownstreamHandler {
     private int generateMessageId() {
         int id = messageIdGenerator.getAndIncrement();
         // MQTT 消息 ID 范围是 1-65535
+        // TODO @haohao：并发可能有问题；
         if (id > 65535) {
             messageIdGenerator.set(1);
             return 1;

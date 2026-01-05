@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqttws.manager;
 
+import cn.hutool.core.collection.CollUtil;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -187,7 +188,7 @@ public class IotMqttWsConnectionManager {
      */
     public boolean isSubscribed(String deviceKey, String topic) {
         Set<String> subscriptions = deviceSubscriptions.get(deviceKey);
-        if (subscriptions == null || subscriptions.isEmpty()) {
+        if (CollUtil.isEmpty(subscriptions)) {
             return false;
         }
 
@@ -210,6 +211,7 @@ public class IotMqttWsConnectionManager {
         return deviceSubscriptions.get(deviceKey);
     }
 
+    // TODO @haohao：这个方法，是不是也可以考虑抽到 IotMqttTopicUtils 里面去哈；感觉更简洁一点？
     /**
      * MQTT 主题匹配
      * 支持通配符：
@@ -227,25 +229,25 @@ public class IotMqttWsConnectionManager {
         }
 
         // 不包含通配符
+        // TODO @haohao：这里要不要枚举下哈；+ #
         if (!subscription.contains("+") && !subscription.contains("#")) {
             return false;
         }
 
         String[] subscriptionParts = subscription.split("/");
         String[] topicParts = topic.split("/");
-
         int i = 0;
         for (; i < subscriptionParts.length && i < topicParts.length; i++) {
             String subPart = subscriptionParts[i];
             String topicPart = topicParts[i];
 
+            // # 匹配剩余所有层级，且必须在末尾
             if (subPart.equals("#")) {
-                // # 匹配剩余所有层级，且必须在末尾
                 return i == subscriptionParts.length - 1;
             }
 
+            // 不是通配符且不匹配
             if (!subPart.equals("+") && !subPart.equals(topicPart)) {
-                // 不是通配符且不匹配
                 return false;
             }
         }
