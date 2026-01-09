@@ -47,14 +47,7 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
     protected int resolveNrOfInstances(DelegateExecution execution) {
         // 情况一：UserTask 节点
         if (execution.getCurrentFlowElement() instanceof UserTask) {
-            // 第一步，设置 collectionVariable 和 CollectionVariable
-            // 从  execution.getVariable() 读取所有任务处理人的 key
-            super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
-            super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
-            // 从 execution.getVariable() 读取当前所有任务处理的人的 key
-            super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
-
-            // 第二步，获取任务的所有处理人
+            // 获取任务的所有处理人
             // 不使用 execution.getVariable 原因：目前依次审批任务回退后 collectionVariable 变量没有清理， 如果重新进入该任务不会重新分配审批人
             @SuppressWarnings("unchecked")
             Set<Long> assigneeUserIds = (Set<Long>) execution.getVariableLocal(super.collectionVariable, Set.class);
