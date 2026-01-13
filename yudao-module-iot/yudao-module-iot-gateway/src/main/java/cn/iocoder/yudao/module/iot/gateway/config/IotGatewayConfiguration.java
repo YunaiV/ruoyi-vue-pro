@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -59,20 +60,20 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class EmqxProtocolConfiguration {
 
-        @Bean(destroyMethod = "close")
+        @Bean(name = "emqxVertx", destroyMethod = "close")
         public Vertx emqxVertx() {
             return Vertx.vertx();
         }
 
         @Bean
         public IotEmqxAuthEventProtocol iotEmqxAuthEventProtocol(IotGatewayProperties gatewayProperties,
-                Vertx emqxVertx) {
+                                                                 @Qualifier("emqxVertx") Vertx emqxVertx) {
             return new IotEmqxAuthEventProtocol(gatewayProperties.getProtocol().getEmqx(), emqxVertx);
         }
 
         @Bean
         public IotEmqxUpstreamProtocol iotEmqxUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                Vertx emqxVertx) {
+                                                               @Qualifier("emqxVertx") Vertx emqxVertx) {
             return new IotEmqxUpstreamProtocol(gatewayProperties.getProtocol().getEmqx(), emqxVertx);
         }
 
@@ -91,7 +92,7 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class TcpProtocolConfiguration {
 
-        @Bean(destroyMethod = "close")
+        @Bean(name = "tcpVertx", destroyMethod = "close")
         public Vertx tcpVertx() {
             return Vertx.vertx();
         }
@@ -101,7 +102,7 @@ public class IotGatewayConfiguration {
                                                              IotDeviceService deviceService,
                                                              IotDeviceMessageService messageService,
                                                              IotTcpConnectionManager connectionManager,
-                                                             Vertx tcpVertx) {
+                                                             @Qualifier("tcpVertx") Vertx tcpVertx) {
             return new IotTcpUpstreamProtocol(gatewayProperties.getProtocol().getTcp(),
                     deviceService, messageService, connectionManager, tcpVertx);
         }
@@ -126,7 +127,7 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class MqttProtocolConfiguration {
 
-        @Bean(destroyMethod = "close")
+        @Bean(name = "mqttVertx", destroyMethod = "close")
         public Vertx mqttVertx() {
             return Vertx.vertx();
         }
@@ -135,7 +136,7 @@ public class IotGatewayConfiguration {
         public IotMqttUpstreamProtocol iotMqttUpstreamProtocol(IotGatewayProperties gatewayProperties,
                                                                IotDeviceMessageService messageService,
                                                                IotMqttConnectionManager connectionManager,
-                                                               Vertx mqttVertx) {
+                                                               @Qualifier("mqttVertx") Vertx mqttVertx) {
             return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getMqtt(), messageService,
                     connectionManager, mqttVertx);
         }
@@ -163,7 +164,7 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class MqttWsProtocolConfiguration {
 
-        @Bean(destroyMethod = "close")
+        @Bean(name = "mqttWsVertx", destroyMethod = "close")
         public Vertx mqttWsVertx() {
             return Vertx.vertx();
         }
@@ -172,7 +173,7 @@ public class IotGatewayConfiguration {
         public IotMqttWsUpstreamProtocol iotMqttWsUpstreamProtocol(IotGatewayProperties gatewayProperties,
                                                                    IotDeviceMessageService messageService,
                                                                    IotMqttWsConnectionManager connectionManager,
-                                                                   Vertx mqttWsVertx) {
+                                                                   @Qualifier("mqttWsVertx") Vertx mqttWsVertx) {
             return new IotMqttWsUpstreamProtocol(gatewayProperties.getProtocol().getMqttWs(),
                     messageService, connectionManager, mqttWsVertx);
         }
