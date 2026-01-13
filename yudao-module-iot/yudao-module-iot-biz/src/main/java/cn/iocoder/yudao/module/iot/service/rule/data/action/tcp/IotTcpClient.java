@@ -31,6 +31,7 @@ public class IotTcpClient {
     private final Integer connectTimeoutMs;
     private final Integer readTimeoutMs;
     private final Boolean ssl;
+    // TODO @puhui999：sslCertPath 是不是没在用？
     private final String sslCertPath;
     private final String dataFormat;
 
@@ -47,6 +48,7 @@ public class IotTcpClient {
         this.readTimeoutMs = readTimeoutMs != null ? readTimeoutMs : IotDataSinkTcpConfig.DEFAULT_READ_TIMEOUT_MS;
         this.ssl = ssl != null ? ssl : IotDataSinkTcpConfig.DEFAULT_SSL;
         this.sslCertPath = sslCertPath;
+        // TODO @puhui999：可以使用 StrUtil.defaultIfBlank 方法简化
         this.dataFormat = dataFormat != null ? dataFormat : IotDataSinkTcpConfig.DEFAULT_DATA_FORMAT;
     }
 

@@ -406,10 +406,7 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
      */
     private void updateLastTriggerTime(Long id) {
         try {
-            IotSceneRuleDO updateObj = new IotSceneRuleDO()
-                    .setId(id)
-                    .setLastTriggerTime(LocalDateTime.now());
-            sceneRuleMapper.updateById(updateObj);
+            sceneRuleMapper.updateById(new IotSceneRuleDO().setId(id).setLastTriggerTime(LocalDateTime.now()));
         } catch (Exception e) {
             log.error("[updateLastTriggerTime][规则场景编号({}) 更新最后触发时间异常]", id, e);
         }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkWebSocketConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
@@ -28,11 +29,11 @@ public class IotWebSocketDataRuleAction extends
 
     @Override
     protected IotWebSocketClient initProducer(IotDataSinkWebSocketConfig config) throws Exception {
-        // 1.1 参数校验
-        if (config.getServerUrl() == null || config.getServerUrl().trim().isEmpty()) {
+        // 1. 参数校验
+        if (StrUtil.isBlank(config.getServerUrl())) {
             throw new IllegalArgumentException("WebSocket 服务器地址不能为空");
         }
-        if (!config.getServerUrl().startsWith("ws://") && !config.getServerUrl().startsWith("wss://")) {
+        if (!StrUtil.startWithAny(config.getServerUrl(), "ws://", "wss://")) {
             throw new IllegalArgumentException("WebSocket 服务器地址必须以 ws:// 或 wss:// 开头");
         }
 
@@ -61,6 +62,7 @@ public class IotWebSocketDataRuleAction extends
     protected void execute(IotDeviceMessage message, IotDataSinkWebSocketConfig config) throws Exception {
         try {
             // 1.1 获取或创建 WebSocket 客户端
+            // TODO @puhui999：需要加锁，保证必须连接上；
             IotWebSocketClient webSocketClient = getProducer(config);
             // 1.2 检查连接状态，如果断开则重新连接
             if (!webSocketClient.isConnected()) {

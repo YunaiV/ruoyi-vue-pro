@@ -45,6 +45,7 @@ public class IotWebSocketClient implements WebSocket.Listener {
     /**
      * 连接到 WebSocket 服务器
      */
+    @SuppressWarnings("resource")
     public void connect() throws Exception {
         if (connected.get()) {
             log.warn("[connect][WebSocket 客户端已经连接，无需重复连接]");
