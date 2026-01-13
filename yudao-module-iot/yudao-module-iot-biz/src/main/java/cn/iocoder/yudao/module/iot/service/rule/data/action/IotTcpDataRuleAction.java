@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.iot.service.rule.data.action.tcp.IotTcpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-
 /**
  * TCP 的 {@link IotDataRuleAction} 实现类
  * <p>
@@ -22,9 +20,6 @@ import java.time.Duration;
 @Slf4j
 public class IotTcpDataRuleAction extends
         IotDataRuleCacheableAction<IotDataSinkTcpConfig, IotTcpClient> {
-
-    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
-    private static final Duration SEND_TIMEOUT = Duration.ofSeconds(10);
 
     @Override
     public Integer getType() {

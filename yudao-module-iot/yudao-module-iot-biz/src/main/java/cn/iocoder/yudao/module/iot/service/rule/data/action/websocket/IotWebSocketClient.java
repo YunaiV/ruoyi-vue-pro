@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.data.action.websocket;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkWebSocketConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
@@ -36,9 +37,9 @@ public class IotWebSocketClient implements WebSocket.Listener {
 
     public IotWebSocketClient(String serverUrl, Integer connectTimeoutMs, Integer sendTimeoutMs, String dataFormat) {
         this.serverUrl = serverUrl;
-        this.connectTimeoutMs = connectTimeoutMs != null ? connectTimeoutMs : 5000;
-        this.sendTimeoutMs = sendTimeoutMs != null ? sendTimeoutMs : 10000;
-        this.dataFormat = dataFormat != null ? dataFormat : "JSON";
+        this.connectTimeoutMs = connectTimeoutMs != null ? connectTimeoutMs : IotDataSinkWebSocketConfig.DEFAULT_CONNECT_TIMEOUT_MS;
+        this.sendTimeoutMs = sendTimeoutMs != null ? sendTimeoutMs : IotDataSinkWebSocketConfig.DEFAULT_SEND_TIMEOUT_MS;
+        this.dataFormat = dataFormat != null ? dataFormat : IotDataSinkWebSocketConfig.DEFAULT_DATA_FORMAT;
     }
 
     /**
@@ -113,7 +114,7 @@ public class IotWebSocketClient implements WebSocket.Listener {
 
         try {
             String messageData;
-            if ("JSON".equalsIgnoreCase(dataFormat)) {
+            if (IotDataSinkWebSocketConfig.DEFAULT_DATA_FORMAT.equalsIgnoreCase(dataFormat)) {
                 messageData = JsonUtils.toJsonString(message);
             } else {
                 messageData = message.toString();
