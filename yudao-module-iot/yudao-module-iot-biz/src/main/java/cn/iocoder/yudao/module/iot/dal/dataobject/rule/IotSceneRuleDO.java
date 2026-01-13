@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -55,6 +56,11 @@ public class IotSceneRuleDO extends TenantBaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+
+    /**
+     * 最后触发时间
+     */
+    private LocalDateTime lastTriggerTime;
 
     /**
      * 场景定义配置
