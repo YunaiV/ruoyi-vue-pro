@@ -28,19 +28,11 @@ public class IotDeviceModbusConfigController {
     @Resource
     private IotDeviceModbusConfigService modbusConfigService;
 
-    // TODO @AI：create 和 update 合并成 save 接口；
-    @PostMapping("/create")
-    @Operation(summary = "创建设备 Modbus 连接配置")
+    @PostMapping("/save")
+    @Operation(summary = "保存设备 Modbus 连接配置")
     @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:create')")
-    public CommonResult<Long> createModbusConfig(@Valid @RequestBody IotDeviceModbusConfigSaveReqVO createReqVO) {
-        return success(modbusConfigService.createModbusConfig(createReqVO));
-    }
-
-    @PutMapping("/update")
-    @Operation(summary = "更新设备 Modbus 连接配置")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:update')")
-    public CommonResult<Boolean> updateModbusConfig(@Valid @RequestBody IotDeviceModbusConfigSaveReqVO updateReqVO) {
-        modbusConfigService.updateModbusConfig(updateReqVO);
+    public CommonResult<Boolean> saveDeviceModbusConfig(@Valid @RequestBody IotDeviceModbusConfigSaveReqVO saveReqVO) {
+        modbusConfigService.saveDeviceModbusConfig(saveReqVO);
         return success(true);
     }
 
@@ -48,36 +40,33 @@ public class IotDeviceModbusConfigController {
     @Operation(summary = "删除设备 Modbus 连接配置")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:delete')")
-    public CommonResult<Boolean> deleteModbusConfig(@RequestParam("id") Long id) {
-        modbusConfigService.deleteModbusConfig(id);
+    public CommonResult<Boolean> deleteDeviceModbusConfig(@RequestParam("id") Long id) {
+        modbusConfigService.deleteDeviceModbusConfig(id);
         return success(true);
     }
 
-    // TODO @AI：这个接口改造，支持 id 或者 deviceId；二选一查询；
     @GetMapping("/get")
     @Operation(summary = "获得设备 Modbus 连接配置")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameter(name = "id", description = "编号", example = "1024")
+    @Parameter(name = "deviceId", description = "设备编号", example = "2048")
     @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:query')")
-    public CommonResult<IotDeviceModbusConfigRespVO> getModbusConfig(@RequestParam("id") Long id) {
-        IotDeviceModbusConfigDO modbusConfig = modbusConfigService.getModbusConfig(id);
-        return success(BeanUtils.toBean(modbusConfig, IotDeviceModbusConfigRespVO.class));
-    }
-
-    // TODO @AI：合并到 getModbusConfig 接口里；
-    @GetMapping("/get-by-device-id")
-    @Operation(summary = "根据设备编号获得 Modbus 连接配置")
-    @Parameter(name = "deviceId", description = "设备编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:query')")
-    public CommonResult<IotDeviceModbusConfigRespVO> getModbusConfigByDeviceId(@RequestParam("deviceId") Long deviceId) {
-        IotDeviceModbusConfigDO modbusConfig = modbusConfigService.getModbusConfigByDeviceId(deviceId);
+    public CommonResult<IotDeviceModbusConfigRespVO> getDeviceModbusConfig(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "deviceId", required = false) Long deviceId) {
+        IotDeviceModbusConfigDO modbusConfig = null;
+        if (id != null) {
+            modbusConfig = modbusConfigService.getDeviceModbusConfig(id);
+        } else if (deviceId != null) {
+            modbusConfig = modbusConfigService.getDeviceModbusConfigByDeviceId(deviceId);
+        }
         return success(BeanUtils.toBean(modbusConfig, IotDeviceModbusConfigRespVO.class));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得设备 Modbus 连接配置分页")
     @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:query')")
-    public CommonResult<PageResult<IotDeviceModbusConfigRespVO>> getModbusConfigPage(@Valid IotDeviceModbusConfigPageReqVO pageReqVO) {
-        PageResult<IotDeviceModbusConfigDO> pageResult = modbusConfigService.getModbusConfigPage(pageReqVO);
+    public CommonResult<PageResult<IotDeviceModbusConfigRespVO>> getDeviceModbusConfigPage(@Valid IotDeviceModbusConfigPageReqVO pageReqVO) {
+        PageResult<IotDeviceModbusConfigDO> pageResult = modbusConfigService.getDeviceModbusConfigPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceModbusConfigRespVO.class));
     }
 

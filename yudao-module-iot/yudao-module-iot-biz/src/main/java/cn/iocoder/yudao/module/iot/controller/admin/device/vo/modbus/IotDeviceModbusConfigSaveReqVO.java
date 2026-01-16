@@ -9,9 +9,6 @@ import lombok.Data;
 @Data
 public class IotDeviceModbusConfigSaveReqVO {
 
-    @Schema(description = "主键", example = "1")
-    private Long id;
-
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "设备编号不能为空")
     private Long deviceId;

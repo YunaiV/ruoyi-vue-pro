@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceMo
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusPointDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,27 +28,15 @@ public interface IotDeviceModbusPointMapper extends BaseMapperX<IotDeviceModbusP
                 .orderByDesc(IotDeviceModbusPointDO::getId));
     }
 
-    default List<IotDeviceModbusPointDO> selectListByDeviceId(Long deviceId) {
-        return selectList(IotDeviceModbusPointDO::getDeviceId, deviceId);
-    }
-
-    // TODO @AI：是不是 selectList(f1, v1, f2, v2)；
-    default List<IotDeviceModbusPointDO> selectListByDeviceIdAndStatus(Long deviceId, Integer status) {
+    default List<IotDeviceModbusPointDO> selectListByDeviceIdsAndStatus(Collection<Long> deviceIds, Integer status) {
         return selectList(new LambdaQueryWrapperX<IotDeviceModbusPointDO>()
-                .eq(IotDeviceModbusPointDO::getDeviceId, deviceId)
+                .in(IotDeviceModbusPointDO::getDeviceId, deviceIds)
                 .eq(IotDeviceModbusPointDO::getStatus, status));
     }
 
-    // TODO @AI：是不是 selectOne(f1, v1, f2, v2)；
     default IotDeviceModbusPointDO selectByDeviceIdAndIdentifier(Long deviceId, String identifier) {
-        return selectOne(new LambdaQueryWrapperX<IotDeviceModbusPointDO>()
-                .eq(IotDeviceModbusPointDO::getDeviceId, deviceId)
-                .eq(IotDeviceModbusPointDO::getIdentifier, identifier));
-    }
-
-    // TODO @AI：是不是删除这个方法；
-    default void deleteByDeviceId(Long deviceId) {
-        delete(IotDeviceModbusPointDO::getDeviceId, deviceId);
+        return selectOne(IotDeviceModbusPointDO::getDeviceId, deviceId,
+                IotDeviceModbusPointDO::getIdentifier, identifier);
     }
 
 }

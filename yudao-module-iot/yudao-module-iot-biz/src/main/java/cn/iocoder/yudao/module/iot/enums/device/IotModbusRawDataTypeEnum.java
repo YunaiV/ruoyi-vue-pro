@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
+// TODO @AI：如果枚举需要共享，可以拿到 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-core/src/main/java/cn/iocoder/yudao/module/iot/core/enums 里
 /**
  * IoT Modbus 原始数据类型枚举
  *

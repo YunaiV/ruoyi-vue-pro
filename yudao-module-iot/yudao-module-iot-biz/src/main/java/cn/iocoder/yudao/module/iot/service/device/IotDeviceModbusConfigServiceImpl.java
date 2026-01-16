@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MODBUS_CONFIG_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MODBUS_CONFIG_NOT_EXISTS;
 
 /**
@@ -32,90 +31,54 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
     @Resource
     private IotDeviceService deviceService;
 
-    // TODO @AI：是不是搞成 save 接口？因为前端也不知道是 create 还是 update；
     @Override
-    public Long createModbusConfig(IotDeviceModbusConfigSaveReqVO createReqVO) {
-        // 1.1 校验设备存在
-        deviceService.validateDeviceExists(createReqVO.getDeviceId());
-        // 1.2 校验设备是否已有 Modbus 配置
-        validateModbusConfigUnique(createReqVO.getDeviceId(), null);
+    public void saveDeviceModbusConfig(IotDeviceModbusConfigSaveReqVO saveReqVO) {
+        // 1. 校验设备存在
+        deviceService.validateDeviceExists(saveReqVO.getDeviceId());
 
-        // 2. 插入
-        IotDeviceModbusConfigDO modbusConfig = BeanUtils.toBean(createReqVO, IotDeviceModbusConfigDO.class);
-        setDefaultValues(modbusConfig);
-        modbusConfigMapper.insert(modbusConfig);
-        return modbusConfig.getId();
+        // 2. 根据数据库中是否已有配置，决定是新增还是更新
+        IotDeviceModbusConfigDO existConfig = modbusConfigMapper.selectByDeviceId(saveReqVO.getDeviceId());
+        if (existConfig == null) {
+            IotDeviceModbusConfigDO modbusConfig = BeanUtils.toBean(saveReqVO, IotDeviceModbusConfigDO.class);
+            modbusConfigMapper.insert(modbusConfig);
+        } else {
+            IotDeviceModbusConfigDO updateObj = BeanUtils.toBean(saveReqVO, IotDeviceModbusConfigDO.class,
+                    o -> o.setId(existConfig.getId()));
+            modbusConfigMapper.updateById(updateObj);
+        }
     }
 
     @Override
-    public void updateModbusConfig(IotDeviceModbusConfigSaveReqVO updateReqVO) {
-        // 1.1 校验存在
-        validateModbusConfigExists(updateReqVO.getId());
-        // 1.2 校验设备存在
-        deviceService.validateDeviceExists(updateReqVO.getDeviceId());
-        // 1.3 校验唯一性
-        validateModbusConfigUnique(updateReqVO.getDeviceId(), updateReqVO.getId());
-
-        // 2. 更新
-        IotDeviceModbusConfigDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceModbusConfigDO.class);
-        modbusConfigMapper.updateById(updateObj);
-    }
-
-    @Override
-    public void deleteModbusConfig(Long id) {
+    public void deleteDeviceModbusConfig(Long id) {
         // 校验存在
-        validateModbusConfigExists(id);
+        validateDeviceModbusConfigExists(id);
         // 删除
         modbusConfigMapper.deleteById(id);
     }
 
-    private void validateModbusConfigExists(Long id) {
+    private void validateDeviceModbusConfigExists(Long id) {
         if (modbusConfigMapper.selectById(id) == null) {
             throw exception(DEVICE_MODBUS_CONFIG_NOT_EXISTS);
         }
     }
 
-    private void validateModbusConfigUnique(Long deviceId, Long excludeId) {
-        IotDeviceModbusConfigDO config = modbusConfigMapper.selectByDeviceId(deviceId);
-        // TODO @AI：ObjUtil notequals
-        if (config != null && !config.getId().equals(excludeId)) {
-            throw exception(DEVICE_MODBUS_CONFIG_EXISTS);
-        }
-    }
-
-    // TODO @AI：不要这个；前端都必须传递；
-    private void setDefaultValues(IotDeviceModbusConfigDO config) {
-        if (config.getPort() == null) {
-            config.setPort(502);
-        }
-        if (config.getSlaveId() == null) {
-            config.setSlaveId(1);
-        }
-        if (config.getTimeout() == null) {
-            config.setTimeout(3000);
-        }
-        if (config.getRetryInterval() == null) {
-            config.setRetryInterval(1000);
-        }
-    }
-
     @Override
-    public IotDeviceModbusConfigDO getModbusConfig(Long id) {
+    public IotDeviceModbusConfigDO getDeviceModbusConfig(Long id) {
         return modbusConfigMapper.selectById(id);
     }
 
     @Override
-    public IotDeviceModbusConfigDO getModbusConfigByDeviceId(Long deviceId) {
+    public IotDeviceModbusConfigDO getDeviceModbusConfigByDeviceId(Long deviceId) {
         return modbusConfigMapper.selectByDeviceId(deviceId);
     }
 
     @Override
-    public PageResult<IotDeviceModbusConfigDO> getModbusConfigPage(IotDeviceModbusConfigPageReqVO pageReqVO) {
+    public PageResult<IotDeviceModbusConfigDO> getDeviceModbusConfigPage(IotDeviceModbusConfigPageReqVO pageReqVO) {
         return modbusConfigMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<IotDeviceModbusConfigDO> getEnabledModbusConfigList() {
+    public List<IotDeviceModbusConfigDO> getEnabledDeviceModbusConfigList() {
         return modbusConfigMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
     }
 

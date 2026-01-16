@@ -8,22 +8,15 @@ import com.ghgande.j2mod.modbus.procimg.Register;
 import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 import com.ghgande.j2mod.modbus.util.BitVector;
 import io.vertx.core.Future;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
- * IoT Modbus TCP 客户端
- *
- * 负责：
- * 1. 封装 Modbus 读写操作
- * 2. 根据功能码执行对应的 Modbus 请求
+ * IoT Modbus TCP 客户端，负责：
+ * 1. 封装 Modbus 读/写操作
+ * 2. 根据功能码，执行对应的 Modbus 请求
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Component
-@RequiredArgsConstructor // TODO @AI：这个注解，是不是可以去掉？
 @Slf4j
 public class IotModbusTcpClient {
 
@@ -54,8 +47,8 @@ public class IotModbusTcpClient {
                 ModbusResponse response = transaction.getResponse();
                 return extractValues(response, point.getFunctionCode());
             } catch (Exception e) {
-                // TODO @AI：抛出异常时，增加更多的上下文信息，比如设备、点位等
-                throw new RuntimeException("Modbus 读取失败", e);
+                throw new RuntimeException(String.format("Modbus 读取失败 [slaveId=%d, identifier=%s, address=%d]",
+                        slaveId, point.getIdentifier(), point.getRegisterAddress()), e);
             }
         });
     }
@@ -89,8 +82,8 @@ public class IotModbusTcpClient {
                 transaction.execute();
                 return true;
             } catch (Exception e) {
-                // TODO @AI：抛出异常时，增加更多的上下文信息，比如设备、点位等；
-                throw new RuntimeException("Modbus 写入失败", e);
+                throw new RuntimeException(String.format("Modbus 写入失败 [slaveId=%d, identifier=%s, address=%d]",
+                        slaveId, point.getIdentifier(), point.getRegisterAddress()), e);
             }
         });
     }
@@ -101,7 +94,7 @@ public class IotModbusTcpClient {
     private ModbusRequest createReadRequest(Integer functionCode, Integer address, Integer count) {
         // TODO @AI：1、2、3、4 能不能有枚举哈？这样 1、2、3、4 那的注释就不用写；
         switch (functionCode) {
-            case 1: // ReadCoils
+            case 1:
                 return new ReadCoilsRequest(address, count);
             case 2: // ReadDiscreteInputs
                 return new ReadInputDiscretesRequest(address, count);
@@ -155,7 +148,7 @@ public class IotModbusTcpClient {
     private int[] extractValues(ModbusResponse response, Integer functionCode) {
         // TODO @AI：1、2、3、4 能不能有枚举哈？这样 1、2、3、4 那的注释就不用写；
         switch (functionCode) {
-            case 1: // ReadCoils
+            case 1:
                 ReadCoilsResponse coilsResponse = (ReadCoilsResponse) response;
                 int bitCount = coilsResponse.getBitCount();
                 int[] coilValues = new int[bitCount];

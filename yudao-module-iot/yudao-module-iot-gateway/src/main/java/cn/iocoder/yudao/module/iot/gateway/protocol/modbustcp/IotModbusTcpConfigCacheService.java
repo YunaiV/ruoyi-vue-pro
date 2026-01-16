@@ -5,25 +5,18 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-// TODO @AI：是不是 1、2、3 注释可以合并下；
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+
 /**
- * IoT Modbus TCP 配置缓存服务
- *
- * 负责：
- * 1. 从 biz 拉取 Modbus 设备配置
- * 2. 缓存配置数据
- * 3. 检测配置变更
+ * IoT Modbus TCP 配置缓存服务，负责：从 biz 拉取 Modbus 设备配置，缓存配置数据，并检测配置变更
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpConfigCacheService {
@@ -77,6 +70,7 @@ public class IotModbusTcpConfigCacheService {
         return configCache.get(deviceId);
     }
 
+    // TODO @AI：怎么感觉 cleanupRemovedDevices 的时候，knownDeviceIds 已经在 refreshConfig 里更新了？？？
     /**
      * 清理已删除设备的资源
      *
@@ -85,11 +79,7 @@ public class IotModbusTcpConfigCacheService {
      */
     public void cleanupRemovedDevices(List<IotModbusDeviceConfigRespDTO> currentConfigs, Consumer<Long> cleanupAction) {
         // 1.1 获取当前有效的设备 ID
-        // TODO @AI：convertSet 简化；
-        Set<Long> currentDeviceIds = new HashSet<>();
-        for (IotModbusDeviceConfigRespDTO config : currentConfigs) {
-            currentDeviceIds.add(config.getDeviceId());
-        }
+        Set<Long> currentDeviceIds = convertSet(currentConfigs, IotModbusDeviceConfigRespDTO::getDeviceId);
         // 1.2 找出已删除的设备
         Set<Long> removedDeviceIds = new HashSet<>(knownDeviceIds);
         removedDeviceIds.removeAll(currentDeviceIds);

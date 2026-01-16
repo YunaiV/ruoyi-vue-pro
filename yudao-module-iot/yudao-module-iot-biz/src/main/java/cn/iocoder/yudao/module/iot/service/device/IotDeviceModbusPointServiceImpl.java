@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -13,10 +15,13 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
 /**
@@ -38,13 +43,13 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
     private IotThingModelService thingModelService;
 
     @Override
-    public Long createModbusPoint(IotDeviceModbusPointSaveReqVO createReqVO) {
+    public Long createDeviceModbusPoint(IotDeviceModbusPointSaveReqVO createReqVO) {
         // 1.1 校验设备存在
         deviceService.validateDeviceExists(createReqVO.getDeviceId());
         // 1.2 校验物模型属性存在
         IotThingModelDO thingModel = validateThingModelExists(createReqVO.getThingModelId());
         // 1.3 校验同一设备下点位唯一性（基于 identifier）
-        validateModbusPointUnique(createReqVO.getDeviceId(), thingModel.getIdentifier(), null);
+        validateDeviceModbusPointUnique(createReqVO.getDeviceId(), thingModel.getIdentifier(), null);
 
         // 2. 插入
         IotDeviceModbusPointDO modbusPoint = BeanUtils.toBean(createReqVO, IotDeviceModbusPointDO.class,
@@ -54,21 +59,22 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
     }
 
     @Override
-    public void updateModbusPoint(IotDeviceModbusPointSaveReqVO updateReqVO) {
+    public void updateDeviceModbusPoint(IotDeviceModbusPointSaveReqVO updateReqVO) {
         // 1.1 校验存在
-        validateModbusPointExists(updateReqVO.getId());
+        validateDeviceModbusPointExists(updateReqVO.getId());
         // 1.2 校验设备存在
         deviceService.validateDeviceExists(updateReqVO.getDeviceId());
         // 1.3 校验物模型属性存在
         IotThingModelDO thingModel = validateThingModelExists(updateReqVO.getThingModelId());
         // 1.4 校验同一设备下点位唯一性
-        validateModbusPointUnique(updateReqVO.getDeviceId(), thingModel.getIdentifier(), updateReqVO.getId());
+        validateDeviceModbusPointUnique(updateReqVO.getDeviceId(), thingModel.getIdentifier(), updateReqVO.getId());
 
         // 2. 更新
         IotDeviceModbusPointDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceModbusPointDO.class);
-        // TODO @AI：这块
         modbusPointMapper.updateById(updateObj);
     }
+
+    // TODO @AI：物模型更新的时候，更新下 identifier、name 信息；例如说 updateDeviceModbusPoint(thingModelId, identifier、name) 方法；
 
     private IotThingModelDO validateThingModelExists(Long id) {
         IotThingModelDO thingModel = thingModelService.getThingModel(id);
@@ -79,60 +85,45 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
     }
 
     @Override
-    public void deleteModbusPoint(Long id) {
+    public void deleteDeviceModbusPoint(Long id) {
         // 校验存在
-        validateModbusPointExists(id);
+        validateDeviceModbusPointExists(id);
         // 删除
         modbusPointMapper.deleteById(id);
     }
 
-    private IotDeviceModbusPointDO validateModbusPointExists(Long id) {
+    private void validateDeviceModbusPointExists(Long id) {
         IotDeviceModbusPointDO point = modbusPointMapper.selectById(id);
         if (point == null) {
             throw exception(DEVICE_MODBUS_POINT_NOT_EXISTS);
         }
-        return point;
     }
 
-    private void validateModbusPointUnique(Long deviceId, String identifier, Long excludeId) {
+    private void validateDeviceModbusPointUnique(Long deviceId, String identifier, Long excludeId) {
         IotDeviceModbusPointDO point = modbusPointMapper.selectByDeviceIdAndIdentifier(deviceId, identifier);
-        // TODO @AI：ObjUtil notequals；
-        if (point != null && !point.getId().equals(excludeId)) {
+        if (point != null && ObjUtil.notEqual(point.getId(), excludeId)) {
             throw exception(DEVICE_MODBUS_POINT_EXISTS);
         }
     }
 
-    // TODO @AI：这块
-    private void setDefaultValues(IotDeviceModbusPointDO point) {
-        if (point.getRegisterCount() == null) {
-            point.setRegisterCount(1);
-        }
-        if (point.getScale() == null) {
-            point.setScale(BigDecimal.ONE);
-        }
-        if (point.getPollInterval() == null) {
-            point.setPollInterval(5000);
-        }
-    }
-
     @Override
-    public IotDeviceModbusPointDO getModbusPoint(Long id) {
+    public IotDeviceModbusPointDO getDeviceModbusPoint(Long id) {
         return modbusPointMapper.selectById(id);
     }
 
     @Override
-    public PageResult<IotDeviceModbusPointDO> getModbusPointPage(IotDeviceModbusPointPageReqVO pageReqVO) {
+    public PageResult<IotDeviceModbusPointDO> getDeviceModbusPointPage(IotDeviceModbusPointPageReqVO pageReqVO) {
         return modbusPointMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<IotDeviceModbusPointDO> getModbusPointListByDeviceId(Long deviceId) {
-        return modbusPointMapper.selectListByDeviceId(deviceId);
-    }
-
-    @Override
-    public List<IotDeviceModbusPointDO> getEnabledModbusPointListByDeviceId(Long deviceId) {
-        return modbusPointMapper.selectListByDeviceIdAndStatus(deviceId, CommonStatusEnum.ENABLE.getStatus());
+    public Map<Long, List<IotDeviceModbusPointDO>> getEnabledDeviceModbusPointMapByDeviceIds(Collection<Long> deviceIds) {
+        if (CollUtil.isEmpty(deviceIds)) {
+            return Collections.emptyMap();
+        }
+        List<IotDeviceModbusPointDO> pointList = modbusPointMapper.selectListByDeviceIdsAndStatus(
+                deviceIds, CommonStatusEnum.ENABLE.getStatus());
+        return convertMultiMap(pointList, IotDeviceModbusPointDO::getDeviceId);
     }
 
 }

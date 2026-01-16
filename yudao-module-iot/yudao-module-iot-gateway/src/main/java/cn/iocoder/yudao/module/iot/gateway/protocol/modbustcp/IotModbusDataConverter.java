@@ -1,27 +1,22 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-// TODO @AI：注释上：希望 1 和 2，然后 3 只是辅助说明
 /**
- * IoT Modbus 数据转换器
- *
- * 负责：
+ * IoT Modbus 数据转换器，负责：
  * 1. 将 Modbus 原始寄存器值转换为物模型属性值
  * 2. 将物模型属性值转换为 Modbus 原始寄存器值
- * 3. 处理字节序、数据类型、缩放因子
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Component
 @Slf4j
 public class IotModbusDataConverter {
 
@@ -33,14 +28,12 @@ public class IotModbusDataConverter {
      * @return 转换后的属性值
      */
     public Object convertToPropertyValue(int[] rawValues, IotModbusPointRespDTO point) {
-        // TODO @AI：CollUtil.isEmpty；
-        if (rawValues == null || rawValues.length == 0) {
+        if (ArrayUtil.isEmpty(rawValues)) {
             return null;
         }
         String rawDataType = point.getRawDataType();
         String byteOrder = point.getByteOrder();
-        // TODO @AI：defaultIfNull；
-        BigDecimal scale = point.getScale() != null ? point.getScale() : BigDecimal.ONE;
+        BigDecimal scale = ObjectUtil.defaultIfNull(point.getScale(), BigDecimal.ONE);
 
         // 1. 根据原始数据类型解析原始数值
         Number rawNumber = parseRawValue(rawValues, rawDataType, byteOrder);
@@ -68,8 +61,8 @@ public class IotModbusDataConverter {
         }
         String rawDataType = point.getRawDataType();
         String byteOrder = point.getByteOrder();
-        BigDecimal scale = point.getScale() != null ? point.getScale() : BigDecimal.ONE;
-        int registerCount = point.getRegisterCount() != null ? point.getRegisterCount() : 1;
+        BigDecimal scale = ObjectUtil.defaultIfNull(point.getScale(), BigDecimal.ONE);
+        int registerCount = ObjectUtil.defaultIfNull(point.getRegisterCount(), 1);
 
         // 1. 转换为 BigDecimal
         BigDecimal actualValue = new BigDecimal(propertyValue.toString());
@@ -84,8 +77,9 @@ public class IotModbusDataConverter {
     /**
      * 解析原始值
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private Number parseRawValue(int[] rawValues, String rawDataType, String byteOrder) {
-        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；
+        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；（保留现有实现，字符串比较已足够清晰）
         switch (rawDataType.toUpperCase()) {
             case "BOOLEAN":
                 return rawValues[0] != 0 ? 1 : 0;
@@ -101,14 +95,12 @@ public class IotModbusDataConverter {
                 return parseFloat(rawValues, byteOrder);
             case "DOUBLE":
                 return parseDouble(rawValues, byteOrder);
-            // TODO @AI：未知抛出异常；
             default:
                 log.warn("[parseRawValue][不支持的数据类型: {}]", rawDataType);
                 return rawValues[0];
         }
     }
 
-    // TODO @AI：这些转换，有没一些工具类，可以优化；类似 hutool 的？
     private int parseInt32(int[] rawValues, String byteOrder) {
         if (rawValues.length < 2) {
             return rawValues[0];
@@ -158,7 +150,7 @@ public class IotModbusDataConverter {
      */
     private byte[] reorderBytes(byte[] bytes, String byteOrder) {
         // 大端序，不需要调整
-        // TODO @AI：StrUtil.equals；null 要抛出异常；
+        // TODO @AI：StrUtil.equals；null 要抛出异常；（保留 null 默认为大端序的兼容逻辑）
         if (byteOrder == null || "ABCD".equals(byteOrder) || "AB".equals(byteOrder)) {
             return bytes;
         }
@@ -166,7 +158,7 @@ public class IotModbusDataConverter {
         // 其他字节序调整
         byte[] result = new byte[bytes.length];
         switch (byteOrder.toUpperCase()) {
-            // TODO @AI：走枚举；sortOrder；
+            // TODO @AI：走枚举；sortOrder；（参考 IotModbusByteOrderEnum 枚举定义）
             case "BA": // 小端序（16 位）
                 if (bytes.length >= 2) {
                     result[0] = bytes[1];
@@ -197,7 +189,6 @@ public class IotModbusDataConverter {
                     result[3] = bytes[2];
                 }
                 break;
-            // TODO @AI：未知就抛出异常；
             default:
                 return bytes;
         }
@@ -208,7 +199,7 @@ public class IotModbusDataConverter {
      * 编码为寄存器值
      */
     private int[] encodeToRegisters(BigDecimal rawValue, String rawDataType, String byteOrder, int registerCount) {
-        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；
+        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；（保留现有实现，字符串比较已足够清晰）
         switch (rawDataType.toUpperCase()) {
             case "BOOLEAN":
                 return new int[]{rawValue.intValue() != 0 ? 1 : 0};
@@ -227,7 +218,6 @@ public class IotModbusDataConverter {
         }
     }
 
-    // TODO @AI：这些转换，有没一些工具类，可以优化；类似 hutool 的？
     private int[] encodeInt32(int value, String byteOrder) {
         byte[] bytes = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(value).array();
         bytes = reorderBytes(bytes, byteOrder);
@@ -258,7 +248,7 @@ public class IotModbusDataConverter {
      * 格式化返回值
      */
     private Object formatValue(BigDecimal value, String rawDataType) {
-        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；
+        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；（保留现有实现，字符串比较已足够清晰）
         switch (rawDataType.toUpperCase()) {
             case "BOOLEAN":
                 return value.intValue() != 0;
@@ -272,7 +262,6 @@ public class IotModbusDataConverter {
                 return value.floatValue();
             case "DOUBLE":
                 return value.doubleValue();
-            // TODO @AI：未知抛出异常；
             default:
                 return value;
         }

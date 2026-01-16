@@ -16,26 +16,18 @@ import java.util.List;
 public interface IotDeviceModbusConfigService {
 
     /**
-     * 创建设备 Modbus 连接配置
+     * 保存设备 Modbus 连接配置（新增或更新）
      *
-     * @param createReqVO 创建信息
-     * @return 编号
+     * @param saveReqVO 保存信息
      */
-    Long createModbusConfig(@Valid IotDeviceModbusConfigSaveReqVO createReqVO);
-
-    /**
-     * 更新设备 Modbus 连接配置
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateModbusConfig(@Valid IotDeviceModbusConfigSaveReqVO updateReqVO);
+    void saveDeviceModbusConfig(@Valid IotDeviceModbusConfigSaveReqVO saveReqVO);
 
     /**
      * 删除设备 Modbus 连接配置
      *
      * @param id 编号
      */
-    void deleteModbusConfig(Long id);
+    void deleteDeviceModbusConfig(Long id);
 
     /**
      * 获得设备 Modbus 连接配置
@@ -43,7 +35,7 @@ public interface IotDeviceModbusConfigService {
      * @param id 编号
      * @return 设备 Modbus 连接配置
      */
-    IotDeviceModbusConfigDO getModbusConfig(Long id);
+    IotDeviceModbusConfigDO getDeviceModbusConfig(Long id);
 
     /**
      * 根据设备编号获得 Modbus 连接配置
@@ -51,7 +43,7 @@ public interface IotDeviceModbusConfigService {
      * @param deviceId 设备编号
      * @return 设备 Modbus 连接配置
      */
-    IotDeviceModbusConfigDO getModbusConfigByDeviceId(Long deviceId);
+    IotDeviceModbusConfigDO getDeviceModbusConfigByDeviceId(Long deviceId);
 
     /**
      * 获得设备 Modbus 连接配置分页
@@ -59,13 +51,13 @@ public interface IotDeviceModbusConfigService {
      * @param pageReqVO 分页查询
      * @return 设备 Modbus 连接配置分页
      */
-    PageResult<IotDeviceModbusConfigDO> getModbusConfigPage(IotDeviceModbusConfigPageReqVO pageReqVO);
+    PageResult<IotDeviceModbusConfigDO> getDeviceModbusConfigPage(IotDeviceModbusConfigPageReqVO pageReqVO);
 
     /**
      * 获得所有启用的 Modbus 连接配置列表
      *
      * @return 启用的 Modbus 连接配置列表
      */
-    List<IotDeviceModbusConfigDO> getEnabledModbusConfigList();
+    List<IotDeviceModbusConfigDO> getEnabledDeviceModbusConfigList();
 
 }

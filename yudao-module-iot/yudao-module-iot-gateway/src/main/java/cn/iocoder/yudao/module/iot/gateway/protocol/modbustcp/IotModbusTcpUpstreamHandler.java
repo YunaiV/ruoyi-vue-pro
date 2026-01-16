@@ -4,12 +4,13 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO @AI：注释可以简化下
 /**
  * IoT Modbus TCP 上行数据处理器
  *
@@ -20,30 +21,19 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Component
 @Slf4j
 public class IotModbusTcpUpstreamHandler {
 
     private final IotDeviceMessageService messageService;
     private final IotModbusDataConverter dataConverter;
 
+    @Setter
     private String serverId;
 
     public IotModbusTcpUpstreamHandler(IotDeviceMessageService messageService,
                                         IotModbusDataConverter dataConverter) {
         this.messageService = messageService;
         this.dataConverter = dataConverter;
-    }
-
-    // TODO @AI：lombok 简化
-    /**
-     * 设置 serverId
-     *
-     * @param serverId 服务器 ID
-     */
-    public void setServerId(String serverId) {
-        this.serverId = serverId;
     }
 
     /**

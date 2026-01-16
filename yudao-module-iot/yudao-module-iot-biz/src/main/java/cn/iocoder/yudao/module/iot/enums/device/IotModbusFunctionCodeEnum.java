@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
+// TODO @AI：如果枚举需要共享，可以拿到 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-core/src/main/java/cn/iocoder/yudao/module/iot/core/enums 里
 /**
  * IoT Modbus 功能码枚举
  *
@@ -61,20 +62,6 @@ public enum IotModbusFunctionCodeEnum implements ArrayValuable<Integer> {
                 .filter(e -> e.getCode().equals(code))
                 .findFirst()
                 .orElse(null);
-    }
-
-    // TODO @AI：如果用不到，可以暂时删除哈；
-    /**
-     * 获取写功能码
-     *
-     * @param registerCount 寄存器数量
-     * @return 写功能码
-     */
-    public Integer getWriteCode(int registerCount) {
-        if (!writable) {
-            return null;
-        }
-        return registerCount == 1 ? writeSingleCode : writeMultipleCode;
     }
 
 }

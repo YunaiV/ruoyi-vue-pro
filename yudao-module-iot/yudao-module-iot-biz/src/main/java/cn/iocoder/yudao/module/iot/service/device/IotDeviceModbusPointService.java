@@ -6,7 +6,9 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceMo
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusPointDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * IoT 设备 Modbus 点位配置 Service 接口
@@ -21,21 +23,21 @@ public interface IotDeviceModbusPointService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createModbusPoint(@Valid IotDeviceModbusPointSaveReqVO createReqVO);
+    Long createDeviceModbusPoint(@Valid IotDeviceModbusPointSaveReqVO createReqVO);
 
     /**
      * 更新设备 Modbus 点位配置
      *
      * @param updateReqVO 更新信息
      */
-    void updateModbusPoint(@Valid IotDeviceModbusPointSaveReqVO updateReqVO);
+    void updateDeviceModbusPoint(@Valid IotDeviceModbusPointSaveReqVO updateReqVO);
 
     /**
      * 删除设备 Modbus 点位配置
      *
      * @param id 编号
      */
-    void deleteModbusPoint(Long id);
+    void deleteDeviceModbusPoint(Long id);
 
     /**
      * 获得设备 Modbus 点位配置
@@ -43,7 +45,7 @@ public interface IotDeviceModbusPointService {
      * @param id 编号
      * @return 设备 Modbus 点位配置
      */
-    IotDeviceModbusPointDO getModbusPoint(Long id);
+    IotDeviceModbusPointDO getDeviceModbusPoint(Long id);
 
     /**
      * 获得设备 Modbus 点位配置分页
@@ -51,22 +53,14 @@ public interface IotDeviceModbusPointService {
      * @param pageReqVO 分页查询
      * @return 设备 Modbus 点位配置分页
      */
-    PageResult<IotDeviceModbusPointDO> getModbusPointPage(IotDeviceModbusPointPageReqVO pageReqVO);
+    PageResult<IotDeviceModbusPointDO> getDeviceModbusPointPage(IotDeviceModbusPointPageReqVO pageReqVO);
 
     /**
-     * 根据设备编号获得点位配置列表
+     * 根据设备编号批量获得启用的点位配置 Map
      *
-     * @param deviceId 设备编号
-     * @return 点位配置列表
+     * @param deviceIds 设备编号集合
+     * @return 设备点位 Map，key 为设备编号，value 为点位配置列表
      */
-    List<IotDeviceModbusPointDO> getModbusPointListByDeviceId(Long deviceId);
-
-    /**
-     * 根据设备编号获得启用的点位配置列表
-     *
-     * @param deviceId 设备编号
-     * @return 启用的点位配置列表
-     */
-    List<IotDeviceModbusPointDO> getEnabledModbusPointListByDeviceId(Long deviceId);
+    Map<Long, List<IotDeviceModbusPointDO>> getEnabledDeviceModbusPointMapByDeviceIds(Collection<Long> deviceIds);
 
 }

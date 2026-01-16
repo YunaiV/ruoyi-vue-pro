@@ -10,24 +10,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * IoT Modbus TCP 连接管理器
- *
- * 负责：
+ * IoT Modbus TCP 连接管理器，负责：
  * 1. 管理 TCP 连接（相同 ip:port 共用连接）
- * 2. 分布式锁管理（连接级别）
+ * 2. 分布式锁管理（连接级别），避免多节点重复创建连接
  * 3. 连接重试和故障恢复
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpConnectionManager {
@@ -239,16 +234,8 @@ public class IotModbusTcpConnectionManager {
          * 执行 Modbus 读取操作（阻塞方式，在 Vert.x worker 线程执行）
          */
         public <T> Future<T> executeBlocking(java.util.function.Function<TCPMasterConnection, T> operation) {
-            // TODO @AI：executeBlocking 方法，已经废弃了，看看要不要替换。
-            // TODO @AI：疑问。这里会不会线程阻塞？多个设备之间，担心性能；
-            return context.executeBlocking(promise -> {
-                try {
-                    T result = operation.apply(tcpConnection);
-                    promise.complete(result);
-                } catch (Exception e) {
-                    promise.fail(e);
-                }
-            }, true); // ordered=true 保证同一连接串行执行
+            // ordered=true 保证同一 Context 的操作串行执行，不同连接之间可并行
+            return context.executeBlocking(() -> operation.apply(tcpConnection), true);
         }
     }
 

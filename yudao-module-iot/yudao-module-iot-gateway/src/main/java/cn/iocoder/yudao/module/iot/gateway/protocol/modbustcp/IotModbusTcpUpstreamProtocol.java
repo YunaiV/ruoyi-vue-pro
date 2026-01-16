@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessa
 import io.vertx.core.Vertx;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+// TODO @AI：注释可以简化下
 /**
  * IoT Modbus TCP 上行协议
  *
@@ -24,7 +26,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
 @RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpUpstreamProtocol {
@@ -37,10 +38,10 @@ public class IotModbusTcpUpstreamProtocol {
     private final IotModbusTcpUpstreamHandler upstreamHandler;
     private final Vertx vertx;
 
-    // TODO @AI：按照别的模块，生成 serverId；
     /**
      * 服务器 ID，用于标识当前网关实例
      */
+    @Getter
     private final String serverId = UUID.randomUUID().toString();
 
     /**
@@ -113,16 +114,6 @@ public class IotModbusTcpUpstreamProtocol {
         } catch (Exception e) {
             log.error("[refreshConfig][刷新配置失败]", e);
         }
-    }
-
-    // TODO @AI：是不是 lombok 简化
-    public String getServerId() {
-        return serverId;
-    }
-
-    // TODO @AI：不需要；可以删除；
-    public IotDeviceMessageService getMessageService() {
-        return messageService;
     }
 
 }

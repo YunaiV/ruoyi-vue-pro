@@ -5,13 +5,13 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import io.vertx.core.Vertx;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO @AI：注释可以简化？
 /**
  * IoT Modbus TCP 轮询调度器
  *
@@ -22,8 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpPollScheduler {

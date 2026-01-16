@@ -24,10 +24,6 @@ public class IotModbusDeviceConfigRespDTO {
      * 设备名称
      */
     private String deviceName;
-    /**
-     * 租户编号
-     */
-    private Long tenantId;
 
     // ========== Modbus 连接配置 ==========
 
@@ -36,7 +32,7 @@ public class IotModbusDeviceConfigRespDTO {
      */
     private String ip;
     /**
-     * Modbus 端口
+     * Modbus 服务器端口
      */
     private Integer port;
     /**
@@ -44,11 +40,11 @@ public class IotModbusDeviceConfigRespDTO {
      */
     private Integer slaveId;
     /**
-     * 连接超时时间（毫秒）
+     * 连接超时时间，单位：毫秒
      */
     private Integer timeout;
     /**
-     * 重试间隔（毫秒）
+     * 重试间隔，单位：毫秒
      */
     private Integer retryInterval;
 

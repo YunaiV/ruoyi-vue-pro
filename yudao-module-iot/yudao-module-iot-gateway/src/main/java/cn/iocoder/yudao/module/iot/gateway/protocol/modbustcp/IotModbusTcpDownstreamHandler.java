@@ -5,23 +5,18 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-// TODO @AI：看看注释能不能优化下；
 /**
  * IoT Modbus TCP 下行消息处理器
  *
  * 负责：
- * 1. 处理属性设置消息（thing.service.property.set）
- * 2. 将属性值转换为 Modbus 原始值
- * 3. 执行 Modbus 写入操作
+ * 1. 处理下行消息（如属性设置 thing.service.property.set）
+ * 2. 执行 Modbus 写入操作
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpDownstreamHandler {
