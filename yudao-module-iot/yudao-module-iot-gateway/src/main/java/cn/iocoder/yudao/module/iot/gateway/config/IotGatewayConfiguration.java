@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.*;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
@@ -190,6 +191,40 @@ public class IotGatewayConfiguration {
                                                                            IotMqttWsDownstreamHandler downstreamHandler,
                                                                            IotMessageBus messageBus) {
             return new IotMqttWsDownstreamSubscriber(mqttWsUpstreamProtocol, downstreamHandler, messageBus);
+        }
+
+    }
+
+    /**
+     * IoT 网关 Modbus TCP 协议配置类
+     */
+    @Configuration
+    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.modbus-tcp", name = "enabled", havingValue = "true")
+    @Slf4j
+    public static class ModbusTcpProtocolConfiguration {
+
+        @Bean(name = "modbusTcpVertx", destroyMethod = "close")
+        public Vertx modbusTcpVertx() {
+            return Vertx.vertx();
+        }
+
+        @Bean
+        public IotModbusTcpUpstreamProtocol iotModbusTcpUpstreamProtocol(IotGatewayProperties gatewayProperties,
+                                                                         IotDeviceMessageService messageService,
+                                                                         IotModbusTcpConnectionManager connectionManager,
+                                                                         IotModbusTcpPollScheduler pollScheduler,
+                                                                         IotModbusTcpConfigCacheService configCacheService,
+                                                                         IotModbusTcpUpstreamHandler upstreamHandler,
+                                                                         @Qualifier("modbusTcpVertx") Vertx modbusTcpVertx) {
+            return new IotModbusTcpUpstreamProtocol(gatewayProperties.getProtocol().getModbusTcp(),
+                    messageService, connectionManager, pollScheduler, configCacheService, upstreamHandler, modbusTcpVertx);
+        }
+
+        @Bean
+        public IotModbusTcpDownstreamSubscriber iotModbusTcpDownstreamSubscriber(IotModbusTcpUpstreamProtocol upstreamProtocol,
+                                                                                  IotModbusTcpDownstreamHandler downstreamHandler,
+                                                                                  IotMessageBus messageBus) {
+            return new IotModbusTcpDownstreamSubscriber(upstreamProtocol, downstreamHandler, messageBus);
         }
 
     }

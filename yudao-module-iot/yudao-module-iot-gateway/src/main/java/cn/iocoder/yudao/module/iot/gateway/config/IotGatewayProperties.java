@@ -93,6 +93,11 @@ public class IotGatewayProperties {
          */
         private MqttWsProperties mqttWs;
 
+        /**
+         * Modbus TCP 组件配置
+         */
+        private ModbusTcpProperties modbusTcp;
+
     }
 
     @Data
@@ -500,6 +505,23 @@ public class IotGatewayProperties {
             private String trustStorePassword;
 
         }
+
+    }
+
+    @Data
+    public static class ModbusTcpProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 配置刷新间隔（秒）
+         */
+        // TODO @AI：需要校验下非空；
+        private Integer configRefreshInterval = 30;
 
     }
 

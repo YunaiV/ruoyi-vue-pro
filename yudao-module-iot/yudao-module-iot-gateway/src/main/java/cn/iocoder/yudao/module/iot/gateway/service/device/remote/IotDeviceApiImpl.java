@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
@@ -33,6 +36,7 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     private IotGatewayProperties gatewayProperties;
 
     private RestTemplate restTemplate;
+    private RestTemplate modbusRestTemplate;
 
     @PostConstruct
     public void init() {
@@ -42,24 +46,35 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
                 .readTimeout(rpc.getReadTimeout())
                 .connectTimeout(rpc.getConnectTimeout())
                 .build();
+        // TODO @AI：继续复用 rpc.getConnectTimeout()；不需要独立 modbusRestTemplate
+        modbusRestTemplate = new RestTemplateBuilder()
+                .rootUri(rpc.getUrl() + "/rpc-api/iot/modbus")
+                .readTimeout(rpc.getReadTimeout())
+                .connectTimeout(rpc.getConnectTimeout())
+                .build();
     }
 
     @Override
     public CommonResult<Boolean> authDevice(IotDeviceAuthReqDTO authReqDTO) {
-        return doPost("/auth", authReqDTO, new ParameterizedTypeReference<>() { });
+        return doPost(restTemplate, "/auth", authReqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override
     public CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO getReqDTO) {
-        return doPost("/get", getReqDTO, new ParameterizedTypeReference<>() { });
+        return doPost(restTemplate, "/get", getReqDTO, new ParameterizedTypeReference<>() { });
     }
 
-    private <T, R> CommonResult<R> doPost(String url, T body,
+    @Override
+    public CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs() {
+        return doPost(modbusRestTemplate, "/enabled-configs", null, new ParameterizedTypeReference<>() { });
+    }
+
+    private <T, R> CommonResult<R> doPost(RestTemplate template, String url, T body,
                                           ParameterizedTypeReference<CommonResult<R>> responseType) {
         try {
             // 请求
             HttpEntity<T> requestEntity = new HttpEntity<>(body);
-            ResponseEntity<CommonResult<R>> response = restTemplate.exchange(
+            ResponseEntity<CommonResult<R>> response = template.exchange(
                     url, HttpMethod.POST, requestEntity, responseType);
             // 响应
             CommonResult<R> result = response.getBody();

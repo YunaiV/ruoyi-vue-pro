@@ -4,6 +4,9 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
+
+import java.util.List;
 
 /**
  * IoT 设备通用 API
@@ -27,5 +30,12 @@ public interface IotDeviceCommonApi {
      * @return 设备信息
      */
     CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO infoReqDTO);
+
+    /**
+     * 获取所有启用的 Modbus 设备配置列表
+     *
+     * @return Modbus 设备配置列表
+     */
+    CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs();
 
 }
