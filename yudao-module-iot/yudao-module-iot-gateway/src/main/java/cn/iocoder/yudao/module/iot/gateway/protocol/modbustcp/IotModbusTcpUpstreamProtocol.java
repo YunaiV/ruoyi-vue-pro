@@ -92,8 +92,6 @@ public class IotModbusTcpUpstreamProtocol {
                     // 2.1 确保连接存在
                     connectionManager.ensureConnection(config);
                     // 2.2 更新轮询任务
-                    // DONE @AI：【重要】当前实现是全量更新轮询任务，未来可优化为增量更新（只更新变化的点位）
-                    // TODO @AI：【超级重要，这次必须优化】需要对比 point 的更新：1）如果 points 删除了，需要停止对应的轮询定时器；2）如果 points 新增了，需要新增对应的轮询定时器；3）如果 points 只修改了 pollInterval，需要更新对应的轮询定时器；4）如果 points 其他属性修改了，不需要处理轮询定时器
                     pollScheduler.updatePolling(config);
                 } catch (Exception e) {
                     log.error("[refreshConfig][处理设备配置失败, deviceId={}]", config.getDeviceId(), e);
