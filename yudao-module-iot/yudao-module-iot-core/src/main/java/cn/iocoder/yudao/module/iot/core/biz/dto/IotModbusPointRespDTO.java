@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.iot.core.biz.dto;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusByteOrderEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusRawDataTypeEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -27,11 +30,10 @@ public class IotModbusPointRespDTO {
 
     // ========== Modbus 协议配置 ==========
 
-    // TODO @AI：所有的枚举，通过 @，不要写上去；
     /**
      * Modbus 功能码
      *
-     * 1-ReadCoils 2-ReadDiscreteInputs 3-ReadHoldingRegisters 4-ReadInputRegisters
+     * 枚举 {@link IotModbusFunctionCodeEnum}
      */
     private Integer functionCode;
     /**
@@ -45,13 +47,13 @@ public class IotModbusPointRespDTO {
     /**
      * 字节序
      *
-     * AB/BA/ABCD/CDAB/DCBA/BADC
+     * 枚举 {@link IotModbusByteOrderEnum}
      */
     private String byteOrder;
     /**
      * 原始数据类型
      *
-     * INT16/UINT16/INT32/UINT32/FLOAT/DOUBLE/BOOLEAN/STRING
+     * 枚举 {@link IotModbusRawDataTypeEnum}
      */
     private String rawDataType;
     /**
@@ -62,13 +64,5 @@ public class IotModbusPointRespDTO {
      * 轮询间隔（毫秒）
      */
     private Integer pollInterval;
-
-    // ========== 物模型相关字段 ==========
-
-    // TODO @AI：分析一下，是否有必要返回
-    /**
-     * 数据类型（来自物模型）
-     */
-    private String dataType;
 
 }

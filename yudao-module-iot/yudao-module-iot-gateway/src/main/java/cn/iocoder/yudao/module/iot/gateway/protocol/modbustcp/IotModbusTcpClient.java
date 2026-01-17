@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.procimg.InputRegister;
@@ -91,16 +92,20 @@ public class IotModbusTcpClient {
     /**
      * 创建读取请求
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private ModbusRequest createReadRequest(Integer functionCode, Integer address, Integer count) {
-        // TODO @AI：1、2、3、4 能不能有枚举哈？这样 1、2、3、4 那的注释就不用写；
-        switch (functionCode) {
-            case 1:
+        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
+        if (functionCodeEnum == null) {
+            throw new IllegalArgumentException("不支持的功能码: " + functionCode);
+        }
+        switch (functionCodeEnum) {
+            case READ_COILS:
                 return new ReadCoilsRequest(address, count);
-            case 2: // ReadDiscreteInputs
+            case READ_DISCRETE_INPUTS:
                 return new ReadInputDiscretesRequest(address, count);
-            case 3: // ReadHoldingRegisters
+            case READ_HOLDING_REGISTERS:
                 return new ReadMultipleRegistersRequest(address, count);
-            case 4: // ReadInputRegisters
+            case READ_INPUT_REGISTERS:
                 return new ReadInputRegistersRequest(address, count);
             default:
                 throw new IllegalArgumentException("不支持的功能码: " + functionCode);
@@ -111,31 +116,33 @@ public class IotModbusTcpClient {
      * 创建写入请求
      */
     private ModbusRequest createWriteRequest(Integer functionCode, Integer address, Integer count, int[] values) {
-        // TODO @AI：5、6、15、16 能不能有枚举哈？这样 5、6、15、16 那的注释就不用写；
-        switch (functionCode) {
-            case 1: // WriteCoils (使用 5 或 15)
+        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
+        if (functionCodeEnum == null) {
+            throw new IllegalArgumentException("不支持的功能码: " + functionCode);
+        }
+        switch (functionCodeEnum) {
+            case READ_COILS: // 写线圈（使用功能码 5 或 15）
                 if (count == 1) {
                     return new WriteCoilRequest(address, values[0] != 0);
                 } else {
-                    // 多线圈写入
                     BitVector bv = new BitVector(count);
                     for (int i = 0; i < Math.min(values.length, count); i++) {
                         bv.setBit(i, values[i] != 0);
                     }
                     return new WriteMultipleCoilsRequest(address, bv);
                 }
-            case 3: // WriteHoldingRegisters (使用 6 或 16)
+            case READ_HOLDING_REGISTERS: // 写保持寄存器（使用功能码 6 或 16）
                 if (count == 1) {
                     return new WriteSingleRegisterRequest(address, new SimpleRegister(values[0]));
                 } else {
-                    Register[] registers = new com.ghgande.j2mod.modbus.procimg.SimpleRegister[count];
+                    Register[] registers = new SimpleRegister[count];
                     for (int i = 0; i < count; i++) {
                         registers[i] = new SimpleRegister(i < values.length ? values[i] : 0);
                     }
                     return new WriteMultipleRegistersRequest(address, registers);
                 }
-            case 2: // ReadDiscreteInputs - 只读
-            case 4: // ReadInputRegisters - 只读
+            case READ_DISCRETE_INPUTS: // 只读
+            case READ_INPUT_REGISTERS: // 只读
                 return null;
             default:
                 throw new IllegalArgumentException("不支持的功能码: " + functionCode);
@@ -146,9 +153,12 @@ public class IotModbusTcpClient {
      * 从响应中提取值
      */
     private int[] extractValues(ModbusResponse response, Integer functionCode) {
-        // TODO @AI：1、2、3、4 能不能有枚举哈？这样 1、2、3、4 那的注释就不用写；
-        switch (functionCode) {
-            case 1:
+        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
+        if (functionCodeEnum == null) {
+            throw new IllegalArgumentException("不支持的功能码: " + functionCode);
+        }
+        switch (functionCodeEnum) {
+            case READ_COILS:
                 ReadCoilsResponse coilsResponse = (ReadCoilsResponse) response;
                 int bitCount = coilsResponse.getBitCount();
                 int[] coilValues = new int[bitCount];
@@ -156,7 +166,7 @@ public class IotModbusTcpClient {
                     coilValues[i] = coilsResponse.getCoilStatus(i) ? 1 : 0;
                 }
                 return coilValues;
-            case 2: // ReadDiscreteInputs
+            case READ_DISCRETE_INPUTS:
                 ReadInputDiscretesResponse discretesResponse = (ReadInputDiscretesResponse) response;
                 int discreteCount = discretesResponse.getBitCount();
                 int[] discreteValues = new int[discreteCount];
@@ -164,7 +174,7 @@ public class IotModbusTcpClient {
                     discreteValues[i] = discretesResponse.getDiscreteStatus(i) ? 1 : 0;
                 }
                 return discreteValues;
-            case 3: // ReadHoldingRegisters
+            case READ_HOLDING_REGISTERS:
                 ReadMultipleRegistersResponse holdingResponse = (ReadMultipleRegistersResponse) response;
                 InputRegister[] holdingRegisters = holdingResponse.getRegisters();
                 int[] holdingValues = new int[holdingRegisters.length];
@@ -172,7 +182,7 @@ public class IotModbusTcpClient {
                     holdingValues[i] = holdingRegisters[i].getValue();
                 }
                 return holdingValues;
-            case 4: // ReadInputRegisters
+            case READ_INPUT_REGISTERS:
                 ReadInputRegistersResponse inputResponse = (ReadInputRegistersResponse) response;
                 InputRegister[] inputRegisters = inputResponse.getRegisters();
                 int[] inputValues = new int[inputRegisters.length];

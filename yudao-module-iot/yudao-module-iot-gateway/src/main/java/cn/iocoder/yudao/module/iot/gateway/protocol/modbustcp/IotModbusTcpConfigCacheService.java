@@ -29,7 +29,9 @@ public class IotModbusTcpConfigCacheService {
     private final Map<Long, IotModbusDeviceConfigRespDTO> configCache = new ConcurrentHashMap<>();
 
     /**
-     * 已知的设备 ID 集合
+     * 已知的设备 ID 集合（作用：用于检测已删除的设备）
+     *
+     * @see #cleanupRemovedDevices(List, Consumer)
      */
     private final Set<Long> knownDeviceIds = ConcurrentHashMap.newKeySet();
 
@@ -48,10 +50,9 @@ public class IotModbusTcpConfigCacheService {
             }
             List<IotModbusDeviceConfigRespDTO> configs = result.getData();
 
-            // 2. 更新缓存
+            // 2. 更新缓存（注意：不在这里更新 knownDeviceIds，由 cleanupRemovedDevices 统一管理）
             for (IotModbusDeviceConfigRespDTO config : configs) {
                 configCache.put(config.getDeviceId(), config);
-                knownDeviceIds.add(config.getDeviceId());
             }
             return configs;
         } catch (Exception e) {
@@ -70,9 +71,8 @@ public class IotModbusTcpConfigCacheService {
         return configCache.get(deviceId);
     }
 
-    // TODO @AI：怎么感觉 cleanupRemovedDevices 的时候，knownDeviceIds 已经在 refreshConfig 里更新了？？？
     /**
-     * 清理已删除设备的资源
+     * 清理已删除设备的资源，并更新已知设备 ID 集合
      *
      * @param currentConfigs 当前有效的配置列表
      * @param cleanupAction  清理动作
@@ -80,7 +80,7 @@ public class IotModbusTcpConfigCacheService {
     public void cleanupRemovedDevices(List<IotModbusDeviceConfigRespDTO> currentConfigs, Consumer<Long> cleanupAction) {
         // 1.1 获取当前有效的设备 ID
         Set<Long> currentDeviceIds = convertSet(currentConfigs, IotModbusDeviceConfigRespDTO::getDeviceId);
-        // 1.2 找出已删除的设备
+        // 1.2 找出已删除的设备（基于旧的 knownDeviceIds）
         Set<Long> removedDeviceIds = new HashSet<>(knownDeviceIds);
         removedDeviceIds.removeAll(currentDeviceIds);
 
@@ -88,9 +88,12 @@ public class IotModbusTcpConfigCacheService {
         for (Long deviceId : removedDeviceIds) {
             log.info("[cleanupRemovedDevices][清理已删除设备: {}]", deviceId);
             configCache.remove(deviceId);
-            knownDeviceIds.remove(deviceId);
             cleanupAction.accept(deviceId);
         }
+
+        // 3. 更新已知设备 ID 集合为当前有效的设备 ID
+        knownDeviceIds.clear();
+        knownDeviceIds.addAll(currentDeviceIds);
     }
 
 }

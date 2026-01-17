@@ -117,9 +117,9 @@ yudao:
           keep-alive-timeout-seconds: 300      # 保持连接超时时间（秒）
           ssl-enabled: false                   # 是否启用 SSL（wss://）
           sub-protocol: mqtt                   # WebSocket 子协议
-        # TODO @AI：modbus-tcp 组件配置待补充
         modbus-tcp:
           enabled: true
+          config-refresh-interval: 30  # 配置刷新间隔（秒）
 
 --- #################### 日志相关配置 ####################
 

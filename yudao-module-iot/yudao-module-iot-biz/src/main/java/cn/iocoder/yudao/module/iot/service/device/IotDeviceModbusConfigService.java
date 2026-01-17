@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
 import jakarta.validation.Valid;
@@ -44,14 +42,6 @@ public interface IotDeviceModbusConfigService {
      * @return 设备 Modbus 连接配置
      */
     IotDeviceModbusConfigDO getDeviceModbusConfigByDeviceId(Long deviceId);
-
-    /**
-     * 获得设备 Modbus 连接配置分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 设备 Modbus 连接配置分页
-     */
-    PageResult<IotDeviceModbusConfigDO> getDeviceModbusConfigPage(IotDeviceModbusConfigPageReqVO pageReqVO);
 
     /**
      * 获得所有启用的 Modbus 连接配置列表

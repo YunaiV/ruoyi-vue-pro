@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceModbusConfigMapper;
@@ -70,11 +68,6 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
     @Override
     public IotDeviceModbusConfigDO getDeviceModbusConfigByDeviceId(Long deviceId) {
         return modbusConfigMapper.selectByDeviceId(deviceId);
-    }
-
-    @Override
-    public PageResult<IotDeviceModbusConfigDO> getDeviceModbusConfigPage(IotDeviceModbusConfigPageReqVO pageReqVO) {
-        return modbusConfigMapper.selectPage(pageReqVO);
     }
 
     @Override

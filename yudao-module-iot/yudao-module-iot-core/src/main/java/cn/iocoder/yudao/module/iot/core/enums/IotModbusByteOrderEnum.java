@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums.device;
+package cn.iocoder.yudao.module.iot.core.enums;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-// TODO @AI：如果枚举需要共享，可以拿到 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-core/src/main/java/cn/iocoder/yudao/module/iot/core/enums 里
 /**
  * IoT Modbus 字节序枚举
  *
@@ -45,13 +44,6 @@ public enum IotModbusByteOrderEnum implements ArrayValuable<String> {
         return ARRAYS;
     }
 
-    // TODO @AI：如果不需要，可以删除掉这个方法；
-    /**
-     * 根据字节序获取枚举
-     *
-     * @param order 字节序
-     * @return 枚举
-     */
     public static IotModbusByteOrderEnum getByOrder(String order) {
         return Arrays.stream(values())
                 .filter(e -> e.getOrder().equals(order))

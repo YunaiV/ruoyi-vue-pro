@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums.device;
+package cn.iocoder.yudao.module.iot.core.enums;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-// TODO @AI：如果枚举需要共享，可以拿到 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-core/src/main/java/cn/iocoder/yudao/module/iot/core/enums 里
 /**
  * IoT Modbus 功能码枚举
  *
@@ -51,12 +50,6 @@ public enum IotModbusFunctionCodeEnum implements ArrayValuable<Integer> {
         return ARRAYS;
     }
 
-    /**
-     * 根据功能码获取枚举
-     *
-     * @param code 功能码
-     * @return 枚举
-     */
     public static IotModbusFunctionCodeEnum valueOf(Integer code) {
         return Arrays.stream(values())
                 .filter(e -> e.getCode().equals(code))

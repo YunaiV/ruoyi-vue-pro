@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums.device;
+package cn.iocoder.yudao.module.iot.core.enums;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-// TODO @AI：如果枚举需要共享，可以拿到 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-core/src/main/java/cn/iocoder/yudao/module/iot/core/enums 里
 /**
  * IoT Modbus 原始数据类型枚举
  *
@@ -23,7 +22,7 @@ public enum IotModbusRawDataTypeEnum implements ArrayValuable<String> {
     FLOAT("FLOAT", "32 位浮点数", 2),
     DOUBLE("DOUBLE", "64 位浮点数", 4),
     BOOLEAN("BOOLEAN", "布尔值（用于线圈）", 1),
-    STRING("STRING", "字符串", -1); // -1 表示可变长度
+    STRING("STRING", "字符串", null); // null 表示可变长度
 
     public static final String[] ARRAYS = Arrays.stream(values())
             .map(IotModbusRawDataTypeEnum::getType)
@@ -37,24 +36,16 @@ public enum IotModbusRawDataTypeEnum implements ArrayValuable<String> {
      * 名称
      */
     private final String name;
-    // TODO @AI：去掉 default 会好点。null 表示可变；
     /**
-     * 默认寄存器数量（-1 表示可变）
+     * 寄存器数量（null 表示可变）
      */
-    private final Integer defaultRegisterCount;
+    private final Integer registerCount;
 
     @Override
     public String[] array() {
         return ARRAYS;
     }
 
-    // TODO @AI：如果不用，可以删除掉
-    /**
-     * 根据类型获取枚举
-     *
-     * @param type 类型
-     * @return 枚举
-     */
     public static IotModbusRawDataTypeEnum getByType(String type) {
         return Arrays.stream(values())
                 .filter(e -> e.getType().equals(type))

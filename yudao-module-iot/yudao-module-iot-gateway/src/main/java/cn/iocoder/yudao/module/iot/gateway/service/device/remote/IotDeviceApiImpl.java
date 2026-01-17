@@ -36,19 +36,12 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     private IotGatewayProperties gatewayProperties;
 
     private RestTemplate restTemplate;
-    private RestTemplate modbusRestTemplate;
 
     @PostConstruct
     public void init() {
         IotGatewayProperties.RpcProperties rpc = gatewayProperties.getRpc();
         restTemplate = new RestTemplateBuilder()
-                .rootUri(rpc.getUrl() + "/rpc-api/iot/device")
-                .readTimeout(rpc.getReadTimeout())
-                .connectTimeout(rpc.getConnectTimeout())
-                .build();
-        // TODO @AI：继续复用 rpc.getConnectTimeout()；不需要独立 modbusRestTemplate
-        modbusRestTemplate = new RestTemplateBuilder()
-                .rootUri(rpc.getUrl() + "/rpc-api/iot/modbus")
+                .rootUri(rpc.getUrl())
                 .readTimeout(rpc.getReadTimeout())
                 .connectTimeout(rpc.getConnectTimeout())
                 .build();
@@ -56,25 +49,25 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
 
     @Override
     public CommonResult<Boolean> authDevice(IotDeviceAuthReqDTO authReqDTO) {
-        return doPost(restTemplate, "/auth", authReqDTO, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/device/auth", authReqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override
     public CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO getReqDTO) {
-        return doPost(restTemplate, "/get", getReqDTO, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/device/get", getReqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override
     public CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs() {
-        return doPost(modbusRestTemplate, "/enabled-configs", null, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/modbus/enabled-configs", null, new ParameterizedTypeReference<>() { });
     }
 
-    private <T, R> CommonResult<R> doPost(RestTemplate template, String url, T body,
+    private <T, R> CommonResult<R> doPost(String url, T body,
                                           ParameterizedTypeReference<CommonResult<R>> responseType) {
         try {
             // 请求
             HttpEntity<T> requestEntity = new HttpEntity<>(body);
-            ResponseEntity<CommonResult<R>> response = template.exchange(
+            ResponseEntity<CommonResult<R>> response = restTemplate.exchange(
                     url, HttpMethod.POST, requestEntity, responseType);
             // 响应
             CommonResult<R> result = response.getBody();

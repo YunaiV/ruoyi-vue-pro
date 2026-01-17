@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -101,23 +103,15 @@ public class IotModbusTcpDownstreamHandler {
      * 查找点位配置
      */
     private IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
-        if (config.getPoints() == null) {
-            return null;
-        }
-        // TODO @AI：hutool findOne？
-        return config.getPoints().stream()
-                .filter(p -> identifier.equals(p.getIdentifier()))
-                .findFirst()
-                .orElse(null);
+        return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
     }
 
     /**
      * 检查功能码是否支持写操作
      */
     private boolean isWritable(Integer functionCode) {
-        // TODO @AI：能不能通过 枚举优化下？
-        // 功能码 1（ReadCoils）和 3（ReadHoldingRegisters）支持写操作
-        return functionCode != null && (functionCode == 1 || functionCode == 3);
+        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
+        return functionCodeEnum != null && Boolean.TRUE.equals(functionCodeEnum.getWritable());
     }
 
 }

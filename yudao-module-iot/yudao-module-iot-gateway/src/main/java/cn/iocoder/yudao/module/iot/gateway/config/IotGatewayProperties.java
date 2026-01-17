@@ -520,7 +520,7 @@ public class IotGatewayProperties {
         /**
          * 配置刷新间隔（秒）
          */
-        // TODO @AI：需要校验下非空；
+        @NotNull(message = "配置刷新间隔不能为空")
         private Integer configRefreshInterval = 30;
 
     }

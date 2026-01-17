@@ -9,15 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT Modbus TCP 下行消息订阅器
- *
- * 负责：
- * 1. 订阅消息总线的下行消息
- * 2. 将属性设置消息转发给下行处理器
+ * IoT Modbus TCP 下行消息订阅器：订阅消息总线的下行消息并转发给处理器
  *
  * @author 芋道源码
  */
-// TODO @AI：希望它的初始化，在 configuration 里；
 @RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {

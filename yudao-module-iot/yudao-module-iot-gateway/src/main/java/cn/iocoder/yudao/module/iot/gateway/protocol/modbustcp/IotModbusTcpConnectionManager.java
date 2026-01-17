@@ -27,8 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class IotModbusTcpConnectionManager {
 
-    // TODO @AI：iot:modbus-tcp:connection:
-    private static final String LOCK_KEY_PREFIX = "iot:modbus:connection:";
+    private static final String LOCK_KEY_PREFIX = "iot:modbus-tcp:connection:";
 
     private final RedissonClient redissonClient;
     private final Vertx vertx;
@@ -56,11 +55,7 @@ public class IotModbusTcpConnectionManager {
         // 2. 情况一：连接已存在，添加设备引用
         ModbusConnection connection = connectionPool.get(connectionKey);
         if (connection != null) {
-            // 添加设备引用
             connection.addDevice(config.getDeviceId(), config.getSlaveId());
-            // 更新连接参数（取最小值）
-            // TODO @AI：（不确定）如果后续最小值被移除后，是不是无法灰度到上一个最小值？
-            connection.updateParams(config.getTimeout(), config.getRetryInterval());
             return;
         }
 
@@ -86,22 +81,17 @@ public class IotModbusTcpConnectionManager {
      * 创建 Modbus TCP 连接
      */
     private ModbusConnection createConnection(IotModbusDeviceConfigRespDTO config, RLock lock) throws Exception {
-        // 创建 TCP 连接
-        // TODO @AI：需要重连么？
+        // 1. 创建 TCP 连接
         TCPMasterConnection tcpConnection = new TCPMasterConnection(InetAddress.getByName(config.getIp()));
         tcpConnection.setPort(config.getPort());
         tcpConnection.setTimeout(config.getTimeout());
         tcpConnection.connect();
 
-        // 创建 Modbus 连接对象
-        ModbusConnection connection = new ModbusConnection();
-        // TODO @AI：链式调用，简化下；
-        connection.setConnectionKey(buildConnectionKey(config.getIp(), config.getPort()));
-        connection.setTcpConnection(tcpConnection);
-        connection.setLock(lock);
-        connection.setTimeout(config.getTimeout());
-        connection.setRetryInterval(config.getRetryInterval());
-        connection.setContext(vertx.getOrCreateContext());
+        // 2. 创建 Modbus 连接对象
+        ModbusConnection connection = new ModbusConnection()
+                .setConnectionKey(buildConnectionKey(config.getIp(), config.getPort()))
+                .setTcpConnection(tcpConnection).setLock(lock).setContext(vertx.getOrCreateContext())
+                .setTimeout(config.getTimeout()).setRetryInterval(config.getRetryInterval());
         connection.addDevice(config.getDeviceId(), config.getSlaveId());
         return connection;
     }
@@ -162,9 +152,10 @@ public class IotModbusTcpConnectionManager {
             if (connection.getTcpConnection() != null) {
                 connection.getTcpConnection().close();
             }
-            // TODO @AI：（不确定）是不是要当前线程？还是当前进程就 ok 了。
-            if (connection.getLock() != null && connection.getLock().isHeldByCurrentThread()) {
-                connection.getLock().unlock();
+            // 安全释放锁：先检查锁存在且被锁定，再检查是否当前线程持有
+            RLock lock = connection.getLock();
+            if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
+                lock.unlock();
             }
             log.info("[closeConnection][关闭 Modbus 连接: {}]", connectionKey);
         } catch (Exception e) {
@@ -218,16 +209,6 @@ public class IotModbusTcpConnectionManager {
 
         public Integer getSlaveId(Long deviceId) {
             return deviceSlaveMap.get(deviceId);
-        }
-
-        public void updateParams(Integer timeout, Integer retryInterval) {
-            // 取最小值
-            if (timeout != null && (this.timeout == null || timeout < this.timeout)) {
-                this.timeout = timeout;
-            }
-            if (retryInterval != null && (this.retryInterval == null || retryInterval < this.retryInterval)) {
-                this.retryInterval = retryInterval;
-            }
         }
 
         /**

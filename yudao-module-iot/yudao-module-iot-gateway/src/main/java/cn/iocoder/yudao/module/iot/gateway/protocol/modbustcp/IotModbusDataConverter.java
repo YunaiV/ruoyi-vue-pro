@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusByteOrderEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusRawDataTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -79,21 +82,25 @@ public class IotModbusDataConverter {
      */
     @SuppressWarnings("EnhancedSwitchMigration")
     private Number parseRawValue(int[] rawValues, String rawDataType, String byteOrder) {
-        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；（保留现有实现，字符串比较已足够清晰）
-        switch (rawDataType.toUpperCase()) {
-            case "BOOLEAN":
+        IotModbusRawDataTypeEnum dataTypeEnum = IotModbusRawDataTypeEnum.getByType(rawDataType);
+        if (dataTypeEnum == null) {
+            log.warn("[parseRawValue][不支持的数据类型: {}]", rawDataType);
+            return rawValues[0];
+        }
+        switch (dataTypeEnum) {
+            case BOOLEAN:
                 return rawValues[0] != 0 ? 1 : 0;
-            case "INT16":
+            case INT16:
                 return (short) rawValues[0];
-            case "UINT16":
+            case UINT16:
                 return rawValues[0] & 0xFFFF;
-            case "INT32":
+            case INT32:
                 return parseInt32(rawValues, byteOrder);
-            case "UINT32":
+            case UINT32:
                 return parseUint32(rawValues, byteOrder);
-            case "FLOAT":
+            case FLOAT:
                 return parseFloat(rawValues, byteOrder);
-            case "DOUBLE":
+            case DOUBLE:
                 return parseDouble(rawValues, byteOrder);
             default:
                 log.warn("[parseRawValue][不支持的数据类型: {}]", rawDataType);
@@ -148,24 +155,24 @@ public class IotModbusDataConverter {
     /**
      * 根据字节序重排字节
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private byte[] reorderBytes(byte[] bytes, String byteOrder) {
-        // 大端序，不需要调整
-        // TODO @AI：StrUtil.equals；null 要抛出异常；（保留 null 默认为大端序的兼容逻辑）
-        if (byteOrder == null || "ABCD".equals(byteOrder) || "AB".equals(byteOrder)) {
+        IotModbusByteOrderEnum byteOrderEnum = IotModbusByteOrderEnum.getByOrder(byteOrder);
+        // null 或者大端序，不需要调整
+        if (ObjectUtils.equalsAny(byteOrderEnum, null, IotModbusByteOrderEnum.ABCD, IotModbusByteOrderEnum.AB)) {
             return bytes;
         }
 
         // 其他字节序调整
         byte[] result = new byte[bytes.length];
-        switch (byteOrder.toUpperCase()) {
-            // TODO @AI：走枚举；sortOrder；（参考 IotModbusByteOrderEnum 枚举定义）
-            case "BA": // 小端序（16 位）
+        switch (byteOrderEnum) {
+            case BA: // 小端序（16 位）
                 if (bytes.length >= 2) {
                     result[0] = bytes[1];
                     result[1] = bytes[0];
                 }
                 break;
-            case "CDAB": // 大端字交换（32 位）
+            case CDAB: // 大端字交换（32 位）
                 if (bytes.length >= 4) {
                     result[0] = bytes[2];
                     result[1] = bytes[3];
@@ -173,7 +180,7 @@ public class IotModbusDataConverter {
                     result[3] = bytes[1];
                 }
                 break;
-            case "DCBA": // 小端序（32 位）
+            case DCBA: // 小端序（32 位）
                 if (bytes.length >= 4) {
                     result[0] = bytes[3];
                     result[1] = bytes[2];
@@ -181,7 +188,7 @@ public class IotModbusDataConverter {
                     result[3] = bytes[0];
                 }
                 break;
-            case "BADC": // 小端字交换（32 位）
+            case BADC: // 小端字交换（32 位）
                 if (bytes.length >= 4) {
                     result[0] = bytes[1];
                     result[1] = bytes[0];
@@ -198,20 +205,24 @@ public class IotModbusDataConverter {
     /**
      * 编码为寄存器值
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private int[] encodeToRegisters(BigDecimal rawValue, String rawDataType, String byteOrder, int registerCount) {
-        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；（保留现有实现，字符串比较已足够清晰）
-        switch (rawDataType.toUpperCase()) {
-            case "BOOLEAN":
+        IotModbusRawDataTypeEnum dataTypeEnum = IotModbusRawDataTypeEnum.getByType(rawDataType);
+        if (dataTypeEnum == null) {
+            return new int[]{rawValue.intValue()};
+        }
+        switch (dataTypeEnum) {
+            case BOOLEAN:
                 return new int[]{rawValue.intValue() != 0 ? 1 : 0};
-            case "INT16":
-            case "UINT16":
+            case INT16:
+            case UINT16:
                 return new int[]{rawValue.intValue() & 0xFFFF};
-            case "INT32":
-            case "UINT32":
+            case INT32:
+            case UINT32:
                 return encodeInt32(rawValue.intValue(), byteOrder);
-            case "FLOAT":
+            case FLOAT:
                 return encodeFloat(rawValue.floatValue(), byteOrder);
-            case "DOUBLE":
+            case DOUBLE:
                 return encodeDouble(rawValue.doubleValue(), byteOrder);
             default:
                 return new int[]{rawValue.intValue()};
@@ -247,20 +258,24 @@ public class IotModbusDataConverter {
     /**
      * 格式化返回值
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private Object formatValue(BigDecimal value, String rawDataType) {
-        // TODO @AI：是不是可以用枚举？复用 IotModbusRawDataTypeEnum 里的；（保留现有实现，字符串比较已足够清晰）
-        switch (rawDataType.toUpperCase()) {
-            case "BOOLEAN":
+        IotModbusRawDataTypeEnum dataTypeEnum = IotModbusRawDataTypeEnum.getByType(rawDataType);
+        if (dataTypeEnum == null) {
+            return value;
+        }
+        switch (dataTypeEnum) {
+            case BOOLEAN:
                 return value.intValue() != 0;
-            case "INT16":
-            case "INT32":
+            case INT16:
+            case INT32:
                 return value.intValue();
-            case "UINT16":
-            case "UINT32":
+            case UINT16:
+            case UINT32:
                 return value.longValue();
-            case "FLOAT":
+            case FLOAT:
                 return value.floatValue();
-            case "DOUBLE":
+            case DOUBLE:
                 return value.doubleValue();
             default:
                 return value;

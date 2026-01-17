@@ -10,14 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO @AI：注释可以简化下
 /**
- * IoT Modbus TCP 上行数据处理器
- *
- * 负责：
- * 1. 将 Modbus 读取的原始值转换为物模型属性值
- * 2. 构造属性上报消息
- * 3. 发送消息到消息总线
+ * IoT Modbus TCP 上行数据处理器：将原始值转换为物模型属性值并上报
  *
  * @author 芋道源码
  */

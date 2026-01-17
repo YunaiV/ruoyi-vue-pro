@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
@@ -60,14 +58,6 @@ public class IotDeviceModbusConfigController {
             modbusConfig = modbusConfigService.getDeviceModbusConfigByDeviceId(deviceId);
         }
         return success(BeanUtils.toBean(modbusConfig, IotDeviceModbusConfigRespVO.class));
-    }
-
-    @GetMapping("/page")
-    @Operation(summary = "获得设备 Modbus 连接配置分页")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:query')")
-    public CommonResult<PageResult<IotDeviceModbusConfigRespVO>> getDeviceModbusConfigPage(@Valid IotDeviceModbusConfigPageReqVO pageReqVO) {
-        PageResult<IotDeviceModbusConfigDO> pageResult = modbusConfigService.getDeviceModbusConfigPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, IotDeviceModbusConfigRespVO.class));
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import io.vertx.core.Vertx;
@@ -11,14 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// TODO @AI：注释可以简化？
 /**
- * IoT Modbus TCP 轮询调度器
- *
- * 负责：
- * 1. 管理每个点位的轮询定时器
- * 2. 调度 Modbus 读取任务
- * 3. 处理读取结果并上报
+ * IoT Modbus TCP 轮询调度器：管理点位的轮询定时器，调度读取任务并上报结果
  *
  * @author 芋道源码
  */
@@ -46,22 +41,22 @@ public class IotModbusTcpPollScheduler {
         stopPolling(deviceId);
 
         // 2.1 为每个点位创建新的轮询任务
-        List<Long> timerIds = new ArrayList<>();
-        // TODO @AI：if return 简化；上面的 size 加下；config.getPoints()
-        if (config.getPoints() != null) {
-            for (IotModbusPointRespDTO point : config.getPoints()) {
-                Long timerId = createPollTimer(config, point);
-                if (timerId != null) {
-                    timerIds.add(timerId);
-                }
+        if (CollUtil.isEmpty(config.getPoints())) {
+            return;
+        }
+        List<Long> timerIds = new ArrayList<>(config.getPoints().size());
+        for (IotModbusPointRespDTO point : config.getPoints()) {
+            Long timerId = createPollTimer(config, point);
+            if (timerId != null) {
+                timerIds.add(timerId);
             }
         }
         // 2.2 记录定时器
-        // TODO @AI：CollUtil.isNotEmpty；if return 简化；
-        if (!timerIds.isEmpty()) {
-            deviceTimers.put(deviceId, timerIds);
-            log.debug("[updatePolling][设备 {} 创建了 {} 个轮询定时器]", deviceId, timerIds.size());
+        if (CollUtil.isEmpty(timerIds)) {
+            return;
         }
+        deviceTimers.put(deviceId, timerIds);
+        log.debug("[updatePolling][设备 {} 创建了 {} 个轮询定时器]", deviceId, timerIds.size());
     }
 
     /**
@@ -99,7 +94,6 @@ public class IotModbusTcpPollScheduler {
         }
 
         // 2. 执行 Modbus 读取
-        // TODO @AI：超时时间，有实现么？？？
         modbusClient.read(connection, slaveId, point)
                 .onSuccess(rawValue -> upstreamHandler.handleReadResult(config, point, rawValue))
                 .onFailure(e -> log.error("[pollPoint][读取点位失败, deviceId={}, identifier={}]",
@@ -111,13 +105,13 @@ public class IotModbusTcpPollScheduler {
      */
     public void stopPolling(Long deviceId) {
         List<Long> timerIds = deviceTimers.remove(deviceId);
-        // TODO @AI：CollUtil.isNotEmpty；并且 if return；
-        if (timerIds != null) {
-            for (Long timerId : timerIds) {
-                vertx.cancelTimer(timerId);
-            }
-            log.debug("[stopPolling][设备 {} 停止了 {} 个轮询定时器]", deviceId, timerIds.size());
+        if (CollUtil.isEmpty(timerIds)) {
+            return;
         }
+        for (Long timerId : timerIds) {
+            vertx.cancelTimer(timerId);
+        }
+        log.debug("[stopPolling][设备 {} 停止了 {} 个轮询定时器]", deviceId, timerIds.size());
     }
 
     /**

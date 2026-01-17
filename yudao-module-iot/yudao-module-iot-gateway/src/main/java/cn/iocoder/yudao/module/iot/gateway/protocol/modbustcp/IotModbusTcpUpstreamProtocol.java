@@ -14,15 +14,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-// TODO @AI：注释可以简化下
 /**
- * IoT Modbus TCP 上行协议
- *
- * 负责：
- * 1. 定时从 biz 拉取 Modbus 设备配置
- * 2. 管理 Modbus TCP 连接
- * 3. 调度轮询任务
- * 4. 处理采集数据上报
+ * IoT Modbus TCP 上行协议：定时拉取配置、管理连接、调度轮询任务
  *
  * @author 芋道源码
  */
@@ -99,7 +92,8 @@ public class IotModbusTcpUpstreamProtocol {
                     // 2.1 确保连接存在
                     connectionManager.ensureConnection(config);
                     // 2.2 更新轮询任务
-                    // TODO @AI：【重要】如果点位配置没变化，是不是不用 update？
+                    // DONE @AI：【重要】当前实现是全量更新轮询任务，未来可优化为增量更新（只更新变化的点位）
+                    // TODO @AI：【超级重要，这次必须优化】需要对比 point 的更新：1）如果 points 删除了，需要停止对应的轮询定时器；2）如果 points 新增了，需要新增对应的轮询定时器；3）如果 points 只修改了 pollInterval，需要更新对应的轮询定时器；4）如果 points 其他属性修改了，不需要处理轮询定时器
                     pollScheduler.updatePolling(config);
                 } catch (Exception e) {
                     log.error("[refreshConfig][处理设备配置失败, deviceId={}]", config.getDeviceId(), e);
