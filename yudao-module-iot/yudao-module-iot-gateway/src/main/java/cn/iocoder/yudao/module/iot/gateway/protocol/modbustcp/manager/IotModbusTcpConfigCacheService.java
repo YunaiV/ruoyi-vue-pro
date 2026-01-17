@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;

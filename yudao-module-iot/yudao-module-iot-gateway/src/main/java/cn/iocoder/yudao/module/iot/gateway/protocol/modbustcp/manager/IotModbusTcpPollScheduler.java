@@ -1,8 +1,10 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.router.IotModbusTcpUpstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client.IotModbusTcpClient;
 import io.vertx.core.Vertx;
 import lombok.AllArgsConstructor;
 import lombok.Data;

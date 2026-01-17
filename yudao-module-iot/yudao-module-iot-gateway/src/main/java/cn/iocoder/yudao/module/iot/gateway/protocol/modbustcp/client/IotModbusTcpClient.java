@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConnectionManager;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.procimg.InputRegister;
@@ -12,7 +13,9 @@ import io.vertx.core.Future;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT Modbus TCP 客户端，负责：
+ * IoT Modbus TCP 客户端
+ * <p>
+ * 封装 Modbus 协议读写操作：
  * 1. 封装 Modbus 读/写操作
  * 2. 根据功能码，执行对应的 Modbus 请求
  *

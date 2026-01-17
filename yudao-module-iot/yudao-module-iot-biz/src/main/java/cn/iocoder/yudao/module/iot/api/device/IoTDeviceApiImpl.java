@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,11 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/modbus/enabled-configs")
     @PermitAll
     public CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs() {
+        // TODO @芋艿：临时 mock 数据，用于测试 ModbusTcpSlaveSimulator
+        if (true) {
+            return success(buildMockModbusConfigs());
+        }
+
         // 1. 获取所有启用的 Modbus 连接配置
         List<IotDeviceModbusConfigDO> configList = modbusConfigService.getEnabledDeviceModbusConfigList();
         if (CollUtil.isEmpty(configList)) {
@@ -103,6 +109,76 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
             result.add(configDTO);
         }
         return success(result);
+    }
+
+    /**
+     * 构建 Mock Modbus 配置，对接 ModbusTcpSlaveSimulator
+     *
+     * 设备：productKey=4aymZgOTOOCrDKRT, deviceName=small
+     * 物模型字段：width, height, oneThree
+     */
+    private List<IotModbusDeviceConfigRespDTO> buildMockModbusConfigs() {
+        List<IotModbusDeviceConfigRespDTO> configs = new ArrayList<>();
+
+        // 设备配置
+        IotModbusDeviceConfigRespDTO config = new IotModbusDeviceConfigRespDTO();
+        config.setDeviceId(1L);
+        config.setProductKey("4aymZgOTOOCrDKRT");
+        config.setDeviceName("small");
+        config.setIp("127.0.0.1");
+        config.setPort(5020); // 对应 ModbusTcpSlaveSimulator 的端口
+        config.setSlaveId(1);
+        config.setTimeout(3000);
+        config.setRetryInterval(5000);
+
+        // 点位配置（对应物模型字段：width, height, oneThree）
+        List<IotModbusPointRespDTO> points = new ArrayList<>();
+
+        // 点位 1：width - 读取保持寄存器地址 0（功能码 03）
+        IotModbusPointRespDTO point1 = new IotModbusPointRespDTO();
+        point1.setId(1L);
+        point1.setIdentifier("width");
+        point1.setName("宽度");
+        point1.setFunctionCode(3); // 读保持寄存器
+        point1.setRegisterAddress(0);
+        point1.setRegisterCount(1);
+        point1.setByteOrder("AB");
+        point1.setRawDataType("INT16");
+        point1.setScale(BigDecimal.ONE);
+        point1.setPollInterval(3000); // 3 秒轮询
+        points.add(point1);
+
+        // 点位 2：height - 读取保持寄存器地址 1（功能码 03）
+        IotModbusPointRespDTO point2 = new IotModbusPointRespDTO();
+        point2.setId(2L);
+        point2.setIdentifier("height");
+        point2.setName("高度");
+        point2.setFunctionCode(3); // 读保持寄存器
+        point2.setRegisterAddress(1);
+        point2.setRegisterCount(1);
+        point2.setByteOrder("AB");
+        point2.setRawDataType("INT16");
+        point2.setScale(BigDecimal.ONE);
+        point2.setPollInterval(3000); // 3 秒轮询
+        points.add(point2);
+
+        // 点位 3：oneThree - 读取保持寄存器地址 2（功能码 03）
+        IotModbusPointRespDTO point3 = new IotModbusPointRespDTO();
+        point3.setId(3L);
+        point3.setIdentifier("oneThree");
+        point3.setName("一三");
+        point3.setFunctionCode(3); // 读保持寄存器
+        point3.setRegisterAddress(2);
+        point3.setRegisterCount(1);
+        point3.setByteOrder("AB");
+        point3.setRawDataType("INT16");
+        point3.setScale(BigDecimal.ONE);
+        point3.setPollInterval(3000); // 3 秒轮询
+        points.add(point3);
+
+        config.setPoints(points);
+        configs.add(config);
+        return configs;
     }
 
 }

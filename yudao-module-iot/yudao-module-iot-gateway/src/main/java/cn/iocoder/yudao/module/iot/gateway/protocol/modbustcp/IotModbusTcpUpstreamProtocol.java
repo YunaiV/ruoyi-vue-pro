@@ -2,6 +2,10 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConfigCacheService;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpPollScheduler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.router.IotModbusTcpUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import jakarta.annotation.PostConstruct;

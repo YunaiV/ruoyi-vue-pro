@@ -1,13 +1,15 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.router;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -46,9 +48,8 @@ public class IotModbusTcpUpstreamHandler {
             log.debug("[handleReadResult][设备={}, 属性={}, 原始值={}, 转换值={}]",
                     config.getDeviceId(), point.getIdentifier(), rawValue, convertedValue);
             // 1.2 构造属性上报消息
-            Map<String, Object> params = new HashMap<>();
-            params.put(point.getIdentifier(), convertedValue);
-            IotDeviceMessage message = IotDeviceMessage.requestOf("thing.event.property.post", params);
+            Map<String, Object> params = MapUtil.of(point.getIdentifier(), convertedValue);
+            IotDeviceMessage message = IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), params);
 
             // 2. 发送到消息总线
             messageService.sendDeviceMessage(message, config.getProductKey(),

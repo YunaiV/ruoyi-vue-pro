@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -14,7 +14,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * IoT Modbus 数据转换器，负责：
+ * IoT Modbus 数据转换器
+ * <p>
+ * 负责 Modbus 原始寄存器值与物模型属性值的相互转换：
  * 1. 将 Modbus 原始寄存器值转换为物模型属性值
  * 2. 将物模型属性值转换为 Modbus 原始寄存器值
  *

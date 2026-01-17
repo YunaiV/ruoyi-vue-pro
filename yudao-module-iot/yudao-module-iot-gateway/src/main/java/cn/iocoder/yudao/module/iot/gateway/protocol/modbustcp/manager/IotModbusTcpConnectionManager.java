@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
@@ -16,7 +16,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * IoT Modbus TCP 连接管理器，负责：
+ * IoT Modbus TCP 连接管理器
+ * <p>
+ * 统一管理 Modbus TCP 连接：
  * 1. 管理 TCP 连接（相同 ip:port 共用连接）
  * 2. 分布式锁管理（连接级别），避免多节点重复创建连接
  * 3. 连接重试和故障恢复
