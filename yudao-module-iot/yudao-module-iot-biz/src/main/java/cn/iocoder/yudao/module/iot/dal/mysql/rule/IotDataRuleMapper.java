@@ -35,4 +35,8 @@ public interface IotDataRuleMapper extends BaseMapperX<IotDataRuleDO> {
         return selectList(IotDataRuleDO::getStatus, status);
     }
 
+    default IotDataRuleDO selectByName(String name) {
+        return selectOne(IotDataRuleDO::getName, name);
+    }
+
 }

@@ -29,4 +29,8 @@ public interface IotDataSinkMapper extends BaseMapperX<IotDataSinkDO> {
         return selectList(IotDataSinkDO::getStatus, status);
     }
 
+    default IotDataSinkDO selectByName(String name) {
+        return selectOne(IotDataSinkDO::getName, name);
+    }
+
 }
