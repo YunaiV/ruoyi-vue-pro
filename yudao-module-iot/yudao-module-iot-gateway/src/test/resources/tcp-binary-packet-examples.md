@@ -162,7 +162,7 @@ E8 AF 81 E6 88 90 E5 8A 9F 22
 ## 4. 编解码器标识
 
 ```java
-public static final String TYPE = "TCP_BINARY";
+public static final String TYPE = "TcpBinary";
 ```
 
 ## 5. 协议优势

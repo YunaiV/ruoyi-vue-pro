@@ -28,18 +28,9 @@ public class IotDeviceModbusConfigController {
 
     @PostMapping("/save")
     @Operation(summary = "保存设备 Modbus 连接配置")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:create')")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
     public CommonResult<Boolean> saveDeviceModbusConfig(@Valid @RequestBody IotDeviceModbusConfigSaveReqVO saveReqVO) {
         modbusConfigService.saveDeviceModbusConfig(saveReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除设备 Modbus 连接配置")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:delete')")
-    public CommonResult<Boolean> deleteDeviceModbusConfig(@RequestParam("id") Long id) {
-        modbusConfigService.deleteDeviceModbusConfig(id);
         return success(true);
     }
 
@@ -47,7 +38,7 @@ public class IotDeviceModbusConfigController {
     @Operation(summary = "获得设备 Modbus 连接配置")
     @Parameter(name = "id", description = "编号", example = "1024")
     @Parameter(name = "deviceId", description = "设备编号", example = "2048")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-config:query')")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<IotDeviceModbusConfigRespVO> getDeviceModbusConfig(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "deviceId", required = false) Long deviceId) {

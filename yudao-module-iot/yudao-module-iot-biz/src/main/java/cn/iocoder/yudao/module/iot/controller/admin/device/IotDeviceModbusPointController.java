@@ -30,14 +30,14 @@ public class IotDeviceModbusPointController {
 
     @PostMapping("/create")
     @Operation(summary = "创建设备 Modbus 点位配置")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-point:create')")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
     public CommonResult<Long> createDeviceModbusPoint(@Valid @RequestBody IotDeviceModbusPointSaveReqVO createReqVO) {
         return success(modbusPointService.createDeviceModbusPoint(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新设备 Modbus 点位配置")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-point:update')")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
     public CommonResult<Boolean> updateDeviceModbusPoint(@Valid @RequestBody IotDeviceModbusPointSaveReqVO updateReqVO) {
         modbusPointService.updateDeviceModbusPoint(updateReqVO);
         return success(true);
@@ -46,7 +46,7 @@ public class IotDeviceModbusPointController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除设备 Modbus 点位配置")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-point:delete')")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
     public CommonResult<Boolean> deleteDeviceModbusPoint(@RequestParam("id") Long id) {
         modbusPointService.deleteDeviceModbusPoint(id);
         return success(true);
@@ -55,7 +55,7 @@ public class IotDeviceModbusPointController {
     @GetMapping("/get")
     @Operation(summary = "获得设备 Modbus 点位配置")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-point:query')")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<IotDeviceModbusPointRespVO> getDeviceModbusPoint(@RequestParam("id") Long id) {
         IotDeviceModbusPointDO modbusPoint = modbusPointService.getDeviceModbusPoint(id);
         return success(BeanUtils.toBean(modbusPoint, IotDeviceModbusPointRespVO.class));
@@ -63,7 +63,7 @@ public class IotDeviceModbusPointController {
 
     @GetMapping("/page")
     @Operation(summary = "获得设备 Modbus 点位配置分页")
-    @PreAuthorize("@ss.hasPermission('iot:device-modbus-point:query')")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<PageResult<IotDeviceModbusPointRespVO>> getDeviceModbusPointPage(@Valid IotDeviceModbusPointPageReqVO pageReqVO) {
         PageResult<IotDeviceModbusPointDO> pageResult = modbusPointService.getDeviceModbusPointPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceModbusPointRespVO.class));

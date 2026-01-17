@@ -21,13 +21,6 @@ public interface IotDeviceModbusConfigService {
     void saveDeviceModbusConfig(@Valid IotDeviceModbusConfigSaveReqVO saveReqVO);
 
     /**
-     * 删除设备 Modbus 连接配置
-     *
-     * @param id 编号
-     */
-    void deleteDeviceModbusConfig(Long id);
-
-    /**
      * 获得设备 Modbus 连接配置
      *
      * @param id 编号

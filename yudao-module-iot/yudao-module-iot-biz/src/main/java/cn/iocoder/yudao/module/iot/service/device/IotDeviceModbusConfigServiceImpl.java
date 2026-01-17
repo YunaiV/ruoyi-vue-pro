@@ -11,9 +11,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MODBUS_CONFIG_NOT_EXISTS;
-
 /**
  * IoT 设备 Modbus 连接配置 Service 实现类
  *
@@ -43,20 +40,6 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
             IotDeviceModbusConfigDO updateObj = BeanUtils.toBean(saveReqVO, IotDeviceModbusConfigDO.class,
                     o -> o.setId(existConfig.getId()));
             modbusConfigMapper.updateById(updateObj);
-        }
-    }
-
-    @Override
-    public void deleteDeviceModbusConfig(Long id) {
-        // 校验存在
-        validateDeviceModbusConfigExists(id);
-        // 删除
-        modbusConfigMapper.deleteById(id);
-    }
-
-    private void validateDeviceModbusConfigExists(Long id) {
-        if (modbusConfigMapper.selectById(id) == null) {
-            throw exception(DEVICE_MODBUS_CONFIG_NOT_EXISTS);
         }
     }
 

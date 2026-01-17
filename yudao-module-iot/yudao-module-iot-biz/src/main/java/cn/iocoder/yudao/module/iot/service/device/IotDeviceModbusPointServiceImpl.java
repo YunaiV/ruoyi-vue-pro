@@ -70,7 +70,8 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
         validateDeviceModbusPointUnique(updateReqVO.getDeviceId(), thingModel.getIdentifier(), updateReqVO.getId());
 
         // 2. 更新
-        IotDeviceModbusPointDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceModbusPointDO.class);
+        IotDeviceModbusPointDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceModbusPointDO.class,
+                o -> o.setIdentifier(thingModel.getIdentifier()).setName(thingModel.getName()));
         modbusPointMapper.updateById(updateObj);
     }
 

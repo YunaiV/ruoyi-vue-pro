@@ -161,7 +161,7 @@ TCP JSON 格式协议采用纯 JSON 格式进行数据传输，具有以下特�
 ## 4. 编解码器标识
 
 ```java
-public static final String TYPE = "TCP_JSON";
+public static final String TYPE = "TcpJson";
 ```
 
 ## 5. 协议优势

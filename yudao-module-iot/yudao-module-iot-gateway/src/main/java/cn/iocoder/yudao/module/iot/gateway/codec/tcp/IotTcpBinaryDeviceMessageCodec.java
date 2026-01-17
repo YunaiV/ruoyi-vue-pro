@@ -41,7 +41,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class IotTcpBinaryDeviceMessageCodec implements IotDeviceMessageCodec {
 
-    public static final String TYPE = "TCP_BINARY";
+    public static final String TYPE = "TcpBinary";
 
     /**
      * 协议魔术字，用于协议识别

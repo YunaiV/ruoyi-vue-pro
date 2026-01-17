@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IotTcpJsonDeviceMessageCodec implements IotDeviceMessageCodec {
 
-    public static final String TYPE = "TCP_JSON";
+    public static final String TYPE = "TcpJson";
 
     @Data
     @NoArgsConstructor
