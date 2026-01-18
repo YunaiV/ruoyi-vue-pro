@@ -6,8 +6,9 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqttws.router.IotMqttWsDownstreamHandler;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
 
 /**
  * IoT MQTT WebSocket 下行消息订阅器

@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.system.mq.producer.mail;
 
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Collection;
 

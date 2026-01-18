@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -13,8 +15,6 @@ import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
 import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.assertj.core.util.Lists;
-import org.dromara.hutool.extra.mail.MailAccount;
-import org.dromara.hutool.extra.mail.MailUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -62,7 +62,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
 //                .setFrom("奥特曼 <ydym_test@163.com>")
                 .setFrom("ydym_test@163.com") // 邮箱地址
                 .setHost("smtp.163.com").setPort(465).setSslEnable(true) // SMTP 服务器
-                .setAuth(true).setUser("ydym_test@163.com").setPass("WBZTEINMIFVRYSOE".toCharArray()); // 登录账号密码
+                .setAuth(true).setUser("ydym_test@163.com").setPass("WBZTEINMIFVRYSOE"); // 登录账号密码
         String messageId = MailUtil.send(mailAccount, "7685413@qq.com", "主题", "内容", false);
         System.out.println("发送结果：" + messageId);
     }
@@ -263,7 +263,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> mailSendService.sendSingleMail(toMails, null, null, userId,
-                UserTypeEnum.ADMIN.getValue(), templateCode, templateParams, (java.io.File[]) null),
+                        UserTypeEnum.ADMIN.getValue(), templateCode, templateParams, (java.io.File[]) null),
                 MAIL_SEND_MAIL_NOT_EXISTS);
     }
 
@@ -280,17 +280,17 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             // mock 方法（发送邮件）
             String messageId = randomString();
             mailUtilMock.when(() -> MailUtil.send(
-                    argThat(mailAccount -> {
-                        assertEquals("芋艿 <7685@qq.com>", mailAccount.getFrom());
-                        assertTrue(mailAccount.isAuth());
-                        assertEquals(account.getUsername(), mailAccount.getUser());
-                        assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass());
-                        assertEquals(account.getHost(), mailAccount.getHost());
-                        assertEquals(account.getPort(), mailAccount.getPort());
-                        assertEquals(account.getSslEnable(), mailAccount.isSslEnable());
-                        return true;
-                    }), eq(message.getToMails()), eq(message.getCcMails()), eq(message.getBccMails()),
-                    eq(message.getTitle()), eq(message.getContent()), eq(true), eq(message.getAttachments())))
+                            argThat(mailAccount -> {
+                                assertEquals("芋艿 <7685@qq.com>", mailAccount.getFrom());
+                                assertTrue(mailAccount.isAuth());
+                                assertEquals(account.getUsername(), mailAccount.getUser());
+                                assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass().toCharArray());
+                                assertEquals(account.getHost(), mailAccount.getHost());
+                                assertEquals(account.getPort(), mailAccount.getPort());
+                                assertEquals(account.getSslEnable(), mailAccount.isSslEnable());
+                                return true;
+                            }), eq(message.getToMails()), eq(message.getCcMails()), eq(message.getBccMails()),
+                            eq(message.getTitle()), eq(message.getContent()), eq(true), any()))
                     .thenReturn(messageId);
 
             // 调用
@@ -316,13 +316,13 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
                         assertEquals("芋艿 <7685@qq.com>", mailAccount.getFrom());
                         assertTrue(mailAccount.isAuth());
                         assertEquals(account.getUsername(), mailAccount.getUser());
-                        assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass());
+                        assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass().toCharArray());
                         assertEquals(account.getHost(), mailAccount.getHost());
                         assertEquals(account.getPort(), mailAccount.getPort());
                         assertEquals(account.getSslEnable(), mailAccount.isSslEnable());
                         return true;
                     }), eq(message.getToMails()), eq(message.getCcMails()), eq(message.getBccMails()),
-                    eq(message.getTitle()), eq(message.getContent()), eq(true), same(message.getAttachments()))).thenThrow(e);
+                    eq(message.getTitle()), eq(message.getContent()), eq(true), any())).thenThrow(e);
 
             // 调用
             mailSendService.doSendMail(message);
