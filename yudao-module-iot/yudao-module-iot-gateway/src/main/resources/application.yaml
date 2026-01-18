@@ -96,6 +96,16 @@ yudao:
           ssl-cert-path: "classpath:certs/client.jks"
           ssl-key-path: "classpath:certs/client.jks"
         # ====================================
+        # 针对引入的 UDP 组件的配置
+        # ====================================
+        udp:
+          enabled: false                       # 是否启用 UDP
+          port: 8092                           # UDP 服务端口
+          receive-buffer-size: 65536           # 接收缓冲区大小（字节，默认 64KB）
+          send-buffer-size: 65536              # 发送缓冲区大小（字节，默认 64KB）
+          session-timeout-ms: 60000            # 会话超时时间（毫秒，默认 60 秒）
+          session-clean-interval-ms: 30000     # 会话清理间隔（毫秒，默认 30 秒）
+        # ====================================
         # 针对引入的 MQTT 组件的配置
         # ====================================
         mqtt:

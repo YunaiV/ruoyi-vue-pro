@@ -93,6 +93,11 @@ public class IotGatewayProperties {
          */
         private MqttWsProperties mqttWs;
 
+        /**
+         * UDP 组件配置
+         */
+        private UdpProperties udp;
+
     }
 
     @Data
@@ -500,6 +505,44 @@ public class IotGatewayProperties {
             private String trustStorePassword;
 
         }
+
+    }
+
+    @Data
+    public static class UdpProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务端口（默认 8092）
+         */
+        private Integer port = 8092;
+
+        /**
+         * 接收缓冲区大小（默认 64KB）
+         */
+        private Integer receiveBufferSize = 65536;
+
+        /**
+         * 发送缓冲区大小（默认 64KB）
+         */
+        private Integer sendBufferSize = 65536;
+
+        /**
+         * 会话超时时间（毫秒，默认 60 秒）
+         * <p>
+         * 用于清理不活跃的设备地址映射
+         */
+        private Long sessionTimeoutMs = 60000L;
+
+        /**
+         * 会话清理间隔（毫秒，默认 30 秒）
+         */
+        private Long sessionCleanIntervalMs = 30000L;
 
     }
 
