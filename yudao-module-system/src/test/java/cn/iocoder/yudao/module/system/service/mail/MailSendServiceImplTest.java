@@ -312,8 +312,17 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
 
             // mock 方法（发送邮件）
             Exception e = new NullPointerException("啦啦啦");
-            mailUtilMock.when(() -> MailUtil.send(any(MailAccount.class), any(), any(), any(),
-                    any(), any(), eq(true), any(java.io.File[].class))).thenThrow(e);
+            mailUtilMock.when(() -> MailUtil.send(argThat(mailAccount -> {
+                        assertEquals("芋艿 <7685@qq.com>", mailAccount.getFrom());
+                        assertTrue(mailAccount.isAuth());
+                        assertEquals(account.getUsername(), mailAccount.getUser());
+                        assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass());
+                        assertEquals(account.getHost(), mailAccount.getHost());
+                        assertEquals(account.getPort(), mailAccount.getPort());
+                        assertEquals(account.getSslEnable(), mailAccount.isSslEnable());
+                        return true;
+                    }), eq(message.getToMails()), eq(message.getCcMails()), eq(message.getBccMails()),
+                    eq(message.getTitle()), eq(message.getContent()), eq(true), same(message.getAttachments()))).thenThrow(e);
 
             // 调用
             mailSendService.doSendMail(message);
