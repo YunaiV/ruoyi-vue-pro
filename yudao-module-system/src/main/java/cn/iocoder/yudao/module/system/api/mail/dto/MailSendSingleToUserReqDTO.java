@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.system.api.mail.dto;
 
-import lombok.Data;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -46,5 +46,10 @@ public class MailSendSingleToUserReqDTO {
      * 邮件模板参数
      */
     private Map<String, Object> templateParams;
+
+    /**
+     * 附件
+     */
+    private File[] attachments;
 
 }
