@@ -30,6 +30,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -392,7 +393,23 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
                     }
                 });
             });
+
+            // 3. 更新最后触发时间
+            updateLastTriggerTime(sceneRule.getId());
         });
+    }
+
+    /**
+     * 更新规则场景的最后触发时间
+     *
+     * @param id 规则场景编号
+     */
+    private void updateLastTriggerTime(Long id) {
+        try {
+            sceneRuleMapper.updateById(new IotSceneRuleDO().setId(id).setLastTriggerTime(LocalDateTime.now()));
+        } catch (Exception e) {
+            log.error("[updateLastTriggerTime][规则场景编号({}) 更新最后触发时间异常]", id, e);
+        }
     }
 
     private IotSceneRuleServiceImpl getSelf() {

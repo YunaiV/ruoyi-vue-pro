@@ -21,12 +21,17 @@ public interface IotDataSinkMapper extends BaseMapperX<IotDataSinkDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotDataSinkDO>()
                 .likeIfPresent(IotDataSinkDO::getName, reqVO.getName())
                 .eqIfPresent(IotDataSinkDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(IotDataSinkDO::getType, reqVO.getType())
                 .betweenIfPresent(IotDataSinkDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(IotDataSinkDO::getId));
     }
 
     default List<IotDataSinkDO> selectListByStatus(Integer status) {
         return selectList(IotDataSinkDO::getStatus, status);
+    }
+
+    default IotDataSinkDO selectByName(String name) {
+        return selectOne(IotDataSinkDO::getName, name);
     }
 
 }

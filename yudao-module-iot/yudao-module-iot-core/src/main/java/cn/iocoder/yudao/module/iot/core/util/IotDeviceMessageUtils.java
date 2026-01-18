@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
@@ -65,6 +66,55 @@ public class IotDeviceMessageUtils {
         }  else if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
             Map<String, Object> params = (Map<String, Object>) message.getParams();
             return MapUtil.getStr(params, "state");
+        }
+        return null;
+    }
+
+    /**
+     * 判断消息中是否包含指定的标识符
+     *
+     * 对于不同消息类型的处理：
+     * - EVENT_POST/SERVICE_INVOKE：检查 params.identifier 是否匹配
+     * - STATE_UPDATE：检查 params.state 是否匹配
+     * - PROPERTY_POST：检查 params 中是否包含该属性 key
+     *
+     * @param message    消息
+     * @param identifier 要检查的标识符
+     * @return 是否包含
+     */
+    public static boolean containsIdentifier(IotDeviceMessage message, String identifier) {
+        if (message.getParams() == null || StrUtil.isBlank(identifier)) {
+            return false;
+        }
+        // EVENT_POST / SERVICE_INVOKE / STATE_UPDATE：使用原有逻辑
+        String messageIdentifier = getIdentifier(message);
+        if (messageIdentifier != null) {
+            return identifier.equals(messageIdentifier);
+        }
+        // PROPERTY_POST：检查 params 中是否包含该属性 key
+        if (StrUtil.equals(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
+            Map<String, Object> params = parseParamsToMap(message.getParams());
+            return params != null && params.containsKey(identifier);
+        }
+        return false;
+    }
+
+    /**
+     * 将 params 解析为 Map
+     *
+     * @param params 参数（可能是 Map 或 JSON 字符串）
+     * @return Map，解析失败返回 null
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> parseParamsToMap(Object params) {
+        if (params instanceof Map) {
+            return (Map<String, Object>) params;
+        }
+        if (params instanceof String) {
+            try {
+                return JsonUtils.parseObject((String) params, Map.class);
+            } catch (Exception ignored) {
+            }
         }
         return null;
     }

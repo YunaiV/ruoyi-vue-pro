@@ -16,8 +16,8 @@ import java.util.Arrays;
 public enum IotDataSinkTypeEnum implements ArrayValuable<Integer> {
 
     HTTP(1, "HTTP"),
-    TCP(2, "TCP"), // TODO @puhui999：待实现；
-    WEBSOCKET(3, "WebSocket"), // TODO @puhui999：待实现；
+    TCP(2, "TCP"),
+    WEBSOCKET(3, "WebSocket"),
 
     MQTT(10, "MQTT"), // TODO 待实现；
 

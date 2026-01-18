@@ -382,7 +382,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                     return;
                 }
                 // 2.2.2 如果存在，判断是否允许更新
-                if (updateSupport) {
+                if (!updateSupport) {
                     throw exception(DEVICE_KEY_EXISTS);
                 }
                 updateDevice(new IotDeviceSaveReqVO().setId(existDevice.getId())

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
@@ -145,6 +146,12 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                     IotDataSpecsDataTypeEnum.STRUCT.getDataType(), IotDataSpecsDataTypeEnum.ARRAY.getDataType())) {
                 // 特殊：STRUCT 和 ARRAY 类型，在 TDengine 里，有没对应数据类型，只能通过 JSON 来存储
                 properties.put((String) key, JsonUtils.toJsonString(value));
+            } else if (IotDataSpecsDataTypeEnum.DOUBLE.getDataType().equals(thingModel.getProperty().getDataType())) {
+                properties.put((String) key, Convert.toDouble(value));
+            } else if (IotDataSpecsDataTypeEnum.FLOAT.getDataType().equals(thingModel.getProperty().getDataType())) {
+                properties.put((String) key, Convert.toFloat(value));
+            } else if (IotDataSpecsDataTypeEnum.BOOL.getDataType().equals(thingModel.getProperty().getDataType())) {
+                properties.put((String) key, Convert.toByte(value));
             } else {
                 properties.put((String) key, value);
             }
