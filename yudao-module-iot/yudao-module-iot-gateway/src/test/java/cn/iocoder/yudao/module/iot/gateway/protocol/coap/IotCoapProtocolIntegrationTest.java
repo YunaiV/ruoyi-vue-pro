@@ -135,11 +135,14 @@ public class IotCoapProtocolIntegrationTest {
                 .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.EVENT_POST.getMethod())
                 .put("version", "1.0")
-                .put("identifier", "eat")
                 .put("params", MapUtil.builder()
-                        .put("width", 1)
-                        .put("height", "2")
-                        .put("oneThree", "3")
+                        .put("identifier", "eat")
+                        .put("value", MapUtil.builder()
+                                .put("width", 1)
+                                .put("height", "2")
+                                .put("oneThree", "3")
+                                .build())
+                        .put("time", System.currentTimeMillis())
                         .build())
                 .build());
 
