@@ -1,0 +1,91 @@
+package cn.iocoder.yudao.module.iot.gateway.protocol.coap;
+
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthResource;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapUpstreamTopicResource;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapUpstreamHandler;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.californium.core.CoapServer;
+import org.eclipse.californium.core.config.CoapConfig;
+import org.eclipse.californium.elements.config.Configuration;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * IoT 网关 CoAP 协议：接收设备上行消息
+ *
+ * 基于 Eclipse Californium 实现，支持：
+ * 1. 认证：POST /auth
+ * 2. 属性上报：POST /topic/sys/{productKey}/{deviceName}/thing/property/post
+ * 3. 事件上报：POST /topic/sys/{productKey}/{deviceName}/thing/event/{eventId}/post
+ *
+ * @author 芋道源码
+ */
+@Slf4j
+public class IotCoapUpstreamProtocol {
+
+    private final IotGatewayProperties.CoapProperties coapProperties;
+
+    private final IotCoapAuthHandler authHandler;
+    private final IotCoapUpstreamHandler upstreamHandler;
+
+    private CoapServer coapServer;
+
+    @Getter
+    private final String serverId;
+
+    public IotCoapUpstreamProtocol(IotGatewayProperties.CoapProperties coapProperties,
+                                   IotCoapAuthHandler authHandler,
+                                   IotCoapUpstreamHandler upstreamHandler) {
+        this.coapProperties = coapProperties;
+        this.authHandler = authHandler;
+        this.upstreamHandler = upstreamHandler;
+        this.serverId = IotDeviceMessageUtils.generateServerId(coapProperties.getPort());
+    }
+
+    @PostConstruct
+    public void start() {
+        try {
+            // 1.1 创建网络配置（Californium 3.x API）
+            Configuration config = Configuration.createStandardWithoutFile();
+            config.set(CoapConfig.COAP_PORT, coapProperties.getPort());
+            config.set(CoapConfig.MAX_MESSAGE_SIZE, coapProperties.getMaxMessageSize());
+            config.set(CoapConfig.ACK_TIMEOUT, coapProperties.getAckTimeout(), TimeUnit.MILLISECONDS);
+            config.set(CoapConfig.MAX_RETRANSMIT, coapProperties.getMaxRetransmit());
+            // 1.2 创建 CoAP 服务器
+            coapServer = new CoapServer(config);
+
+            // 2.1 添加 /auth 认证资源
+            IotCoapAuthResource authResource = new IotCoapAuthResource(this, authHandler);
+            coapServer.add(authResource);
+            // 2.2 添加 /topic 根资源（用于上行消息）
+            IotCoapUpstreamTopicResource topicResource = new IotCoapUpstreamTopicResource(this, upstreamHandler);
+            coapServer.add(topicResource);
+
+            // 3. 启动服务器
+            coapServer.start();
+            log.info("[start][IoT 网关 CoAP 协议启动成功，端口：{}，资源：/auth, /topic]", coapProperties.getPort());
+        } catch (Exception e) {
+            log.error("[start][IoT 网关 CoAP 协议启动失败]", e);
+            throw e;
+        }
+    }
+
+    @PreDestroy
+    public void stop() {
+        if (coapServer != null) {
+            try {
+                coapServer.stop();
+                log.info("[stop][IoT 网关 CoAP 协议已停止]");
+            } catch (Exception e) {
+                log.error("[stop][IoT 网关 CoAP 协议停止失败]", e);
+            }
+        }
+    }
+
+}

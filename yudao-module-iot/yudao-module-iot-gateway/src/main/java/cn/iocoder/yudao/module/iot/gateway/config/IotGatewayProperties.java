@@ -93,6 +93,11 @@ public class IotGatewayProperties {
          */
         private MqttWsProperties mqttWs;
 
+        /**
+         * CoAP 组件配置
+         */
+        private CoapProperties coap;
+
     }
 
     @Data
@@ -500,6 +505,41 @@ public class IotGatewayProperties {
             private String trustStorePassword;
 
         }
+
+    }
+
+    @Data
+    public static class CoapProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务端口（CoAP 默认端口 5683）
+         */
+        // TODO @AI：默认不为空
+        private Integer port = 5683;
+
+        /**
+         * 最大消息大小（字节）
+         */
+        // TODO @AI：默认不为空
+        private Integer maxMessageSize = 1024;
+
+        /**
+         * ACK 超时时间（毫秒）
+         */
+        // TODO @AI：默认不为空
+        private Integer ackTimeout = 2000;
+
+        /**
+         * 最大重传次数
+         */
+        // TODO @AI：默认不为空
+        private Integer maxRetransmit = 4;
 
     }
 
