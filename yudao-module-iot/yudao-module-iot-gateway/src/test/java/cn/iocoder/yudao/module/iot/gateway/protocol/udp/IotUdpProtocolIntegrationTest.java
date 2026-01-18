@@ -36,13 +36,14 @@ public class IotUdpProtocolIntegrationTest {
     private static final String DEVICE_NAME = "small";
     private static final String PASSWORD = "509e2b08f7598eb139d276388c600435913ba4c94cd0d50aebc5c0d1855bcb75";
 
+    // TODO @芋艿：1、IotDeviceAuthUtils 调整下拼接；2、password 的生成；3、后续给 http 也整个单测；4、后续给 tcp 也整个单测；5、后续给 mqtt 也整个单测；6、后续给 emqp 也整个单测
     private static final String CLIENT_ID = PRODUCT_KEY + "." + DEVICE_NAME;
     private static final String USERNAME = DEVICE_NAME + "&" + PRODUCT_KEY;
 
     /**
      * 设备 Token：从 {@link #testAuth()} 方法获取后，粘贴到这里
      */
-    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc2OTMwNTA1NSwiZGV2aWNlTmFtZSI6InNtYWxsIn0.mf3MEATCn5bp6cXgULunZjs8d00RGUxj96JEz0hMS7k";
+    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc2OTMxMTY0NiwiZGV2aWNlTmFtZSI6InNtYWxsIn0.re6LCaRfKiE9VQTP3w0Brh2ScVIgrvN3H96z_snndoM";
 
     /**
      * 认证测试：获取设备 Token
@@ -107,12 +108,14 @@ public class IotUdpProtocolIntegrationTest {
                 .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.EVENT_POST.getMethod())
                 .put("version", "1.0")
-                .put("identifier", "eat")
                 .put("params", MapUtil.builder()
-                        .put("token", TOKEN)
-                        .put("width", 1)
-                        .put("height", "2")
-                        .put("oneThree", "3")
+                        .put("identifier", "eat")
+                        .put("value", MapUtil.builder()
+                                .put("width", 1)
+                                .put("height", "2")
+                                .put("oneThree", "3")
+                                .build())
+                        .put("time", System.currentTimeMillis())
                         .build())
                 .build());
 

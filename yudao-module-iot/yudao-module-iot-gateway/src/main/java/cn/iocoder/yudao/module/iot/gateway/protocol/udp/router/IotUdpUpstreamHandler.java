@@ -26,11 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
 import java.util.Map;
 
-// TODO @AI：注释里，不要出现 CoAP，避免理解成本过高；
 /**
  * UDP 上行消息处理器
  * <p>
- * 采用 CoAP 风格的 Token 机制（无状态，每次请求携带 token）：
+ * 采用无状态 Token 机制（每次请求携带 token）：
  * 1. 认证请求：设备发送 auth 消息，携带 clientId、username、password
  * 2. 返回 Token：服务端验证后返回 JWT token
  * 3. 后续请求：每次请求在 params 中携带 token
@@ -45,6 +44,10 @@ public class IotUdpUpstreamHandler {
     private static final String CODEC_TYPE_BINARY = IotTcpBinaryDeviceMessageCodec.TYPE;
 
     private static final String AUTH_METHOD = "auth";
+    /**
+     * Token 参数 Key
+     */
+    private static final String PARAM_KEY_TOKEN = "token";
 
     private final IotDeviceMessageService deviceMessageService;
 
@@ -70,15 +73,13 @@ public class IotUdpUpstreamHandler {
         this.serverId = protocol.getServerId();
     }
 
-    // TODO @AI：protocol 这个参数如果用不到，就删除下；
     /**
      * 处理 UDP 数据包
      *
-     * @param packet   数据包
-     * @param socket   UDP Socket
-     * @param protocol UDP 协议
+     * @param packet 数据包
+     * @param socket UDP Socket
      */
-    public void handle(DatagramPacket packet, DatagramSocket socket, IotUdpUpstreamProtocol protocol) {
+    public void handle(DatagramPacket packet, DatagramSocket socket) {
         InetSocketAddress senderAddress = new InetSocketAddress(packet.sender().host(), packet.sender().port());
         Buffer data = packet.data();
         log.debug("[handle][收到 UDP 数据包，来源: {}，数据长度: {} 字节]",
@@ -180,7 +181,7 @@ public class IotUdpUpstreamHandler {
                 return;
             }
 
-            // 3.1 生成 JWT Token（CoAP 风格）
+            // 3.1 生成 JWT Token（无状态）
             String token = deviceTokenService.createToken(device.getProductKey(), device.getDeviceName());
 
             // 3.2 更新设备地址映射（用于下行消息）
@@ -212,20 +213,18 @@ public class IotUdpUpstreamHandler {
                                        InetSocketAddress senderAddress, DatagramSocket socket) {
         String addressKey = sessionManager.buildAddressKey(senderAddress);
         try {
-            // TODO @AI：token 需要枚举个 KEY；考虑到是通过 params 传递的话，需要获取到后，从 map 里移除掉，避免影响后续业务逻辑处理；
-            // 1. 从消息中提取 token（CoAP 风格：消息体携带 token）
+            // 1.1 从消息中提取 token（无状态：消息体携带 token）
             String token = null;
             if (message.getParams() instanceof Map) {
-                token = MapUtil.getStr((Map<String, Object>) message.getParams(), "token");
+                Map<String, Object> paramsMap = (Map<String, Object>) message.getParams();
+                token = (String) paramsMap.remove(PARAM_KEY_TOKEN);
             }
-
             if (StrUtil.isBlank(token)) {
                 log.warn("[handleBusinessRequest][缺少 token，来源: {}]", addressKey);
                 sendErrorResponse(socket, senderAddress, message.getRequestId(), "请先进行认证", codecType);
                 return;
             }
-
-            // 2. 验证 token，获取设备信息
+            // 1.2 验证 token，获取设备信息
             IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.verifyToken(token);
             if (deviceInfo == null) {
                 log.warn("[handleBusinessRequest][token 无效或已过期，来源: {}]", addressKey);
@@ -233,7 +232,7 @@ public class IotUdpUpstreamHandler {
                 return;
             }
 
-            // 3. 获取设备详细信息
+            // 2. 获取设备详细信息
             IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceInfo.getProductKey(),
                     deviceInfo.getDeviceName());
             if (device == null) {
@@ -243,14 +242,14 @@ public class IotUdpUpstreamHandler {
                 return;
             }
 
-            // 4. 更新设备地址映射（保持最新）
+            // 3. 更新设备地址映射（保持最新）
             sessionManager.updateDeviceAddress(device.getId(), senderAddress);
 
-            // 5. 发送消息到消息总线
+            // 4. 发送消息到消息总线
             deviceMessageService.sendDeviceMessage(message, device.getProductKey(),
                     device.getDeviceName(), serverId);
 
-            // 6. 发送成功响应
+            // 5. 发送成功响应
             sendSuccessResponse(socket, senderAddress, message.getRequestId(), "处理成功", codecType);
             log.debug("[handleBusinessRequest][业务消息处理成功，设备 ID: {}，方法: {}，来源: {}]",
                     device.getId(), message.getMethod(), addressKey);

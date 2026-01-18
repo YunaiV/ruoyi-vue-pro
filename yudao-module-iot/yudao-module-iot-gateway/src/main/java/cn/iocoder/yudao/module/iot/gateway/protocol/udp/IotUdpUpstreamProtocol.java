@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.udp;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
@@ -14,6 +16,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * IoT 网关 UDP 协议：接收设备上行消息
@@ -80,19 +84,18 @@ public class IotUdpUpstreamProtocol {
 
         // 4. 监听端口
         udpSocket.listen(udpProperties.getPort(), "0.0.0.0", result -> {
-            // TODO @AI：if return；简化下；成功才继续往下走；
-            if (result.succeeded()) {
-                // 设置数据包处理器
-                udpSocket.handler(packet -> upstreamHandler.handle(packet, udpSocket, this));
-                log.info("[start][IoT 网关 UDP 协议启动成功，端口：{}，接收缓冲区：{} 字节，发送缓冲区：{} 字节]",
-                        udpProperties.getPort(), udpProperties.getReceiveBufferSize(),
-                        udpProperties.getSendBufferSize());
-
-                // 5. 启动会话清理定时器
-                startSessionCleanTimer();
-            } else {
+            if (result.failed()) {
                 log.error("[start][IoT 网关 UDP 协议启动失败]", result.cause());
+                return;
             }
+            // 设置数据包处理器
+            udpSocket.handler(packet -> upstreamHandler.handle(packet, udpSocket));
+            log.info("[start][IoT 网关 UDP 协议启动成功，端口：{}，接收缓冲区：{} 字节，发送缓冲区：{} 字节]",
+                    udpProperties.getPort(), udpProperties.getReceiveBufferSize(),
+                    udpProperties.getSendBufferSize());
+
+            // 5. 启动会话清理定时器
+            startSessionCleanTimer();
         });
     }
 
@@ -123,16 +126,14 @@ public class IotUdpUpstreamProtocol {
         cleanTimerId = vertx.setPeriodic(udpProperties.getSessionCleanIntervalMs(), id -> {
             try {
                 // 1. 清理超时的设备地址映射，并获取离线设备列表
-                // TODO @AI：兼容 jdk8，不要用 var；
-                var offlineDevices = sessionManager.cleanExpiredMappings(udpProperties.getSessionTimeoutMs());
+                List<Long> offlineDeviceIds = sessionManager.cleanExpiredMappings(udpProperties.getSessionTimeoutMs());
 
                 // 2. 为每个离线设备发送离线消息
-                for (var offlineInfo : offlineDevices) {
-                    sendOfflineMessage(offlineInfo.getDeviceId());
+                for (Long deviceId : offlineDeviceIds) {
+                    sendOfflineMessage(deviceId);
                 }
-                // TODO @AI：CollUtil.isNotEmpty ；简化下 if 判断；
-                if (!offlineDevices.isEmpty()) {
-                    log.info("[cleanExpiredMappings][本次清理 {} 个超时设备]", offlineDevices.size());
+                if (CollUtil.isNotEmpty(offlineDeviceIds)) {
+                    log.info("[cleanExpiredMappings][本次清理 {} 个超时设备]", offlineDeviceIds.size());
                 }
             } catch (Exception e) {
                 log.error("[cleanExpiredMappings][清理超时会话失败]", e);
@@ -150,7 +151,7 @@ public class IotUdpUpstreamProtocol {
     private void sendOfflineMessage(Long deviceId) {
         try {
             // 获取设备信息
-            var device = deviceService.getDeviceFromCache(deviceId);
+            IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceId);
             if (device == null) {
                 log.warn("[sendOfflineMessage][设备不存在，设备 ID: {}]", deviceId);
                 return;

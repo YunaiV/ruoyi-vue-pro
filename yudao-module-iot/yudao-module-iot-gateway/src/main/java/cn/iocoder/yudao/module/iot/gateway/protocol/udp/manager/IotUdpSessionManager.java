@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,8 +36,7 @@ public class IotUdpSessionManager {
     /**
      * 设备地址 Key -> 最后活跃时间（用于清理）
      */
-    // TODO @AI：是不是尽量使用 LocalDateTime ？统一时间类型
-    private final Map<String, Long> lastActiveTimeMap = new ConcurrentHashMap<>();
+    private final Map<String, LocalDateTime> lastActiveTimeMap = new ConcurrentHashMap<>();
 
     /**
      * 设备地址 Key -> 设备 ID（反向映射，用于清理时同步）
@@ -52,20 +53,9 @@ public class IotUdpSessionManager {
         String addressKey = buildAddressKey(address);
         // 更新设备地址映射
         deviceAddressMap.put(deviceId, address);
-        lastActiveTimeMap.put(addressKey, System.currentTimeMillis());
+        lastActiveTimeMap.put(addressKey, LocalDateTime.now());
         addressDeviceMap.put(addressKey, deviceId);
         log.debug("[updateDeviceAddress][更新设备地址，设备 ID: {}，地址: {}]", deviceId, addressKey);
-    }
-
-    // TODO @AI：是不是用不到？用不掉就删除掉！简化
-    /**
-     * 获取设备地址（下行消息发送时使用）
-     *
-     * @param deviceId 设备 ID
-     * @return 设备地址，如果不存在返回 null
-     */
-    public InetSocketAddress getDeviceAddress(Long deviceId) {
-        return deviceAddressMap.get(deviceId);
     }
 
     /**
@@ -126,46 +116,35 @@ public class IotUdpSessionManager {
      * @param timeoutMs 超时时间（毫秒）
      * @return 清理的设备 ID 列表（用于发送离线消息）
      */
-    // TODO @AI：目前暂时用不到 address 字段，是不是只返回 list of deviceId 就行？简化
-    public java.util.List<DeviceOfflineInfo> cleanExpiredMappings(long timeoutMs) {
-        java.util.List<DeviceOfflineInfo> offlineDevices = new java.util.ArrayList<>();
-        long now = System.currentTimeMillis();
-        Iterator<Map.Entry<String, Long>> iterator = lastActiveTimeMap.entrySet().iterator();
+    public List<Long> cleanExpiredMappings(long timeoutMs) {
+        List<Long> offlineDeviceIds = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expireTime = now.minusNanos(timeoutMs * 1_000_000);
+        Iterator<Map.Entry<String, LocalDateTime>> iterator = lastActiveTimeMap.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, Long> entry = iterator.next();
-            if (now - entry.getValue() > timeoutMs) {
-                String addressKey = entry.getKey();
-                Long deviceId = addressDeviceMap.remove(addressKey);
-                // TODO @AI：if continue，减少括号层级；
-                if (deviceId != null) {
-                    InetSocketAddress address = deviceAddressMap.remove(deviceId);
-                    if (address != null) {
-                        // 获取设备信息用于发送离线消息
-                        offlineDevices.add(new DeviceOfflineInfo(deviceId, addressKey));
-                        log.info("[cleanExpiredMappings][清理超时设备，设备 ID: {}，地址: {}，最后活跃时间: {}ms 前]",
-                                deviceId, addressKey, now - entry.getValue());
-                    }
-                }
-                iterator.remove();
+            // 未过期，跳过
+            Map.Entry<String, LocalDateTime> entry = iterator.next();
+            if (entry.getValue().isAfter(expireTime)) {
+                continue;
             }
+            // 过期处理：记录离线设备 ID
+            String addressKey = entry.getKey();
+            Long deviceId = addressDeviceMap.remove(addressKey);
+            if (deviceId == null) {
+                iterator.remove();
+                continue;
+            }
+            InetSocketAddress address = deviceAddressMap.remove(deviceId);
+            if (address == null) {
+                iterator.remove();
+                continue;
+            }
+            offlineDeviceIds.add(deviceId);
+            log.debug("[cleanExpiredMappings][清理超时设备，设备 ID: {}，地址: {}，最后活跃时间: {}]",
+                    deviceId, addressKey, entry.getValue());
+            iterator.remove();
         }
-        return offlineDevices;
-    }
-
-    // TODO @AI：是不是用不到？用不掉就删除掉！简化
-    /**
-     * 移除设备地址映射
-     *
-     * @param deviceId 设备 ID
-     */
-    public void removeDeviceAddress(Long deviceId) {
-        InetSocketAddress address = deviceAddressMap.remove(deviceId);
-        if (address != null) {
-            String addressKey = buildAddressKey(address);
-            lastActiveTimeMap.remove(addressKey);
-            addressDeviceMap.remove(addressKey);
-            log.debug("[removeDeviceAddress][移除设备地址，设备 ID: {}，地址: {}]", deviceId, addressKey);
-        }
+        return offlineDeviceIds;
     }
 
     /**
@@ -176,29 +155,6 @@ public class IotUdpSessionManager {
      */
     public String buildAddressKey(InetSocketAddress address) {
         return address.getHostString() + ":" + address.getPort();
-    }
-
-    /**
-     * 设备离线信息
-     */
-    @Data
-    public static class DeviceOfflineInfo {
-
-        /**
-         * 设备 ID
-         */
-        private final Long deviceId;
-
-        /**
-         * 设备地址
-         */
-        private final String address;
-
-        public DeviceOfflineInfo(Long deviceId, String address) {
-            this.deviceId = deviceId;
-            this.address = address;
-        }
-
     }
 
 }
