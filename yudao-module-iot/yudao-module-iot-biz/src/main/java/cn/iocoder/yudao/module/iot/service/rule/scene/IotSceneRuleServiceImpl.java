@@ -23,13 +23,14 @@ import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherManager;
 import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotSceneRuleTimerHandler;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -392,7 +393,23 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
                     }
                 });
             });
+
+            // 3. 更新最后触发时间
+            updateLastTriggerTime(sceneRule.getId());
         });
+    }
+
+    /**
+     * 更新规则场景的最后触发时间
+     *
+     * @param id 规则场景编号
+     */
+    private void updateLastTriggerTime(Long id) {
+        try {
+            sceneRuleMapper.updateById(new IotSceneRuleDO().setId(id).setLastTriggerTime(LocalDateTime.now()));
+        } catch (Exception e) {
+            log.error("[updateLastTriggerTime][规则场景编号({}) 更新最后触发时间异常]", id, e);
+        }
     }
 
     private IotSceneRuleServiceImpl getSelf() {

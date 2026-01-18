@@ -36,11 +36,12 @@ public class IotDevicePropertyPostTriggerMatcher implements IotSceneRuleTriggerM
             return false;
         }
 
-        // 1.3 检查标识符是否匹配
-        String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
-        if (!IotSceneRuleMatcherHelper.isIdentifierMatched(trigger.getIdentifier(), messageIdentifier)) {
-            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "标识符不匹配，期望: " +
-                    trigger.getIdentifier() + ", 实际: " + messageIdentifier);
+        // 1.3 检查消息中是否包含触发器指定的属性标识符
+        // 注意：属性上报可能同时上报多个属性，所以需要判断 trigger.getIdentifier() 是否在 message 的 params 中
+        // TODO @puhui999：可以考虑 notXXX 方法，简化代码（尽量取反）
+        if (!IotDeviceMessageUtils.containsIdentifier(message, trigger.getIdentifier())) {
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中不包含属性: " +
+                    trigger.getIdentifier());
             return false;
         }
 

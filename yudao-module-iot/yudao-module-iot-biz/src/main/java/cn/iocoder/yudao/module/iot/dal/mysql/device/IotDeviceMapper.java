@@ -31,6 +31,7 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .eqIfPresent(IotDeviceDO::getDeviceType, reqVO.getDeviceType())
                 .likeIfPresent(IotDeviceDO::getNickname, reqVO.getNickname())
                 .eqIfPresent(IotDeviceDO::getState, reqVO.getStatus())
+                .eqIfPresent(IotDeviceDO::getGatewayId, reqVO.getGatewayId())
                 .apply(ObjectUtil.isNotNull(reqVO.getGroupId()), "FIND_IN_SET(" + reqVO.getGroupId() + ",group_ids) > 0")
                 .orderByDesc(IotDeviceDO::getId));
     }

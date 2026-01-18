@@ -32,6 +32,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_RULE_NAME_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_RULE_NOT_EXISTS;
 
 /**
@@ -62,6 +63,8 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
     @Override
     @CacheEvict(value = RedisKeyConstants.DATA_RULE_LIST, allEntries = true)
     public Long createDataRule(IotDataRuleSaveReqVO createReqVO) {
+        // 校验名称唯一
+        validateDataRuleNameUnique(null, createReqVO.getName());
         // 校验数据源配置和数据目的
         validateDataRuleConfig(createReqVO);
         // 新增
@@ -75,6 +78,8 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
     public void updateDataRule(IotDataRuleSaveReqVO updateReqVO) {
         // 校验存在
         validateDataRuleExists(updateReqVO.getId());
+        // 校验名称唯一
+        validateDataRuleNameUnique(updateReqVO.getId(), updateReqVO.getName());
         // 校验数据源配置和数据目的
         validateDataRuleConfig(updateReqVO);
 
@@ -95,6 +100,29 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
     private void validateDataRuleExists(Long id) {
         if (dataRuleMapper.selectById(id) == null) {
             throw exception(DATA_RULE_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 校验数据流转规则名称唯一性
+     *
+     * @param id   数据流转规则编号（用于更新时排除自身）
+     * @param name 数据流转规则名称
+     */
+    private void validateDataRuleNameUnique(Long id, String name) {
+        if (StrUtil.isBlank(name)) {
+            return;
+        }
+        IotDataRuleDO dataRule = dataRuleMapper.selectByName(name);
+        if (dataRule == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的规则
+        if (id == null) {
+            throw exception(DATA_RULE_NAME_EXISTS);
+        }
+        if (!dataRule.getId().equals(id)) {
+            throw exception(DATA_RULE_NAME_EXISTS);
         }
     }
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.data.action.tcp;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkTcpConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -30,6 +31,7 @@ public class IotTcpClient {
     private final Integer connectTimeoutMs;
     private final Integer readTimeoutMs;
     private final Boolean ssl;
+    // TODO @puhui999：sslCertPath 是不是没在用？
     private final String sslCertPath;
     private final String dataFormat;
 
@@ -38,16 +40,16 @@ public class IotTcpClient {
     private BufferedReader reader;
     private final AtomicBoolean connected = new AtomicBoolean(false);
 
-    // TODO @puhui999：default 值，IotDataSinkTcpConfig.java 枚举起来哈；
     public IotTcpClient(String host, Integer port, Integer connectTimeoutMs, Integer readTimeoutMs,
                         Boolean ssl, String sslCertPath, String dataFormat) {
         this.host = host;
         this.port = port;
-        this.connectTimeoutMs = connectTimeoutMs != null ? connectTimeoutMs : 5000;
-        this.readTimeoutMs = readTimeoutMs != null ? readTimeoutMs : 10000;
-        this.ssl = ssl != null ? ssl : false;
+        this.connectTimeoutMs = connectTimeoutMs != null ? connectTimeoutMs : IotDataSinkTcpConfig.DEFAULT_CONNECT_TIMEOUT_MS;
+        this.readTimeoutMs = readTimeoutMs != null ? readTimeoutMs : IotDataSinkTcpConfig.DEFAULT_READ_TIMEOUT_MS;
+        this.ssl = ssl != null ? ssl : IotDataSinkTcpConfig.DEFAULT_SSL;
         this.sslCertPath = sslCertPath;
-        this.dataFormat = dataFormat != null ? dataFormat : "JSON";
+        // TODO @puhui999：可以使用 StrUtil.defaultIfBlank 方法简化
+        this.dataFormat = dataFormat != null ? dataFormat : IotDataSinkTcpConfig.DEFAULT_DATA_FORMAT;
     }
 
     /**
@@ -99,9 +101,8 @@ public class IotTcpClient {
         }
 
         try {
-            // TODO @puhui999：枚举值
             String messageData;
-            if ("JSON".equalsIgnoreCase(dataFormat)) {
+            if (IotDataSinkTcpConfig.DEFAULT_DATA_FORMAT.equalsIgnoreCase(dataFormat)) {
                 // JSON 格式
                 messageData = JsonUtils.toJsonString(message);
             } else {

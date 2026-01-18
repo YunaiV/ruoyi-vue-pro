@@ -98,11 +98,24 @@ yudao:
         # 针对引入的 MQTT 组件的配置
         # ====================================
         mqtt:
-          enabled: true
+          enabled: false
           port: 1883
           max-message-size: 8192
           connect-timeout-seconds: 60
           ssl-enabled: false
+        # ====================================
+        # 针对引入的 MQTT WebSocket 组件的配置
+        # ====================================
+        mqtt-ws:
+          enabled: false                        # 是否启用 MQTT WebSocket
+          port: 8083                           # WebSocket 服务端口
+          path: /mqtt                          # WebSocket 路径
+          max-message-size: 8192               # 最大消息大小（字节）
+          max-frame-size: 65536                # 最大帧大小（字节）
+          connect-timeout-seconds: 60          # 连接超时时间（秒）
+          keep-alive-timeout-seconds: 300      # 保持连接超时时间（秒）
+          ssl-enabled: false                   # 是否启用 SSL（wss://）
+          sub-protocol: mqtt                   # WebSocket 子协议
 
 --- #################### 日志相关配置 ####################
 
@@ -122,6 +135,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.emqx: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
     # 根日志级别
     root: INFO
 
