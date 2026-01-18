@@ -48,7 +48,7 @@ yudao:
         # 针对引入的 HTTP 组件的配置
         # ====================================
         http:
-          enabled: false
+          enabled: true
           server-port: 8092
         # ====================================
         # 针对引入的 EMQX 组件的配置
@@ -108,7 +108,7 @@ yudao:
         # 针对引入的 MQTT WebSocket 组件的配置
         # ====================================
         mqtt-ws:
-          enabled: true                        # 是否启用 MQTT WebSocket
+          enabled: false                        # 是否启用 MQTT WebSocket
           port: 8083                           # WebSocket 服务端口
           path: /mqtt                          # WebSocket 路径
           max-message-size: 8192               # 最大消息大小（字节）
