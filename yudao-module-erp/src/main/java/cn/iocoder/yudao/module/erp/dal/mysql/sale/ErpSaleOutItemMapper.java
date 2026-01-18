@@ -46,11 +46,11 @@ public interface ErpSaleOutItemMapper extends BaseMapperX<ErpSaleOutItemDO> {
         }
         // SQL sum 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpSaleOutItemDO>()
-                .select("order_item_id, SUM(count) AS sumCount")
+                .select("order_item_id, SUM(count) AS sum_count")
                 .groupBy("order_item_id")
                 .in("out_id", outIds));
         // 获得数量
-        return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
+        return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sum_count"));
     }
 
 }

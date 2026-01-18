@@ -52,13 +52,13 @@ public interface ErpStockMapper extends BaseMapperX<ErpStockDO> {
     default BigDecimal selectSumByProductId(Long productId) {
         // SQL sum 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpStockDO>()
-                .select("SUM(count) AS sumCount")
+                .select("SUM(count) AS sum_count")
                 .eq("product_id", productId));
         // 获得数量
         if (CollUtil.isEmpty(result)) {
             return BigDecimal.ZERO;
         }
-        return BigDecimal.valueOf(MapUtil.getDouble(result.get(0), "sumCount", 0D));
+        return BigDecimal.valueOf(MapUtil.getDouble(result.get(0), "sum_count", 0D));
     }
 
 }
