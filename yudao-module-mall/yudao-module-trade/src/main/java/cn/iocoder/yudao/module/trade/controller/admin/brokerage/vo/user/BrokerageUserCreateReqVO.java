@@ -14,6 +14,7 @@ public class BrokerageUserCreateReqVO {
     private Long userId;
 
     @Schema(description = "推广员编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "4587")
+    @NotNull(message = "推广员编号不能为空")
     private Long bindUserId;
 
 }

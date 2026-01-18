@@ -65,11 +65,17 @@ public class TradeOrderLogAspect {
     public void doAfterReturning(JoinPoint joinPoint, TradeOrderLog orderLog) {
         try {
             // 1.1 操作用户
-            Integer userType = getUserType();
-            Long userId = getUserId();
+            Integer userType = USER_TYPE.get();
+            if (ObjectUtil.isNull(userType)) {
+                userType = getUserType();
+            }
+            Long userId = USER_ID.get();
+            if (ObjectUtil.isNull(userId)) {
+                userId = getUserId();
+            }
             // 1.2 订单信息
             Long orderId = ORDER_ID.get();
-            if (orderId == null) { // 如果未设置，只有注解，说明不需要记录日志
+            if (ObjectUtil.isNull(orderId)) { // 如果未设置，只有注解，说明不需要记录日志
                 return;
             }
             Integer beforeStatus = BEFORE_STATUS.get();

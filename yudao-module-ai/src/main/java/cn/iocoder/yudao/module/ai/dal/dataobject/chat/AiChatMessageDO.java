@@ -27,7 +27,7 @@ import java.util.List;
  * @since 2024/4/14 17:35
  */
 @TableName(value = "ai_chat_message", autoResultMap = true)
-@KeySequence("ai_chat_conversation_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("ai_chat_message_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor

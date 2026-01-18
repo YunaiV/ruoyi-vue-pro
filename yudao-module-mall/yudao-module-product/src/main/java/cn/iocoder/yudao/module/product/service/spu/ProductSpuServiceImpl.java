@@ -109,7 +109,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         // sku 单价最低的商品的成本价格
         spu.setCostPrice(getMinValue(skus, ProductSkuSaveReqVO::getCostPrice));
         // skus 库存总数
-        spu.setStock(getSumValue(skus, ProductSkuSaveReqVO::getStock, Integer::sum));
+        spu.setStock(getSumValue(skus, ProductSkuSaveReqVO::getStock, Math::addExact));
         // 若是 spu 已有状态则不处理
         if (spu.getStatus() == null) {
             spu.setStatus(ProductSpuStatusEnum.ENABLE.getStatus()); // 默认状态为上架

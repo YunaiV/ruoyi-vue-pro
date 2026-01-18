@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -59,8 +58,6 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     private static final String DEPT_COLUMN_NAME = "dept_id";
     private static final String USER_COLUMN_NAME = "user_id";
-
-    static final Expression EXPRESSION_NULL = new NullValue();
 
     private final PermissionCommonApi permissionApi;
 
@@ -136,7 +133,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
 //            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",
 //                    loginUser.getId(), tableName, tableAlias.getName()));
-            return EXPRESSION_NULL;
+            return new EqualsTo(null, null); // WHERE null = null，可以保证返回的数据为空
         }
         if (deptExpression == null) {
             return userExpression;

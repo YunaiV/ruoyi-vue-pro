@@ -7,7 +7,6 @@ import { http } from '@/http/http'
 #else
 #set ($primaryTsType = "string")
 #end
-
 /** ${table.classComment}信息 */
 export interface ${simpleClassName} {
 #foreach ($column in $columns)
@@ -28,7 +27,6 @@ export interface ${simpleClassName} {
 #end
 }
 
-// TODO @AI：`/system/operate-log/get?id=${id}` 类似这种
 /** 获取${table.classComment}分页列表 */
 export function get${simpleClassName}Page(params: PageParam) {
   return http.get<PageResult<${simpleClassName}>>('/${table.moduleName}/${simpleClassName_strikeCase}/page', params)
@@ -36,7 +34,7 @@ export function get${simpleClassName}Page(params: PageParam) {
 
 /** 获取${table.classComment}详情 */
 export function get${simpleClassName}(id: ${primaryTsType}) {
-  return http.get<${simpleClassName}>('/${table.moduleName}/${simpleClassName_strikeCase}/get?id=' + id)
+  return http.get<${simpleClassName}>(`/${table.moduleName}/${simpleClassName_strikeCase}/get?id=${id}`)
 }
 
 /** 创建${table.classComment} */
@@ -49,8 +47,7 @@ export function update${simpleClassName}(data: ${simpleClassName}) {
   return http.put<boolean>('/${table.moduleName}/${simpleClassName_strikeCase}/update', data)
 }
 
-// TODO @AI：`/system/operate-log/get?id=${id}` 类似这种
 /** 删除${table.classComment} */
 export function delete${simpleClassName}(id: ${primaryTsType}) {
-  return http.delete<boolean>('/${table.moduleName}/${simpleClassName_strikeCase}/delete?id=' + id)
+  return http.delete<boolean>(`/${table.moduleName}/${simpleClassName_strikeCase}/delete?id=${id}`)
 }

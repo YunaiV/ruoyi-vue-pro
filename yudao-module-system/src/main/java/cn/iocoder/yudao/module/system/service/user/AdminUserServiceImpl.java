@@ -44,6 +44,7 @@ import javax.annotation.Resource;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -284,11 +285,14 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
         // 如果有角色编号，查询角色对应的用户编号
-        Set<Long> userIds = reqVO.getRoleId() != null ?
-                permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId())) : null;
-        if (userIds != null && userIds.isEmpty()) {
-            return PageResult.empty();
+        Set<Long> userIds = null;
+        if (reqVO.getRoleId() != null) {
+            userIds = permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId()));
+            if (CollUtil.isEmpty(userIds)) {
+                return PageResult.empty();
+            }
         }
+
         // 分页查询
         return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()), userIds);
     }
@@ -484,12 +488,15 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 2. 遍历，逐个创建 or 更新
         UserImportRespVO respVO = UserImportRespVO.builder().createUsernames(new ArrayList<>())
                 .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
+        AtomicInteger index = new AtomicInteger(1);
         importUsers.forEach(importUser -> {
+            int currentIndex = index.getAndIncrement();
             // 2.1.1 校验字段是否符合要求
             try {
                 ValidationUtils.validate(BeanUtils.toBean(importUser, UserSaveReqVO.class).setPassword(initPassword));
-            } catch (ConstraintViolationException ex){
-                respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
+            } catch (ConstraintViolationException ex) {
+                String key = StrUtil.blankToDefault(importUser.getUsername(), "第 " + currentIndex + " 行");
+                respVO.getFailureUsernames().put(key, ex.getMessage());
                 return;
             }
             // 2.1.2 校验，判断是否有不符合的原因

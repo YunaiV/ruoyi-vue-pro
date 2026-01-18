@@ -144,7 +144,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 
     @Override
     public void createSkuList(Long spuId, List<ProductSkuSaveReqVO> skuCreateReqList) {
-        List<ProductSkuDO> skus = BeanUtils.toBean(skuCreateReqList, ProductSkuDO.class, sku -> sku.setSpuId(spuId));
+        List<ProductSkuDO> skus = BeanUtils.toBean(skuCreateReqList, ProductSkuDO.class, sku -> sku.setSpuId(spuId).setSalesCount(0));
         productSkuMapper.insertBatch(skus);
     }
 

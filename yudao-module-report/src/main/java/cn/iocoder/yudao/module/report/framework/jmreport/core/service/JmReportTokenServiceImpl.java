@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.report.framework.jmreport.core.service;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.OAuth2TokenCommonApi;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
 import cn.iocoder.yudao.framework.common.biz.system.permission.PermissionCommonApi;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -10,9 +12,6 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import cn.iocoder.yudao.framework.common.biz.system.oauth2.OAuth2TokenCommonApi;
-import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
-import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import lombok.RequiredArgsConstructor;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
@@ -156,6 +155,35 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
             return null;
         }
         return StrUtil.toStringOrNull(loginUser.getTenantId());
+    }
+
+    @Override
+    public String[] getPermissions(String token) {
+        // 设置租户上下文
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if (loginUser == null) {
+            return null;
+        }
+        TenantContextHolder.setTenantId(loginUser.getTenantId());
+
+        // 参见文档 https://help.jimureport.com/prodSafe/ 文档
+        // 适配：如果是本系统的管理员，则返回积木报表（仪表盘/大屏设计器）的所有权限指令
+        // 如果不处理，会碰到 https://t.zsxq.com/yzlkA 反馈的问题
+        Long userId = SecurityFrameworkUtils.getLoginUserId();
+        if (permissionApi.hasAnyRoles(userId, RoleCodeEnum.SUPER_ADMIN.getCode())) {
+            return new String[]{
+                    "drag:datasource:testConnection",  // 数据库连接测试
+                    "drag:datasource:saveOrUpate",     // 数据源保存
+                    "drag:datasource:delete",          // 数据源删除
+                    "drag:analysis:sql",               // SQL解析
+                    "drag:design:getTotalData",        // 展示Online表单数据
+                    "drag:dataset:save",               // 数据集保存
+                    "drag:dataset:delete",             // 数据集删除
+                    "onl:drag:clear:recovery",         // 清空回收站
+                    "onl:drag:page:delete"             // 数据删除
+            };
+        }
+        return null;
     }
 
 }
