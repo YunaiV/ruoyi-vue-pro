@@ -174,7 +174,11 @@ public class PayWalletServiceImpl implements PayWalletService {
             }
 
             // 3. 生成钱包流水
-            Integer afterBalance = payWallet.getBalance() - price;
+            // 情况一：充值退款：balance 在冻结时已扣，updateWhenRechargeRefund 只扣 freeze_price，所以 afterBalance 不变。https://t.zsxq.com/OJk9m
+            // 情况二：消费支付：updateWhenConsumption 从 balance 扣，所以 afterBalance = balance - price
+            Integer afterBalance = bizType == PayWalletBizTypeEnum.RECHARGE_REFUND
+                    ? payWallet.getBalance()
+                    : payWallet.getBalance() - price;
             WalletTransactionCreateReqBO bo = new WalletTransactionCreateReqBO().setWalletId(payWallet.getId())
                     .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
                     .setBizType(bizType.getType()).setTitle(bizType.getDescription());
