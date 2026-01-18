@@ -265,8 +265,7 @@ public interface TradeOrderConvert {
                                       ProductSpuRespDTO spu, ProductSkuRespDTO sku) {
         BrokerageAddReqBO bo = new BrokerageAddReqBO().setBizId(String.valueOf(item.getId())).setSourceUserId(item.getUserId())
                 .setBasePrice(item.getPayPrice())
-                .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()))
-                .setFirstFixedPrice(0).setSecondFixedPrice(0);
+                .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()));
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
             // 特殊：单独设置的佣金需要乘以购买数量。关联 https://gitee.com/yudaocode/yudao-mall-uniapp/issues/ICY7SJ
             bo.setFirstFixedPrice(sku.getFirstBrokeragePrice() * item.getCount())
