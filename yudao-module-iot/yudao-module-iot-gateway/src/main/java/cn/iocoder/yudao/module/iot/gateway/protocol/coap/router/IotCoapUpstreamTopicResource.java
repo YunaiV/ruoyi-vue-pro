@@ -51,17 +51,17 @@ public class IotCoapUpstreamTopicResource extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
-        upstreamHandler.handle(exchange, "GET", protocol);
+        upstreamHandler.handle(exchange, protocol);
     }
 
     @Override
     public void handlePOST(CoapExchange exchange) {
-        upstreamHandler.handle(exchange, "POST", protocol);
+        upstreamHandler.handle(exchange, protocol);
     }
 
     @Override
     public void handlePUT(CoapExchange exchange) {
-        upstreamHandler.handle(exchange, "PUT", protocol);
+        upstreamHandler.handle(exchange, protocol);
     }
 
 }

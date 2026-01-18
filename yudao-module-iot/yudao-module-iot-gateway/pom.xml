@@ -48,6 +48,12 @@
             <artifactId>vertx-mqtt</artifactId>
         </dependency>
 
+        <!-- CoAP 相关 - Eclipse Californium -->
+        <dependency>
+            <groupId>org.eclipse.californium</groupId>
+            <artifactId>californium-core</artifactId>
+        </dependency>
+
         <!-- 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

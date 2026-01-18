@@ -68,6 +68,7 @@
         <netty.version>4.2.9.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.22</vertx.version>
+        <californium.version>3.12.0</californium.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.40.15</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
@@ -652,6 +653,13 @@
                 <groupId>org.eclipse.paho</groupId>
                 <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
                 <version>${mqtt.version}</version>
+            </dependency>
+
+            <!-- CoAP - Eclipse Californium -->
+            <dependency>
+                <groupId>org.eclipse.californium</groupId>
+                <artifactId>californium-core</artifactId>
+                <version>${californium.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.iot.gateway.config;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxAuthEventProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
@@ -207,11 +205,8 @@ public class IotGatewayConfiguration {
     public static class CoapProtocolConfiguration {
 
         @Bean
-        public IotCoapUpstreamProtocol iotCoapUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                               IotCoapAuthHandler authHandler,
-                                                               IotCoapUpstreamHandler upstreamHandler) {
-            return new IotCoapUpstreamProtocol(gatewayProperties.getProtocol().getCoap(),
-                    authHandler, upstreamHandler);
+        public IotCoapUpstreamProtocol iotCoapUpstreamProtocol(IotGatewayProperties gatewayProperties) {
+            return new IotCoapUpstreamProtocol(gatewayProperties.getProtocol().getCoap());
         }
 
         @Bean

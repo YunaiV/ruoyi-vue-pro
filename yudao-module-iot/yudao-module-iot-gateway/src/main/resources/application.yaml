@@ -108,7 +108,7 @@ yudao:
         # 针对引入的 MQTT WebSocket 组件的配置
         # ====================================
         mqtt-ws:
-          enabled: true                        # 是否启用 MQTT WebSocket
+          enabled: false                        # 是否启用 MQTT WebSocket
           port: 8083                           # WebSocket 服务端口
           path: /mqtt                          # WebSocket 路径
           max-message-size: 8192               # 最大消息大小（字节）
@@ -121,7 +121,7 @@ yudao:
         # 针对引入的 CoAP 组件的配置
         # ====================================
         coap:
-          enabled: false                       # 是否启用 CoAP 协议
+          enabled: true                       # 是否启用 CoAP 协议
           port: 5683                           # CoAP 服务端口（默认 5683）
           max-message-size: 1024               # 最大消息大小（字节）
           ack-timeout: 2000                    # ACK 超时时间（毫秒）

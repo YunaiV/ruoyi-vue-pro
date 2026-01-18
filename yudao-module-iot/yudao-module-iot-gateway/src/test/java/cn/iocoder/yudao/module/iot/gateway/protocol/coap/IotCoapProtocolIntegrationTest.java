@@ -1,57 +1,74 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.coap;
 
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapUpstreamHandler;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.util.IotCoapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.Request;
-import org.junit.jupiter.api.*;
+import org.eclipse.californium.core.config.CoapConfig;
+import org.eclipse.californium.elements.config.Configuration;
+import org.eclipse.californium.elements.config.UdpConfig;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * IoT 网关 CoAP 协议集成测试（手动测试）
  *
- * 使用步骤：
- * 1. 启动 CoAP 网关服务（端口 5683）
- * 2. 运行 testAuth() 获取 token
- * 3. 将 token 粘贴到 TOKEN 常量
- * 4. 运行 testPropertyPost() 或 testEventPost()
+ * <p>使用步骤：
+ * <ol>
+ *     <li>启动 yudao-module-iot-gateway 服务（CoAP 端口 5683）</li>
+ *     <li>运行 {@link #testAuth()} 获取 token，将返回的 token 粘贴到 {@link #TOKEN} 常量</li>
+ *     <li>运行 {@link #testPropertyPost()} 测试属性上报，或运行 {@link #testEventPost()} 测试事件上报</li>
+ * </ol>
  *
  * @author 芋道源码
  */
 @Slf4j
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class IotCoapProtocolIntegrationTest {
+public class IotCoapProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";
     private static final int SERVER_PORT = 5683;
 
-    // 设备信息（根据实际情况修改）
-    private static final String PRODUCT_KEY = "testProductKey";
-    private static final String DEVICE_NAME = "testDeviceName";
+    // 设备信息（根据实际情况修改 PRODUCT_KEY、DEVICE_NAME、PASSWORD）
+    private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
+    private static final String DEVICE_NAME = "small";
+    private static final String PASSWORD = "509e2b08f7598eb139d276388c600435913ba4c94cd0d50aebc5c0d1855bcb75";
+
     private static final String CLIENT_ID = PRODUCT_KEY + "." + DEVICE_NAME;
     private static final String USERNAME = DEVICE_NAME + "&" + PRODUCT_KEY;
-    private static final String PASSWORD = "testPassword123";
 
-    // TODO: 运行 testAuth() 后，将返回的 token 粘贴到这里
-    private static final String TOKEN = "粘贴你的token到这里";
+    /**
+     * 设备 Token：从 {@link #testAuth()} 方法获取后，粘贴到这里
+     */
+    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc2OTMwNTA1NSwiZGV2aWNlTmFtZSI6InNtYWxsIn0.mf3MEATCn5bp6cXgULunZjs8d00RGUxj96JEz0hMS7k";
 
-    // ========== 1. 认证测试 ==========
+    @BeforeAll
+    public static void initCaliforniumConfig() {
+        // 注册 Californium 配置定义
+        CoapConfig.register();
+        UdpConfig.register();
+        // 创建默认配置
+        Configuration.setStandard(Configuration.createStandardWithoutFile());
+    }
 
+    /**
+     * 认证测试：获取设备 Token
+     */
     @Test
-    @Order(1)
-    @DisplayName("1. 认证 - 获取 Token")
-    void testAuth() throws Exception {
+    @SuppressWarnings("deprecation")
+    public void testAuth() throws Exception {
         String uri = String.format("coap://%s:%d/auth", SERVER_HOST, SERVER_PORT);
-
-        String payload = String.format("""
-                {
-                    "clientId": "%s",
-                    "username": "%s",
-                    "password": "%s"
-                }
-                """, CLIENT_ID, USERNAME, PASSWORD);
+        String payload = JsonUtils.toJsonString(MapUtil.builder()
+                .put("clientId", CLIENT_ID)
+                .put("username", USERNAME)
+                .put("password", PASSWORD)
+                .build());
 
         CoapClient client = new CoapClient(uri);
         try {
@@ -68,38 +85,33 @@ class IotCoapProtocolIntegrationTest {
         }
     }
 
-    // ========== 2. 属性上报测试 ==========
-
+    /**
+     * 属性上报测试
+     */
     @Test
-    @Order(2)
-    @DisplayName("2. 属性上报")
-    void testPropertyPost() throws Exception {
+    @SuppressWarnings("deprecation")
+    public void testPropertyPost() throws Exception {
         String uri = String.format("coap://%s:%d/topic/sys/%s/%s/thing/property/post",
                 SERVER_HOST, SERVER_PORT, PRODUCT_KEY, DEVICE_NAME);
-
-        String payload = """
-                {
-                    "id": "123",
-                    "method": "thing.property.post",
-                    "params": {
-                        "temperature": 25.5,
-                        "humidity": 60
-                    }
-                }
-                """;
+        String payload = JsonUtils.toJsonString(MapUtil.builder()
+                .put("id", IdUtil.fastSimpleUUID())
+                .put("method", IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())
+                .put("version", "1.0")
+                .put("params", MapUtil.builder()
+                        .put("width", 1)
+                        .put("height", "2")
+                        .build())
+                .build());
 
         CoapClient client = new CoapClient(uri);
         try {
-            // 构造带自定义 Option 的请求
             Request request = Request.newPost();
             request.setURI(uri);
             request.setPayload(payload);
             request.getOptions().setContentFormat(MediaTypeRegistry.APPLICATION_JSON);
-            // 添加自定义 Token Option (2088)
-            request.getOptions().addOption(new Option(IotCoapUpstreamHandler.OPTION_TOKEN, TOKEN));
+            request.getOptions().addOption(new Option(IotCoapUtils.OPTION_TOKEN, TOKEN));
 
             log.info("[testPropertyPost][请求 URI: {}]", uri);
-            log.info("[testPropertyPost][Token: {}]", TOKEN);
             log.info("[testPropertyPost][请求体: {}]", payload);
 
             CoapResponse response = client.advanced(request);
@@ -111,39 +123,35 @@ class IotCoapProtocolIntegrationTest {
         }
     }
 
-    // ========== 3. 事件上报测试 ==========
-
+    /**
+     * 事件上报测试
+     */
     @Test
-    @Order(3)
-    @DisplayName("3. 事件上报")
-    void testEventPost() throws Exception {
-        String uri = String.format("coap://%s:%d/topic/sys/%s/%s/thing/event/alarm/post",
+    @SuppressWarnings("deprecation")
+    public void testEventPost() throws Exception {
+        String uri = String.format("coap://%s:%d/topic/sys/%s/%s/thing/event/post",
                 SERVER_HOST, SERVER_PORT, PRODUCT_KEY, DEVICE_NAME);
-
-        String payload = """
-                {
-                    "id": "456",
-                    "method": "thing.event.alarm.post",
-                    "params": {
-                        "alarmType": "temperature_high",
-                        "level": "warning",
-                        "value": 85.2
-                    }
-                }
-                """;
+        String payload = JsonUtils.toJsonString(MapUtil.builder()
+                .put("id", IdUtil.fastSimpleUUID())
+                .put("method", IotDeviceMessageMethodEnum.EVENT_POST.getMethod())
+                .put("version", "1.0")
+                .put("identifier", "eat")
+                .put("params", MapUtil.builder()
+                        .put("width", 1)
+                        .put("height", "2")
+                        .put("oneThree", "3")
+                        .build())
+                .build());
 
         CoapClient client = new CoapClient(uri);
         try {
-            // 构造带自定义 Option 的请求
             Request request = Request.newPost();
             request.setURI(uri);
             request.setPayload(payload);
             request.getOptions().setContentFormat(MediaTypeRegistry.APPLICATION_JSON);
-            // 添加自定义 Token Option (2088)
-            request.getOptions().addOption(new Option(IotCoapUpstreamHandler.OPTION_TOKEN, TOKEN));
+            request.getOptions().addOption(new Option(IotCoapUtils.OPTION_TOKEN, TOKEN));
 
             log.info("[testEventPost][请求 URI: {}]", uri);
-            log.info("[testEventPost][Token: {}]", TOKEN);
             log.info("[testEventPost][请求体: {}]", payload);
 
             CoapResponse response = client.advanced(request);

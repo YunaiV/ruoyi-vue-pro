@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * 基于 Eclipse Californium 实现，支持：
  * 1. 认证：POST /auth
  * 2. 属性上报：POST /topic/sys/{productKey}/{deviceName}/thing/property/post
- * 3. 事件上报：POST /topic/sys/{productKey}/{deviceName}/thing/event/{eventId}/post
+ * 3. 事件上报：POST /topic/sys/{productKey}/{deviceName}/thing/event/post
  *
  * @author 芋道源码
  */
@@ -31,20 +31,13 @@ public class IotCoapUpstreamProtocol {
 
     private final IotGatewayProperties.CoapProperties coapProperties;
 
-    private final IotCoapAuthHandler authHandler;
-    private final IotCoapUpstreamHandler upstreamHandler;
-
     private CoapServer coapServer;
 
     @Getter
     private final String serverId;
 
-    public IotCoapUpstreamProtocol(IotGatewayProperties.CoapProperties coapProperties,
-                                   IotCoapAuthHandler authHandler,
-                                   IotCoapUpstreamHandler upstreamHandler) {
+    public IotCoapUpstreamProtocol(IotGatewayProperties.CoapProperties coapProperties) {
         this.coapProperties = coapProperties;
-        this.authHandler = authHandler;
-        this.upstreamHandler = upstreamHandler;
         this.serverId = IotDeviceMessageUtils.generateServerId(coapProperties.getPort());
     }
 
@@ -61,9 +54,11 @@ public class IotCoapUpstreamProtocol {
             coapServer = new CoapServer(config);
 
             // 2.1 添加 /auth 认证资源
+            IotCoapAuthHandler authHandler = new IotCoapAuthHandler();
             IotCoapAuthResource authResource = new IotCoapAuthResource(this, authHandler);
             coapServer.add(authResource);
             // 2.2 添加 /topic 根资源（用于上行消息）
+            IotCoapUpstreamHandler upstreamHandler = new IotCoapUpstreamHandler();
             IotCoapUpstreamTopicResource topicResource = new IotCoapUpstreamTopicResource(this, upstreamHandler);
             coapServer.add(topicResource);
 
