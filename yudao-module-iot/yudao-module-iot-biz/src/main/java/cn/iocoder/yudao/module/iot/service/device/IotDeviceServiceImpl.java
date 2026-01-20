@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -376,8 +377,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 if (existDevice == null) {
                     createDevice(new IotDeviceSaveReqVO()
                             .setDeviceName(importDevice.getDeviceName())
-                            .setProductId(product.getId()).setGatewayId(gatewayId).setGroupIds(groupIds)
-                            .setLocationType(importDevice.getLocationType()));
+                            .setProductId(product.getId()).setGatewayId(gatewayId).setGroupIds(groupIds));
                     respVO.getCreateDeviceNames().add(importDevice.getDeviceName());
                     return;
                 }
@@ -386,7 +386,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                     throw exception(DEVICE_KEY_EXISTS);
                 }
                 updateDevice(new IotDeviceSaveReqVO().setId(existDevice.getId())
-                        .setGatewayId(gatewayId).setGroupIds(groupIds).setLocationType(importDevice.getLocationType()));
+                        .setGatewayId(gatewayId).setGroupIds(groupIds));
                 respVO.getUpdateDeviceNames().add(importDevice.getDeviceName());
             } catch (ServiceException ex) {
                 respVO.getFailureDeviceNames().put(importDevice.getDeviceName(), ex.getMessage());
@@ -490,12 +490,22 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     public void updateDeviceFirmware(Long deviceId, Long firmwareId) {
         // 1. 校验设备是否存在
         IotDeviceDO device = validateDeviceExists(deviceId);
-        
+
         // 2. 更新设备固件版本
         IotDeviceDO updateObj = new IotDeviceDO().setId(deviceId).setFirmwareId(firmwareId);
         deviceMapper.updateById(updateObj);
-        
+
         // 3. 清空对应缓存
+        deleteDeviceCache(device);
+    }
+
+    @Override
+    public void updateDeviceLocation(IotDeviceDO device, BigDecimal longitude, BigDecimal latitude) {
+        // 1. 更新定位信息
+        deviceMapper.updateById(new IotDeviceDO().setId(device.getId())
+                .setLongitude(longitude).setLatitude(latitude));
+
+        // 2. 清空对应缓存
         deleteDeviceCache(device);
     }
 

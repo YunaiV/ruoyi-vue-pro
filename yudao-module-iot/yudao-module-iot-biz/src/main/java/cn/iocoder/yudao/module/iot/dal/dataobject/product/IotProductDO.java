@@ -70,12 +70,6 @@ public class IotProductDO extends TenantBaseDO {
      */
     private Integer netType;
     /**
-     * 定位方式
-     * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum}
-     */
-    private Integer locationType;
-    /**
      * 数据格式（编解码器类型）
      * <p>
      * 字典 {@link cn.iocoder.yudao.module.iot.enums.DictTypeConstants#CODEC_TYPE}

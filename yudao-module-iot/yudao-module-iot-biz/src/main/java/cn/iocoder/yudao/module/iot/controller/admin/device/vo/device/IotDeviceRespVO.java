@@ -84,11 +84,6 @@ public class IotDeviceRespVO {
     @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
     private String config;
 
-    @Schema(description = "定位方式", example = "2")
-    @ExcelProperty(value = "定位方式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.LOCATION_TYPE)
-    private Integer locationType;
-
     @Schema(description = "设备位置的纬度", example = "45.000000")
     private BigDecimal latitude;
 

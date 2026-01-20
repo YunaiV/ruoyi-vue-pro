@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -270,5 +271,14 @@ public interface IotDeviceService {
      * @param firmwareId 固件编号
      */
     void updateDeviceFirmware(Long deviceId, Long firmwareId);
+
+    /**
+     * 更新设备定位信息（GeoLocation 上报时调用）
+     *
+     * @param device    设备信息（用于清除缓存）
+     * @param longitude 经度
+     * @param latitude  纬度
+     */
+    void updateDeviceLocation(IotDeviceDO device, BigDecimal longitude, BigDecimal latitude);
 
 }

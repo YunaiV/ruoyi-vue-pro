@@ -130,12 +130,6 @@ public class IotDeviceDO extends TenantBaseDO {
     private String authType;
 
     /**
-     * 定位方式
-     * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum}
-     */
-    private Integer locationType;
-    /**
      * 设备位置的纬度
      */
     private BigDecimal latitude;

@@ -147,7 +147,7 @@ public class IotProductController {
         List<IotProductDO> list = productService.getProductList();
         return success(convertList(list, product -> // 只返回 id、name 字段
                 new IotProductRespVO().setId(product.getId()).setName(product.getName()).setStatus(product.getStatus())
-                        .setDeviceType(product.getDeviceType()).setLocationType(product.getLocationType())));
+                        .setDeviceType(product.getDeviceType())));
     }
 
 }

@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -38,10 +36,6 @@ public class IotDeviceSaveReqVO {
 
     @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
     private String config;
-
-    @Schema(description = "定位类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @InEnum(value = IotLocationTypeEnum.class, message = "定位方式必须是 {value}")
-    private Integer locationType;
 
     @Schema(description = "设备位置的纬度", example = "16380")
     private BigDecimal latitude;

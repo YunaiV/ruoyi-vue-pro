@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import jakarta.annotation.Resource;
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -66,6 +68,9 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     @Resource
     @Lazy  // 延迟加载，解决循环依赖
     private IotProductService productService;
+    @Resource
+    @Lazy  // 延迟加载，解决循环依赖
+    private IotDeviceService deviceService;
 
     @Resource
     private DevicePropertyRedisDAO deviceDataRedisDAO;
@@ -168,6 +173,9 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         Map<String, IotDevicePropertyDO> properties2 = convertMap(properties.entrySet(), Map.Entry::getKey, entry ->
                 IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build());
         deviceDataRedisDAO.putAll(device.getId(), properties2);
+
+        // 2.3 提取 GeoLocation 并更新设备定位
+        extractAndUpdateDeviceLocation(device, (Map<?, ?>) message.getParams());
     }
 
     @Override
@@ -211,6 +219,75 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     @Override
     public String getDeviceServerId(Long id) {
         return deviceServerIdRedisDAO.get(id);
+    }
+
+    // ========== 设备定位相关操作 ==========
+
+    /**
+     * 从属性中提取 GeoLocation 并更新设备定位
+     *
+     * @see <a href="https://help.aliyun.com/zh/iot/user-guide/device-geolocation">阿里云规范</a>
+     * GeoLocation 结构体包含：Longitude, Latitude, Altitude, CoordinateSystem
+     */
+    private void extractAndUpdateDeviceLocation(IotDeviceDO device, Map<?, ?> params) {
+        // 1. 解析 GeoLocation 经纬度坐标
+        Double[] location = parseGeoLocation(params);
+        if (location == null) {
+            return;
+        }
+
+        // 2. 更新设备定位
+        deviceService.updateDeviceLocation(device,
+                BigDecimal.valueOf(location[0]), BigDecimal.valueOf(location[1]));
+        log.info("[extractAndUpdateGeoLocation][设备({}) 定位更新: lng={}, lat={}]",
+                device.getId(), location[0], location[1]);
+    }
+
+    /**
+     * 从属性参数中解析 GeoLocation，返回经纬度坐标数组 [longitude, latitude]
+     *
+     * @param params 属性参数
+     * @return [经度, 纬度]，解析失败返回 null
+     */
+    @SuppressWarnings("unchecked")
+    // TODO @AI：返回 BigDecimal 数组；
+    private Double[] parseGeoLocation(Map<?, ?> params) {
+        if (params == null) {
+            return null;
+        }
+        // 1. 查找 GeoLocation 属性（标识符为 GeoLocation 或 geoLocation）
+        Object geoValue = params.get("GeoLocation");
+        if (geoValue == null) {
+            geoValue = params.get("geoLocation");
+        }
+        if (geoValue == null) {
+            return null;
+        }
+
+        // 2. 转换为 Map
+        Map<String, Object> geoLocation = null;
+        if (geoValue instanceof Map) {
+            geoLocation = (Map<String, Object>) geoValue;
+        } else if (geoValue instanceof String) {
+            geoLocation = JsonUtils.parseObject((String) geoValue, Map.class);
+        }
+        if (geoLocation == null) {
+            return null;
+        }
+
+        // 3. 提取经纬度（支持阿里云命名规范：首字母大写）
+        Double longitude = MapUtil.getDouble(geoLocation, "Longitude");
+        if (longitude == null) {
+            longitude = MapUtil.getDouble(geoLocation, "longitude");
+        }
+        Double latitude = MapUtil.getDouble(geoLocation, "Latitude");
+        if (latitude == null) {
+            latitude = MapUtil.getDouble(geoLocation, "latitude");
+        }
+        if (longitude == null || latitude == null) {
+            return null;
+        }
+        return new Double[]{longitude, latitude};
     }
 
 }
