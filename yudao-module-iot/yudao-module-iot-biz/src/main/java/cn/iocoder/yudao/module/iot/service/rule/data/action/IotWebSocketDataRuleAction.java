@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.iot.service.rule.data.action;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkWebSocketConfig;
+import cn.iocoder.yudao.module.iot.dal.redis.rule.IotWebSocketLockRedisDAO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.data.action.websocket.IotWebSocketClient;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class IotWebSocketDataRuleAction extends
         IotDataRuleCacheableAction<IotDataSinkWebSocketConfig, IotWebSocketClient> {
+
+    @Resource
+    private IotWebSocketLockRedisDAO webSocketLockRedisDAO;
 
     @Override
     public Integer getType() {
@@ -62,12 +67,11 @@ public class IotWebSocketDataRuleAction extends
     protected void execute(IotDeviceMessage message, IotDataSinkWebSocketConfig config) throws Exception {
         try {
             // 1.1 获取或创建 WebSocket 客户端
-            // TODO @puhui999：需要加锁，保证必须连接上；
             IotWebSocketClient webSocketClient = getProducer(config);
-            // 1.2 检查连接状态，如果断开则重新连接
+
+            // 1.2 检查连接状态，如果断开则使用分布式锁保证重连的线程安全
             if (!webSocketClient.isConnected()) {
-                log.warn("[execute][WebSocket 连接已断开，尝试重新连接，服务器: {}]", config.getServerUrl());
-                webSocketClient.connect();
+                reconnectWithLock(webSocketClient, config);
             }
 
             // 2.1 发送消息
@@ -80,6 +84,26 @@ public class IotWebSocketDataRuleAction extends
                     message, config, config.getServerUrl(), e);
             throw e;
         }
+    }
+
+    /**
+     * 使用分布式锁进行重连
+     *
+     * @param webSocketClient WebSocket 客户端
+     * @param config          配置信息
+     */
+    private void reconnectWithLock(IotWebSocketClient webSocketClient, IotDataSinkWebSocketConfig config) throws Exception {
+        webSocketLockRedisDAO.lock(config.getServerUrl(), () -> {
+            // 双重检查：获取锁后再次检查连接状态，避免重复连接
+            if (!webSocketClient.isConnected()) {
+                log.warn("[reconnectWithLock][WebSocket 连接已断开，尝试重新连接，服务器: {}]", config.getServerUrl());
+                try {
+                    webSocketClient.connect();
+                } catch (Exception e) {
+                    throw new RuntimeException("WebSocket 重连失败，服务器: " + config.getServerUrl(), e);
+                }
+            }
+        });
     }
 
 }
