@@ -45,6 +45,9 @@ public class IotDeviceRespVO {
     @ExcelProperty("产品编号")
     private Long productId;
 
+    @Schema(description = "产品名称", example = "温湿度传感器")
+    private String productName; // 只有部分接口返回，例如 getDeviceLocationList
+
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品 Key")
     private String productKey;

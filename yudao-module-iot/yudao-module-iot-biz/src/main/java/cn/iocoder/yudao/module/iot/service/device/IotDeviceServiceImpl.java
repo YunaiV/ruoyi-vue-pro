@@ -509,6 +509,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         deleteDeviceCache(device);
     }
 
+    @Override
+    public List<IotDeviceDO> getDeviceListByHasLocation() {
+        return deviceMapper.selectListByHasLocation();
+    }
+
     private IotDeviceServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }

@@ -281,4 +281,11 @@ public interface IotDeviceService {
      */
     void updateDeviceLocation(IotDeviceDO device, BigDecimal longitude, BigDecimal latitude);
 
+    /**
+     * 获得有位置信息的设备列表
+     *
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceListByHasLocation();
+
 }

@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -22,13 +26,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 @Tag(name = "管理后台 - IoT 设备")
 @RestController
@@ -38,6 +41,8 @@ public class IotDeviceController {
 
     @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotProductService productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备")
@@ -133,6 +138,26 @@ public class IotDeviceController {
         return success(convertList(list, device ->  // 只返回 id、name、productId 字段
                 new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())
                         .setProductId(device.getProductId()).setState(device.getState())));
+    }
+
+    @GetMapping("/location-list")
+    @Operation(summary = "获取设备位置列表", description = "获取有经纬度信息的设备列表，用于地图展示")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<List<IotDeviceRespVO>> getDeviceLocationList() {
+        // 1. 获取有位置信息的设备列表
+        List<IotDeviceDO> devices = deviceService.getDeviceListByHasLocation();
+        if (CollUtil.isEmpty(devices)) {
+            return success(Collections.emptyList());
+        }
+
+        // 2. 转换并返回
+        Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
+        return success(convertList(devices, device -> {
+            IotDeviceRespVO respVO = BeanUtils.toBean(device, IotDeviceRespVO.class);
+            MapUtils.findAndThen(productMap, device.getProductId(),
+                    product -> respVO.setProductName(product.getName()));
+            return respVO;
+        }));
     }
 
     @PostMapping("/import")

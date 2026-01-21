@@ -118,4 +118,15 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         ));
     }
 
+    /**
+     * 查询有位置信息的设备列表
+     *
+     * @return 设备列表
+     */
+    default List<IotDeviceDO> selectListByHasLocation() {
+        return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
+                .isNotNull(IotDeviceDO::getLatitude)
+                .isNotNull(IotDeviceDO::getLongitude));
+    }
+
 }
