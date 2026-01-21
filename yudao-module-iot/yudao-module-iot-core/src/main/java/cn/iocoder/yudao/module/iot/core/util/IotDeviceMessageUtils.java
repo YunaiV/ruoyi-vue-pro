@@ -100,6 +100,17 @@ public class IotDeviceMessageUtils {
     }
 
     /**
+     * 判断消息中是否不包含指定的标识符
+     *
+     * @param message    消息
+     * @param identifier 要检查的标识符
+     * @return 是否不包含
+     */
+    public static boolean notContainsIdentifier(IotDeviceMessage message, String identifier) {
+        return !containsIdentifier(message, identifier);
+    }
+
+    /**
      * 将 params 解析为 Map
      *
      * @param params 参数（可能是 Map 或 JSON 字符串）
