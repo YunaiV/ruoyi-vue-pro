@@ -207,6 +207,44 @@ public class IotDeviceMessageUtils {
         return null;
     }
 
+    /**
+     * 从服务调用消息中提取输入参数
+     * <p>
+     * 服务调用消息的 params 结构通常为：
+     * {
+     * "identifier": "serviceIdentifier",
+     * "inputData": { ... } 或 "inputParams": { ... }
+     * }
+     *
+     * @param message 设备消息
+     * @return 输入参数 Map，如果未找到则返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> extractServiceInputParams(IotDeviceMessage message) {
+        Object params = message.getParams();
+        if (params == null) {
+            return null;
+        }
+        if (!(params instanceof Map)) {
+            return null;
+        }
+        Map<String, Object> paramsMap = (Map<String, Object>) params;
+
+        // 尝试从 inputData 字段获取
+        Object inputData = paramsMap.get("inputData");
+        if (inputData instanceof Map) {
+            return (Map<String, Object>) inputData;
+        }
+
+        // 尝试从 inputParams 字段获取
+        Object inputParams = paramsMap.get("inputParams");
+        if (inputParams instanceof Map) {
+            return (Map<String, Object>) inputParams;
+        }
+
+        return null;
+    }
+
     // ========== Topic 相关 ==========
 
     public static String buildMessageBusGatewayDeviceMessageTopic(String serverId) {
