@@ -137,16 +137,6 @@ public class IotDeviceDO extends TenantBaseDO {
      * 设备位置的经度
      */
     private BigDecimal longitude;
-    /**
-     * 地区编码
-     * <p>
-     * 关联 Area 的 id
-     */
-    private Integer areaId;
-    /**
-     * 设备详细地址
-     */
-    private String address;
 
     /**
      * 设备配置
