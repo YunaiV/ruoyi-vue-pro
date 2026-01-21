@@ -514,6 +514,85 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return deviceMapper.selectListByHasLocation();
     }
 
+    // ========== 网关-子设备绑定相关 ==========
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void bindDeviceGateway(Collection<Long> ids, Long gatewayId) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // TODO @AI：校验应该是 1.1、1.2 统一风格；
+        // 1. 校验网关设备存在且类型正确
+        validateGatewayDeviceExists(gatewayId);
+
+        // 2. 校验并绑定每个子设备
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
+        if (devices.size() != ids.size()) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+
+        List<IotDeviceDO> updateList = new ArrayList<>();
+        for (IotDeviceDO device : devices) {
+            // 2.1 校验是否为子设备类型
+            if (!IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())) {
+                throw exception(DEVICE_NOT_GATEWAY_SUB);
+            }
+            // 2.2 校验是否已绑定其他网关
+            if (device.getGatewayId() != null && !device.getGatewayId().equals(gatewayId)) {
+                throw exception(DEVICE_GATEWAY_BINDTO_EXISTS);
+            }
+            updateList.add(new IotDeviceDO().setId(device.getId()).setGatewayId(gatewayId));
+        }
+
+        // 3. 批量更新数据库
+        // TODO @AI：List<IotDeviceDO> updateList 直接 convertList，不用上面 for 里面搞；校验是校验，插入是插入；
+        deviceMapper.updateBatch(updateList);
+
+        // 4. 清空对应缓存
+        deleteDeviceCache(devices);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void unbindDeviceGateway(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 1. 校验设备存在
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
+        if (devices.size() != ids.size()) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+
+        // 2. 批量更新数据库（将 gatewayId 设置为 null）
+        List<IotDeviceDO> updateList = devices.stream()
+                .filter(device -> device.getGatewayId() != null)
+                .map(device -> new IotDeviceDO().setId(device.getId()).setGatewayId(null))
+                .toList();
+        if (CollUtil.isNotEmpty(updateList)) {
+            deviceMapper.updateBatch(updateList);
+        }
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(devices);
+    }
+
+    @Override
+    public List<IotDeviceDO> getBindableSubDeviceList(@Nullable Long gatewayId) {
+        return deviceMapper.selectBindableSubDeviceList(gatewayId);
+    }
+
+    @Override
+    public List<IotDeviceDO> getDeviceListByGatewayId(Long gatewayId) {
+        return deviceMapper.selectListByGatewayId(gatewayId);
+    }
+
+    @Override
+    public Long getDeviceCountByGatewayId(Long gatewayId) {
+        return deviceMapper.selectCountByGatewayId(gatewayId);
+    }
+
     private IotDeviceServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }

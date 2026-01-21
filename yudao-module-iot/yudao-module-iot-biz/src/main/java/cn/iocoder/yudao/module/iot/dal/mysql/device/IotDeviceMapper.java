@@ -129,4 +129,33 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .isNotNull(IotDeviceDO::getLongitude));
     }
 
+    // ========== 网关-子设备绑定相关 ==========
+
+    /**
+     * 根据网关编号查询子设备列表
+     *
+     * @param gatewayId 网关设备编号
+     * @return 子设备列表
+     */
+    default List<IotDeviceDO> selectListByGatewayId(Long gatewayId) {
+        return selectList(IotDeviceDO::getGatewayId, gatewayId);
+    }
+
+    /**
+     * 查询可绑定到网关的子设备列表
+     * <p>
+     * 条件：设备类型为 GATEWAY_SUB 且未绑定任何网关，或已绑定到指定网关
+     *
+     * @param gatewayId 网关设备编号（可选，用于包含已绑定到该网关的设备）
+     * @return 子设备列表
+     */
+    default List<IotDeviceDO> selectBindableSubDeviceList(@Nullable Long gatewayId) {
+        return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
+                .eq(IotDeviceDO::getDeviceType, cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum.GATEWAY_SUB.getType())
+                .and(wrapper -> wrapper
+                        .isNull(IotDeviceDO::getGatewayId)));
+//                        .or()
+//                        .eqIfPresent(IotDeviceDO::getGatewayId, gatewayId)))
+    }
+
 }

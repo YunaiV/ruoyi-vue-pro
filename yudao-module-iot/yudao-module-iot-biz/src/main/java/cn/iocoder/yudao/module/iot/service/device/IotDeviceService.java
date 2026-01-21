@@ -73,6 +73,7 @@ public interface IotDeviceService {
      */
     void updateDeviceGroup(@Valid IotDeviceUpdateGroupReqVO updateReqVO);
 
+    // TODO @AI：网关设备被删除时，需要查看是否有子设备绑定。如果有，则不允许删除。
     /**
      * 删除单个设备
      *
@@ -287,5 +288,49 @@ public interface IotDeviceService {
      * @return 设备列表
      */
     List<IotDeviceDO> getDeviceListByHasLocation();
+
+    // ========== 网关-子设备绑定相关 ==========
+
+    /**
+     * 绑定子设备到网关
+     *
+     * @param ids       子设备编号列表
+     * @param gatewayId 网关设备编号
+     */
+    void bindDeviceGateway(Collection<Long> ids, Long gatewayId);
+
+    /**
+     * 解绑子设备与网关
+     *
+     * @param ids 子设备编号列表
+     */
+    void unbindDeviceGateway(Collection<Long> ids);
+
+    /**
+     * 获取可绑定到网关的子设备列表
+     * <p>
+     * 条件：设备类型为 GATEWAY_SUB 且未绑定任何网关
+     *
+     * @param gatewayId 网关设备编号（可选，用于包含已绑定到该网关的设备）
+     * @return 子设备列表
+     */
+    List<IotDeviceDO> getBindableSubDeviceList(@Nullable Long gatewayId);
+
+    /**
+     * 根据网关编号获取子设备列表
+     *
+     * @param gatewayId 网关设备编号
+     * @return 子设备列表
+     */
+    List<IotDeviceDO> getDeviceListByGatewayId(Long gatewayId);
+
+    // TODO @AI：暂时用不到，可以删除。
+    /**
+     * 根据网关编号获取子设备数量
+     *
+     * @param gatewayId 网关设备编号
+     * @return 子设备数量
+     */
+    Long getDeviceCountByGatewayId(Long gatewayId);
 
 }

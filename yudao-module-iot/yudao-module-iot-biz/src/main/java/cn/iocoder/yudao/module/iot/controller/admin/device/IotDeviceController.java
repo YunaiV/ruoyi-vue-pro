@@ -51,6 +51,7 @@ public class IotDeviceController {
         return success(deviceService.createDevice(createReqVO));
     }
 
+
     @PutMapping("/update")
     @Operation(summary = "更新设备")
     @PreAuthorize("@ss.hasPermission('iot:device:update')")
@@ -59,7 +60,72 @@ public class IotDeviceController {
         return success(true);
     }
 
-    // TODO @芋艿：参考阿里云：1）绑定网关；2）解绑网关
+    @PutMapping("/bind-gateway")
+    @Operation(summary = "绑定子设备到网关")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
+    public CommonResult<Boolean> bindDeviceGateway(@Valid @RequestBody IotDeviceBindGatewayReqVO reqVO) {
+        deviceService.bindDeviceGateway(reqVO.getIds(), reqVO.getGatewayId());
+        return success(true);
+    }
+
+    @PutMapping("/unbind-gateway")
+    @Operation(summary = "解绑子设备与网关")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
+    public CommonResult<Boolean> unbindDeviceGateway(@Valid @RequestBody IotDeviceUnbindGatewayReqVO reqVO) {
+        deviceService.unbindDeviceGateway(reqVO.getIds());
+        return success(true);
+    }
+
+    @GetMapping("/sub-device-list")
+    @Operation(summary = "获取网关的子设备列表")
+    @Parameter(name = "gatewayId", description = "网关设备编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<List<IotDeviceRespVO>> getSubDeviceList(@RequestParam("gatewayId") Long gatewayId) {
+        List<IotDeviceDO> list = deviceService.getDeviceListByGatewayId(gatewayId);
+        if (CollUtil.isEmpty(list)) {
+            return success(Collections.emptyList());
+        }
+
+        // 补充产品名称
+        Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
+        return success(convertList(list, device -> {
+            IotDeviceRespVO respVO = BeanUtils.toBean(device, IotDeviceRespVO.class);
+            MapUtils.findAndThen(productMap, device.getProductId(),
+                    product -> respVO.setProductName(product.getName()));
+            return respVO;
+        }));
+    }
+
+    // TODO @AI：希望改成“未绑定的”。需要剔除已经绑定，包括自己的；
+    // TODO @AI：不需要传递 gatewayId；
+    // TODO @AI：需要分页；
+    @GetMapping("/bindable-sub-device-list")
+    @Operation(summary = "获取可绑定到网关的子设备列表")
+    @Parameter(name = "gatewayId", description = "网关设备编号（可选）", example = "1")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<List<IotDeviceRespVO>> getBindableSubDeviceList(
+            @RequestParam(value = "gatewayId", required = false) Long gatewayId) {
+        List<IotDeviceDO> list = deviceService.getBindableSubDeviceList(gatewayId);
+        if (CollUtil.isEmpty(list)) {
+            return success(Collections.emptyList());
+        }
+
+        // 补充产品名称
+        Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
+        return success(convertList(list, device -> {
+            // TODO @AI：可以 beanutils 转换么？
+            IotDeviceRespVO respVO = new IotDeviceRespVO()
+                    .setId(device.getId())
+                    .setDeviceName(device.getDeviceName())
+                    .setNickname(device.getNickname())
+                    .setProductId(device.getProductId())
+                    .setState(device.getState())
+                    .setGatewayId(device.getGatewayId());
+            MapUtils.findAndThen(productMap, device.getProductId(),
+                    product -> respVO.setProductName(product.getName()));
+            return respVO;
+        }));
+    }
 
     @PutMapping("/update-group")
     @Operation(summary = "更新设备分组")
