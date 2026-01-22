@@ -96,35 +96,20 @@ public class IotDeviceController {
         }));
     }
 
-    // TODO @AI：希望改成“未绑定的”。需要剔除已经绑定，包括自己的；
-    // TODO @AI：不需要传递 gatewayId；
-    // TODO @AI：需要分页；
-    @GetMapping("/bindable-sub-device-list")
-    @Operation(summary = "获取可绑定到网关的子设备列表")
-    @Parameter(name = "gatewayId", description = "网关设备编号（可选）", example = "1")
+    @GetMapping("/unbound-sub-device-page")
+    @Operation(summary = "获取未绑定网关的子设备分页")
     @PreAuthorize("@ss.hasPermission('iot:device:query')")
-    public CommonResult<List<IotDeviceRespVO>> getBindableSubDeviceList(
-            @RequestParam(value = "gatewayId", required = false) Long gatewayId) {
-        List<IotDeviceDO> list = deviceService.getBindableSubDeviceList(gatewayId);
-        if (CollUtil.isEmpty(list)) {
-            return success(Collections.emptyList());
+    public CommonResult<PageResult<IotDeviceRespVO>> getUnboundSubDevicePage(@Valid IotDevicePageReqVO pageReqVO) {
+        PageResult<IotDeviceDO> pageResult = deviceService.getUnboundSubDevicePage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
         }
 
         // 补充产品名称
         Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
-        return success(convertList(list, device -> {
-            // TODO @AI：可以 beanutils 转换么？
-            IotDeviceRespVO respVO = new IotDeviceRespVO()
-                    .setId(device.getId())
-                    .setDeviceName(device.getDeviceName())
-                    .setNickname(device.getNickname())
-                    .setProductId(device.getProductId())
-                    .setState(device.getState())
-                    .setGatewayId(device.getGatewayId());
-            MapUtils.findAndThen(productMap, device.getProductId(),
-                    product -> respVO.setProductName(product.getName()));
-            return respVO;
-        }));
+        PageResult<IotDeviceRespVO> result = BeanUtils.toBean(pageResult, IotDeviceRespVO.class, device ->
+                MapUtils.findAndThen(productMap, device.getProductId(), product -> device.setProductName(product.getName())));
+        return success(result);
     }
 
     @PutMapping("/update-group")

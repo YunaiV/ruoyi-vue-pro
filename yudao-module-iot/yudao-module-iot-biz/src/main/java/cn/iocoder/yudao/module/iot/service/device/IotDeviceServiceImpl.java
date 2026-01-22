@@ -170,9 +170,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     public void deleteDevice(Long id) {
         // 1.1 校验存在
         IotDeviceDO device = validateDeviceExists(id);
-        // 1.2 如果是网关设备，检查是否有子设备
-        if (device.getGatewayId() != null && deviceMapper.selectCountByGatewayId(id) > 0) {
-            throw exception(DEVICE_HAS_CHILDREN);
+        // 1.2 如果是网关设备，检查是否有子设备绑定
+        if (IotProductDeviceTypeEnum.isGateway(device.getDeviceType())
+                && deviceMapper.selectCountByGatewayId(id) > 0) {
+            throw exception(DEVICE_GATEWAY_HAS_SUB);
         }
 
         // 2. 删除设备
@@ -193,10 +194,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (CollUtil.isEmpty(devices)) {
             return;
         }
-        // 1.2 校验网关设备是否存在
+        // 1.2 如果是网关设备，检查是否有子设备绑定
         for (IotDeviceDO device : devices) {
-            if (device.getGatewayId() != null && deviceMapper.selectCountByGatewayId(device.getId()) > 0) {
-                throw exception(DEVICE_HAS_CHILDREN);
+            if (IotProductDeviceTypeEnum.isGateway(device.getDeviceType())
+                    && deviceMapper.selectCountByGatewayId(device.getId()) > 0) {
+                throw exception(DEVICE_GATEWAY_HAS_SUB);
             }
         }
 
@@ -522,34 +524,29 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        // TODO @AI：校验应该是 1.1、1.2 统一风格；
-        // 1. 校验网关设备存在且类型正确
+        // 1.1 校验网关设备存在且类型正确
         validateGatewayDeviceExists(gatewayId);
-
-        // 2. 校验并绑定每个子设备
+        // 1.2 校验子设备存在
         List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
         if (devices.size() != ids.size()) {
             throw exception(DEVICE_NOT_EXISTS);
         }
-
-        List<IotDeviceDO> updateList = new ArrayList<>();
+        // 1.3 校验每个设备是否可绑定
         for (IotDeviceDO device : devices) {
-            // 2.1 校验是否为子设备类型
             if (!IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())) {
-                throw exception(DEVICE_NOT_GATEWAY_SUB);
+                throw exception(DEVICE_NOT_GATEWAY_SUB, device.getProductKey(), device.getDeviceName());
             }
-            // 2.2 校验是否已绑定其他网关
             if (device.getGatewayId() != null && !device.getGatewayId().equals(gatewayId)) {
-                throw exception(DEVICE_GATEWAY_BINDTO_EXISTS);
+                throw exception(DEVICE_GATEWAY_BINDTO_EXISTS, device.getProductKey(), device.getDeviceName());
             }
-            updateList.add(new IotDeviceDO().setId(device.getId()).setGatewayId(gatewayId));
         }
 
-        // 3. 批量更新数据库
-        // TODO @AI：List<IotDeviceDO> updateList 直接 convertList，不用上面 for 里面搞；校验是校验，插入是插入；
+        // 2. 批量更新数据库
+        List<IotDeviceDO> updateList = convertList(devices, device ->
+                new IotDeviceDO().setId(device.getId()).setGatewayId(gatewayId));
         deviceMapper.updateBatch(updateList);
 
-        // 4. 清空对应缓存
+        // 3. 清空对应缓存
         deleteDeviceCache(devices);
     }
 
@@ -579,18 +576,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public List<IotDeviceDO> getBindableSubDeviceList(@Nullable Long gatewayId) {
-        return deviceMapper.selectBindableSubDeviceList(gatewayId);
+    public PageResult<IotDeviceDO> getUnboundSubDevicePage(IotDevicePageReqVO pageReqVO) {
+        return deviceMapper.selectUnboundSubDevicePage(pageReqVO);
     }
 
     @Override
     public List<IotDeviceDO> getDeviceListByGatewayId(Long gatewayId) {
         return deviceMapper.selectListByGatewayId(gatewayId);
-    }
-
-    @Override
-    public Long getDeviceCountByGatewayId(Long gatewayId) {
-        return deviceMapper.selectCountByGatewayId(gatewayId);
     }
 
     private IotDeviceServiceImpl getSelf() {

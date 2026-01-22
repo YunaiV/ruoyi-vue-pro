@@ -158,6 +158,11 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    public List<IotProductDO> getProductList(Integer deviceType) {
+        return productMapper.selectList(deviceType);
+    }
+
+    @Override
     public Long getProductCount(LocalDateTime createTime) {
         return productMapper.selectCountByCreateTime(createTime);
     }

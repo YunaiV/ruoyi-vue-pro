@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Nullable;
 import org.apache.ibatis.annotations.Mapper;
@@ -142,20 +143,20 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     }
 
     /**
-     * 查询可绑定到网关的子设备列表
-     * <p>
-     * 条件：设备类型为 GATEWAY_SUB 且未绑定任何网关，或已绑定到指定网关
+     * 分页查询未绑定网关的子设备
      *
-     * @param gatewayId 网关设备编号（可选，用于包含已绑定到该网关的设备）
-     * @return 子设备列表
+     * @param reqVO 分页查询参数
+     * @return 子设备分页
      */
-    default List<IotDeviceDO> selectBindableSubDeviceList(@Nullable Long gatewayId) {
-        return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
-                .eq(IotDeviceDO::getDeviceType, cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum.GATEWAY_SUB.getType())
-                .and(wrapper -> wrapper
-                        .isNull(IotDeviceDO::getGatewayId)));
-//                        .or()
-//                        .eqIfPresent(IotDeviceDO::getGatewayId, gatewayId)))
+    default PageResult<IotDeviceDO> selectUnboundSubDevicePage(IotDevicePageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<IotDeviceDO>()
+                .likeIfPresent(IotDeviceDO::getDeviceName, reqVO.getDeviceName())
+                .likeIfPresent(IotDeviceDO::getNickname, reqVO.getNickname())
+                .eqIfPresent(IotDeviceDO::getProductId, reqVO.getProductId())
+                // 仅查询子设备 + 未绑定网关
+                .eq(IotDeviceDO::getDeviceType, IotProductDeviceTypeEnum.GATEWAY_SUB.getType())
+                .isNull(IotDeviceDO::getGatewayId)
+                .orderByDesc(IotDeviceDO::getId));
     }
 
 }

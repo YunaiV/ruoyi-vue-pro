@@ -26,19 +26,15 @@ public interface ErrorCodeConstants {
     // ========== 设备 1-050-003-000 ============
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1_050_003_000, "设备不存在");
     ErrorCode DEVICE_NAME_EXISTS = new ErrorCode(1_050_003_001, "设备名称在同一产品下必须唯一");
-    ErrorCode DEVICE_HAS_CHILDREN = new ErrorCode(1_050_003_002, "有子设备，不允许删除");
+    ErrorCode DEVICE_GATEWAY_HAS_SUB = new ErrorCode(1_050_003_002, "网关设备存在已绑定的子设备，不允许删除");
     ErrorCode DEVICE_KEY_EXISTS = new ErrorCode(1_050_003_003, "设备标识已经存在");
     ErrorCode DEVICE_GATEWAY_NOT_EXISTS = new ErrorCode(1_050_003_004, "网关设备不存在");
     ErrorCode DEVICE_NOT_GATEWAY = new ErrorCode(1_050_003_005, "设备不是网关设备");
     ErrorCode DEVICE_IMPORT_LIST_IS_EMPTY = new ErrorCode(1_050_003_006, "导入设备数据不能为空！");
     ErrorCode DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL = new ErrorCode(1_050_003_007, "下行设备消息失败，原因：设备未连接网关");
     ErrorCode DEVICE_SERIAL_NUMBER_EXISTS = new ErrorCode(1_050_003_008, "设备序列号已存在，序列号必须全局唯一");
-    // TODO @AI：1_050_003_009 需要提示具体的哪个设备。产品/设备，标识下
-    ErrorCode DEVICE_NOT_GATEWAY_SUB = new ErrorCode(1_050_003_009, "设备不是网关子设备类型，无法绑定到网关");
-    // TODO @AI：1_050_003_009 需要提示具体的哪个设备。产品/设备，标识下
-    ErrorCode DEVICE_GATEWAY_BINDTO_EXISTS = new ErrorCode(1_050_003_010, "设备已绑定到其他网关，请先解绑");
-    // TODO @AI：是不是可以删除，DEVICE_GATEWAY_BINDTO_NOT_EXISTS
-    ErrorCode DEVICE_GATEWAY_BINDTO_NOT_EXISTS = new ErrorCode(1_050_003_011, "设备未绑定到任何网关");
+    ErrorCode DEVICE_NOT_GATEWAY_SUB = new ErrorCode(1_050_003_009, "设备【{}/{}】不是网关子设备类型，无法绑定到网关");
+    ErrorCode DEVICE_GATEWAY_BINDTO_EXISTS = new ErrorCode(1_050_003_010, "设备【{}/{}】已绑定到其他网关，请先解绑");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
