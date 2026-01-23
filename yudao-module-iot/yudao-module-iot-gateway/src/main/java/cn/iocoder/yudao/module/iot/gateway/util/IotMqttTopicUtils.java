@@ -63,4 +63,50 @@ public final class IotMqttTopicUtils {
         return SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/" + topicSuffix;
     }
 
+    /**
+     * 构建拓扑管理 Topic
+     * <p>
+     * 拓扑管理类 Topic 使用网关设备的 productKey/deviceName
+     *
+     * @param method            方法，如 thing.topo.add
+     * @param gatewayProductKey 网关 ProductKey
+     * @param gatewayDeviceName 网关 DeviceName
+     * @param isReply           是否为响应
+     * @return Topic
+     */
+    public static String buildTopoTopic(String method, String gatewayProductKey,
+                                        String gatewayDeviceName, boolean isReply) {
+        return buildTopicByMethod(method, gatewayProductKey, gatewayDeviceName, isReply);
+    }
+
+    /**
+     * 判断是否为拓扑管理 Topic（通过 method 判断）
+     *
+     * @param method 消息方法
+     * @return 是否为拓扑管理 Topic
+     */
+    public static boolean isTopoMethod(String method) {
+        return method != null && method.startsWith("thing.topo.");
+    }
+
+    /**
+     * 判断是否为子设备注册 Topic
+     *
+     * @param method 消息方法
+     * @return 是否为子设备注册 Topic
+     */
+    public static boolean isSubDeviceRegisterMethod(String method) {
+        return "thing.sub.register".equals(method);
+    }
+
+    /**
+     * 判断是否为批量上报 Topic
+     *
+     * @param method 消息方法
+     * @return 是否为批量上报 Topic
+     */
+    public static boolean isPackPostMethod(String method) {
+        return "thing.event.property.pack.post".equals(method);
+    }
+
 }

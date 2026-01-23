@@ -94,6 +94,42 @@ public class IotDeviceMessage {
      */
     private String msg;
 
+    /**
+     * 父消息 ID
+     * <p>
+     * - null：原始消息，需要 reply
+     * - 非 null：从父消息（如 pack）拆分而来，不需要单独 reply
+     */
+    private String parentMessageId;
+
+    // TODO @TODO @AI：抽到工具类里，具体哪个，一起讨论下；
+    /**
+     * 判断是否需要发送 reply
+     *
+     * @return 是否需要回复
+     */
+    public boolean needReply() {
+        // 1. 来自拆包的消息，不单独 reply
+        if (parentMessageId != null) {
+            return false;
+        }
+        // 2. 某些方法本身不需要 reply（如 STATE_UPDATE）
+        if (IotDeviceMessageMethodEnum.isReplyDisabled(method)) {
+            return false;
+        }
+        return true;
+    }
+
+    // TODO @AI：没用的字段，删除删除
+    /**
+     * 获取原始消息 ID（用于日志追踪）
+     *
+     * @return 原始消息 ID
+     */
+    public String getOriginMessageId() {
+        return parentMessageId != null ? parentMessageId : id;
+    }
+
     // ========== 基础方法：只传递"codec（编解码）字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {

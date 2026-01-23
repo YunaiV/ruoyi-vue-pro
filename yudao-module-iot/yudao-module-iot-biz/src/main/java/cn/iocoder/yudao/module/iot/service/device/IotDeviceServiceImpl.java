@@ -468,6 +468,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             log.error("[authDevice][设备({}/{}) 密码不正确]", productKey, deviceName);
             return false;
         }
+
+        // 3. 校验子设备拓扑关系：子设备必须先绑定到某网关才能认证上线
+        if (IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())
+                && device.getGatewayId() != null) {
+            log.warn("[authDevice][子设备({}/{}) 未绑定到任何网关，认证失败]", productKey, deviceName);
+            return false;
+        }
         return true;
     }
 
