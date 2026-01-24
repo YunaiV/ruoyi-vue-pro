@@ -605,7 +605,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (!IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())) {
             throw exception(DEVICE_NOT_GATEWAY_SUB, device.getProductKey(), device.getDeviceName());
         }
-        if (ObjUtil.equals(device.getGatewayId(), gatewayId)) {
+        // 已绑定到其他网关，拒绝绑定（需先解绑）
+        if (device.getGatewayId() != null && ObjUtil.notEqual(device.getGatewayId(), gatewayId)) {
             throw exception(DEVICE_GATEWAY_BINDTO_EXISTS, device.getProductKey(), device.getDeviceName());
         }
     }
@@ -652,8 +653,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             throw exception(DEVICE_NOT_GATEWAY);
         }
         // 1.2 解析参数
-        IotDeviceTopoAddReqDTO params = JsonUtils.parseObject(JsonUtils.toJsonString(message.getParams()),
-                IotDeviceTopoAddReqDTO.class);
+        IotDeviceTopoAddReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceTopoAddReqDTO.class);
         if (params == null || CollUtil.isEmpty(params.getSubDevices())) {
             throw exception(DEVICE_TOPO_PARAMS_INVALID);
         }
@@ -693,7 +693,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         checkSubDeviceCanBind(subDevice, gatewayDevice.getId());
 
         // 2. 更新数据库
-        deviceMapper.updateById(new IotDeviceDO().setId(subDevice.getId()).setGatewayId(subDevice.getGatewayId()));
+        deviceMapper.updateById(new IotDeviceDO().setId(subDevice.getId()).setGatewayId(gatewayDevice.getId()));
         log.info("[addDeviceTopo][网关({}/{}) 绑定子设备({}/{})]",
                 gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
                 subDevice.getProductKey(), subDevice.getDeviceName());
@@ -710,8 +710,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             throw exception(DEVICE_NOT_GATEWAY);
         }
         // 1.2 解析参数
-        IotDeviceTopoDeleteReqDTO params = JsonUtils.parseObject(JsonUtils.toJsonString(message.getParams()),
-                IotDeviceTopoDeleteReqDTO.class);
+        IotDeviceTopoDeleteReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceTopoDeleteReqDTO.class);
         if (params == null || CollUtil.isEmpty(params.getSubDevices())) {
             throw exception(DEVICE_TOPO_PARAMS_INVALID);
         }

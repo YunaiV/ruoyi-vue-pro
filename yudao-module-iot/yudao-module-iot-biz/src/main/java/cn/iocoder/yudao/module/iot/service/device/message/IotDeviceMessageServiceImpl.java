@@ -251,9 +251,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      */
     private void handlePackMessage(IotDeviceMessage packMessage, IotDeviceDO gatewayDevice) {
         // 1. 解析参数
-        IotDevicePropertyPackPostReqDTO params = JsonUtils.parseObject(
-                JsonUtils.toJsonString(packMessage.getParams()),
-                IotDevicePropertyPackPostReqDTO.class);
+        IotDevicePropertyPackPostReqDTO params = JsonUtils.convertObject(
+                packMessage.getParams(), IotDevicePropertyPackPostReqDTO.class);
         if (params == null) {
             log.warn("[handlePackMessage][消息({}) 参数解析失败]", packMessage);
             return;
@@ -272,7 +271,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
                 IotDeviceDO subDevice = deviceService.getDeviceFromCache(identity.getProductKey(), identity.getDeviceName());
                 if (subDevice == null) {
                     log.warn("[handlePackMessage][子设备({}/{}) 不存在]", identity.getProductKey(), identity.getDeviceName());
-                    return;
+                    continue;
                 }
                 sendDevicePackData(subDevice, packMessage.getServerId(), subDeviceData.getProperties(), subDeviceData.getEvents());
             } catch (Exception ex) {
