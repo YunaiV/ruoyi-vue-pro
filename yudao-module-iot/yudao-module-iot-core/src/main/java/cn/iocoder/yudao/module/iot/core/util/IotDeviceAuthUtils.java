@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.digest.HmacAlgorithm;
 import lombok.AllArgsConstructor;
@@ -53,25 +54,29 @@ public class IotDeviceAuthUtils {
     public static AuthInfo getAuthInfo(String productKey, String deviceName, String deviceSecret) {
         String clientId = buildClientId(productKey, deviceName);
         String username = buildUsername(productKey, deviceName);
-        String content = "clientId" + clientId +
-                "deviceName" + deviceName +
-                "deviceSecret" + deviceSecret +
-                "productKey" + productKey;
-        String password = buildPassword(deviceSecret, content);
+        String password = buildPassword(deviceSecret,
+                buildContent(clientId, productKey, deviceName, deviceSecret));
         return new AuthInfo(clientId, username, password);
     }
 
-    private static String buildClientId(String productKey, String deviceName) {
+    public static String buildClientId(String productKey, String deviceName) {
         return String.format("%s.%s", productKey, deviceName);
     }
 
-    private static String buildUsername(String productKey, String deviceName) {
+    public static String buildUsername(String productKey, String deviceName) {
         return String.format("%s&%s", deviceName, productKey);
     }
 
-    private static String buildPassword(String deviceSecret, String content) {
-        return DigestUtil.hmac(HmacAlgorithm.HmacSHA256, deviceSecret.getBytes())
+    public static String buildPassword(String deviceSecret, String content) {
+        return DigestUtil.hmac(HmacAlgorithm.HmacSHA256, StrUtil.utf8Bytes(deviceSecret))
                 .digestHex(content);
+    }
+
+    public static String buildContent(String clientId, String productKey, String deviceName, String deviceSecret) {
+        return "clientId" + clientId +
+                "deviceName" + deviceName +
+                "deviceSecret" + deviceSecret +
+                "productKey" + productKey;
     }
 
     public static DeviceInfo parseUsername(String username) {
