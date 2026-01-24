@@ -3,14 +3,13 @@ package cn.iocoder.yudao.module.iot.core.topic.auth;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-// TODO @AI：不用带 device 关键字；
-// TODO @AI：挂个阿里云的链接，https://help.aliyun.com/zh/iot/user-guide/register-devices 的「子设备的 MQTT 动态注册」小节
 /**
  * IoT 子设备动态注册 Request DTO
  * <p>
  * 用于 thing.sub.register 消息的 params 数组元素
  *
  * @author 芋道源码
+ * @see <a href="http://help.aliyun.com/zh/marketplace/dynamic-registration-of-sub-devices">阿里云 - 动态注册子设备</a>
  */
 @Data
 public class IotSubDeviceRegisterReqDTO {

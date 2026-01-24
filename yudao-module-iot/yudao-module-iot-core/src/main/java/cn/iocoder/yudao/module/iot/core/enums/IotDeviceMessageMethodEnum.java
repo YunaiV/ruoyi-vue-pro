@@ -43,7 +43,6 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     PROPERTY_POST("thing.property.post", "属性上报", true),
     PROPERTY_SET("thing.property.set", "属性设置", false),
 
-    // TODO @AI：改成 thing.property.pack.post
     PROPERTY_PACK_POST("thing.event.property.pack.post", "批量上报（属性 + 事件 + 子设备）", true), // 网关独有
 
     // ========== 设备事件 ==========
@@ -77,8 +76,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
      */
     public static final Set<String> REPLY_DISABLED = SetUtils.asSet(
             STATE_UPDATE.getMethod(),
-            OTA_PROGRESS.getMethod(), // 参考阿里云，OTA 升级进度上报，不进行回复
-            TOPO_CHANGE.getMethod() // 拓扑变更通知，下行消息，不需要回复 TODO @AI：看看阿里云的文档，确认下是不是这样的
+            OTA_PROGRESS.getMethod() // 参考阿里云，OTA 升级进度上报，不进行回复
     );
 
     private final String method;

@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -183,10 +185,9 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // 2. 记录消息
         getSelf().createDeviceLogAsync(message);
 
-        // TODO @AI：我在想，是不是批量上传后，还是得 reply 。因为打包上传的时候，只是那条消息的回复。然后，需要单独给每个子消息回复，后续至于怎么使用，是不是得看具体业务了；例如说：1）批量上传属性，默认回复是批量上传的消息；然后，每个属性、事件拆包消息，单独回复，后续网关设备按需回复给子设备。
-        // 3. 回复消息。前提：非 _reply 消息、非禁用回复的消息、非拆包消息
+        // 3. 回复消息。前提：非 _reply 消息、非禁用回复的消息
         if (IotDeviceMessageUtils.isReplyMessage(message)
-                || !message.needReply()
+                || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
                 || StrUtil.isEmpty(message.getServerId())) {
             return;
         }
@@ -242,7 +243,6 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod())) {
             return handleTopoDelete(message, device);
         }
-
         // 获取拓扑关系
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.TOPO_GET.getMethod())) {
             return handleTopoGet(device);
@@ -267,57 +267,81 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      * @return 响应数据
      */
     private Object handleTopoAdd(IotDeviceMessage message, IotDeviceDO gatewayDevice) {
-        // TODO @AI：这里是不是 1.1 1.2 1.3 这样？修改前，我们确认下，有没模块是这么写的；iot 消息处理里；
-        // 1. 校验网关设备类型
+        // 1.1 校验网关设备类型
         if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
             throw exception(DEVICE_NOT_GATEWAY);
         }
-
-        // 2. 解析参数
+        // 1.2 解析参数
         // TODO @AI：是不是 parseObject 增加一个方法，允许传入 object 类型，避免先转 jsonString 再 parseObject ；
         IotDeviceTopoAddReqDTO params = JsonUtils.parseObject(JsonUtils.toJsonString(message.getParams()),
                 IotDeviceTopoAddReqDTO.class);
-        if (params == null) {
+        if (params == null || CollUtil.isEmpty(params.getSubDevices())) {
             throw exception(DEVICE_TOPO_PARAMS_INVALID);
         }
 
-        // 3. 解析子设备信息
-        IotDeviceAuthUtils.DeviceInfo subDeviceInfo = IotDeviceAuthUtils.parseUsername(params.getUsername());
+        // 2. 遍历处理每个子设备
+        // TODO @AI：processTopoAddSubDevice 不要抽成小方法；
+        List<IotDeviceDO> addedSubDevices = new ArrayList<>(params.getSubDevices().size());
+        for (IotDeviceAuthReqDTO subDeviceAuth : params.getSubDevices()) {
+            try {
+                IotDeviceDO subDevice = processTopoAddSubDevice(subDeviceAuth, gatewayDevice);
+                addedSubDevices.add(subDevice);
+            } catch (Exception ex) {
+                log.warn("[handleTopoAdd][网关({}/{}) 添加子设备失败，username={}]",
+                        gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                        subDeviceAuth.getUsername(), ex);
+            }
+        }
+        // TODO @AI：http://help.aliyun.com/zh/marketplace/add-topological-relationship 要回复的！
+
+        // 3. 发送拓扑变更通知
+        // TODO @AI：这里不应该发，它更多发生在，管理后台改动后，主动下发；http://help.aliyun.com/zh/marketplace/notify-gateway-topology-changes
+        for (IotDeviceDO subDevice : addedSubDevices) {
+            sendTopoChangeNotify(gatewayDevice, "add", subDevice);
+        }
+        return null;
+    }
+
+    /**
+     * 处理单个子设备的拓扑添加
+     *
+     * @param subDeviceAuth 子设备认证信息
+     * @param gatewayDevice 网关设备
+     * @return 添加成功的子设备，失败返回 null
+     */
+    private IotDeviceDO processTopoAddSubDevice(IotDeviceAuthReqDTO subDeviceAuth, IotDeviceDO gatewayDevice) {
+        // 1.1 解析子设备信息
+        IotDeviceAuthUtils.DeviceInfo subDeviceInfo = IotDeviceAuthUtils.parseUsername(subDeviceAuth.getUsername());
         if (subDeviceInfo == null) {
             throw exception(DEVICE_TOPO_SUB_DEVICE_USERNAME_INVALID);
         }
-
-        // 4. 校验子设备认证信息
-        // TODO @AI：链式调用；
-        IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO();
-        authReqDTO.setClientId(params.getClientId());
-        authReqDTO.setUsername(params.getUsername());
-        authReqDTO.setPassword(params.getPassword());
-        if (!deviceService.authDevice(authReqDTO)) {
+        // 1.2 校验子设备认证信息
+        if (!deviceService.authDevice(subDeviceAuth)) {
             throw exception(DEVICE_TOPO_SUB_DEVICE_AUTH_FAILED);
         }
 
-        // 5. 获取子设备
+        // 1.3 获取子设备
         IotDeviceDO subDevice = deviceService.getDeviceFromCache(subDeviceInfo.getProductKey(), subDeviceInfo.getDeviceName());
         if (subDevice == null) {
             throw exception(DEVICE_NOT_EXISTS);
         }
-
-        // 6. 校验子设备类型
+        // 1.4 校验子设备类型
         if (!IotProductDeviceTypeEnum.isGatewaySub(subDevice.getDeviceType())) {
             throw exception(DEVICE_NOT_GATEWAY_SUB, subDevice.getProductKey(), subDevice.getDeviceName());
         }
+        // 1.5 校验子设备是否已绑定到其他网关
+        if (subDevice.getGatewayId() != null
+                && ObjectUtil.notEqual(subDevice.getGatewayId(), gatewayDevice.getId())) {
+            throw exception(DEVICE_GATEWAY_BINDTO_EXISTS, subDevice.getProductKey(), subDevice.getDeviceName());
+        }
 
-        // 7. 绑定拓扑关系
-        // TODO @AI：这里要考虑，校验是不是老设备已经绑定到其他网关了？
+        // 2. 绑定拓扑关系
+        // TODO @AI：上面的校验，貌似和 bindDeviceGateway 里的，有点重复；
         deviceService.bindDeviceGateway(Collections.singletonList(subDevice.getId()), gatewayDevice.getId());
-        log.info("[handleTopoAdd][网关({}/{}) 绑定子设备({}/{})]",
+        log.info("[processTopoAddSubDevice][网关({}/{}) 绑定子设备({}/{})]",
                 gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
                 subDevice.getProductKey(), subDevice.getDeviceName());
-
-        // 8. 发送拓扑变更通知
-        sendTopoChangeNotify(gatewayDevice, "add", subDevice);
-        return null;
+        return subDevice;
     }
 
     // TODO @AI：是不是更适合在 deviceService 里面处理？
@@ -335,41 +359,70 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             throw exception(DEVICE_NOT_GATEWAY);
         }
 
-        // 2. 解析参数
+        // 2. 解析参数（数组格式）
         IotDeviceTopoDeleteReqDTO params = JsonUtils.parseObject(JsonUtils.toJsonString(message.getParams()),
                 IotDeviceTopoDeleteReqDTO.class);
-        if (params == null) {
+        if (params == null || params.getSubDevices() == null || params.getSubDevices().isEmpty()) {
             throw exception(DEVICE_TOPO_PARAMS_INVALID);
         }
 
-        // 3. 获取子设备
-        IotDeviceDO subDevice = deviceService.getDeviceFromCache(params.getProductKey(), params.getDeviceName());
+        // 3. 遍历处理每个子设备
+        List<IotDeviceDO> deletedSubDevices = new ArrayList<>();
+        for (IotDeviceTopoDeleteReqDTO.SubDevice subDeviceInfo : params.getSubDevices()) {
+            try {
+                IotDeviceDO subDevice = processTopoDeleteSubDevice(subDeviceInfo, gatewayDevice);
+                deletedSubDevices.add(subDevice);
+            } catch (Exception ex) {
+                log.warn("[handleTopoDelete][网关({}/{}) 删除子设备失败，productKey={}, deviceName={}]",
+                        gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                        subDeviceInfo.getProductKey(), subDeviceInfo.getDeviceName(), ex);
+            }
+        }
+
+        // 4. 发送拓扑变更通知
+        for (IotDeviceDO subDevice : deletedSubDevices) {
+            sendTopoChangeNotify(gatewayDevice, "delete", subDevice);
+        }
+        return null;
+    }
+
+    // TODO @AI：是不是更适合在 deviceService 里面处理？
+
+    /**
+     * 处理单个子设备的拓扑删除
+     *
+     * @param subDeviceInfo 子设备标识
+     * @param gatewayDevice 网关设备
+     * @return 删除成功的子设备，失败返回 null
+     */
+    private IotDeviceDO processTopoDeleteSubDevice(IotDeviceTopoDeleteReqDTO.SubDevice subDeviceInfo,
+                                                    IotDeviceDO gatewayDevice) {
+        // 1. 获取子设备
+        IotDeviceDO subDevice = deviceService.getDeviceFromCache(subDeviceInfo.getProductKey(), subDeviceInfo.getDeviceName());
         if (subDevice == null) {
             throw exception(DEVICE_NOT_EXISTS);
         }
 
-        // 4. 校验子设备是否绑定到该网关
+        // 2. 校验子设备是否绑定到该网关
         if (!Objects.equal(subDevice.getGatewayId(), gatewayDevice.getId())) {
-            throw exception(DEVICE_TOPO_SUB_NOT_BINDTO_GATEWAY, params.getProductKey(), params.getDeviceName());
+            throw exception(DEVICE_TOPO_SUB_NOT_BINDTO_GATEWAY, subDeviceInfo.getProductKey(), subDeviceInfo.getDeviceName());
         }
 
-        // 5. 解绑拓扑关系
+        // 3. 解绑拓扑关系
         deviceService.unbindDeviceGateway(Collections.singletonList(subDevice.getId()));
-        log.info("[handleTopoDelete][网关({}/{}) 解绑子设备({}/{})]",
+        log.info("[processTopoDeleteSubDevice][网关({}/{}) 解绑子设备({}/{})]",
                 gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
                 subDevice.getProductKey(), subDevice.getDeviceName());
 
-        // 6. 子设备下线
+        // 4. 子设备下线
         if (Objects.equal(subDevice.getState(), IotDeviceStateEnum.ONLINE.getState())) {
             deviceService.updateDeviceState(subDevice, IotDeviceStateEnum.OFFLINE.getState());
         }
 
-        // 7. 发送拓扑变更通知
-        sendTopoChangeNotify(gatewayDevice, "delete", subDevice);
-
-        return null;
+        return subDevice;
     }
 
+    // TODO @AI：是不是更适合在 deviceService 里面处理？
     /**
      * 处理获取拓扑关系请求
      *
@@ -391,6 +444,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
                 .setDeviceName(subDevice.getDeviceName()));
     }
 
+    // TODO @AI：是不是更适合在 deviceService 里面处理？
     /**
      * 发送拓扑变更通知
      *
@@ -427,6 +481,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     // ========== 子设备注册处理方法 ==========
 
+    // TODO @AI：是不是更适合在 deviceService 里面处理？
     /**
      * 处理子设备动态注册请求
      *
@@ -469,6 +524,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         return results;
     }
 
+    // TODO @AI：是不是更适合在 deviceService 里面处理？
     /**
      * 注册单个子设备
      *
@@ -539,11 +595,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         }
 
         // 2. 处理网关自身属性
+        // TODO @AI：是不是经过总线会更好：
+        // TODO @AI：是不是少处理了 event 事件？
         if (params.getProperties() != null && !params.getProperties().isEmpty()) {
             Map<String, Object> gatewayProperties = convertPackProperties(params.getProperties());
             IotDeviceMessage gatewayMsg = IotDeviceMessage.builder()
                     .id(IotDeviceMessageUtils.generateMessageId())
-                    .parentMessageId(packMessage.getId())
                     .deviceId(gatewayDevice.getId())
                     .tenantId(gatewayDevice.getTenantId())
                     .serverId(packMessage.getServerId())
@@ -596,7 +653,6 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             Map<String, Object> properties = convertPackProperties(subDeviceData.getProperties());
             IotDeviceMessage subMsg = IotDeviceMessage.builder()
                     .id(IotDeviceMessageUtils.generateMessageId())
-                    .parentMessageId(packMessage.getId())
                     .deviceId(subDevice.getId())
                     .tenantId(subDevice.getTenantId())
                     .serverId(packMessage.getServerId())
@@ -608,8 +664,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             getSelf().createDeviceLogAsync(subMsg);
         }
 
-        // 3. 处理子设备事件（如果需要）
-        // TODO: 事件处理可以后续扩展
+        // 3. 处理子设备事件
+        // TODO @AI：事件处理可以后续扩展
     }
 
     /**
@@ -633,7 +689,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     // ========== 网关下线联动处理 ==========
 
-    // TODO @AI：是不是写到 deviceService 里更合适？更解耦。
+    // TODO 芋艿：是不是写到 deviceService 里更合适？更解耦。
     /**
      * 处理网关下线，联动所有子设备下线
      *

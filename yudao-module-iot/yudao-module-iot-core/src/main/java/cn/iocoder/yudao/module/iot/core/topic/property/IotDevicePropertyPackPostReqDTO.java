@@ -6,41 +6,18 @@ import lombok.experimental.Accessors;
 import java.util.List;
 import java.util.Map;
 
-// TODO @AI：挂个阿里云的链接，http://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services 的「设备批量上报属性、事件」小节
 /**
  * IoT 设备属性批量上报 Request DTO
  * <p>
  * 用于 thing.event.property.pack.post 消息的 params 参数
- * 参考阿里云 Alink 协议
  *
  * @author 芋道源码
+ * @see <a href="http://help.aliyun.com/zh/marketplace/gateway-reports-data-in-batches">阿里云 - 网关批量上报数据</a>
  */
 @Data
 public class IotDevicePropertyPackPostReqDTO {
 
-    // TODO @AI：去掉里面的 time，直接平铺值（可能就是直接的 map）；例如说 "Power"：value， 而不是 PropertyValue "properties": {
-    //            "Power": [
-    //                {
-    //                    "value": "on",
-    //                    "time": 1524448722000
-    //                },
-    //                {
-    //                    "value": "off",
-    //                    "time": 1524448722001
-    //                }
-    //            ],
-    //            "WF": [
-    //                {
-    //                    "value": 3,
-    //                    "time": 1524448722000
-    //                },
-    //                {
-    //                    "value": 4,
-    //                    "time": 1524448722009
-    //                }
-    //            ]
-    //        }
-
+    // TODO @AI：不用 PropertyValue，直接使用 Object 接收就行！
     /**
      * 网关自身属性
      * <p>
@@ -48,27 +25,6 @@ public class IotDevicePropertyPackPostReqDTO {
      * value: 属性值对象（包含 value 和 time）
      */
     private Map<String, PropertyValue> properties;
-
-    // TODO @AI：EventValue {
-    //
-    //    "method": "thing.event.post",
-    //
-    //    "version": "1.0",
-    //
-    //    "params": {
-    //
-    //        "identifier": "eat",
-    //
-    //        "params": {
-    //
-    //            "rice": 100
-    //
-    //        }
-    //
-    //    }
-    //
-    //}
-
 
     /**
      * 网关自身事件

@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.iot.core.topic.auth;
 
 import lombok.Data;
 
-// TODO @AI：修复建议，参考 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-core/src/main/java/cn/iocoder/yudao/module/iot/core/topic/auth/IotSubDeviceRegisterReqDTO.java
 /**
  * IoT 子设备动态注册 Response DTO
  * <p>
  * 用于 thing.sub.register 响应的设备信息
  *
  * @author 芋道源码
+ * @see <a href="http://help.aliyun.com/zh/marketplace/dynamic-registration-of-sub-devices">阿里云 - 动态注册子设备</a>
  */
 @Data
 public class IotSubDeviceRegisterRespDTO {
