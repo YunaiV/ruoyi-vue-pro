@@ -305,9 +305,10 @@ public interface IotDeviceService {
     /**
      * 解绑子设备与网关
      *
-     * @param ids 子设备编号列表
+     * @param ids       子设备编号列表
+     * @param gatewayId 网关设备编号
      */
-    void unbindDeviceGateway(Collection<Long> ids);
+    void unbindDeviceGateway(Collection<Long> ids, Long gatewayId);
 
     /**
      * 获取未绑定网关的子设备分页

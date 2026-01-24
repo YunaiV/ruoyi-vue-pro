@@ -72,7 +72,7 @@ public class IotDeviceController {
     @Operation(summary = "解绑子设备与网关")
     @PreAuthorize("@ss.hasPermission('iot:device:update')")
     public CommonResult<Boolean> unbindDeviceGateway(@Valid @RequestBody IotDeviceUnbindGatewayReqVO reqVO) {
-        deviceService.unbindDeviceGateway(reqVO.getIds());
+        deviceService.unbindDeviceGateway(reqVO.getIds(), reqVO.getGatewayId());
         return success(true);
     }
 

@@ -262,4 +262,20 @@ public class JsonUtils {
         return objectMapper.convertValue(obj, typeReference);
     }
 
+    /**
+     * 将 Object 转换为 List 类型
+     * <p>
+     * 避免先转 jsonString 再 parseArray 的性能损耗
+     *
+     * @param obj   源对象（可以是 List、数组等）
+     * @param clazz 目标元素类型
+     * @return 转换后的 List
+     */
+    public static <T> List<T> convertList(Object obj, Class<T> clazz) {
+        if (obj == null) {
+            return new ArrayList<>();
+        }
+        return objectMapper.convertValue(obj, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+    }
+
 }
