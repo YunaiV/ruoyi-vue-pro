@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
@@ -14,6 +15,13 @@ import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoAddReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoDeleteReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetRespDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
@@ -64,6 +72,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
+        return createDevice0(createReqVO).getId();
+    }
+
+    private IotDeviceDO createDevice0(IotDeviceSaveReqVO createReqVO) {
         // 1.1 校验产品是否存在
         IotProductDO product = productService.getProduct(createReqVO.getProductId());
         if (product == null) {
@@ -81,7 +93,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class);
         initDevice(device, product);
         deviceMapper.insert(device);
-        return device.getId();
+        return device;
     }
 
     private void validateCreateDeviceParam(String productKey, String deviceName,
@@ -298,6 +310,37 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 2. 清空对应缓存
         deleteDeviceCache(device);
+
+        // 3. 网关设备下线时，联动所有子设备下线
+        if (Objects.equals(state, IotDeviceStateEnum.OFFLINE.getState())
+                && IotProductDeviceTypeEnum.isGateway(device.getDeviceType())) {
+            handleGatewayOffline(device);
+        }
+    }
+
+    /**
+     * 处理网关下线，联动所有子设备下线
+     *
+     * @param gatewayDevice 网关设备
+     */
+    private void handleGatewayOffline(IotDeviceDO gatewayDevice) {
+        List<IotDeviceDO> subDevices = deviceMapper.selectListByGatewayId(gatewayDevice.getId());
+        if (CollUtil.isEmpty(subDevices)) {
+            return;
+        }
+        for (IotDeviceDO subDevice : subDevices) {
+            if (Objects.equals(subDevice.getState(), IotDeviceStateEnum.ONLINE.getState())) {
+                try {
+                    updateDeviceState(subDevice, IotDeviceStateEnum.OFFLINE.getState());
+                    log.info("[handleGatewayOffline][网关({}/{}) 下线，子设备({}/{}) 联动下线]",
+                            gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                            subDevice.getProductKey(), subDevice.getDeviceName());
+                } catch (Exception ex) {
+                    log.error("[handleGatewayOffline][子设备({}/{}) 下线失败]",
+                            subDevice.getProductKey(), subDevice.getDeviceName(), ex);
+                }
+            }
+        }
     }
 
     @Override
@@ -533,19 +576,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         // 1.1 校验网关设备存在且类型正确
         validateGatewayDeviceExists(gatewayId);
-        // 1.2 校验子设备存在
+        // 1.2 校验每个设备是否可绑定
         List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
-        if (devices.size() != ids.size()) {
-            throw exception(DEVICE_NOT_EXISTS);
-        }
-        // 1.3 校验每个设备是否可绑定
         for (IotDeviceDO device : devices) {
-            if (!IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())) {
-                throw exception(DEVICE_NOT_GATEWAY_SUB, device.getProductKey(), device.getDeviceName());
-            }
-            if (device.getGatewayId() != null && !device.getGatewayId().equals(gatewayId)) {
-                throw exception(DEVICE_GATEWAY_BINDTO_EXISTS, device.getProductKey(), device.getDeviceName());
-            }
+            checkSubDeviceCanBind(device, gatewayId);
         }
 
         // 2. 批量更新数据库
@@ -555,21 +589,33 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 3. 清空对应缓存
         deleteDeviceCache(devices);
+
+        // TODO @AI：需要下发网关设备，让其建立拓扑关系吗？（增加）
+    }
+
+    private void checkSubDeviceCanBind(IotDeviceDO device, Long gatewayId) {
+        if (!IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY_SUB, device.getProductKey(), device.getDeviceName());
+        }
+        if (ObjUtil.equals(device.getGatewayId(), gatewayId)) {
+            throw exception(DEVICE_GATEWAY_BINDTO_EXISTS, device.getProductKey(), device.getDeviceName());
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void unbindDeviceGateway(Collection<Long> ids) {
+        // 1. 校验设备存在
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        // 1. 校验设备存在
         List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
-        if (devices.size() != ids.size()) {
-            throw exception(DEVICE_NOT_EXISTS);
+        if (CollUtil.isNotEmpty(devices)) {
+            return;
         }
 
         // 2. 批量更新数据库（将 gatewayId 设置为 null）
+        // TODO @AI：需要搞个方法，专门批量更新某个字段为 null。
         List<IotDeviceDO> updateList = devices.stream()
                 .filter(device -> device.getGatewayId() != null)
                 .map(device -> new IotDeviceDO().setId(device.getId()).setGatewayId(null))
@@ -580,6 +626,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
         // 3. 清空对应缓存
         deleteDeviceCache(devices);
+
+        // TODO @AI：需要下发网关设备，让其建立拓扑关系吗？（减少）
     }
 
     @Override
@@ -590,6 +638,202 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public List<IotDeviceDO> getDeviceListByGatewayId(Long gatewayId) {
         return deviceMapper.selectListByGatewayId(gatewayId);
+    }
+
+    // ========== 网关-拓扑管理（设备上报） ==========
+
+    @Override
+    public List<IotDeviceIdentity> handleTopoAddMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice) {
+        // 1.1 校验网关设备类型
+        if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY);
+        }
+        // 1.2 解析参数
+        IotDeviceTopoAddReqDTO params = JsonUtils.parseObject(JsonUtils.toJsonString(message.getParams()),
+                IotDeviceTopoAddReqDTO.class);
+        if (params == null || CollUtil.isEmpty(params.getSubDevices())) {
+            throw exception(DEVICE_TOPO_PARAMS_INVALID);
+        }
+
+        // 2. 遍历处理每个子设备
+        List<IotDeviceIdentity> addedSubDevices = new ArrayList<>();
+        for (IotDeviceAuthReqDTO subDeviceAuth : params.getSubDevices()) {
+            try {
+                IotDeviceDO subDevice = addDeviceTopo(gatewayDevice, subDeviceAuth);
+                addedSubDevices.add(new IotDeviceIdentity(subDevice.getProductKey(), subDevice.getDeviceName()));
+            } catch (Exception ex) {
+                log.warn("[handleTopoAddMessage][网关({}/{}) 添加子设备失败，message={}]",
+                        gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(), message, ex);
+            }
+        }
+
+        // 3. 返回响应数据（包含成功添加的子设备列表）
+        return addedSubDevices;
+    }
+
+    private IotDeviceDO addDeviceTopo(IotDeviceDO gatewayDevice, IotDeviceAuthReqDTO subDeviceAuth) {
+        // 1.1 解析子设备信息
+        IotDeviceAuthUtils.DeviceInfo subDeviceInfo = IotDeviceAuthUtils.parseUsername(subDeviceAuth.getUsername());
+        if (subDeviceInfo == null) {
+            throw exception(DEVICE_TOPO_SUB_DEVICE_USERNAME_INVALID);
+        }
+        // 1.2 校验子设备认证信息
+        if (!authDevice(subDeviceAuth)) {
+            throw exception(DEVICE_TOPO_SUB_DEVICE_AUTH_FAILED);
+        }
+        // 1.3 获取子设备
+        IotDeviceDO subDevice = getSelf().getDeviceFromCache(subDeviceInfo.getProductKey(), subDeviceInfo.getDeviceName());
+        if (subDevice == null) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+        // 1.4 校验子设备类型
+        checkSubDeviceCanBind(subDevice, gatewayDevice.getId());
+
+        // 2. 更新数据库
+        deviceMapper.updateById(new IotDeviceDO().setId(subDevice.getId()).setGatewayId(subDevice.getGatewayId()));
+        log.info("[addDeviceTopo][网关({}/{}) 绑定子设备({}/{})]",
+                gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                subDevice.getProductKey(), subDevice.getDeviceName());
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(subDevice);
+        return subDevice;
+    }
+
+    @Override
+    public List<IotDeviceIdentity> handleTopoDeleteMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice) {
+        // 1.1 校验网关设备类型
+        if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY);
+        }
+        // 1.2 解析参数
+        IotDeviceTopoDeleteReqDTO params = JsonUtils.parseObject(JsonUtils.toJsonString(message.getParams()),
+                IotDeviceTopoDeleteReqDTO.class);
+        if (params == null || CollUtil.isEmpty(params.getSubDevices())) {
+            throw exception(DEVICE_TOPO_PARAMS_INVALID);
+        }
+
+        // 2. 遍历处理每个子设备
+        List<IotDeviceIdentity> deletedSubDevices = new ArrayList<>();
+        for (IotDeviceIdentity subDeviceIdentity : params.getSubDevices()) {
+            try {
+                deleteDeviceTopo(gatewayDevice, subDeviceIdentity);
+                deletedSubDevices.add(subDeviceIdentity);
+            } catch (Exception ex) {
+                log.warn("[handleTopoDeleteMessage][网关({}/{}) 删除子设备失败，productKey={}, deviceName={}]",
+                        gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                        subDeviceIdentity.getProductKey(), subDeviceIdentity.getDeviceName(), ex);
+            }
+        }
+
+        // 3. 返回响应数据（包含成功删除的子设备列表）
+        return deletedSubDevices;
+    }
+
+    private void deleteDeviceTopo(IotDeviceDO gatewayDevice, IotDeviceIdentity subDeviceIdentity) {
+        // 1.1 获取子设备
+        IotDeviceDO subDevice = getSelf().getDeviceFromCache(subDeviceIdentity.getProductKey(), subDeviceIdentity.getDeviceName());
+        if (subDevice == null) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+        // 1.2 校验子设备是否绑定到该网关
+        if (ObjUtil.notEqual(subDevice.getGatewayId(), gatewayDevice.getId())) {
+            throw exception(DEVICE_TOPO_SUB_NOT_BINDTO_GATEWAY,
+                    subDeviceIdentity.getProductKey(), subDeviceIdentity.getDeviceName());
+        }
+
+        // 2. 更新数据库
+        // TODO @AI：直接调用更新方法；
+//        unbindDeviceGateway(Collections.singletonList(subDevice.getId()));
+        log.info("[deleteDeviceTopo][网关({}/{}) 解绑子设备({}/{})]",
+                gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                subDevice.getProductKey(), subDevice.getDeviceName());
+
+        // 3. 清空对应缓存
+        deleteDeviceCache(subDevice);
+
+        // 4. 子设备下线
+        if (Objects.equals(subDevice.getState(), IotDeviceStateEnum.ONLINE.getState())) {
+            updateDeviceState(subDevice, IotDeviceStateEnum.OFFLINE.getState());
+        }
+    }
+
+    @Override
+    public IotDeviceTopoGetRespDTO handleTopoGetMessage(IotDeviceDO gatewayDevice) {
+        // 1. 校验网关设备类型
+        if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY);
+        }
+
+        // 2. 获取子设备列表并转换
+        List<IotDeviceDO> subDevices = deviceMapper.selectListByGatewayId(gatewayDevice.getId());
+        List<IotDeviceIdentity> subDeviceIdentities = convertList(subDevices, subDevice ->
+                new IotDeviceIdentity(subDevice.getProductKey(), subDevice.getDeviceName()));
+        return new IotDeviceTopoGetRespDTO().setSubDevices(subDeviceIdentities);
+    }
+
+    @Override
+    public List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice) {
+        // 1.1 校验网关设备类型
+        if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY);
+        }
+        // 1.2 解析参数
+        if (!(message.getParams() instanceof List)) {
+            throw exception(DEVICE_SUB_REGISTER_PARAMS_INVALID);
+        }
+        // TODO @AI：这个要不也弄到 JsonUtils 里面去？感觉类似 convertObject 呀。
+        List<IotSubDeviceRegisterReqDTO> paramsList = JsonUtils.parseArray(JsonUtils.toJsonString(message.getParams()),
+                IotSubDeviceRegisterReqDTO.class);
+        if (CollUtil.isEmpty(paramsList)) {
+            throw exception(DEVICE_SUB_REGISTER_PARAMS_INVALID);
+        }
+
+        // 2. 遍历注册每个子设备
+        List<IotSubDeviceRegisterRespDTO> results = new ArrayList<>(paramsList.size());
+        for (IotSubDeviceRegisterReqDTO params : paramsList) {
+            try {
+                IotDeviceDO device = registerSubDevice(gatewayDevice, params);
+                results.add(new IotSubDeviceRegisterRespDTO(
+                        params.getProductKey(), params.getDeviceName(), device.getDeviceSecret()));
+            } catch (Exception ex) {
+                log.error("[handleSubDeviceRegisterMessage][子设备({}/{}) 注册失败]",
+                        params.getProductKey(), params.getDeviceName(), ex);
+            }
+        }
+
+        // 3. 返回响应数据（包含成功注册的子设备列表）
+        return results;
+    }
+
+    private IotDeviceDO registerSubDevice(IotDeviceDO gatewayDevice, IotSubDeviceRegisterReqDTO params) {
+        // 1.1 校验产品
+        IotProductDO product = productService.getProductByProductKey(params.getProductKey());
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        // 1.2 校验产品是否为网关子设备类型
+        if (!IotProductDeviceTypeEnum.isGatewaySub(product.getDeviceType())) {
+            throw exception(DEVICE_SUB_REGISTER_PRODUCT_NOT_GATEWAY_SUB, params.getProductKey());
+        }
+        // 1.3 查找设备是否已存在
+        // TODO @AI：存在的时候，必须父设备是自己，才返回，否则抛出业务异常；
+        IotDeviceDO existDevice = getSelf().getDeviceFromCache(params.getProductKey(), params.getDeviceName());
+        if (existDevice != null) {
+            // 已存在则返回设备信息
+            return existDevice;
+        }
+
+        // 2. 创建新设备
+        IotDeviceSaveReqVO createReqVO = new IotDeviceSaveReqVO()
+                .setDeviceName(params.getDeviceName())
+                .setProductId(product.getId())
+                .setGatewayId(gatewayDevice.getId());
+        IotDeviceDO newDevice = createDevice0(createReqVO);
+        log.info("[registerSubDevice][网关({}/{}) 注册子设备({}/{})]",
+                gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                newDevice.getProductKey(), newDevice.getDeviceName());
+        return newDevice;
     }
 
     private IotDeviceServiceImpl getSelf() {

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.topic.topo;
 
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
@@ -16,30 +18,11 @@ import java.util.List;
 @Data
 public class IotDeviceTopoDeleteReqDTO {
 
-    // TODO @AI：应该是数组；IotDeviceIdentify
     /**
      * 子设备标识列表
      */
-    private List<SubDevice> subDevices;
-
-    /**
-     * 子设备标识
-     */
-    @Data
-    public static class SubDevice {
-
-        /**
-         * 子设备 ProductKey
-         */
-        @NotEmpty(message = "产品标识不能为空")
-        private String productKey;
-
-        /**
-         * 子设备 DeviceName
-         */
-        @NotEmpty(message = "设备名称不能为空")
-        private String deviceName;
-
-    }
+    @Valid
+    @NotEmpty(message = "子设备标识列表不能为空")
+    private List<IotDeviceIdentity> subDevices;
 
 }

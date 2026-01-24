@@ -4,6 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
 
@@ -320,5 +324,42 @@ public interface IotDeviceService {
      * @return 子设备列表
      */
     List<IotDeviceDO> getDeviceListByGatewayId(Long gatewayId);
+
+    // ========== 网关-拓扑管理（设备上报） ==========
+
+    /**
+     * 处理添加拓扑关系消息（网关设备上报）
+     *
+     * @param message       消息
+     * @param gatewayDevice 网关设备
+     * @return 成功添加的子设备列表
+     */
+    List<IotDeviceIdentity> handleTopoAddMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
+
+    /**
+     * 处理删除拓扑关系消息（网关设备上报）
+     *
+     * @param message       消息
+     * @param gatewayDevice 网关设备
+     * @return 成功删除的子设备列表
+     */
+    List<IotDeviceIdentity> handleTopoDeleteMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
+
+    /**
+     * 处理获取拓扑关系消息（网关设备上报）
+     *
+     * @param gatewayDevice 网关设备
+     * @return 拓扑关系响应
+     */
+    IotDeviceTopoGetRespDTO handleTopoGetMessage(IotDeviceDO gatewayDevice);
+
+    /**
+     * 处理子设备动态注册消息（网关设备上报）
+     *
+     * @param message       消息
+     * @param gatewayDevice 网关设备
+     * @return 注册结果列表
+     */
+    List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
 
 }

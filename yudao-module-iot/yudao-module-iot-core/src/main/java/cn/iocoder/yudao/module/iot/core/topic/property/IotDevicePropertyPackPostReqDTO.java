@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.topic.property;
 
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.Map;
@@ -17,14 +17,13 @@ import java.util.Map;
 @Data
 public class IotDevicePropertyPackPostReqDTO {
 
-    // TODO @AI：不用 PropertyValue，直接使用 Object 接收就行！
     /**
      * 网关自身属性
      * <p>
      * key: 属性标识符
-     * value: 属性值对象（包含 value 和 time）
+     * value: 属性值
      */
-    private Map<String, PropertyValue> properties;
+    private Map<String, Object> properties;
 
     /**
      * 网关自身事件
@@ -38,24 +37,6 @@ public class IotDevicePropertyPackPostReqDTO {
      * 子设备数据列表
      */
     private List<SubDeviceData> subDevices;
-
-    /**
-     * 属性值对象
-     */
-    @Data
-    public static class PropertyValue {
-
-        /**
-         * 属性值
-         */
-        private Object value;
-
-        /**
-         * 上报时间（毫秒时间戳）
-         */
-        private Long time;
-
-    }
 
     /**
      * 事件值对象
@@ -84,36 +65,23 @@ public class IotDevicePropertyPackPostReqDTO {
         /**
          * 子设备标识
          */
-        private DeviceIdentity identity;
+        private IotDeviceIdentity identity;
 
         /**
          * 子设备属性
+         * <p>
+         * key: 属性标识符
+         * value: 属性值
          */
-        private Map<String, PropertyValue> properties;
+        private Map<String, Object> properties;
 
         /**
          * 子设备事件
+         * <p>
+         * key: 事件标识符
+         * value: 事件值对象（包含 value 和 time）
          */
         private Map<String, EventValue> events;
-
-    }
-
-    /**
-     * 设备标识
-     */
-    @Data
-    @Accessors(chain = true)
-    public static class DeviceIdentity {
-
-        /**
-         * 产品标识
-         */
-        private String productKey;
-
-        /**
-         * 设备名称
-         */
-        private String deviceName;
 
     }
 
