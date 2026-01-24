@@ -518,13 +518,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             log.error("[authDevice][设备({}/{}) 密码不正确]", productKey, deviceName);
             return false;
         }
-
-        // 3. 校验子设备拓扑关系：子设备必须先绑定到某网关才能认证上线
-        if (IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())
-                && device.getGatewayId() == null) {
-            log.warn("[authDevice][子设备({}/{}) 未绑定到任何网关，认证失败]", productKey, deviceName);
-            return false;
-        }
         return true;
     }
 
@@ -577,14 +570,14 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void bindDeviceGateway(Collection<Long> ids, Long gatewayId) {
-        if (CollUtil.isEmpty(ids)) {
+    public void bindDeviceGateway(Collection<Long> subIds, Long gatewayId) {
+        if (CollUtil.isEmpty(subIds)) {
             return;
         }
         // 1.1 校验网关设备存在且类型正确
         validateGatewayDeviceExists(gatewayId);
         // 1.2 校验每个设备是否可绑定
-        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(subIds);
         for (IotDeviceDO device : devices) {
             checkSubDeviceCanBind(device, gatewayId);
         }
@@ -613,13 +606,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void unbindDeviceGateway(Collection<Long> ids, Long gatewayId) {
+    public void unbindDeviceGateway(Collection<Long> subIds, Long gatewayId) {
         // 1. 校验设备存在
-        if (CollUtil.isEmpty(ids)) {
+        if (CollUtil.isEmpty(subIds)) {
             return;
         }
-        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
-        devices.removeIf(device -> device.getGatewayId() == null);
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(subIds);
+        devices.removeIf(device -> ObjUtil.notEqual(device.getGatewayId(), gatewayId));
         if (CollUtil.isEmpty(devices)) {
             return;
         }

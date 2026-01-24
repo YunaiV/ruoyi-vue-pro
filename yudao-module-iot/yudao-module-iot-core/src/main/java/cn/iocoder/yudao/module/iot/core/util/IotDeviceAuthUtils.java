@@ -72,7 +72,7 @@ public class IotDeviceAuthUtils {
                 .digestHex(content);
     }
 
-    public static String buildContent(String clientId, String productKey, String deviceName, String deviceSecret) {
+    private static String buildContent(String clientId, String productKey, String deviceName, String deviceSecret) {
         return "clientId" + clientId +
                 "deviceName" + deviceName +
                 "deviceSecret" + deviceSecret +

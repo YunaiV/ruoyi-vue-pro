@@ -13,7 +13,7 @@ public class IotDeviceUnbindGatewayReqVO {
 
     @Schema(description = "子设备编号列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
     @NotEmpty(message = "子设备编号列表不能为空")
-    private Set<Long> ids;
+    private Set<Long> subIds;
 
     @Schema(description = "网关设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "网关设备编号不能为空")

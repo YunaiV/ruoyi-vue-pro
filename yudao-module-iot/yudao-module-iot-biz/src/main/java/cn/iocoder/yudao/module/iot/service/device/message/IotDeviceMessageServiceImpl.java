@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -103,7 +104,6 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         return sendDeviceMessage(message, device);
     }
 
-    // TODO @芋艿：针对连接网关的设备，是不是 productKey、deviceName 需要调整下；
     @Override
     public IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
         return sendDeviceMessage(message, device, null);
@@ -273,7 +273,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
                     log.warn("[handlePackMessage][子设备({}/{}) 不存在]", identity.getProductKey(), identity.getDeviceName());
                     continue;
                 }
-                sendDevicePackData(subDevice, packMessage.getServerId(), subDeviceData.getProperties(), subDeviceData.getEvents());
+                // 特殊：子设备不需要指定 serverId，因为子设备实际可能连接在不同的 gateway-server 上，导致 serverId 不同
+                sendDevicePackData(subDevice, null, subDeviceData.getProperties(), subDeviceData.getEvents());
             } catch (Exception ex) {
                 log.error("[handlePackMessage][子设备({}/{}) 数据处理失败]", subDeviceData.getIdentity().getProductKey(),
                         subDeviceData.getIdentity().getDeviceName(), ex);
@@ -335,9 +336,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     }
 
     @Override
-    public List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(Long deviceId,
-                                                                             List<String> requestIds,
-                                                                             Boolean reply) {
+    public List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(Long deviceId, List<String> requestIds, Boolean reply) {
+        if (CollUtil.isEmpty(requestIds)) {
+            return ListUtil.of();
+        }
         return deviceMessageMapper.selectListByRequestIdsAndReply(deviceId, requestIds, reply);
     }
 
