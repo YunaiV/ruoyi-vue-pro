@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxAuthEventProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
@@ -228,6 +230,27 @@ public class IotGatewayConfiguration {
                                                                      IotMessageBus messageBus) {
             return new IotUdpDownstreamSubscriber(protocolHandler, messageService, deviceService, sessionManager,
                     messageBus);
+        }
+
+    }
+
+    /**
+     * IoT 网关 CoAP 协议配置类
+     */
+    @Configuration
+    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.coap", name = "enabled", havingValue = "true")
+    @Slf4j
+    public static class CoapProtocolConfiguration {
+
+        @Bean
+        public IotCoapUpstreamProtocol iotCoapUpstreamProtocol(IotGatewayProperties gatewayProperties) {
+            return new IotCoapUpstreamProtocol(gatewayProperties.getProtocol().getCoap());
+        }
+
+        @Bean
+        public IotCoapDownstreamSubscriber iotCoapDownstreamSubscriber(IotCoapUpstreamProtocol coapUpstreamProtocol,
+                                                                       IotMessageBus messageBus) {
+            return new IotCoapDownstreamSubscriber(coapUpstreamProtocol, messageBus);
         }
 
     }

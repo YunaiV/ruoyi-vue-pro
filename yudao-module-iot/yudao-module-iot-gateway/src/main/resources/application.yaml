@@ -127,6 +127,15 @@ yudao:
           keep-alive-timeout-seconds: 300      # 保持连接超时时间（秒）
           ssl-enabled: false                   # 是否启用 SSL（wss://）
           sub-protocol: mqtt                   # WebSocket 子协议
+        # ====================================
+        # 针对引入的 CoAP 组件的配置
+        # ====================================
+        coap:
+          enabled: true                       # 是否启用 CoAP 协议
+          port: 5683                           # CoAP 服务端口（默认 5683）
+          max-message-size: 1024               # 最大消息大小（字节）
+          ack-timeout: 2000                    # ACK 超时时间（毫秒）
+          max-retransmit: 4                    # 最大重传次数
 
 --- #################### 日志相关配置 ####################
 
@@ -147,6 +156,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     # 根日志级别
     root: INFO
 
