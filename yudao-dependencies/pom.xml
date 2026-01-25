@@ -76,7 +76,6 @@
         <jimubi.version>2.3.0</jimubi.version>
         <weixin-java.version>4.7.9-20251224.161447</weixin-java.version>
         <alipay-sdk-java.version>4.40.607.ALL</alipay-sdk-java.version>
-        <!-- OkHttp -->
         <okhttp.version>4.12.0</okhttp.version>
     </properties>
 
