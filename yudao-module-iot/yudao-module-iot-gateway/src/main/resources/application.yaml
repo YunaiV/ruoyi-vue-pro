@@ -100,7 +100,7 @@ yudao:
         # ====================================
         udp:
           enabled: false                       # 是否启用 UDP
-          port: 8092                           # UDP 服务端口
+          port: 8093                           # UDP 服务端口
           receive-buffer-size: 65536           # 接收缓冲区大小（字节，默认 64KB）
           send-buffer-size: 65536              # 发送缓冲区大小（字节，默认 64KB）
           session-timeout-ms: 60000            # 会话超时时间（毫秒，默认 60 秒）

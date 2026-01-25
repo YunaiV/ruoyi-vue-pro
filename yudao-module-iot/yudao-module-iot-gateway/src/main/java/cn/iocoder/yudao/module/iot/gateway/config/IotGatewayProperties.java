@@ -518,9 +518,9 @@ public class IotGatewayProperties {
         private Boolean enabled;
 
         /**
-         * 服务端口（默认 8092）
+         * 服务端口（默认 8093）
          */
-        private Integer port = 8092;
+        private Integer port = 8093;
 
         /**
          * 接收缓冲区大小（默认 64KB）
