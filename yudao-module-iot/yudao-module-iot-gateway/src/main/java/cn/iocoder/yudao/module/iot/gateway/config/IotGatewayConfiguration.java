@@ -17,6 +17,9 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqttws.router.IotMqttWsDowns
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager.IotUdpSessionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
@@ -190,6 +193,41 @@ public class IotGatewayConfiguration {
                                                                            IotMqttWsDownstreamHandler downstreamHandler,
                                                                            IotMessageBus messageBus) {
             return new IotMqttWsDownstreamSubscriber(mqttWsUpstreamProtocol, downstreamHandler, messageBus);
+        }
+
+    }
+
+    /**
+     * IoT 网关 UDP 协议配置类
+     */
+    @Configuration
+    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.udp", name = "enabled", havingValue = "true")
+    @Slf4j
+    public static class UdpProtocolConfiguration {
+
+        @Bean(name = "udpVertx", destroyMethod = "close")
+        public Vertx udpVertx() {
+            return Vertx.vertx();
+        }
+
+        @Bean
+        public IotUdpUpstreamProtocol iotUdpUpstreamProtocol(IotGatewayProperties gatewayProperties,
+                                                             IotDeviceService deviceService,
+                                                             IotDeviceMessageService messageService,
+                                                             IotUdpSessionManager sessionManager,
+                                                             @Qualifier("udpVertx") Vertx udpVertx) {
+            return new IotUdpUpstreamProtocol(gatewayProperties.getProtocol().getUdp(),
+                    deviceService, messageService, sessionManager, udpVertx);
+        }
+
+        @Bean
+        public IotUdpDownstreamSubscriber iotUdpDownstreamSubscriber(IotUdpUpstreamProtocol protocolHandler,
+                                                                     IotDeviceMessageService messageService,
+                                                                     IotDeviceService deviceService,
+                                                                     IotUdpSessionManager sessionManager,
+                                                                     IotMessageBus messageBus) {
+            return new IotUdpDownstreamSubscriber(protocolHandler, messageService, deviceService, sessionManager,
+                    messageBus);
         }
 
     }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager;
 
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -119,7 +120,7 @@ public class IotTcpConnectionManager {
         }
 
         try {
-            socket.write(io.vertx.core.buffer.Buffer.buffer(data));
+            socket.write(Buffer.buffer(data));
             log.debug("[sendToDevice][发送消息成功，设备 ID: {}，数据长度: {} 字节]", deviceId, data.length);
             return true;
         } catch (Exception e) {
