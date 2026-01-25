@@ -43,7 +43,6 @@ public class IotTcpDataRuleAction extends
                 config.getConnectTimeoutMs(),
                 config.getReadTimeoutMs(),
                 config.getSsl(),
-                config.getSslCertPath(),
                 config.getDataFormat()
         );
         // 2.2 连接服务器

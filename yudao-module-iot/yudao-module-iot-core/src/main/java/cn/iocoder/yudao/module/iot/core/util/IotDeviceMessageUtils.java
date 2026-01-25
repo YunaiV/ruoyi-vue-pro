@@ -100,6 +100,17 @@ public class IotDeviceMessageUtils {
     }
 
     /**
+     * 判断消息中是否不包含指定的标识符
+     *
+     * @param message    消息
+     * @param identifier 要检查的标识符
+     * @return 是否不包含
+     */
+    public static boolean notContainsIdentifier(IotDeviceMessage message, String identifier) {
+        return !containsIdentifier(message, identifier);
+    }
+
+    /**
      * 将 params 解析为 Map
      *
      * @param params 参数（可能是 Map 或 JSON 字符串）
@@ -193,6 +204,44 @@ public class IotDeviceMessageUtils {
         }
 
         // 未找到对应的属性值
+        return null;
+    }
+
+    /**
+     * 从服务调用消息中提取输入参数
+     * <p>
+     * 服务调用消息的 params 结构通常为：
+     * {
+     * "identifier": "serviceIdentifier",
+     * "inputData": { ... } 或 "inputParams": { ... }
+     * }
+     *
+     * @param message 设备消息
+     * @return 输入参数 Map，如果未找到则返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> extractServiceInputParams(IotDeviceMessage message) {
+        Object params = message.getParams();
+        if (params == null) {
+            return null;
+        }
+        if (!(params instanceof Map)) {
+            return null;
+        }
+        Map<String, Object> paramsMap = (Map<String, Object>) params;
+
+        // 尝试从 inputData 字段获取
+        Object inputData = paramsMap.get("inputData");
+        if (inputData instanceof Map) {
+            return (Map<String, Object>) inputData;
+        }
+
+        // 尝试从 inputParams 字段获取
+        Object inputParams = paramsMap.get("inputParams");
+        if (inputParams instanceof Map) {
+            return (Map<String, Object>) inputParams;
+        }
+
         return null;
     }
 
