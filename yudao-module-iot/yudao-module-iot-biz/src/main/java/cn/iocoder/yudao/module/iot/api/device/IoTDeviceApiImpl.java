@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -55,6 +57,13 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
                 deviceDTO.setCodecType(product.getCodecType());
             }
         }));
+    }
+
+    @Override
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/register")
+    @PermitAll
+    public CommonResult<IotDeviceRegisterRespDTO> registerDevice(@RequestBody IotDeviceRegisterReqDTO reqDTO) {
+        return success(deviceService.registerDevice(reqDTO));
     }
 
 }

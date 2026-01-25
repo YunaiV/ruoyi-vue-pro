@@ -211,11 +211,13 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
      * 子设备动态注册测试
      * <p>
      * 网关设备代理子设备进行动态注册，平台返回子设备的 deviceSecret
+     * <p>
+     * 注意：此接口需要网关 Token 认证
      */
     @Test
     public void testSubDeviceRegister() {
         // 1.1 构建请求
-        String url = String.format("http://%s:%d/topic/sys/%s/%s/thing/sub/register",
+        String url = String.format("http://%s:%d/auth/register/sub-device/%s/%s",
                 SERVER_HOST, SERVER_PORT, GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
         // 1.2 构建请求参数
         IotSubDeviceRegisterReqDTO subDevice = new IotSubDeviceRegisterReqDTO();

@@ -40,9 +40,12 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_TOPO_SUB_DEVICE_USERNAME_INVALID = new ErrorCode(1_050_003_101, "子设备用户名格式无效");
     ErrorCode DEVICE_TOPO_SUB_DEVICE_AUTH_FAILED = new ErrorCode(1_050_003_102, "子设备认证失败");
     ErrorCode DEVICE_TOPO_SUB_NOT_BINDTO_GATEWAY = new ErrorCode(1_050_003_103, "子设备【{}/{}】未绑定到该网关");
-    // 子设备注册相关错误码 1-050-003-200
+    // 设备注册相关错误码 1-050-003-200
     ErrorCode DEVICE_SUB_REGISTER_PARAMS_INVALID = new ErrorCode(1_050_003_200, "子设备注册参数无效");
     ErrorCode DEVICE_SUB_REGISTER_PRODUCT_NOT_GATEWAY_SUB = new ErrorCode(1_050_003_201, "产品【{}】不是网关子设备类型");
+    ErrorCode DEVICE_REGISTER_DISABLED = new ErrorCode(1_050_003_210, "该产品未开启动态注册功能");
+    ErrorCode DEVICE_REGISTER_SIGN_INVALID = new ErrorCode(1_050_003_211, "动态注册签名验证失败");
+    ErrorCode DEVICE_ALREADY_ACTIVATED = new ErrorCode(1_050_003_212, "设备已激活，不允许重复注册");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");

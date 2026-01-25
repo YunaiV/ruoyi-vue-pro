@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -292,7 +294,7 @@ public interface IotDeviceService {
      */
     List<IotDeviceDO> getDeviceListByHasLocation();
 
-    // ========== 网关-子设备绑定相关 ==========
+    // ========== 网关-拓扑管理（后台操作） ==========
 
     /**
      * 绑定子设备到网关
@@ -354,6 +356,8 @@ public interface IotDeviceService {
      */
     IotDeviceTopoGetRespDTO handleTopoGetMessage(IotDeviceDO gatewayDevice);
 
+    // ========== 设备动态注册 ==========
+
     /**
      * 处理子设备动态注册消息（网关设备上报）
      *
@@ -362,5 +366,13 @@ public interface IotDeviceService {
      * @return 注册结果列表
      */
     List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
+
+    /**
+     * 设备动态注册（直连设备/网关）
+     *
+     * @param reqDTO 动态注册请求
+     * @return 注册结果（包含 DeviceSecret）
+     */
+    IotDeviceRegisterRespDTO registerDevice(@Valid IotDeviceRegisterReqDTO reqDTO);
 
 }

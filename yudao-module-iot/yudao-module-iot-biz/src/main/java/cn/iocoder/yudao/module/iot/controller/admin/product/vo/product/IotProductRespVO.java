@@ -27,6 +27,12 @@ public class IotProductRespVO {
     @ExcelProperty("产品标识")
     private String productKey;
 
+    @Schema(description = "产品密钥", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String productSecret;
+
+    @Schema(description = "是否开启动态注册", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    private Boolean registerEnabled;
+
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long categoryId;
 

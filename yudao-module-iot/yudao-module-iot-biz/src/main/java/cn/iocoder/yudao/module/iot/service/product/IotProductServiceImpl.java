@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.product;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
@@ -53,7 +54,8 @@ public class IotProductServiceImpl implements IotProductService {
 
         // 2. 插入
         IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class)
-                .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus());
+                .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus())
+                .setProductSecret(IotDeviceAuthUtils.generateProductSecret());
         productMapper.insert(product);
         return product.getId();
     }

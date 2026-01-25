@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -52,6 +54,11 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     @Override
     public CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO getReqDTO) {
         return doPost("/get", getReqDTO, new ParameterizedTypeReference<>() { });
+    }
+
+    @Override
+    public CommonResult<IotDeviceRegisterRespDTO> registerDevice(IotDeviceRegisterReqDTO reqDTO) {
+        return doPost("/register", reqDTO, new ParameterizedTypeReference<>() { });
     }
 
     private <T, R> CommonResult<R> doPost(String url, T body,

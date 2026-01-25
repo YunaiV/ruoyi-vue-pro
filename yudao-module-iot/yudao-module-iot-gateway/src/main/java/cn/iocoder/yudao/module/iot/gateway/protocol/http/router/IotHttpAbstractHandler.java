@@ -7,6 +7,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
 import io.vertx.core.Handler;
@@ -54,7 +55,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
     private void beforeHandle(RoutingContext context) {
         // 如果不需要认证，则不走前置处理
         String path = context.request().path();
-        if (ObjUtil.equal(path, IotHttpAuthHandler.PATH)) {
+        if (ObjectUtils.equalsAny(path, IotHttpAuthHandler.PATH, IotHttpRegisterHandler.PATH)) {
             return;
         }
 

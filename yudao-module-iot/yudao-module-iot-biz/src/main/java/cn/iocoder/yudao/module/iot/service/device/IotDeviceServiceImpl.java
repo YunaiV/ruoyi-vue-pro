@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -18,6 +18,8 @@ import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoAddReqDTO;
@@ -76,6 +78,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖
     private IotDeviceMessageService deviceMessageService;
+
+    private IotDeviceServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
+    }
 
     @Override
     public Long createDevice(IotDeviceSaveReqVO createReqVO) {
@@ -138,7 +144,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         device.setProductId(product.getId()).setProductKey(product.getProductKey())
                 .setDeviceType(product.getDeviceType());
         // 生成密钥
-        device.setDeviceSecret(generateDeviceSecret());
+        device.setDeviceSecret(IotDeviceAuthUtils.generateDeviceSecret());
         // 设置设备状态为未激活
         device.setState(IotDeviceStateEnum.INACTIVE.getState());
     }
@@ -368,15 +374,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return deviceMapper.selectCountByGroupId(groupId);
     }
 
-    /**
-     * 生成 deviceSecret
-     *
-     * @return 生成的 deviceSecret
-     */
-    private String generateDeviceSecret() {
-        return IdUtil.fastSimpleUUID();
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
     public IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport) {
@@ -566,7 +563,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return deviceMapper.selectListByHasLocation();
     }
 
-    // ========== 网关-子设备绑定相关 ==========
+    // ========== 网关-拓扑管理（后台操作） ==========
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -766,77 +763,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return new IotDeviceTopoGetRespDTO().setSubDevices(subDeviceIdentities);
     }
 
-    @Override
-    public List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice) {
-        // 1.1 校验网关设备类型
-        if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
-            throw exception(DEVICE_NOT_GATEWAY);
-        }
-        // 1.2 解析参数
-        if (!(message.getParams() instanceof List)) {
-            throw exception(DEVICE_SUB_REGISTER_PARAMS_INVALID);
-        }
-        List<IotSubDeviceRegisterReqDTO> paramsList = JsonUtils.convertList(message.getParams(),
-                IotSubDeviceRegisterReqDTO.class);
-        if (CollUtil.isEmpty(paramsList)) {
-            throw exception(DEVICE_SUB_REGISTER_PARAMS_INVALID);
-        }
-
-        // 2. 遍历注册每个子设备
-        List<IotSubDeviceRegisterRespDTO> results = new ArrayList<>(paramsList.size());
-        for (IotSubDeviceRegisterReqDTO params : paramsList) {
-            try {
-                IotDeviceDO device = registerSubDevice(gatewayDevice, params);
-                results.add(new IotSubDeviceRegisterRespDTO(
-                        params.getProductKey(), params.getDeviceName(), device.getDeviceSecret()));
-            } catch (Exception ex) {
-                log.error("[handleSubDeviceRegisterMessage][子设备({}/{}) 注册失败]",
-                        params.getProductKey(), params.getDeviceName(), ex);
-            }
-        }
-
-        // 3. 返回响应数据（包含成功注册的子设备列表）
-        return results;
-    }
-
-    private IotDeviceDO registerSubDevice(IotDeviceDO gatewayDevice, IotSubDeviceRegisterReqDTO params) {
-        // 1.1 校验产品
-        IotProductDO product = productService.getProductByProductKey(params.getProductKey());
-        if (product == null) {
-            throw exception(PRODUCT_NOT_EXISTS);
-        }
-        // 1.2 校验产品是否为网关子设备类型
-        if (!IotProductDeviceTypeEnum.isGatewaySub(product.getDeviceType())) {
-            throw exception(DEVICE_SUB_REGISTER_PRODUCT_NOT_GATEWAY_SUB, params.getProductKey());
-        }
-        // 1.3 查找设备是否已存在
-        IotDeviceDO existDevice = getSelf().getDeviceFromCache(params.getProductKey(), params.getDeviceName());
-        if (existDevice != null) {
-            // 校验是否绑定到当前网关
-            if (ObjUtil.notEqual(existDevice.getGatewayId(), gatewayDevice.getId())) {
-                throw exception(DEVICE_GATEWAY_BINDTO_EXISTS,
-                        existDevice.getProductKey(), existDevice.getDeviceName());
-            }
-            // 已存在则返回设备信息
-            return existDevice;
-        }
-
-        // 2. 创建新设备
-        IotDeviceSaveReqVO createReqVO = new IotDeviceSaveReqVO()
-                .setDeviceName(params.getDeviceName())
-                .setProductId(product.getId())
-                .setGatewayId(gatewayDevice.getId());
-        IotDeviceDO newDevice = createDevice0(createReqVO);
-        log.info("[registerSubDevice][网关({}/{}) 注册子设备({}/{})]",
-                gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
-                newDevice.getProductKey(), newDevice.getDeviceName());
-        return newDevice;
-    }
-
-    private IotDeviceServiceImpl getSelf() {
-        return SpringUtil.getBean(getClass());
-    }
-
     /**
      * 发送拓扑变更通知给网关设备
      *
@@ -873,6 +799,109 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             log.error("[sendTopoChangeNotify][网关({}/{}) 发送拓扑变更通知失败，status={}]",
                     gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(), status, ex);
         }
+    }
+
+    // ========== 设备动态注册 ==========
+
+    @Override
+    public IotDeviceRegisterRespDTO registerDevice(IotDeviceRegisterReqDTO reqDTO) {
+        // 1.1 校验产品
+        IotProductDO product = productService.getProductByProductKey(reqDTO.getProductKey());
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        // 1.2 校验产品是否开启动态注册
+        if (BooleanUtil.isFalse(product.getRegisterEnabled())) {
+            throw exception(DEVICE_REGISTER_DISABLED);
+        }
+        // 1.3 验证签名
+        if (!IotDeviceAuthUtils.verifyRegisterSign(product.getProductSecret(),
+                reqDTO.getProductKey(), reqDTO.getDeviceName(), reqDTO.getRandom(), reqDTO.getSign())) {
+            throw exception(DEVICE_REGISTER_SIGN_INVALID);
+        }
+
+        // 4. 查找设备（预注册模式：设备必须已存在）
+        // TODO @AI：设备不用提前有，这个有问题！
+        IotDeviceDO device = getSelf().getDeviceFromCache(reqDTO.getProductKey(), reqDTO.getDeviceName());
+        if (device == null) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+
+        // 5. 校验设备是否已激活（已激活的设备不允许重复注册）
+        if (!Objects.equals(device.getState(), IotDeviceStateEnum.INACTIVE.getState())) {
+            throw exception(DEVICE_ALREADY_ACTIVATED);
+        }
+
+        // 6. 返回设备密钥
+        return new IotDeviceRegisterRespDTO(device.getProductKey(), device.getDeviceName(), device.getDeviceSecret());
+    }
+
+    @Override
+    public List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice) {
+        // 1.1 校验网关设备类型
+        if (!IotProductDeviceTypeEnum.isGateway(gatewayDevice.getDeviceType())) {
+            throw exception(DEVICE_NOT_GATEWAY);
+        }
+        // 1.2 解析参数
+        if (!(message.getParams() instanceof List)) {
+            throw exception(DEVICE_SUB_REGISTER_PARAMS_INVALID);
+        }
+        List<IotSubDeviceRegisterReqDTO> paramsList = JsonUtils.convertList(message.getParams(),
+                IotSubDeviceRegisterReqDTO.class);
+        if (CollUtil.isEmpty(paramsList)) {
+            throw exception(DEVICE_SUB_REGISTER_PARAMS_INVALID);
+        }
+
+        // 2. 遍历注册每个子设备
+        List<IotSubDeviceRegisterRespDTO> results = new ArrayList<>(paramsList.size());
+        for (IotSubDeviceRegisterReqDTO params : paramsList) {
+            try {
+                IotDeviceDO device = registerSubDevice(gatewayDevice, params);
+                results.add(new IotSubDeviceRegisterRespDTO(
+                        params.getProductKey(), params.getDeviceName(), device.getDeviceSecret()));
+            } catch (Exception ex) {
+                log.error("[handleSubDeviceRegisterMessage][子设备({}/{}) 注册失败]",
+                        params.getProductKey(), params.getDeviceName(), ex);
+            }
+        }
+
+        // 3. 返回响应数据（包含成功注册的子设备列表）
+        return results;
+    }
+
+    // TODO @AI：阿里云的，设备必须存在；
+    private IotDeviceDO registerSubDevice(IotDeviceDO gatewayDevice, IotSubDeviceRegisterReqDTO params) {
+        // 1.1 校验产品
+        IotProductDO product = productService.getProductByProductKey(params.getProductKey());
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        // 1.2 校验产品是否为网关子设备类型
+        if (!IotProductDeviceTypeEnum.isGatewaySub(product.getDeviceType())) {
+            throw exception(DEVICE_SUB_REGISTER_PRODUCT_NOT_GATEWAY_SUB, params.getProductKey());
+        }
+        // 1.3 查找设备是否已存在
+        IotDeviceDO existDevice = getSelf().getDeviceFromCache(params.getProductKey(), params.getDeviceName());
+        if (existDevice != null) {
+            // 校验是否绑定到当前网关
+            if (ObjUtil.notEqual(existDevice.getGatewayId(), gatewayDevice.getId())) {
+                throw exception(DEVICE_GATEWAY_BINDTO_EXISTS,
+                        existDevice.getProductKey(), existDevice.getDeviceName());
+            }
+            // 已存在则返回设备信息
+            return existDevice;
+        }
+
+        // 2. 创建新设备
+        IotDeviceSaveReqVO createReqVO = new IotDeviceSaveReqVO()
+                .setDeviceName(params.getDeviceName())
+                .setProductId(product.getId())
+                .setGatewayId(gatewayDevice.getId());
+        IotDeviceDO newDevice = createDevice0(createReqVO);
+        log.info("[registerSubDevice][网关({}/{}) 注册子设备({}/{})]",
+                gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                newDevice.getProductKey(), newDevice.getDeviceName());
+        return newDevice;
     }
 
 }

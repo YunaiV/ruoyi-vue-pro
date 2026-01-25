@@ -33,9 +33,10 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     TOPO_CHANGE("thing.topo.change", "拓扑关系变更通知", false),
 
     // ========== 设备注册 ==========
-    // 可参考：https://help.aliyun.com/zh/iot/user-guide/register-devices
+    // 可参考：https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification
 
-    SUB_DEVICE_REGISTER("thing.sub.register", "子设备动态注册", true),
+    DEVICE_REGISTER("thing.auth.register", "设备动态注册", true),
+    SUB_DEVICE_REGISTER("thing.auth.register.sub", "子设备动态注册", true),
 
     // ========== 设备属性 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services

@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 
 /**
  * IoT 设备通用 API
@@ -27,5 +29,13 @@ public interface IotDeviceCommonApi {
      * @return 设备信息
      */
     CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO infoReqDTO);
+
+    /**
+     * 设备动态注册（一型一密）
+     *
+     * @param reqDTO 动态注册请求
+     * @return 注册结果（包含 DeviceSecret）
+     */
+    CommonResult<IotDeviceRegisterRespDTO> registerDevice(IotDeviceRegisterReqDTO reqDTO);
 
 }
