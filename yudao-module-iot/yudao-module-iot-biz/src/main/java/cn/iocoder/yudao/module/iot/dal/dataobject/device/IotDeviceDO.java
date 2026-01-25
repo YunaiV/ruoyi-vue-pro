@@ -123,11 +123,6 @@ public class IotDeviceDO extends TenantBaseDO {
      * 设备密钥，用于设备认证
      */
     private String deviceSecret;
-    /**
-     * 认证类型（如一机一密、动态注册）
-     */
-    // TODO @haohao：是不是要枚举哈
-    private String authType;
 
     /**
      * 设备位置的纬度

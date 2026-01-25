@@ -68,10 +68,8 @@ public class IotProductServiceImpl implements IotProductService {
     @CacheEvict(value = RedisKeyConstants.PRODUCT, key = "#updateReqVO.id")
     public void updateProduct(IotProductSaveReqVO updateReqVO) {
         updateReqVO.setProductKey(null); // 不更新产品标识
-        // 1.1 校验存在
-        IotProductDO iotProductDO = validateProductExists(updateReqVO.getId());
-        // 1.2 发布状态不可更新
-        validateProductStatus(iotProductDO);
+        // 1. 校验存在
+        validateProductExists(updateReqVO.getId());
 
         // 2. 更新
         IotProductDO updateObj = BeanUtils.toBean(updateReqVO, IotProductDO.class);

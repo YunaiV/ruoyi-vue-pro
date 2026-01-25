@@ -810,7 +810,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public IotDeviceRegisterRespDTO registerDevice(IotDeviceRegisterReqDTO reqDTO) {
         // 1.1 校验产品
-        IotProductDO product = productService.getProductByProductKey(reqDTO.getProductKey());
+        IotProductDO product = TenantUtils.executeIgnore(() ->
+                productService.getProductByProductKey(reqDTO.getProductKey()));
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
@@ -822,21 +823,23 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (ObjUtil.notEqual(product.getProductSecret(), reqDTO.getProductSecret())) {
             throw exception(DEVICE_REGISTER_SECRET_INVALID);
         }
-        // 1.4 校验设备是否已存在（已存在则不允许重复注册）
-        IotDeviceDO device = getSelf().getDeviceFromCache(reqDTO.getProductKey(), reqDTO.getDeviceName());
-        if (device != null) {
-            throw exception(DEVICE_REGISTER_ALREADY_EXISTS);
-        }
+        return TenantUtils.execute(product.getTenantId(), () -> {
+            // 1.4 校验设备是否已存在（已存在则不允许重复注册）
+            IotDeviceDO device = getSelf().getDeviceFromCache(reqDTO.getProductKey(), reqDTO.getDeviceName());
+            if (device != null) {
+                throw exception(DEVICE_REGISTER_ALREADY_EXISTS);
+            }
 
-        // 2.1 自动创建设备
-        IotDeviceSaveReqVO createReqVO = new IotDeviceSaveReqVO()
-                .setDeviceName(reqDTO.getDeviceName())
-                .setProductId(product.getId());
-        device = createDevice0(createReqVO);
-        log.info("[registerDevice][产品({}) 自动创建设备({})]",
-                reqDTO.getProductKey(), reqDTO.getDeviceName());
-        // 2.2 返回设备密钥
-        return new IotDeviceRegisterRespDTO(device.getProductKey(), device.getDeviceName(), device.getDeviceSecret());
+            // 2.1 自动创建设备
+            IotDeviceSaveReqVO createReqVO = new IotDeviceSaveReqVO()
+                    .setDeviceName(reqDTO.getDeviceName())
+                    .setProductId(product.getId());
+            device = createDevice0(createReqVO);
+            log.info("[registerDevice][产品({}) 自动创建设备({})]",
+                    reqDTO.getProductKey(), reqDTO.getDeviceName());
+            // 2.2 返回设备密钥
+            return new IotDeviceRegisterRespDTO(device.getProductKey(), device.getDeviceName(), device.getDeviceSecret());
+        });
     }
 
     @Override
@@ -845,7 +848,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         IotDeviceDO gatewayDevice = getSelf().getDeviceFromCache(reqDTO.getGatewayProductKey(), reqDTO.getGatewayDeviceName());
 
         // 2. 遍历注册每个子设备
-        return registerSubDevices0(gatewayDevice, reqDTO.getSubDevices());
+        return TenantUtils.execute(gatewayDevice.getTenantId(), () ->
+                registerSubDevices0(gatewayDevice, reqDTO.getSubDevices()));
     }
 
     @Override

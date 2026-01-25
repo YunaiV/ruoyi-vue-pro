@@ -95,8 +95,6 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
 
     // ===================== 拓扑管理测试 =====================
 
-    // TODO @芋艿：待测试
-
     /**
      * 添加子设备拓扑关系测试
      * <p>
@@ -222,7 +220,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         // 1.2 构建请求参数
         IotSubDeviceRegisterReqDTO subDevice = new IotSubDeviceRegisterReqDTO();
         subDevice.setProductKey(SUB_DEVICE_PRODUCT_KEY);
-        subDevice.setDeviceName(SUB_DEVICE_NAME);
+        subDevice.setDeviceName("mougezishebei");
         String payload = JsonUtils.toJsonString(MapUtil.builder()
                 .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod())

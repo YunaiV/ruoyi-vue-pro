@@ -48,76 +48,9 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
     private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
 
     /**
-     * 产品密钥（从 iot_product 表的 product_secret 字段获取），用于动态注册
-     */
-    private static final String PRODUCT_SECRET = "your_product_secret";
-
-    /**
-     * 动态注册的设备名称
-     */
-    private static final String REGISTER_DEVICE_NAME = "test-register-device";
-
-    /**
      * 直连设备 Token：从 {@link #testAuth()} 方法获取后，粘贴到这里
      */
     private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc2OTMwNTA1NSwiZGV2aWNlTmFtZSI6InNtYWxsIn0.mf3MEATCn5bp6cXgULunZjs8d00RGUxj96JEz0hMS7k";
-
-    // ===================== 动态注册测试 =====================
-
-    /**
-     * 直连设备动态注册测试（一型一密）
-     * <p>
-     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
-     * <p>
-     * 注意：此接口不需要 Token 认证
-     */
-    @Test
-    public void testDeviceRegister() {
-        // 1.1 构建请求
-        String url = String.format("http://%s:%d/auth/register/device", SERVER_HOST, SERVER_PORT);
-        // 1.2 构建请求参数
-        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO();
-        reqDTO.setProductKey(PRODUCT_KEY);
-        reqDTO.setDeviceName(REGISTER_DEVICE_NAME);
-        reqDTO.setProductSecret(PRODUCT_SECRET);
-        String payload = JsonUtils.toJsonString(reqDTO);
-        // 1.3 输出请求
-        log.info("[testDeviceRegister][请求 URL: {}]", url);
-        log.info("[testDeviceRegister][请求体: {}]", payload);
-
-        // 2.1 发送请求
-        String response = HttpUtil.post(url, payload);
-        // 2.2 输出结果
-        log.info("[testDeviceRegister][响应体: {}]", response);
-        log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
-    }
-
-    /**
-     * 测试动态注册后使用 deviceSecret 进行认证
-     * <p>
-     * 此测试需要先执行 testDeviceRegister 获取 deviceSecret
-     */
-    @Test
-    public void testAuthAfterRegister() {
-        // 1.1 构建请求
-        String url = String.format("http://%s:%d/auth", SERVER_HOST, SERVER_PORT);
-        // TODO 将 testDeviceRegister 返回的 deviceSecret 填入此处
-        String deviceSecret = "返回的deviceSecret";
-        IotDeviceAuthUtils.AuthInfo authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, REGISTER_DEVICE_NAME, deviceSecret);
-        IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
-                .setClientId(authInfo.getClientId())
-                .setUsername(authInfo.getUsername())
-                .setPassword(authInfo.getPassword());
-        String payload = JsonUtils.toJsonString(authReqDTO);
-        // 1.2 输出请求
-        log.info("[testAuthAfterRegister][请求 URL: {}]", url);
-        log.info("[testAuthAfterRegister][请求体: {}]", payload);
-
-        // 2.1 发送请求
-        String response = HttpUtil.post(url, payload);
-        // 2.2 输出结果
-        log.info("[testAuthAfterRegister][响应体: {}]", response);
-    }
 
     // ===================== 认证测试 =====================
 
@@ -128,7 +61,7 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
     public void testAuth() {
         // 1.1 构建请求
         String url = String.format("http://%s:%d/auth", SERVER_HOST, SERVER_PORT);
-        IotDeviceAuthUtils.AuthInfo authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+        IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
         IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
                 .setClientId(authInfo.getClientId())
                 .setUsername(authInfo.getUsername())
@@ -211,6 +144,36 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
             // 2.2 输出结果
             log.info("[testEventPost][响应体: {}]", httpResponse.body());
         }
+    }
+
+    // ===================== 动态注册测试 =====================
+
+    /**
+     * 直连设备动态注册测试（一型一密）
+     * <p>
+     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
+     * <p>
+     * 注意：此接口不需要 Token 认证
+     */
+    @Test
+    public void testDeviceRegister() {
+        // 1.1 构建请求
+        String url = String.format("http://%s:%d/auth/register/device", SERVER_HOST, SERVER_PORT);
+        // 1.2 构建请求参数
+        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO();
+        reqDTO.setProductKey(PRODUCT_KEY);
+        reqDTO.setDeviceName("test-" + System.currentTimeMillis());
+        reqDTO.setProductSecret("test-product-secret");
+        String payload = JsonUtils.toJsonString(reqDTO);
+        // 1.3 输出请求
+        log.info("[testDeviceRegister][请求 URL: {}]", url);
+        log.info("[testDeviceRegister][请求体: {}]", payload);
+
+        // 2.1 发送请求
+        String response = HttpUtil.post(url, payload);
+        // 2.2 输出结果
+        log.info("[testDeviceRegister][响应体: {}]", response);
+        log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
     }
 
 }
