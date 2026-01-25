@@ -8,7 +8,7 @@ import lombok.Data;
  * 用于 thing.event.post 消息的 params 参数
  *
  * @author 芋道源码
- * @see <a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services">阿里云 - 设备上报事件</a>
+ * @see <a href="http://help.aliyun.com/zh/marketplace/device-reporting-events">阿里云 - 设备上报事件</a>
  */
 @Data
 public class IotDeviceEventPostReqDTO {

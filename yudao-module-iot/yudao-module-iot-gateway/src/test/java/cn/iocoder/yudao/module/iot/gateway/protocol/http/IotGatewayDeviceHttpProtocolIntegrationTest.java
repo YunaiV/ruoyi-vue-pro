@@ -75,7 +75,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
     public void testAuth() {
         // 1.1 构建请求
         String url = String.format("http://%s:%d/auth", SERVER_HOST, SERVER_PORT);
-        IotDeviceAuthUtils.AuthInfo authInfo = IotDeviceAuthUtils.getAuthInfo(
+        IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(
                 GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME, GATEWAY_DEVICE_SECRET);
         IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
                 .setClientId(authInfo.getClientId())
@@ -108,7 +108,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         String url = String.format("http://%s:%d/topic/sys/%s/%s/thing/topo/add",
                 SERVER_HOST, SERVER_PORT, GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
         // 1.2 构建子设备认证信息
-        IotDeviceAuthUtils.AuthInfo subAuthInfo = IotDeviceAuthUtils.getAuthInfo(
+        IotDeviceAuthReqDTO subAuthInfo = IotDeviceAuthUtils.getAuthInfo(
                 SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME, SUB_DEVICE_SECRET);
         IotDeviceAuthReqDTO subDeviceAuth = new IotDeviceAuthReqDTO()
                 .setClientId(subAuthInfo.getClientId())

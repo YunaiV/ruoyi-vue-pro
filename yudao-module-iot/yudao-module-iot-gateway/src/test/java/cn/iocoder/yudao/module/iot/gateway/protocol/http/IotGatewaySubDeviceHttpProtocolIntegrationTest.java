@@ -63,7 +63,7 @@ public class IotGatewaySubDeviceHttpProtocolIntegrationTest {
     public void testAuth() {
         // 1.1 构建请求
         String url = String.format("http://%s:%d/auth", SERVER_HOST, SERVER_PORT);
-        IotDeviceAuthUtils.AuthInfo authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+        IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
         IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
                 .setClientId(authInfo.getClientId())
                 .setUsername(authInfo.getUsername())

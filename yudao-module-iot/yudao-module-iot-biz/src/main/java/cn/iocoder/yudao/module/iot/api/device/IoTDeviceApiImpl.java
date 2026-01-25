@@ -7,8 +7,10 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -20,6 +22,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -64,6 +68,13 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     @PermitAll
     public CommonResult<IotDeviceRegisterRespDTO> registerDevice(@RequestBody IotDeviceRegisterReqDTO reqDTO) {
         return success(deviceService.registerDevice(reqDTO));
+    }
+
+    @Override
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/register-sub")
+    @PermitAll
+    public CommonResult<List<IotSubDeviceRegisterRespDTO>> registerSubDevices(@RequestBody IotSubDeviceRegisterFullReqDTO reqDTO) {
+        return success(deviceService.registerSubDevices(reqDTO));
     }
 
 }

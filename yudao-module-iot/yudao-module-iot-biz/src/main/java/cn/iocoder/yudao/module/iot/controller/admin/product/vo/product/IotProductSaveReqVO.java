@@ -49,7 +49,7 @@ public class IotProductSaveReqVO {
     private String codecType;
 
     @Schema(description = "是否开启动态注册", example = "false")
-    @NotEmpty(message = "是否开启动态注册不能为空")
+    @NotNull(message = "是否开启动态注册不能为空")
     private Boolean registerEnabled;
 
 }

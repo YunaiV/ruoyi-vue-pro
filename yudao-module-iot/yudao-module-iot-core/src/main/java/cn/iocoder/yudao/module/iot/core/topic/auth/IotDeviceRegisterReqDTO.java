@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * IoT 设备动态注册 Request DTO
  * <p>
- * 用于直连设备/网关的一型一密动态注册：使用 ProductSecret 验证签名，返回 DeviceSecret
+ * 用于直连设备/网关的一型一密动态注册：使用 productSecret 验证，返回 deviceSecret
  *
  * @author 芋道源码
  * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
@@ -26,18 +26,10 @@ public class IotDeviceRegisterReqDTO {
     @NotEmpty(message = "设备名称不能为空")
     private String deviceName;
 
-    // TODO @AI：可以去掉 random 字段；
     /**
-     * 随机数，用于签名
+     * 产品密钥
      */
-    @NotEmpty(message = "随机数不能为空")
-    private String random;
-
-    // TODO @AI：看起来，是直接带 productSecret 阿里云上，你在检查下！
-    /**
-     * 签名
-     */
-    @NotEmpty(message = "签名不能为空")
-    private String sign;
+    @NotEmpty(message = "产品密钥不能为空")
+    private String productSecret;
 
 }

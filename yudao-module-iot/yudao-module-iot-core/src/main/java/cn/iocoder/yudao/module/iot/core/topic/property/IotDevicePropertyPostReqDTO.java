@@ -11,7 +11,7 @@ import java.util.Map;
  * 本质是一个 Map，key 为属性标识符，value 为属性值
  *
  * @author 芋道源码
- * @see <a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services">阿里云 - 设备上报属性</a>
+ * @see <a href="http://help.aliyun.com/zh/marketplace/device-reporting-attributes">阿里云 - 设备上报属性</a>
  */
 public class IotDevicePropertyPostReqDTO extends HashMap<String, Object> {
 

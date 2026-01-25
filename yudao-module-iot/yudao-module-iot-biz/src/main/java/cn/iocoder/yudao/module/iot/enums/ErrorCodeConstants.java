@@ -44,8 +44,8 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_SUB_REGISTER_PARAMS_INVALID = new ErrorCode(1_050_003_200, "子设备注册参数无效");
     ErrorCode DEVICE_SUB_REGISTER_PRODUCT_NOT_GATEWAY_SUB = new ErrorCode(1_050_003_201, "产品【{}】不是网关子设备类型");
     ErrorCode DEVICE_REGISTER_DISABLED = new ErrorCode(1_050_003_210, "该产品未开启动态注册功能");
-    ErrorCode DEVICE_REGISTER_SIGN_INVALID = new ErrorCode(1_050_003_211, "动态注册签名验证失败");
-    ErrorCode DEVICE_ALREADY_ACTIVATED = new ErrorCode(1_050_003_212, "设备已激活，不允许重复注册");
+    ErrorCode DEVICE_REGISTER_SECRET_INVALID = new ErrorCode(1_050_003_211, "产品密钥验证失败");
+    ErrorCode DEVICE_REGISTER_ALREADY_EXISTS = new ErrorCode(1_050_003_212, "设备已存在，不允许重复注册");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");

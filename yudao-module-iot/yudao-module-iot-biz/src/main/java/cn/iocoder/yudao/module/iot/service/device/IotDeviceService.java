@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
@@ -43,18 +44,6 @@ public interface IotDeviceService {
      * @param updateReqVO 更新信息
      */
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
-
-    // TODO @芋艿：先这么实现。未来看情况，要不要自己实现
-
-    /**
-     * 更新设备的所属网关
-     *
-     * @param id        编号
-     * @param gatewayId 网关设备 ID
-     */
-    default void updateDeviceGateway(Long id, Long gatewayId) {
-        updateDevice(new IotDeviceSaveReqVO().setId(id).setGatewayId(gatewayId));
-    }
 
     /**
      * 更新设备状态
@@ -359,6 +348,25 @@ public interface IotDeviceService {
     // ========== 设备动态注册 ==========
 
     /**
+     * 直连/网关设备动态注册
+     *
+     * @param reqDTO 动态注册请求
+     * @return 注册结果（包含 DeviceSecret）
+     */
+    IotDeviceRegisterRespDTO registerDevice(@Valid IotDeviceRegisterReqDTO reqDTO);
+
+    /**
+     * 网关子设备动态注册
+     * <p>
+     * 与 {@link #handleSubDeviceRegisterMessage} 方法的区别：
+     * 该方法网关设备信息通过 reqDTO 参数传入，而 {@link #handleSubDeviceRegisterMessage} 方法通过 gatewayDevice 参数传入
+     *
+     * @param reqDTO 子设备注册请求（包含网关设备信息）
+     * @return 注册结果列表
+     */
+    List<IotSubDeviceRegisterRespDTO> registerSubDevices(@Valid IotSubDeviceRegisterFullReqDTO reqDTO);
+
+    /**
      * 处理子设备动态注册消息（网关设备上报）
      *
      * @param message       消息
@@ -366,13 +374,5 @@ public interface IotDeviceService {
      * @return 注册结果列表
      */
     List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
-
-    /**
-     * 设备动态注册（直连设备/网关）
-     *
-     * @param reqDTO 动态注册请求
-     * @return 注册结果（包含 DeviceSecret）
-     */
-    IotDeviceRegisterRespDTO registerDevice(@Valid IotDeviceRegisterReqDTO reqDTO);
 
 }

@@ -33,7 +33,6 @@ public class IotHttpRegisterHandler extends IotHttpAbstractHandler {
     @Override
     public CommonResult<Object> handle0(RoutingContext context) {
         // 1. 解析参数
-        // TODO @AI：参数不太对，看看我写的建议
         JsonObject body = context.body().asJsonObject();
         String productKey = body.getString("productKey");
         if (StrUtil.isEmpty(productKey)) {
@@ -43,21 +42,14 @@ public class IotHttpRegisterHandler extends IotHttpAbstractHandler {
         if (StrUtil.isEmpty(deviceName)) {
             throw invalidParamException("deviceName 不能为空");
         }
-        String random = body.getString("random");
-        if (StrUtil.isEmpty(random)) {
-            throw invalidParamException("random 不能为空");
-        }
-        String sign = body.getString("sign");
-        if (StrUtil.isEmpty(sign)) {
-            throw invalidParamException("sign 不能为空");
+        String productSecret = body.getString("productSecret");
+        if (StrUtil.isEmpty(productSecret)) {
+            throw invalidParamException("productSecret 不能为空");
         }
 
         // 2. 调用动态注册
         IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO()
-                .setProductKey(productKey)
-                .setDeviceName(deviceName)
-                .setRandom(random)
-                .setSign(sign);
+                .setProductKey(productKey).setDeviceName(deviceName).setProductSecret(productSecret);
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(reqDTO);
         result.checkError();
 

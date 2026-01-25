@@ -2,11 +2,14 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -27,13 +30,10 @@ public class IotHttpRegisterSubHandler extends IotHttpAbstractHandler {
      */
     public static final String PATH = "/auth/register/sub-device/:productKey/:deviceName";
 
-    private final IotHttpUpstreamProtocol protocol;
+    private final IotDeviceCommonApi deviceApi;
 
-    private final IotDeviceMessageService deviceMessageService;
-
-    public IotHttpRegisterSubHandler(IotHttpUpstreamProtocol protocol) {
-        this.protocol = protocol;
-        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
+    public IotHttpRegisterSubHandler() {
+        this.deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
     }
 
     @Override
@@ -42,18 +42,19 @@ public class IotHttpRegisterSubHandler extends IotHttpAbstractHandler {
         String productKey = context.pathParam("productKey");
         String deviceName = context.pathParam("deviceName");
 
-        // 2.1 解析消息
-        byte[] bytes = context.body().buffer().getBytes();
-        IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(bytes, productKey, deviceName);
-        // 2.2 设置方法
-        message.setMethod(IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod());
+        // 2. 解析子设备列表
+        JsonObject body = context.body().asJsonObject();
+        List<cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO> subDevices = JsonUtils.parseArray(
+                body.getJsonArray("params").toString(), cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO.class);
 
-        // TODO @AI：可能还是需要一个新的 deviceApi 接口。因为 register sub 子设备不太一行；
-        // 2.3 发送消息
-        Object responseData = deviceMessageService.sendDeviceMessage(message, productKey, deviceName, protocol.getServerId());
+        // 3. 调用子设备动态注册
+        IotSubDeviceRegisterFullReqDTO reqDTO = new IotSubDeviceRegisterFullReqDTO()
+                .setGatewayProductKey(productKey).setGatewayDeviceName(deviceName).setSubDevices(subDevices);
+        CommonResult<List<IotSubDeviceRegisterRespDTO>> result = deviceApi.registerSubDevices(reqDTO);
+        result.checkError();
 
-        // 3. 返回结果
-        return success(responseData);
+        // 4. 返回结果
+        return success(result.getData());
     }
 
 }

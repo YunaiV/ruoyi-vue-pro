@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
@@ -74,7 +74,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
         }
 
         // 校验 token
-        IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.verifyToken(token);
+        IotDeviceIdentity deviceInfo = deviceTokenService.verifyToken(token);
         Assert.notNull(deviceInfo, "设备信息不能为空");
         // 校验设备信息是否匹配
         if (ObjUtil.notEqual(productKey, deviceInfo.getProductKey())
