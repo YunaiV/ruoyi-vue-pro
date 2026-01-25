@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import lombok.Setter;
 import org.flowable.bpmn.model.*;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
@@ -88,6 +89,23 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
             return;
         }
         super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
+    }
+
+    // ========== 屏蔽解析器覆写 ==========
+
+    @Override
+    public void setCollectionExpression(Expression collectionExpression) {
+        // 保持自定义变量名，忽略解析器写入的 collection 表达式
+    }
+
+    @Override
+    public void setCollectionVariable(String collectionVariable) {
+        // 保持自定义变量名，忽略解析器写入的 collection 变量名
+    }
+
+    @Override
+    public void setCollectionElementVariable(String collectionElementVariable) {
+        // 保持自定义变量名，忽略解析器写入的单元素变量名
     }
 
 }
