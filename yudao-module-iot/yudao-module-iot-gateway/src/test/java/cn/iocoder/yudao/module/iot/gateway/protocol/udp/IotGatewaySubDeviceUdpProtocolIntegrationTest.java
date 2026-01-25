@@ -5,34 +5,35 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotDirectDeviceUdpProtocolIntegrationTest.sendAndReceive;
+
 /**
- * IoT 直连设备 UDP 协议集成测试（手动测试）
+ * IoT 网关子设备 UDP 协议集成测试（手动测试）
  *
- * <p>测试场景：直连设备（IotProductDeviceTypeEnum 的 DIRECT 类型）通过 UDP 协议直接连接平台
+ * <p>测试场景：子设备（IotProductDeviceTypeEnum 的 SUB 类型）通过网关设备代理上报数据
+ *
+ * <p><b>重要说明：子设备无法直接连接平台，所有请求均由网关设备（Gateway）代为转发。</b>
+ * <p>网关设备转发子设备请求时，Token 使用子设备自己的信息。
  *
  * <p>使用步骤：
  * <ol>
- *     <li>启动 yudao-module-iot-gateway 服务（UDP 端口 8092）</li>
- *     <li>运行 {@link #testDeviceRegister()} 测试直连设备动态注册（一型一密）</li>
- *     <li>运行 {@link #testAuth()} 获取设备 token，将返回的 token 粘贴到 {@link #TOKEN} 常量</li>
+ *     <li>启动 yudao-module-iot-gateway 服务（UDP 端口 8093）</li>
+ *     <li>确保子设备已通过 {@link IotGatewayDeviceUdpProtocolIntegrationTest#testTopoAdd()} 绑定到网关</li>
+ *     <li>运行 {@link #testAuth()} 获取子设备 token，将返回的 token 粘贴到 {@link #TOKEN} 常量</li>
  *     <li>运行以下测试方法：
  *         <ul>
- *             <li>{@link #testPropertyPost()} - 设备属性上报</li>
- *             <li>{@link #testEventPost()} - 设备事件上报</li>
+ *             <li>{@link #testPropertyPost()} - 子设备属性上报（由网关代理转发）</li>
+ *             <li>{@link #testEventPost()} - 子设备事件上报（由网关代理转发）</li>
  *         </ul>
  *     </li>
  * </ol>
@@ -42,26 +43,26 @@ import java.util.Map;
  * @author 芋道源码
  */
 @Slf4j
-public class IotDirectDeviceUdpProtocolIntegrationTest {
+public class IotGatewaySubDeviceUdpProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";
     private static final int SERVER_PORT = 8093;
     private static final int TIMEOUT_MS = 5000;
 
-    // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
-    private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
-    private static final String DEVICE_NAME = "small";
-    private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
+    // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+    private static final String PRODUCT_KEY = "jAufEMTF1W6wnPhn";
+    private static final String DEVICE_NAME = "chazuo-it";
+    private static final String DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";
 
     /**
-     * 直连设备 Token：从 {@link #testAuth()} 方法获取后，粘贴到这里
+     * 网关子设备 Token：从 {@link #testAuth()} 方法获取后，粘贴到这里
      */
-    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc2OTk0ODYzOCwiZGV2aWNlTmFtZSI6InNtYWxsIn0.TrOJisXhloZ3quLBOAIyowmpq6Syp9PHiEpfj-nQ9xo";
+    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiakF1ZkVNVEYxVzZ3blBobiIsImV4cCI6MTc2OTk1NDY3OSwiZGV2aWNlTmFtZSI6ImNoYXp1by1pdCJ9.jfbUAoU0xkJl4UvO-NUvcJ6yITPRgUjQ4MKATPuwneg";
 
     // ===================== 认证测试 =====================
 
     /**
-     * 认证测试：获取设备 Token
+     * 子设备认证测试：获取子设备 Token
      */
     @Test
     public void testAuth() throws Exception {
@@ -89,10 +90,10 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
         }
     }
 
-    // ===================== 直连设备属性上报测试 =====================
+    // ===================== 子设备属性上报测试 =====================
 
     /**
-     * 属性上报测试
+     * 子设备属性上报测试
      */
     @Test
     public void testPropertyPost() throws Exception {
@@ -102,14 +103,16 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
                 .put("method", IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())
                 .put("version", "1.0")
                 .put("params", withToken(IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
-                        .put("width", 1)
-                        .put("height", "2")
+                        .put("power", 100)
+                        .put("status", "online")
+                        .put("temperature", 36.5)
                         .build())))
                 .build());
         // 1.2 输出请求
+        log.info("[testPropertyPost][子设备属性上报 - 请求实际由 Gateway 代为转发]");
         log.info("[testPropertyPost][请求体: {}]", payload);
 
-        // 2. 发送请求
+        // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
             String response = sendAndReceive(socket, payload);
@@ -118,10 +121,10 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
         }
     }
 
-    // ===================== 直连设备事件上报测试 =====================
+    // ===================== 子设备事件上报测试 =====================
 
     /**
-     * 事件上报测试
+     * 子设备事件上报测试
      */
     @Test
     public void testEventPost() throws Exception {
@@ -131,11 +134,17 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
                 .put("method", IotDeviceMessageMethodEnum.EVENT_POST.getMethod())
                 .put("version", "1.0")
                 .put("params", withToken(IotDeviceEventPostReqDTO.of(
-                        "eat",
-                        MapUtil.<String, Object>builder().put("rice", 3).build(),
+                        "alarm",
+                        MapUtil.<String, Object>builder()
+                                .put("level", "warning")
+                                .put("message", "temperature too high")
+                                .put("threshold", 40)
+                                .put("current", 42)
+                                .build(),
                         System.currentTimeMillis())))
                 .build());
         // 1.2 输出请求
+        log.info("[testEventPost][子设备事件上报 - 请求实际由 Gateway 代为转发]");
         log.info("[testEventPost][请求体: {}]", payload);
 
         // 2.1 发送请求
@@ -144,41 +153,6 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
             String response = sendAndReceive(socket, payload);
             // 2.2 输出结果
             log.info("[testEventPost][响应体: {}]", response);
-        }
-    }
-
-    // ===================== 动态注册测试 =====================
-
-    /**
-     * 直连设备动态注册测试（一型一密）
-     * <p>
-     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
-     * <p>
-     * 注意：此接口不需要 Token 认证
-     */
-    @Test
-    public void testDeviceRegister() throws Exception {
-        // 1.1 构建请求参数
-        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO();
-        reqDTO.setProductKey(PRODUCT_KEY);
-        reqDTO.setDeviceName("test-" + System.currentTimeMillis());
-        reqDTO.setProductSecret("test-product-secret");
-        // 1.2 构建请求
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod())
-                .put("params", reqDTO)
-                .build());
-        // 1.3 输出请求
-        log.info("[testDeviceRegister][请求体: {}]", payload);
-
-        // 2.1 发送请求
-        try (DatagramSocket socket = new DatagramSocket()) {
-            socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testDeviceRegister][响应体: {}]", response);
-            log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
         }
     }
 
@@ -199,34 +173,6 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
         result.put("token", TOKEN);
         result.put("body", params);
         return result;
-    }
-
-
-    /**
-     * 发送 UDP 请求并接收响应
-     *
-     * @param socket  UDP Socket
-     * @param payload 请求体
-     * @return 响应内容
-     */
-    public static String sendAndReceive(DatagramSocket socket, String payload) throws Exception {
-        byte[] sendData = payload.getBytes(StandardCharsets.UTF_8);
-        InetAddress address = InetAddress.getByName(SERVER_HOST);
-
-        // 发送请求
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, SERVER_PORT);
-        socket.send(sendPacket);
-
-        // 接收响应
-        byte[] receiveData = new byte[4096];
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        try {
-            socket.receive(receivePacket);
-            return new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
-        } catch (java.net.SocketTimeoutException e) {
-            log.warn("[sendAndReceive][接收响应超时]");
-            return null;
-        }
     }
 
 }

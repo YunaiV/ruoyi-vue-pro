@@ -52,6 +52,10 @@ public class IotUdpUpstreamHandler {
      * Token 参数 Key
      */
     private static final String PARAM_KEY_TOKEN = "token";
+    /**
+     * Body 参数 Key（实际请求内容）
+     */
+    private static final String PARAM_KEY_BODY = "body";
 
     private final IotDeviceMessageService deviceMessageService;
 
@@ -248,6 +252,10 @@ public class IotUdpUpstreamHandler {
 
     /**
      * 处理业务请求
+     * <p>
+     * 请求参数格式：
+     * - token：JWT 令牌
+     * - body：实际请求内容（可以是 Map、List 或其他类型）
      *
      * @param message       消息信息
      * @param codecType     消息编解码类型
@@ -259,11 +267,13 @@ public class IotUdpUpstreamHandler {
                                        InetSocketAddress senderAddress, DatagramSocket socket) {
         String addressKey = sessionManager.buildAddressKey(senderAddress);
         try {
-            // 1.1 从消息中提取 token（无状态：消息体携带 token）
+            // 1.1 从消息中提取 token 和 body（格式：{token: "xxx", body: {...}} 或 {token: "xxx", body: [...]}）
             String token = null;
+            Object body = null;
             if (message.getParams() instanceof Map) {
                 Map<String, Object> paramsMap = (Map<String, Object>) message.getParams();
-                token = (String) paramsMap.remove(PARAM_KEY_TOKEN);
+                token = (String) paramsMap.get(PARAM_KEY_TOKEN);
+                body = paramsMap.get(PARAM_KEY_BODY);
             }
             if (StrUtil.isBlank(token)) {
                 log.warn("[handleBusinessRequest][缺少 token，来源: {}]", addressKey);
@@ -291,12 +301,10 @@ public class IotUdpUpstreamHandler {
             // 3. 更新设备地址映射（保持最新）
             sessionManager.updateDeviceAddress(device.getId(), senderAddress);
 
-            // 4. 发送消息到消息总线
+            // 4. 将 body 设置为实际的 params，发送消息到消息总线
+            message.setParams(body);
             deviceMessageService.sendDeviceMessage(message, device.getProductKey(),
                     device.getDeviceName(), serverId);
-
-            // 5. 发送成功响应
-            sendSuccessResponse(socket, senderAddress, message.getRequestId(), "处理成功", codecType);
             log.debug("[handleBusinessRequest][业务消息处理成功，设备 ID: {}，方法: {}，来源: {}]",
                     device.getId(), message.getMethod(), addressKey);
         } catch (Exception e) {
@@ -420,21 +428,6 @@ public class IotUdpUpstreamHandler {
     }
 
     /**
-     * 发送成功响应
-     *
-     * @param socket        UDP Socket
-     * @param address       目标地址
-     * @param requestId     请求 ID
-     * @param message       消息
-     * @param codecType     消息编解码类型
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void sendSuccessResponse(DatagramSocket socket, InetSocketAddress address,
-                                     String requestId, String message, String codecType) {
-        sendResponse(socket, address, true, message, requestId, codecType);
-    }
-
-    /**
      * 发送错误响应
      *
      * @param socket        UDP Socket
@@ -458,18 +451,20 @@ public class IotUdpUpstreamHandler {
      * @param requestId 请求 ID
      * @param codecType 消息编解码类型
      */
+    @SuppressWarnings("SameParameterValue")
     private void sendResponse(DatagramSocket socket, InetSocketAddress address, boolean success,
                               String message, String requestId, String codecType) {
         try {
+            // 构建响应数据
             Object responseData = MapUtil.builder()
                     .put("success", success)
                     .put("message", message)
                     .build();
-
             int code = success ? 0 : 401;
-            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, "response", responseData,
-                    code, message);
+            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId,
+                    "response", responseData, code, message);
 
+            // 发送响应
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, codecType);
             socket.send(Buffer.buffer(encodedData), address.getPort(), address.getHostString(), ar -> {
                 if (ar.failed()) {
