@@ -4,6 +4,8 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition.IotCurrentTimeConditionMatcher;
+import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotTimerConditionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -15,8 +17,7 @@ import java.util.List;
 /**
  * IoT 场景规则时间匹配工具类
  * <p>
- * 提供时间条件匹配的通用方法，供 {@link cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition.IotCurrentTimeConditionMatcher}
- * 和 {@link cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotTimerConditionEvaluator} 共同使用。
+ * 提供时间条件匹配的通用方法，供 {@link IotCurrentTimeConditionMatcher} 和 {@link IotTimerConditionEvaluator} 共同使用。
  *
  * @author HUIHUI
  */
@@ -33,6 +34,7 @@ public class IotSceneRuleTimeHelper {
      */
     private static final DateTimeFormatter TIME_FORMATTER_SHORT = DateTimeFormatter.ofPattern("HH:mm");
 
+    // TODO @puhui999：可以使用 lombok 简化
     private IotSceneRuleTimeHelper() {
         // 工具类，禁止实例化
     }
@@ -94,6 +96,7 @@ public class IotSceneRuleTimeHelper {
      * @param param            参数值
      * @return 是否匹配
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     public static boolean matchDateTime(long currentTimestamp, IotSceneRuleConditionOperatorEnum operatorEnum,
                                         String param) {
         try {
@@ -133,6 +136,7 @@ public class IotSceneRuleTimeHelper {
         }
         long startTimestamp = Long.parseLong(timestampRange.get(0).trim());
         long endTimestamp = Long.parseLong(timestampRange.get(1).trim());
+        // TODO @puhui999：hutool 里，看看有没 between 方法
         return currentTimestamp >= startTimestamp && currentTimestamp <= endTimestamp;
     }
 
@@ -144,6 +148,7 @@ public class IotSceneRuleTimeHelper {
      * @param param        参数值
      * @return 是否匹配
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     public static boolean matchTime(LocalTime currentTime, IotSceneRuleConditionOperatorEnum operatorEnum,
                                     String param) {
         try {
@@ -183,6 +188,7 @@ public class IotSceneRuleTimeHelper {
         }
         LocalTime startTime = parseTime(timeRange.get(0).trim());
         LocalTime endTime = parseTime(timeRange.get(1).trim());
+        // TODO @puhui999：hutool 里，看看有没 between 方法
         return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
     }
 

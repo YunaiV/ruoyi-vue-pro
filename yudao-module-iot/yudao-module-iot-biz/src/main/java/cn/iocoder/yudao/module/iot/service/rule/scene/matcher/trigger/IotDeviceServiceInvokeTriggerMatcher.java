@@ -31,13 +31,11 @@ public class IotDeviceServiceInvokeTriggerMatcher implements IotSceneRuleTrigger
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "触发器基础参数无效");
             return false;
         }
-
         // 1.2 检查消息方法是否匹配
         if (!IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod().equals(message.getMethod())) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息方法不匹配，期望: " + IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod() + ", 实际: " + message.getMethod());
             return false;
         }
-
         // 1.3 检查标识符是否匹配
         String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
         if (!IotSceneRuleMatcherHelper.isIdentifierMatched(trigger.getIdentifier(), messageIdentifier)) {
@@ -73,21 +71,21 @@ public class IotDeviceServiceInvokeTriggerMatcher implements IotSceneRuleTrigger
      * @return 是否匹配
      */
     private boolean matchParameterCondition(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
-        // 从消息中提取服务调用的输入参数
+        // 1.1 从消息中提取服务调用的输入参数
         Map<String, Object> inputParams = IotDeviceMessageUtils.extractServiceInputParams(message);
+        // TODO @puhui999：要考虑 empty 的情况么？
         if (inputParams == null) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中缺少服务输入参数");
             return false;
         }
-
-        // 获取要匹配的参数值（使用 identifier 作为参数名）
+        // 1.2 获取要匹配的参数值（使用 identifier 作为参数名）
         Object paramValue = inputParams.get(trigger.getIdentifier());
         if (paramValue == null) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "服务输入参数中缺少指定参数: " + trigger.getIdentifier());
             return false;
         }
 
-        // 使用条件评估器进行匹配
+        // 2. 使用条件评估器进行匹配
         boolean matched = IotSceneRuleMatcherHelper.evaluateCondition(paramValue, trigger.getOperator(), trigger.getValue());
         if (matched) {
             IotSceneRuleMatcherHelper.logTriggerMatchSuccess(message, trigger);

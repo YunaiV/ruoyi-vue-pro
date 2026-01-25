@@ -67,7 +67,6 @@ public class IotWebSocketClient {
             // 使用 CountDownLatch 等待连接完成
             CountDownLatch connectLatch = new CountDownLatch(1);
             AtomicBoolean connectSuccess = new AtomicBoolean(false);
-
             // 创建 WebSocket 连接
             webSocket = okHttpClient.newWebSocket(request, new IotWebSocketListener(connectLatch, connectSuccess));
 
@@ -77,7 +76,6 @@ public class IotWebSocketClient {
                 close();
                 throw new Exception("WebSocket 连接超时或失败，服务器地址: " + serverUrl);
             }
-
             log.info("[connect][WebSocket 客户端连接成功，服务器地址: {}]", serverUrl);
         } catch (Exception e) {
             close();
@@ -126,6 +124,7 @@ public class IotWebSocketClient {
         try {
             if (webSocket != null) {
                 // 发送正常关闭帧，状态码 1000 表示正常关闭
+                // TODO @puhui999：有没 1000 的枚举哈？在 okhttp 里
                 webSocket.close(1000, "客户端主动关闭");
                 webSocket = null;
             }
@@ -163,6 +162,7 @@ public class IotWebSocketClient {
     /**
      * OkHttp WebSocket 监听器
      */
+    @SuppressWarnings("NullableProblems")
     private class IotWebSocketListener extends WebSocketListener {
 
         private final CountDownLatch connectLatch;

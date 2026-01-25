@@ -72,7 +72,7 @@ public class IotDeviceMessageUtils {
 
     /**
      * 判断消息中是否包含指定的标识符
-     *
+     * <p>
      * 对于不同消息类型的处理：
      * - EVENT_POST/SERVICE_INVOKE：检查 params.identifier 是否匹配
      * - STATE_UPDATE：检查 params.state 是否匹配
@@ -212,8 +212,8 @@ public class IotDeviceMessageUtils {
      * <p>
      * 服务调用消息的 params 结构通常为：
      * {
-     * "identifier": "serviceIdentifier",
-     * "inputData": { ... } 或 "inputParams": { ... }
+     *     "identifier": "serviceIdentifier",
+     *     "inputData": { ... } 或 "inputParams": { ... }
      * }
      *
      * @param message 设备消息
@@ -221,6 +221,7 @@ public class IotDeviceMessageUtils {
      */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> extractServiceInputParams(IotDeviceMessage message) {
+        // 1. 参数校验
         Object params = message.getParams();
         if (params == null) {
             return null;
@@ -235,13 +236,11 @@ public class IotDeviceMessageUtils {
         if (inputData instanceof Map) {
             return (Map<String, Object>) inputData;
         }
-
         // 尝试从 inputParams 字段获取
         Object inputParams = paramsMap.get("inputParams");
         if (inputParams instanceof Map) {
             return (Map<String, Object>) inputParams;
         }
-
         return null;
     }
 
