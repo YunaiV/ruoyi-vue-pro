@@ -7,7 +7,8 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
@@ -54,7 +55,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
     private void beforeHandle(RoutingContext context) {
         // 如果不需要认证，则不走前置处理
         String path = context.request().path();
-        if (ObjUtil.equal(path, IotHttpAuthHandler.PATH)) {
+        if (ObjectUtils.equalsAny(path, IotHttpAuthHandler.PATH, IotHttpRegisterHandler.PATH)) {
             return;
         }
 
@@ -73,7 +74,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
         }
 
         // 校验 token
-        IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.verifyToken(token);
+        IotDeviceIdentity deviceInfo = deviceTokenService.verifyToken(token);
         Assert.notNull(deviceInfo, "设备信息不能为空");
         // 校验设备信息是否匹配
         if (ObjUtil.notEqual(productKey, deviceInfo.getProductKey())

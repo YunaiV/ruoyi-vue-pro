@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.json.JsonObject;
@@ -201,7 +202,7 @@ public class IotEmqxAuthEventHandler {
      */
     private void handleDeviceStateChange(String username, boolean online) {
         // 1. 解析设备信息
-        IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(username);
+        IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(username);
         if (deviceInfo == null) {
             log.debug("[handleDeviceStateChange][跳过非设备({})连接]", username);
             return;

@@ -33,6 +33,14 @@ public class IotProductDO extends TenantBaseDO {
      */
     private String productKey;
     /**
+     * 产品密钥，用于一型一密动态注册
+     */
+    private String productSecret;
+    /**
+     * 是否开启动态注册
+     */
+    private Boolean registerEnabled;
+    /**
      * 产品分类编号
      * <p>
      * 关联 {@link IotProductCategoryDO#getId()}

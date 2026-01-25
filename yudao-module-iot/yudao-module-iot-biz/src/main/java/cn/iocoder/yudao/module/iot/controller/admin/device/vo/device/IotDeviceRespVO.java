@@ -4,7 +4,6 @@ import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -79,10 +78,6 @@ public class IotDeviceRespVO {
     @Schema(description = "设备密钥，用于设备认证")
     @ExcelProperty("设备密钥")
     private String deviceSecret;
-
-    @Schema(description = "认证类型（如一机一密、动态注册）", example = "2")
-    @ExcelProperty("认证类型（如一机一密、动态注册）")
-    private String authType;
 
     @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
     private String config;

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
@@ -214,7 +215,7 @@ public class IotMqttUpstreamHandler {
             }
 
             // 4. 获取设备信息
-            IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(username);
+            IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(username);
             if (deviceInfo == null) {
                 log.warn("[authenticateDevice][用户名格式不正确，客户端 ID: {}，用户名: {}]", clientId, username);
                 return false;

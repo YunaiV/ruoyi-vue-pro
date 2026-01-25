@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -16,6 +18,10 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsD
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPackPostReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
@@ -98,7 +104,6 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         return sendDeviceMessage(message, device);
     }
 
-    // TODO @芋艿：针对连接网关的设备，是不是 productKey、deviceName 需要调整下；
     @Override
     public IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
         return sendDeviceMessage(message, device, null);
@@ -168,7 +173,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // 2. 记录消息
         getSelf().createDeviceLogAsync(message);
 
-        // 3. 回复消息。前提：非 _reply 消息，并且非禁用回复的消息
+        // 3. 回复消息。前提：非 _reply 消息、非禁用回复的消息
         if (IotDeviceMessageUtils.isReplyMessage(message)
                 || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
                 || StrUtil.isEmpty(message.getServerId())) {
@@ -185,21 +190,25 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     }
 
     // TODO @芋艿：可优化：未来逻辑复杂后，可以独立拆除 Processor 处理器
-    @SuppressWarnings("SameReturnValue")
     private Object handleUpstreamDeviceMessage0(IotDeviceMessage message, IotDeviceDO device) {
         // 设备上下线
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
             String stateStr = IotDeviceMessageUtils.getIdentifier(message);
             assert stateStr != null;
             Assert.notEmpty(stateStr, "设备状态不能为空");
-            deviceService.updateDeviceState(device, Integer.valueOf(stateStr));
-            // TODO 芋艿：子设备的关联
+            Integer state = Integer.valueOf(stateStr);
+            deviceService.updateDeviceState(device, state);
             return null;
         }
 
         // 属性上报
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
             devicePropertyService.saveDeviceProperty(device, message);
+            return null;
+        }
+        // 批量上报（属性+事件+子设备）
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod())) {
+            handlePackMessage(message, device);
             return null;
         }
 
@@ -209,9 +218,108 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return null;
         }
 
-        // TODO @芋艿：这里可以按需，添加别的逻辑；
+        // 添加拓扑关系
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.TOPO_ADD.getMethod())) {
+            return deviceService.handleTopoAddMessage(message, device);
+        }
+        // 删除拓扑关系
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod())) {
+            return deviceService.handleTopoDeleteMessage(message, device);
+        }
+        // 获取拓扑关系
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.TOPO_GET.getMethod())) {
+            return deviceService.handleTopoGetMessage(device);
+        }
+
+        // 子设备动态注册
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod())) {
+            return deviceService.handleSubDeviceRegisterMessage(message, device);
+        }
+
         return null;
     }
+
+    // ========== 批量上报处理方法 ==========
+
+    /**
+     * 处理批量上报消息
+     * <p>
+     * 将 pack 消息拆分成多条标准消息，发送到 MQ 让规则引擎处理
+     *
+     * @param packMessage   批量消息
+     * @param gatewayDevice 网关设备
+     */
+    private void handlePackMessage(IotDeviceMessage packMessage, IotDeviceDO gatewayDevice) {
+        // 1. 解析参数
+        IotDevicePropertyPackPostReqDTO params = JsonUtils.convertObject(
+                packMessage.getParams(), IotDevicePropertyPackPostReqDTO.class);
+        if (params == null) {
+            log.warn("[handlePackMessage][消息({}) 参数解析失败]", packMessage);
+            return;
+        }
+
+        // 2. 处理网关设备（自身）的数据
+        sendDevicePackData(gatewayDevice, packMessage.getServerId(), params.getProperties(), params.getEvents());
+
+        // 3. 处理子设备的数据
+        if (CollUtil.isEmpty(params.getSubDevices())) {
+            return;
+        }
+        for (IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData : params.getSubDevices()) {
+            try {
+                IotDeviceIdentity identity = subDeviceData.getIdentity();
+                IotDeviceDO subDevice = deviceService.getDeviceFromCache(identity.getProductKey(), identity.getDeviceName());
+                if (subDevice == null) {
+                    log.warn("[handlePackMessage][子设备({}/{}) 不存在]", identity.getProductKey(), identity.getDeviceName());
+                    continue;
+                }
+                // 特殊：子设备不需要指定 serverId，因为子设备实际可能连接在不同的 gateway-server 上，导致 serverId 不同
+                sendDevicePackData(subDevice, null, subDeviceData.getProperties(), subDeviceData.getEvents());
+            } catch (Exception ex) {
+                log.error("[handlePackMessage][子设备({}/{}) 数据处理失败]", subDeviceData.getIdentity().getProductKey(),
+                        subDeviceData.getIdentity().getDeviceName(), ex);
+            }
+        }
+    }
+
+    /**
+     * 发送设备 pack 数据到 MQ（属性 + 事件）
+     *
+     * @param device     设备
+     * @param serverId   服务标识
+     * @param properties 属性数据
+     * @param events     事件数据
+     */
+    private void sendDevicePackData(IotDeviceDO device, String serverId,
+                                    Map<String, Object> properties,
+                                    Map<String, IotDevicePropertyPackPostReqDTO.EventValue> events) {
+        // 1. 发送属性消息
+        if (MapUtil.isNotEmpty(properties)) {
+            IotDeviceMessage propertyMsg = IotDeviceMessage.requestOf(
+                    device.getId(), device.getTenantId(), serverId,
+                    IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
+                    IotDevicePropertyPostReqDTO.of(properties));
+            deviceMessageProducer.sendDeviceMessage(propertyMsg);
+        }
+
+        // 2. 发送事件消息
+        if (MapUtil.isNotEmpty(events)) {
+            for (Map.Entry<String, IotDevicePropertyPackPostReqDTO.EventValue> eventEntry : events.entrySet()) {
+                String eventId = eventEntry.getKey();
+                IotDevicePropertyPackPostReqDTO.EventValue eventValue = eventEntry.getValue();
+                if (eventValue == null) {
+                    continue;
+                }
+                IotDeviceMessage eventMsg = IotDeviceMessage.requestOf(
+                        device.getId(), device.getTenantId(), serverId,
+                        IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
+                        IotDeviceEventPostReqDTO.of(eventId, eventValue.getValue(), eventValue.getTime()));
+                deviceMessageProducer.sendDeviceMessage(eventMsg);
+            }
+        }
+    }
+
+    // ========= 设备消息查询 ==========
 
     @Override
     public PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO) {
@@ -228,9 +336,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     }
 
     @Override
-    public List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(Long deviceId,
-                                                                             List<String> requestIds,
-                                                                             Boolean reply) {
+    public List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(Long deviceId, List<String> requestIds, Boolean reply) {
+        if (CollUtil.isEmpty(requestIds)) {
+            return ListUtil.of();
+        }
         return deviceMessageMapper.selectListByRequestIdsAndReply(deviceId, requestIds, reply);
     }
 

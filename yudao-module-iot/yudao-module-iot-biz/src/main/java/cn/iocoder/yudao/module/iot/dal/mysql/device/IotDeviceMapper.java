@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePa
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Nullable;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -157,6 +158,18 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .eq(IotDeviceDO::getDeviceType, IotProductDeviceTypeEnum.GATEWAY_SUB.getType())
                 .isNull(IotDeviceDO::getGatewayId)
                 .orderByDesc(IotDeviceDO::getId));
+    }
+
+    /**
+     * 批量更新设备的网关编号
+     *
+     * @param ids       设备编号列表
+     * @param gatewayId 网关设备编号（可以为 null，表示解绑）
+     */
+    default void updateGatewayIdBatch(Collection<Long> ids, Long gatewayId) {
+        update(null, new LambdaUpdateWrapper<IotDeviceDO>()
+                .set(IotDeviceDO::getGatewayId, gatewayId)
+                .in(IotDeviceDO::getId, ids));
     }
 
 }

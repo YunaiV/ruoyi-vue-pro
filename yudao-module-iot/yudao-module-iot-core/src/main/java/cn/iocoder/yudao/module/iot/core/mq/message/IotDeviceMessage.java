@@ -108,6 +108,23 @@ public class IotDeviceMessage {
         return of(requestId, method, params, null, null, null);
     }
 
+    /**
+     * 创建设备请求消息（包含设备信息）
+     *
+     * @param deviceId 设备编号
+     * @param tenantId 租户编号
+     * @param serverId 服务标识
+     * @param method   消息方法
+     * @param params   消息参数
+     * @return 消息对象
+     */
+    public static IotDeviceMessage requestOf(Long deviceId, Long tenantId, String serverId,
+                                             String method, Object params) {
+        IotDeviceMessage message = of(null, method, params, null, null, null);
+        return message.setId(IotDeviceMessageUtils.generateMessageId())
+                .setDeviceId(deviceId).setTenantId(tenantId).setServerId(serverId);
+    }
+
     public static IotDeviceMessage replyOf(String requestId, String method,
                                            Object data, Integer code, String msg) {
         if (code == null) {

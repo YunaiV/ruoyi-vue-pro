@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
@@ -72,7 +72,7 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
             throw exception(DEVICE_AUTH_FAIL);
         }
         // 2.2 生成 Token
-        IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.parseUsername(username);
+        IotDeviceIdentity deviceInfo = deviceTokenService.parseUsername(username);
         Assert.notNull(deviceInfo, "设备信息不能为空");
         String token = deviceTokenService.createToken(deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         Assert.notBlank(token, "生成 token 不能为空位");
