@@ -9,7 +9,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.util.IotCoapUtils;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
@@ -75,7 +75,7 @@ public class IotCoapUpstreamHandler {
                 return;
             }
             // 验证 token
-            IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.verifyToken(token);
+            IotDeviceIdentity deviceInfo = deviceTokenService.verifyToken(token);
             if (deviceInfo == null) {
                 IotCoapUtils.respondError(exchange, CoAP.ResponseCode.UNAUTHORIZED, "token 无效或已过期");
                 return;
