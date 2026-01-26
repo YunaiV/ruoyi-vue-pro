@@ -10,7 +10,10 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
@@ -120,6 +123,9 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             if (AUTH_METHOD.equals(message.getMethod())) {
                 // 认证请求
                 handleAuthenticationRequest(clientId, message, codecType, socket);
+            } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
+                // 设备动态注册请求
+                handleRegisterRequest(clientId, message, codecType, socket);
             } else {
                 // 业务消息
                 handleBusinessRequest(clientId, message, codecType, socket);
@@ -187,6 +193,44 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         } catch (Exception e) {
             log.error("[handleAuthenticationRequest][认证处理异常，客户端 ID: {}]", clientId, e);
             sendErrorResponse(socket, message.getRequestId(), "认证处理异常", codecType);
+        }
+    }
+
+    /**
+     * 处理设备动态注册请求（一型一密，不需要认证）
+     *
+     * @param clientId  客户端 ID
+     * @param message   消息信息
+     * @param codecType 消息编解码类型
+     * @param socket    网络连接
+     * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
+     */
+    private void handleRegisterRequest(String clientId, IotDeviceMessage message, String codecType,
+                                       NetSocket socket) {
+        try {
+            // 1. 解析注册参数
+            IotDeviceRegisterReqDTO registerParams = parseRegisterParams(message.getParams());
+            if (registerParams == null) {
+                log.warn("[handleRegisterRequest][注册参数解析失败，客户端 ID: {}]", clientId);
+                sendErrorResponse(socket, message.getRequestId(), "注册参数不完整", codecType);
+                return;
+            }
+
+            // 2. 调用动态注册
+            CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(registerParams);
+            if (result.isError()) {
+                log.warn("[handleRegisterRequest][注册失败，客户端 ID: {}，错误: {}]", clientId, result.getMsg());
+                sendErrorResponse(socket, message.getRequestId(), result.getMsg(), codecType);
+                return;
+            }
+
+            // 3. 发送成功响应（包含 deviceSecret）
+            sendRegisterSuccessResponse(socket, message.getRequestId(), result.getData(), codecType);
+            log.info("[handleRegisterRequest][注册成功，客户端 ID: {}，设备名: {}]",
+                    clientId, registerParams.getDeviceName());
+        } catch (Exception e) {
+            log.error("[handleRegisterRequest][注册处理异常，客户端 ID: {}]", clientId, e);
+            sendErrorResponse(socket, message.getRequestId(), "注册处理异常", codecType);
         }
     }
 
@@ -402,6 +446,75 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         } catch (Exception e) {
             log.error("[parseAuthParams][解析认证参数({})失败]", params, e);
             return null;
+        }
+    }
+
+    /**
+     * 解析注册参数
+     *
+     * @param params 参数对象（通常为 Map 类型）
+     * @return 注册参数 DTO，解析失败时返回 null
+     */
+    @SuppressWarnings("unchecked")
+    private IotDeviceRegisterReqDTO parseRegisterParams(Object params) {
+        if (params == null) {
+            return null;
+        }
+
+        try {
+            // 参数默认为 Map 类型，直接转换
+            if (params instanceof java.util.Map) {
+                java.util.Map<String, Object> paramMap = (java.util.Map<String, Object>) params;
+                String productKey = MapUtil.getStr(paramMap, "productKey");
+                String deviceName = MapUtil.getStr(paramMap, "deviceName");
+                String productSecret = MapUtil.getStr(paramMap, "productSecret");
+                if (StrUtil.hasBlank(productKey, deviceName, productSecret)) {
+                    return null;
+                }
+                return new IotDeviceRegisterReqDTO()
+                        .setProductKey(productKey)
+                        .setDeviceName(deviceName)
+                        .setProductSecret(productSecret);
+            }
+
+            // 如果已经是目标类型，直接返回
+            if (params instanceof IotDeviceRegisterReqDTO) {
+                return (IotDeviceRegisterReqDTO) params;
+            }
+
+            // 其他情况尝试 JSON 转换
+            String jsonStr = JsonUtils.toJsonString(params);
+            return JsonUtils.parseObject(jsonStr, IotDeviceRegisterReqDTO.class);
+        } catch (Exception e) {
+            log.error("[parseRegisterParams][解析注册参数({})失败]", params, e);
+            return null;
+        }
+    }
+
+    /**
+     * 发送注册成功响应（包含 deviceSecret）
+     *
+     * @param socket       网络连接
+     * @param requestId    请求 ID
+     * @param registerResp 注册响应
+     * @param codecType    消息编解码类型
+     */
+    private void sendRegisterSuccessResponse(NetSocket socket, String requestId,
+                                             IotDeviceRegisterRespDTO registerResp, String codecType) {
+        try {
+            // 构建响应数据
+            Object responseData = MapUtil.builder()
+                    .put("success", true)
+                    .put("deviceSecret", registerResp.getDeviceSecret())
+                    .put("message", "注册成功")
+                    .build();
+            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId,
+                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), responseData, 0, "注册成功");
+
+            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, codecType);
+            socket.write(Buffer.buffer(encodedData));
+        } catch (Exception e) {
+            log.error("[sendRegisterSuccessResponse][发送注册成功响应失败，requestId: {}]", requestId, e);
         }
     }
 

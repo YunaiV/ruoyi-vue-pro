@@ -6,7 +6,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
@@ -21,9 +20,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * IoT 直连设备 TCP 协议集成测试（手动测试）
+ * IoT 网关子设备 TCP 协议集成测试（手动测试）
  *
- * <p>测试场景：直连设备（IotProductDeviceTypeEnum 的 DIRECT 类型）通过 TCP 协议直接连接平台
+ * <p>测试场景：子设备（IotProductDeviceTypeEnum 的 SUB 类型）通过网关设备代理上报数据
+ *
+ * <p><b>重要说明：子设备无法直接连接平台，所有请求均由网关设备（Gateway）代为转发。</b>
  *
  * <p>支持两种编解码格式：
  * <ul>
@@ -34,13 +35,13 @@ import java.net.Socket;
  * <p>使用步骤：
  * <ol>
  *     <li>启动 yudao-module-iot-gateway 服务（TCP 端口 8091）</li>
+ *     <li>确保子设备已通过 {@link IotGatewayDeviceTcpProtocolIntegrationTest#testTopoAdd()} 绑定到网关</li>
  *     <li>修改 {@link #CODEC} 选择测试的编解码格式</li>
  *     <li>运行以下测试方法：
  *         <ul>
- *             <li>{@link #testAuth()} - 设备认证</li>
- *             <li>{@link #testDeviceRegister()} - 设备动态注册（一型一密）</li>
- *             <li>{@link #testPropertyPost()} - 设备属性上报</li>
- *             <li>{@link #testEventPost()} - 设备事件上报</li>
+ *             <li>{@link #testAuth()} - 子设备认证</li>
+ *             <li>{@link #testPropertyPost()} - 子设备属性上报（由网关代理转发）</li>
+ *             <li>{@link #testEventPost()} - 子设备事件上报（由网关代理转发）</li>
  *         </ul>
  *     </li>
  * </ol>
@@ -50,25 +51,25 @@ import java.net.Socket;
  * @author 芋道源码
  */
 @Slf4j
-public class IotDirectDeviceTcpProtocolIntegrationTest {
+public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";
     private static final int SERVER_PORT = 8091;
     private static final int TIMEOUT_MS = 5000;
 
     // ===================== 编解码器选择（修改此处切换 JSON / Binary） =====================
-//    private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
-    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
+    private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
+//    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
 
-    // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询） =====================
-    private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
-    private static final String DEVICE_NAME = "small";
-    private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
+    // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+    private static final String PRODUCT_KEY = "jAufEMTF1W6wnPhn";
+    private static final String DEVICE_NAME = "chazuo-it";
+    private static final String DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";
 
     // ===================== 认证测试 =====================
 
     /**
-     * 认证测试：设备认证
+     * 子设备认证测试
      */
     @Test
     public void testAuth() throws Exception {
@@ -100,50 +101,10 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
         }
     }
 
-    // ===================== 动态注册测试 =====================
+    // ===================== 子设备属性上报测试 =====================
 
     /**
-     * 直连设备动态注册测试（一型一密）
-     * <p>
-     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
-     * <p>
-     * 注意：此接口不需要认证
-     */
-    @Test
-    public void testDeviceRegister() throws Exception {
-        // 1.1 构建注册消息
-        IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO();
-        registerReqDTO.setProductKey(PRODUCT_KEY);
-        registerReqDTO.setDeviceName("test-tcp-" + System.currentTimeMillis());
-        registerReqDTO.setProductSecret("test-product-secret");
-        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(),
-                IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerReqDTO, null, null, null);
-        // 1.2 编码
-        byte[] payload = CODEC.encode(request);
-        log.info("[testDeviceRegister][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
-        if (CODEC instanceof IotTcpBinaryDeviceMessageCodec) {
-            log.info("[testDeviceRegister][二进制数据包(HEX): {}]", HexUtil.encodeHexStr(payload));
-        }
-
-        // 2.1 发送请求
-        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
-            socket.setSoTimeout(TIMEOUT_MS);
-            byte[] responseBytes = sendAndReceive(socket, payload);
-            // 2.2 解码响应
-            if (responseBytes != null) {
-                IotDeviceMessage response = CODEC.decode(responseBytes);
-                log.info("[testDeviceRegister][响应消息: {}]", response);
-                log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
-            } else {
-                log.warn("[testDeviceRegister][未收到响应]");
-            }
-        }
-    }
-
-    // ===================== 直连设备属性上报测试 =====================
-
-    /**
-     * 属性上报测试
+     * 子设备属性上报测试
      */
     @Test
     public void testPropertyPost() throws Exception {
@@ -159,12 +120,14 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
                     IdUtil.fastSimpleUUID(),
                     IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
                     IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
-                            .put("width", 1)
-                            .put("height", "2")
+                            .put("power", 100)
+                            .put("status", "online")
+                            .put("temperature", 36.5)
                             .build()),
                     null, null, null);
             // 2.2 编码
             byte[] payload = CODEC.encode(request);
+            log.info("[testPropertyPost][子设备属性上报 - 请求实际由 Gateway 代为转发]");
             log.info("[testPropertyPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
             // 3.1 发送请求
@@ -179,10 +142,10 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
         }
     }
 
-    // ===================== 直连设备事件上报测试 =====================
+    // ===================== 子设备事件上报测试 =====================
 
     /**
-     * 事件上报测试
+     * 子设备事件上报测试
      */
     @Test
     public void testEventPost() throws Exception {
@@ -198,12 +161,18 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
                     IdUtil.fastSimpleUUID(),
                     IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
                     IotDeviceEventPostReqDTO.of(
-                            "eat",
-                            MapUtil.<String, Object>builder().put("rice", 3).build(),
+                            "alarm",
+                            MapUtil.<String, Object>builder()
+                                    .put("level", "warning")
+                                    .put("message", "temperature too high")
+                                    .put("threshold", 40)
+                                    .put("current", 42)
+                                    .build(),
                             System.currentTimeMillis()),
                     null, null, null);
             // 2.2 编码
             byte[] payload = CODEC.encode(request);
+            log.info("[testEventPost][子设备事件上报 - 请求实际由 Gateway 代为转发]");
             log.info("[testEventPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
             // 3.1 发送请求
@@ -221,10 +190,7 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
     // ===================== 辅助方法 =====================
 
     /**
-     * 执行设备认证
-     *
-     * @param socket TCP 连接
-     * @return 认证响应消息
+     * 执行子设备认证
      */
     private IotDeviceMessage authenticate(Socket socket) throws Exception {
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
@@ -236,10 +202,6 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
         byte[] payload = CODEC.encode(request);
         byte[] responseBytes = sendAndReceive(socket, payload);
         if (responseBytes != null) {
-            log.info("[authenticate][响应数据长度: {} 字节，首字节: 0x{}, HEX: {}]",
-                    responseBytes.length,
-                    String.format("%02X", responseBytes[0]),
-                    HexUtil.encodeHexStr(responseBytes));
             return CODEC.decode(responseBytes);
         }
         return null;
@@ -247,10 +209,6 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
 
     /**
      * 发送 TCP 请求并接收响应
-     *
-     * @param socket  TCP Socket
-     * @param payload 请求数据
-     * @return 响应数据
      */
     private byte[] sendAndReceive(Socket socket, byte[] payload) throws Exception {
         // 1. 发送请求
