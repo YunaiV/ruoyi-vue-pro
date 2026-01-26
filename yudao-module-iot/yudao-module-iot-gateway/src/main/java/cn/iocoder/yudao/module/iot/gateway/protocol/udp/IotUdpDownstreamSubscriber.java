@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager.IotUdpSessionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.router.IotUdpDownstreamHandler;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,6 @@ public class IotUdpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
 
     private final IotDeviceMessageService messageService;
 
-    private final IotDeviceService deviceService;
-
     private final IotUdpSessionManager sessionManager;
 
     private final IotMessageBus messageBus;
@@ -36,7 +33,7 @@ public class IotUdpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
     @PostConstruct
     public void init() {
         // 初始化下游处理器
-        this.downstreamHandler = new IotUdpDownstreamHandler(messageService, deviceService, sessionManager, protocol);
+        this.downstreamHandler = new IotUdpDownstreamHandler(messageService, sessionManager, protocol);
 
         messageBus.register(this);
         log.info("[init][UDP 下游订阅者初始化完成，服务器 ID: {}，Topic: {}]",

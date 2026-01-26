@@ -195,8 +195,8 @@ public class IotUdpUpstreamHandler {
             // 3.1 生成 JWT Token（无状态）
             String token = deviceTokenService.createToken(device.getProductKey(), device.getDeviceName());
 
-            // 3.2 更新设备地址映射（用于下行消息）
-            sessionManager.updateDeviceAddress(device.getId(), senderAddress);
+            // 3.2 更新设备会话信息（用于下行消息，保存 codecType）
+            sessionManager.updateDeviceSession(device.getId(), senderAddress, codecType);
 
             // 3.3 发送上线消息
             sendOnlineMessage(device);
@@ -298,8 +298,8 @@ public class IotUdpUpstreamHandler {
                 return;
             }
 
-            // 3. 更新设备地址映射（保持最新）
-            sessionManager.updateDeviceAddress(device.getId(), senderAddress);
+            // 3. 更新设备会话信息（保持最新，保存 codecType）
+            sessionManager.updateDeviceSession(device.getId(), senderAddress, codecType);
 
             // 4. 将 body 设置为实际的 params，发送消息到消息总线
             message.setParams(body);

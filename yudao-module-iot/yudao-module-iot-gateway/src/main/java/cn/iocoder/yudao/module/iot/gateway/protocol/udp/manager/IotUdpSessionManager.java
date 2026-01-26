@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +30,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IotUdpSessionManager {
 
     /**
-     * 设备 ID -> 设备地址（用于下行消息发送）
+     * 设备 ID -> 会话信息（包含地址和 codecType）
      */
-    private final Map<Long, InetSocketAddress> deviceAddressMap = new ConcurrentHashMap<>();
+    private final Map<Long, SessionInfo> deviceSessionMap = new ConcurrentHashMap<>();
 
     /**
      * 设备地址 Key -> 最后活跃时间（用于清理）
@@ -44,18 +45,41 @@ public class IotUdpSessionManager {
     private final Map<String, Long> addressDeviceMap = new ConcurrentHashMap<>();
 
     /**
-     * 更新设备地址（每次收到上行消息时调用）
+     * 更新设备会话（每次收到上行消息时调用）
+     *
+     * @param deviceId  设备 ID
+     * @param address   设备地址
+     * @param codecType 消息编解码类型
+     */
+    public void updateDeviceSession(Long deviceId, InetSocketAddress address, String codecType) {
+        String addressKey = buildAddressKey(address);
+        // 更新设备会话映射
+        deviceSessionMap.put(deviceId, new SessionInfo().setAddress(address).setCodecType(codecType));
+        lastActiveTimeMap.put(addressKey, LocalDateTime.now());
+        addressDeviceMap.put(addressKey, deviceId);
+        log.debug("[updateDeviceSession][更新设备会话，设备 ID: {}，地址: {}，codecType: {}]", deviceId, addressKey, codecType);
+    }
+
+    /**
+     * 更新设备地址（兼容旧接口，默认不更新 codecType）
      *
      * @param deviceId 设备 ID
      * @param address  设备地址
      */
     public void updateDeviceAddress(Long deviceId, InetSocketAddress address) {
-        String addressKey = buildAddressKey(address);
-        // 更新设备地址映射
-        deviceAddressMap.put(deviceId, address);
-        lastActiveTimeMap.put(addressKey, LocalDateTime.now());
-        addressDeviceMap.put(addressKey, deviceId);
-        log.debug("[updateDeviceAddress][更新设备地址，设备 ID: {}，地址: {}]", deviceId, addressKey);
+        SessionInfo sessionInfo = deviceSessionMap.get(deviceId);
+        String codecType = sessionInfo != null ? sessionInfo.getCodecType() : null;
+        updateDeviceSession(deviceId, address, codecType);
+    }
+
+    /**
+     * 获取设备会话信息
+     *
+     * @param deviceId 设备 ID
+     * @return 会话信息
+     */
+    public SessionInfo getSessionInfo(Long deviceId) {
+        return deviceSessionMap.get(deviceId);
     }
 
     /**
@@ -65,7 +89,7 @@ public class IotUdpSessionManager {
      * @return 是否在线
      */
     public boolean isDeviceOnline(Long deviceId) {
-        return deviceAddressMap.containsKey(deviceId);
+        return deviceSessionMap.containsKey(deviceId);
     }
 
     /**
@@ -87,12 +111,13 @@ public class IotUdpSessionManager {
      * @return 是否发送成功
      */
     public boolean sendToDevice(Long deviceId, byte[] data, DatagramSocket socket) {
-        InetSocketAddress address = deviceAddressMap.get(deviceId);
-        if (address == null) {
-            log.warn("[sendToDevice][设备地址不存在，设备 ID: {}]", deviceId);
+        SessionInfo sessionInfo = deviceSessionMap.get(deviceId);
+        if (sessionInfo == null || sessionInfo.getAddress() == null) {
+            log.warn("[sendToDevice][设备会话不存在，设备 ID: {}]", deviceId);
             return false;
         }
 
+        InetSocketAddress address = sessionInfo.getAddress();
         try {
             socket.send(Buffer.buffer(data), address.getPort(), address.getHostString(), result -> {
                 if (result.succeeded()) {
@@ -134,8 +159,8 @@ public class IotUdpSessionManager {
                 iterator.remove();
                 continue;
             }
-            InetSocketAddress address = deviceAddressMap.remove(deviceId);
-            if (address == null) {
+            SessionInfo sessionInfo = deviceSessionMap.remove(deviceId);
+            if (sessionInfo == null) {
                 iterator.remove();
                 continue;
             }
@@ -155,6 +180,24 @@ public class IotUdpSessionManager {
      */
     public String buildAddressKey(InetSocketAddress address) {
         return address.getHostString() + ":" + address.getPort();
+    }
+
+    /**
+     * 会话信息
+     */
+    @Data
+    public static class SessionInfo {
+
+        /**
+         * 设备地址
+         */
+        private InetSocketAddress address;
+
+        /**
+         * 消息编解码类型
+         */
+        private String codecType;
+
     }
 
 }

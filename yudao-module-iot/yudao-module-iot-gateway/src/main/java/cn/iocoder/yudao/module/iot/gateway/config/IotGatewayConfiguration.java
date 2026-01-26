@@ -223,11 +223,9 @@ public class IotGatewayConfiguration {
         @Bean
         public IotUdpDownstreamSubscriber iotUdpDownstreamSubscriber(IotUdpUpstreamProtocol protocolHandler,
                                                                      IotDeviceMessageService messageService,
-                                                                     IotDeviceService deviceService,
                                                                      IotUdpSessionManager sessionManager,
                                                                      IotMessageBus messageBus) {
-            return new IotUdpDownstreamSubscriber(protocolHandler, messageService, deviceService, sessionManager,
-                    messageBus);
+            return new IotUdpDownstreamSubscriber(protocolHandler, messageService, sessionManager, messageBus);
         }
 
     }

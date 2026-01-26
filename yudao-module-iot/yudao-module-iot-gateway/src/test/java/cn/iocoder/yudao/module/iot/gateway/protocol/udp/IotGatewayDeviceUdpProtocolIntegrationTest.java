@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.udp;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPackPostReqDTO;
@@ -12,6 +13,9 @@ import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoAddReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoDeleteReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpJsonDeviceMessageCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +32,16 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotDirectDeviceUd
  *
  * <p>测试场景：网关设备（IotProductDeviceTypeEnum 的 GATEWAY 类型）通过 UDP 协议管理子设备拓扑关系
  *
+ * <p>支持两种编解码格式：
+ * <ul>
+ *     <li>{@link IotTcpJsonDeviceMessageCodec} - JSON 格式</li>
+ *     <li>{@link IotTcpBinaryDeviceMessageCodec} - 二进制格式</li>
+ * </ul>
+ *
  * <p>使用步骤：
  * <ol>
  *     <li>启动 yudao-module-iot-gateway 服务（UDP 端口 8093）</li>
+ *     <li>修改 {@link #CODEC} 选择测试的编解码格式</li>
  *     <li>运行 {@link #testAuth()} 获取网关设备 token，将返回的 token 粘贴到 {@link #GATEWAY_TOKEN} 常量</li>
  *     <li>运行以下测试方法：
  *         <ul>
@@ -50,9 +61,11 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotDirectDeviceUd
 @Slf4j
 public class IotGatewayDeviceUdpProtocolIntegrationTest {
 
-    private static final String SERVER_HOST = "127.0.0.1";
-    private static final int SERVER_PORT = 8093;
     private static final int TIMEOUT_MS = 5000;
+
+    // ===================== 编解码器选择（修改此处切换 JSON / Binary） =====================
+    private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
+//    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
 
     // ===================== 网关设备信息（根据实际情况修改，从 iot_device 表查询网关设备） =====================
     private static final String GATEWAY_PRODUCT_KEY = "m6XcS1ZJ3TW8eC0v";
@@ -76,28 +89,33 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
      */
     @Test
     public void testAuth() throws Exception {
-        // 1.1 构建请求
+        // 1.1 构建认证消息
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(
                 GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME, GATEWAY_DEVICE_SECRET);
         IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
                 .setClientId(authInfo.getClientId())
                 .setUsername(authInfo.getUsername())
                 .setPassword(authInfo.getPassword());
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", "auth")
-                .put("params", authReqDTO)
-                .build());
-        // 1.2 输出请求
-        log.info("[testAuth][请求体: {}]", payload);
+        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testAuth][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
+        if (CODEC instanceof IotTcpBinaryDeviceMessageCodec) {
+            log.info("[testAuth][二进制数据包(HEX): {}]", HexUtil.encodeHexStr(payload));
+        }
 
         // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testAuth][响应体: {}]", response);
-            log.info("[testAuth][请将返回的 token 复制到 GATEWAY_TOKEN 常量中]");
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testAuth][响应消息: {}]", response);
+                log.info("[testAuth][请将返回的 token 复制到 GATEWAY_TOKEN 常量中]");
+            } else {
+                log.warn("[testAuth][未收到响应]");
+            }
         }
     }
 
@@ -120,21 +138,26 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
         // 1.2 构建请求参数
         IotDeviceTopoAddReqDTO params = new IotDeviceTopoAddReqDTO();
         params.setSubDevices(Collections.singletonList(subDeviceAuth));
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", IotDeviceMessageMethodEnum.TOPO_ADD.getMethod())
-                .put("version", "1.0")
-                .put("params", withToken(params))
-                .build());
-        // 1.3 输出请求
-        log.info("[testTopoAdd][请求体: {}]", payload);
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.TOPO_ADD.getMethod(),
+                withToken(params),
+                null, null, null);
+        // 1.3 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testTopoAdd][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
         // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testTopoAdd][响应体: {}]", response);
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testTopoAdd][响应消息: {}]", response);
+            } else {
+                log.warn("[testTopoAdd][未收到响应]");
+            }
         }
     }
 
@@ -149,21 +172,26 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
         IotDeviceTopoDeleteReqDTO params = new IotDeviceTopoDeleteReqDTO();
         params.setSubDevices(Collections.singletonList(
                 new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME)));
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod())
-                .put("version", "1.0")
-                .put("params", withToken(params))
-                .build());
-        // 1.2 输出请求
-        log.info("[testTopoDelete][请求体: {}]", payload);
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod(),
+                withToken(params),
+                null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testTopoDelete][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
         // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testTopoDelete][响应体: {}]", response);
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testTopoDelete][响应消息: {}]", response);
+            } else {
+                log.warn("[testTopoDelete][未收到响应]");
+            }
         }
     }
 
@@ -176,21 +204,26 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
     public void testTopoGet() throws Exception {
         // 1.1 构建请求参数（目前为空，预留扩展）
         IotDeviceTopoGetReqDTO params = new IotDeviceTopoGetReqDTO();
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", IotDeviceMessageMethodEnum.TOPO_GET.getMethod())
-                .put("version", "1.0")
-                .put("params", withToken(params))
-                .build());
-        // 1.2 输出请求
-        log.info("[testTopoGet][请求体: {}]", payload);
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.TOPO_GET.getMethod(),
+                withToken(params),
+                null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testTopoGet][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
         // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testTopoGet][响应体: {}]", response);
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testTopoGet][响应消息: {}]", response);
+            } else {
+                log.warn("[testTopoGet][未收到响应]");
+            }
         }
     }
 
@@ -209,21 +242,26 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
         IotSubDeviceRegisterReqDTO subDevice = new IotSubDeviceRegisterReqDTO();
         subDevice.setProductKey(SUB_DEVICE_PRODUCT_KEY);
         subDevice.setDeviceName("mougezishebei");
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod())
-                .put("version", "1.0")
-                .put("params", withToken(Collections.singletonList(subDevice)))
-                .build());
-        // 1.2 输出请求
-        log.info("[testSubDeviceRegister][请求体: {}]", payload);
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod(),
+                withToken(Collections.singletonList(subDevice)),
+                null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testSubDeviceRegister][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
         // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testSubDeviceRegister][响应体: {}]", response);
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testSubDeviceRegister][响应消息: {}]", response);
+            } else {
+                log.warn("[testSubDeviceRegister][未收到响应]");
+            }
         }
     }
 
@@ -268,21 +306,26 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
         params.setProperties(gatewayProperties);
         params.setEvents(gatewayEvents);
         params.setSubDevices(List.of(subDeviceData));
-        String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
-                .put("method", IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod())
-                .put("version", "1.0")
-                .put("params", withToken(params))
-                .build());
-        // 1.7 输出请求
-        log.info("[testPropertyPackPost][请求体: {}]", payload);
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod(),
+                withToken(params),
+                null, null, null);
+        // 1.7 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testPropertyPackPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
         // 2.1 发送请求
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(TIMEOUT_MS);
-            String response = sendAndReceive(socket, payload);
-            // 2.2 输出结果
-            log.info("[testPropertyPackPost][响应体: {}]", response);
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testPropertyPackPost][响应消息: {}]", response);
+            } else {
+                log.warn("[testPropertyPackPost][未收到响应]");
+            }
         }
     }
 
