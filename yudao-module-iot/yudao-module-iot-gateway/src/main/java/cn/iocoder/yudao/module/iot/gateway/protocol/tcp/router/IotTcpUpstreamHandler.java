@@ -502,15 +502,10 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     private void sendRegisterSuccessResponse(NetSocket socket, String requestId,
                                              IotDeviceRegisterRespDTO registerResp, String codecType) {
         try {
-            // 构建响应数据
-            Object responseData = MapUtil.builder()
-                    .put("success", true)
-                    .put("deviceSecret", registerResp.getDeviceSecret())
-                    .put("message", "注册成功")
-                    .build();
+            // 1. 构建响应消息（参考 HTTP 返回格式，直接返回 IotDeviceRegisterRespDTO）
             IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId,
-                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), responseData, 0, "注册成功");
-
+                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerResp, 0, null);
+            // 2. 发送响应
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, codecType);
             socket.write(Buffer.buffer(encodedData));
         } catch (Exception e) {
