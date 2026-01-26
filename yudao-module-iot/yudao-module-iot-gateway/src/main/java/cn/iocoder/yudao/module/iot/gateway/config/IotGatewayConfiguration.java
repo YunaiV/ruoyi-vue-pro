@@ -115,11 +115,9 @@ public class IotGatewayConfiguration {
         @Bean
         public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocolHandler,
                                                                      IotDeviceMessageService messageService,
-                                                                     IotDeviceService deviceService,
                                                                      IotTcpConnectionManager connectionManager,
                                                                      IotMessageBus messageBus) {
-            return new IotTcpDownstreamSubscriber(protocolHandler, messageService, deviceService, connectionManager,
-                    messageBus);
+            return new IotTcpDownstreamSubscriber(protocolHandler, messageService, connectionManager, messageBus);
         }
 
     }

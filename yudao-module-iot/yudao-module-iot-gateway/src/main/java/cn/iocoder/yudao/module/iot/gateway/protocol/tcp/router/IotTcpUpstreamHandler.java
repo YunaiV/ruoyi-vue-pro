@@ -230,8 +230,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     private String getMessageCodecType(Buffer buffer, NetSocket socket) {
         // 1. 如果已认证，优先使用缓存的编解码类型
         IotTcpConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
-        if (connectionInfo != null && connectionInfo.isAuthenticated() &&
-                StrUtil.isNotBlank(connectionInfo.getCodecType())) {
+        if (connectionInfo != null
+                && StrUtil.isNotBlank(connectionInfo.getCodecType())) {
             return connectionInfo.getCodecType();
         }
 
@@ -255,8 +255,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                 .setProductKey(device.getProductKey())
                 .setDeviceName(device.getDeviceName())
                 .setClientId(clientId)
-                .setCodecType(codecType)
-                .setAuthenticated(true);
+                .setCodecType(codecType);
         // 注册连接
         connectionManager.registerConnection(socket, device.getId(), connectionInfo);
     }

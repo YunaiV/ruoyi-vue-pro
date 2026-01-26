@@ -78,7 +78,7 @@ public class IotTcpConnectionManager {
      */
     public boolean isAuthenticated(NetSocket socket) {
         ConnectionInfo info = connectionMap.get(socket);
-        return info != null && info.isAuthenticated();
+        return info != null;
     }
 
     /**
@@ -96,17 +96,11 @@ public class IotTcpConnectionManager {
     }
 
     /**
-     * 检查设备是否在线
+     * 根据设备 ID 获取连接信息
      */
-    public boolean isDeviceOnline(Long deviceId) {
-        return deviceSocketMap.containsKey(deviceId);
-    }
-
-    /**
-     * 检查设备是否离线
-     */
-    public boolean isDeviceOffline(Long deviceId) {
-        return !isDeviceOnline(deviceId);
+    public ConnectionInfo getConnectionInfoByDeviceId(Long deviceId) {
+        NetSocket socket = deviceSocketMap.get(deviceId);
+        return socket != null ? connectionMap.get(socket) : null;
     }
 
     /**
@@ -158,11 +152,6 @@ public class IotTcpConnectionManager {
          * 消息编解码类型（认证后确定）
          */
         private String codecType;
-        // TODO @haohao：有没可能不要 authenticated 字段，通过 deviceId 或者其他的？进一步简化，想的是哈。
-        /**
-         * 是否已认证
-         */
-        private boolean authenticated;
 
     }
 
