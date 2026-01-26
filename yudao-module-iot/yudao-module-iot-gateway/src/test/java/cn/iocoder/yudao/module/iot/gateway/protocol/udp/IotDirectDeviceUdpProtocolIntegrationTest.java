@@ -6,6 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
@@ -102,6 +103,46 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
                 log.info("[testAuth][请将返回的 token 复制到 TOKEN 常量中]");
             } else {
                 log.warn("[testAuth][未收到响应]");
+            }
+        }
+    }
+
+    // ===================== 动态注册测试 =====================
+
+    /**
+     * 直连设备动态注册测试（一型一密）
+     * <p>
+     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
+     * <p>
+     * 注意：此接口不需要认证
+     */
+    @Test
+    public void testDeviceRegister() throws Exception {
+        // 1.1 构建注册消息
+        IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO();
+        registerReqDTO.setProductKey(PRODUCT_KEY);
+        registerReqDTO.setDeviceName("test-udp-" + System.currentTimeMillis());
+        registerReqDTO.setProductSecret("test-product-secret");
+        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerReqDTO, null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        log.info("[testDeviceRegister][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
+        if (CODEC instanceof IotTcpBinaryDeviceMessageCodec) {
+            log.info("[testDeviceRegister][二进制数据包(HEX): {}]", HexUtil.encodeHexStr(payload));
+        }
+
+        // 2.1 发送请求
+        try (DatagramSocket socket = new DatagramSocket()) {
+            socket.setSoTimeout(TIMEOUT_MS);
+            byte[] responseBytes = sendAndReceive(socket, payload);
+            // 2.2 解码响应
+            if (responseBytes != null) {
+                IotDeviceMessage response = CODEC.decode(responseBytes);
+                log.info("[testDeviceRegister][响应消息: {}]", response);
+                log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
+            } else {
+                log.warn("[testDeviceRegister][未收到响应]");
             }
         }
     }

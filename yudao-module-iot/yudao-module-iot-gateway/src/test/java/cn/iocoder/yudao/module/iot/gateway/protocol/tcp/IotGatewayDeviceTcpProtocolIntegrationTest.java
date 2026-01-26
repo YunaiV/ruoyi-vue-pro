@@ -81,7 +81,7 @@ public class IotGatewayDeviceTcpProtocolIntegrationTest {
     // ===================== 认证测试 =====================
 
     /**
-     * 网关设备认证测试
+     * 网关设备认证测试：获取网关设备 Token
      */
     @Test
     public void testAuth() throws Exception {
@@ -341,6 +341,9 @@ public class IotGatewayDeviceTcpProtocolIntegrationTest {
 
     /**
      * 执行网关设备认证
+     *
+     * @param socket TCP 连接
+     * @return 认证响应消息
      */
     private IotDeviceMessage authenticate(Socket socket) throws Exception {
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(
@@ -360,6 +363,10 @@ public class IotGatewayDeviceTcpProtocolIntegrationTest {
 
     /**
      * 发送 TCP 请求并接收响应
+     *
+     * @param socket  TCP Socket
+     * @param payload 请求数据
+     * @return 响应数据
      */
     private byte[] sendAndReceive(Socket socket, byte[] payload) throws Exception {
         // 1. 发送请求

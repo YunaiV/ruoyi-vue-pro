@@ -75,7 +75,6 @@ public class IotGatewaySubDeviceCoapProtocolIntegrationTest {
      * 子设备认证测试：获取子设备 Token
      */
     @Test
-    @SuppressWarnings("deprecation")
     public void testAuth() throws Exception {
         // 1.1 构建请求
         String uri = String.format("coap://%s:%d/auth", SERVER_HOST, SERVER_PORT);

@@ -68,7 +68,7 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
     // ===================== 认证测试 =====================
 
     /**
-     * 认证测试：设备认证
+     * 认证测试：获取设备 Token
      */
     @Test
     public void testAuth() throws Exception {
