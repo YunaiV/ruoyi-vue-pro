@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.websocket;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -12,15 +13,14 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.websocket.IotWebSocketJsonDeviceMessageCodec;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.WebSocket;
+import io.vertx.core.http.WebSocketClient;
 import io.vertx.core.http.WebSocketConnectOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -81,119 +81,83 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
 
     // ===================== 认证测试 =====================
 
-    // TODO @AI：参考 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/test/java/cn/iocoder/yudao/module/iot/gateway/protocol/tcp/IotDirectDeviceTcpProtocolIntegrationTest.java 或 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/test/java/cn/iocoder/yudao/module/iot/gateway/protocol/mqtt/IotDirectDeviceMqttProtocolIntegrationTest.java 类，优化代码结构
-
     /**
      * 认证测试：获取设备 Token
      */
     @Test
     public void testAuth() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicReference<String> responseRef = new AtomicReference<>();
+        // 1.1 构建认证消息
+        IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+        IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
+                .setClientId(authInfo.getClientId())
+                .setUsername(authInfo.getUsername())
+                .setPassword(authInfo.getPassword());
+        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        String jsonMessage = StrUtil.utf8Str(payload);
+        log.info("[testAuth][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
-        // 1. 创建 WebSocket 连接
-        HttpClient client = vertx.createHttpClient();
-        WebSocketConnectOptions options = new WebSocketConnectOptions()
-                .setHost(SERVER_HOST)
-                .setPort(SERVER_PORT)
-                .setURI(WS_PATH);
+        // 2.1 创建 WebSocket 连接（同步）
+        WebSocket ws = createWebSocketConnection();
+        log.info("[testAuth][WebSocket 连接成功]");
 
-        // TODO @AI：这里有告警；Deprecate /instead use WebSocketClient.connect(WebSocketConnectOptions)
-        client.webSocket(options).onComplete(ar -> {
-            if (ar.succeeded()) {
-                WebSocket ws = ar.result();
-                log.info("[testAuth][WebSocket 连接成功]");
+        // 2.2 发送并等待响应
+        String response = sendAndReceive(ws, jsonMessage);
 
-                // 设置消息处理器
-                ws.textMessageHandler(message -> {
-                    log.info("[testAuth][收到响应: {}]", message);
-                    responseRef.set(message);
-                    ws.close();
-                    latch.countDown();
-                });
-
-                // 2. 构建认证消息
-                IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
-                IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
-                        .setClientId(authInfo.getClientId())
-                        .setUsername(authInfo.getUsername())
-                        .setPassword(authInfo.getPassword());
-                IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
-
-                // 3. 编码并发送
-                byte[] payload = CODEC.encode(request);
-                String jsonMessage = new String(payload, StandardCharsets.UTF_8);
-                log.info("[testAuth][发送认证请求: {}]", jsonMessage);
-                ws.writeTextMessage(jsonMessage);
-            } else {
-                log.error("[testAuth][WebSocket 连接失败]", ar.cause());
-                latch.countDown();
-            }
-        });
-
-        // 4. 等待响应
-        boolean completed = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        if (completed && responseRef.get() != null) {
-            IotDeviceMessage response = CODEC.decode(responseRef.get().getBytes(StandardCharsets.UTF_8));
-            log.info("[testAuth][解码响应: {}]", response);
+        // 3. 解码响应
+        if (response != null) {
+            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            log.info("[testAuth][响应消息: {}]", responseMessage);
         } else {
-            log.warn("[testAuth][测试超时或未收到响应]");
+            log.warn("[testAuth][未收到响应]");
         }
+
+        // 4. 关闭连接
+        ws.close();
     }
 
     // ===================== 动态注册测试 =====================
 
     /**
      * 直连设备动态注册测试（一型一密）
+     * <p>
+     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
+     * <p>
+     * 注意：此接口不需要认证
      */
     @Test
     public void testDeviceRegister() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicReference<String> responseRef = new AtomicReference<>();
+        // 1.1 构建注册消息
+        IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO();
+        registerReqDTO.setProductKey(PRODUCT_KEY);
+        registerReqDTO.setDeviceName("test-ws-" + System.currentTimeMillis());
+        registerReqDTO.setProductSecret("test-product-secret");
+        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerReqDTO, null, null, null);
+        // 1.2 编码
+        byte[] payload = CODEC.encode(request);
+        String jsonMessage = StrUtil.utf8Str(payload);
+        log.info("[testDeviceRegister][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
-        HttpClient client = vertx.createHttpClient();
-        WebSocketConnectOptions options = new WebSocketConnectOptions()
-                .setHost(SERVER_HOST)
-                .setPort(SERVER_PORT)
-                .setURI(WS_PATH);
+        // 2.1 创建 WebSocket 连接（同步）
+        WebSocket ws = createWebSocketConnection();
+        log.info("[testDeviceRegister][WebSocket 连接成功]");
 
-        client.webSocket(options).onComplete(ar -> {
-            if (ar.succeeded()) {
-                WebSocket ws = ar.result();
-                log.info("[testDeviceRegister][WebSocket 连接成功]");
+        // 2.2 发送并等待响应
+        String response = sendAndReceive(ws, jsonMessage);
 
-                ws.textMessageHandler(message -> {
-                    log.info("[testDeviceRegister][收到响应: {}]", message);
-                    responseRef.set(message);
-                    ws.close();
-                    latch.countDown();
-                });
-
-                // 构建注册消息
-                IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO();
-                registerReqDTO.setProductKey(PRODUCT_KEY);
-                registerReqDTO.setDeviceName("test-ws-" + System.currentTimeMillis());
-                registerReqDTO.setProductSecret("test-product-secret");
-                IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(),
-                        IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerReqDTO, null, null, null);
-
-                byte[] payload = CODEC.encode(request);
-                String jsonMessage = new String(payload, StandardCharsets.UTF_8);
-                log.info("[testDeviceRegister][发送注册请求: {}]", jsonMessage);
-                ws.writeTextMessage(jsonMessage);
-            } else {
-                log.error("[testDeviceRegister][WebSocket 连接失败]", ar.cause());
-                latch.countDown();
-            }
-        });
-
-        boolean completed = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        if (completed && responseRef.get() != null) {
-            IotDeviceMessage response = CODEC.decode(responseRef.get().getBytes(StandardCharsets.UTF_8));
-            log.info("[testDeviceRegister][解码响应: {}]", response);
+        // 3. 解码响应
+        if (response != null) {
+            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            log.info("[testDeviceRegister][响应消息: {}]", responseMessage);
+            log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
         } else {
-            log.warn("[testDeviceRegister][测试超时或未收到响应]");
+            log.warn("[testDeviceRegister][未收到响应]");
         }
+
+        // 4. 关闭连接
+        ws.close();
     }
 
     // ===================== 直连设备属性上报测试 =====================
@@ -203,82 +167,40 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
      */
     @Test
     public void testPropertyPost() throws Exception {
-        CountDownLatch latch = new CountDownLatch(2); // 认证 + 属性上报
-        AtomicReference<String> authResponseRef = new AtomicReference<>();
-        AtomicReference<String> propertyResponseRef = new AtomicReference<>();
+        // 1.1 创建 WebSocket 连接（同步）
+        WebSocket ws = createWebSocketConnection();
+        log.info("[testPropertyPost][WebSocket 连接成功]");
 
-        HttpClient client = vertx.createHttpClient();
-        WebSocketConnectOptions options = new WebSocketConnectOptions()
-                .setHost(SERVER_HOST)
-                .setPort(SERVER_PORT)
-                .setURI(WS_PATH);
+        // 1.2 先进行认证
+        IotDeviceMessage authResponse = authenticate(ws);
+        log.info("[testPropertyPost][认证响应: {}]", authResponse);
 
-        client.webSocket(options).onComplete(ar -> {
-            if (ar.succeeded()) {
-                WebSocket ws = ar.result();
-                log.info("[testPropertyPost][WebSocket 连接成功]");
+        // 2.1 构建属性上报消息
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
+                IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
+                        .put("width", 1)
+                        .put("height", "2")
+                        .build()),
+                null, null, null);
+        // 2.2 编码
+        byte[] payload = CODEC.encode(request);
+        String jsonMessage = StrUtil.utf8Str(payload);
+        log.info("[testPropertyPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
-                final boolean[] authenticated = {false};
-
-                ws.textMessageHandler(message -> {
-                    log.info("[testPropertyPost][收到响应: {}]", message);
-                    if (!authenticated[0]) {
-                        authResponseRef.set(message);
-                        authenticated[0] = true;
-                        latch.countDown();
-
-                        // 认证成功后发送属性上报
-                        IotDeviceMessage propertyRequest = IotDeviceMessage.of(
-                                IdUtil.fastSimpleUUID(),
-                                IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
-                                IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
-                                        .put("width", 1)
-                                        .put("height", "2")
-                                        .build()),
-                                null, null, null);
-                        byte[] payload = CODEC.encode(propertyRequest);
-                        String jsonMessage = new String(payload, StandardCharsets.UTF_8);
-                        log.info("[testPropertyPost][发送属性上报请求: {}]", jsonMessage);
-                        ws.writeTextMessage(jsonMessage);
-                    } else {
-                        propertyResponseRef.set(message);
-                        ws.close();
-                        latch.countDown();
-                    }
-                });
-
-                // 先发送认证请求
-                IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
-                IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
-                        .setClientId(authInfo.getClientId())
-                        .setUsername(authInfo.getUsername())
-                        .setPassword(authInfo.getPassword());
-                IotDeviceMessage authRequest = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
-
-                byte[] payload = CODEC.encode(authRequest);
-                String jsonMessage = new String(payload, StandardCharsets.UTF_8);
-                log.info("[testPropertyPost][发送认证请求: {}]", jsonMessage);
-                ws.writeTextMessage(jsonMessage);
-            } else {
-                log.error("[testPropertyPost][WebSocket 连接失败]", ar.cause());
-                latch.countDown();
-                latch.countDown();
-            }
-        });
-
-        boolean completed = latch.await(TIMEOUT_SECONDS * 2, TimeUnit.SECONDS);
-        if (completed) {
-            if (authResponseRef.get() != null) {
-                IotDeviceMessage authResponse = CODEC.decode(authResponseRef.get().getBytes(StandardCharsets.UTF_8));
-                log.info("[testPropertyPost][认证响应: {}]", authResponse);
-            }
-            if (propertyResponseRef.get() != null) {
-                IotDeviceMessage propertyResponse = CODEC.decode(propertyResponseRef.get().getBytes(StandardCharsets.UTF_8));
-                log.info("[testPropertyPost][属性上报响应: {}]", propertyResponse);
-            }
+        // 3.1 发送并等待响应
+        String response = sendAndReceive(ws, jsonMessage);
+        // 3.2 解码响应
+        if (response != null) {
+            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            log.info("[testPropertyPost][响应消息: {}]", responseMessage);
         } else {
-            log.warn("[testPropertyPost][测试超时]");
+            log.warn("[testPropertyPost][未收到响应]");
         }
+
+        // 4. 关闭连接
+        ws.close();
     }
 
     // ===================== 直连设备事件上报测试 =====================
@@ -288,82 +210,111 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
      */
     @Test
     public void testEventPost() throws Exception {
-        CountDownLatch latch = new CountDownLatch(2); // 认证 + 事件上报
-        AtomicReference<String> authResponseRef = new AtomicReference<>();
-        AtomicReference<String> eventResponseRef = new AtomicReference<>();
+        // 1.1 创建 WebSocket 连接（同步）
+        WebSocket ws = createWebSocketConnection();
+        log.info("[testEventPost][WebSocket 连接成功]");
 
-        HttpClient client = vertx.createHttpClient();
+        // 1.2 先进行认证
+        IotDeviceMessage authResponse = authenticate(ws);
+        log.info("[testEventPost][认证响应: {}]", authResponse);
+
+        // 2.1 构建事件上报消息
+        IotDeviceMessage request = IotDeviceMessage.of(
+                IdUtil.fastSimpleUUID(),
+                IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
+                IotDeviceEventPostReqDTO.of(
+                        "eat",
+                        MapUtil.<String, Object>builder().put("rice", 3).build(),
+                        System.currentTimeMillis()),
+                null, null, null);
+        // 2.2 编码
+        byte[] payload = CODEC.encode(request);
+        String jsonMessage = StrUtil.utf8Str(payload);
+        log.info("[testEventPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
+
+        // 3.1 发送并等待响应
+        String response = sendAndReceive(ws, jsonMessage);
+        // 3.2 解码响应
+        if (response != null) {
+            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            log.info("[testEventPost][响应消息: {}]", responseMessage);
+        } else {
+            log.warn("[testEventPost][未收到响应]");
+        }
+
+        // 4. 关闭连接
+        ws.close();
+    }
+
+    // ===================== 辅助方法 =====================
+
+    /**
+     * 创建 WebSocket 连接（同步）
+     *
+     * @return WebSocket 连接
+     */
+    private WebSocket createWebSocketConnection() throws Exception {
+        WebSocketClient wsClient = vertx.createWebSocketClient();
         WebSocketConnectOptions options = new WebSocketConnectOptions()
                 .setHost(SERVER_HOST)
                 .setPort(SERVER_PORT)
                 .setURI(WS_PATH);
+        return wsClient.connect(options).toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
 
-        client.webSocket(options).onComplete(ar -> {
-            if (ar.succeeded()) {
-                WebSocket ws = ar.result();
-                log.info("[testEventPost][WebSocket 连接成功]");
+    /**
+     * 发送消息并等待响应（同步）
+     *
+     * @param ws      WebSocket 连接
+     * @param message 请求消息
+     * @return 响应消息
+     */
+    public static String sendAndReceive(WebSocket ws, String message) throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<String> responseRef = new AtomicReference<>();
 
-                final boolean[] authenticated = {false};
-
-                ws.textMessageHandler(message -> {
-                    log.info("[testEventPost][收到响应: {}]", message);
-                    if (!authenticated[0]) {
-                        authResponseRef.set(message);
-                        authenticated[0] = true;
-                        latch.countDown();
-
-                        // 认证成功后发送事件上报
-                        IotDeviceMessage eventRequest = IotDeviceMessage.of(
-                                IdUtil.fastSimpleUUID(),
-                                IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
-                                IotDeviceEventPostReqDTO.of(
-                                        "eat",
-                                        MapUtil.<String, Object>builder().put("rice", 3).build(),
-                                        System.currentTimeMillis()),
-                                null, null, null);
-                        byte[] payload = CODEC.encode(eventRequest);
-                        String jsonMessage = new String(payload, StandardCharsets.UTF_8);
-                        log.info("[testEventPost][发送事件上报请求: {}]", jsonMessage);
-                        ws.writeTextMessage(jsonMessage);
-                    } else {
-                        eventResponseRef.set(message);
-                        ws.close();
-                        latch.countDown();
-                    }
-                });
-
-                // 先发送认证请求
-                IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
-                IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
-                        .setClientId(authInfo.getClientId())
-                        .setUsername(authInfo.getUsername())
-                        .setPassword(authInfo.getPassword());
-                IotDeviceMessage authRequest = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
-
-                byte[] payload = CODEC.encode(authRequest);
-                String jsonMessage = new String(payload, StandardCharsets.UTF_8);
-                log.info("[testEventPost][发送认证请求: {}]", jsonMessage);
-                ws.writeTextMessage(jsonMessage);
-            } else {
-                log.error("[testEventPost][WebSocket 连接失败]", ar.cause());
-                latch.countDown();
-                latch.countDown();
-            }
+        // 设置消息处理器
+        ws.textMessageHandler(response -> {
+            log.info("[sendAndReceive][收到响应: {}]", response);
+            responseRef.set(response);
+            latch.countDown();
         });
 
-        boolean completed = latch.await(TIMEOUT_SECONDS * 2, TimeUnit.SECONDS);
-        if (completed) {
-            if (authResponseRef.get() != null) {
-                IotDeviceMessage authResponse = CODEC.decode(authResponseRef.get().getBytes(StandardCharsets.UTF_8));
-                log.info("[testEventPost][认证响应: {}]", authResponse);
-            }
-            if (eventResponseRef.get() != null) {
-                IotDeviceMessage eventResponse = CODEC.decode(eventResponseRef.get().getBytes(StandardCharsets.UTF_8));
-                log.info("[testEventPost][事件上报响应: {}]", eventResponse);
-            }
-        } else {
-            log.warn("[testEventPost][测试超时]");
+        // 发送请求
+        log.info("[sendAndReceive][发送请求: {}]", message);
+        ws.writeTextMessage(message);
+
+        // 等待响应
+        boolean completed = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        if (!completed) {
+            log.warn("[sendAndReceive][等待响应超时]");
         }
+        return responseRef.get();
+    }
+
+    /**
+     * 执行设备认证（同步）
+     *
+     * @param ws WebSocket 连接
+     * @return 认证响应消息
+     */
+    private IotDeviceMessage authenticate(WebSocket ws) throws Exception {
+        IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+        IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
+                .setClientId(authInfo.getClientId())
+                .setUsername(authInfo.getUsername())
+                .setPassword(authInfo.getPassword());
+        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
+
+        byte[] payload = CODEC.encode(request);
+        String jsonMessage = StrUtil.utf8Str(payload);
+        log.info("[authenticate][发送认证请求: {}]", jsonMessage);
+
+        String response = sendAndReceive(ws, jsonMessage);
+        if (response != null) {
+            return CODEC.decode(StrUtil.utf8Bytes(response));
+        }
+        return null;
     }
 
 }

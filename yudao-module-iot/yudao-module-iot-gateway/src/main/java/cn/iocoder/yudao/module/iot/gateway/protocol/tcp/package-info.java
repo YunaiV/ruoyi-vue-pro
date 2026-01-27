@@ -1,2 +1,6 @@
-// TODO @AI：参考 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/main/java/cn/iocoder/yudao/module/iot/gateway/protocol/mqtt/package-info.java
+/**
+ * TCP 协议实现包
+ * <p>
+ * 提供基于 Vert.x TCP Server 的 IoT 设备连接和消息处理功能
+ */
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;

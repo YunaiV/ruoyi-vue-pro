@@ -568,25 +568,25 @@ public class IotGatewayProperties {
         /**
          * 服务端口（CoAP 默认端口 5683）
          */
-        // TODO @AI：默认不为空
+        @NotNull(message = "服务端口不能为空")
         private Integer port = 5683;
 
         /**
          * 最大消息大小（字节）
          */
-        // TODO @AI：默认不为空
+        @NotNull(message = "最大消息大小不能为空")
         private Integer maxMessageSize = 1024;
 
         /**
          * ACK 超时时间（毫秒）
          */
-        // TODO @AI：默认不为空
+        @NotNull(message = "ACK 超时时间不能为空")
         private Integer ackTimeout = 2000;
 
         /**
          * 最大重传次数
          */
-        // TODO @AI：默认不为空
+        @NotNull(message = "最大重传次数不能为空")
         private Integer maxRetransmit = 4;
 
     }

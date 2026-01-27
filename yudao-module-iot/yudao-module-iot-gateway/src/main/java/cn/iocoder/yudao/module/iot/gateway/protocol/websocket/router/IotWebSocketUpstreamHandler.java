@@ -25,7 +25,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.charset.StandardCharsets;
 
 /**
  * WebSocket 上行消息处理器
@@ -35,7 +34,9 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
 
-    // TODO @芋艿：codeType 的处理；
+    /**
+     * 默认消息编解码类型
+     */
     private static final String CODEC_TYPE = IotWebSocketJsonDeviceMessageCodec.TYPE;
 
     private static final String AUTH_METHOD = "auth";
@@ -63,13 +64,10 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
 
     @Override
     public void handle(ServerWebSocket socket) {
-        // 1. 接受 WebSocket 连接
         String clientId = IdUtil.simpleUUID();
         log.debug("[handle][设备连接，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
-        // TODO @AI：这个方法已经废弃，看看有没其他替换的
-        socket.accept();
 
-        // 2.1 设置异常和关闭处理器
+        // 1. 设置异常和关闭处理器
         socket.exceptionHandler(ex -> {
             log.warn("[handle][连接异常，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
             cleanupConnection(socket);
@@ -79,7 +77,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             cleanupConnection(socket);
         });
 
-        // 2.2 设置文本消息处理器
+        // 2. 设置文本消息处理器
         socket.textMessageHandler(message -> {
             try {
                 processMessage(clientId, message, socket);
@@ -105,12 +103,13 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
         if (StrUtil.isBlank(message)) {
             return;
         }
-        // 1.2 解码消息
-        // TODO @AI：应该只有初始使用 CODEC_TYPE 解析，后续基于
+        // 1.2 解码消息（已认证连接使用其 codecType，未认证连接使用默认 CODEC_TYPE）
+        IotWebSocketConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
+        String codecType = connectionInfo != null ? connectionInfo.getCodecType() : CODEC_TYPE;
         IotDeviceMessage deviceMessage;
         try {
             deviceMessage = deviceMessageService.decodeDeviceMessage(
-                    message.getBytes(StandardCharsets.UTF_8), CODEC_TYPE);
+                    StrUtil.utf8Bytes(message), codecType);
             if (deviceMessage == null) {
                 throw new Exception("解码后消息为空");
             }
@@ -269,7 +268,8 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
                 .setDeviceId(device.getId())
                 .setProductKey(device.getProductKey())
                 .setDeviceName(device.getDeviceName())
-                .setClientId(clientId);
+                .setClientId(clientId)
+                .setCodecType(CODEC_TYPE);
         // 注册连接
         connectionManager.registerConnection(socket, device.getId(), connectionInfo);
     }
@@ -330,7 +330,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, AUTH_METHOD, responseData, code, message);
 
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, CODEC_TYPE);
-            socket.writeTextMessage(new String(encodedData, StandardCharsets.UTF_8));
+            socket.writeTextMessage(StrUtil.utf8Str(encodedData));
         } catch (Exception e) {
             log.error("[sendResponse][发送响应失败，requestId: {}]", requestId, e);
         }
@@ -472,7 +472,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
                     IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerResp, 0, null);
             // 2. 发送响应
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, CODEC_TYPE);
-            socket.writeTextMessage(new String(encodedData, StandardCharsets.UTF_8));
+            socket.writeTextMessage(StrUtil.utf8Str(encodedData));
         } catch (Exception e) {
             log.error("[sendRegisterSuccessResponse][发送注册成功响应失败，requestId: {}]", requestId, e);
         }

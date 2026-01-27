@@ -53,6 +53,7 @@ public class IotWebSocketUpstreamProtocol {
     }
 
     @PostConstruct
+    @SuppressWarnings("deprecation")
     public void start() {
         // 1.1 创建服务器选项
         HttpServerOptions options = new HttpServerOptions()
@@ -73,15 +74,14 @@ public class IotWebSocketUpstreamProtocol {
         httpServer.webSocketHandler(socket -> {
             // 验证路径
             if (ObjUtil.notEqual(wsProperties.getPath(), socket.path())) {
-                log.warn("[webSocketHandler][WebSocket 路径不匹配，拒绝连接，路径: {}，期望: {}]", socket.path(), wsProperties.getPath());
-                // TODO @AI：已经被废弃，看看换什么其他方法；
+                log.warn("[webSocketHandler][WebSocket 路径不匹配，拒绝连接，路径: {}，期望: {}]",
+                        socket.path(), wsProperties.getPath());
                 socket.reject();
                 return;
             }
-
             // 创建上行处理器
-            IotWebSocketUpstreamHandler handler = new IotWebSocketUpstreamHandler(
-                    this, messageService, deviceService, connectionManager);
+            IotWebSocketUpstreamHandler handler = new IotWebSocketUpstreamHandler(this,
+                    messageService, deviceService, connectionManager);
             handler.handle(socket);
         });
 

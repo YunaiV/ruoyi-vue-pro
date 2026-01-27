@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.router;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.codec.websocket.IotWebSocketJsonDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * IoT 网关 WebSocket 下行消息处理器
@@ -17,9 +15,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @RequiredArgsConstructor
 public class IotWebSocketDownstreamHandler {
-
-    // TODO @芋艿：codeType 的处理；
-    private static final String CODEC_TYPE = IotWebSocketJsonDeviceMessageCodec.TYPE;
 
     private final IotDeviceMessageService deviceMessageService;
 
@@ -42,8 +37,8 @@ public class IotWebSocketDownstreamHandler {
             }
 
             // 2. 编码消息并发送到设备
-            byte[] bytes = deviceMessageService.encodeDeviceMessage(message, CODEC_TYPE);
-            String jsonMessage = new String(bytes, StandardCharsets.UTF_8);
+            byte[] bytes = deviceMessageService.encodeDeviceMessage(message, connectionInfo.getCodecType());
+            String jsonMessage = StrUtil.utf8Str(bytes);
             boolean success = connectionManager.sendToDevice(message.getDeviceId(), jsonMessage);
             if (success) {
                 log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",

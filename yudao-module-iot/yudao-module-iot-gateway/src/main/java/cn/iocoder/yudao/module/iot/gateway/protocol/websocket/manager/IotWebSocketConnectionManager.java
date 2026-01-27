@@ -139,8 +139,10 @@ public class IotWebSocketConnectionManager {
          * 客户端 ID
          */
         private String clientId;
-
-        // TODO @AI：增加有个 codecType 字段；后续可以使用，参考 tcp、udp；然后下行的时候，也基于这个 codeType 去获取；
+        /**
+         * 消息编解码类型（认证后确定）
+         */
+        private String codecType;
 
     }
 
