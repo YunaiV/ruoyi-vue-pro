@@ -55,16 +55,17 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
     private static final String WS_PATH = "/ws";
     private static final int TIMEOUT_SECONDS = 5;
 
-    // 编解码器
+    private static Vertx vertx;
+
+    // ===================== 编解码器选择 =====================
+
     private static final IotDeviceMessageCodec CODEC = new IotWebSocketJsonDeviceMessageCodec();
 
     // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询） =====================
+
     private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
     private static final String DEVICE_NAME = "small";
     private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
-
-    // Vert.x 实例
-    private static Vertx vertx;
 
     @BeforeAll
     public static void setUp() {

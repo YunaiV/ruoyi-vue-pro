@@ -64,10 +64,12 @@ public class IotGatewayDeviceUdpProtocolIntegrationTest {
     private static final int TIMEOUT_MS = 5000;
 
     // ===================== 编解码器选择（修改此处切换 JSON / Binary） =====================
+
     private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
 //    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
 
     // ===================== 网关设备信息（根据实际情况修改，从 iot_device 表查询网关设备） =====================
+
     private static final String GATEWAY_PRODUCT_KEY = "m6XcS1ZJ3TW8eC0v";
     private static final String GATEWAY_DEVICE_NAME = "sub-ddd";
     private static final String GATEWAY_DEVICE_SECRET = "b3d62c70f8a4495487ed1d35d61ac2b3";

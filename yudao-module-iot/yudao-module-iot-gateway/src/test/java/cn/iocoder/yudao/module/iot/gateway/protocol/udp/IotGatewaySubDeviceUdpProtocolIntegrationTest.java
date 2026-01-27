@@ -59,10 +59,12 @@ public class IotGatewaySubDeviceUdpProtocolIntegrationTest {
     private static final int TIMEOUT_MS = 5000;
 
     // ===================== 编解码器选择（修改此处切换 JSON / Binary） =====================
+
     private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
 //    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
 
     // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+
     private static final String PRODUCT_KEY = "jAufEMTF1W6wnPhn";
     private static final String DEVICE_NAME = "chazuo-it";
     private static final String DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";

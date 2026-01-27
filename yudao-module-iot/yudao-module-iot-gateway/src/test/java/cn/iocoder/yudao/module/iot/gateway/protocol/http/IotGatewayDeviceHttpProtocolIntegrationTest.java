@@ -52,6 +52,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
     private static final int SERVER_PORT = 8092;
 
     // ===================== 网关设备信息（根据实际情况修改，从 iot_device 表查询网关设备） =====================
+
     private static final String GATEWAY_PRODUCT_KEY = "m6XcS1ZJ3TW8eC0v";
     private static final String GATEWAY_DEVICE_NAME = "sub-ddd";
     private static final String GATEWAY_DEVICE_SECRET = "b3d62c70f8a4495487ed1d35d61ac2b3";
@@ -62,6 +63,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
     private static final String GATEWAY_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoibTZYY1MxWkozVFc4ZUMwdiIsImV4cCI6MTc2OTg2NjY3OCwiZGV2aWNlTmFtZSI6InN1Yi1kZGQifQ.nCLSAfHEjXLtTDRXARjOoFqpuo5WfArjFWweUAzrjKU";
 
     // ===================== 子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+
     private static final String SUB_DEVICE_PRODUCT_KEY = "jAufEMTF1W6wnPhn";
     private static final String SUB_DEVICE_NAME = "chazuo-it";
     private static final String SUB_DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";

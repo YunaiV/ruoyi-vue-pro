@@ -55,16 +55,17 @@ public class IotDirectDeviceMqttProtocolIntegrationTest {
     private static final int SERVER_PORT = 1883;
     private static final int TIMEOUT_SECONDS = 10;
 
+    private static Vertx vertx;
+
     // ===================== 编解码器（MQTT 使用 Alink 协议） =====================
+
     private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
 
     // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询） =====================
+
     private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
     private static final String DEVICE_NAME = "small";
     private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
-
-    // ===================== 全局共享 Vertx 实例 =====================
-    private static Vertx vertx;
 
     @BeforeAll
     public static void setUp() {

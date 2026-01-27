@@ -63,21 +63,23 @@ public class IotGatewayDeviceWebSocketProtocolIntegrationTest {
     private static final String WS_PATH = "/ws";
     private static final int TIMEOUT_SECONDS = 5;
 
-    // 编解码器
+    private static Vertx vertx;
+
+    // ===================== 编解码器选择 =====================
+
     private static final IotDeviceMessageCodec CODEC = new IotWebSocketJsonDeviceMessageCodec();
 
     // ===================== 网关设备信息（根据实际情况修改，从 iot_device 表查询网关设备） =====================
+
     private static final String GATEWAY_PRODUCT_KEY = "m6XcS1ZJ3TW8eC0v";
     private static final String GATEWAY_DEVICE_NAME = "sub-ddd";
     private static final String GATEWAY_DEVICE_SECRET = "b3d62c70f8a4495487ed1d35d61ac2b3";
 
     // ===================== 子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+
     private static final String SUB_DEVICE_PRODUCT_KEY = "jAufEMTF1W6wnPhn";
     private static final String SUB_DEVICE_NAME = "chazuo-it";
     private static final String SUB_DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";
-
-    // Vert.x 实例
-    private static Vertx vertx;
 
     @BeforeAll
     public static void setUp() {

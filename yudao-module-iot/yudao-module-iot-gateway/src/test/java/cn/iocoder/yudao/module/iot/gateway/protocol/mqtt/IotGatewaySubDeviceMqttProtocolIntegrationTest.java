@@ -57,16 +57,17 @@ public class IotGatewaySubDeviceMqttProtocolIntegrationTest {
     private static final int SERVER_PORT = 1883;
     private static final int TIMEOUT_SECONDS = 10;
 
+    private static Vertx vertx;
+
     // ===================== 编解码器（MQTT 使用 Alink 协议） =====================
+    
     private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
 
     // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+
     private static final String PRODUCT_KEY = "jAufEMTF1W6wnPhn";
     private static final String DEVICE_NAME = "chazuo-it";
     private static final String DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";
-
-    // ===================== 全局共享 Vertx 实例 =====================
-    private static Vertx vertx;
 
     @BeforeAll
     public static void setUp() {

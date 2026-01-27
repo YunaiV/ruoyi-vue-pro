@@ -58,10 +58,12 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
     private static final int TIMEOUT_MS = 5000;
 
     // ===================== 编解码器选择（修改此处切换 JSON / Binary） =====================
+
     private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
 //    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
 
     // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+
     private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
     private static final String DEVICE_NAME = "small";
     private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";

@@ -49,6 +49,7 @@ public class IotDirectDeviceCoapProtocolIntegrationTest {
     private static final int SERVER_PORT = 5683;
 
     // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
+
     private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
     private static final String DEVICE_NAME = "small";
     private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
