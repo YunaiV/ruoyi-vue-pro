@@ -123,6 +123,17 @@ yudao:
           max-message-size: 1024               # 最大消息大小（字节）
           ack-timeout: 2000                    # ACK 超时时间（毫秒）
           max-retransmit: 4                    # 最大重传次数
+        # ====================================
+        # 针对引入的 WebSocket 组件的配置
+        # ====================================
+        websocket:
+          enabled: false                       # 是否启用 WebSocket 协议
+          port: 8094                           # WebSocket 服务端口（默认 8094）
+          path: /ws                            # WebSocket 路径（默认 /ws）
+          max-message-size: 65536              # 最大消息大小（字节，默认 64KB）
+          max-frame-size: 65536                # 最大帧大小（字节，默认 64KB）
+          idle-timeout-seconds: 60             # 空闲超时时间（秒，默认 60）
+          ssl-enabled: false                   # 是否启用 SSL（wss://）
 
 --- #################### 日志相关配置 ####################
 
@@ -144,6 +155,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
     # 根日志级别
     root: INFO
 

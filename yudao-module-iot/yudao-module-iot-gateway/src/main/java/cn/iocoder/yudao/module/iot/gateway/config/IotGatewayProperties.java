@@ -103,6 +103,11 @@ public class IotGatewayProperties {
          */
         private CoapProperties coap;
 
+        /**
+         * WebSocket 组件配置
+         */
+        private WebSocketProperties websocket;
+
     }
 
     @Data
@@ -583,6 +588,58 @@ public class IotGatewayProperties {
          */
         // TODO @AI：默认不为空
         private Integer maxRetransmit = 4;
+
+    }
+
+    @Data
+    public static class WebSocketProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务器端口（默认：8094）
+         */
+        private Integer port = 8094;
+
+        /**
+         * WebSocket 路径（默认：/ws）
+         */
+        @NotEmpty(message = "WebSocket 路径不能为空")
+        private String path = "/ws";
+
+        /**
+         * 最大消息大小（字节，默认 64KB）
+         */
+        private Integer maxMessageSize = 65536;
+
+        /**
+         * 最大帧大小（字节，默认 64KB）
+         */
+        private Integer maxFrameSize = 65536;
+
+        /**
+         * 空闲超时时间（秒，默认 60）
+         */
+        private Integer idleTimeoutSeconds = 60;
+
+        /**
+         * 是否启用 SSL（wss://）
+         */
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL 证书路径
+         */
+        private String sslCertPath;
+
+        /**
+         * SSL 私钥路径
+         */
+        private String sslKeyPath;
 
     }
 
