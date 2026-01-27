@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.coap.router;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
@@ -93,7 +92,10 @@ public class IotCoapUpstreamHandler {
 
             // 2.2 解码消息
             IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(payload, productKey, deviceName);
-            Assert.equals(method, message.getMethod(), "method 不匹配");
+            if (ObjUtil.notEqual(method, message.getMethod())) {
+                IotCoapUtils.respondError(exchange, CoAP.ResponseCode.BAD_REQUEST, "method 不匹配");
+                return;
+            }
             // 2.3 发送消息到消息总线
             deviceMessageService.sendDeviceMessage(message, productKey, deviceName, protocol.getServerId());
 

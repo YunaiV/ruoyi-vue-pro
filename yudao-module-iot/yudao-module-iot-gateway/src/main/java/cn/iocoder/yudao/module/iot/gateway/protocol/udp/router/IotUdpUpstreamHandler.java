@@ -225,15 +225,15 @@ public class IotUdpUpstreamHandler {
         String addressKey = sessionManager.buildAddressKey(senderAddress);
         try {
             // 1. 解析注册参数
-            IotDeviceRegisterReqDTO registerParams = parseRegisterParams(message.getParams());
-            if (registerParams == null) {
+            IotDeviceRegisterReqDTO params = parseRegisterParams(message.getParams());
+            if (params == null) {
                 log.warn("[handleRegisterRequest][注册参数解析失败，来源: {}]", addressKey);
                 sendErrorResponse(socket, senderAddress, message.getRequestId(), "注册参数不完整", codecType);
                 return;
             }
 
             // 2. 调用动态注册
-            CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(registerParams);
+            CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);
             if (result.isError()) {
                 log.warn("[handleRegisterRequest][注册失败，来源: {}，错误: {}]", addressKey, result.getMsg());
                 sendErrorResponse(socket, senderAddress, message.getRequestId(), result.getMsg(), codecType);
@@ -243,7 +243,7 @@ public class IotUdpUpstreamHandler {
             // 3. 发送成功响应（包含 deviceSecret）
             sendRegisterSuccessResponse(socket, senderAddress, message.getRequestId(), result.getData(), codecType);
             log.info("[handleRegisterRequest][注册成功，设备名: {}，来源: {}]",
-                    registerParams.getDeviceName(), addressKey);
+                    params.getDeviceName(), addressKey);
         } catch (Exception e) {
             log.error("[handleRegisterRequest][注册处理异常，来源: {}]", addressKey, e);
             sendErrorResponse(socket, senderAddress, message.getRequestId(), "注册处理异常", codecType);
@@ -484,7 +484,6 @@ public class IotUdpUpstreamHandler {
         if (params == null) {
             return null;
         }
-
         try {
             // 参数默认为 Map 类型，直接转换
             if (params instanceof Map) {
@@ -494,15 +493,13 @@ public class IotUdpUpstreamHandler {
                         .setUsername(MapUtil.getStr(paramMap, "username"))
                         .setPassword(MapUtil.getStr(paramMap, "password"));
             }
-
             // 如果已经是目标类型，直接返回
             if (params instanceof IotDeviceAuthReqDTO) {
                 return (IotDeviceAuthReqDTO) params;
             }
 
             // 其他情况尝试 JSON 转换
-            String jsonStr = JsonUtils.toJsonString(params);
-            return JsonUtils.parseObject(jsonStr, IotDeviceAuthReqDTO.class);
+            return JsonUtils.convertObject(params, IotDeviceAuthReqDTO.class);
         } catch (Exception e) {
             log.error("[parseAuthParams][解析认证参数({})失败]", params, e);
             return null;
@@ -515,36 +512,27 @@ public class IotUdpUpstreamHandler {
      * @param params 参数对象（通常为 Map 类型）
      * @return 注册参数 DTO，解析失败时返回 null
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "DuplicatedCode"})
     private IotDeviceRegisterReqDTO parseRegisterParams(Object params) {
         if (params == null) {
             return null;
         }
-
         try {
             // 参数默认为 Map 类型，直接转换
             if (params instanceof Map) {
                 Map<String, Object> paramMap = (Map<String, Object>) params;
-                String productKey = MapUtil.getStr(paramMap, "productKey");
-                String deviceName = MapUtil.getStr(paramMap, "deviceName");
-                String productSecret = MapUtil.getStr(paramMap, "productSecret");
-                if (StrUtil.hasBlank(productKey, deviceName, productSecret)) {
-                    return null;
-                }
                 return new IotDeviceRegisterReqDTO()
-                        .setProductKey(productKey)
-                        .setDeviceName(deviceName)
-                        .setProductSecret(productSecret);
+                        .setProductKey(MapUtil.getStr(paramMap, "productKey"))
+                        .setDeviceName(MapUtil.getStr(paramMap, "deviceName"))
+                        .setProductSecret(MapUtil.getStr(paramMap, "productSecret"));
             }
-
             // 如果已经是目标类型，直接返回
             if (params instanceof IotDeviceRegisterReqDTO) {
                 return (IotDeviceRegisterReqDTO) params;
             }
 
             // 其他情况尝试 JSON 转换
-            String jsonStr = JsonUtils.toJsonString(params);
-            return JsonUtils.parseObject(jsonStr, IotDeviceRegisterReqDTO.class);
+            return JsonUtils.convertObject(params, IotDeviceRegisterReqDTO.class);
         } catch (Exception e) {
             log.error("[parseRegisterParams][解析注册参数({})失败]", params, e);
             return null;

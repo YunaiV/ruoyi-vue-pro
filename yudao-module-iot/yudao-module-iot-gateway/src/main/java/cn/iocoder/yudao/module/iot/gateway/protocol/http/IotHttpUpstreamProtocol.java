@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpAuthHandl
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpRegisterHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpRegisterSubHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpUpstreamHandler;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -24,25 +23,26 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotHttpUpstreamProtocol extends AbstractVerticle {
+public class IotHttpUpstreamProtocol {
 
     private final IotGatewayProperties.HttpProperties httpProperties;
+
+    private final Vertx vertx;
 
     private HttpServer httpServer;
 
     @Getter
     private final String serverId;
 
-    public IotHttpUpstreamProtocol(IotGatewayProperties.HttpProperties httpProperties) {
+    public IotHttpUpstreamProtocol(IotGatewayProperties.HttpProperties httpProperties, Vertx vertx) {
         this.httpProperties = httpProperties;
+        this.vertx = vertx;
         this.serverId = IotDeviceMessageUtils.generateServerId(httpProperties.getServerPort());
     }
 
-    @Override
     @PostConstruct
     public void start() {
         // 创建路由
-        Vertx vertx = Vertx.vertx();
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
 
@@ -76,7 +76,6 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
         }
     }
 
-    @Override
     @PreDestroy
     public void stop() {
         if (httpServer != null) {

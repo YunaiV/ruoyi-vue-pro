@@ -44,9 +44,15 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class HttpProtocolConfiguration {
 
+        @Bean(name = "httpVertx", destroyMethod = "close")
+        public Vertx httpVertx() {
+            return Vertx.vertx();
+        }
+
         @Bean
-        public IotHttpUpstreamProtocol iotHttpUpstreamProtocol(IotGatewayProperties gatewayProperties) {
-            return new IotHttpUpstreamProtocol(gatewayProperties.getProtocol().getHttp());
+        public IotHttpUpstreamProtocol iotHttpUpstreamProtocol(IotGatewayProperties gatewayProperties,
+                                                               @Qualifier("httpVertx") Vertx httpVertx) {
+            return new IotHttpUpstreamProtocol(gatewayProperties.getProtocol().getHttp(), httpVertx);
         }
 
         @Bean

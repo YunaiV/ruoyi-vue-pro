@@ -34,6 +34,9 @@ public class IotHttpRegisterHandler extends IotHttpAbstractHandler {
     public CommonResult<Object> handle0(RoutingContext context) {
         // 1. 解析参数
         JsonObject body = context.body().asJsonObject();
+        if (body == null) {
+            throw invalidParamException("请求体不能为空");
+        }
         String productKey = body.getString("productKey");
         if (StrUtil.isEmpty(productKey)) {
             throw invalidParamException("productKey 不能为空");

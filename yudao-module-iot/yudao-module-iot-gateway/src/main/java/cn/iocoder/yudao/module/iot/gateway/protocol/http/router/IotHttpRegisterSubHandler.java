@@ -11,6 +11,7 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
@@ -44,6 +45,12 @@ public class IotHttpRegisterSubHandler extends IotHttpAbstractHandler {
 
         // 2. 解析子设备列表
         JsonObject body = context.body().asJsonObject();
+        if (body == null) {
+            throw invalidParamException("请求体不能为空");
+        }
+        if (body.getJsonArray("params") == null) {
+            throw invalidParamException("params 不能为空");
+        }
         List<cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO> subDevices = JsonUtils.parseArray(
                 body.getJsonArray("params").toString(), cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO.class);
 

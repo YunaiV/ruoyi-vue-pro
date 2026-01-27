@@ -12,9 +12,9 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
-import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpJsonDeviceMessageCodec;
@@ -26,6 +26,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 /**
  * TCP 上行消息处理器
@@ -78,6 +80,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
         // 设置消息处理器
         socket.handler(buffer -> {
+            // TODO @AI：TODO @芋艿：这里应该有拆粘包的问题；
             try {
                 processMessage(clientId, buffer, socket);
             } catch (Exception e) {
@@ -209,15 +212,15 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                                        NetSocket socket) {
         try {
             // 1. 解析注册参数
-            IotDeviceRegisterReqDTO registerParams = parseRegisterParams(message.getParams());
-            if (registerParams == null) {
+            IotDeviceRegisterReqDTO params = parseRegisterParams(message.getParams());
+            if (params == null) {
                 log.warn("[handleRegisterRequest][注册参数解析失败，客户端 ID: {}]", clientId);
                 sendErrorResponse(socket, message.getRequestId(), "注册参数不完整", codecType);
                 return;
             }
 
             // 2. 调用动态注册
-            CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(registerParams);
+            CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);
             if (result.isError()) {
                 log.warn("[handleRegisterRequest][注册失败，客户端 ID: {}，错误: {}]", clientId, result.getMsg());
                 sendErrorResponse(socket, message.getRequestId(), result.getMsg(), codecType);
@@ -227,7 +230,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             // 3. 发送成功响应（包含 deviceSecret）
             sendRegisterSuccessResponse(socket, message.getRequestId(), result.getData(), codecType);
             log.info("[handleRegisterRequest][注册成功，客户端 ID: {}，设备名: {}]",
-                    clientId, registerParams.getDeviceName());
+                    clientId, params.getDeviceName());
         } catch (Exception e) {
             log.error("[handleRegisterRequest][注册处理异常，客户端 ID: {}]", clientId, e);
             sendErrorResponse(socket, message.getRequestId(), "注册处理异常", codecType);
@@ -419,30 +422,27 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param params 参数对象（通常为 Map 类型）
      * @return 认证参数 DTO，解析失败时返回 null
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "DuplicatedCode"})
     private IotDeviceAuthReqDTO parseAuthParams(Object params) {
         if (params == null) {
             return null;
         }
-
         try {
             // 参数默认为 Map 类型，直接转换
-            if (params instanceof java.util.Map) {
-                java.util.Map<String, Object> paramMap = (java.util.Map<String, Object>) params;
+            if (params instanceof Map) {
+                Map<String, Object> paramMap = (Map<String, Object>) params;
                 return new IotDeviceAuthReqDTO()
                         .setClientId(MapUtil.getStr(paramMap, "clientId"))
                         .setUsername(MapUtil.getStr(paramMap, "username"))
                         .setPassword(MapUtil.getStr(paramMap, "password"));
             }
-
             // 如果已经是目标类型，直接返回
             if (params instanceof IotDeviceAuthReqDTO) {
                 return (IotDeviceAuthReqDTO) params;
             }
 
             // 其他情况尝试 JSON 转换
-            String jsonStr = JsonUtils.toJsonString(params);
-            return JsonUtils.parseObject(jsonStr, IotDeviceAuthReqDTO.class);
+            return JsonUtils.convertObject(params, IotDeviceAuthReqDTO.class);
         } catch (Exception e) {
             log.error("[parseAuthParams][解析认证参数({})失败]", params, e);
             return null;
@@ -455,28 +455,20 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param params 参数对象（通常为 Map 类型）
      * @return 注册参数 DTO，解析失败时返回 null
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "DuplicatedCode"})
     private IotDeviceRegisterReqDTO parseRegisterParams(Object params) {
         if (params == null) {
             return null;
         }
-
         try {
             // 参数默认为 Map 类型，直接转换
-            if (params instanceof java.util.Map) {
-                java.util.Map<String, Object> paramMap = (java.util.Map<String, Object>) params;
-                String productKey = MapUtil.getStr(paramMap, "productKey");
-                String deviceName = MapUtil.getStr(paramMap, "deviceName");
-                String productSecret = MapUtil.getStr(paramMap, "productSecret");
-                if (StrUtil.hasBlank(productKey, deviceName, productSecret)) {
-                    return null;
-                }
+            if (params instanceof Map) {
+                Map<String, Object> paramMap = (Map<String, Object>) params;
                 return new IotDeviceRegisterReqDTO()
-                        .setProductKey(productKey)
-                        .setDeviceName(deviceName)
-                        .setProductSecret(productSecret);
+                        .setProductKey(MapUtil.getStr(paramMap, "productKey"))
+                        .setDeviceName(MapUtil.getStr(paramMap, "deviceName"))
+                        .setProductSecret(MapUtil.getStr(paramMap, "productSecret"));
             }
-
             // 如果已经是目标类型，直接返回
             if (params instanceof IotDeviceRegisterReqDTO) {
                 return (IotDeviceRegisterReqDTO) params;

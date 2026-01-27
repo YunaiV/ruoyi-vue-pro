@@ -104,7 +104,7 @@ public class IotEmqxAuthEventHandler {
         JsonObject body = null;
         try {
             // 1. 解析请求体
-            body = parseRequestBody(context);
+            body = parseEventRequestBody(context);
             if (body == null) {
                 return;
             }
@@ -153,7 +153,9 @@ public class IotEmqxAuthEventHandler {
     }
 
     /**
-     * 解析请求体
+     * 解析认证接口请求体
+     * <p>
+     * 认证接口解析失败时返回 JSON 格式响应（包含 result 字段）
      *
      * @param context 路由上下文
      * @return 请求体JSON对象，解析失败时返回null
@@ -170,6 +172,30 @@ public class IotEmqxAuthEventHandler {
         } catch (Exception e) {
             log.error("[parseRequestBody][body({}) 解析请求体失败]", context.body().asString(), e);
             sendAuthResponse(context, RESULT_IGNORE);
+            return null;
+        }
+    }
+
+    /**
+     * 解析事件接口请求体
+     * <p>
+     * 事件接口解析失败时仅返回 200 状态码，无响应体（符合 EMQX Webhook 规范）
+     *
+     * @param context 路由上下文
+     * @return 请求体JSON对象，解析失败时返回null
+     */
+    private JsonObject parseEventRequestBody(RoutingContext context) {
+        try {
+            JsonObject body = context.body().asJsonObject();
+            if (body == null) {
+                log.info("[parseEventRequestBody][请求体为空]");
+                context.response().setStatusCode(SUCCESS_STATUS_CODE).end();
+                return null;
+            }
+            return body;
+        } catch (Exception e) {
+            log.error("[parseEventRequestBody][body({}) 解析请求体失败]", context.body().asString(), e);
+            context.response().setStatusCode(SUCCESS_STATUS_CODE).end();
             return null;
         }
     }

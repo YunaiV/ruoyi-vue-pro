@@ -51,6 +51,9 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
     public CommonResult<Object> handle0(RoutingContext context) {
         // 1. 解析参数
         JsonObject body = context.body().asJsonObject();
+        if (body == null) {
+            throw invalidParamException("请求体不能为空");
+        }
         String clientId = body.getString("clientId");
         if (StrUtil.isEmpty(clientId)) {
             throw invalidParamException("clientId 不能为空");
