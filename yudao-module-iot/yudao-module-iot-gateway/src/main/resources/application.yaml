@@ -115,23 +115,10 @@ yudao:
           connect-timeout-seconds: 60
           ssl-enabled: false
         # ====================================
-        # 针对引入的 MQTT WebSocket 组件的配置
-        # ====================================
-        mqtt-ws:
-          enabled: false                        # 是否启用 MQTT WebSocket
-          port: 8083                           # WebSocket 服务端口
-          path: /mqtt                          # WebSocket 路径
-          max-message-size: 8192               # 最大消息大小（字节）
-          max-frame-size: 65536                # 最大帧大小（字节）
-          connect-timeout-seconds: 60          # 连接超时时间（秒）
-          keep-alive-timeout-seconds: 300      # 保持连接超时时间（秒）
-          ssl-enabled: false                   # 是否启用 SSL（wss://）
-          sub-protocol: mqtt                   # WebSocket 子协议
-        # ====================================
         # 针对引入的 CoAP 组件的配置
         # ====================================
         coap:
-          enabled: true                       # 是否启用 CoAP 协议
+          enabled: false                       # 是否启用 CoAP 协议
           port: 5683                           # CoAP 服务端口（默认 5683）
           max-message-size: 1024               # 最大消息大小（字节）
           ack-timeout: 2000                    # ACK 超时时间（毫秒）

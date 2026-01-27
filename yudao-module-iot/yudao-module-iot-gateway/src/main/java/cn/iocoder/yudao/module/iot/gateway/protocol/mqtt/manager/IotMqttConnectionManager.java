@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager;
 
 import cn.hutool.core.util.StrUtil;
 import io.netty.handler.codec.mqtt.MqttQoS;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -166,7 +167,7 @@ public class IotMqttConnectionManager {
         }
 
         try {
-            endpoint.publish(topic, io.vertx.core.buffer.Buffer.buffer(payload), MqttQoS.valueOf(qos), false, retain);
+            endpoint.publish(topic, Buffer.buffer(payload), MqttQoS.valueOf(qos), false, retain);
             log.debug("[sendToDevice][发送消息成功，设备 ID: {}，主题: {}，QoS: {}]", deviceId, topic, qos);
             return true;
         } catch (Exception e) {
