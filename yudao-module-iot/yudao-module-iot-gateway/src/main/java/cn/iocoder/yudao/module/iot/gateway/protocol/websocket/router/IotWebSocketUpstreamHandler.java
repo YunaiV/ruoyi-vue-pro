@@ -327,8 +327,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
                     .build();
 
             int code = success ? 0 : 401;
-            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, AUTH_METHOD, responseData,
-                    code, message);
+            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, AUTH_METHOD, responseData, code, message);
 
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, CODEC_TYPE);
             socket.writeTextMessage(new String(encodedData, StandardCharsets.UTF_8));

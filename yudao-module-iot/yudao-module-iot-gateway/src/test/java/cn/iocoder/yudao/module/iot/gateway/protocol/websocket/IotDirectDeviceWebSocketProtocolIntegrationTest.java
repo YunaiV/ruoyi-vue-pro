@@ -81,6 +81,8 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
 
     // ===================== 认证测试 =====================
 
+    // TODO @AI：参考 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/test/java/cn/iocoder/yudao/module/iot/gateway/protocol/tcp/IotDirectDeviceTcpProtocolIntegrationTest.java 或 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/test/java/cn/iocoder/yudao/module/iot/gateway/protocol/mqtt/IotDirectDeviceMqttProtocolIntegrationTest.java 类，优化代码结构
+
     /**
      * 认证测试：获取设备 Token
      */
@@ -96,6 +98,7 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
                 .setPort(SERVER_PORT)
                 .setURI(WS_PATH);
 
+        // TODO @AI：这里有告警；Deprecate /instead use WebSocketClient.connect(WebSocketConnectOptions)
         client.webSocket(options).onComplete(ar -> {
             if (ar.succeeded()) {
                 WebSocket ws = ar.result();

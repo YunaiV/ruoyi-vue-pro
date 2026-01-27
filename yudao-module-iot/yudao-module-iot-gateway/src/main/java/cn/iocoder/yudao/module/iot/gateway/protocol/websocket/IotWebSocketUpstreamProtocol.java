@@ -73,8 +73,7 @@ public class IotWebSocketUpstreamProtocol {
         httpServer.webSocketHandler(socket -> {
             // 验证路径
             if (ObjUtil.notEqual(wsProperties.getPath(), socket.path())) {
-                log.warn("[webSocketHandler][WebSocket 路径不匹配，拒绝连接，路径: {}，期望: {}]",
-                        socket.path(), wsProperties.getPath());
+                log.warn("[webSocketHandler][WebSocket 路径不匹配，拒绝连接，路径: {}，期望: {}]", socket.path(), wsProperties.getPath());
                 // TODO @AI：已经被废弃，看看换什么其他方法；
                 socket.reject();
                 return;
@@ -89,8 +88,7 @@ public class IotWebSocketUpstreamProtocol {
         // 3. 启动服务器
         try {
             httpServer.listen().result();
-            log.info("[start][IoT 网关 WebSocket 协议启动成功，端口：{}，路径：{}]",
-                    wsProperties.getPort(), wsProperties.getPath());
+            log.info("[start][IoT 网关 WebSocket 协议启动成功，端口：{}，路径：{}]", wsProperties.getPort(), wsProperties.getPath());
         } catch (Exception e) {
             log.error("[start][IoT 网关 WebSocket 协议启动失败]", e);
             throw e;

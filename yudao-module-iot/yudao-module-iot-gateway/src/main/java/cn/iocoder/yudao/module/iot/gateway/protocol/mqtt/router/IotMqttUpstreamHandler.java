@@ -471,9 +471,7 @@ public class IotMqttUpstreamHandler {
     /**
      * 注册连接
      */
-    private void registerConnection(MqttEndpoint endpoint, IotDeviceRespDTO device,
-                                    String clientId) {
-
+    private void registerConnection(MqttEndpoint endpoint, IotDeviceRespDTO device, String clientId) {
         IotMqttConnectionManager.ConnectionInfo connectionInfo = new IotMqttConnectionManager.ConnectionInfo()
                 .setDeviceId(device.getId())
                 .setProductKey(device.getProductKey())
@@ -481,7 +479,6 @@ public class IotMqttUpstreamHandler {
                 .setClientId(clientId)
                 .setAuthenticated(true)
                 .setRemoteAddress(connectionManager.getEndpointAddress(endpoint));
-
         connectionManager.registerConnection(endpoint, device.getId(), connectionInfo);
     }
 
@@ -510,15 +507,13 @@ public class IotMqttUpstreamHandler {
                 IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
                 deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
                         connectionInfo.getDeviceName(), serverId);
-                log.info("[cleanupConnection][设备离线，设备 ID: {}，设备名称: {}]",
-                        connectionInfo.getDeviceId(), connectionInfo.getDeviceName());
+                log.info("[cleanupConnection][设备离线，设备 ID: {}，设备名称: {}]", connectionInfo.getDeviceId(), connectionInfo.getDeviceName());
             }
 
             // 注销连接
             connectionManager.unregisterConnection(endpoint);
         } catch (Exception e) {
-            log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]",
-                    endpoint.clientIdentifier(), e.getMessage());
+            log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]", endpoint.clientIdentifier(), e.getMessage());
         }
     }
 

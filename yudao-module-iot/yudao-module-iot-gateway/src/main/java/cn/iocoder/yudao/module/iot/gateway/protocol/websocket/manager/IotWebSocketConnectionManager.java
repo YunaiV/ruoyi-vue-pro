@@ -51,9 +51,9 @@ public class IotWebSocketConnectionManager {
             connectionMap.remove(oldSocket);
         }
 
+        // 注册新连接
         connectionMap.put(socket, connectionInfo);
         deviceSocketMap.put(deviceId, socket);
-
         log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
                 deviceId, socket.remoteAddress(), connectionInfo.getProductKey(), connectionInfo.getDeviceName());
     }
@@ -65,12 +65,13 @@ public class IotWebSocketConnectionManager {
      */
     public void unregisterConnection(ServerWebSocket socket) {
         ConnectionInfo connectionInfo = connectionMap.remove(socket);
-        if (connectionInfo != null) {
-            Long deviceId = connectionInfo.getDeviceId();
-            deviceSocketMap.remove(deviceId);
-            log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
-                    deviceId, socket.remoteAddress());
+        if (connectionInfo == null) {
+            return;
         }
+        Long deviceId = connectionInfo.getDeviceId();
+        deviceSocketMap.remove(deviceId);
+        log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
+                deviceId, socket.remoteAddress());
     }
 
     /**

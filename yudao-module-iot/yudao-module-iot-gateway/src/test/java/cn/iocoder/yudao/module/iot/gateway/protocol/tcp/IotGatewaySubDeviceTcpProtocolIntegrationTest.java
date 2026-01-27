@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
@@ -85,9 +84,6 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
         // 1.2 编码
         byte[] payload = CODEC.encode(request);
         log.info("[testAuth][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
-        if (CODEC instanceof IotTcpBinaryDeviceMessageCodec) {
-            log.info("[testAuth][二进制数据包(HEX): {}]", HexUtil.encodeHexStr(payload));
-        }
 
         // 2.1 发送请求
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {

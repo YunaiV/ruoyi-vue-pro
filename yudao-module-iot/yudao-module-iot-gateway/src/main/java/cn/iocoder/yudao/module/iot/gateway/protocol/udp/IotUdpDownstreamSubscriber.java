@@ -34,7 +34,7 @@ public class IotUdpDownstreamSubscriber implements IotMessageSubscriber<IotDevic
     public void init() {
         // 初始化下游处理器
         this.downstreamHandler = new IotUdpDownstreamHandler(messageService, sessionManager, protocol);
-
+        // 注册下游订阅者
         messageBus.register(this);
         log.info("[init][UDP 下游订阅者初始化完成，服务器 ID: {}，Topic: {}]",
                 protocol.getServerId(), getTopic());

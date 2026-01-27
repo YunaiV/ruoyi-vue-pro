@@ -88,9 +88,9 @@ public class IotMqttConnectionManager {
             connectionMap.remove(oldEndpoint);
         }
 
+        // 注册新连接
         connectionMap.put(endpoint, connectionInfo);
         deviceEndpointMap.put(deviceId, endpoint);
-
         log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
                 deviceId, getEndpointAddress(endpoint), connectionInfo.getProductKey(), connectionInfo.getDeviceName());
     }
@@ -102,13 +102,12 @@ public class IotMqttConnectionManager {
      */
     public void unregisterConnection(MqttEndpoint endpoint) {
         ConnectionInfo connectionInfo = connectionMap.remove(endpoint);
-        if (connectionInfo != null) {
-            Long deviceId = connectionInfo.getDeviceId();
-            deviceEndpointMap.remove(deviceId);
-
-            log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId,
-                    getEndpointAddress(endpoint));
+        if (connectionInfo == null) {
+            return;
         }
+        Long deviceId = connectionInfo.getDeviceId();
+        deviceEndpointMap.remove(deviceId);
+        log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, getEndpointAddress(endpoint));
     }
 
     /**

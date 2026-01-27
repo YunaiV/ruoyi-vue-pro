@@ -84,9 +84,6 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
         // 1.2 编码
         byte[] payload = CODEC.encode(request);
         log.info("[testAuth][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
-        if (CODEC instanceof IotTcpBinaryDeviceMessageCodec) {
-            log.info("[testAuth][二进制数据包(HEX): {}]", HexUtil.encodeHexStr(payload));
-        }
 
         // 2.1 发送请求
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
@@ -123,9 +120,6 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
         // 1.2 编码
         byte[] payload = CODEC.encode(request);
         log.info("[testDeviceRegister][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
-        if (CODEC instanceof IotTcpBinaryDeviceMessageCodec) {
-            log.info("[testDeviceRegister][二进制数据包(HEX): {}]", HexUtil.encodeHexStr(payload));
-        }
 
         // 2.1 发送请求
         try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
