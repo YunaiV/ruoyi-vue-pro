@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.websocket.IotWebSocketJsonDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
@@ -37,7 +37,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
     /**
      * 默认消息编解码类型
      */
-    private static final String CODEC_TYPE = IotWebSocketJsonDeviceMessageCodec.TYPE;
+    private static final String CODEC_TYPE = IotAlinkDeviceMessageCodec.TYPE;
 
     private static final String AUTH_METHOD = "auth";
 

@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.websocket.IotWebSocketJsonDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketClient;
@@ -59,7 +59,7 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
 
     // ===================== 编解码器选择 =====================
 
-    private static final IotDeviceMessageCodec CODEC = new IotWebSocketJsonDeviceMessageCodec();
+    private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
 
     // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询） =====================
 

@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoDeleteReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.websocket.IotWebSocketJsonDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketClient;
@@ -67,7 +67,7 @@ public class IotGatewayDeviceWebSocketProtocolIntegrationTest {
 
     // ===================== 编解码器选择 =====================
 
-    private static final IotDeviceMessageCodec CODEC = new IotWebSocketJsonDeviceMessageCodec();
+    private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
 
     // ===================== 网关设备信息（根据实际情况修改，从 iot_device 表查询网关设备） =====================
 
