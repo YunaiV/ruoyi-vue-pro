@@ -15,6 +15,7 @@ import java.util.function.Consumer;
  * <p>
  * 1. 拼接条件的方法，增加 xxxIfPresent 方法，用于判断值不存在的时候，不要拼接到条件中。
  * 2. SFunction<S, ?> column + <S> 泛型：支持任意类字段（主表、子表、三表），推荐写法, 让编译器自动推断 S 类型
+ *
  * @param <T> 数据类型
  */
 public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
@@ -119,6 +120,12 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     @Override
     public <X> MPJLambdaWrapperX<T> orderByDesc(SFunction<X, ?> column) {
         super.orderByDesc(true, column);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> orderByAsc(SFunction<X, ?> column) {
+        super.orderByAsc(true, column);
         return this;
     }
 
