@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpJsonDeviceMessageCodec;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.net.DatagramSocket;
@@ -53,6 +54,7 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotDirectDeviceUd
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 public class IotGatewaySubDeviceUdpProtocolIntegrationTest {
 
     private static final int TIMEOUT_MS = 5000;

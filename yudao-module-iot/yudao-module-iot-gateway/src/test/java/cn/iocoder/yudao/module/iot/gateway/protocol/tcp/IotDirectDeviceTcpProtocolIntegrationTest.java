@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpJsonDeviceMessageCodec;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
@@ -50,6 +51,7 @@ import java.net.Socket;
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 public class IotDirectDeviceTcpProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";

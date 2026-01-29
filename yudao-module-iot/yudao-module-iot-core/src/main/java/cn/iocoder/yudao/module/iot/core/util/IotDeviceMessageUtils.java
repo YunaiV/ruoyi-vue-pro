@@ -155,20 +155,19 @@ public class IotDeviceMessageUtils {
             return null;
         }
 
-        // 策略1：如果 params 不是 Map，直接返回该值（适用于简单的单属性消息）
+        // 策略 1：如果 params 不是 Map，直接返回该值（适用于简单的单属性消息）
         if (!(params instanceof Map)) {
             return params;
         }
 
+        // 策略 2：直接通过标识符获取属性值
         Map<String, Object> paramsMap = (Map<String, Object>) params;
-
-        // 策略2：直接通过标识符获取属性值
         Object directValue = paramsMap.get(identifier);
         if (directValue != null) {
             return directValue;
         }
 
-        // 策略3：从 properties 字段中获取（适用于标准属性上报消息）
+        // 策略 3：从 properties 字段中获取（适用于标准属性上报消息）
         Object properties = paramsMap.get("properties");
         if (properties instanceof Map) {
             Map<String, Object> propertiesMap = (Map<String, Object>) properties;
@@ -178,7 +177,7 @@ public class IotDeviceMessageUtils {
             }
         }
 
-        // 策略4：从 data 字段中获取（适用于某些消息格式）
+        // 策略 4：从 data 字段中获取（适用于某些消息格式）
         Object data = paramsMap.get("data");
         if (data instanceof Map) {
             Map<String, Object> dataMap = (Map<String, Object>) data;
@@ -188,13 +187,13 @@ public class IotDeviceMessageUtils {
             }
         }
 
-        // 策略5：从 value 字段中获取（适用于单值消息）
+        // 策略 5：从 value 字段中获取（适用于单值消息）
         Object value = paramsMap.get("value");
         if (value != null) {
             return value;
         }
 
-        // 策略6：如果 Map 只有两个字段且包含 identifier，返回另一个字段的值
+        // 策略 6：如果 Map 只有两个字段且包含 identifier，返回另一个字段的值
         if (paramsMap.size() == 2 && paramsMap.containsKey("identifier")) {
             for (Map.Entry<String, Object> entry : paramsMap.entrySet()) {
                 if (!"identifier".equals(entry.getKey())) {

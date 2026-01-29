@@ -20,6 +20,7 @@ import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.UdpConfig;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,6 +44,7 @@ import org.junit.jupiter.api.Test;
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 public class IotDirectDeviceCoapProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";

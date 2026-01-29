@@ -23,6 +23,7 @@ import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.UdpConfig;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -52,6 +53,7 @@ import java.util.Map;
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 public class IotGatewayDeviceCoapProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";

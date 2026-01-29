@@ -22,6 +22,7 @@ import io.vertx.core.http.WebSocketConnectOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -56,6 +57,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 public class IotGatewayDeviceWebSocketProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";

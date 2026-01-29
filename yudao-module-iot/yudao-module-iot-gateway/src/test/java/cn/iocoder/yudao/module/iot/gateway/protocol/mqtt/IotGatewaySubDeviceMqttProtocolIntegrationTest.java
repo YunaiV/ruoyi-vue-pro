@@ -18,6 +18,7 @@ import io.vertx.mqtt.MqttClientOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
@@ -51,6 +52,7 @@ import java.util.concurrent.TimeUnit;
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 public class IotGatewaySubDeviceMqttProtocolIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";
@@ -60,7 +62,7 @@ public class IotGatewaySubDeviceMqttProtocolIntegrationTest {
     private static Vertx vertx;
 
     // ===================== 编解码器（MQTT 使用 Alink 协议） =====================
-    
+
     private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
 
     // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================

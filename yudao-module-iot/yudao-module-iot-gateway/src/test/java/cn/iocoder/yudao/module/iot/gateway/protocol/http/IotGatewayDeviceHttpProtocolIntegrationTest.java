@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoDeleteReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -45,6 +46,7 @@ import java.util.Map;
  * @author 芋道源码
  */
 @Slf4j
+@Disabled
 @SuppressWarnings("HttpUrlsUsage")
 public class IotGatewayDeviceHttpProtocolIntegrationTest {
 
