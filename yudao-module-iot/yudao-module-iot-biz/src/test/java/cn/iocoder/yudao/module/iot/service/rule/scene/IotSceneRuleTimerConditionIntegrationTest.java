@@ -20,6 +20,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -74,15 +75,15 @@ public class IotSceneRuleTimerConditionIntegrationTest extends BaseMockitoUnitTe
         // 创建并注入 timerConditionEvaluator 的依赖
         timerConditionEvaluator = new IotTimerConditionEvaluator();
         try {
-            var devicePropertyServiceField = IotTimerConditionEvaluator.class.getDeclaredField("devicePropertyService");
+            Field devicePropertyServiceField = IotTimerConditionEvaluator.class.getDeclaredField("devicePropertyService");
             devicePropertyServiceField.setAccessible(true);
             devicePropertyServiceField.set(timerConditionEvaluator, devicePropertyService);
 
-            var deviceServiceField = IotTimerConditionEvaluator.class.getDeclaredField("deviceService");
+            Field deviceServiceField = IotTimerConditionEvaluator.class.getDeclaredField("deviceService");
             deviceServiceField.setAccessible(true);
             deviceServiceField.set(timerConditionEvaluator, deviceService);
 
-            var evaluatorField = IotSceneRuleServiceImpl.class.getDeclaredField("timerConditionEvaluator");
+            Field evaluatorField = IotSceneRuleServiceImpl.class.getDeclaredField("timerConditionEvaluator");
             evaluatorField.setAccessible(true);
             evaluatorField.set(sceneRuleService, timerConditionEvaluator);
         } catch (Exception e) {
