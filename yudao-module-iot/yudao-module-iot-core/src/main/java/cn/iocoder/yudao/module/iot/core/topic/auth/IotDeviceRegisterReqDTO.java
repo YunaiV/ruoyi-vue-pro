@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.iot.core.topic.auth;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * IoT 设备动态注册 Request DTO

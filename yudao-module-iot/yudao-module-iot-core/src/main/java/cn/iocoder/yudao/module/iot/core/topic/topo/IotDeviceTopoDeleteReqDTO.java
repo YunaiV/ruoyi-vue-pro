@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.core.topic.topo;
 
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**

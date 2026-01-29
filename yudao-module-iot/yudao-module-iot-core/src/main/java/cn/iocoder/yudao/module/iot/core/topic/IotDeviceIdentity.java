@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.iot.core.topic;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * IoT 设备标识

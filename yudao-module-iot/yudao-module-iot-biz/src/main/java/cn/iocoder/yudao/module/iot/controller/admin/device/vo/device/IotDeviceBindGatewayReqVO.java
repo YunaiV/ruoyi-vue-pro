@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Schema(description = "管理后台 - IoT 设备绑定网关 Request VO")

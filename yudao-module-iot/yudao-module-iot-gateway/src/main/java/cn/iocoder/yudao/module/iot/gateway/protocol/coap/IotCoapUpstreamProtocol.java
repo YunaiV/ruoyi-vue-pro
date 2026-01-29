@@ -2,14 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.coap;
 
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthResource;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapRegisterHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapRegisterResource;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapUpstreamTopicResource;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapUpstreamHandler;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapResource;
@@ -17,6 +10,8 @@ import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.Configuration;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
 
 /**

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.core.topic.topo;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
