@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action.tcp;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkTcpConfig;
@@ -31,8 +32,6 @@ public class IotTcpClient {
     private final Integer connectTimeoutMs;
     private final Integer readTimeoutMs;
     private final Boolean ssl;
-    // TODO @puhui999：sslCertPath 是不是没在用？
-    private final String sslCertPath;
     private final String dataFormat;
 
     private Socket socket;
@@ -41,15 +40,13 @@ public class IotTcpClient {
     private final AtomicBoolean connected = new AtomicBoolean(false);
 
     public IotTcpClient(String host, Integer port, Integer connectTimeoutMs, Integer readTimeoutMs,
-                        Boolean ssl, String sslCertPath, String dataFormat) {
+                        Boolean ssl, String dataFormat) {
         this.host = host;
         this.port = port;
         this.connectTimeoutMs = connectTimeoutMs != null ? connectTimeoutMs : IotDataSinkTcpConfig.DEFAULT_CONNECT_TIMEOUT_MS;
         this.readTimeoutMs = readTimeoutMs != null ? readTimeoutMs : IotDataSinkTcpConfig.DEFAULT_READ_TIMEOUT_MS;
         this.ssl = ssl != null ? ssl : IotDataSinkTcpConfig.DEFAULT_SSL;
-        this.sslCertPath = sslCertPath;
-        // TODO @puhui999：可以使用 StrUtil.defaultIfBlank 方法简化
-        this.dataFormat = dataFormat != null ? dataFormat : IotDataSinkTcpConfig.DEFAULT_DATA_FORMAT;
+        this.dataFormat = ObjUtil.defaultIfBlank(dataFormat, IotDataSinkTcpConfig.DEFAULT_DATA_FORMAT);
     }
 
     /**

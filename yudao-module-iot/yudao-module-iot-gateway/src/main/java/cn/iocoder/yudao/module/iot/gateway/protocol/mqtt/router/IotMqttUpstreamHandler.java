@@ -1,18 +1,26 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.netty.handler.codec.mqtt.MqttConnectReturnCode;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.mqtt.MqttEndpoint;
@@ -20,6 +28,7 @@ import io.vertx.mqtt.MqttTopicSubscription;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * MQTT 上行消息处理器
@@ -28,6 +37,16 @@ import java.util.List;
  */
 @Slf4j
 public class IotMqttUpstreamHandler {
+
+    /**
+     * 默认编解码类型（MQTT 使用 Alink 协议）
+     */
+    private static final String DEFAULT_CODEC_TYPE = "Alink";
+
+    /**
+     * register 请求的 topic 后缀
+     */
+    private static final String REGISTER_TOPIC_SUFFIX = "/thing/auth/register";
 
     private final IotDeviceMessageService deviceMessageService;
 
@@ -84,20 +103,28 @@ public class IotMqttUpstreamHandler {
         });
 
         // 4. 设置消息处理器
-        endpoint.publishHandler(message -> {
+        endpoint.publishHandler(mqttMessage -> {
             try {
-                processMessage(clientId, message.topicName(), message.payload().getBytes());
+                // 4.1 根据 topic 判断是否为 register 请求
+                String topic = mqttMessage.topicName();
+                byte[] payload = mqttMessage.payload().getBytes();
+                if (topic.endsWith(REGISTER_TOPIC_SUFFIX)) {
+                    // register 请求：使用默认编解码器处理（设备可能未注册）
+                    processRegisterMessage(clientId, topic, payload, endpoint);
+                } else {
+                    // 业务请求：正常处理
+                    processMessage(clientId, topic, payload);
+                }
 
-                // 根据 QoS 级别发送相应的确认消息
-                if (message.qosLevel() == MqttQoS.AT_LEAST_ONCE) {
+                // 4.2 根据 QoS 级别发送相应的确认消息
+                if (mqttMessage.qosLevel() == MqttQoS.AT_LEAST_ONCE) {
                     // QoS 1: 发送 PUBACK 确认
-                    endpoint.publishAcknowledge(message.messageId());
-                } else if (message.qosLevel() == MqttQoS.EXACTLY_ONCE) {
+                    endpoint.publishAcknowledge(mqttMessage.messageId());
+                } else if (mqttMessage.qosLevel() == MqttQoS.EXACTLY_ONCE) {
                     // QoS 2: 发送 PUBREC 确认
-                    endpoint.publishReceived(message.messageId());
+                    endpoint.publishReceived(mqttMessage.messageId());
                 }
                 // QoS 0 无需确认
-
             } catch (Exception e) {
                 log.error("[handle][消息解码失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
                         clientId, connectionManager.getEndpointAddress(endpoint), e.getMessage());
@@ -160,10 +187,9 @@ public class IotMqttUpstreamHandler {
             return;
         }
 
+        // 3. 解码消息（使用从 topic 解析的 productKey 和 deviceName）
         String productKey = topicParts[2];
         String deviceName = topicParts[3];
-
-        // 3. 解码消息（使用从 topic 解析的 productKey 和 deviceName）
         try {
             IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(payload, productKey, deviceName);
             if (message == null) {
@@ -171,10 +197,9 @@ public class IotMqttUpstreamHandler {
                 return;
             }
 
+            // 4. 处理业务消息（认证已在连接时完成）
             log.info("[processMessage][收到设备消息，设备: {}.{}, 方法: {}]",
                     productKey, deviceName, message.getMethod());
-
-            // 4. 处理业务消息（认证已在连接时完成）
             handleBusinessRequest(message, productKey, deviceName);
         } catch (Exception e) {
             log.error("[processMessage][消息处理异常，客户端 ID: {}，主题: {}，错误: {}]",
@@ -214,7 +239,7 @@ public class IotMqttUpstreamHandler {
             }
 
             // 4. 获取设备信息
-            IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(username);
+            IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(username);
             if (deviceInfo == null) {
                 log.warn("[authenticateDevice][用户名格式不正确，客户端 ID: {}，用户名: {}]", clientId, username);
                 return false;
@@ -246,6 +271,186 @@ public class IotMqttUpstreamHandler {
     }
 
     /**
+     * 处理 register 消息（设备动态注册，使用默认编解码器）
+     *
+     * @param clientId 客户端 ID
+     * @param topic    主题
+     * @param payload  消息内容
+     * @param endpoint MQTT 连接端点
+     */
+    private void processRegisterMessage(String clientId, String topic, byte[] payload, MqttEndpoint endpoint) {
+        // 1.1 基础检查
+        if (ArrayUtil.isEmpty(payload)) {
+            return;
+        }
+        // 1.2 解析主题，获取 productKey 和 deviceName
+        String[] topicParts = topic.split("/");
+        if (topicParts.length < 4 || StrUtil.hasBlank(topicParts[2], topicParts[3])) {
+            log.warn("[processRegisterMessage][topic({}) 格式不正确]", topic);
+            return;
+        }
+        String productKey = topicParts[2];
+        String deviceName = topicParts[3];
+
+        // 2. 使用默认编解码器解码消息（设备可能未注册，无法获取 codecType）
+        IotDeviceMessage message;
+        try {
+            message = deviceMessageService.decodeDeviceMessage(payload, DEFAULT_CODEC_TYPE);
+            if (message == null) {
+                log.warn("[processRegisterMessage][消息解码失败，客户端 ID: {}，主题: {}]", clientId, topic);
+                return;
+            }
+        } catch (Exception e) {
+            log.error("[processRegisterMessage][消息解码异常，客户端 ID: {}，主题: {}，错误: {}]",
+                    clientId, topic, e.getMessage(), e);
+            return;
+        }
+
+        // 3. 处理设备动态注册请求
+        log.info("[processRegisterMessage][收到设备注册消息，设备: {}.{}, 方法: {}]",
+                productKey, deviceName, message.getMethod());
+        try {
+            handleRegisterRequest(message, productKey, deviceName, endpoint);
+        } catch (Exception e) {
+            log.error("[processRegisterMessage][消息处理异常，客户端 ID: {}，主题: {}，错误: {}]",
+                    clientId, topic, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 处理设备动态注册请求（一型一密，不需要 deviceSecret）
+     *
+     * @param message     消息信息
+     * @param productKey  产品 Key
+     * @param deviceName  设备名称
+     * @param endpoint    MQTT 连接端点
+     * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
+     */
+    private void handleRegisterRequest(IotDeviceMessage message, String productKey, String deviceName, MqttEndpoint endpoint) {
+        String clientId = endpoint.clientIdentifier();
+        try {
+            // 1. 解析注册参数
+            IotDeviceRegisterReqDTO params = parseRegisterParams(message.getParams());
+            if (params == null) {
+                log.warn("[handleRegisterRequest][注册参数解析失败，客户端 ID: {}]", clientId);
+                sendRegisterErrorResponse(endpoint, productKey, deviceName, message.getRequestId(), "注册参数不完整");
+                return;
+            }
+
+            // 2. 调用动态注册 API
+            CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);
+            if (result.isError()) {
+                log.warn("[handleRegisterRequest][注册失败，客户端 ID: {}，错误: {}]", clientId, result.getMsg());
+                sendRegisterErrorResponse(endpoint, productKey, deviceName, message.getRequestId(), result.getMsg());
+                return;
+            }
+
+            // 3. 发送成功响应（包含 deviceSecret）
+            sendRegisterSuccessResponse(endpoint, productKey, deviceName, message.getRequestId(), result.getData());
+            log.info("[handleRegisterRequest][注册成功，设备名: {}，客户端 ID: {}]",
+                    params.getDeviceName(), clientId);
+        } catch (Exception e) {
+            log.error("[handleRegisterRequest][注册处理异常，客户端 ID: {}]", clientId, e);
+            sendRegisterErrorResponse(endpoint, productKey, deviceName, message.getRequestId(), "注册处理异常");
+        }
+    }
+
+    /**
+     * 解析注册参数
+     *
+     * @param params 参数对象（通常为 Map 类型）
+     * @return 注册参数 DTO，解析失败时返回 null
+     */
+    @SuppressWarnings({"unchecked", "DuplicatedCode"})
+    private IotDeviceRegisterReqDTO parseRegisterParams(Object params) {
+        if (params == null) {
+            return null;
+        }
+        try {
+            // 参数默认为 Map 类型，直接转换
+            if (params instanceof Map) {
+                Map<String, Object> paramMap = (Map<String, Object>) params;
+                return new IotDeviceRegisterReqDTO()
+                        .setProductKey(MapUtil.getStr(paramMap, "productKey"))
+                        .setDeviceName(MapUtil.getStr(paramMap, "deviceName"))
+                        .setProductSecret(MapUtil.getStr(paramMap, "productSecret"));
+            }
+            // 如果已经是目标类型，直接返回
+            if (params instanceof IotDeviceRegisterReqDTO) {
+                return (IotDeviceRegisterReqDTO) params;
+            }
+
+            // 其他情况尝试 JSON 转换
+            return JsonUtils.convertObject(params, IotDeviceRegisterReqDTO.class);
+        } catch (Exception e) {
+            log.error("[parseRegisterParams][解析注册参数({})失败]", params, e);
+            return null;
+        }
+    }
+
+    /**
+     * 发送注册成功响应（包含 deviceSecret）
+     *
+     * @param endpoint     MQTT 连接端点
+     * @param productKey   产品 Key
+     * @param deviceName   设备名称
+     * @param requestId    请求 ID
+     * @param registerResp 注册响应
+     */
+    private void sendRegisterSuccessResponse(MqttEndpoint endpoint, String productKey, String deviceName,
+                                             String requestId, IotDeviceRegisterRespDTO registerResp) {
+        try {
+            // 1. 构建响应消息（参考 HTTP 返回格式，直接返回 IotDeviceRegisterRespDTO）
+            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId,
+                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerResp, 0, null);
+
+            // 2. 编码消息（使用默认编解码器，因为设备可能还未注册）
+            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
+
+            // 3. 构建响应主题并发送（格式：/sys/{productKey}/{deviceName}/thing/auth/register_reply）
+            String replyTopic = IotMqttTopicUtils.buildTopicByMethod(
+                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), productKey, deviceName, true);
+            endpoint.publish(replyTopic, io.vertx.core.buffer.Buffer.buffer(encodedData),
+                    MqttQoS.AT_LEAST_ONCE, false, false);
+            log.debug("[sendRegisterSuccessResponse][发送注册成功响应，主题: {}]", replyTopic);
+        } catch (Exception e) {
+            log.error("[sendRegisterSuccessResponse][发送注册成功响应异常，客户端 ID: {}]",
+                    endpoint.clientIdentifier(), e);
+        }
+    }
+
+    /**
+     * 发送注册错误响应
+     *
+     * @param endpoint     MQTT 连接端点
+     * @param productKey   产品 Key
+     * @param deviceName   设备名称
+     * @param requestId    请求 ID
+     * @param errorMessage 错误消息
+     */
+    private void sendRegisterErrorResponse(MqttEndpoint endpoint, String productKey, String deviceName,
+                                           String requestId, String errorMessage) {
+        try {
+            // 1. 构建响应消息
+            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId,
+                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), null, 400, errorMessage);
+
+            // 2. 编码消息（使用默认编解码器，因为设备可能还未注册）
+            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
+
+            // 3. 构建响应主题并发送（格式：/sys/{productKey}/{deviceName}/thing/auth/register_reply）
+            String replyTopic = IotMqttTopicUtils.buildTopicByMethod(
+                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), productKey, deviceName, true);
+            endpoint.publish(replyTopic, io.vertx.core.buffer.Buffer.buffer(encodedData),
+                    MqttQoS.AT_LEAST_ONCE, false, false);
+            log.debug("[sendRegisterErrorResponse][发送注册错误响应，主题: {}]", replyTopic);
+        } catch (Exception e) {
+            log.error("[sendRegisterErrorResponse][发送注册错误响应异常，客户端 ID: {}]",
+                    endpoint.clientIdentifier(), e);
+        }
+    }
+
+    /**
      * 处理业务请求
      */
     private void handleBusinessRequest(IotDeviceMessage message, String productKey, String deviceName) {
@@ -257,9 +462,7 @@ public class IotMqttUpstreamHandler {
     /**
      * 注册连接
      */
-    private void registerConnection(MqttEndpoint endpoint, IotDeviceRespDTO device,
-                                    String clientId) {
-
+    private void registerConnection(MqttEndpoint endpoint, IotDeviceRespDTO device, String clientId) {
         IotMqttConnectionManager.ConnectionInfo connectionInfo = new IotMqttConnectionManager.ConnectionInfo()
                 .setDeviceId(device.getId())
                 .setProductKey(device.getProductKey())
@@ -267,7 +470,6 @@ public class IotMqttUpstreamHandler {
                 .setClientId(clientId)
                 .setAuthenticated(true)
                 .setRemoteAddress(connectionManager.getEndpointAddress(endpoint));
-
         connectionManager.registerConnection(endpoint, device.getId(), connectionInfo);
     }
 
@@ -296,15 +498,13 @@ public class IotMqttUpstreamHandler {
                 IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
                 deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
                         connectionInfo.getDeviceName(), serverId);
-                log.info("[cleanupConnection][设备离线，设备 ID: {}，设备名称: {}]",
-                        connectionInfo.getDeviceId(), connectionInfo.getDeviceName());
+                log.info("[cleanupConnection][设备离线，设备 ID: {}，设备名称: {}]", connectionInfo.getDeviceId(), connectionInfo.getDeviceName());
             }
 
             // 注销连接
             connectionManager.unregisterConnection(endpoint);
         } catch (Exception e) {
-            log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]",
-                    endpoint.clientIdentifier(), e.getMessage());
+            log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]", endpoint.clientIdentifier(), e.getMessage());
         }
     }
 

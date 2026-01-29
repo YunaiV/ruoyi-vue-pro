@@ -3,11 +3,19 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -36,18 +44,6 @@ public interface IotDeviceService {
      * @param updateReqVO 更新信息
      */
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
-
-    // TODO @芋艿：先这么实现。未来看情况，要不要自己实现
-
-    /**
-     * 更新设备的所属网关
-     *
-     * @param id        编号
-     * @param gatewayId 网关设备 ID
-     */
-    default void updateDeviceGateway(Long id, Long gatewayId) {
-        updateDevice(new IotDeviceSaveReqVO().setId(id).setGatewayId(gatewayId));
-    }
 
     /**
      * 更新设备状态
@@ -270,5 +266,113 @@ public interface IotDeviceService {
      * @param firmwareId 固件编号
      */
     void updateDeviceFirmware(Long deviceId, Long firmwareId);
+
+    /**
+     * 更新设备定位信息（GeoLocation 上报时调用）
+     *
+     * @param device    设备信息（用于清除缓存）
+     * @param longitude 经度
+     * @param latitude  纬度
+     */
+    void updateDeviceLocation(IotDeviceDO device, BigDecimal longitude, BigDecimal latitude);
+
+    /**
+     * 获得有位置信息的设备列表
+     *
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceListByHasLocation();
+
+    // ========== 网关-拓扑管理（后台操作） ==========
+
+    /**
+     * 绑定子设备到网关
+     *
+     * @param subIds    子设备编号列表
+     * @param gatewayId 网关设备编号
+     */
+    void bindDeviceGateway(Collection<Long> subIds, Long gatewayId);
+
+    /**
+     * 解绑子设备与网关
+     *
+     * @param subIds    子设备编号列表
+     * @param gatewayId 网关设备编号
+     */
+    void unbindDeviceGateway(Collection<Long> subIds, Long gatewayId);
+
+    /**
+     * 获取未绑定网关的子设备分页
+     *
+     * @param pageReqVO 分页查询参数（仅使用 productId、deviceName、nickname）
+     * @return 子设备分页
+     */
+    PageResult<IotDeviceDO> getUnboundSubDevicePage(IotDevicePageReqVO pageReqVO);
+
+    /**
+     * 根据网关编号获取子设备列表
+     *
+     * @param gatewayId 网关设备编号
+     * @return 子设备列表
+     */
+    List<IotDeviceDO> getDeviceListByGatewayId(Long gatewayId);
+
+    // ========== 网关-拓扑管理（设备上报） ==========
+
+    /**
+     * 处理添加拓扑关系消息（网关设备上报）
+     *
+     * @param message       消息
+     * @param gatewayDevice 网关设备
+     * @return 成功添加的子设备列表
+     */
+    List<IotDeviceIdentity> handleTopoAddMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
+
+    /**
+     * 处理删除拓扑关系消息（网关设备上报）
+     *
+     * @param message       消息
+     * @param gatewayDevice 网关设备
+     * @return 成功删除的子设备列表
+     */
+    List<IotDeviceIdentity> handleTopoDeleteMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
+
+    /**
+     * 处理获取拓扑关系消息（网关设备上报）
+     *
+     * @param gatewayDevice 网关设备
+     * @return 拓扑关系响应
+     */
+    IotDeviceTopoGetRespDTO handleTopoGetMessage(IotDeviceDO gatewayDevice);
+
+    // ========== 设备动态注册 ==========
+
+    /**
+     * 直连/网关设备动态注册
+     *
+     * @param reqDTO 动态注册请求
+     * @return 注册结果（包含 DeviceSecret）
+     */
+    IotDeviceRegisterRespDTO registerDevice(@Valid IotDeviceRegisterReqDTO reqDTO);
+
+    /**
+     * 网关子设备动态注册
+     * <p>
+     * 与 {@link #handleSubDeviceRegisterMessage} 方法的区别：
+     * 该方法网关设备信息通过 reqDTO 参数传入，而 {@link #handleSubDeviceRegisterMessage} 方法通过 gatewayDevice 参数传入
+     *
+     * @param reqDTO 子设备注册请求（包含网关设备信息）
+     * @return 注册结果列表
+     */
+    List<IotSubDeviceRegisterRespDTO> registerSubDevices(@Valid IotSubDeviceRegisterFullReqDTO reqDTO);
+
+    /**
+     * 处理子设备动态注册消息（网关设备上报）
+     *
+     * @param message       消息
+     * @param gatewayDevice 网关设备
+     * @return 注册结果列表
+     */
+    List<IotSubDeviceRegisterRespDTO> handleSubDeviceRegisterMessage(IotDeviceMessage message, IotDeviceDO gatewayDevice);
 
 }

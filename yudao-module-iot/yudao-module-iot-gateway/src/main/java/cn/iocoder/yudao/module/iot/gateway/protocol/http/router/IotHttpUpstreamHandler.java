@@ -12,6 +12,8 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
+
 /**
  * IoT 网关 HTTP 协议的【上行】处理器
  *
@@ -40,6 +42,9 @@ public class IotHttpUpstreamHandler extends IotHttpAbstractHandler {
         String method = context.pathParam("*").replaceAll(StrPool.SLASH, StrPool.DOT);
 
         // 2.1 解析消息
+        if (context.body().buffer() == null) {
+            throw invalidParamException("请求体不能为空");
+        }
         byte[] bytes = context.body().buffer().getBytes();
         IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(bytes,
                 productKey, deviceName);

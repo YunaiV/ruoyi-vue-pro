@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager;
 
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +51,9 @@ public class IotTcpConnectionManager {
             connectionMap.remove(oldSocket);
         }
 
+        // 注册新连接
         connectionMap.put(socket, connectionInfo);
         deviceSocketMap.put(deviceId, socket);
-
         log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
                 deviceId, socket.remoteAddress(), connectionInfo.getProductKey(), connectionInfo.getDeviceName());
     }
@@ -64,12 +65,12 @@ public class IotTcpConnectionManager {
      */
     public void unregisterConnection(NetSocket socket) {
         ConnectionInfo connectionInfo = connectionMap.remove(socket);
-        if (connectionInfo != null) {
-            Long deviceId = connectionInfo.getDeviceId();
-            deviceSocketMap.remove(deviceId);
-            log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
-                    deviceId, socket.remoteAddress());
+        if (connectionInfo == null) {
+            return;
         }
+        Long deviceId = connectionInfo.getDeviceId();
+        deviceSocketMap.remove(deviceId);
+        log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, socket.remoteAddress());
     }
 
     /**
@@ -77,7 +78,7 @@ public class IotTcpConnectionManager {
      */
     public boolean isAuthenticated(NetSocket socket) {
         ConnectionInfo info = connectionMap.get(socket);
-        return info != null && info.isAuthenticated();
+        return info != null;
     }
 
     /**
@@ -95,17 +96,11 @@ public class IotTcpConnectionManager {
     }
 
     /**
-     * 检查设备是否在线
+     * 根据设备 ID 获取连接信息
      */
-    public boolean isDeviceOnline(Long deviceId) {
-        return deviceSocketMap.containsKey(deviceId);
-    }
-
-    /**
-     * 检查设备是否离线
-     */
-    public boolean isDeviceOffline(Long deviceId) {
-        return !isDeviceOnline(deviceId);
+    public ConnectionInfo getConnectionInfoByDeviceId(Long deviceId) {
+        NetSocket socket = deviceSocketMap.get(deviceId);
+        return socket != null ? connectionMap.get(socket) : null;
     }
 
     /**
@@ -119,7 +114,7 @@ public class IotTcpConnectionManager {
         }
 
         try {
-            socket.write(io.vertx.core.buffer.Buffer.buffer(data));
+            socket.write(Buffer.buffer(data));
             log.debug("[sendToDevice][发送消息成功，设备 ID: {}，数据长度: {} 字节]", deviceId, data.length);
             return true;
         } catch (Exception e) {
@@ -157,11 +152,6 @@ public class IotTcpConnectionManager {
          * 消息编解码类型（认证后确定）
          */
         private String codecType;
-        // TODO @haohao：有没可能不要 authenticated 字段，通过 deviceId 或者其他的？进一步简化，想的是哈。
-        /**
-         * 是否已认证
-         */
-        private boolean authenticated;
 
     }
 

@@ -93,6 +93,21 @@ public class IotGatewayProperties {
          */
         private MqttWsProperties mqttWs;
 
+        /**
+         * UDP 组件配置
+         */
+        private UdpProperties udp;
+
+        /**
+         * CoAP 组件配置
+         */
+        private CoapProperties coap;
+
+        /**
+         * WebSocket 组件配置
+         */
+        private WebSocketProperties websocket;
+
     }
 
     @Data
@@ -500,6 +515,131 @@ public class IotGatewayProperties {
             private String trustStorePassword;
 
         }
+
+    }
+
+    @Data
+    public static class UdpProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务端口（默认 8093）
+         */
+        private Integer port = 8093;
+
+        /**
+         * 接收缓冲区大小（默认 64KB）
+         */
+        private Integer receiveBufferSize = 65536;
+
+        /**
+         * 发送缓冲区大小（默认 64KB）
+         */
+        private Integer sendBufferSize = 65536;
+
+        /**
+         * 会话超时时间（毫秒，默认 60 秒）
+         * <p>
+         * 用于清理不活跃的设备地址映射
+         */
+        private Long sessionTimeoutMs = 60000L;
+
+        /**
+         * 会话清理间隔（毫秒，默认 30 秒）
+         */
+        private Long sessionCleanIntervalMs = 30000L;
+
+    }
+
+    @Data
+    public static class CoapProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务端口（CoAP 默认端口 5683）
+         */
+        @NotNull(message = "服务端口不能为空")
+        private Integer port = 5683;
+
+        /**
+         * 最大消息大小（字节）
+         */
+        @NotNull(message = "最大消息大小不能为空")
+        private Integer maxMessageSize = 1024;
+
+        /**
+         * ACK 超时时间（毫秒）
+         */
+        @NotNull(message = "ACK 超时时间不能为空")
+        private Integer ackTimeout = 2000;
+
+        /**
+         * 最大重传次数
+         */
+        @NotNull(message = "最大重传次数不能为空")
+        private Integer maxRetransmit = 4;
+
+    }
+
+    @Data
+    public static class WebSocketProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+
+        /**
+         * 服务器端口（默认：8094）
+         */
+        private Integer port = 8094;
+
+        /**
+         * WebSocket 路径（默认：/ws）
+         */
+        @NotEmpty(message = "WebSocket 路径不能为空")
+        private String path = "/ws";
+
+        /**
+         * 最大消息大小（字节，默认 64KB）
+         */
+        private Integer maxMessageSize = 65536;
+
+        /**
+         * 最大帧大小（字节，默认 64KB）
+         */
+        private Integer maxFrameSize = 65536;
+
+        /**
+         * 空闲超时时间（秒，默认 60）
+         */
+        private Integer idleTimeoutSeconds = 60;
+
+        /**
+         * 是否启用 SSL（wss://）
+         */
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL 证书路径
+         */
+        private String sslCertPath;
+
+        /**
+         * SSL 私钥路径
+         */
+        private String sslKeyPath;
 
     }
 

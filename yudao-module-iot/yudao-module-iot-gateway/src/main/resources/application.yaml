@@ -96,6 +96,16 @@ yudao:
           ssl-cert-path: "classpath:certs/client.jks"
           ssl-key-path: "classpath:certs/client.jks"
         # ====================================
+        # 针对引入的 UDP 组件的配置
+        # ====================================
+        udp:
+          enabled: false                       # 是否启用 UDP
+          port: 8093                           # UDP 服务端口
+          receive-buffer-size: 65536           # 接收缓冲区大小（字节，默认 64KB）
+          send-buffer-size: 65536              # 发送缓冲区大小（字节，默认 64KB）
+          session-timeout-ms: 60000            # 会话超时时间（毫秒，默认 60 秒）
+          session-clean-interval-ms: 30000     # 会话清理间隔（毫秒，默认 30 秒）
+        # ====================================
         # 针对引入的 MQTT 组件的配置
         # ====================================
         mqtt:
@@ -105,18 +115,25 @@ yudao:
           connect-timeout-seconds: 60
           ssl-enabled: false
         # ====================================
-        # 针对引入的 MQTT WebSocket 组件的配置
+        # 针对引入的 CoAP 组件的配置
         # ====================================
-        mqtt-ws:
-          enabled: false                        # 是否启用 MQTT WebSocket
-          port: 8083                           # WebSocket 服务端口
-          path: /mqtt                          # WebSocket 路径
-          max-message-size: 8192               # 最大消息大小（字节）
-          max-frame-size: 65536                # 最大帧大小（字节）
-          connect-timeout-seconds: 60          # 连接超时时间（秒）
-          keep-alive-timeout-seconds: 300      # 保持连接超时时间（秒）
+        coap:
+          enabled: false                       # 是否启用 CoAP 协议
+          port: 5683                           # CoAP 服务端口（默认 5683）
+          max-message-size: 1024               # 最大消息大小（字节）
+          ack-timeout: 2000                    # ACK 超时时间（毫秒）
+          max-retransmit: 4                    # 最大重传次数
+        # ====================================
+        # 针对引入的 WebSocket 组件的配置
+        # ====================================
+        websocket:
+          enabled: false                       # 是否启用 WebSocket 协议
+          port: 8094                           # WebSocket 服务端口（默认 8094）
+          path: /ws                            # WebSocket 路径（默认 /ws）
+          max-message-size: 65536              # 最大消息大小（字节，默认 64KB）
+          max-frame-size: 65536                # 最大帧大小（字节，默认 64KB）
+          idle-timeout-seconds: 60             # 空闲超时时间（秒，默认 60）
           ssl-enabled: false                   # 是否启用 SSL（wss://）
-          sub-protocol: mqtt                   # WebSocket 子协议
 
 --- #################### 日志相关配置 ####################
 
@@ -137,6 +154,8 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
     # 根日志级别
     root: INFO
 
