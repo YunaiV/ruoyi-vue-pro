@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -23,13 +26,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 @Tag(name = "管理后台 - IoT 设备")
 @RestController
@@ -39,6 +41,8 @@ public class IotDeviceController {
 
     @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotProductService productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备")
@@ -46,6 +50,7 @@ public class IotDeviceController {
     public CommonResult<Long> createDevice(@Valid @RequestBody IotDeviceSaveReqVO createReqVO) {
         return success(deviceService.createDevice(createReqVO));
     }
+
 
     @PutMapping("/update")
     @Operation(summary = "更新设备")
@@ -55,7 +60,57 @@ public class IotDeviceController {
         return success(true);
     }
 
-    // TODO @芋艿：参考阿里云：1）绑定网关；2）解绑网关
+    @PutMapping("/bind-gateway")
+    @Operation(summary = "绑定子设备到网关")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
+    public CommonResult<Boolean> bindDeviceGateway(@Valid @RequestBody IotDeviceBindGatewayReqVO reqVO) {
+        deviceService.bindDeviceGateway(reqVO.getSubIds(), reqVO.getGatewayId());
+        return success(true);
+    }
+
+    @PutMapping("/unbind-gateway")
+    @Operation(summary = "解绑子设备与网关")
+    @PreAuthorize("@ss.hasPermission('iot:device:update')")
+    public CommonResult<Boolean> unbindDeviceGateway(@Valid @RequestBody IotDeviceUnbindGatewayReqVO reqVO) {
+        deviceService.unbindDeviceGateway(reqVO.getSubIds(), reqVO.getGatewayId());
+        return success(true);
+    }
+
+    @GetMapping("/sub-device-list")
+    @Operation(summary = "获取网关的子设备列表")
+    @Parameter(name = "gatewayId", description = "网关设备编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<List<IotDeviceRespVO>> getSubDeviceList(@RequestParam("gatewayId") Long gatewayId) {
+        List<IotDeviceDO> list = deviceService.getDeviceListByGatewayId(gatewayId);
+        if (CollUtil.isEmpty(list)) {
+            return success(Collections.emptyList());
+        }
+
+        // 补充产品名称
+        Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
+        return success(convertList(list, device -> {
+            IotDeviceRespVO respVO = BeanUtils.toBean(device, IotDeviceRespVO.class);
+            MapUtils.findAndThen(productMap, device.getProductId(),
+                    product -> respVO.setProductName(product.getName()));
+            return respVO;
+        }));
+    }
+
+    @GetMapping("/unbound-sub-device-page")
+    @Operation(summary = "获取未绑定网关的子设备分页")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<PageResult<IotDeviceRespVO>> getUnboundSubDevicePage(@Valid IotDevicePageReqVO pageReqVO) {
+        PageResult<IotDeviceDO> pageResult = deviceService.getUnboundSubDevicePage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+
+        // 补充产品名称
+        Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
+        PageResult<IotDeviceRespVO> result = BeanUtils.toBean(pageResult, IotDeviceRespVO.class, device ->
+                MapUtils.findAndThen(productMap, device.getProductId(), product -> device.setProductName(product.getName())));
+        return success(result);
+    }
 
     @PutMapping("/update-group")
     @Operation(summary = "更新设备分组")
@@ -136,6 +191,26 @@ public class IotDeviceController {
                         .setProductId(device.getProductId()).setState(device.getState())));
     }
 
+    @GetMapping("/location-list")
+    @Operation(summary = "获取设备位置列表", description = "获取有经纬度信息的设备列表，用于地图展示")
+    @PreAuthorize("@ss.hasPermission('iot:device:query')")
+    public CommonResult<List<IotDeviceRespVO>> getDeviceLocationList() {
+        // 1. 获取有位置信息的设备列表
+        List<IotDeviceDO> devices = deviceService.getDeviceListByHasLocation();
+        if (CollUtil.isEmpty(devices)) {
+            return success(Collections.emptyList());
+        }
+
+        // 2. 转换并返回
+        Map<Long, IotProductDO> productMap = convertMap(productService.getProductList(), IotProductDO::getId);
+        return success(convertList(devices, device -> {
+            IotDeviceRespVO respVO = BeanUtils.toBean(device, IotDeviceRespVO.class);
+            MapUtils.findAndThen(productMap, device.getProductId(),
+                    product -> respVO.setProductName(product.getName()));
+            return respVO;
+        }));
+    }
+
     @PostMapping("/import")
     @Operation(summary = "导入设备")
     @PreAuthorize("@ss.hasPermission('iot:device:import')")
@@ -153,10 +228,9 @@ public class IotDeviceController {
         // 手动创建导出 demo
         List<IotDeviceImportExcelVO> list = Arrays.asList(
                 IotDeviceImportExcelVO.builder().deviceName("温度传感器001").parentDeviceName("gateway110")
-                        .productKey("1de24640dfe").groupNames("灰度分组,生产分组")
-                        .locationType(IotLocationTypeEnum.IP.getType()).build(),
+                        .productKey("1de24640dfe").groupNames("灰度分组,生产分组").build(),
                 IotDeviceImportExcelVO.builder().deviceName("biubiu").productKey("YzvHxd4r67sT4s2B")
-                        .groupNames("").locationType(IotLocationTypeEnum.MANUAL.getType()).build());
+                        .groupNames("").build());
         // 输出
         ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
     }

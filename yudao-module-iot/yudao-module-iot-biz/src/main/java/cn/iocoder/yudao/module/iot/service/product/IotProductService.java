@@ -106,6 +106,14 @@ public interface IotProductService {
     List<IotProductDO> getProductList();
 
     /**
+     * 根据设备类型获得产品列表
+     *
+     * @param deviceType 设备类型（可选）
+     * @return 产品列表
+     */
+    List<IotProductDO> getProductList(@Nullable Integer deviceType);
+
+    /**
      * 获得产品数量
      *
      * @param createTime 创建时间，如果为空，则统计所有产品数量

@@ -23,13 +23,14 @@ import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherManager;
 import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotSceneRuleTimerHandler;
+import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotTimerConditionEvaluator;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -62,6 +63,8 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     private List<IotSceneRuleAction> sceneRuleActions;
     @Resource
     private IotSceneRuleTimerHandler timerHandler;
+    @Resource
+    private IotTimerConditionEvaluator timerConditionEvaluator;
 
     @Override
     @CacheEvict(value = RedisKeyConstants.SCENE_RULE_LIST, allEntries = true)
@@ -222,16 +225,96 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
             return;
         }
         // 1.2 判断是否有定时触发器，避免脏数据
-        IotSceneRuleDO.Trigger config = CollUtil.findOne(scene.getTriggers(),
+        IotSceneRuleDO.Trigger timerTrigger = CollUtil.findOne(scene.getTriggers(),
                 trigger -> ObjUtil.equals(trigger.getType(), IotSceneRuleTriggerTypeEnum.TIMER.getType()));
-        if (config == null) {
+        if (timerTrigger == null) {
             log.error("[executeSceneRuleByTimer][规则场景({}) 不存在定时触发器]", scene);
             return;
         }
 
-        // 2. 执行规则场景
+        // 2. 评估条件组（新增逻辑）
+        log.info("[executeSceneRuleByTimer][规则场景({}) 开始评估条件组]", id);
+        if (!evaluateTimerConditionGroups(scene, timerTrigger)) {
+            log.info("[executeSceneRuleByTimer][规则场景({}) 条件组不满足，跳过执行]", id);
+            return;
+        }
+        log.info("[executeSceneRuleByTimer][规则场景({}) 条件组评估通过，准备执行动作]", id);
+
+        // 3. 执行规则场景
         TenantUtils.execute(scene.getTenantId(),
                 () -> executeSceneRuleAction(null, ListUtil.toList(scene)));
+    }
+
+    /**
+     * 评估定时触发器的条件组
+     *
+     * @param scene   场景规则
+     * @param trigger 定时触发器
+     * @return 是否满足条件
+     */
+    private boolean evaluateTimerConditionGroups(IotSceneRuleDO scene, IotSceneRuleDO.Trigger trigger) {
+        // 1. 如果没有条件组，直接返回 true（直接执行动作）
+        if (CollUtil.isEmpty(trigger.getConditionGroups())) {
+            log.debug("[evaluateTimerConditionGroups][规则场景({}) 无条件组配置，直接执行]", scene.getId());
+            return true;
+        }
+
+        // 2. 条件组之间是 OR 关系，任一条件组满足即可
+        for (List<IotSceneRuleDO.TriggerCondition> conditionGroup : trigger.getConditionGroups()) {
+            if (evaluateSingleConditionGroup(scene, conditionGroup)) {
+                log.debug("[evaluateTimerConditionGroups][规则场景({}) 条件组匹配成功]", scene.getId());
+                return true;
+            }
+        }
+
+        // 3. 所有条件组都不满足
+        log.debug("[evaluateTimerConditionGroups][规则场景({}) 所有条件组都不满足]", scene.getId());
+        return false;
+    }
+
+    /**
+     * 评估单个条件组
+     *
+     * @param scene          场景规则
+     * @param conditionGroup 条件组
+     * @return 是否满足条件
+     */
+    private boolean evaluateSingleConditionGroup(IotSceneRuleDO scene,
+                                                 List<IotSceneRuleDO.TriggerCondition> conditionGroup) {
+        // 1. 空条件组视为满足
+        if (CollUtil.isEmpty(conditionGroup)) {
+            return true;
+        }
+
+        // 2. 条件之间是 AND 关系，所有条件都必须满足
+        for (IotSceneRuleDO.TriggerCondition condition : conditionGroup) {
+            if (!evaluateTimerCondition(scene, condition)) {
+                log.debug("[evaluateSingleConditionGroup][规则场景({}) 条件({}) 不满足]",
+                        scene.getId(), condition);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 评估单个条件（定时触发器专用）
+     *
+     * @param scene     场景规则
+     * @param condition 条件
+     * @return 是否满足条件
+     */
+    private boolean evaluateTimerCondition(IotSceneRuleDO scene, IotSceneRuleDO.TriggerCondition condition) {
+        try {
+            boolean result = timerConditionEvaluator.evaluate(condition);
+            log.debug("[evaluateTimerCondition][规则场景({}) 条件类型({}) 评估结果: {}]",
+                    scene.getId(), condition.getType(), result);
+            return result;
+        } catch (Exception e) {
+            log.error("[evaluateTimerCondition][规则场景({}) 条件评估异常]", scene.getId(), e);
+            return false;
+        }
     }
 
     /**

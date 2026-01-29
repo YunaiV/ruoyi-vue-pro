@@ -229,4 +229,53 @@ public class JsonUtils {
         return JSONUtil.isTypeJSONObject(str);
     }
 
+    /**
+     * 将 Object 转换为目标类型
+     * <p>
+     * 避免先转 jsonString 再 parseObject 的性能损耗
+     *
+     * @param obj   源对象（可以是 Map、POJO 等）
+     * @param clazz 目标类型
+     * @return 转换后的对象
+     */
+    public static <T> T convertObject(Object obj, Class<T> clazz) {
+        if (obj == null) {
+            return null;
+        }
+        if (clazz.isInstance(obj)) {
+            return clazz.cast(obj);
+        }
+        return objectMapper.convertValue(obj, clazz);
+    }
+
+    /**
+     * 将 Object 转换为目标类型（支持泛型）
+     *
+     * @param obj           源对象
+     * @param typeReference 目标类型引用
+     * @return 转换后的对象
+     */
+    public static <T> T convertObject(Object obj, TypeReference<T> typeReference) {
+        if (obj == null) {
+            return null;
+        }
+        return objectMapper.convertValue(obj, typeReference);
+    }
+
+    /**
+     * 将 Object 转换为 List 类型
+     * <p>
+     * 避免先转 jsonString 再 parseArray 的性能损耗
+     *
+     * @param obj   源对象（可以是 List、数组等）
+     * @param clazz 目标元素类型
+     * @return 转换后的 List
+     */
+    public static <T> List<T> convertList(Object obj, Class<T> clazz) {
+        if (obj == null) {
+            return new ArrayList<>();
+        }
+        return objectMapper.convertValue(obj, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+    }
+
 }

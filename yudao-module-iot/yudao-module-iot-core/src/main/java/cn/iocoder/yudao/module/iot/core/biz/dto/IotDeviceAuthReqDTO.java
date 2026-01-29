@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.iot.core.biz.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
+import lombok.NoArgsConstructor;
 
 /**
  * IoT 设备认证 Request DTO
@@ -10,6 +11,8 @@ import javax.validation.constraints.NotEmpty;
  * @author 芋道源码
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class IotDeviceAuthReqDTO {
 
     /**

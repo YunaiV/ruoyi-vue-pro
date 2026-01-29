@@ -271,6 +271,10 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
             if (ObjUtil.notEqual(action.getType(), dataSink.getType())) {
                 return;
             }
+            if (CommonStatusEnum.isDisable(dataSink.getStatus())) {
+                log.warn("[executeDataRuleAction][消息({}) 数据目的({}) 状态为禁用]", message.getId(), dataSink.getId());
+                return;
+            }
             try {
                 action.execute(message, dataSink);
                 log.info("[executeDataRuleAction][消息({}) 数据目的({}) 执行成功]", message.getId(), dataSink.getId());

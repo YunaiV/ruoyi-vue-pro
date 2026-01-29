@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.product;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
@@ -53,19 +54,22 @@ public class IotProductServiceImpl implements IotProductService {
 
         // 2. 插入
         IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class)
-                .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus());
+                .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus())
+                .setProductSecret(generateProductSecret());
         productMapper.insert(product);
         return product.getId();
+    }
+
+    private String generateProductSecret() {
+        return IdUtil.fastSimpleUUID();
     }
 
     @Override
     @CacheEvict(value = RedisKeyConstants.PRODUCT, key = "#updateReqVO.id")
     public void updateProduct(IotProductSaveReqVO updateReqVO) {
         updateReqVO.setProductKey(null); // 不更新产品标识
-        // 1.1 校验存在
-        IotProductDO iotProductDO = validateProductExists(updateReqVO.getId());
-        // 1.2 发布状态不可更新
-        validateProductStatus(iotProductDO);
+        // 1. 校验存在
+        validateProductExists(updateReqVO.getId());
 
         // 2. 更新
         IotProductDO updateObj = BeanUtils.toBean(updateReqVO, IotProductDO.class);
@@ -155,6 +159,11 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public List<IotProductDO> getProductList() {
         return productMapper.selectList();
+    }
+
+    @Override
+    public List<IotProductDO> getProductList(Integer deviceType) {
+        return productMapper.selectList(deviceType);
     }
 
     @Override

@@ -7,10 +7,9 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsD
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import jakarta.validation.constraints.NotNull;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -75,7 +74,7 @@ public interface IotDeviceMessageService {
      */
     List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(
             @NotNull(message = "设备编号不能为空") Long deviceId,
-            @NotEmpty(message = "请求编号不能为空") List<String> requestIds,
+            List<String> requestIds,
             Boolean reply);
 
     /**

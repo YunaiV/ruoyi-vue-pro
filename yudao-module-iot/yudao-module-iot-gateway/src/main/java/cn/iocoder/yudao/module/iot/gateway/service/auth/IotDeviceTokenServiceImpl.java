@@ -5,6 +5,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public class IotDeviceTokenServiceImpl implements IotDeviceTokenService {
     }
 
     @Override
-    public IotDeviceAuthUtils.DeviceInfo verifyToken(String token) {
+    public IotDeviceIdentity verifyToken(String token) {
         Assert.notBlank(token, "token 不能为空");
         // 校验 JWT Token
         boolean verify = JWTUtil.verify(token, gatewayProperties.getToken().getSecret().getBytes());
@@ -68,11 +69,11 @@ public class IotDeviceTokenServiceImpl implements IotDeviceTokenService {
         String deviceName = payload.getStr("deviceName");
         Assert.notBlank(productKey, "productKey 不能为空");
         Assert.notBlank(deviceName, "deviceName 不能为空");
-        return new IotDeviceAuthUtils.DeviceInfo().setProductKey(productKey).setDeviceName(deviceName);
+        return new IotDeviceIdentity(productKey, deviceName);
     }
 
     @Override
-    public IotDeviceAuthUtils.DeviceInfo parseUsername(String username) {
+    public IotDeviceIdentity parseUsername(String username) {
         return IotDeviceAuthUtils.parseUsername(username);
     }
 

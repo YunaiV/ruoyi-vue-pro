@@ -1,16 +1,12 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import cn.idev.excel.annotation.ExcelProperty;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.iot.enums.product.IotLocationTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 /**
  * 设备 Excel 导入 VO
@@ -35,10 +31,5 @@ public class IotDeviceImportExcelVO {
 
     @ExcelProperty("设备分组")
     private String groupNames;
-
-    @ExcelProperty("上报方式(1:IP 定位， 2:设备上报，3:手动定位)")
-    @NotNull(message = "上报方式不能为空")
-    @InEnum(IotLocationTypeEnum.class)
-    private Integer locationType;
 
 }

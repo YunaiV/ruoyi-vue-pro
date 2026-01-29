@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 
 /**
- * TCP 二进制格式 {@link IotDeviceMessage} 编解码器
+ * TCP/UDP 二进制格式 {@link IotDeviceMessage} 编解码器
  * <p>
  * 二进制协议格式（所有数值使用大端序）：
  *

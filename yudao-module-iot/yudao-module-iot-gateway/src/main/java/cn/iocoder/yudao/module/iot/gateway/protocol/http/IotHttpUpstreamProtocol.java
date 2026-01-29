@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpAuthHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpRegisterHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpRegisterSubHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpUpstreamHandler;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -23,31 +24,36 @@ import javax.annotation.PreDestroy;
  * @author 芋道源码
  */
 @Slf4j
-public class IotHttpUpstreamProtocol extends AbstractVerticle {
+public class IotHttpUpstreamProtocol {
 
     private final IotGatewayProperties.HttpProperties httpProperties;
+
+    private final Vertx vertx;
 
     private HttpServer httpServer;
 
     @Getter
     private final String serverId;
 
-    public IotHttpUpstreamProtocol(IotGatewayProperties.HttpProperties httpProperties) {
+    public IotHttpUpstreamProtocol(IotGatewayProperties.HttpProperties httpProperties, Vertx vertx) {
         this.httpProperties = httpProperties;
+        this.vertx = vertx;
         this.serverId = IotDeviceMessageUtils.generateServerId(httpProperties.getServerPort());
     }
 
-    @Override
     @PostConstruct
     public void start() {
         // 创建路由
-        Vertx vertx = Vertx.vertx();
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
 
         // 创建处理器，添加路由处理器
         IotHttpAuthHandler authHandler = new IotHttpAuthHandler(this);
         router.post(IotHttpAuthHandler.PATH).handler(authHandler);
+        IotHttpRegisterHandler registerHandler = new IotHttpRegisterHandler();
+        router.post(IotHttpRegisterHandler.PATH).handler(registerHandler);
+        IotHttpRegisterSubHandler registerSubHandler = new IotHttpRegisterSubHandler();
+        router.post(IotHttpRegisterSubHandler.PATH).handler(registerSubHandler);
         IotHttpUpstreamHandler upstreamHandler = new IotHttpUpstreamHandler(this);
         router.post(IotHttpUpstreamHandler.PATH).handler(upstreamHandler);
 
@@ -71,7 +77,6 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
         }
     }
 
-    @Override
     @PreDestroy
     public void stop() {
         if (httpServer != null) {
