@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2025.12-SNAPSHOT</revision>
+        <revision>2026.01-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.5.9</spring.boot.version>
