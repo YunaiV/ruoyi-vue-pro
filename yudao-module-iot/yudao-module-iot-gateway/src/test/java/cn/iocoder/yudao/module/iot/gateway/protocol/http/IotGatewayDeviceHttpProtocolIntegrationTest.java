@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpResponse;
@@ -288,7 +289,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO();
         params.setProperties(gatewayProperties);
         params.setEvents(gatewayEvents);
-        params.setSubDevices(List.of(subDeviceData));
+        params.setSubDevices(ListUtil.of(subDeviceData));
         String payload = JsonUtils.toJsonString(MapUtil.builder()
                 .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod())

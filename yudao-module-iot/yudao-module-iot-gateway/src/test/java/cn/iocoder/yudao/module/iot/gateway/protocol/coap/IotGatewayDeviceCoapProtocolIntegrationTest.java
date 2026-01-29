@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.coap;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -344,7 +344,7 @@ public class IotGatewayDeviceCoapProtocolIntegrationTest {
         IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO();
         params.setProperties(gatewayProperties);
         params.setEvents(gatewayEvents);
-        params.setSubDevices(List.of(subDeviceData));
+        params.setSubDevices(ListUtil.of(subDeviceData));
         String payload = JsonUtils.toJsonString(MapUtil.builder()
                 .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod())

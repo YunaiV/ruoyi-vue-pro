@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
@@ -350,7 +351,7 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
         IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO();
         params.setProperties(gatewayProperties);
         params.setEvents(gatewayEvents);
-        params.setSubDevices(List.of(subDeviceData));
+        params.setSubDevices(ListUtil.of(subDeviceData));
         IotDeviceMessage request = IotDeviceMessage.of(
                 IdUtil.fastSimpleUUID(),
                 IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod(),

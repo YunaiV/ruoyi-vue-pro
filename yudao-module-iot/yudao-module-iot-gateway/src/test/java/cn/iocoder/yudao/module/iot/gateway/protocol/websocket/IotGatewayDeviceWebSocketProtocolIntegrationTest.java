@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -352,7 +352,7 @@ public class IotGatewayDeviceWebSocketProtocolIntegrationTest {
         IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO();
         params.setProperties(gatewayProperties);
         params.setEvents(gatewayEvents);
-        params.setSubDevices(List.of(subDeviceData));
+        params.setSubDevices(ListUtil.of(subDeviceData));
         IotDeviceMessage request = IotDeviceMessage.of(
                 IdUtil.fastSimpleUUID(),
                 IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod(),
