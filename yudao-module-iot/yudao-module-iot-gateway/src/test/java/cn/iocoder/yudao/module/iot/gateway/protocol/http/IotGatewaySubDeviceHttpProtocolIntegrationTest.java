@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -94,9 +93,7 @@ public class IotGatewaySubDeviceHttpProtocolIntegrationTest {
         String url = String.format("http://%s:%d/topic/sys/%s/%s/thing/property/post",
                 SERVER_HOST, SERVER_PORT, PRODUCT_KEY, DEVICE_NAME);
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())
-                .put("version", "1.0")
                 .put("params", IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
                         .put("power", 100)
                         .put("status", "online")
@@ -130,9 +127,7 @@ public class IotGatewaySubDeviceHttpProtocolIntegrationTest {
         String url = String.format("http://%s:%d/topic/sys/%s/%s/thing/event/post",
                 SERVER_HOST, SERVER_PORT, PRODUCT_KEY, DEVICE_NAME);
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.EVENT_POST.getMethod())
-                .put("version", "1.0")
                 .put("params", IotDeviceEventPostReqDTO.of(
                         "alarm",
                         MapUtil.<String, Object>builder()
