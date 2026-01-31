@@ -1,13 +1,15 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
-import io.vertx.core.json.JsonObject;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpAbstractHandler;
 import io.vertx.ext.web.RoutingContext;
+import lombok.Data;
 
 import java.util.List;
 
@@ -39,29 +41,32 @@ public class IotHttpRegisterSubHandler extends IotHttpAbstractHandler {
 
     @Override
     public CommonResult<Object> handle0(RoutingContext context) {
-        // 1. 解析通用参数
+        // 1.1 解析通用参数
         String productKey = context.pathParam("productKey");
         String deviceName = context.pathParam("deviceName");
-
-        // 2. 解析子设备列表
-        JsonObject body = context.body().asJsonObject();
-        if (body == null) {
-            throw invalidParamException("请求体不能为空");
-        }
-        if (body.getJsonArray("params") == null) {
+        // 1.2 解析子设备列表
+        SubDeviceRegisterRequest request = deserializeRequest(context, SubDeviceRegisterRequest.class);
+        if (CollUtil.isEmpty(request.getParams())) {
             throw invalidParamException("params 不能为空");
         }
-        List<cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO> subDevices = JsonUtils.parseArray(
-                body.getJsonArray("params").toString(), cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterReqDTO.class);
 
-        // 3. 调用子设备动态注册
+        // 2. 调用子设备动态注册
         IotSubDeviceRegisterFullReqDTO reqDTO = new IotSubDeviceRegisterFullReqDTO()
-                .setGatewayProductKey(productKey).setGatewayDeviceName(deviceName).setSubDevices(subDevices);
+                .setGatewayProductKey(productKey)
+                .setGatewayDeviceName(deviceName)
+                .setSubDevices(request.getParams());
         CommonResult<List<IotSubDeviceRegisterRespDTO>> result = deviceApi.registerSubDevices(reqDTO);
         result.checkError();
 
-        // 4. 返回结果
+        // 3. 返回结果
         return success(result.getData());
+    }
+
+    @Data
+    public static class SubDeviceRegisterRequest {
+
+        private List<IotSubDeviceRegisterReqDTO> params;
+
     }
 
 }

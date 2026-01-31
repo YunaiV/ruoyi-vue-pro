@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.udp;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager.IotUdpSessionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.router.IotUdpUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
@@ -30,7 +32,9 @@ import java.util.List;
  * @author 芋道源码
  */
 @Slf4j
-public class IotUdpUpstreamProtocol {
+public class IotUdpUpstreamProtocol implements IotProtocol {
+
+    private static final String ID = "udp";
 
     private final IotGatewayProperties.UdpProperties udpProperties;
 
@@ -55,6 +59,8 @@ public class IotUdpUpstreamProtocol {
 
     private IotUdpUpstreamHandler upstreamHandler;
 
+    private volatile boolean running = false;
+
     public IotUdpUpstreamProtocol(IotGatewayProperties.UdpProperties udpProperties,
                                   IotDeviceService deviceService,
                                   IotDeviceMessageService messageService,
@@ -68,6 +74,17 @@ public class IotUdpUpstreamProtocol {
         this.serverId = IotDeviceMessageUtils.generateServerId(udpProperties.getPort());
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public IotProtocolTypeEnum getType() {
+        return IotProtocolTypeEnum.UDP;
+    }
+
+    @Override
     @PostConstruct
     public void start() {
         // 1. 初始化上行消息处理器
@@ -90,6 +107,7 @@ public class IotUdpUpstreamProtocol {
             }
             // 设置数据包处理器
             udpSocket.handler(packet -> upstreamHandler.handle(packet, udpSocket));
+            running = true;
             log.info("[start][IoT 网关 UDP 协议启动成功，端口：{}，接收缓冲区：{} 字节，发送缓冲区：{} 字节]",
                     udpProperties.getPort(), udpProperties.getReceiveBufferSize(),
                     udpProperties.getSendBufferSize());
@@ -99,6 +117,7 @@ public class IotUdpUpstreamProtocol {
         });
     }
 
+    @Override
     @PreDestroy
     public void stop() {
         // 1. 取消会话清理定时器
@@ -112,11 +131,17 @@ public class IotUdpUpstreamProtocol {
         if (udpSocket != null) {
             try {
                 udpSocket.close().result();
+                running = false;
                 log.info("[stop][IoT 网关 UDP 协议已停止]");
             } catch (Exception e) {
                 log.error("[stop][IoT 网关 UDP 协议停止失败]", e);
             }
         }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
     /**

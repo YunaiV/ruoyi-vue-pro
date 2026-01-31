@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolManager;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxAuthEventProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
@@ -15,12 +15,15 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttDownstrea
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router.IotTcpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager.IotUdpSessionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.router.IotUdpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.router.IotWebSocketDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
@@ -31,35 +34,22 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 @EnableConfigurationProperties(IotGatewayProperties.class)
 @Slf4j
 public class IotGatewayConfiguration {
 
-    /**
-     * IoT 网关 HTTP 协议配置类
-     */
-    @Configuration
-    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.http", name = "enabled", havingValue = "true")
-    @Slf4j
-    public static class HttpProtocolConfiguration {
+    @Bean
+    public IotMessageSerializerManager iotMessageSerializerManager() {
+        return new IotMessageSerializerManager();
+    }
 
-        @Bean(name = "httpVertx", destroyMethod = "close")
-        public Vertx httpVertx() {
-            return Vertx.vertx();
-        }
-
-        @Bean
-        public IotHttpUpstreamProtocol iotHttpUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                               @Qualifier("httpVertx") Vertx httpVertx) {
-            return new IotHttpUpstreamProtocol(gatewayProperties.getProtocol().getHttp(), httpVertx);
-        }
-
-        @Bean
-        public IotHttpDownstreamSubscriber iotHttpDownstreamSubscriber(IotHttpUpstreamProtocol httpUpstreamProtocol,
-                IotMessageBus messageBus) {
-            return new IotHttpDownstreamSubscriber(httpUpstreamProtocol, messageBus);
-        }
+    @Bean
+    public IotProtocolManager iotProtocolManager(IotGatewayProperties gatewayProperties,
+                                                 IotMessageSerializerManager serializerManager,
+                                                 IotMessageBus messageBus) {
+        return new IotProtocolManager(gatewayProperties, serializerManager, messageBus);
     }
 
     /**
@@ -118,11 +108,16 @@ public class IotGatewayConfiguration {
         }
 
         @Bean
+        public IotTcpDownstreamHandler iotTcpDownstreamHandler(IotDeviceMessageService messageService,
+                                                               IotTcpConnectionManager connectionManager) {
+            return new IotTcpDownstreamHandler(messageService, connectionManager);
+        }
+
+        @Bean
         public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol protocolHandler,
-                                                                     IotDeviceMessageService messageService,
-                                                                     IotTcpConnectionManager connectionManager,
+                                                                     IotTcpDownstreamHandler downstreamHandler,
                                                                      IotMessageBus messageBus) {
-            return new IotTcpDownstreamSubscriber(protocolHandler, messageService, connectionManager, messageBus);
+            return new IotTcpDownstreamSubscriber(protocolHandler, downstreamHandler, messageBus);
         }
 
     }
@@ -188,11 +183,17 @@ public class IotGatewayConfiguration {
         }
 
         @Bean
+        public IotUdpDownstreamHandler iotUdpDownstreamHandler(IotDeviceMessageService messageService,
+                                                               IotUdpSessionManager sessionManager,
+                                                               IotUdpUpstreamProtocol protocol) {
+            return new IotUdpDownstreamHandler(messageService, sessionManager, protocol);
+        }
+
+        @Bean
         public IotUdpDownstreamSubscriber iotUdpDownstreamSubscriber(IotUdpUpstreamProtocol protocolHandler,
-                                                                     IotDeviceMessageService messageService,
-                                                                     IotUdpSessionManager sessionManager,
+                                                                     IotUdpDownstreamHandler downstreamHandler,
                                                                      IotMessageBus messageBus) {
-            return new IotUdpDownstreamSubscriber(protocolHandler, messageService, sessionManager, messageBus);
+            return new IotUdpDownstreamSubscriber(protocolHandler, downstreamHandler, messageBus);
         }
 
     }
@@ -242,11 +243,16 @@ public class IotGatewayConfiguration {
         }
 
         @Bean
+        public IotWebSocketDownstreamHandler iotWebSocketDownstreamHandler(IotDeviceMessageService messageService,
+                                                                           IotWebSocketConnectionManager connectionManager) {
+            return new IotWebSocketDownstreamHandler(messageService, connectionManager);
+        }
+
+        @Bean
         public IotWebSocketDownstreamSubscriber iotWebSocketDownstreamSubscriber(IotWebSocketUpstreamProtocol protocolHandler,
-                                                                                 IotDeviceMessageService messageService,
-                                                                                 IotWebSocketConnectionManager connectionManager,
+                                                                                 IotWebSocketDownstreamHandler downstreamHandler,
                                                                                  IotMessageBus messageBus) {
-            return new IotWebSocketDownstreamSubscriber(protocolHandler, messageService, connectionManager, messageBus);
+            return new IotWebSocketDownstreamSubscriber(protocolHandler, downstreamHandler, messageBus);
         }
 
     }

@@ -42,14 +42,20 @@ yudao:
         secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
         expiration: 7d
 
-      # 协议配置
-      protocol:
+      # 协议实例列表（新版配置方式）
+      protocols:
         # ====================================
         # 针对引入的 HTTP 组件的配置
         # ====================================
-        http:
+        - id: http-json
+          type: http
+          port: 8092
           enabled: true
-          server-port: 8092
+          http:
+            ssl-enabled: false
+
+      # 协议配置（旧版，保持兼容）
+      protocol:
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================

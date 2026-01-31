@@ -22,7 +22,6 @@ import java.util.Map;
  *
  * @author 芋道源码
  * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
- * @see cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpRegisterHandler
  */
 @Slf4j
 public class IotCoapRegisterHandler {

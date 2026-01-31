@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.router.IotWebSocketUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
@@ -22,7 +24,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotWebSocketUpstreamProtocol {
+public class IotWebSocketUpstreamProtocol implements IotProtocol {
+
+    private static final String ID = "websocket";
 
     private final IotGatewayProperties.WebSocketProperties wsProperties;
 
@@ -39,6 +43,8 @@ public class IotWebSocketUpstreamProtocol {
 
     private HttpServer httpServer;
 
+    private volatile boolean running = false;
+
     public IotWebSocketUpstreamProtocol(IotGatewayProperties.WebSocketProperties wsProperties,
                                         IotDeviceService deviceService,
                                         IotDeviceMessageService messageService,
@@ -52,6 +58,17 @@ public class IotWebSocketUpstreamProtocol {
         this.serverId = IotDeviceMessageUtils.generateServerId(wsProperties.getPort());
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public IotProtocolTypeEnum getType() {
+        return IotProtocolTypeEnum.WEBSOCKET;
+    }
+
+    @Override
     @PostConstruct
     @SuppressWarnings("deprecation")
     public void start() {
@@ -88,6 +105,7 @@ public class IotWebSocketUpstreamProtocol {
         // 3. 启动服务器
         try {
             httpServer.listen().result();
+            running = true;
             log.info("[start][IoT 网关 WebSocket 协议启动成功，端口：{}，路径：{}]", wsProperties.getPort(), wsProperties.getPath());
         } catch (Exception e) {
             log.error("[start][IoT 网关 WebSocket 协议启动失败]", e);
@@ -95,16 +113,23 @@ public class IotWebSocketUpstreamProtocol {
         }
     }
 
+    @Override
     @PreDestroy
     public void stop() {
         if (httpServer != null) {
             try {
                 httpServer.close().result();
+                running = false;
                 log.info("[stop][IoT 网关 WebSocket 协议已停止]");
             } catch (Exception e) {
                 log.error("[stop][IoT 网关 WebSocket 协议停止失败]", e);
             }
         }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
 }

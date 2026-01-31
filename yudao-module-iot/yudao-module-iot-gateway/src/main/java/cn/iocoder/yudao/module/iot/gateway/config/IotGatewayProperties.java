@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,9 +27,14 @@ public class IotGatewayProperties {
     private TokenProperties token;
 
     /**
-     * 协议配置
+     * 协议配置（旧版，保持兼容）
      */
     private ProtocolProperties protocol;
+
+    /**
+     * 协议实例列表（新版）
+     */
+    private List<ProtocolInstanceProperties> protocols;
 
     @Data
     public static class RpcProperties {
@@ -87,11 +95,6 @@ public class IotGatewayProperties {
          * MQTT 组件配置
          */
         private MqttProperties mqtt;
-
-        /**
-         * MQTT WebSocket 组件配置
-         */
-        private MqttWsProperties mqttWs;
 
         /**
          * UDP 组件配置
@@ -423,102 +426,6 @@ public class IotGatewayProperties {
     }
 
     @Data
-    public static class MqttWsProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * WebSocket 服务器端口（默认：8083）
-         */
-        private Integer port = 8083;
-
-        /**
-         * WebSocket 路径（默认：/mqtt）
-         */
-        @NotEmpty(message = "WebSocket 路径不能为空")
-        private String path = "/mqtt";
-
-        /**
-         * 最大消息大小（字节）
-         */
-        private Integer maxMessageSize = 8192;
-
-        /**
-         * 连接超时时间（秒）
-         */
-        private Integer connectTimeoutSeconds = 60;
-
-        /**
-         * 保持连接超时时间（秒）
-         */
-        private Integer keepAliveTimeoutSeconds = 300;
-
-        /**
-         * 是否启用 SSL（wss://）
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 配置
-         */
-        private SslOptions sslOptions = new SslOptions();
-
-        /**
-         * WebSocket 子协议（通常为 "mqtt" 或 "mqttv3.1"）
-         */
-        @NotEmpty(message = "WebSocket 子协议不能为空")
-        private String subProtocol = "mqtt";
-
-        /**
-         * 最大帧大小（字节）
-         */
-        private Integer maxFrameSize = 65536;
-
-        /**
-         * SSL 配置选项
-         */
-        @Data
-        public static class SslOptions {
-
-            /**
-             * 密钥证书选项
-             */
-            private io.vertx.core.net.KeyCertOptions keyCertOptions;
-
-            /**
-             * 信任选项
-             */
-            private io.vertx.core.net.TrustOptions trustOptions;
-
-            /**
-             * SSL 证书路径
-             */
-            private String certPath;
-
-            /**
-             * SSL 私钥路径
-             */
-            private String keyPath;
-
-            /**
-             * 信任存储路径
-             */
-            private String trustStorePath;
-
-            /**
-             * 信任存储密码
-             */
-            private String trustStorePassword;
-
-        }
-
-    }
-
-    @Data
     public static class UdpProperties {
 
         /**
@@ -640,6 +547,127 @@ public class IotGatewayProperties {
          * SSL 私钥路径
          */
         private String sslKeyPath;
+
+    }
+
+    // TODO @AI：【暂时忽略】改成 ProtocolProperties
+    /**
+     * 协议实例配置
+     */
+    @Data
+    public static class ProtocolInstanceProperties {
+
+        /**
+         * 协议实例 ID，如 "http-alink"、"tcp-binary"
+         */
+        @NotEmpty(message = "协议实例 ID 不能为空")
+        private String id;
+        /**
+         * 是否启用
+         */
+        @NotNull(message = "是否启用不能为空")
+        private Boolean enabled = true;
+        /**
+         * 协议类型
+         *
+         * @see cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum
+         */
+        @NotEmpty(message = "协议类型不能为空")
+        private String type;
+        /**
+         * 服务端口
+         */
+        @NotNull(message = "服务端口不能为空")
+        private Integer port;
+        /**
+         * 序列化类型（可选）
+         *
+         * @see cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum
+         *
+         * 为什么是可选的呢？
+         * 1. {@link IotProtocolTypeEnum#HTTP}、${@link IotProtocolTypeEnum#COAP} 协议，目前强制是 JSON 格式
+         * 2. {@link IotProtocolTypeEnum#EMQX} 协议，目前支持根据产品（设备）配置的序列化类型来解析
+         */
+        private String serialize;
+
+        /**
+         * HTTP 协议配置
+         */
+        @Valid
+        private IotHttpConfig http;
+
+        // TODO @AI：后续改下；
+        /**
+         * TCP 协议配置（后续扩展）
+         */
+        @Valid
+        private TcpInstanceConfig tcp;
+
+    }
+
+    /**
+     * TCP 协议实例配置（后续扩展）
+     */
+    @Data
+    public static class TcpInstanceConfig {
+
+        /**
+         * 最大连接数
+         */
+        private Integer maxConnections = 1000;
+
+        /**
+         * 心跳超时时间（毫秒）
+         */
+        private Long keepAliveTimeoutMs = 30000L;
+
+        /**
+         * 是否启用 SSL
+         */
+        private Boolean sslEnabled = false;
+
+        /**
+         * SSL 证书路径
+         */
+        private String sslCertPath;
+
+        /**
+         * SSL 私钥路径
+         */
+        private String sslKeyPath;
+
+        /**
+         * 拆包配置
+         */
+        private CodecConfig codec;
+
+        /**
+         * TCP 拆包配置
+         */
+        @Data
+        public static class CodecConfig {
+
+            /**
+             * 拆包类型：LENGTH_FIELD / DELIMITER
+             */
+            private String type;
+
+            /**
+             * LENGTH_FIELD: 偏移量
+             */
+            private Integer lengthFieldOffset;
+
+            /**
+             * LENGTH_FIELD: 长度字段长度
+             */
+            private Integer lengthFieldLength;
+
+            /**
+             * DELIMITER: 分隔符
+             */
+            private String delimiter;
+
+        }
 
     }
 

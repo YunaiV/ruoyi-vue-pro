@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -9,11 +10,13 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream.IotHttpAuthHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream.IotHttpRegisterHandler;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
@@ -27,11 +30,12 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  *
  * @author 芋道源码
  */
-@RequiredArgsConstructor
 @Slf4j
 public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> {
 
     private final IotDeviceTokenService deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
+
+    private final IotMessageSerializerManager serializerManager = SpringUtil.getBean(IotMessageSerializerManager.class);
 
     @Override
     public final void handle(RoutingContext context) {
@@ -83,12 +87,26 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
         }
     }
 
+    // ========== 序列化相关方法 ==========
+
+    protected static  <T> T deserializeRequest(RoutingContext context, Class<T> clazz) {
+        byte[] body = context.body().buffer() != null ? context.body().buffer().getBytes() : null;
+        if (ArrayUtil.isEmpty(body)) {
+            throw invalidParamException("请求体不能为空");
+        }
+        return JsonUtils.parseObject(body, clazz);
+    }
+
+    private static String serializeResponse(Object data) {
+        return JsonUtils.toJsonString(data);
+    }
+
     @SuppressWarnings("deprecation")
     public static void writeResponse(RoutingContext context, Object data) {
         context.response()
                 .setStatusCode(200)
                 .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .end(JsonUtils.toJsonString(data));
+                .end(serializeResponse(data));
     }
 
 }

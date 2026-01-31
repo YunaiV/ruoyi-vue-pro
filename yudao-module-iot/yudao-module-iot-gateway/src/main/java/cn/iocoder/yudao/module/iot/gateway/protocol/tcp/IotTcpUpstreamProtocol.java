@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.router.IotTcpUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
@@ -21,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotTcpUpstreamProtocol {
+public class IotTcpUpstreamProtocol implements IotProtocol {
+
+    private static final String ID = "tcp";
 
     private final IotGatewayProperties.TcpProperties tcpProperties;
 
@@ -38,6 +42,8 @@ public class IotTcpUpstreamProtocol {
 
     private NetServer tcpServer;
 
+    private volatile boolean running = false;
+
     public IotTcpUpstreamProtocol(IotGatewayProperties.TcpProperties tcpProperties,
                                   IotDeviceService deviceService,
                                   IotDeviceMessageService messageService,
@@ -51,6 +57,17 @@ public class IotTcpUpstreamProtocol {
         this.serverId = IotDeviceMessageUtils.generateServerId(tcpProperties.getPort());
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public IotProtocolTypeEnum getType() {
+        return IotProtocolTypeEnum.TCP;
+    }
+
+    @Override
     @PostConstruct
     public void start() {
         // 创建服务器选项
@@ -78,6 +95,7 @@ public class IotTcpUpstreamProtocol {
         // 启动服务器
         try {
             tcpServer.listen().result();
+            running = true;
             log.info("[start][IoT 网关 TCP 协议启动成功，端口：{}]", tcpProperties.getPort());
         } catch (Exception e) {
             log.error("[start][IoT 网关 TCP 协议启动失败]", e);
@@ -85,15 +103,23 @@ public class IotTcpUpstreamProtocol {
         }
     }
 
+    @Override
     @PreDestroy
     public void stop() {
         if (tcpServer != null) {
             try {
                 tcpServer.close().result();
+                running = false;
                 log.info("[stop][IoT 网关 TCP 协议已停止]");
             } catch (Exception e) {
                 log.error("[stop][IoT 网关 TCP 协议停止失败]", e);
             }
         }
     }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
 }

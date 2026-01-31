@@ -24,8 +24,6 @@ import java.util.Map;
 /**
  * IoT 网关 CoAP 协议的【认证】处理器
  *
- * 参考 {@link cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpAuthHandler}
- *
  * @author 芋道源码
  */
 @Slf4j

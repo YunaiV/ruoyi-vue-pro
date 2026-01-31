@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.coap;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapAuthResource;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.router.IotCoapRegisterHandler;
@@ -30,7 +32,9 @@ import java.util.concurrent.TimeUnit;
  * @author 芋道源码
  */
 @Slf4j
-public class IotCoapUpstreamProtocol {
+public class IotCoapUpstreamProtocol implements IotProtocol {
+
+    private static final String ID = "coap";
 
     private final IotGatewayProperties.CoapProperties coapProperties;
 
@@ -39,11 +43,24 @@ public class IotCoapUpstreamProtocol {
     @Getter
     private final String serverId;
 
+    private volatile boolean running = false;
+
     public IotCoapUpstreamProtocol(IotGatewayProperties.CoapProperties coapProperties) {
         this.coapProperties = coapProperties;
         this.serverId = IotDeviceMessageUtils.generateServerId(coapProperties.getPort());
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public IotProtocolTypeEnum getType() {
+        return IotProtocolTypeEnum.COAP;
+    }
+
+    @Override
     @PostConstruct
     public void start() {
         try {
@@ -73,6 +90,7 @@ public class IotCoapUpstreamProtocol {
 
             // 3. 启动服务器
             coapServer.start();
+            running = true;
             log.info("[start][IoT 网关 CoAP 协议启动成功，端口：{}，资源：/auth, /auth/register/device, /topic]", coapProperties.getPort());
         } catch (Exception e) {
             log.error("[start][IoT 网关 CoAP 协议启动失败]", e);
@@ -80,16 +98,23 @@ public class IotCoapUpstreamProtocol {
         }
     }
 
+    @Override
     @PreDestroy
     public void stop() {
         if (coapServer != null) {
             try {
                 coapServer.stop();
+                running = false;
                 log.info("[stop][IoT 网关 CoAP 协议已停止]");
             } catch (Exception e) {
                 log.error("[stop][IoT 网关 CoAP 协议停止失败]", e);
             }
         }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
 }
