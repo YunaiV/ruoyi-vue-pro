@@ -22,6 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IotTcpConnectionManager {
 
     /**
+     * 最大连接数
+     */
+    private final int maxConnections;
+
+    /**
      * 连接信息映射：NetSocket -> 连接信息
      */
     private final Map<NetSocket, ConnectionInfo> connectionMap = new ConcurrentHashMap<>();
@@ -31,6 +36,24 @@ public class IotTcpConnectionManager {
      */
     private final Map<Long, NetSocket> deviceSocketMap = new ConcurrentHashMap<>();
 
+    public IotTcpConnectionManager(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
+
+    /**
+     * 获取当前连接数
+     */
+    public int getConnectionCount() {
+        return connectionMap.size();
+    }
+
+    /**
+     * 检查是否可以接受新连接
+     */
+    public boolean canAcceptConnection() {
+        return connectionMap.size() < maxConnections;
+    }
+
     /**
      * 注册设备连接（包含认证信息）
      *
@@ -39,6 +62,10 @@ public class IotTcpConnectionManager {
      * @param connectionInfo 连接信息
      */
     public void registerConnection(NetSocket socket, Long deviceId, ConnectionInfo connectionInfo) {
+        // 检查连接数是否已达上限
+        if (connectionMap.size() >= maxConnections) {
+            throw new IllegalStateException("连接数已达上限: " + maxConnections);
+        }
         // 如果设备已有其他连接，先清理旧连接
         NetSocket oldSocket = deviceSocketMap.get(deviceId);
         if (oldSocket != null && oldSocket != socket) {
@@ -67,7 +94,8 @@ public class IotTcpConnectionManager {
             return;
         }
         Long deviceId = connectionInfo.getDeviceId();
-        deviceSocketMap.remove(deviceId);
+        // 仅当 deviceSocketMap 中的 socket 是当前 socket 时才移除，避免误删新连接
+        deviceSocketMap.remove(deviceId, socket);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, socket.remoteAddress());
     }
 

@@ -20,6 +20,7 @@ import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 /**
  * IoT TCP 协议实现
@@ -89,11 +90,12 @@ public class IotTcpProtocol implements IotProtocol {
         this.serializer = serializerManager.get(serializeType);
         // 初始化帧编解码器
         IotTcpConfig tcpConfig = properties.getTcp();
-        IotTcpConfig.CodecConfig codecConfig = tcpConfig != null ? tcpConfig.getCodec() : null;
-        this.frameCodec = IotTcpFrameCodecFactory.create(codecConfig);
+        Assert.notNull(tcpConfig, "TCP 协议配置（tcp）不能为空");
+        Assert.notNull(tcpConfig.getCodec(), "TCP 拆包配置（tcp.codec）不能为空");
+        this.frameCodec = IotTcpFrameCodecFactory.create(tcpConfig.getCodec());
 
         // 初始化连接管理器
-        this.connectionManager = new IotTcpConnectionManager();
+        this.connectionManager = new IotTcpConnectionManager(tcpConfig.getMaxConnections());
 
         // 初始化下行消息订阅者
         IotTcpDownstreamHandler downstreamHandler = new IotTcpDownstreamHandler(connectionManager, frameCodec, serializer);
@@ -117,7 +119,7 @@ public class IotTcpProtocol implements IotProtocol {
             return;
         }
 
-        // 1.1 创建 Vertx 实例（每个 Protocol 独立管理）
+        // 1.1 创建 Vertx 实例
         this.vertx = Vertx.vertx();
 
         // 1.2 创建服务器选项
@@ -126,8 +128,9 @@ public class IotTcpProtocol implements IotProtocol {
                 .setPort(properties.getPort())
                 .setTcpKeepAlive(true)
                 .setTcpNoDelay(true)
-                .setReuseAddress(true);
-        if (tcpConfig != null && Boolean.TRUE.equals(tcpConfig.getSslEnabled())) {
+                .setReuseAddress(true)
+                .setIdleTimeout((int) (tcpConfig.getKeepAliveTimeoutMs() / 1000)); // 设置空闲超时
+        if (Boolean.TRUE.equals(tcpConfig.getSslEnabled())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
                     .setKeyPath(tcpConfig.getSslKeyPath())
                     .setCertPath(tcpConfig.getSslCertPath());

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.delimiter;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpCodecTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
@@ -28,6 +29,11 @@ import org.springframework.util.Assert;
 public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
 
     /**
+     * 最大记录大小（64KB），防止 DoS 攻击
+     */
+    private static final int MAX_RECORD_SIZE = 65536;
+
+    /**
      * 解析后的分隔符字节数组
      */
     private final byte[] delimiterBytes;
@@ -45,6 +51,7 @@ public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
     @Override
     public RecordParser createDecodeParser(Handler<Buffer> handler) {
         RecordParser parser = RecordParser.newDelimited(Buffer.buffer(delimiterBytes));
+        parser.maxRecordSize(MAX_RECORD_SIZE); // 设置最大记录大小，防止 DoS 攻击
         // 处理完整消息（不包含分隔符）
         parser.handler(handler);
         parser.exceptionHandler(ex -> {
@@ -76,7 +83,7 @@ public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
                 .replace("\\r", "\r")
                 .replace("\\n", "\n")
                 .replace("\\t", "\t");
-        return parsed.getBytes();
+        return StrUtil.utf8Bytes(parsed);
     }
 
 }

@@ -46,6 +46,11 @@ public class IotTcpFixedLengthFrameCodec implements IotTcpFrameCodec {
 
     @Override
     public Buffer encode(byte[] data) {
+        // 校验数据长度不能超过固定长度
+        if (data.length > fixedLength) {
+            throw new IllegalArgumentException(String.format(
+                    "数据长度 %d 超过固定长度 %d", data.length, fixedLength));
+        }
         Buffer buffer = Buffer.buffer(fixedLength);
         buffer.appendBytes(data);
         // 如果数据不足固定长度，填充 0（RecordParser.newFixed 解码时按固定长度读取，所以发送端需要填充）

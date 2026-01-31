@@ -25,7 +25,7 @@ import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
@@ -95,8 +95,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             try {
                 processMessage(clientId, buffer, socket);
             } catch (Exception e) {
-                log.error("[handle][消息处理失败，客户端 ID: {}，地址: {}，错误: {}]",
-                        clientId, socket.remoteAddress(), e.getMessage());
+                log.error("[handle][消息处理失败，客户端 ID: {}，地址: {}]",
+                        clientId, socket.remoteAddress(), e);
                 socket.close();
             }
         };
@@ -114,20 +114,40 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param socket   网络连接
      */
     private void processMessage(String clientId, Buffer buffer, NetSocket socket) {
-        // 1. 反序列化消息
-        IotDeviceMessage message = serializer.deserialize(buffer.getBytes());
-        Assert.notNull(message, "反序列化后消息为空");
+        IotDeviceMessage message = null;
+        try {
+            // 1. 反序列化消息
+            message = serializer.deserialize(buffer.getBytes());
+            if (message == null) {
+                sendErrorResponse(socket, null, null, BAD_REQUEST.getCode(), "消息反序列化失败");
+                return;
+            }
 
-        // 2. 根据消息类型路由处理
-        if (AUTH_METHOD.equals(message.getMethod())) {
-            // 认证请求
-            handleAuthenticationRequest(clientId, message, socket);
-        } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
-            // 设备动态注册请求
-            handleRegisterRequest(clientId, message, socket);
-        } else {
-            // 业务消息
-            handleBusinessRequest(clientId, message, socket);
+            // 2. 根据消息类型路由处理
+            if (AUTH_METHOD.equals(message.getMethod())) {
+                // 认证请求
+                handleAuthenticationRequest(clientId, message, socket);
+            } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
+                // 设备动态注册请求
+                handleRegisterRequest(clientId, message, socket);
+            } else {
+                // 业务消息
+                handleBusinessRequest(clientId, message, socket);
+            }
+        } catch (IllegalArgumentException e) {
+            // 参数校验失败，返回 400
+            log.warn("[processMessage][参数校验失败，客户端 ID: {}，错误: {}]", clientId, e.getMessage());
+            String requestId = message != null ? message.getRequestId() : null;
+            String method = message != null ? message.getMethod() : null;
+            sendErrorResponse(socket, requestId, method, BAD_REQUEST.getCode(), e.getMessage());
+        } catch (Exception e) {
+            // 其他异常，返回 500 并重新抛出让上层关闭连接
+            log.error("[processMessage][处理消息失败，客户端 ID: {}]", clientId, e);
+            String requestId = message != null ? message.getRequestId() : null;
+            String method = message != null ? message.getMethod() : null;
+            sendErrorResponse(socket, requestId, method,
+                    INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
+            throw e;
         }
     }
 
