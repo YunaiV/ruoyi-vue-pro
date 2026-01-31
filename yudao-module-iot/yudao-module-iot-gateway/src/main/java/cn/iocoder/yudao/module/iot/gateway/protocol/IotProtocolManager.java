@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
@@ -14,9 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * IoT 协议管理器
- *
- * 负责根据配置创建和管理协议实例
+ * IoT 协议管理器：负责根据配置创建和管理协议实例
  *
  * @author 芋道源码
  */
@@ -96,7 +95,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return 协议实例
      */
-    @SuppressWarnings({"SwitchStatementWithTooFewBranches", "EnhancedSwitchMigration"})
+    @SuppressWarnings({"EnhancedSwitchMigration"})
     private IotProtocol createProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
         IotProtocolTypeEnum protocolType = IotProtocolTypeEnum.of(config.getType());
         if (protocolType == null) {
@@ -106,6 +105,8 @@ public class IotProtocolManager implements SmartLifecycle {
         switch (protocolType) {
             case HTTP:
                 return createHttpProtocol(config);
+            case TCP:
+                return createTcpProtocol(config);
             // TODO 后续添加其他协议类型
             default:
                 throw new IllegalArgumentException(String.format(
@@ -121,6 +122,16 @@ public class IotProtocolManager implements SmartLifecycle {
      */
     private IotHttpProtocol createHttpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
         return new IotHttpProtocol(config, messageBus);
+    }
+
+    /**
+     * 创建 TCP 协议实例
+     *
+     * @param config 协议实例配置
+     * @return TCP 协议实例
+     */
+    private IotTcpProtocol createTcpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+        return new IotTcpProtocol(config, messageBus, serializerManager);
     }
 
 }

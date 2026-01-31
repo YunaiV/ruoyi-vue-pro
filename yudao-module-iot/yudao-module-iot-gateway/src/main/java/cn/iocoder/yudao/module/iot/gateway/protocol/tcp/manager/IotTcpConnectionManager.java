@@ -81,6 +81,7 @@ public class IotTcpConnectionManager {
         return info != null;
     }
 
+    // TODO @AI：是不是可以去掉；因为现在只有认证成功的，才会注册连接；
     /**
      * 检查连接是否未认证
      */
@@ -148,10 +149,6 @@ public class IotTcpConnectionManager {
          * 客户端 ID
          */
         private String clientId;
-        /**
-         * 消息编解码类型（认证后确定）
-         */
-        private String codecType;
 
     }
 

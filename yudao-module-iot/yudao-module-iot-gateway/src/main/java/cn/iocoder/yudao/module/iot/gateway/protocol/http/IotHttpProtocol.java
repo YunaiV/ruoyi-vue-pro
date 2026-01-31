@@ -34,36 +34,32 @@ public class IotHttpProtocol implements IotProtocol {
      */
     private final ProtocolInstanceProperties properties;
     /**
-     * 消息总线
-     */
-    private final IotMessageBus messageBus;
-    /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
     @Getter
     private final String serverId;
 
     /**
-     * Vert.x 实例（每个 Protocol 自己管理）
+     * 运行状态
+     */
+    private volatile boolean running = false;
+
+    /**
+     * Vert.x 实例
      */
     private Vertx vertx;
     /**
      * HTTP 服务器
      */
     private HttpServer httpServer;
+
     /**
      * 下行消息订阅者
      */
     private IotHttpDownstreamSubscriber downstreamSubscriber;
 
-    /**
-     * 运行状态
-     */
-    private volatile boolean running = false;
-
     public IotHttpProtocol(ProtocolInstanceProperties properties, IotMessageBus messageBus) {
         this.properties = properties;
-        this.messageBus = messageBus;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
         this.downstreamSubscriber = new IotHttpDownstreamSubscriber(this, messageBus);
     }
@@ -121,7 +117,6 @@ public class IotHttpProtocol implements IotProtocol {
                     getId(), properties.getPort(), serverId);
 
             // 2. 启动下行消息订阅者
-            this.downstreamSubscriber = new IotHttpDownstreamSubscriber(this, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT HTTP 协议 {} 启动失败]", getId(), e);
@@ -132,9 +127,6 @@ public class IotHttpProtocol implements IotProtocol {
             }
             throw e;
         }
-
-        // 2. 启动下行消息订阅者
-        this.downstreamSubscriber.start();
     }
 
     @Override

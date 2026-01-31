@@ -42,7 +42,7 @@ yudao:
         secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
         expiration: 7d
 
-      # 协议实例列表（新版配置方式）
+      # 协议实例列表
       protocols:
         # ====================================
         # 针对引入的 HTTP 组件的配置
@@ -53,6 +53,22 @@ yudao:
           enabled: true
           http:
             ssl-enabled: false
+        # ====================================
+        # 针对引入的 TCP 组件的配置
+        # ====================================
+        - id: tcp-json
+          type: tcp
+          port: 8091
+          enabled: true
+          serialize: json
+          tcp:
+            max-connections: 1000
+            keep-alive-timeout-ms: 30000
+            ssl-enabled: false
+            codec:
+              type: delimiter              # 拆包类型：length_field / delimiter / fixed_length
+              delimiter: "\\n"             # 分隔符（支持转义：\\n=换行, \\r=回车, \\t=制表符）
+              max-frame-length: 1048576    # 最大帧长度（字节）
 
       # 协议配置（旧版，保持兼容）
       protocol:
@@ -90,17 +106,6 @@ yudao:
             key-store-password: "your-keystore-password" # 客户端证书库密码
             trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
             trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
-        # ====================================
-        # 针对引入的 TCP 组件的配置
-        # ====================================
-        tcp:
-          enabled: false
-          port: 8091
-          keep-alive-timeout-ms: 30000
-          max-connections: 1000
-          ssl-enabled: false
-          ssl-cert-path: "classpath:certs/client.jks"
-          ssl-key-path: "classpath:certs/client.jks"
         # ====================================
         # 针对引入的 UDP 组件的配置
         # ====================================

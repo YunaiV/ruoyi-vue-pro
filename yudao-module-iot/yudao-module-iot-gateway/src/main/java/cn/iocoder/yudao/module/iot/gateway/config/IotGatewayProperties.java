@@ -2,6 +2,9 @@ package cn.iocoder.yudao.module.iot.gateway.config;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
+import io.vertx.core.net.KeyCertOptions;
+import io.vertx.core.net.TrustOptions;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -77,19 +80,9 @@ public class IotGatewayProperties {
     public static class ProtocolProperties {
 
         /**
-         * HTTP 组件配置
-         */
-        private HttpProperties http;
-
-        /**
          * EMQX 组件配置
          */
         private EmqxProperties emqx;
-
-        /**
-         * TCP 组件配置
-         */
-        private TcpProperties tcp;
 
         /**
          * MQTT 组件配置
@@ -110,36 +103,6 @@ public class IotGatewayProperties {
          * WebSocket 组件配置
          */
         private WebSocketProperties websocket;
-
-    }
-
-    @Data
-    public static class HttpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-        /**
-         * 服务端口
-         */
-        private Integer serverPort;
-
-        /**
-         * 是否开启 SSL
-         */
-        @NotNull(message = "是否开启 SSL 不能为空")
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 证书路径
-         */
-        private String sslKeyPath;
-        /**
-         * SSL 证书路径
-         */
-        private String sslCertPath;
 
     }
 
@@ -313,47 +276,6 @@ public class IotGatewayProperties {
     }
 
     @Data
-    public static class TcpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口
-         */
-        private Integer port = 8091;
-
-        /**
-         * 心跳超时时间（毫秒）
-         */
-        private Long keepAliveTimeoutMs = 30000L;
-
-        /**
-         * 最大连接数
-         */
-        private Integer maxConnections = 1000;
-
-        /**
-         * 是否启用SSL
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL证书路径
-         */
-        private String sslCertPath;
-
-        /**
-         * SSL私钥路径
-         */
-        private String sslKeyPath;
-
-    }
-
-    @Data
     public static class MqttProperties {
 
         /**
@@ -381,6 +303,7 @@ public class IotGatewayProperties {
          */
         private Integer keepAliveTimeoutSeconds = 300;
 
+        // TODO @AI：所有跟 ssl 相关的参数，是不是可以统一？放到 protocol 层级？ProtocolInstanceProperties【优先级：低】暂时不用规划；
         /**
          * 是否启用 SSL
          */
@@ -399,11 +322,11 @@ public class IotGatewayProperties {
             /**
              * 密钥证书选项
              */
-            private io.vertx.core.net.KeyCertOptions keyCertOptions;
+            private KeyCertOptions keyCertOptions;
             /**
              * 信任选项
              */
-            private io.vertx.core.net.TrustOptions trustOptions;
+            private TrustOptions trustOptions;
             /**
              * SSL 证书路径
              */
@@ -596,78 +519,11 @@ public class IotGatewayProperties {
         @Valid
         private IotHttpConfig http;
 
-        // TODO @AI：后续改下；
         /**
-         * TCP 协议配置（后续扩展）
+         * TCP 协议配置
          */
         @Valid
-        private TcpInstanceConfig tcp;
-
-    }
-
-    /**
-     * TCP 协议实例配置（后续扩展）
-     */
-    @Data
-    public static class TcpInstanceConfig {
-
-        /**
-         * 最大连接数
-         */
-        private Integer maxConnections = 1000;
-
-        /**
-         * 心跳超时时间（毫秒）
-         */
-        private Long keepAliveTimeoutMs = 30000L;
-
-        /**
-         * 是否启用 SSL
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 证书路径
-         */
-        private String sslCertPath;
-
-        /**
-         * SSL 私钥路径
-         */
-        private String sslKeyPath;
-
-        /**
-         * 拆包配置
-         */
-        private CodecConfig codec;
-
-        /**
-         * TCP 拆包配置
-         */
-        @Data
-        public static class CodecConfig {
-
-            /**
-             * 拆包类型：LENGTH_FIELD / DELIMITER
-             */
-            private String type;
-
-            /**
-             * LENGTH_FIELD: 偏移量
-             */
-            private Integer lengthFieldOffset;
-
-            /**
-             * LENGTH_FIELD: 长度字段长度
-             */
-            private Integer lengthFieldLength;
-
-            /**
-             * DELIMITER: 分隔符
-             */
-            private String delimiter;
-
-        }
+        private IotTcpConfig tcp;
 
     }
 
