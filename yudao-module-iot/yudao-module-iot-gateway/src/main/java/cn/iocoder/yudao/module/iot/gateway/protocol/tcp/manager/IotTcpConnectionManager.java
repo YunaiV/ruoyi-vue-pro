@@ -4,7 +4,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 芋道源码
  */
 @Slf4j
-@Component
 public class IotTcpConnectionManager {
 
     /**
@@ -71,22 +69,6 @@ public class IotTcpConnectionManager {
         Long deviceId = connectionInfo.getDeviceId();
         deviceSocketMap.remove(deviceId);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, socket.remoteAddress());
-    }
-
-    /**
-     * 检查连接是否已认证
-     */
-    public boolean isAuthenticated(NetSocket socket) {
-        ConnectionInfo info = connectionMap.get(socket);
-        return info != null;
-    }
-
-    // TODO @AI：是不是可以去掉；因为现在只有认证成功的，才会注册连接；
-    /**
-     * 检查连接是否未认证
-     */
-    public boolean isNotAuthenticated(NetSocket socket) {
-        return !isAuthenticated(socket);
     }
 
     /**

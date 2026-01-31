@@ -42,6 +42,7 @@ public class IotHttpProtocol implements IotProtocol {
     /**
      * 运行状态
      */
+    @Getter
     private volatile boolean running = false;
 
     /**
@@ -61,6 +62,8 @@ public class IotHttpProtocol implements IotProtocol {
     public IotHttpProtocol(ProtocolInstanceProperties properties, IotMessageBus messageBus) {
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
+
+        // 初始化下行消息订阅者
         this.downstreamSubscriber = new IotHttpDownstreamSubscriber(this, messageBus);
     }
 
@@ -167,11 +170,6 @@ public class IotHttpProtocol implements IotProtocol {
         }
         running = false;
         log.info("[stop][IoT HTTP 协议 {} 已停止]", getId());
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
     }
 
 }

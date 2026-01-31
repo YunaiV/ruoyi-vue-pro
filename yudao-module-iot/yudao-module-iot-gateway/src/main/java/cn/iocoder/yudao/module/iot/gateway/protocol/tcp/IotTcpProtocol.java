@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
@@ -14,8 +13,6 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.upstream.IotTcpU
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
@@ -46,6 +43,7 @@ public class IotTcpProtocol implements IotProtocol {
     /**
      * 运行状态
      */
+    @Getter
     private volatile boolean running = false;
 
     /**
@@ -72,6 +70,11 @@ public class IotTcpProtocol implements IotProtocol {
      */
     private final IotTcpFrameCodec frameCodec;
 
+    /**
+     * TCP 连接管理器（每个 Protocol 实例独立）
+     */
+    private final IotTcpConnectionManager connectionManager;
+
     public IotTcpProtocol(ProtocolInstanceProperties properties, IotMessageBus messageBus,
                           IotMessageSerializerManager serializerManager) {
         this.properties = properties;
@@ -83,14 +86,15 @@ public class IotTcpProtocol implements IotProtocol {
             serializeType = IotSerializeTypeEnum.JSON; // 默认 JSON
         }
         this.serializer = serializerManager.get(serializeType);
-
         // 初始化帧编解码器
         IotTcpConfig tcpConfig = properties.getTcp();
         IotTcpConfig.CodecConfig codecConfig = tcpConfig != null ? tcpConfig.getCodec() : null;
         this.frameCodec = IotTcpFrameCodec.create(codecConfig);
 
+        // 初始化连接管理器
+        this.connectionManager = new IotTcpConnectionManager();
+
         // 初始化下行消息订阅者
-        IotTcpConnectionManager connectionManager = SpringUtil.getBean(IotTcpConnectionManager.class);
         IotTcpDownstreamHandler downstreamHandler = new IotTcpDownstreamHandler(connectionManager, frameCodec, serializer);
         this.downstreamSubscriber = new IotTcpDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
@@ -131,12 +135,8 @@ public class IotTcpProtocol implements IotProtocol {
 
         // 1.3 创建服务器并设置连接处理器
         tcpServer = vertx.createNetServer(options);
-        IotDeviceService deviceService = SpringUtil.getBean(IotDeviceService.class);
-        IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
-        IotTcpConnectionManager connectionManager = SpringUtil.getBean(IotTcpConnectionManager.class);
         tcpServer.connectHandler(socket -> {
-            IotTcpUpstreamHandler handler = new IotTcpUpstreamHandler(this, messageService, deviceService,
-                    connectionManager, frameCodec, serializer);
+            IotTcpUpstreamHandler handler = new IotTcpUpstreamHandler(serverId, frameCodec, serializer, connectionManager);
             handler.handle(socket);
         });
 
@@ -195,11 +195,6 @@ public class IotTcpProtocol implements IotProtocol {
         }
         running = false;
         log.info("[stop][IoT TCP 协议 {} 已停止]", getId());
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
     }
 
 }
