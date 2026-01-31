@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec;
 
-import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
@@ -40,25 +39,5 @@ public interface IotTcpFrameCodec {
      * @return 编码后的数据（带帧头/分隔符）
      */
     Buffer encode(byte[] data);
-
-    // TODO @AI：还是搞个 facory 类 ，更好理解；
-    // ========== 静态工厂方法 ==========
-
-    /**
-     * 根据配置创建编解码器
-     *
-     * @param config 拆包配置
-     * @return 编解码器实例，如果配置为空则返回 null
-     */
-    static IotTcpFrameCodec create(IotTcpConfig.CodecConfig config) {
-        if (config == null) {
-            return null;
-        }
-        IotTcpCodecTypeEnum type = IotTcpCodecTypeEnum.of(config.getType());
-        if (type == null) {
-            return null;
-        }
-        return type.createCodec(config);
-    }
 
 }

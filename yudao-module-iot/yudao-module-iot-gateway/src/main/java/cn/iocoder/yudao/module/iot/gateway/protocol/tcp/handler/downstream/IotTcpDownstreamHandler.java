@@ -39,8 +39,8 @@ public class IotTcpDownstreamHandler {
             IotTcpConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfoByDeviceId(
                     message.getDeviceId());
             if (connectionInfo == null) {
-                // TODO @AI：是不是把消息 id 也打印进去？类似上面的日志
-                log.warn("[handle][连接信息不存在，设备 ID: {}]", message.getDeviceId());
+                log.warn("[handle][连接信息不存在，设备 ID: {}，方法: {}，消息 ID: {}]",
+                        message.getDeviceId(), message.getMethod(), message.getId());
                 return;
             }
 
@@ -50,14 +50,11 @@ public class IotTcpDownstreamHandler {
 
             // 3. 发送到设备
             boolean success = connectionManager.sendToDevice(message.getDeviceId(), frameData.getBytes());
-            // TODO @AI：不成功，直接抛出异常；反正下面的日志也会打印失败的
-            if (success) {
-                log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",
-                        message.getDeviceId(), message.getMethod(), message.getId(), frameData.length());
-            } else {
-                log.error("[handle][下行消息发送失败，设备 ID: {}，方法: {}，消息 ID: {}]",
-                        message.getDeviceId(), message.getMethod(), message.getId());
+            if (!success) {
+                throw new RuntimeException("下行消息发送失败");
             }
+            log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",
+                    message.getDeviceId(), message.getMethod(), message.getId(), frameData.length());
         } catch (Exception e) {
             log.error("[handle][处理下行消息失败，设备 ID: {}，方法: {}，消息内容: {}]",
                     message.getDeviceId(), message.getMethod(), message, e);

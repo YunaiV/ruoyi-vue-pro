@@ -7,6 +7,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 /**
  * IoT TCP 定长帧编解码器
@@ -24,8 +25,8 @@ public class IotTcpFixedLengthFrameCodec implements IotTcpFrameCodec {
     private final int fixedLength;
 
     public IotTcpFixedLengthFrameCodec(IotTcpConfig.CodecConfig config) {
-        // TODO @AI：config.getFixedLength() 禁止为空；
-        this.fixedLength = config.getFixedLength() != null ? config.getFixedLength() : 1024;
+        Assert.notNull(config.getFixedLength(), "fixedLength 不能为空");
+        this.fixedLength = config.getFixedLength();
     }
 
     @Override
@@ -37,8 +38,9 @@ public class IotTcpFixedLengthFrameCodec implements IotTcpFrameCodec {
     public RecordParser createDecodeParser(Handler<Buffer> handler) {
         RecordParser parser = RecordParser.newFixed(fixedLength);
         parser.handler(handler);
-        // TODO @AI：解析失败，是不是要抛出异常？因为要 close 掉连接；
-        parser.exceptionHandler(ex -> log.error("[createDecodeParser][解析异常]", ex));
+        parser.exceptionHandler(ex -> {
+            throw new RuntimeException("[createDecodeParser][解析异常]", ex);
+        });
         return parser;
     }
 
@@ -46,8 +48,7 @@ public class IotTcpFixedLengthFrameCodec implements IotTcpFrameCodec {
     public Buffer encode(byte[] data) {
         Buffer buffer = Buffer.buffer(fixedLength);
         buffer.appendBytes(data);
-        // 如果数据不足固定长度，填充 0
-        // TODO @AI：这里的填充是合理的么？RecordParser.newFixed(fixedLength) 有填充的逻辑么？
+        // 如果数据不足固定长度，填充 0（RecordParser.newFixed 解码时按固定长度读取，所以发送端需要填充）
         if (data.length < fixedLength) {
             byte[] padding = new byte[fixedLength - data.length];
             buffer.appendBytes(padding);

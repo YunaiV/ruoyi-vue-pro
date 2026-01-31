@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.delimiter;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpCodecTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
@@ -8,6 +7,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 /**
  * IoT TCP 分隔符帧编解码器
@@ -27,24 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
 
-    private final IotTcpConfig.CodecConfig config;
-
     /**
      * 解析后的分隔符字节数组
      */
     private final byte[] delimiterBytes;
 
-    /**
-     * 最大帧长度
-     */
-    // TODO @AI：最大帧数要不去掉；简洁一点；包括其他地方的配置项；
-    private final int maxFrameLength;
-
     public IotTcpDelimiterFrameCodec(IotTcpConfig.CodecConfig config) {
-        this.config = config;
-        // TODO @AI：禁止为空；
+        Assert.hasText(config.getDelimiter(), "delimiter 不能为空");
         this.delimiterBytes = parseDelimiter(config.getDelimiter());
-        this.maxFrameLength = config.getMaxFrameLength() != null ? config.getMaxFrameLength() : 1048576;
     }
 
     @Override
@@ -55,20 +45,11 @@ public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
     @Override
     public RecordParser createDecodeParser(Handler<Buffer> handler) {
         RecordParser parser = RecordParser.newDelimited(Buffer.buffer(delimiterBytes));
-
-        parser.handler(buffer -> {
-            // 检查帧长度是否超过限制
-            if (buffer.length() > maxFrameLength) {
-                log.warn("[createDecodeParser][帧长度超过限制，length: {}, maxFrameLength: {}]",
-                        buffer.length(), maxFrameLength);
-                return;
-            }
-            // 处理完整消息（不包含分隔符）
-            handler.handle(buffer);
+        // 处理完整消息（不包含分隔符）
+        parser.handler(handler);
+        parser.exceptionHandler(ex -> {
+            throw new RuntimeException("[createDecodeParser][解析异常]", ex);
         });
-
-        // TODO @AI：异常处理；
-        parser.exceptionHandler(ex -> log.error("[createDecodeParser][解析异常]", ex));
         return parser;
     }
 
@@ -89,13 +70,7 @@ public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
      * @return 分隔符字节数组
      */
     private byte[] parseDelimiter(String delimiter) {
-        if (StrUtil.isBlank(delimiter)) {
-            // 默认使用换行符
-            return new byte[]{'\n'};
-        }
-
         // 处理转义字符
-        // TODO @AI：是否必要？不调整感觉也没问题？用户自己写对就 ok 了是哇？
         String parsed = delimiter
                 .replace("\\r\\n", "\r\n")
                 .replace("\\r", "\r")

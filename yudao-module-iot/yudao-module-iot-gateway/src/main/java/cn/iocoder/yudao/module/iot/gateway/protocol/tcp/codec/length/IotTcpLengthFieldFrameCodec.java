@@ -7,6 +7,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * IoT TCP 长度字段帧编解码器
@@ -30,8 +33,6 @@ public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {
     private final int lengthFieldLength;
     private final int lengthAdjustment;
     private final int initialBytesToStrip;
-    // TODO @AI：去掉 maxFrameLength 相关字段；
-    private final int maxFrameLength;
 
     /**
      * 头部长度 = 长度字段偏移量 + 长度字段长度
@@ -39,12 +40,14 @@ public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {
     private final int headerLength;
 
     public IotTcpLengthFieldFrameCodec(IotTcpConfig.CodecConfig config) {
-        // TODO @AI： 增加参数校验；不要 default 逻辑；
-        this.lengthFieldOffset = config.getLengthFieldOffset() != null ? config.getLengthFieldOffset() : 0;
-        this.lengthFieldLength = config.getLengthFieldLength() != null ? config.getLengthFieldLength() : 4;
-        this.lengthAdjustment = config.getLengthAdjustment() != null ? config.getLengthAdjustment() : 0;
-        this.initialBytesToStrip = config.getInitialBytesToStrip() != null ? config.getInitialBytesToStrip() : 0;
-        this.maxFrameLength = config.getMaxFrameLength() != null ? config.getMaxFrameLength() : 1048576;
+        Assert.notNull(config.getLengthFieldOffset(), "lengthFieldOffset 不能为空");
+        Assert.notNull(config.getLengthFieldLength(), "lengthFieldLength 不能为空");
+        Assert.notNull(config.getLengthAdjustment(), "lengthAdjustment 不能为空");
+        Assert.notNull(config.getInitialBytesToStrip(), "initialBytesToStrip 不能为空");
+        this.lengthFieldOffset = config.getLengthFieldOffset();
+        this.lengthFieldLength = config.getLengthFieldLength();
+        this.lengthAdjustment = config.getLengthAdjustment();
+        this.initialBytesToStrip = config.getInitialBytesToStrip();
         this.headerLength = lengthFieldOffset + lengthFieldLength;
     }
 
@@ -57,49 +60,45 @@ public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {
     public RecordParser createDecodeParser(Handler<Buffer> handler) {
         // 创建状态机：先读取头部，再读取消息体
         RecordParser parser = RecordParser.newFixed(headerLength);
-        // 使用数组保存状态和头部数据
-        // TODO @AI：bodyLength 只使用第 0 位，是不是 atomicInteger 更合适？
-        final int[] bodyLength = {-1};
-        final Buffer[] headerBuffer = {null};
+        final AtomicReference<Integer> bodyLength = new AtomicReference<>(null); // 消息体长度，null 表示读取头部阶段
+        final AtomicReference<Buffer> headerBuffer = new AtomicReference<>(null); // 头部消息
 
         // 处理读取到的数据
         parser.handler(buffer -> {
-            if (bodyLength[0] == -1) {
+            if (bodyLength.get() == null) {
                 // 阶段 1: 读取头部，解析长度字段
-                headerBuffer[0] = buffer.copy();
+                headerBuffer.set(buffer.copy());
                 int length = readLength(buffer, lengthFieldOffset, lengthFieldLength);
                 int frameBodyLength = length + lengthAdjustment;
-                // 检查帧长度是否超过限制
-                if (frameBodyLength < 0 || frameBodyLength > maxFrameLength - headerLength) {
-                    log.warn("[createDecodeParser][帧长度异常，length: {}, frameBodyLength: {}, maxFrameLength: {}]",
-                            length, frameBodyLength, maxFrameLength);
-                    return;
+                // 检查帧长度是否合法
+                if (frameBodyLength < 0) {
+                    throw new IllegalStateException(String.format(
+                            "[createDecodeParser][帧长度异常，length: %d, frameBodyLength: %d]",
+                            length, frameBodyLength));
+                }
+                // 消息体为空，抛出异常
+                if (frameBodyLength == 0) {
+                    throw new IllegalStateException("[createDecodeParser][消息体不能为空]");
                 }
 
-                if (frameBodyLength == 0) {
-                    // 消息体为空，直接处理
-                    // TODO @AI：消息体为空，是不是不合理哈？应该抛出异常？
-                    Buffer frame = processFrame(headerBuffer[0], null);
-                    handler.handle(frame);
-                } else {
-                    // 切换到读取消息体模式
-                    bodyLength[0] = frameBodyLength;
-                    parser.fixedSizeMode(frameBodyLength);
-                }
+                // 【重要】切换到读取消息体模式
+                bodyLength.set(frameBodyLength);
+                parser.fixedSizeMode(frameBodyLength);
             } else {
                 // 阶段 2: 读取消息体，组装完整帧
-                Buffer frame = processFrame(headerBuffer[0], buffer);
+                Buffer frame = processFrame(headerBuffer.get(), buffer);
                 // 重置状态，准备读取下一帧
-                bodyLength[0] = -1;
-                headerBuffer[0] = null;
+                bodyLength.set(null);
+                headerBuffer.set(null);
                 parser.fixedSizeMode(headerLength);
 
-                // 处理完整消息
+                // 【重要】处理完整消息
                 handler.handle(frame);
             }
         });
-
-        parser.exceptionHandler(ex -> log.error("[createDecodeParser][解析异常]", ex));
+        parser.exceptionHandler(ex -> {
+            throw new RuntimeException("[createDecodeParser][解析异常]", ex);
+        });
         return parser;
     }
 
@@ -122,26 +121,36 @@ public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {
     /**
      * 从 Buffer 中读取长度字段
      */
-    // TODO @AI：兼容 JDK8
+    @SuppressWarnings("EnhancedSwitchMigration")
     private int readLength(Buffer buffer, int offset, int length) {
-        return switch (length) {
-            case 1 -> buffer.getUnsignedByte(offset);
-            case 2 -> buffer.getUnsignedShort(offset);
-            case 4 -> buffer.getInt(offset);
-            default -> throw new IllegalArgumentException("不支持的长度字段长度: " + length);
-        };
+        switch (length) {
+            case 1:
+                return buffer.getUnsignedByte(offset);
+            case 2:
+                return buffer.getUnsignedShort(offset);
+            case 4:
+                return buffer.getInt(offset);
+            default:
+                throw new IllegalArgumentException("不支持的长度字段长度: " + length);
+        }
     }
 
     /**
      * 向 Buffer 中写入长度字段
      */
-    // TODO @AI：兼容 JDK8
     private void writeLength(Buffer buffer, int length, int fieldLength) {
         switch (fieldLength) {
-            case 1 -> buffer.appendByte((byte) length);
-            case 2 -> buffer.appendShort((short) length);
-            case 4 -> buffer.appendInt(length);
-            default -> throw new IllegalArgumentException("不支持的长度字段长度: " + fieldLength);
+            case 1:
+                buffer.appendByte((byte) length);
+                break;
+            case 2:
+                buffer.appendShort((short) length);
+                break;
+            case 4:
+                buffer.appendInt(length);
+                break;
+            default:
+                throw new IllegalArgumentException("不支持的长度字段长度: " + fieldLength);
         }
     }
 

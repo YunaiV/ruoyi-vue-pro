@@ -68,7 +68,13 @@ yudao:
             codec:
               type: delimiter              # 拆包类型：length_field / delimiter / fixed_length
               delimiter: "\\n"             # 分隔符（支持转义：\\n=换行, \\r=回车, \\t=制表符）
-              max-frame-length: 1048576    # 最大帧长度（字节）
+#              type: length_field           # 拆包类型：length_field / delimiter / fixed_length
+#              length-field-offset: 0       # 长度字段偏移量
+#              length-field-length: 4       # 长度字段长度
+#              length-adjustment: 0         # 长度调整值
+#              initial-bytes-to-strip: 4    # 初始跳过的字节数
+#              type: fixed_length           # 拆包类型：length_field / delimiter / fixed_length
+#              fixed-length: 256            # 固定长度
 
       # 协议配置（旧版，保持兼容）
       protocol:

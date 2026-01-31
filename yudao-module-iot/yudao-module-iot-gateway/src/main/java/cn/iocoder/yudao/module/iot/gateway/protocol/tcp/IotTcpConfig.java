@@ -64,13 +64,13 @@ public class IotTcpConfig {
         /**
          * LENGTH_FIELD: 长度字段偏移量
          * <p>
-         * 表示长度字段在消息中的起始位置（从0开始）
+         * 表示长度字段在消息中的起始位置（从 0 开始）
          */
         private Integer lengthFieldOffset;
         /**
          * LENGTH_FIELD: 长度字段长度（字节数）
          * <p>
-         * 常见值：1（最大255）、2（最大65535）、4（最大2GB）
+         * 常见值：1（最大 255）、2（最大 65535）、4（最大 2GB）
          */
         private Integer lengthFieldLength;
         /**
@@ -99,15 +99,6 @@ public class IotTcpConfig {
          * 每条消息的固定长度
          */
         private Integer fixedLength;
-
-        /**
-         * 最大帧长度（字节）
-         * <p>
-         * 防止内存溢出，默认 1MB
-         */
-        @NotNull(message = "最大帧长度不能为空")
-        @Min(value = 1, message = "最大帧长度必须大于 0")
-        private Integer maxFrameLength = 1048576;
 
     }
 

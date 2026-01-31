@@ -8,7 +8,9 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpCodecTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodecFactory;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.serialize.json.IotJsonSerializer;
 import io.vertx.core.Vertx;
@@ -69,11 +71,17 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
     /**
      * TCP 帧编解码器
      */
-    private static final IotTcpFrameCodec FRAME_CODEC = IotTcpFrameCodec.create(
-            new IotTcpConfig.CodecConfig() {{
-                setType("delimiter");
-                setDelimiter("\\n");
-            }}
+    private static final IotTcpFrameCodec FRAME_CODEC = IotTcpFrameCodecFactory.create(
+            new IotTcpConfig.CodecConfig()
+                    .setType(IotTcpCodecTypeEnum.DELIMITER.getType())
+                    .setDelimiter("\\n")
+//                    .setType(IotTcpCodecTypeEnum.LENGTH_FIELD.getType())
+//                    .setLengthFieldOffset(0)
+//                    .setLengthFieldLength(4)
+//                    .setLengthAdjustment(0)
+//                    .setInitialBytesToStrip(4)
+//                    .setType(IotTcpCodecTypeEnum.LENGTH_FIELD.getType())
+//                    .setFixedLength(256)
     );
 
     // ===================== 直连设备信息（根据实际情况修改，从 iot_device 表查询） =====================

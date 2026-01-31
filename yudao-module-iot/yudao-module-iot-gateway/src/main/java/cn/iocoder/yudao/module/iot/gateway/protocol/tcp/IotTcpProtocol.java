@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodecFactory;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.downstream.IotTcpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.downstream.IotTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.upstream.IotTcpUpstreamHandler;
@@ -89,7 +90,7 @@ public class IotTcpProtocol implements IotProtocol {
         // 初始化帧编解码器
         IotTcpConfig tcpConfig = properties.getTcp();
         IotTcpConfig.CodecConfig codecConfig = tcpConfig != null ? tcpConfig.getCodec() : null;
-        this.frameCodec = IotTcpFrameCodec.create(codecConfig);
+        this.frameCodec = IotTcpFrameCodecFactory.create(codecConfig);
 
         // 初始化连接管理器
         this.connectionManager = new IotTcpConnectionManager();
