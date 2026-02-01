@@ -291,7 +291,7 @@ public class IotGatewayProperties {
          */
         private Integer keepAliveTimeoutSeconds = 300;
 
-        // TODO @AI：所有跟 ssl 相关的参数，是不是可以统一？放到 protocol 层级？ProtocolInstanceProperties【优先级：低】暂时不用规划；
+        // NOTE：SSL 相关参数后续统一到 protocol 层级（优先级低）
         /**
          * 是否启用 SSL
          */
@@ -336,7 +336,7 @@ public class IotGatewayProperties {
 
     }
 
-    // TODO @AI：【暂时忽略】改成 ProtocolProperties
+    // NOTE：暂未统一为 ProtocolProperties，待协议改造完成再调整
     /**
      * 协议实例配置
      */

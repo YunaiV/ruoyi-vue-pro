@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstrea
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import lombok.RequiredArgsConstructor;
@@ -37,23 +36,17 @@ public class IotWebSocketDownstreamHandler {
                 return;
             }
 
-            // 2. 编码消息并发送到设备
+            // 2. 序列化
             byte[] bytes = serializer.serialize(message);
-            // TODO @AI：参考别的模块的做法，直接发？类似 tcp 这种；
-            boolean success;
-            if (serializer.getType() == IotSerializeTypeEnum.BINARY) {
-                success = connectionManager.sendToDevice(message.getDeviceId(), bytes);
-            } else {
-                String jsonMessage = StrUtil.utf8Str(bytes);
-                success = connectionManager.sendToDevice(message.getDeviceId(), jsonMessage);
+            String bytesContent = StrUtil.utf8Str(bytes);
+
+            // 3. 发送到设备
+            boolean success = connectionManager.sendToDevice(connectionInfo.getDeviceId(), bytesContent);
+            if (!success) {
+                throw new RuntimeException("下行消息发送失败");
             }
-            if (success) {
-                log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",
-                        message.getDeviceId(), message.getMethod(), message.getId(), bytes.length);
-            } else {
-                log.error("[handle][下行消息发送失败，设备 ID: {}，方法: {}，消息 ID: {}]",
-                        message.getDeviceId(), message.getMethod(), message.getId());
-            }
+            log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",
+                    message.getDeviceId(), message.getMethod(), message.getId(), bytes.length);
         } catch (Exception e) {
             log.error("[handle][处理下行消息失败，设备 ID: {}，方法: {}，消息内容: {}]",
                     message.getDeviceId(), message.getMethod(), message, e);

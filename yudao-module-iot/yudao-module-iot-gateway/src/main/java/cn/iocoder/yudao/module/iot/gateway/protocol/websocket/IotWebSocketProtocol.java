@@ -9,13 +9,11 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.upstream.IotWebSocketUpstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -24,9 +22,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
-// TODO @AI：注释调整下，参考 IotTcpProtocol
 /**
- * IoT 网关 WebSocket 协议：接收设备上行消息
+ * IoT WebSocket 协议实现
+ * <p>
+ * 基于 Vert.x 实现 WebSocket 服务器，接收设备上行消息
  *
  * @author 芋道源码
  */
@@ -62,12 +61,6 @@ public class IotWebSocketProtocol implements IotProtocol {
      */
     private final IotWebSocketConnectionManager connectionManager;
 
-    // TODO @AI：可以不用这个变量，从 properties 里面获取
-    /**
-     * WebSocket 配置
-     */
-    private final IotWebSocketConfig wsConfig;
-
     /**
      * 下行消息订阅者
      */
@@ -78,14 +71,10 @@ public class IotWebSocketProtocol implements IotProtocol {
      */
     private final IotMessageSerializer serializer;
 
-    private final IotDeviceService deviceService;
-    private final IotDeviceMessageService messageService;
-
     public IotWebSocketProtocol(ProtocolInstanceProperties properties) {
         Assert.notNull(properties, "协议实例配置不能为空");
         Assert.notNull(properties.getWebsocket(), "WebSocket 协议配置（websocket）不能为空");
         this.properties = properties;
-        this.wsConfig = properties.getWebsocket();
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
 
         // 初始化序列化器
@@ -94,9 +83,7 @@ public class IotWebSocketProtocol implements IotProtocol {
         IotMessageSerializerManager serializerManager = SpringUtil.getBean(IotMessageSerializerManager.class);
         this.serializer = serializerManager.get(serializeType);
 
-        // 初始化基础依赖
-        this.deviceService = SpringUtil.getBean(IotDeviceService.class);
-        this.messageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        // 初始化连接管理器
         this.connectionManager = new IotWebSocketConnectionManager();
 
         // 初始化下行消息订阅者
@@ -127,6 +114,7 @@ public class IotWebSocketProtocol implements IotProtocol {
         this.vertx = Vertx.vertx();
 
         // 1.2 创建服务器选项
+        IotWebSocketConfig wsConfig = properties.getWebsocket();
         HttpServerOptions options = new HttpServerOptions()
                 .setPort(properties.getPort())
                 .setIdleTimeout(wsConfig.getIdleTimeoutSeconds())
@@ -150,8 +138,7 @@ public class IotWebSocketProtocol implements IotProtocol {
                 return;
             }
             // 创建上行处理器
-            IotWebSocketUpstreamHandler handler = new IotWebSocketUpstreamHandler(this,
-                    messageService, deviceService, connectionManager, serializer);
+            IotWebSocketUpstreamHandler handler = new IotWebSocketUpstreamHandler(serverId, serializer, connectionManager);
             handler.handle(socket);
         });
 

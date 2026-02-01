@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager;
 
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -106,33 +105,6 @@ public class IotWebSocketConnectionManager {
         try {
             socket.writeTextMessage(message);
             log.debug("[sendToDevice][发送消息成功，设备 ID: {}，数据长度: {} 字节]", deviceId, message.length());
-            return true;
-        } catch (Exception e) {
-            log.error("[sendToDevice][发送消息失败，设备 ID: {}]", deviceId, e);
-            // 发送失败时清理连接
-            unregisterConnection(socket);
-            return false;
-        }
-    }
-
-    // TODO @AI：没必要这里加一个；
-    /**
-     * 发送消息到设备（二进制消息）
-     *
-     * @param deviceId 设备 ID
-     * @param payload  二进制消息
-     * @return 是否发送成功
-     */
-    public boolean sendToDevice(Long deviceId, byte[] payload) {
-        ServerWebSocket socket = deviceSocketMap.get(deviceId);
-        if (socket == null) {
-            log.warn("[sendToDevice][设备未连接，设备 ID: {}]", deviceId);
-            return false;
-        }
-
-        try {
-            socket.writeBinaryMessage(Buffer.buffer(payload));
-            log.debug("[sendToDevice][发送消息成功，设备 ID: {}，数据长度: {} 字节]", deviceId, payload.length);
             return true;
         } catch (Exception e) {
             log.error("[sendToDevice][发送消息失败，设备 ID: {}]", deviceId, e);

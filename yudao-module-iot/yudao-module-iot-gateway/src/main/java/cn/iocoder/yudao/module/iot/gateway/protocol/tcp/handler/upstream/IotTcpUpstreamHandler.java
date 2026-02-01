@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.upstream;
 
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -79,35 +78,32 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     @Override
     @SuppressWarnings("DuplicatedCode")
     public void handle(NetSocket socket) {
-        // TODO @AI：clientId 去掉；其它模块也看看，怎么去掉下看看；
-        String clientId = IdUtil.simpleUUID();
-        log.debug("[handle][设备连接，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
+        String remoteAddress = String.valueOf(socket.remoteAddress());
+        log.debug("[handle][设备连接，地址: {}]", remoteAddress);
 
         // 1. 设置异常和关闭处理器
         socket.exceptionHandler(ex -> {
-            log.warn("[handle][连接异常，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
+            log.warn("[handle][连接异常，地址: {}]", remoteAddress, ex);
             socket.close();
         });
         socket.closeHandler(v -> {
-            log.debug("[handle][连接关闭，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
+            log.debug("[handle][连接关闭，地址: {}]", remoteAddress);
             cleanupConnection(socket);
         });
 
         // 2.1 设置消息处理器
-        // TODO @AI：去掉 clientId；
         Handler<Buffer> messageHandler = buffer -> {
             try {
                 processMessage(buffer, socket);
             } catch (Exception e) {
-                log.error("[handle][消息处理失败，客户端 ID: {}，地址: {}]",
-                        clientId, socket.remoteAddress(), e);
+                log.error("[handle][消息处理失败，地址: {}]", remoteAddress, e);
                 socket.close();
             }
         };
         // 2.2 使用拆包器处理粘包/拆包
         RecordParser parser = codec.createDecodeParser(messageHandler);
         socket.handler(parser);
-        log.debug("[handle][启用 {} 拆包器，客户端 ID: {}]", codec.getType(), clientId);
+        log.debug("[handle][启用 {} 拆包器，地址: {}]", codec.getType(), remoteAddress);
     }
 
     /**
@@ -135,23 +131,23 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                 handleRegisterRequest(message, socket);
             } else {
                 // 业务消息
-                handleBusinessRequest(null, message, socket);
+                handleBusinessRequest(message, socket);
             }
         } catch (ServiceException e) {
             // 业务异常，返回对应的错误码和错误信息
-            log.warn("[processMessage][业务异常，客户端 ID: {}，错误: {}]", null, e.getMessage());
+            log.warn("[processMessage][业务异常，地址: {}，错误: {}]", socket.remoteAddress(), e.getMessage());
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method, e.getCode(), e.getMessage());
         } catch (IllegalArgumentException e) {
             // 参数校验失败，返回 400
-            log.warn("[processMessage][参数校验失败，客户端 ID: {}，错误: {}]", null, e.getMessage());
+            log.warn("[processMessage][参数校验失败，地址: {}，错误: {}]", socket.remoteAddress(), e.getMessage());
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method, BAD_REQUEST.getCode(), e.getMessage());
         } catch (Exception e) {
             // 其他异常，返回 500，并重新抛出让上层关闭连接
-            log.error("[processMessage][处理消息失败，客户端 ID: {}]", null, e);
+            log.error("[processMessage][处理消息失败，地址: {}]", socket.remoteAddress(), e);
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method,
@@ -218,21 +214,21 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         // 3. 发送成功响应
         sendSuccessResponse(socket, message.getRequestId(),
                 IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), result.getData());
-        log.info("[handleRegisterRequest][注册成功，客户端 ID: {}，设备名: {}]", null, params.getDeviceName());
+        log.info("[handleRegisterRequest][注册成功，地址: {}，设备名: {}]",
+                socket.remoteAddress(), params.getDeviceName());
     }
 
     /**
      * 处理业务请求
      *
-     * @param clientId 客户端 ID
      * @param message  消息信息
      * @param socket   网络连接
      */
-    private void handleBusinessRequest(String clientId, IotDeviceMessage message, NetSocket socket) {
+    private void handleBusinessRequest(IotDeviceMessage message, NetSocket socket) {
         // 1. 获取认证信息并处理业务消息
         IotTcpConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
         if (connectionInfo == null) {
-            log.error("[handleBusinessRequest][无法获取连接信息，客户端 ID: {}]", clientId);
+            log.error("[handleBusinessRequest][无法获取连接信息，地址: {}]", socket.remoteAddress());
             sendErrorResponse(socket, message.getRequestId(), message.getMethod(),
                     UNAUTHORIZED.getCode(), "设备未认证，无法处理业务消息");
             return;
@@ -241,7 +237,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         // 2. 发送消息到消息总线
         deviceMessageService.sendDeviceMessage(message, connectionInfo.getProductKey(),
                 connectionInfo.getDeviceName(), serverId);
-        log.info("[handleBusinessRequest][发送消息到消息总线，客户端 ID: {}，消息: {}", clientId, message);
+        log.info("[handleBusinessRequest][发送消息到消息总线，地址: {}，消息: {}]", socket.remoteAddress(), message);
     }
 
     /**
