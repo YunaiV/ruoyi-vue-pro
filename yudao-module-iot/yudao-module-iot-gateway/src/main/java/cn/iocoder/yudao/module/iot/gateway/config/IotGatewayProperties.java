@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
-import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig;
-import io.vertx.core.net.KeyCertOptions;
-import io.vertx.core.net.TrustOptions;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -86,11 +84,6 @@ public class IotGatewayProperties {
          * EMQX 组件配置
          */
         private EmqxProperties emqx;
-
-        /**
-         * MQTT 组件配置
-         */
-        private MqttProperties mqtt;
 
     }
 
@@ -263,79 +256,6 @@ public class IotGatewayProperties {
 
     }
 
-    @Data
-    public static class MqttProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口
-         */
-        private Integer port = 1883;
-
-        /**
-         * 最大消息大小（字节）
-         */
-        private Integer maxMessageSize = 8192;
-
-        /**
-         * 连接超时时间（秒）
-         */
-        private Integer connectTimeoutSeconds = 60;
-        /**
-         * 保持连接超时时间（秒）
-         */
-        private Integer keepAliveTimeoutSeconds = 300;
-
-        // NOTE：SSL 相关参数后续统一到 protocol 层级（优先级低）
-        /**
-         * 是否启用 SSL
-         */
-        private Boolean sslEnabled = false;
-        /**
-         * SSL 配置
-         */
-        private SslOptions sslOptions = new SslOptions();
-
-        /**
-         * SSL 配置选项
-         */
-        @Data
-        public static class SslOptions {
-
-            /**
-             * 密钥证书选项
-             */
-            private KeyCertOptions keyCertOptions;
-            /**
-             * 信任选项
-             */
-            private TrustOptions trustOptions;
-            /**
-             * SSL 证书路径
-             */
-            private String certPath;
-            /**
-             * SSL 私钥路径
-             */
-            private String keyPath;
-            /**
-             * 信任存储路径
-             */
-            private String trustStorePath;
-            /**
-             * 信任存储密码
-             */
-            private String trustStorePassword;
-
-        }
-
-    }
-
     // NOTE：暂未统一为 ProtocolProperties，待协议改造完成再调整
     /**
      * 协议实例配置
@@ -376,6 +296,8 @@ public class IotGatewayProperties {
          */
         private String serialize;
 
+        // ========== 各协议配置 ==========
+
         /**
          * HTTP 协议配置
          */
@@ -405,6 +327,12 @@ public class IotGatewayProperties {
          */
         @Valid
         private IotWebSocketConfig websocket;
+
+        /**
+         * MQTT 协议配置
+         */
+        @Valid
+        private IotMqttConfig mqtt;
 
     }
 

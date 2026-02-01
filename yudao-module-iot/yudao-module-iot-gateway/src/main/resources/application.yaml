@@ -57,9 +57,9 @@ yudao:
         # 针对引入的 TCP 组件的配置
         # ====================================
         - id: tcp-json
+          enabled: false
           type: tcp
           port: 8091
-          enabled: false
           serialize: json
           tcp:
             max-connections: 1000
@@ -79,9 +79,9 @@ yudao:
         # 针对引入的 UDP 组件的配置
         # ====================================
         - id: udp-json
+          enabled: false
           type: udp
           port: 8093
-          enabled: false
           serialize: json
           udp:
             max-sessions: 1000               # 最大会话数
@@ -92,9 +92,9 @@ yudao:
         # 针对引入的 WebSocket 组件的配置
         # ====================================
         - id: websocket-json
+          enabled: true
           type: websocket
           port: 8094
-          enabled: true
           serialize: json
           websocket:
             path: /ws
@@ -106,13 +106,26 @@ yudao:
         # 针对引入的 CoAP 组件的配置
         # ====================================
         - id: coap-json
+          enabled: false
           type: coap
           port: 5683
-          enabled: true
           coap:
             max-message-size: 1024           # 最大消息大小（字节）
             ack-timeout-ms: 2000             # ACK 超时时间（毫秒）
             max-retransmit: 4                # 最大重传次数
+        # ====================================
+        # 针对引入的 MQTT 组件的配置
+        # ====================================
+        - id: mqtt-json
+          enabled: true
+          type: mqtt
+          port: 1883
+          serialize: json
+          mqtt:
+            max-message-size: 8192           # 最大消息大小（字节）
+            connect-timeout-seconds: 60      # 连接超时时间（秒）
+            keep-alive-timeout-seconds: 300  # 保持连接超时时间（秒）
+            ssl-enabled: false               # 是否启用 SSL
 
       # 协议配置（旧版，保持兼容）
       protocol:
@@ -150,15 +163,6 @@ yudao:
             key-store-password: "your-keystore-password" # 客户端证书库密码
             trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
             trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
-        # ====================================
-        # 针对引入的 MQTT 组件的配置
-        # ====================================
-        mqtt:
-          enabled: false
-          port: 1883
-          max-message-size: 8192
-          connect-timeout-seconds: 60
-          ssl-enabled: false
 
 --- #################### 日志相关配置 ####################
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -7,30 +7,21 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnecti
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.netty.handler.codec.mqtt.MqttQoS;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * IoT 网关 MQTT 协议：下行消息处理器
- * <p>
- * 专门处理下行消息的业务逻辑，包括：
- * 1. 消息编码
- * 2. 主题构建
- * 3. 消息发送
  *
  * @author 芋道源码
  */
 @Slf4j
+@RequiredArgsConstructor
 public class IotMqttDownstreamHandler {
 
     private final IotDeviceMessageService deviceMessageService;
 
     private final IotMqttConnectionManager connectionManager;
-
-    public IotMqttDownstreamHandler(IotDeviceMessageService deviceMessageService,
-                                    IotMqttConnectionManager connectionManager) {
-        this.deviceMessageService = deviceMessageService;
-        this.connectionManager = connectionManager;
-    }
 
     /**
      * 处理下行消息
@@ -40,6 +31,7 @@ public class IotMqttDownstreamHandler {
      */
     public boolean handleDownstreamMessage(IotDeviceMessage message) {
         try {
+            // TODO @AI：参考 IotTcpDownstreamHandler 逻辑；
             // 1. 基础校验
             if (message == null || message.getDeviceId() == null) {
                 log.warn("[handleDownstreamMessage][消息或设备 ID 为空，忽略处理]");
@@ -47,6 +39,7 @@ public class IotMqttDownstreamHandler {
             }
 
             // 2. 检查设备是否在线
+            // TODO @AI：这块逻辑，是不是冗余？直接使用 3. 获取连接信息判断不就行了？
             if (connectionManager.isDeviceOffline(message.getDeviceId())) {
                 log.warn("[handleDownstreamMessage][设备离线，无法发送消息，设备 ID：{}]", message.getDeviceId());
                 return false;
@@ -59,7 +52,7 @@ public class IotMqttDownstreamHandler {
                 return false;
             }
 
-            // 4. 编码消息
+            // 4. 序列化
             byte[] payload = deviceMessageService.encodeDeviceMessage(message, connectionInfo.getProductKey(),
                     connectionInfo.getDeviceName());
             if (payload == null || payload.length == 0) {
@@ -68,6 +61,7 @@ public class IotMqttDownstreamHandler {
             }
 
             // 5. 发送消息到设备
+            // TODO @AI：参考 IotTcpDownstreamHandler 的逻辑；
             return sendMessageToDevice(message, connectionInfo, payload);
         } catch (Exception e) {
             if (message != null) {
@@ -78,6 +72,7 @@ public class IotMqttDownstreamHandler {
         }
     }
 
+    // TODO @AI 是不是合并到 handleDownstreamMessage 里；
     /**
      * 发送消息到设备
      *
@@ -91,6 +86,7 @@ public class IotMqttDownstreamHandler {
                                         byte[] payload) {
         // 1. 构建主题
         String topic = buildDownstreamTopic(message, connectionInfo);
+        // TODO @AI：直接断言，非空！
         if (StrUtil.isBlank(topic)) {
             log.warn("[sendMessageToDevice][主题构建失败，设备 ID：{}，方法：{}]",
                     message.getDeviceId(), message.getMethod());
@@ -118,6 +114,7 @@ public class IotMqttDownstreamHandler {
      */
     private String buildDownstreamTopic(IotDeviceMessage message,
                                         IotMqttConnectionManager.ConnectionInfo connectionInfo) {
+        // TODO @AI：直接断言，非空！
         String method = message.getMethod();
         if (StrUtil.isBlank(method)) {
             return null;

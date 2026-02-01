@@ -40,6 +40,7 @@ public class IotMqttConnectionManager {
      */
     private final Map<Long, MqttEndpoint> deviceEndpointMap = new ConcurrentHashMap<>();
 
+    // TODO @AI：这里会存在返回 "unknown" 的情况么？是不是必须返回，否则还是异常更合理点？
     /**
      * 安全获取 endpoint 地址
      * <p>
@@ -66,7 +67,6 @@ public class IotMqttConnectionManager {
         } catch (Exception ignored) {
             // 连接已关闭，忽略异常
         }
-
         return realTimeAddress;
     }
 
@@ -129,7 +129,6 @@ public class IotMqttConnectionManager {
         if (endpoint == null) {
             return null;
         }
-
         // 获取连接信息
         return getConnectionInfo(endpoint);
     }
@@ -208,6 +207,7 @@ public class IotMqttConnectionManager {
          */
         private String clientId;
 
+        // TODO @AI：是不是要去掉！感觉没用啊；
         /**
          * 是否已认证
          */

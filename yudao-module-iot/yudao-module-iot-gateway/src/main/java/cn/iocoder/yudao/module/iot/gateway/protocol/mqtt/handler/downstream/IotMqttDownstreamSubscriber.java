@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
+package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttDownstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,7 +18,7 @@ public class IotMqttDownstreamSubscriber extends IotProtocolDownstreamSubscriber
 
     private final IotMqttDownstreamHandler downstreamHandler;
 
-    public IotMqttDownstreamSubscriber(IotMqttUpstreamProtocol protocol,
+    public IotMqttDownstreamSubscriber(IotMqttProtocol protocol,
                                        IotMqttDownstreamHandler downstreamHandler,
                                        IotMessageBus messageBus) {
         super(protocol, messageBus);
@@ -27,6 +27,7 @@ public class IotMqttDownstreamSubscriber extends IotProtocolDownstreamSubscriber
 
     @Override
     protected void handleMessage(IotDeviceMessage message) {
+        // TODO @AI：参考 IotTcpDownstreamHandler 不处理返回值，甚至不用返回值；
         boolean success = downstreamHandler.handleDownstreamMessage(message);
         if (success) {
             log.debug("[handleMessage][下行消息处理成功, messageId: {}, method: {}, deviceId: {}]",
