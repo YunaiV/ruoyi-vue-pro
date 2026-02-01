@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.config;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
 import io.vertx.core.net.KeyCertOptions;
 import io.vertx.core.net.TrustOptions;
 import jakarta.validation.Valid;
@@ -35,7 +36,7 @@ public class IotGatewayProperties {
     private ProtocolProperties protocol;
 
     /**
-     * 协议实例列表（新版）
+     * 协议实例列表
      */
     private List<ProtocolInstanceProperties> protocols;
 
@@ -88,11 +89,6 @@ public class IotGatewayProperties {
          * MQTT 组件配置
          */
         private MqttProperties mqtt;
-
-        /**
-         * UDP 组件配置
-         */
-        private UdpProperties udp;
 
         /**
          * CoAP 组件配置
@@ -349,44 +345,6 @@ public class IotGatewayProperties {
     }
 
     @Data
-    public static class UdpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务端口（默认 8093）
-         */
-        private Integer port = 8093;
-
-        /**
-         * 接收缓冲区大小（默认 64KB）
-         */
-        private Integer receiveBufferSize = 65536;
-
-        /**
-         * 发送缓冲区大小（默认 64KB）
-         */
-        private Integer sendBufferSize = 65536;
-
-        /**
-         * 会话超时时间（毫秒，默认 60 秒）
-         * <p>
-         * 用于清理不活跃的设备地址映射
-         */
-        private Long sessionTimeoutMs = 60000L;
-
-        /**
-         * 会话清理间隔（毫秒，默认 30 秒）
-         */
-        private Long sessionCleanIntervalMs = 30000L;
-
-    }
-
-    @Data
     public static class CoapProperties {
 
         /**
@@ -524,6 +482,12 @@ public class IotGatewayProperties {
          */
         @Valid
         private IotTcpConfig tcp;
+
+        /**
+         * UDP 协议配置
+         */
+        @Valid
+        private IotUdpConfig udp;
 
     }
 

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
@@ -59,11 +60,12 @@ public class IotHttpProtocol implements IotProtocol {
      */
     private IotHttpDownstreamSubscriber downstreamSubscriber;
 
-    public IotHttpProtocol(ProtocolInstanceProperties properties, IotMessageBus messageBus) {
+    public IotHttpProtocol(ProtocolInstanceProperties properties) {
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
 
         // 初始化下行消息订阅者
+        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
         this.downstreamSubscriber = new IotHttpDownstreamSubscriber(this, messageBus);
     }
 

@@ -50,7 +50,7 @@ yudao:
         - id: http-json
           type: http
           port: 8092
-          enabled: true
+          enabled: false
           http:
             ssl-enabled: false
         # ====================================
@@ -59,7 +59,7 @@ yudao:
         - id: tcp-json
           type: tcp
           port: 8091
-          enabled: true
+          enabled: false
           serialize: json
           tcp:
             max-connections: 1000
@@ -75,6 +75,20 @@ yudao:
 #              initial-bytes-to-strip: 4    # 初始跳过的字节数
 #              type: fixed_length           # 拆包类型：length_field / delimiter / fixed_length
 #              fixed-length: 256            # 固定长度
+        # ====================================
+        # 针对引入的 UDP 组件的配置
+        # ====================================
+        - id: udp-json
+          type: udp
+          port: 8093
+          enabled: true
+          serialize: json
+          udp:
+            max-sessions: 1000               # 最大会话数
+            session-timeout-ms: 60000        # 会话超时时间（毫秒）
+            session-clean-interval-ms: 30000 # 会话清理间隔（毫秒）
+            receive-buffer-size: 65536       # 接收缓冲区大小（字节）
+            send-buffer-size: 65536          # 发送缓冲区大小（字节）
 
       # 协议配置（旧版，保持兼容）
       protocol:
@@ -112,16 +126,6 @@ yudao:
             key-store-password: "your-keystore-password" # 客户端证书库密码
             trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
             trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
-        # ====================================
-        # 针对引入的 UDP 组件的配置
-        # ====================================
-        udp:
-          enabled: false                       # 是否启用 UDP
-          port: 8093                           # UDP 服务端口
-          receive-buffer-size: 65536           # 接收缓冲区大小（字节，默认 64KB）
-          send-buffer-size: 65536              # 发送缓冲区大小（字节，默认 64KB）
-          session-timeout-ms: 60000            # 会话超时时间（毫秒，默认 60 秒）
-          session-clean-interval-ms: 30000     # 会话清理间隔（毫秒，默认 30 秒）
         # ====================================
         # 针对引入的 MQTT 组件的配置
         # ====================================

@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.udp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.udp.handler.downstream;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.udp.router.IotUdpDownstreamHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,7 +16,7 @@ public class IotUdpDownstreamSubscriber extends IotProtocolDownstreamSubscriber 
 
     private final IotUdpDownstreamHandler downstreamHandler;
 
-    public IotUdpDownstreamSubscriber(IotUdpUpstreamProtocol protocol,
+    public IotUdpDownstreamSubscriber(IotProtocol protocol,
                                       IotUdpDownstreamHandler downstreamHandler,
                                       IotMessageBus messageBus) {
         super(protocol, messageBus);

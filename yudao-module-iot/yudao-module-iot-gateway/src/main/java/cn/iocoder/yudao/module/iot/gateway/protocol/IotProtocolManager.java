@@ -3,11 +3,11 @@ package cn.iocoder.yudao.module.iot.gateway.protocol;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
-import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
-import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpProtocol;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 
@@ -24,20 +24,16 @@ public class IotProtocolManager implements SmartLifecycle {
 
     private final IotGatewayProperties gatewayProperties;
 
-    private final IotMessageSerializerManager serializerManager;
-
-    private final IotMessageBus messageBus;
-
+    /**
+     * 协议实例列表
+     */
     private final List<IotProtocol> protocols = new ArrayList<>();
 
+    @Getter
     private volatile boolean running = false;
 
-    public IotProtocolManager(IotGatewayProperties gatewayProperties,
-                              IotMessageSerializerManager serializerManager,
-                              IotMessageBus messageBus) {
+    public IotProtocolManager(IotGatewayProperties gatewayProperties) {
         this.gatewayProperties = gatewayProperties;
-        this.serializerManager = serializerManager;
-        this.messageBus = messageBus;
     }
 
     @Override
@@ -84,11 +80,6 @@ public class IotProtocolManager implements SmartLifecycle {
         log.info("[stop][协议管理器已停止]");
     }
 
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
     /**
      * 创建协议实例
      *
@@ -107,7 +98,8 @@ public class IotProtocolManager implements SmartLifecycle {
                 return createHttpProtocol(config);
             case TCP:
                 return createTcpProtocol(config);
-            // TODO 后续添加其他协议类型
+            case UDP:
+                return createUdpProtocol(config);
             default:
                 throw new IllegalArgumentException(String.format(
                         "[createProtocol][协议实例 %s 的协议类型 %s 暂不支持]", config.getId(), protocolType));
@@ -121,7 +113,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @return HTTP 协议实例
      */
     private IotHttpProtocol createHttpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
-        return new IotHttpProtocol(config, messageBus);
+        return new IotHttpProtocol(config);
     }
 
     /**
@@ -131,7 +123,17 @@ public class IotProtocolManager implements SmartLifecycle {
      * @return TCP 协议实例
      */
     private IotTcpProtocol createTcpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
-        return new IotTcpProtocol(config, messageBus, serializerManager);
+        return new IotTcpProtocol(config);
+    }
+
+    /**
+     * 创建 UDP 协议实例
+     *
+     * @param config 协议实例配置
+     * @return UDP 协议实例
+     */
+    private IotUdpProtocol createUdpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+        return new IotUdpProtocol(config);
     }
 
 }

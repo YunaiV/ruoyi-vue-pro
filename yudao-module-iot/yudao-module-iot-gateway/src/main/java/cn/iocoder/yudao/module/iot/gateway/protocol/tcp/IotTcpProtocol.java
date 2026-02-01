@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
@@ -73,31 +74,30 @@ public class IotTcpProtocol implements IotProtocol {
     private final IotTcpFrameCodec frameCodec;
 
     /**
-     * TCP 连接管理器（每个 Protocol 实例独立）
+     * TCP 连接管理器
      */
     private final IotTcpConnectionManager connectionManager;
 
-    public IotTcpProtocol(ProtocolInstanceProperties properties, IotMessageBus messageBus,
-                          IotMessageSerializerManager serializerManager) {
+    public IotTcpProtocol(ProtocolInstanceProperties properties) {
+        IotTcpConfig tcpConfig = properties.getTcp();
+        Assert.notNull(tcpConfig, "TCP 协议配置（tcp）不能为空");
+        Assert.notNull(tcpConfig.getCodec(), "TCP 拆包配置（tcp.codec）不能为空");
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
 
         // 初始化序列化器
         IotSerializeTypeEnum serializeType = IotSerializeTypeEnum.of(properties.getSerialize());
-        if (serializeType == null) {
-            serializeType = IotSerializeTypeEnum.JSON; // 默认 JSON
-        }
+        Assert.notNull(serializeType, "不支持的序列化类型：" + properties.getSerialize());
+        IotMessageSerializerManager serializerManager = SpringUtil.getBean(IotMessageSerializerManager.class);
         this.serializer = serializerManager.get(serializeType);
         // 初始化帧编解码器
-        IotTcpConfig tcpConfig = properties.getTcp();
-        Assert.notNull(tcpConfig, "TCP 协议配置（tcp）不能为空");
-        Assert.notNull(tcpConfig.getCodec(), "TCP 拆包配置（tcp.codec）不能为空");
         this.frameCodec = IotTcpFrameCodecFactory.create(tcpConfig.getCodec());
 
         // 初始化连接管理器
         this.connectionManager = new IotTcpConnectionManager(tcpConfig.getMaxConnections());
 
         // 初始化下行消息订阅者
+        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
         IotTcpDownstreamHandler downstreamHandler = new IotTcpDownstreamHandler(connectionManager, frameCodec, serializer);
         this.downstreamSubscriber = new IotTcpDownstreamSubscriber(this, downstreamHandler, messageBus);
     }

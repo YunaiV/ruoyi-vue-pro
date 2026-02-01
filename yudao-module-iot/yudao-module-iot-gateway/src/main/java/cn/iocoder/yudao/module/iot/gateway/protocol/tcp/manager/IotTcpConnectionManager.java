@@ -41,20 +41,6 @@ public class IotTcpConnectionManager {
     }
 
     /**
-     * 获取当前连接数
-     */
-    public int getConnectionCount() {
-        return connectionMap.size();
-    }
-
-    /**
-     * 检查是否可以接受新连接
-     */
-    public boolean canAcceptConnection() {
-        return connectionMap.size() < maxConnections;
-    }
-
-    /**
      * 注册设备连接（包含认证信息）
      *
      * @param socket         TCP 连接
@@ -154,11 +140,6 @@ public class IotTcpConnectionManager {
          * 设备名称
          */
         private String deviceName;
-
-        /**
-         * 客户端 ID
-         */
-        private String clientId;
 
     }
 

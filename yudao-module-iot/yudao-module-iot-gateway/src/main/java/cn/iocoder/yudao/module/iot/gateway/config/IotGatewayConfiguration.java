@@ -11,10 +11,6 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttDownstreamHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager.IotUdpSessionManager;
-import cn.iocoder.yudao.module.iot.gateway.protocol.udp.router.IotUdpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
@@ -42,10 +38,8 @@ public class IotGatewayConfiguration {
     }
 
     @Bean
-    public IotProtocolManager iotProtocolManager(IotGatewayProperties gatewayProperties,
-                                                 IotMessageSerializerManager serializerManager,
-                                                 IotMessageBus messageBus) {
-        return new IotProtocolManager(gatewayProperties, serializerManager, messageBus);
+    public IotProtocolManager iotProtocolManager(IotGatewayProperties gatewayProperties) {
+        return new IotProtocolManager(gatewayProperties);
     }
 
     /**
@@ -113,45 +107,6 @@ public class IotGatewayConfiguration {
                                                                        IotMqttDownstreamHandler downstreamHandler,
                                                                        IotMessageBus messageBus) {
             return new IotMqttDownstreamSubscriber(mqttUpstreamProtocol, downstreamHandler, messageBus);
-        }
-
-    }
-
-    /**
-     * IoT 网关 UDP 协议配置类
-     */
-    @Configuration
-    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.udp", name = "enabled", havingValue = "true")
-    @Slf4j
-    public static class UdpProtocolConfiguration {
-
-        @Bean(name = "udpVertx", destroyMethod = "close")
-        public Vertx udpVertx() {
-            return Vertx.vertx();
-        }
-
-        @Bean
-        public IotUdpUpstreamProtocol iotUdpUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                             IotDeviceService deviceService,
-                                                             IotDeviceMessageService messageService,
-                                                             IotUdpSessionManager sessionManager,
-                                                             @Qualifier("udpVertx") Vertx udpVertx) {
-            return new IotUdpUpstreamProtocol(gatewayProperties.getProtocol().getUdp(),
-                    deviceService, messageService, sessionManager, udpVertx);
-        }
-
-        @Bean
-        public IotUdpDownstreamHandler iotUdpDownstreamHandler(IotDeviceMessageService messageService,
-                                                               IotUdpSessionManager sessionManager,
-                                                               IotUdpUpstreamProtocol protocol) {
-            return new IotUdpDownstreamHandler(messageService, sessionManager, protocol);
-        }
-
-        @Bean
-        public IotUdpDownstreamSubscriber iotUdpDownstreamSubscriber(IotUdpUpstreamProtocol protocolHandler,
-                                                                     IotUdpDownstreamHandler downstreamHandler,
-                                                                     IotMessageBus messageBus) {
-            return new IotUdpDownstreamSubscriber(protocolHandler, downstreamHandler, messageBus);
         }
 
     }

@@ -49,11 +49,9 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      */
     private final IotMessageSerializer serializer;
     /**
-     * TCP 连接管理器（每个 Protocol 实例独立）
+     * TCP 连接管理器
      */
     private final IotTcpConnectionManager connectionManager;
-
-    // ===================== Spring 依赖（构造时注入） =====================
 
     private final IotDeviceMessageService deviceMessageService;
     private final IotDeviceService deviceService;
@@ -141,7 +139,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method, BAD_REQUEST.getCode(), e.getMessage());
         } catch (Exception e) {
-            // 其他异常，返回 500 并重新抛出让上层关闭连接
+            // 其他异常，返回 500，并重新抛出让上层关闭连接
             log.error("[processMessage][处理消息失败，客户端 ID: {}]", clientId, e);
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
@@ -158,6 +156,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param message  消息信息
      * @param socket   网络连接
      */
+    @SuppressWarnings("DuplicatedCode")
     private void handleAuthenticationRequest(String clientId, IotDeviceMessage message, NetSocket socket) {
         // 1. 解析认证参数
         IotDeviceAuthReqDTO authParams = JsonUtils.convertObject(message.getParams(), IotDeviceAuthReqDTO.class);
@@ -180,7 +179,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         Assert.notNull(device, "设备不存在");
 
         // 3.1 注册连接
-        registerConnection(socket, device, clientId);
+        registerConnection(socket, device);
         // 3.2 发送上线消息
         sendOnlineMessage(device);
         // 3.3 发送成功响应
@@ -196,6 +195,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      * @param socket   网络连接
      * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
      */
+    @SuppressWarnings("DuplicatedCode")
     private void handleRegisterRequest(String clientId, IotDeviceMessage message, NetSocket socket) {
         // 1. 解析注册参数
         IotDeviceRegisterReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceRegisterReqDTO.class);
@@ -246,14 +246,12 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
      *
      * @param socket   网络连接
      * @param device   设备
-     * @param clientId 客户端 ID
      */
-    private void registerConnection(NetSocket socket, IotDeviceRespDTO device, String clientId) {
+    private void registerConnection(NetSocket socket, IotDeviceRespDTO device) {
         IotTcpConnectionManager.ConnectionInfo connectionInfo = new IotTcpConnectionManager.ConnectionInfo()
                 .setDeviceId(device.getId())
                 .setProductKey(device.getProductKey())
-                .setDeviceName(device.getDeviceName())
-                .setClientId(clientId);
+                .setDeviceName(device.getDeviceName());
         connectionManager.registerConnection(socket, device.getId(), connectionInfo);
     }
 
