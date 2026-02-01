@@ -5,8 +5,6 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxAuthEventProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.*;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client.IotModbusTcpClient;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
