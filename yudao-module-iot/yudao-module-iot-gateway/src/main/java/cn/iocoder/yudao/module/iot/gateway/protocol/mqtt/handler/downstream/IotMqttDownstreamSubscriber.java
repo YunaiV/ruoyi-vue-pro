@@ -7,9 +7,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT 网关 MQTT 协议：下行消息订阅器
- * <p>
- * 负责接收来自消息总线的下行消息，并委托给下行处理器进行业务处理
+ * IoT 网关 MQTT 协议：接收下行给设备的消息
  *
  * @author 芋道源码
  */
@@ -27,15 +25,7 @@ public class IotMqttDownstreamSubscriber extends IotProtocolDownstreamSubscriber
 
     @Override
     protected void handleMessage(IotDeviceMessage message) {
-        // TODO @AI：参考 IotTcpDownstreamHandler 不处理返回值，甚至不用返回值；
-        boolean success = downstreamHandler.handleDownstreamMessage(message);
-        if (success) {
-            log.debug("[handleMessage][下行消息处理成功, messageId: {}, method: {}, deviceId: {}]",
-                    message.getId(), message.getMethod(), message.getDeviceId());
-        } else {
-            log.warn("[handleMessage][下行消息处理失败, messageId: {}, method: {}, deviceId: {}]",
-                    message.getId(), message.getMethod(), message.getDeviceId());
-        }
+        downstreamHandler.handle(message);
     }
 
 }

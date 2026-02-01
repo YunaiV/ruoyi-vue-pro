@@ -1,16 +1,20 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
+
 /**
- * IoT 网关 MQTT 上行消息处理器
- * <p>
- * 处理业务消息（属性上报、事件上报等）
+ * IoT 网关 MQTT 上行消息处理器：处理业务消息（属性上报、事件上报等）
  *
  * @author 芋道源码
  */
@@ -33,49 +37,64 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
      * @param topic    主题
      * @param payload  消息内容
      */
-    public void handleMessage(MqttEndpoint endpoint, String topic, byte[] payload) {
+    public void handleBusinessRequest(MqttEndpoint endpoint, String topic, byte[] payload) {
         String clientId = endpoint.clientIdentifier();
+        IotDeviceMessage message = null;
+        String productKey = null;
+        String deviceName = null;
 
-        // 1. 基础检查
-        if (payload == null || payload.length == 0) {
-            return;
-        }
-
-        // 2. 解析主题，获取 productKey 和 deviceName
-        String[] topicParts = topic.split("/");
-        if (topicParts.length < 4 || StrUtil.hasBlank(topicParts[2], topicParts[3])) {
-            log.warn("[handleMessage][topic({}) 格式不正确，无法解析有效的 productKey 和 deviceName]", topic);
-            return;
-        }
-
-        // 3. 解码消息（使用从 topic 解析的 productKey 和 deviceName）
-        String productKey = topicParts[2];
-        String deviceName = topicParts[3];
         try {
-            IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(payload, productKey, deviceName);
+            // 1.1 基础检查
+            if (ArrayUtil.isEmpty(payload)) {
+                return;
+            }
+            // 1.2 解析主题，获取 productKey 和 deviceName
+            String[] topicParts = topic.split("/");
+            if (topicParts.length < 4 || StrUtil.hasBlank(topicParts[2], topicParts[3])) {
+                log.warn("[handleBusinessRequest][topic({}) 格式不正确，无法解析有效的 productKey 和 deviceName]", topic);
+                return;
+            }
+            productKey = topicParts[2];
+            deviceName = topicParts[3];
+            // 1.3 校验设备信息，防止伪造设备消息
+            IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(endpoint);
+            Assert.notNull(connectionInfo, "无法获取连接信息");
+            Assert.equals(productKey, connectionInfo.getProductKey(), "产品 Key 不匹配");
+            Assert.equals(deviceName, connectionInfo.getDeviceName(), "设备名称不匹配");
+
+            // 2. 反序列化消息
+            message = deviceMessageService.decodeDeviceMessage(payload, productKey, deviceName);
             if (message == null) {
-                log.warn("[handleMessage][消息解码失败，客户端 ID: {}，主题: {}]", clientId, topic);
+                log.warn("[handleBusinessRequest][消息解码失败，客户端 ID: {}，主题: {}]", clientId, topic);
+                sendErrorResponse(endpoint, productKey, deviceName, null, null,
+                        BAD_REQUEST.getCode(), "消息解码失败");
                 return;
             }
 
-            // 4. 处理业务消息（认证已在连接时完成）
-            log.info("[handleMessage][收到设备消息，设备: {}.{}, 方法: {}]",
-                    productKey, deviceName, message.getMethod());
-            handleBusinessRequest(message, productKey, deviceName);
+            // 3. 处理业务消息
+            deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
+            log.debug("[handleBusinessRequest][消息处理成功，客户端 ID: {}，主题: {}]", clientId, topic);
+        } catch (ServiceException e) {
+            log.warn("[handleBusinessRequest][业务异常，客户端 ID: {}，主题: {}，错误: {}]",
+                    clientId, topic, e.getMessage());
+            String requestId = message != null ? message.getRequestId() : null;
+            String method = message != null ? message.getMethod() : null;
+            sendErrorResponse(endpoint, productKey, deviceName, requestId, method, e.getCode(), e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.warn("[handleBusinessRequest][参数校验失败，客户端 ID: {}，主题: {}，错误: {}]",
+                    clientId, topic, e.getMessage());
+            String requestId = message != null ? message.getRequestId() : null;
+            String method = message != null ? message.getMethod() : null;
+            sendErrorResponse(endpoint, productKey, deviceName, requestId, method,
+                    BAD_REQUEST.getCode(), e.getMessage());
         } catch (Exception e) {
-            // TODO @AI：各种情况下的翻译；
-            log.error("[handleMessage][消息处理异常，客户端 ID: {}，主题: {}，错误: {}]",
+            log.error("[handleBusinessRequest][消息处理异常，客户端 ID: {}，主题: {}，错误: {}]",
                     clientId, topic, e.getMessage(), e);
+            String requestId = message != null ? message.getRequestId() : null;
+            String method = message != null ? message.getMethod() : null;
+            sendErrorResponse(endpoint, productKey, deviceName, requestId, method,
+                    INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
         }
-    }
-
-    /**
-     * 处理业务请求
-     */
-    private void handleBusinessRequest(IotDeviceMessage message, String productKey, String deviceName) {
-        // 发送消息到消息总线
-        message.setServerId(serverId);
-        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
     }
 
 }

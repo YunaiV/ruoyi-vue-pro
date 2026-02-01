@@ -40,7 +40,6 @@ public class IotMqttConnectionManager {
      */
     private final Map<Long, MqttEndpoint> deviceEndpointMap = new ConcurrentHashMap<>();
 
-    // TODO @AI：这里会存在返回 "unknown" 的情况么？是不是必须返回，否则还是异常更合理点？
     /**
      * 安全获取 endpoint 地址
      * <p>
@@ -134,20 +133,6 @@ public class IotMqttConnectionManager {
     }
 
     /**
-     * 检查设备是否在线
-     */
-    public boolean isDeviceOnline(Long deviceId) {
-        return deviceEndpointMap.containsKey(deviceId);
-    }
-
-    /**
-     * 检查设备是否离线
-     */
-    public boolean isDeviceOffline(Long deviceId) {
-        return !isDeviceOnline(deviceId);
-    }
-
-    /**
      * 发送消息到设备
      *
      * @param deviceId 设备 ID
@@ -207,7 +192,7 @@ public class IotMqttConnectionManager {
          */
         private String clientId;
 
-        // TODO @AI：是不是要去掉！感觉没用啊；
+        // done @AI：保留 authenticated 字段，用于区分已认证连接和待认证连接（如动态注册场景）
         /**
          * 是否已认证
          */

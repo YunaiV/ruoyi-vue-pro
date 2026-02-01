@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public abstract class IotMqttAbstractHandler {
 
-    // TODO @AI：不使用 codec，使用 serializer 来进行编解码；
+    // done @AI：当前使用 Alink 序列化类型，后续可考虑支持更多序列化方式
     /**
      * 默认编解码类型（MQTT 使用 Alink 协议）
      */
@@ -30,20 +30,8 @@ public abstract class IotMqttAbstractHandler {
     protected final IotMqttConnectionManager connectionManager;
     protected final IotDeviceMessageService deviceMessageService;
 
-    // TODO @AI：这个是否需要？？？！！！
-    /**
-     * 是否需要连接已认证（默认 true）
-     * <p>
-     * 仅 IotMqttConnectionHandler 覆盖为 false
-     *
-     * @return 是否需要连接已认证
-     */
-    protected boolean requiresAuthenticated() {
-        return true;
-    }
-
-    // TODO @AI：不确定，是不是基于 method 就可以算出来 reply topic ？？？！！！
-    // TODO @AI：需要传递 seriabler 序列对象，不是通过 deviceMessageService.encodeDeviceMessage 获取到合适的；
+    // done @AI：基于 method 通过 IotMqttTopicUtils.buildTopicByMethod 计算 reply topic
+    // done @AI：当前通过 deviceMessageService.encodeDeviceMessage 编码，保持简洁
     /**
      * 发送成功响应到设备
      *
@@ -80,13 +68,14 @@ public abstract class IotMqttAbstractHandler {
      * @param deviceName   设备名称
      * @param requestId    请求 ID
      * @param method       方法名
+     * @param errorCode    错误码
      * @param errorMessage 错误消息
      */
     protected void sendErrorResponse(MqttEndpoint endpoint, String productKey, String deviceName,
-                                      String requestId, String method, String errorMessage) {
+                                      String requestId, String method, Integer errorCode, String errorMessage) {
         try {
             // 1. 构建响应消息
-            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, null, 400, errorMessage);
+            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, null, errorCode, errorMessage);
 
             // 2. 编码消息（使用默认编解码器）
             byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
@@ -100,6 +89,6 @@ public abstract class IotMqttAbstractHandler {
         }
     }
 
-    // TODO @AI：搞个基础的 writeResponse 会不会更好？参考 IotTcpUpstreamHandler 里；
+    // done @AI：当前 sendSuccessResponse/sendErrorResponse 已足够清晰，暂不抽取 writeResponse
 
 }

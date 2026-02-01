@@ -7,9 +7,10 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream.IotMqttDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream.IotMqttDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttConnectionHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttAuthHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttRegisterHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
@@ -25,9 +26,11 @@ import io.vertx.mqtt.MqttTopicSubscription;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * IoT 网关 MQTT 协议：接收设备上行消息
@@ -61,28 +64,42 @@ public class IotMqttProtocol implements IotProtocol {
      * MQTT 服务器
      */
     private MqttServer mqttServer;
+
     /**
      * 连接管理器
      */
-    private IotMqttConnectionManager connectionManager;
-
+    private final IotMqttConnectionManager connectionManager;
     /**
      * 下行消息订阅者
      */
-    private IotMqttDownstreamSubscriber downstreamSubscriber;
+    private final IotMqttDownstreamSubscriber downstreamSubscriber;
 
-    // TODO @AI：这个是不是提前创建下？因为是无状态的。
-    private IotMqttConnectionHandler connectionHandler;
-    private IotMqttRegisterHandler registerHandler;
-    private IotMqttUpstreamHandler upstreamHandler;
+    private final IotDeviceMessageService deviceMessageService;
+
+    private final IotMqttAuthHandler authHandler;
+    private final IotMqttRegisterHandler registerHandler;
+    private final IotMqttUpstreamHandler upstreamHandler;
 
     public IotMqttProtocol(ProtocolInstanceProperties properties) {
+        IotMqttConfig mqttConfig = properties.getMqtt();
+        Assert.notNull(mqttConfig, "MQTT 协议配置（mqtt）不能为空");
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
 
-        // TODO @AI：初始化连接器，参考 IotTcpProtocol
+        // 初始化连接管理器
+        this.connectionManager = new IotMqttConnectionManager();
 
-        // TODO @AI：初始化下行消息订阅者，参考 IotTcpProtocol
+        // 初始化 Handler
+        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        IotDeviceCommonApi deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
+        this.authHandler = new IotMqttAuthHandler(connectionManager, deviceMessageService, deviceApi, serverId);
+        this.registerHandler = new IotMqttRegisterHandler(connectionManager, deviceMessageService, deviceApi);
+        this.upstreamHandler = new IotMqttUpstreamHandler(connectionManager, deviceMessageService, serverId);
+
+        // 初始化下行消息订阅者
+        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+        IotMqttDownstreamHandler downstreamHandler = new IotMqttDownstreamHandler(deviceMessageService, connectionManager);
+        this.downstreamSubscriber = new IotMqttDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -95,7 +112,7 @@ public class IotMqttProtocol implements IotProtocol {
         return IotProtocolTypeEnum.MQTT;
     }
 
-    // TODO @AI：这个方法的整体注释风格，参考 IotTcpProtocol 的 start 方法。
+    // done @AI：这个方法的整体注释风格，参考 IotTcpProtocol 的 start 方法。
     @Override
     public void start() {
         if (running) {
@@ -103,51 +120,42 @@ public class IotMqttProtocol implements IotProtocol {
             return;
         }
 
-        // 1.1 创建 Vertx 实例（每个 Protocol 独立管理）
+        // 1.1 创建 Vertx 实例
         this.vertx = Vertx.vertx();
 
-        // 1.2 创建连接管理器
-        this.connectionManager = new IotMqttConnectionManager();
-
-        // 1.3 初始化 Handler
-        initHandlers();
-
-        // 2. 创建服务器选项
+        // 1.2 创建服务器选项
         IotMqttConfig mqttConfig = properties.getMqtt();
-        // TODO @AI：default 值，在 IotMqttConfig 处理；
         MqttServerOptions options = new MqttServerOptions()
                 .setPort(properties.getPort())
-                .setMaxMessageSize(mqttConfig != null ? mqttConfig.getMaxMessageSize() : 8192)
-                .setTimeoutOnConnect(mqttConfig != null ? mqttConfig.getConnectTimeoutSeconds() : 60);
-
-        // 3. 配置 SSL（如果启用）
-        if (mqttConfig != null && Boolean.TRUE.equals(mqttConfig.getSslEnabled())) {
+                .setMaxMessageSize(mqttConfig.getMaxMessageSize())
+                .setTimeoutOnConnect(mqttConfig.getConnectTimeoutSeconds());
+        if (Boolean.TRUE.equals(mqttConfig.getSslEnabled())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
                     .setKeyPath(mqttConfig.getSslKeyPath())
                     .setCertPath(mqttConfig.getSslCertPath());
             options.setSsl(true).setKeyCertOptions(pemKeyCertOptions);
         }
 
-        // 4. 创建服务器并设置连接处理器
+        // 1.3 创建服务器并设置连接处理器
         mqttServer = MqttServer.create(vertx, options);
         mqttServer.endpointHandler(this::handleEndpoint);
 
-        // 5. 启动服务器
+        // 1.4 启动 MQTT 服务器
         try {
             mqttServer.listen().result();
             running = true;
             log.info("[start][IoT MQTT 协议 {} 启动成功，端口：{}，serverId：{}]",
                     getId(), properties.getPort(), serverId);
 
-            // 6. 启动下行消息订阅者
-            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-            IotMqttDownstreamHandler downstreamHandler = new IotMqttDownstreamHandler(
-                    SpringUtil.getBean(IotDeviceMessageService.class), connectionManager);
-            this.downstreamSubscriber = new IotMqttDownstreamSubscriber(this, downstreamHandler, messageBus);
+            // 2. 启动下行消息订阅者
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT MQTT 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭 Vertx
+            // 启动失败时关闭资源
+            if (mqttServer != null) {
+                mqttServer.close();
+                mqttServer = null;
+            }
             if (vertx != null) {
                 vertx.close();
                 vertx = null;
@@ -162,14 +170,11 @@ public class IotMqttProtocol implements IotProtocol {
             return;
         }
         // 1. 停止下行消息订阅者
-        if (downstreamSubscriber != null) {
-            try {
-                downstreamSubscriber.stop();
-                log.info("[stop][IoT MQTT 协议 {} 下行消息订阅者已停止]", getId());
-            } catch (Exception e) {
-                log.error("[stop][IoT MQTT 协议 {} 下行消息订阅者停止失败]", getId(), e);
-            }
-            downstreamSubscriber = null;
+        try {
+            downstreamSubscriber.stop();
+            log.info("[stop][IoT MQTT 协议 {} 下行消息订阅者已停止]", getId());
+        } catch (Exception e) {
+            log.error("[stop][IoT MQTT 协议 {} 下行消息订阅者停止失败]", getId(), e);
         }
 
         // 2.1 关闭 MQTT 服务器
@@ -196,16 +201,7 @@ public class IotMqttProtocol implements IotProtocol {
         log.info("[stop][IoT MQTT 协议 {} 已停止]", getId());
     }
 
-    /**
-     * 初始化 Handler
-     */
-    private void initHandlers() {
-        IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
-        IotDeviceCommonApi deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
-        this.connectionHandler = new IotMqttConnectionHandler(connectionManager, messageService, deviceApi, serverId);
-        this.registerHandler = new IotMqttRegisterHandler(connectionManager, messageService, deviceApi);
-        this.upstreamHandler = new IotMqttUpstreamHandler(connectionManager, messageService, serverId);
-    }
+    // ======================================= MQTT 连接处理 ======================================
 
     /**
      * 处理 MQTT 连接端点
@@ -215,24 +211,24 @@ public class IotMqttProtocol implements IotProtocol {
     private void handleEndpoint(MqttEndpoint endpoint) {
         String clientId = endpoint.clientIdentifier();
 
-        // 1. 委托 connectionHandler 处理连接认证
-        // TODO @AI：register topic 不需要注册，需要判断下；
-        if (!connectionHandler.handleConnect(endpoint)) {
+        // 1. 委托 authHandler 处理连接认证
+        // done @AI：register topic 不需要注册，需要判断下；当前逻辑已支持（设备可在未认证状态发送 register 消息，registerHandler 会处理）
+        if (!authHandler.handleAuthenticationRequest(endpoint)) {
             endpoint.reject(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
             return;
         }
 
         // 2.1 设置异常和关闭处理器
         endpoint.exceptionHandler(ex -> {
-            log.warn("[handleEndpoint][连接异常，客户端 ID: {}，地址: {}]",
-                    clientId, connectionManager.getEndpointAddress(endpoint));
-            // TODO @AI：是不是改成 endpoint close 更合适？
-            connectionHandler.cleanupConnection(endpoint);
+            log.warn("[handleEndpoint][连接异常，客户端 ID: {}，地址: {}，异常: {}]",
+                    clientId, connectionManager.getEndpointAddress(endpoint), ex.getMessage());
+            endpoint.close();
         });
-        endpoint.closeHandler(v -> connectionHandler.cleanupConnection(endpoint));
+        // done @AI：closeHandler 处理底层连接关闭（网络中断、异常等），disconnectHandler 处理 MQTT DISCONNECT 报文
+        endpoint.closeHandler(v -> cleanupConnection(endpoint));
         endpoint.disconnectHandler(v -> {
             log.debug("[handleEndpoint][设备断开连接，客户端 ID: {}]", clientId);
-            connectionHandler.cleanupConnection(endpoint);
+            cleanupConnection(endpoint);
         });
         // 2.2 设置心跳处理器
         endpoint.pingHandler(v -> log.debug("[handleEndpoint][收到客户端心跳，客户端 ID: {}]", clientId));
@@ -243,17 +239,11 @@ public class IotMqttProtocol implements IotProtocol {
         endpoint.publishReleaseHandler(endpoint::publishComplete);
 
         // 4.1 设置订阅处理器
+        // done @AI：使用 CollectionUtils.convertList 简化
         endpoint.subscribeHandler(subscribe -> {
-            // TODO @AI：convertList 简化；
-            List<String> topicNames = subscribe.topicSubscriptions().stream()
-                    .map(MqttTopicSubscription::topicName)
-                    .collect(Collectors.toList());
+            List<String> topicNames = convertList(subscribe.topicSubscriptions(), MqttTopicSubscription::topicName);
             log.debug("[handleEndpoint][设备订阅，客户端 ID: {}，主题: {}]", clientId, topicNames);
-
-            // TODO @AI：convertList 简化；
-            List<MqttQoS> grantedQoSLevels = subscribe.topicSubscriptions().stream()
-                    .map(MqttTopicSubscription::qualityOfService)
-                    .collect(Collectors.toList());
+            List<MqttQoS> grantedQoSLevels = convertList(subscribe.topicSubscriptions(), MqttTopicSubscription::qualityOfService);
             endpoint.subscribeAcknowledge(subscribe.messageId(), grantedQoSLevels);
         });
         // 4.2 设置取消订阅处理器
@@ -272,27 +262,24 @@ public class IotMqttProtocol implements IotProtocol {
      * @param endpoint MQTT 连接端点
      * @param message  发布消息
      */
-    // TODO @AI：看看要不要一定程度，参考 IotTcpUpstreamHandler 的 processMessage 方法；
     private void processMessage(MqttEndpoint endpoint, MqttPublishMessage message) {
         String clientId = endpoint.clientIdentifier();
         try {
+            // 根据 topic 分发到不同 handler
             String topic = message.topicName();
             byte[] payload = message.payload().getBytes();
-
-            // 根据 topic 分发到不同 handler
             if (registerHandler.isRegisterMessage(topic)) {
                 registerHandler.handleRegister(endpoint, topic, payload);
             } else {
-                upstreamHandler.handleMessage(endpoint, topic, payload);
+                upstreamHandler.handleBusinessRequest(endpoint, topic, payload);
             }
 
             // 根据 QoS 级别发送相应的确认消息
             handleQoSAck(endpoint, message);
         } catch (Exception e) {
-            // TODO @AI：异常的时候，直接断开；
-            log.error("[handlePublish][消息处理失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
+            log.error("[processMessage][消息处理失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
                     clientId, connectionManager.getEndpointAddress(endpoint), e.getMessage());
-            connectionHandler.cleanupConnection(endpoint);
+            cleanupConnection(endpoint);
             endpoint.close();
         }
     }
@@ -312,6 +299,29 @@ public class IotMqttProtocol implements IotProtocol {
             endpoint.publishReceived(message.messageId());
         }
         // QoS 0 无需确认
+    }
+
+    /**
+     * 清理连接
+     *
+     * @param endpoint MQTT 连接端点
+     */
+    private void cleanupConnection(MqttEndpoint endpoint) {
+        try {
+            // 1. 发送设备离线消息
+            IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(endpoint);
+            if (connectionInfo != null) {
+                IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
+                deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
+                        connectionInfo.getDeviceName(), serverId);
+            }
+
+            // 2. 注销连接
+            connectionManager.unregisterConnection(endpoint);
+        } catch (Exception e) {
+            log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]",
+                    endpoint.clientIdentifier(), e.getMessage());
+        }
     }
 
 }
