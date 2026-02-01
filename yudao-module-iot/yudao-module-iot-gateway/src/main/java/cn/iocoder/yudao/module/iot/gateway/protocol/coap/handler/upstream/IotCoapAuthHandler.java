@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstrem;
+package cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstream;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
