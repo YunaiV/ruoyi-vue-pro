@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.coap.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstrem;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapResource;

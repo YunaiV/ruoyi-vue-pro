@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.upstream;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
@@ -26,7 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_AUTH_FAIL;
 
 /**
  * TCP 上行消息处理器
@@ -132,6 +135,12 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
                 // 业务消息
                 handleBusinessRequest(clientId, message, socket);
             }
+        } catch (ServiceException e) {
+            // 业务异常，返回对应的错误码和错误信息
+            log.warn("[processMessage][业务异常，客户端 ID: {}，错误: {}]", clientId, e.getMessage());
+            String requestId = message != null ? message.getRequestId() : null;
+            String method = message != null ? message.getMethod() : null;
+            sendErrorResponse(socket, requestId, method, e.getCode(), e.getMessage());
         } catch (IllegalArgumentException e) {
             // 参数校验失败，返回 400
             log.warn("[processMessage][参数校验失败，客户端 ID: {}，错误: {}]", clientId, e.getMessage());
@@ -166,10 +175,9 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
         // 2.1 执行认证
         CommonResult<Boolean> authResult = deviceApi.authDevice(authParams);
-        if (authResult.isError()) {
-            log.warn("[handleAuthenticationRequest][认证失败，客户端 ID: {}，username: {}]", clientId, authParams.getUsername());
-            sendErrorResponse(socket, message.getRequestId(), AUTH_METHOD, authResult.getCode(), authResult.getMsg());
-            return;
+        authResult.checkError();
+        if (BooleanUtil.isFalse(authResult.getData())) {
+            throw exception(DEVICE_AUTH_FAIL);
         }
         // 2.2 解析设备信息
         IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(authParams.getUsername());
@@ -205,12 +213,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
 
         // 2. 调用动态注册
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);
-        if (result.isError()) {
-            log.warn("[handleRegisterRequest][注册失败，客户端 ID: {}，错误: {}]", clientId, result.getMsg());
-            sendErrorResponse(socket, message.getRequestId(), IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(),
-                    result.getCode(), result.getMsg());
-            return;
-        }
+        result.checkError();
 
         // 3. 发送成功响应
         sendSuccessResponse(socket, message.getRequestId(),

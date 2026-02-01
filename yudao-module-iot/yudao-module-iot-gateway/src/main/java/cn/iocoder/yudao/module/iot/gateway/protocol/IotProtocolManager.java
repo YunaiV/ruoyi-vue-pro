@@ -4,9 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketUpstreamProtocol;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
@@ -100,6 +102,10 @@ public class IotProtocolManager implements SmartLifecycle {
                 return createTcpProtocol(config);
             case UDP:
                 return createUdpProtocol(config);
+            case COAP:
+                return createCoapProtocol(config);
+            case WEBSOCKET:
+                return createWebSocketProtocol(config);
             default:
                 throw new IllegalArgumentException(String.format(
                         "[createProtocol][协议实例 %s 的协议类型 %s 暂不支持]", config.getId(), protocolType));
@@ -134,6 +140,26 @@ public class IotProtocolManager implements SmartLifecycle {
      */
     private IotUdpProtocol createUdpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
         return new IotUdpProtocol(config);
+    }
+
+    /**
+     * 创建 CoAP 协议实例
+     *
+     * @param config 协议实例配置
+     * @return CoAP 协议实例
+     */
+    private IotCoapProtocol createCoapProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+        return new IotCoapProtocol(config);
+    }
+
+    /**
+     * 创建 WebSocket 协议实例
+     *
+     * @param config 协议实例配置
+     * @return WebSocket 协议实例
+     */
+    private IotWebSocketUpstreamProtocol createWebSocketProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+        return new IotWebSocketUpstreamProtocol(config);
     }
 
 }

@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.config;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolManager;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxAuthEventProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
@@ -11,12 +9,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttDownstreamHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.router.IotWebSocketDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
@@ -107,65 +100,6 @@ public class IotGatewayConfiguration {
                                                                        IotMqttDownstreamHandler downstreamHandler,
                                                                        IotMessageBus messageBus) {
             return new IotMqttDownstreamSubscriber(mqttUpstreamProtocol, downstreamHandler, messageBus);
-        }
-
-    }
-
-    /**
-     * IoT 网关 CoAP 协议配置类
-     */
-    @Configuration
-    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.coap", name = "enabled", havingValue = "true")
-    @Slf4j
-    public static class CoapProtocolConfiguration {
-
-        @Bean
-        public IotCoapUpstreamProtocol iotCoapUpstreamProtocol(IotGatewayProperties gatewayProperties) {
-            return new IotCoapUpstreamProtocol(gatewayProperties.getProtocol().getCoap());
-        }
-
-        @Bean
-        public IotCoapDownstreamSubscriber iotCoapDownstreamSubscriber(IotCoapUpstreamProtocol coapUpstreamProtocol,
-                                                                       IotMessageBus messageBus) {
-            return new IotCoapDownstreamSubscriber(coapUpstreamProtocol, messageBus);
-        }
-
-    }
-
-    /**
-     * IoT 网关 WebSocket 协议配置类
-     */
-    @Configuration
-    @ConditionalOnProperty(prefix = "yudao.iot.gateway.protocol.websocket", name = "enabled", havingValue = "true")
-    @Slf4j
-    public static class WebSocketProtocolConfiguration {
-
-        @Bean(name = "websocketVertx", destroyMethod = "close")
-        public Vertx websocketVertx() {
-            return Vertx.vertx();
-        }
-
-        @Bean
-        public IotWebSocketUpstreamProtocol iotWebSocketUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                                         IotDeviceService deviceService,
-                                                                         IotDeviceMessageService messageService,
-                                                                         IotWebSocketConnectionManager connectionManager,
-                                                                         @Qualifier("websocketVertx") Vertx websocketVertx) {
-            return new IotWebSocketUpstreamProtocol(gatewayProperties.getProtocol().getWebsocket(),
-                    deviceService, messageService, connectionManager, websocketVertx);
-        }
-
-        @Bean
-        public IotWebSocketDownstreamHandler iotWebSocketDownstreamHandler(IotDeviceMessageService messageService,
-                                                                           IotWebSocketConnectionManager connectionManager) {
-            return new IotWebSocketDownstreamHandler(messageService, connectionManager);
-        }
-
-        @Bean
-        public IotWebSocketDownstreamSubscriber iotWebSocketDownstreamSubscriber(IotWebSocketUpstreamProtocol protocolHandler,
-                                                                                 IotWebSocketDownstreamHandler downstreamHandler,
-                                                                                 IotMessageBus messageBus) {
-            return new IotWebSocketDownstreamSubscriber(protocolHandler, downstreamHandler, messageBus);
         }
 
     }

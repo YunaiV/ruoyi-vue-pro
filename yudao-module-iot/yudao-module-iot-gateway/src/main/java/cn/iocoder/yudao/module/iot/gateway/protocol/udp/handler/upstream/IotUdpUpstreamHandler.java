@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.udp.handler.upstream;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
@@ -27,10 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.net.InetSocketAddress;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_AUTH_FAIL;
 
 /**
  * UDP 上行消息处理器
@@ -87,7 +91,7 @@ public class IotUdpUpstreamHandler {
         this.deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
     }
 
-    // TODO @AI：vertx 有 udp 的实现么？
+    // TODO done @AI：vertx 有 udp 的实现么？当前已使用 Vert.x DatagramSocket 实现
     /**
      * 处理 UDP 数据包
      *
@@ -99,18 +103,7 @@ public class IotUdpUpstreamHandler {
         Buffer data = packet.data();
         String addressKey = sessionManager.buildAddressKey(senderAddress);
         log.debug("[handle][收到 UDP 数据包，来源: {}，数据长度: {} 字节]", addressKey, data.length());
-        try {
-            processMessage(data, senderAddress, socket);
-        } catch (IllegalArgumentException e) {
-            // 参数校验失败，返回 400
-            log.warn("[handle][参数校验失败，来源: {}，错误: {}]", addressKey, e.getMessage());
-            sendErrorResponse(socket, senderAddress, null, null, BAD_REQUEST.getCode(), e.getMessage());
-        } catch (Exception e) {
-            // 其他异常，返回 500
-            log.error("[handle][处理消息失败，来源: {}]", addressKey, e);
-            sendErrorResponse(socket, senderAddress, null, null,
-                    INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
-        }
+        processMessage(data, senderAddress, socket);
     }
 
     /**
@@ -121,6 +114,7 @@ public class IotUdpUpstreamHandler {
      * @param socket        UDP Socket
      */
     private void processMessage(Buffer buffer, InetSocketAddress senderAddress, DatagramSocket socket) {
+        String addressKey = sessionManager.buildAddressKey(senderAddress);
         // 1.1 基础检查
         if (ArrayUtil.isEmpty(buffer)) {
             return;
@@ -133,15 +127,35 @@ public class IotUdpUpstreamHandler {
         }
 
         // 2. 根据消息类型路由处理
-        if (AUTH_METHOD.equals(message.getMethod())) {
-            // 认证请求
-            handleAuthenticationRequest(message, senderAddress, socket);
-        } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
-            // 设备动态注册请求
-            handleRegisterRequest(message, senderAddress, socket);
-        } else {
-            // 业务消息
-            handleBusinessRequest(message, senderAddress, socket);
+        try {
+            if (AUTH_METHOD.equals(message.getMethod())) {
+                // 认证请求
+                handleAuthenticationRequest(message, senderAddress, socket);
+            } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
+                // 设备动态注册请求
+                handleRegisterRequest(message, senderAddress, socket);
+            } else {
+                // 业务消息
+                handleBusinessRequest(message, senderAddress, socket);
+            }
+        } catch (ServiceException e) {
+            // 业务异常，返回对应的错误码和错误信息
+            log.warn("[processMessage][业务异常，来源: {}，requestId: {}，method: {}，错误: {}]",
+                    addressKey, message.getRequestId(), message.getMethod(), e.getMessage());
+            sendErrorResponse(socket, senderAddress, message.getRequestId(), message.getMethod(),
+                    e.getCode(), e.getMessage());
+        } catch (IllegalArgumentException e) {
+            // 参数校验失败，返回 400
+            log.warn("[processMessage][参数校验失败，来源: {}，requestId: {}，method: {}，错误: {}]",
+                    addressKey, message.getRequestId(), message.getMethod(), e.getMessage());
+            sendErrorResponse(socket, senderAddress, message.getRequestId(), message.getMethod(),
+                    BAD_REQUEST.getCode(), e.getMessage());
+        } catch (Exception e) {
+            // 其他异常，返回 500
+            log.error("[processMessage][处理消息失败，来源: {}，requestId: {}，method: {}]",
+                    addressKey, message.getRequestId(), message.getMethod(), e);
+            sendErrorResponse(socket, senderAddress, message.getRequestId(), message.getMethod(),
+                    INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
         }
     }
 
@@ -164,12 +178,9 @@ public class IotUdpUpstreamHandler {
 
         // 2.1 执行认证
         CommonResult<Boolean> authResult = deviceApi.authDevice(authParams);
-        if (authResult.isError()) {
-            log.warn("[handleAuthenticationRequest][认证失败，客户端 ID: {}，username: {}]",
-                    clientId, authParams.getUsername());
-            sendErrorResponse(socket, senderAddress, message.getRequestId(), AUTH_METHOD,
-                    authResult.getCode(), authResult.getMsg());
-            return;
+        authResult.checkError();
+        if (!BooleanUtil.isTrue(authResult.getData())) {
+            throw exception(DEVICE_AUTH_FAIL);
         }
         // 2.2 解析设备信息
         IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(authParams.getUsername());
@@ -187,7 +198,8 @@ public class IotUdpUpstreamHandler {
         // 4.2 发送上线消息
         sendOnlineMessage(device);
         // 4.3 发送成功响应（包含 token）
-        sendAuthSuccessResponse(socket, senderAddress, message.getRequestId(), token);
+        sendSuccessResponse(socket, senderAddress, message.getRequestId(), AUTH_METHOD,
+                MapUtil.of("token", token));
         log.info("[handleAuthenticationRequest][认证成功，设备 ID: {}，设备名: {}，来源: {}]",
                 device.getId(), device.getDeviceName(), sessionManager.buildAddressKey(senderAddress));
     }
@@ -211,13 +223,7 @@ public class IotUdpUpstreamHandler {
 
         // 2. 调用动态注册
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);
-        if (result.isError()) {
-            log.warn("[handleRegisterRequest][注册失败，来源: {}，错误: {}]",
-                    sessionManager.buildAddressKey(senderAddress), result.getMsg());
-            sendErrorResponse(socket, senderAddress, message.getRequestId(),
-                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), result.getCode(), result.getMsg());
-            return;
-        }
+        result.checkError();
 
         // 3. 发送成功响应
         sendSuccessResponse(socket, senderAddress, message.getRequestId(),
@@ -274,17 +280,8 @@ public class IotUdpUpstreamHandler {
             return;
         }
 
-        // 2. 更新会话活跃时间和地址
-        // TODO @AI：是不是合并到 sessionManager 里面更好？
-        IotUdpSessionManager.SessionInfo sessionInfo = sessionManager.getSessionInfo(device.getId());
-        if (sessionInfo != null) {
-            // 检查地址是否变化，变化则更新
-            if (!senderAddress.equals(sessionInfo.getAddress())) {
-                sessionManager.updateSessionAddress(device.getId(), senderAddress);
-            } else {
-                sessionManager.updateSessionActivity(device.getId());
-            }
-        }
+        // 2. 更新会话地址（如有变化）
+        sessionManager.updateSessionAddress(device.getId(), senderAddress);
 
         // 3. 将 body 设置为实际的 params，发送消息到消息总线
         message.setParams(body);
@@ -306,8 +303,7 @@ public class IotUdpUpstreamHandler {
                 .setDeviceId(device.getId())
                 .setProductKey(device.getProductKey())
                 .setDeviceName(device.getDeviceName())
-                .setAddress(address)
-                .setLastActiveTime(LocalDateTime.now());
+                .setAddress(address);
         sessionManager.registerSession(device.getId(), sessionInfo);
     }
 
@@ -323,21 +319,6 @@ public class IotUdpUpstreamHandler {
     }
 
     // ===================== 发送响应消息 =====================
-
-    /**
-     * 发送认证成功响应（包含 token）
-     *
-     * @param socket    UDP Socket
-     * @param address   目标地址
-     * @param requestId 请求 ID
-     * @param token     JWT Token
-     */
-    private void sendAuthSuccessResponse(DatagramSocket socket, InetSocketAddress address,
-                                         String requestId, String token) {
-        IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, AUTH_METHOD, token,
-                SUCCESS.getCode(), null);
-        writeResponse(socket, address, responseMessage);
-    }
 
     /**
      * 发送成功响应

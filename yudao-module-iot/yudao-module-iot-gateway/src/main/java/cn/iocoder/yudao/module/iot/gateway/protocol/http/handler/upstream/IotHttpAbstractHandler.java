@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
@@ -10,9 +10,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream.IotHttpAuthHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream.IotHttpRegisterHandler;
-import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
@@ -20,8 +17,7 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 
@@ -35,8 +31,6 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
 
     private final IotDeviceTokenService deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
 
-    private final IotMessageSerializerManager serializerManager = SpringUtil.getBean(IotMessageSerializerManager.class);
-
     @Override
     public final void handle(RoutingContext context) {
         try {
@@ -47,15 +41,31 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
             CommonResult<Object> result = handle0(context);
             writeResponse(context, result);
         } catch (ServiceException e) {
+            // 已知异常，返回对应的错误码和错误信息
             writeResponse(context, CommonResult.error(e.getCode(), e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            // 参数校验异常，返回 400 错误
+            writeResponse(context, CommonResult.error(BAD_REQUEST.getCode(), e.getMessage()));
         } catch (Exception e) {
+            // 其他未知异常，返回 500 错误
             log.error("[handle][path({}) 处理异常]", context.request().path(), e);
             writeResponse(context, CommonResult.error(INTERNAL_SERVER_ERROR));
         }
     }
 
+    /**
+     * 处理 HTTP 请求（子类实现）
+     *
+     * @param context RoutingContext 对象
+     * @return 处理结果
+     */
     protected abstract CommonResult<Object> handle0(RoutingContext context);
 
+    /**
+     * 前置处理：认证等
+     *
+     * @param context RoutingContext 对象
+     */
     private void beforeHandle(RoutingContext context) {
         // 如果不需要认证，则不走前置处理
         String path = context.request().path();
@@ -102,7 +112,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
     }
 
     @SuppressWarnings("deprecation")
-    public static void writeResponse(RoutingContext context, Object data) {
+    public static void writeResponse(RoutingContext context, CommonResult<?> data) {
         context.response()
                 .setStatusCode(200)
                 .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)

@@ -7,7 +7,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpAbstractHandler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
@@ -33,15 +32,16 @@ public class IotHttpUpstreamHandler extends IotHttpAbstractHandler {
 
     @Override
     protected CommonResult<Object> handle0(RoutingContext context) {
-        // 1. 解析通用参数
+        // 1.1 解析通用参数
         String productKey = context.pathParam("productKey");
         String deviceName = context.pathParam("deviceName");
         String method = context.pathParam("*").replaceAll(StrPool.SLASH, StrPool.DOT);
-
-        // 2.1 根据 Content-Type 反序列化消息
+        // 1.2 根据 Content-Type 反序列化消息
         IotDeviceMessage message = deserializeRequest(context, IotDeviceMessage.class);
+        Assert.notNull(message, "请求参数不能为空");
         Assert.equals(method, message.getMethod(), "method 不匹配");
-        // 2.2 发送消息
+
+        // 2. 发送消息
         deviceMessageService.sendDeviceMessage(message,
                 productKey, deviceName, serverId);
 

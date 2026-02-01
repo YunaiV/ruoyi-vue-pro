@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig;
 import io.vertx.core.net.KeyCertOptions;
 import io.vertx.core.net.TrustOptions;
 import jakarta.validation.Valid;
@@ -89,16 +91,6 @@ public class IotGatewayProperties {
          * MQTT 组件配置
          */
         private MqttProperties mqtt;
-
-        /**
-         * CoAP 组件配置
-         */
-        private CoapProperties coap;
-
-        /**
-         * WebSocket 组件配置
-         */
-        private WebSocketProperties websocket;
 
     }
 
@@ -344,93 +336,6 @@ public class IotGatewayProperties {
 
     }
 
-    @Data
-    public static class CoapProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务端口（CoAP 默认端口 5683）
-         */
-        @NotNull(message = "服务端口不能为空")
-        private Integer port = 5683;
-
-        /**
-         * 最大消息大小（字节）
-         */
-        @NotNull(message = "最大消息大小不能为空")
-        private Integer maxMessageSize = 1024;
-
-        /**
-         * ACK 超时时间（毫秒）
-         */
-        @NotNull(message = "ACK 超时时间不能为空")
-        private Integer ackTimeout = 2000;
-
-        /**
-         * 最大重传次数
-         */
-        @NotNull(message = "最大重传次数不能为空")
-        private Integer maxRetransmit = 4;
-
-    }
-
-    @Data
-    public static class WebSocketProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口（默认：8094）
-         */
-        private Integer port = 8094;
-
-        /**
-         * WebSocket 路径（默认：/ws）
-         */
-        @NotEmpty(message = "WebSocket 路径不能为空")
-        private String path = "/ws";
-
-        /**
-         * 最大消息大小（字节，默认 64KB）
-         */
-        private Integer maxMessageSize = 65536;
-
-        /**
-         * 最大帧大小（字节，默认 64KB）
-         */
-        private Integer maxFrameSize = 65536;
-
-        /**
-         * 空闲超时时间（秒，默认 60）
-         */
-        private Integer idleTimeoutSeconds = 60;
-
-        /**
-         * 是否启用 SSL（wss://）
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 证书路径
-         */
-        private String sslCertPath;
-
-        /**
-         * SSL 私钥路径
-         */
-        private String sslKeyPath;
-
-    }
-
     // TODO @AI：【暂时忽略】改成 ProtocolProperties
     /**
      * 协议实例配置
@@ -488,6 +393,18 @@ public class IotGatewayProperties {
          */
         @Valid
         private IotUdpConfig udp;
+
+        /**
+         * CoAP 协议配置
+         */
+        @Valid
+        private IotCoapConfig coap;
+
+        /**
+         * WebSocket 协议配置
+         */
+        @Valid
+        private IotWebSocketConfig websocket;
 
     }
 
