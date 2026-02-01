@@ -7,7 +7,13 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+
+import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +66,16 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     @Override
     public CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs() {
         return doPost("/rpc-api/iot/modbus/enabled-configs", null, new ParameterizedTypeReference<>() { });
+    }
+
+    @Override
+    public CommonResult<IotDeviceRegisterRespDTO> registerDevice(IotDeviceRegisterReqDTO reqDTO) {
+        return doPost("/register", reqDTO, new ParameterizedTypeReference<>() { });
+    }
+
+    @Override
+    public CommonResult<List<IotSubDeviceRegisterRespDTO>> registerSubDevices(IotSubDeviceRegisterFullReqDTO reqDTO) {
+        return doPost("/register-sub", reqDTO, new ParameterizedTypeReference<>() { });
     }
 
     private <T, R> CommonResult<R> doPost(String url, T body,

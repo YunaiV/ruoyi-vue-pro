@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.service.auth;
 
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 
 /**
  * IoT 设备 Token Service 接口
@@ -24,7 +24,7 @@ public interface IotDeviceTokenService {
      * @param token 设备 Token
      * @return 设备信息
      */
-    IotDeviceAuthUtils.DeviceInfo verifyToken(String token);
+    IotDeviceIdentity verifyToken(String token);
 
     /**
      * 解析用户名
@@ -32,6 +32,6 @@ public interface IotDeviceTokenService {
      * @param username 用户名
      * @return 设备信息
      */
-    IotDeviceAuthUtils.DeviceInfo parseUsername(String username);
+    IotDeviceIdentity parseUsername(String username);
 
 }

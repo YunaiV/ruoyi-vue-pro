@@ -6,7 +6,9 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Nullable;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -116,6 +118,58 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
             map -> Integer.valueOf(map.get("state").toString()),
             map -> Long.valueOf(map.get("deviceCount").toString())
         ));
+    }
+
+    /**
+     * 查询有位置信息的设备列表
+     *
+     * @return 设备列表
+     */
+    default List<IotDeviceDO> selectListByHasLocation() {
+        return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
+                .isNotNull(IotDeviceDO::getLatitude)
+                .isNotNull(IotDeviceDO::getLongitude));
+    }
+
+    // ========== 网关-子设备绑定相关 ==========
+
+    /**
+     * 根据网关编号查询子设备列表
+     *
+     * @param gatewayId 网关设备编号
+     * @return 子设备列表
+     */
+    default List<IotDeviceDO> selectListByGatewayId(Long gatewayId) {
+        return selectList(IotDeviceDO::getGatewayId, gatewayId);
+    }
+
+    /**
+     * 分页查询未绑定网关的子设备
+     *
+     * @param reqVO 分页查询参数
+     * @return 子设备分页
+     */
+    default PageResult<IotDeviceDO> selectUnboundSubDevicePage(IotDevicePageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<IotDeviceDO>()
+                .likeIfPresent(IotDeviceDO::getDeviceName, reqVO.getDeviceName())
+                .likeIfPresent(IotDeviceDO::getNickname, reqVO.getNickname())
+                .eqIfPresent(IotDeviceDO::getProductId, reqVO.getProductId())
+                // 仅查询子设备 + 未绑定网关
+                .eq(IotDeviceDO::getDeviceType, IotProductDeviceTypeEnum.GATEWAY_SUB.getType())
+                .isNull(IotDeviceDO::getGatewayId)
+                .orderByDesc(IotDeviceDO::getId));
+    }
+
+    /**
+     * 批量更新设备的网关编号
+     *
+     * @param ids       设备编号列表
+     * @param gatewayId 网关设备编号（可以为 null，表示解绑）
+     */
+    default void updateGatewayIdBatch(Collection<Long> ids, Long gatewayId) {
+        update(null, new LambdaUpdateWrapper<IotDeviceDO>()
+                .set(IotDeviceDO::getGatewayId, gatewayId)
+                .in(IotDeviceDO::getId, ids));
     }
 
 }

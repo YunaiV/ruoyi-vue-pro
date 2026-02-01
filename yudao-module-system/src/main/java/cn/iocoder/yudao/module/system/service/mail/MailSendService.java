@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.mail;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,13 +24,15 @@ public interface MailSendService {
      * @param bccMails 密送邮箱
      * @param templateCode 邮件模版编码
      * @param templateParams 邮件模版参数
+     * @param attachments 附件
      * @return 发送日志编号
      */
     default Long sendSingleMailToAdmin(Long userId,
                                        Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
-                                       String templateCode, Map<String, Object> templateParams) {
+                                       String templateCode, Map<String, Object> templateParams,
+                                       File... attachments) {
         return sendSingleMail(toMails, ccMails, bccMails, userId, UserTypeEnum.ADMIN.getValue(),
-                templateCode, templateParams);
+                templateCode, templateParams, attachments);
     }
 
     /**
@@ -41,13 +44,15 @@ public interface MailSendService {
      * @param bccMails 密送邮箱
      * @param templateCode 邮件模版编码
      * @param templateParams 邮件模版参数
+     * @param attachments 附件
      * @return 发送日志编号
      */
     default Long sendSingleMailToMember(Long userId,
                                         Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
-                                        String templateCode, Map<String, Object> templateParams) {
+                                        String templateCode, Map<String, Object> templateParams,
+                                        File... attachments) {
         return sendSingleMail(toMails, ccMails, bccMails, userId, UserTypeEnum.MEMBER.getValue(),
-                templateCode, templateParams);
+                templateCode, templateParams, attachments);
     }
 
     /**
@@ -60,11 +65,13 @@ public interface MailSendService {
      * @param userType 用户类型
      * @param templateCode 邮件模版编码
      * @param templateParams 邮件模版参数
+     * @param attachments 附件
      * @return 发送日志编号
      */
     Long sendSingleMail(Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
                         Long userId, Integer userType,
-                        String templateCode, Map<String, Object> templateParams);
+                        String templateCode, Map<String, Object> templateParams,
+                        File... attachments);
 
     /**
      * 执行真正的邮件发送

@@ -142,7 +142,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
      */
     int calculatePrice(Integer basePrice, Integer percent, Integer fixedPrice) {
         // 1. 优先使用固定佣金
-        if (fixedPrice != null && fixedPrice > 0) {
+        if (fixedPrice != null && fixedPrice >= 0) {
             return ObjectUtil.defaultIfNull(fixedPrice, 0);
         }
         // 2. 根据比例计算佣金

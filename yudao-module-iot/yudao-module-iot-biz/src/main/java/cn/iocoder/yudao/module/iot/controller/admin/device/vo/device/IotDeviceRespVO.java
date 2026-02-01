@@ -4,7 +4,6 @@ import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -45,6 +44,9 @@ public class IotDeviceRespVO {
     @ExcelProperty("产品编号")
     private Long productId;
 
+    @Schema(description = "产品名称", example = "温湿度传感器")
+    private String productName; // 只有部分接口返回，例如 getDeviceLocationList
+
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品 Key")
     private String productKey;
@@ -77,17 +79,8 @@ public class IotDeviceRespVO {
     @ExcelProperty("设备密钥")
     private String deviceSecret;
 
-    @Schema(description = "认证类型（如一机一密、动态注册）", example = "2")
-    @ExcelProperty("认证类型（如一机一密、动态注册）")
-    private String authType;
-
     @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
     private String config;
-
-    @Schema(description = "定位方式", example = "2")
-    @ExcelProperty(value = "定位方式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.LOCATION_TYPE)
-    private Integer locationType;
 
     @Schema(description = "设备位置的纬度", example = "45.000000")
     private BigDecimal latitude;

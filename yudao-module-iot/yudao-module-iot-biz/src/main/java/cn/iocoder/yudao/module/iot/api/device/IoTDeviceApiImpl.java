@@ -7,6 +7,13 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.*;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusPointDO;
@@ -27,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -105,6 +114,20 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
             result.add(configDTO);
         }
         return success(result);
+    }
+
+    @Override
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/register")
+    @PermitAll
+    public CommonResult<IotDeviceRegisterRespDTO> registerDevice(@RequestBody IotDeviceRegisterReqDTO reqDTO) {
+        return success(deviceService.registerDevice(reqDTO));
+    }
+
+    @Override
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/register-sub")
+    @PermitAll
+    public CommonResult<List<IotSubDeviceRegisterRespDTO>> registerSubDevices(@RequestBody IotSubDeviceRegisterFullReqDTO reqDTO) {
+        return success(deviceService.registerSubDevices(reqDTO));
     }
 
 }

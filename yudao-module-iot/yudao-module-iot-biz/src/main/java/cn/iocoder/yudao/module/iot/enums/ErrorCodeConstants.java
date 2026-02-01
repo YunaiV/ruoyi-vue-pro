@@ -26,13 +26,26 @@ public interface ErrorCodeConstants {
     // ========== 设备 1-050-003-000 ============
     ErrorCode DEVICE_NOT_EXISTS = new ErrorCode(1_050_003_000, "设备不存在");
     ErrorCode DEVICE_NAME_EXISTS = new ErrorCode(1_050_003_001, "设备名称在同一产品下必须唯一");
-    ErrorCode DEVICE_HAS_CHILDREN = new ErrorCode(1_050_003_002, "有子设备，不允许删除");
+    ErrorCode DEVICE_GATEWAY_HAS_SUB = new ErrorCode(1_050_003_002, "网关设备存在已绑定的子设备，不允许删除");
     ErrorCode DEVICE_KEY_EXISTS = new ErrorCode(1_050_003_003, "设备标识已经存在");
     ErrorCode DEVICE_GATEWAY_NOT_EXISTS = new ErrorCode(1_050_003_004, "网关设备不存在");
     ErrorCode DEVICE_NOT_GATEWAY = new ErrorCode(1_050_003_005, "设备不是网关设备");
     ErrorCode DEVICE_IMPORT_LIST_IS_EMPTY = new ErrorCode(1_050_003_006, "导入设备数据不能为空！");
     ErrorCode DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL = new ErrorCode(1_050_003_007, "下行设备消息失败，原因：设备未连接网关");
     ErrorCode DEVICE_SERIAL_NUMBER_EXISTS = new ErrorCode(1_050_003_008, "设备序列号已存在，序列号必须全局唯一");
+    ErrorCode DEVICE_NOT_GATEWAY_SUB = new ErrorCode(1_050_003_009, "设备【{}/{}】不是网关子设备类型，无法绑定到网关");
+    ErrorCode DEVICE_GATEWAY_BINDTO_EXISTS = new ErrorCode(1_050_003_010, "设备【{}/{}】已绑定到其他网关，请先解绑");
+    // 拓扑管理相关错误码 1-050-003-100
+    ErrorCode DEVICE_TOPO_PARAMS_INVALID = new ErrorCode(1_050_003_100, "拓扑管理参数无效");
+    ErrorCode DEVICE_TOPO_SUB_DEVICE_USERNAME_INVALID = new ErrorCode(1_050_003_101, "子设备用户名格式无效");
+    ErrorCode DEVICE_TOPO_SUB_DEVICE_AUTH_FAILED = new ErrorCode(1_050_003_102, "子设备认证失败");
+    ErrorCode DEVICE_TOPO_SUB_NOT_BINDTO_GATEWAY = new ErrorCode(1_050_003_103, "子设备【{}/{}】未绑定到该网关");
+    // 设备注册相关错误码 1-050-003-200
+    ErrorCode DEVICE_SUB_REGISTER_PARAMS_INVALID = new ErrorCode(1_050_003_200, "子设备注册参数无效");
+    ErrorCode DEVICE_SUB_REGISTER_PRODUCT_NOT_GATEWAY_SUB = new ErrorCode(1_050_003_201, "产品【{}】不是网关子设备类型");
+    ErrorCode DEVICE_REGISTER_DISABLED = new ErrorCode(1_050_003_210, "该产品未开启动态注册功能");
+    ErrorCode DEVICE_REGISTER_SECRET_INVALID = new ErrorCode(1_050_003_211, "产品密钥验证失败");
+    ErrorCode DEVICE_REGISTER_ALREADY_EXISTS = new ErrorCode(1_050_003_212, "设备已存在，不允许重复注册");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
@@ -73,10 +86,12 @@ public interface ErrorCodeConstants {
 
     // ========== IoT 数据流转规则 1-050-010-000 ==========
     ErrorCode DATA_RULE_NOT_EXISTS = new ErrorCode(1_050_010_000, "数据流转规则不存在");
+    ErrorCode DATA_RULE_NAME_EXISTS = new ErrorCode(1_050_010_001, "数据流转规则名称已存在");
 
     // ========== IoT 数据流转目的 1-050-011-000 ==========
     ErrorCode DATA_SINK_NOT_EXISTS = new ErrorCode(1_050_011_000, "数据桥梁不存在");
     ErrorCode DATA_SINK_DELETE_FAIL_USED_BY_RULE = new ErrorCode(1_050_011_001, "数据流转目的正在被数据流转规则使用，无法删除");
+    ErrorCode DATA_SINK_NAME_EXISTS = new ErrorCode(1_050_011_002, "数据流转目的名称已存在");
 
     // ========== IoT 场景联动 1-050-012-000 ==========
     ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_012_000, "场景联动不存在");

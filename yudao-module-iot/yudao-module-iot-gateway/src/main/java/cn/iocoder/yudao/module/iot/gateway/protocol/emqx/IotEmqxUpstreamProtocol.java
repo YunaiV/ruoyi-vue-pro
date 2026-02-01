@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.emqx;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router.IotEmqxUpstreamHandler;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
@@ -28,11 +30,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author 芋道源码
  */
 @Slf4j
-public class IotEmqxUpstreamProtocol {
+public class IotEmqxUpstreamProtocol implements IotProtocol {
+
+    private static final String ID = "emqx";
 
     private final IotGatewayProperties.EmqxProperties emqxProperties;
 
-    private volatile boolean isRunning = false;
+    private volatile boolean running = false;
 
     private final Vertx vertx;
 
@@ -50,9 +54,20 @@ public class IotEmqxUpstreamProtocol {
         this.vertx = vertx;
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public IotProtocolTypeEnum getType() {
+        return IotProtocolTypeEnum.EMQX;
+    }
+
+    @Override
     @PostConstruct
     public void start() {
-        if (isRunning) {
+        if (running) {
             return;
         }
 
@@ -61,7 +76,7 @@ public class IotEmqxUpstreamProtocol {
             startMqttClient();
 
             // 2. 标记服务为运行状态
-            isRunning = true;
+            running = true;
             log.info("[start][IoT 网关 EMQX 协议启动成功]");
         } catch (Exception e) {
             log.error("[start][IoT 网关 EMQX 协议服务启动失败，应用将关闭]", e);
@@ -88,9 +103,10 @@ public class IotEmqxUpstreamProtocol {
         }
     }
 
+    @Override
     @PreDestroy
     public void stop() {
-        if (!isRunning) {
+        if (!running) {
             return;
         }
 
@@ -98,8 +114,13 @@ public class IotEmqxUpstreamProtocol {
         stopMqttClient();
 
         // 2. 标记服务为停止状态
-        isRunning = false;
+        running = false;
         log.info("[stop][IoT 网关 MQTT 协议服务已停止]");
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
     /**
@@ -185,7 +206,7 @@ public class IotEmqxUpstreamProtocol {
      * 延迟重连
      */
     private void reconnectWithDelay() {
-        if (!isRunning) {
+        if (!running) {
             return;
         }
         if (mqttClient != null && mqttClient.isConnected()) {
@@ -195,7 +216,7 @@ public class IotEmqxUpstreamProtocol {
         long delay = emqxProperties.getReconnectDelayMs();
         log.info("[reconnectWithDelay][将在 {} 毫秒后尝试重连 MQTT Broker]", delay);
         vertx.setTimer(delay, timerId -> {
-            if (!isRunning) {
+            if (!running) {
                 return;
             }
             if (mqttClient != null && mqttClient.isConnected()) {
@@ -305,7 +326,7 @@ public class IotEmqxUpstreamProtocol {
     private void setupMqttHandlers() {
         // 1. 设置断开重连监听器
         mqttClient.closeHandler(closeEvent -> {
-            if (!isRunning) {
+            if (!running) {
                 return;
             }
             log.warn("[closeHandler][MQTT 连接已断开, 准备重连]");

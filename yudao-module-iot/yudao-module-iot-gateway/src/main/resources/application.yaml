@@ -42,14 +42,80 @@ yudao:
         secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
         expiration: 7d
 
-      # 协议配置
-      protocol:
+      # 协议实例列表
+      protocols:
         # ====================================
         # 针对引入的 HTTP 组件的配置
         # ====================================
-        http:
+        - id: http-json
+          type: http
+          port: 8092
           enabled: false
-          server-port: 8092
+          http:
+            ssl-enabled: false
+        # ====================================
+        # 针对引入的 TCP 组件的配置
+        # ====================================
+        - id: tcp-json
+          type: tcp
+          port: 8091
+          enabled: false
+          serialize: json
+          tcp:
+            max-connections: 1000
+            keep-alive-timeout-ms: 30000
+            ssl-enabled: false
+            codec:
+              type: delimiter              # 拆包类型：length_field / delimiter / fixed_length
+              delimiter: "\\n"             # 分隔符（支持转义：\\n=换行, \\r=回车, \\t=制表符）
+#              type: length_field           # 拆包类型：length_field / delimiter / fixed_length
+#              length-field-offset: 0       # 长度字段偏移量
+#              length-field-length: 4       # 长度字段长度
+#              length-adjustment: 0         # 长度调整值
+#              initial-bytes-to-strip: 4    # 初始跳过的字节数
+#              type: fixed_length           # 拆包类型：length_field / delimiter / fixed_length
+#              fixed-length: 256            # 固定长度
+        # ====================================
+        # 针对引入的 UDP 组件的配置
+        # ====================================
+        - id: udp-json
+          type: udp
+          port: 8093
+          enabled: false
+          serialize: json
+          udp:
+            max-sessions: 1000               # 最大会话数
+            session-timeout-ms: 60000        # 会话超时时间（毫秒），基于 Guava Cache 自动过期
+            receive-buffer-size: 65536       # 接收缓冲区大小（字节）
+            send-buffer-size: 65536          # 发送缓冲区大小（字节）
+        # ====================================
+        # 针对引入的 WebSocket 组件的配置
+        # ====================================
+        - id: websocket-json
+          type: websocket
+          port: 8094
+          enabled: true
+          serialize: json
+          websocket:
+            path: /ws
+            max-message-size: 65536          # 最大消息大小（字节，默认 64KB）
+            max-frame-size: 65536            # 最大帧大小（字节，默认 64KB）
+            idle-timeout-seconds: 60         # 空闲超时时间（秒，默认 60）
+            ssl-enabled: false               # 是否启用 SSL（wss://）
+        # ====================================
+        # 针对引入的 CoAP 组件的配置
+        # ====================================
+        - id: coap-json
+          type: coap
+          port: 5683
+          enabled: true
+          coap:
+            max-message-size: 1024           # 最大消息大小（字节）
+            ack-timeout-ms: 2000             # ACK 超时时间（毫秒）
+            max-retransmit: 4                # 最大重传次数
+
+      # 协议配置（旧版，保持兼容）
+      protocol:
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================
@@ -84,17 +150,6 @@ yudao:
             key-store-password: "your-keystore-password" # 客户端证书库密码
             trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
             trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
-        # ====================================
-        # 针对引入的 TCP 组件的配置
-        # ====================================
-        tcp:
-          enabled: false
-          port: 8091
-          keep-alive-timeout-ms: 30000
-          max-connections: 1000
-          ssl-enabled: false
-          ssl-cert-path: "classpath:certs/client.jks"
-          ssl-key-path: "classpath:certs/client.jks"
         # ====================================
         # 针对引入的 MQTT 组件的配置
         # ====================================
@@ -140,6 +195,8 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
     # 根日志级别
     root: INFO
 

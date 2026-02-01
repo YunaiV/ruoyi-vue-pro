@@ -7,6 +7,12 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 
 import java.util.List;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
+import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
+
+import java.util.List;
 
 /**
  * IoT 设备通用 API
@@ -30,6 +36,22 @@ public interface IotDeviceCommonApi {
      * @return 设备信息
      */
     CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO infoReqDTO);
+
+    /**
+     * 直连/网关设备动态注册（一型一密）
+     *
+     * @param reqDTO 动态注册请求
+     * @return 注册结果（包含 DeviceSecret）
+     */
+    CommonResult<IotDeviceRegisterRespDTO> registerDevice(IotDeviceRegisterReqDTO reqDTO);
+
+    /**
+     * 网关子设备动态注册（网关代理转发）
+     *
+     * @param reqDTO 子设备注册请求（包含网关标识和子设备列表）
+     * @return 注册结果列表
+     */
+    CommonResult<List<IotSubDeviceRegisterRespDTO>> registerSubDevices(IotSubDeviceRegisterFullReqDTO reqDTO);
 
     /**
      * 获取所有启用的 Modbus 设备配置列表

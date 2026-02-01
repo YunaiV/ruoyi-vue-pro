@@ -70,7 +70,7 @@ public class ApiAccessLogRespVO {
 
     @Schema(description = "操作分类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty(value = "操作分类", converter = DictConvert.class)
-    @DictFormat(cn.iocoder.yudao.module.infra.enums.DictTypeConstants.OPERATE_TYPE)
+    @DictFormat(DictTypeConstants.OPERATE_TYPE)
     private Integer operateType;
 
     @Schema(description = "开始请求时间", requiredMode = Schema.RequiredMode.REQUIRED)

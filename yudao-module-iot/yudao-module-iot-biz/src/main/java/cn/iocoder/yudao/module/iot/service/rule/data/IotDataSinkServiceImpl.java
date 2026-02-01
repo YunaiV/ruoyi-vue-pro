@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.data;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSinkPageReqVO;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_DELETE_FAIL_USED_BY_RULE;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_NAME_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_NOT_EXISTS;
 
 /**
@@ -39,6 +41,9 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
 
     @Override
     public Long createDataSink(IotDataSinkSaveReqVO createReqVO) {
+        // 校验名称唯一
+        validateDataSinkNameUnique(null, createReqVO.getName());
+        // 新增
         IotDataSinkDO dataBridge = BeanUtils.toBean(createReqVO, IotDataSinkDO.class);
         dataSinkMapper.insert(dataBridge);
         return dataBridge.getId();
@@ -48,6 +53,8 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
     public void updateDataSink(IotDataSinkSaveReqVO updateReqVO) {
         // 校验存在
         validateDataBridgeExists(updateReqVO.getId());
+        // 校验名称唯一
+        validateDataSinkNameUnique(updateReqVO.getId(), updateReqVO.getName());
         // 更新
         IotDataSinkDO updateObj = BeanUtils.toBean(updateReqVO, IotDataSinkDO.class);
         dataSinkMapper.updateById(updateObj);
@@ -68,6 +75,29 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
     private void validateDataBridgeExists(Long id) {
         if (dataSinkMapper.selectById(id) == null) {
             throw exception(DATA_SINK_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 校验数据流转目的名称唯一性
+     *
+     * @param id   数据流转目的编号（用于更新时排除自身）
+     * @param name 数据流转目的名称
+     */
+    private void validateDataSinkNameUnique(Long id, String name) {
+        if (StrUtil.isBlank(name)) {
+            return;
+        }
+        IotDataSinkDO dataSink = dataSinkMapper.selectByName(name);
+        if (dataSink == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的目的
+        if (id == null) {
+            throw exception(DATA_SINK_NAME_EXISTS);
+        }
+        if (!dataSink.getId().equals(id)) {
+            throw exception(DATA_SINK_NAME_EXISTS);
         }
     }
 

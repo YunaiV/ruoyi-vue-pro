@@ -20,6 +20,7 @@ import org.dromara.hutool.extra.mail.MailUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -56,7 +57,8 @@ public class MailSendServiceImpl implements MailSendService {
     @Override
     public Long sendSingleMail(Collection<String> toMails, Collection<String> ccMails, Collection<String> bccMails,
                                Long userId, Integer userType,
-                               String templateCode, Map<String, Object> templateParams) {
+                               String templateCode, Map<String, Object> templateParams,
+                               File... attachments) {
         // 1.1 校验邮箱模版是否合法
         MailTemplateDO template = validateMailTemplate(templateCode);
         // 1.2 校验邮箱账号是否合法
@@ -94,7 +96,7 @@ public class MailSendServiceImpl implements MailSendService {
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
             mailProducer.sendMailSendMessage(sendLogId, toMailSet, ccMailSet, bccMailSet,
-                    account.getId(), template.getNickname(), title, content);
+                    account.getId(), template.getNickname(), title, content, attachments);
         }
         return sendLogId;
     }
@@ -123,7 +125,7 @@ public class MailSendServiceImpl implements MailSendService {
         // 2. 发送邮件
         try {
             String messageId = MailUtil.send(mailAccount, message.getToMails(), message.getCcMails(), message.getBccMails(),
-                    message.getTitle(), message.getContent(), true);
+                    message.getTitle(), message.getContent(), true, message.getAttachments());
             // 3. 更新结果（成功）
             mailLogService.updateMailSendResult(message.getLogId(), messageId, null);
         } catch (Exception e) {

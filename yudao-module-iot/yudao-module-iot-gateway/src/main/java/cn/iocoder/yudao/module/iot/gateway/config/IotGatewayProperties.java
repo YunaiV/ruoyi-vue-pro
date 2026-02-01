@@ -1,5 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig;
+import io.vertx.core.net.KeyCertOptions;
+import io.vertx.core.net.TrustOptions;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,9 +33,14 @@ public class IotGatewayProperties {
     private TokenProperties token;
 
     /**
-     * 协议配置
+     * 协议配置（旧版，保持兼容）
      */
     private ProtocolProperties protocol;
+
+    /**
+     * 协议实例列表
+     */
+    private List<ProtocolInstanceProperties> protocols;
 
     @Data
     public static class RpcProperties {
@@ -69,29 +83,14 @@ public class IotGatewayProperties {
     public static class ProtocolProperties {
 
         /**
-         * HTTP 组件配置
-         */
-        private HttpProperties http;
-
-        /**
          * EMQX 组件配置
          */
         private EmqxProperties emqx;
 
         /**
-         * TCP 组件配置
-         */
-        private TcpProperties tcp;
-
-        /**
          * MQTT 组件配置
          */
         private MqttProperties mqtt;
-
-        /**
-         * MQTT WebSocket 组件配置
-         */
-        private MqttWsProperties mqttWs;
 
         /**
          * Modbus TCP 组件配置
@@ -300,47 +299,6 @@ public class IotGatewayProperties {
     }
 
     @Data
-    public static class TcpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口
-         */
-        private Integer port = 8091;
-
-        /**
-         * 心跳超时时间（毫秒）
-         */
-        private Long keepAliveTimeoutMs = 30000L;
-
-        /**
-         * 最大连接数
-         */
-        private Integer maxConnections = 1000;
-
-        /**
-         * 是否启用SSL
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL证书路径
-         */
-        private String sslCertPath;
-
-        /**
-         * SSL私钥路径
-         */
-        private String sslKeyPath;
-
-    }
-
-    @Data
     public static class MqttProperties {
 
         /**
@@ -368,6 +326,7 @@ public class IotGatewayProperties {
          */
         private Integer keepAliveTimeoutSeconds = 300;
 
+        // NOTE：SSL 相关参数后续统一到 protocol 层级（优先级低）
         /**
          * 是否启用 SSL
          */
@@ -386,11 +345,11 @@ public class IotGatewayProperties {
             /**
              * 密钥证书选项
              */
-            private io.vertx.core.net.KeyCertOptions keyCertOptions;
+            private KeyCertOptions keyCertOptions;
             /**
              * 信任选项
              */
-            private io.vertx.core.net.TrustOptions trustOptions;
+            private TrustOptions trustOptions;
             /**
              * SSL 证书路径
              */
@@ -412,99 +371,75 @@ public class IotGatewayProperties {
 
     }
 
+    // NOTE：暂未统一为 ProtocolProperties，待协议改造完成再调整
+    /**
+     * 协议实例配置
+     */
     @Data
-    public static class MqttWsProperties {
+    public static class ProtocolInstanceProperties {
 
         /**
-         * 是否开启
+         * 协议实例 ID，如 "http-alink"、"tcp-binary"
          */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
+        @NotEmpty(message = "协议实例 ID 不能为空")
+        private String id;
+        /**
+         * 是否启用
+         */
+        @NotNull(message = "是否启用不能为空")
+        private Boolean enabled = true;
+        /**
+         * 协议类型
+         *
+         * @see cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum
+         */
+        @NotEmpty(message = "协议类型不能为空")
+        private String type;
+        /**
+         * 服务端口
+         */
+        @NotNull(message = "服务端口不能为空")
+        private Integer port;
+        /**
+         * 序列化类型（可选）
+         *
+         * @see cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum
+         *
+         * 为什么是可选的呢？
+         * 1. {@link IotProtocolTypeEnum#HTTP}、${@link IotProtocolTypeEnum#COAP} 协议，目前强制是 JSON 格式
+         * 2. {@link IotProtocolTypeEnum#EMQX} 协议，目前支持根据产品（设备）配置的序列化类型来解析
+         */
+        private String serialize;
 
         /**
-         * WebSocket 服务器端口（默认：8083）
+         * HTTP 协议配置
          */
-        private Integer port = 8083;
+        @Valid
+        private IotHttpConfig http;
 
         /**
-         * WebSocket 路径（默认：/mqtt）
+         * TCP 协议配置
          */
-        @NotEmpty(message = "WebSocket 路径不能为空")
-        private String path = "/mqtt";
+        @Valid
+        private IotTcpConfig tcp;
 
         /**
-         * 最大消息大小（字节）
+         * UDP 协议配置
          */
-        private Integer maxMessageSize = 8192;
+        @Valid
+        private IotUdpConfig udp;
 
         /**
-         * 连接超时时间（秒）
+         * CoAP 协议配置
          */
-        private Integer connectTimeoutSeconds = 60;
+        @Valid
+        private IotCoapConfig coap;
 
         /**
-         * 保持连接超时时间（秒）
+         * WebSocket 协议配置
          */
-        private Integer keepAliveTimeoutSeconds = 300;
-
-        /**
-         * 是否启用 SSL（wss://）
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 配置
-         */
-        private SslOptions sslOptions = new SslOptions();
-
-        /**
-         * WebSocket 子协议（通常为 "mqtt" 或 "mqttv3.1"）
-         */
-        @NotEmpty(message = "WebSocket 子协议不能为空")
-        private String subProtocol = "mqtt";
-
-        /**
-         * 最大帧大小（字节）
-         */
-        private Integer maxFrameSize = 65536;
-
-        /**
-         * SSL 配置选项
-         */
-        @Data
-        public static class SslOptions {
-
-            /**
-             * 密钥证书选项
-             */
-            private io.vertx.core.net.KeyCertOptions keyCertOptions;
-
-            /**
-             * 信任选项
-             */
-            private io.vertx.core.net.TrustOptions trustOptions;
-
-            /**
-             * SSL 证书路径
-             */
-            private String certPath;
-
-            /**
-             * SSL 私钥路径
-             */
-            private String keyPath;
-
-            /**
-             * 信任存储路径
-             */
-            private String trustStorePath;
-
-            /**
-             * 信任存储密码
-             */
-            private String trustStorePassword;
-
-        }
+        @Valid
+        private IotWebSocketConfig websocket;
 
     }
 

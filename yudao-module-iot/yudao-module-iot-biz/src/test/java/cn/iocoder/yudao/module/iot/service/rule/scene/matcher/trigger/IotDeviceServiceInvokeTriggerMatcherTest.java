@@ -378,6 +378,268 @@ public class IotDeviceServiceInvokeTriggerMatcherTest extends IotBaseConditionMa
         assertFalse(result);
     }
 
+
+    // ========== 参数条件匹配测试 ==========
+
+    /**
+     * 测试无参数条件时的匹配逻辑 - 只要标识符匹配就返回 true
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.2**
+     */
+    @Test
+    public void testMatches_noParameterCondition_success() {
+        // 准备参数
+        String serviceIdentifier = "testService";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("level", 5)
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(null); // 无参数条件
+        trigger.setValue(null);
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertTrue(result);
+    }
+
+    /**
+     * 测试有参数条件时的匹配逻辑 - 参数条件匹配成功
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.1**
+     */
+    @Test
+    public void testMatches_withParameterCondition_greaterThan_success() {
+        // 准备参数
+        String serviceIdentifier = "level";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("level", 5)
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(">"); // 大于操作符
+        trigger.setValue("3");
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertTrue(result);
+    }
+
+    /**
+     * 测试有参数条件时的匹配逻辑 - 参数条件匹配失败
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.1**
+     */
+    @Test
+    public void testMatches_withParameterCondition_greaterThan_failure() {
+        // 准备参数
+        String serviceIdentifier = "level";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("level", 2)
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(">"); // 大于操作符
+        trigger.setValue("3");
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertFalse(result);
+    }
+
+    /**
+     * 测试有参数条件时的匹配逻辑 - 等于操作符
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.1**
+     */
+    @Test
+    public void testMatches_withParameterCondition_equals_success() {
+        // 准备参数
+        String serviceIdentifier = "mode";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("mode", "auto")
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator("=="); // 等于操作符
+        trigger.setValue("auto");
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertTrue(result);
+    }
+
+    /**
+     * 测试参数缺失时的处理 - 消息中缺少 inputData
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.3**
+     */
+    @Test
+    public void testMatches_withParameterCondition_missingInputData() {
+        // 准备参数
+        String serviceIdentifier = "testService";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                // 缺少 inputData 字段
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(">"); // 配置了参数条件
+        trigger.setValue("3");
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertFalse(result);
+    }
+
+    /**
+     * 测试参数缺失时的处理 - inputData 中缺少指定参数
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.3**
+     */
+    @Test
+    public void testMatches_withParameterCondition_missingParam() {
+        // 准备参数
+        String serviceIdentifier = "level";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("otherParam", 5) // 不是 level 参数
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(">"); // 配置了参数条件
+        trigger.setValue("3");
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertFalse(result);
+    }
+
+    /**
+     * 测试只有 operator 没有 value 时不触发参数条件匹配
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.2**
+     */
+    @Test
+    public void testMatches_onlyOperator_noValue() {
+        // 准备参数
+        String serviceIdentifier = "testService";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("level", 5)
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(">"); // 只有 operator
+        trigger.setValue(null); // 没有 value
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言：只有 operator 没有 value 时，不触发参数条件匹配，标识符匹配即成功
+        assertTrue(result);
+    }
+
+    /**
+     * 测试只有 value 没有 operator 时不触发参数条件匹配
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.2**
+     */
+    @Test
+    public void testMatches_onlyValue_noOperator() {
+        // 准备参数
+        String serviceIdentifier = "testService";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputData", MapUtil.builder(new HashMap<String, Object>())
+                        .put("level", 5)
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(null); // 没有 operator
+        trigger.setValue("3"); // 只有 value
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言：只有 value 没有 operator 时，不触发参数条件匹配，标识符匹配即成功
+        assertTrue(result);
+    }
+
+    /**
+     * 测试使用 inputParams 字段（替代 inputData）
+     * **Property 4: 服务调用触发器参数匹配逻辑**
+     * **Validates: Requirements 5.1**
+     */
+    @Test
+    public void testMatches_withInputParams_success() {
+        // 准备参数
+        String serviceIdentifier = "level";
+        Map<String, Object> serviceParams = MapUtil.builder(new HashMap<String, Object>())
+                .put("identifier", serviceIdentifier)
+                .put("inputParams", MapUtil.builder(new HashMap<String, Object>()) // 使用 inputParams 而不是 inputData
+                        .put("level", 5)
+                        .build())
+                .build();
+        IotDeviceMessage message = createServiceInvokeMessage(serviceParams);
+        IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
+        trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
+        trigger.setIdentifier(serviceIdentifier);
+        trigger.setOperator(">"); // 大于操作符
+        trigger.setValue("3");
+
+        // 调用
+        boolean result = matcher.matches(message, trigger);
+
+        // 断言
+        assertTrue(result);
+    }
+
     // ========== 辅助方法 ==========
 
     /**

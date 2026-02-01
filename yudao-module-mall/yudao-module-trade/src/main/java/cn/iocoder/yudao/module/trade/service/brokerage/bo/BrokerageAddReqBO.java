@@ -31,7 +31,6 @@ public class BrokerageAddReqBO {
     /**
      * 一级佣金（固定）
      */
-    @NotNull(message = "一级佣金（固定）不能为空")
     private Integer firstFixedPrice;
     /**
      * 二级佣金（固定）

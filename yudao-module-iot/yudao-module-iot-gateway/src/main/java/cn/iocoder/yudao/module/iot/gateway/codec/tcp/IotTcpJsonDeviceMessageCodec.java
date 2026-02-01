@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * TCP JSON 格式 {@link IotDeviceMessage} 编解码器
+ * TCP/UDP JSON 格式 {@link IotDeviceMessage} 编解码器
  *
  * 采用纯 JSON 格式传输，格式如下：
  * {

@@ -60,7 +60,7 @@ public class IotDeviceMessage {
      */
     private String serverId;
 
-    // ========== codec（编解码）字段 ==========
+    // ========== serialize（序列化）相关字段 ==========
 
     /**
      * 请求编号
@@ -94,7 +94,7 @@ public class IotDeviceMessage {
      */
     private String msg;
 
-    // ========== 基础方法：只传递"codec（编解码）字段" ==========
+    // ========== 基础方法：只传递"serialize（序列化）相关字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {
         return requestOf(null, method, null);
@@ -106,6 +106,23 @@ public class IotDeviceMessage {
 
     public static IotDeviceMessage requestOf(String requestId, String method, Object params) {
         return of(requestId, method, params, null, null, null);
+    }
+
+    /**
+     * 创建设备请求消息（包含设备信息）
+     *
+     * @param deviceId 设备编号
+     * @param tenantId 租户编号
+     * @param serverId 服务标识
+     * @param method   消息方法
+     * @param params   消息参数
+     * @return 消息对象
+     */
+    public static IotDeviceMessage requestOf(Long deviceId, Long tenantId, String serverId,
+                                             String method, Object params) {
+        IotDeviceMessage message = of(null, method, params, null, null, null);
+        return message.setId(IotDeviceMessageUtils.generateMessageId())
+                .setDeviceId(deviceId).setTenantId(tenantId).setServerId(serverId);
     }
 
     public static IotDeviceMessage replyOf(String requestId, String method,

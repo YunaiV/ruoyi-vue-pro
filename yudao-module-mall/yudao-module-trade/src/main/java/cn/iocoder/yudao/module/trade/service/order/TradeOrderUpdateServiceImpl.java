@@ -780,6 +780,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (ObjUtil.notEqual(DeliveryTypeEnum.PICK_UP.getType(), order.getDeliveryType())) {
             throw exception(ORDER_RECEIVE_FAIL_DELIVERY_TYPE_NOT_PICK_UP);
         }
+        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
+            throw exception(ORDER_PICK_UP_FAIL_STATUS_NOT_UNDELIVERED);
+        }
         // 情况一：如果是拼团订单，则校验拼团是否成功
         if (TradeOrderTypeEnum.isCombination(order.getType())) {
             CombinationRecordRespDTO combinationRecord = combinationRecordApi.getCombinationRecordByOrderId(

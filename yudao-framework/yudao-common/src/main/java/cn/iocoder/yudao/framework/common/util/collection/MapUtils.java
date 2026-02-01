@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -63,6 +64,49 @@ public class MapUtils {
         Map<K, V> map = Maps.newLinkedHashMapWithExpectedSize(keyValues.size());
         keyValues.forEach(keyValue -> map.put(keyValue.getKey(), keyValue.getValue()));
         return map;
+    }
+
+    /**
+     * 从 Map 中获取 BigDecimal 值
+     *
+     * @param map Map 数据源
+     * @param key 键名
+     * @return BigDecimal 值，解析失败或值为 null 时返回 null
+     */
+    public static BigDecimal getBigDecimal(Map<String, ?> map, String key) {
+        return getBigDecimal(map, key, null);
+    }
+
+    /**
+     * 从 Map 中获取 BigDecimal 值
+     *
+     * @param map          Map 数据源
+     * @param key          键名
+     * @param defaultValue 默认值
+     * @return BigDecimal 值，解析失败或值为 null 时返回默认值
+     */
+    public static BigDecimal getBigDecimal(Map<String, ?> map, String key, BigDecimal defaultValue) {
+        if (map == null) {
+            return defaultValue;
+        }
+        Object value = map.get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Number) {
+            return BigDecimal.valueOf(((Number) value).doubleValue());
+        }
+        if (value instanceof String) {
+            try {
+                return new BigDecimal((String) value);
+            } catch (NumberFormatException e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
 }

@@ -143,11 +143,13 @@ public class IotProductController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获取产品的精简信息列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<IotProductRespVO>> getProductSimpleList() {
-        List<IotProductDO> list = productService.getProductList();
-        return success(convertList(list, product -> // 只返回 id、name 字段
+    @Parameter(name = "deviceType", description = "设备类型", example = "1")
+    public CommonResult<List<IotProductRespVO>> getProductSimpleList(
+            @RequestParam(value = "deviceType", required = false) Integer deviceType) {
+        List<IotProductDO> list = productService.getProductList(deviceType);
+        return success(convertList(list, product -> // 只返回 id、name、productKey 字段
                 new IotProductRespVO().setId(product.getId()).setName(product.getName()).setStatus(product.getStatus())
-                        .setDeviceType(product.getDeviceType()).setLocationType(product.getLocationType())));
+                        .setDeviceType(product.getDeviceType()).setProductKey(product.getProductKey())));
     }
 
 }

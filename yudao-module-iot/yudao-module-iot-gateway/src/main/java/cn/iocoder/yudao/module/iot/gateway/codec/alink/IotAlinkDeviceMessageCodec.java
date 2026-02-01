@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IotAlinkDeviceMessageCodec implements IotDeviceMessageCodec {
 
-    private static final String TYPE = "Alink";
+    public static final String TYPE = "Alink";
 
     @Data
     @NoArgsConstructor

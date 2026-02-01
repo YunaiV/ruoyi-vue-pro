@@ -31,14 +31,14 @@ public interface ErpFinancePaymentItemMapper extends BaseMapperX<ErpFinancePayme
     default BigDecimal selectPaymentPriceSumByBizIdAndBizType(Long bizId, Integer bizType) {
         // SQL sum 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpFinancePaymentItemDO>()
-                .select("SUM(payment_price) AS paymentPriceSum")
+                .select("SUM(payment_price) AS payment_price_sum")
                 .eq("biz_id", bizId)
                 .eq("biz_type", bizType));
         // 获得数量
         if (CollUtil.isEmpty(result)) {
             return BigDecimal.ZERO;
         }
-        return BigDecimal.valueOf(MapUtil.getDouble(result.get(0), "paymentPriceSum", 0D));
+        return BigDecimal.valueOf(MapUtil.getDouble(result.get(0), "payment_price_sum", 0D));
     }
 
 }
