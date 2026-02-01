@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketProtocol;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
@@ -158,8 +158,8 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return WebSocket 协议实例
      */
-    private IotWebSocketUpstreamProtocol createWebSocketProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
-        return new IotWebSocketUpstreamProtocol(config);
+    private IotWebSocketProtocol createWebSocketProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+        return new IotWebSocketProtocol(config);
     }
 
 }

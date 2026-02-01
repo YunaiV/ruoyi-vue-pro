@@ -94,7 +94,7 @@ yudao:
         - id: websocket-json
           type: websocket
           port: 8094
-          enabled: false
+          enabled: true
           serialize: json
           websocket:
             path: /ws
@@ -159,6 +159,7 @@ yudao:
           max-message-size: 8192
           connect-timeout-seconds: 60
           ssl-enabled: false
+
 --- #################### 日志相关配置 ####################
 
 # 基础日志配置

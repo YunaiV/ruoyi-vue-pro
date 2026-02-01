@@ -77,7 +77,9 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void handle(NetSocket socket) {
+        // TODO @AI：clientId 去掉；其它模块也看看，怎么去掉下看看；
         String clientId = IdUtil.simpleUUID();
         log.debug("[handle][设备连接，客户端 ID: {}，地址: {}]", clientId, socket.remoteAddress());
 
@@ -92,9 +94,10 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         });
 
         // 2.1 设置消息处理器
+        // TODO @AI：去掉 clientId；
         Handler<Buffer> messageHandler = buffer -> {
             try {
-                processMessage(clientId, buffer, socket);
+                processMessage(buffer, socket);
             } catch (Exception e) {
                 log.error("[handle][消息处理失败，客户端 ID: {}，地址: {}]",
                         clientId, socket.remoteAddress(), e);
@@ -110,11 +113,10 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     /**
      * 处理消息
      *
-     * @param clientId 客户端 ID
      * @param buffer   消息
      * @param socket   网络连接
      */
-    private void processMessage(String clientId, Buffer buffer, NetSocket socket) {
+    private void processMessage(Buffer buffer, NetSocket socket) {
         IotDeviceMessage message = null;
         try {
             // 1. 反序列化消息
@@ -127,29 +129,29 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             // 2. 根据消息类型路由处理
             if (AUTH_METHOD.equals(message.getMethod())) {
                 // 认证请求
-                handleAuthenticationRequest(clientId, message, socket);
+                handleAuthenticationRequest(message, socket);
             } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
                 // 设备动态注册请求
-                handleRegisterRequest(clientId, message, socket);
+                handleRegisterRequest(message, socket);
             } else {
                 // 业务消息
-                handleBusinessRequest(clientId, message, socket);
+                handleBusinessRequest(null, message, socket);
             }
         } catch (ServiceException e) {
             // 业务异常，返回对应的错误码和错误信息
-            log.warn("[processMessage][业务异常，客户端 ID: {}，错误: {}]", clientId, e.getMessage());
+            log.warn("[processMessage][业务异常，客户端 ID: {}，错误: {}]", null, e.getMessage());
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method, e.getCode(), e.getMessage());
         } catch (IllegalArgumentException e) {
             // 参数校验失败，返回 400
-            log.warn("[processMessage][参数校验失败，客户端 ID: {}，错误: {}]", clientId, e.getMessage());
+            log.warn("[processMessage][参数校验失败，客户端 ID: {}，错误: {}]", null, e.getMessage());
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method, BAD_REQUEST.getCode(), e.getMessage());
         } catch (Exception e) {
             // 其他异常，返回 500，并重新抛出让上层关闭连接
-            log.error("[processMessage][处理消息失败，客户端 ID: {}]", clientId, e);
+            log.error("[processMessage][处理消息失败，客户端 ID: {}]", null, e);
             String requestId = message != null ? message.getRequestId() : null;
             String method = message != null ? message.getMethod() : null;
             sendErrorResponse(socket, requestId, method,
@@ -161,12 +163,11 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     /**
      * 处理认证请求
      *
-     * @param clientId 客户端 ID
      * @param message  消息信息
      * @param socket   网络连接
      */
     @SuppressWarnings("DuplicatedCode")
-    private void handleAuthenticationRequest(String clientId, IotDeviceMessage message, NetSocket socket) {
+    private void handleAuthenticationRequest(IotDeviceMessage message, NetSocket socket) {
         // 1. 解析认证参数
         IotDeviceAuthReqDTO authParams = JsonUtils.convertObject(message.getParams(), IotDeviceAuthReqDTO.class);
         Assert.notNull(authParams, "认证参数不能为空");
@@ -198,13 +199,12 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     /**
      * 处理设备动态注册请求（一型一密，不需要认证）
      *
-     * @param clientId 客户端 ID
      * @param message  消息信息
      * @param socket   网络连接
      * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
      */
     @SuppressWarnings("DuplicatedCode")
-    private void handleRegisterRequest(String clientId, IotDeviceMessage message, NetSocket socket) {
+    private void handleRegisterRequest(IotDeviceMessage message, NetSocket socket) {
         // 1. 解析注册参数
         IotDeviceRegisterReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceRegisterReqDTO.class);
         Assert.notNull(params, "注册参数不能为空");
@@ -218,7 +218,7 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         // 3. 发送成功响应
         sendSuccessResponse(socket, message.getRequestId(),
                 IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), result.getData());
-        log.info("[handleRegisterRequest][注册成功，客户端 ID: {}，设备名: {}]", clientId, params.getDeviceName());
+        log.info("[handleRegisterRequest][注册成功，客户端 ID: {}，设备名: {}]", null, params.getDeviceName());
     }
 
     /**

@@ -55,6 +55,10 @@ public class IotUdpProtocol implements IotProtocol {
      */
     @Getter
     private DatagramSocket udpSocket;
+    /**
+     * UDP 会话管理器
+     */
+    private final IotUdpSessionManager sessionManager;
 
     /**
      * 下行消息订阅者
@@ -65,11 +69,6 @@ public class IotUdpProtocol implements IotProtocol {
      * 消息序列化器
      */
     private final IotMessageSerializer serializer;
-
-    /**
-     * UDP 会话管理器
-     */
-    private final IotUdpSessionManager sessionManager;
 
     public IotUdpProtocol(ProtocolInstanceProperties properties) {
         IotUdpConfig udpConfig = properties.getUdp();

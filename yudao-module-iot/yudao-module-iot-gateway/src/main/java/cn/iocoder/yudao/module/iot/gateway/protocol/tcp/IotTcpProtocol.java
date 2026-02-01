@@ -57,6 +57,10 @@ public class IotTcpProtocol implements IotProtocol {
      * TCP 服务器
      */
     private NetServer tcpServer;
+    /**
+     * TCP 连接管理器
+     */
+    private final IotTcpConnectionManager connectionManager;
 
     /**
      * 下行消息订阅者
@@ -67,16 +71,10 @@ public class IotTcpProtocol implements IotProtocol {
      * 消息序列化器
      */
     private final IotMessageSerializer serializer;
-
     /**
      * TCP 帧编解码器
      */
     private final IotTcpFrameCodec frameCodec;
-
-    /**
-     * TCP 连接管理器
-     */
-    private final IotTcpConnectionManager connectionManager;
 
     public IotTcpProtocol(ProtocolInstanceProperties properties) {
         IotTcpConfig tcpConfig = properties.getTcp();

@@ -29,6 +29,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {
 
+    /**
+     * 最大帧长度（64KB），防止 DoS 攻击
+     */
+    private static final int MAX_FRAME_LENGTH = 65536;
+
     private final int lengthFieldOffset;
     private final int lengthFieldLength;
     private final int lengthAdjustment;
@@ -60,6 +65,7 @@ public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {
     public RecordParser createDecodeParser(Handler<Buffer> handler) {
         // 创建状态机：先读取头部，再读取消息体
         RecordParser parser = RecordParser.newFixed(headerLength);
+        parser.maxRecordSize(MAX_FRAME_LENGTH); // 设置最大记录大小，防止 DoS 攻击
         final AtomicReference<Integer> bodyLength = new AtomicReference<>(null); // 消息体长度，null 表示读取头部阶段
         final AtomicReference<Buffer> headerBuffer = new AtomicReference<>(null); // 头部消息
 

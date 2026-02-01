@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
-import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class IotWebSocketDownstreamHandler {
 
-    private final IotDeviceMessageService deviceMessageService;
+    private final IotMessageSerializer serializer;
 
     private final IotWebSocketConnectionManager connectionManager;
 
@@ -37,9 +38,15 @@ public class IotWebSocketDownstreamHandler {
             }
 
             // 2. 编码消息并发送到设备
-            byte[] bytes = deviceMessageService.encodeDeviceMessage(message, connectionInfo.getCodecType());
-            String jsonMessage = StrUtil.utf8Str(bytes);
-            boolean success = connectionManager.sendToDevice(message.getDeviceId(), jsonMessage);
+            byte[] bytes = serializer.serialize(message);
+            // TODO @AI：参考别的模块的做法，直接发？类似 tcp 这种；
+            boolean success;
+            if (serializer.getType() == IotSerializeTypeEnum.BINARY) {
+                success = connectionManager.sendToDevice(message.getDeviceId(), bytes);
+            } else {
+                String jsonMessage = StrUtil.utf8Str(bytes);
+                success = connectionManager.sendToDevice(message.getDeviceId(), jsonMessage);
+            }
             if (success) {
                 log.info("[handle][下行消息发送成功，设备 ID: {}，方法: {}，消息 ID: {}，数据长度: {} 字节]",
                         message.getDeviceId(), message.getMethod(), message.getId(), bytes.length);

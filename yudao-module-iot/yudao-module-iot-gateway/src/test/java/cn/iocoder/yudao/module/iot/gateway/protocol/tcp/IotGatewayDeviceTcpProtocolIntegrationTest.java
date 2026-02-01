@@ -373,7 +373,7 @@ public class IotGatewayDeviceTcpProtocolIntegrationTest {
         });
         socket.handler(parser);
 
-        // 2.1 序列化 + 帧编码（复用 gateway 的编码逻辑）
+        // 2.1 序列化 + 帧编码
         byte[] serializedData = SERIALIZER.serialize(request);
         Buffer frameData = FRAME_CODEC.encode(serializedData);
         log.info("[sendAndReceive][发送消息: {}，数据长度: {} 字节]", request.getMethod(), frameData.length());

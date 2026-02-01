@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager;
 
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 芋道源码
  */
 @Slf4j
-@Component
 public class IotWebSocketConnectionManager {
 
     /**
@@ -69,7 +68,8 @@ public class IotWebSocketConnectionManager {
             return;
         }
         Long deviceId = connectionInfo.getDeviceId();
-        deviceSocketMap.remove(deviceId);
+        // 仅当 deviceSocketMap 中的 socket 是当前 socket 时才移除，避免误删新连接
+        deviceSocketMap.remove(deviceId, socket);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
                 deviceId, socket.remoteAddress());
     }
@@ -115,6 +115,33 @@ public class IotWebSocketConnectionManager {
         }
     }
 
+    // TODO @AI：没必要这里加一个；
+    /**
+     * 发送消息到设备（二进制消息）
+     *
+     * @param deviceId 设备 ID
+     * @param payload  二进制消息
+     * @return 是否发送成功
+     */
+    public boolean sendToDevice(Long deviceId, byte[] payload) {
+        ServerWebSocket socket = deviceSocketMap.get(deviceId);
+        if (socket == null) {
+            log.warn("[sendToDevice][设备未连接，设备 ID: {}]", deviceId);
+            return false;
+        }
+
+        try {
+            socket.writeBinaryMessage(Buffer.buffer(payload));
+            log.debug("[sendToDevice][发送消息成功，设备 ID: {}，数据长度: {} 字节]", deviceId, payload.length);
+            return true;
+        } catch (Exception e) {
+            log.error("[sendToDevice][发送消息失败，设备 ID: {}]", deviceId, e);
+            // 发送失败时清理连接
+            unregisterConnection(socket);
+            return false;
+        }
+    }
+
     /**
      * 连接信息（包含认证信息）
      */
@@ -134,15 +161,6 @@ public class IotWebSocketConnectionManager {
          * 设备名称
          */
         private String deviceName;
-
-        /**
-         * 客户端 ID
-         */
-        private String clientId;
-        /**
-         * 消息编解码类型（认证后确定）
-         */
-        private String codecType;
 
     }
 

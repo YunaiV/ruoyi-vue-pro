@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.websocket;
+package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.router.IotWebSocketDownstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,7 +16,7 @@ public class IotWebSocketDownstreamSubscriber extends IotProtocolDownstreamSubsc
 
     private final IotWebSocketDownstreamHandler downstreamHandler;
 
-    public IotWebSocketDownstreamSubscriber(IotWebSocketUpstreamProtocol protocol,
+    public IotWebSocketDownstreamSubscriber(IotWebSocketProtocol protocol,
                                             IotWebSocketDownstreamHandler downstreamHandler,
                                             IotMessageBus messageBus) {
         super(protocol, messageBus);
