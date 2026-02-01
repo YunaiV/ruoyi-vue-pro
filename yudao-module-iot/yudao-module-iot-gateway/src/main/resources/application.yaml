@@ -85,8 +85,7 @@ yudao:
           serialize: json
           udp:
             max-sessions: 1000               # 最大会话数
-            session-timeout-ms: 60000        # 会话超时时间（毫秒）
-            session-clean-interval-ms: 30000 # 会话清理间隔（毫秒）
+            session-timeout-ms: 60000        # 会话超时时间（毫秒），基于 Guava Cache 自动过期
             receive-buffer-size: 65536       # 接收缓冲区大小（字节）
             send-buffer-size: 65536          # 发送缓冲区大小（字节）
 

@@ -98,7 +98,7 @@ public class IotGatewaySubDeviceUdpProtocolIntegrationTest {
      */
     @Test
     public void testPropertyPost() throws Exception {
-        // 1. 构建属性上报消息（UDP 协议：token 放在 params 中）
+        // 1. 构建属性上报消息
         IotDeviceMessage request = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
                 withToken(IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
@@ -120,7 +120,7 @@ public class IotGatewaySubDeviceUdpProtocolIntegrationTest {
      */
     @Test
     public void testEventPost() throws Exception {
-        // 1. 构建事件上报消息（UDP 协议：token 放在 params 中）
+        // 1. 构建事件上报消息
         IotDeviceMessage request = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
                 withToken(IotDeviceEventPostReqDTO.of(

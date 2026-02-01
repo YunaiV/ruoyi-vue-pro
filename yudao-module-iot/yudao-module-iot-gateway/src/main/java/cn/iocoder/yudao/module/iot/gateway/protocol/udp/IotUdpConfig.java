@@ -21,17 +21,11 @@ public class IotUdpConfig {
     /**
      * 会话超时时间（毫秒）
      * <p>
-     * 用于清理不活跃的设备地址映射
+     * 基于 Guava Cache 的 expireAfterAccess 实现自动过期清理
      */
     @NotNull(message = "会话超时时间不能为空")
     @Min(value = 1000, message = "会话超时时间必须大于 1000 毫秒")
     private Long sessionTimeoutMs = 60000L;
-    /**
-     * 会话清理间隔（毫秒）
-     */
-    @NotNull(message = "会话清理间隔不能为空")
-    @Min(value = 1000, message = "会话清理间隔必须大于 1000 毫秒")
-    private Long sessionCleanIntervalMs = 30000L;
 
     /**
      * 接收缓冲区大小（字节）

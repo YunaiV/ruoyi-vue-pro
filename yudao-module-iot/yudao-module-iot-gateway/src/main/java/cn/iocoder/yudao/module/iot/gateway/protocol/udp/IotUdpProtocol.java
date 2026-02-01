@@ -1,13 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.udp;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.handler.downstream.IotUdpDownstreamHandler;
@@ -16,16 +12,13 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.udp.handler.upstream.IotUdpU
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager.IotUdpSessionManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
-
-import java.util.List;
 
 /**
  * IoT UDP 协议实现
@@ -78,22 +71,11 @@ public class IotUdpProtocol implements IotProtocol {
      */
     private final IotUdpSessionManager sessionManager;
 
-    private final IotDeviceService deviceService;
-    private final IotDeviceMessageService deviceMessageService;
-
-    /**
-     * 会话清理定时器 ID
-     */
-    // TODO @AI：会话清理，是不是放到 sessionManager 更合适？
-    private Long cleanTimerId;
-
     public IotUdpProtocol(ProtocolInstanceProperties properties) {
         IotUdpConfig udpConfig = properties.getUdp();
         Assert.notNull(udpConfig, "UDP 协议配置（udp）不能为空");
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
-        this.deviceService = SpringUtil.getBean(IotDeviceService.class);
-        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
 
         // 初始化序列化器
         IotSerializeTypeEnum serializeType = IotSerializeTypeEnum.of(properties.getSerialize());
@@ -102,7 +84,7 @@ public class IotUdpProtocol implements IotProtocol {
         this.serializer = serializerManager.get(serializeType);
 
         // 初始化会话管理器
-        this.sessionManager = new IotUdpSessionManager(udpConfig.getMaxSessions());
+        this.sessionManager = new IotUdpSessionManager(udpConfig.getMaxSessions(), udpConfig.getSessionTimeoutMs());
 
         // 初始化下行消息订阅者
         IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
@@ -143,24 +125,30 @@ public class IotUdpProtocol implements IotProtocol {
         // 1.4 创建上行消息处理器
         IotUdpUpstreamHandler upstreamHandler = new IotUdpUpstreamHandler(serverId, sessionManager, serializer);
 
-        // 1.5 监听端口
-        udpSocket.listen(properties.getPort(), "0.0.0.0", result -> {
-            if (result.failed()) {
-                log.error("[start][IoT UDP 协议 {} 启动失败]", getId(), result.cause());
-                return;
-            }
+        // 1.5 启动 UDP 服务器（阻塞式）
+        try {
+            udpSocket.listen(properties.getPort(), "0.0.0.0").result();
             // 设置数据包处理器
             udpSocket.handler(packet -> upstreamHandler.handle(packet, udpSocket));
             running = true;
             log.info("[start][IoT UDP 协议 {} 启动成功，端口：{}，serverId：{}]",
                     getId(), properties.getPort(), serverId);
-            // 启动会话清理定时器
-            startSessionCleanTimer(udpConfig);
 
             // 2. 启动下行消息订阅者
-            // TODO @AI：这里会导致  Thread Thread[vert.x-eventloop-thread-0,5,main] has been blocked for 2992 ms, time limit is 2000 ms
             this.downstreamSubscriber.start();
-        });
+        } catch (Exception e) {
+            log.error("[start][IoT UDP 协议 {} 启动失败]", getId(), e);
+            // 启动失败时关闭资源
+            if (udpSocket != null) {
+                udpSocket.close();
+                udpSocket = null;
+            }
+            if (vertx != null) {
+                vertx.close();
+                vertx = null;
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -176,13 +164,7 @@ public class IotUdpProtocol implements IotProtocol {
             log.error("[stop][IoT UDP 协议 {} 下行消息订阅者停止失败]", getId(), e);
         }
 
-        // 2.1 取消会话清理定时器
-        if (cleanTimerId != null) {
-            vertx.cancelTimer(cleanTimerId);
-            cleanTimerId = null;
-            log.info("[stop][IoT UDP 协议 {} 会话清理定时器已取消]", getId());
-        }
-        // 2.2 关闭 UDP Socket
+        // 2.1 关闭 UDP Socket
         if (udpSocket != null) {
             try {
                 udpSocket.close().result();
@@ -192,7 +174,7 @@ public class IotUdpProtocol implements IotProtocol {
             }
             udpSocket = null;
         }
-        // 2.3 关闭 Vertx 实例
+        // 2.2 关闭 Vertx 实例
         if (vertx != null) {
             try {
                 vertx.close().result();
@@ -204,56 +186,6 @@ public class IotUdpProtocol implements IotProtocol {
         }
         running = false;
         log.info("[stop][IoT UDP 协议 {} 已停止]", getId());
-    }
-
-    /**
-     * 启动会话清理定时器
-     */
-    // TODO @AI：这个放到
-    private void startSessionCleanTimer(IotUdpConfig udpConfig) {
-        cleanTimerId = vertx.setPeriodic(udpConfig.getSessionCleanIntervalMs(), id -> {
-            try {
-                // 1. 清理超时的设备会话，并获取离线设备列表
-                List<Long> offlineDeviceIds = sessionManager.cleanExpiredSessions(udpConfig.getSessionTimeoutMs());
-
-                // 2. 为每个离线设备发送离线消息
-                for (Long deviceId : offlineDeviceIds) {
-                    sendOfflineMessage(deviceId);
-                }
-                if (CollUtil.isNotEmpty(offlineDeviceIds)) {
-                    log.info("[cleanExpiredSessions][本次清理 {} 个超时设备]", offlineDeviceIds.size());
-                }
-            } catch (Exception e) {
-                log.error("[cleanExpiredSessions][清理超时会话失败]", e);
-            }
-        });
-        log.info("[startSessionCleanTimer][会话清理定时器启动，间隔：{} ms，超时：{} ms]",
-                udpConfig.getSessionCleanIntervalMs(), udpConfig.getSessionTimeoutMs());
-    }
-
-    /**
-     * 发送设备离线消息
-     *
-     * @param deviceId 设备 ID
-     */
-    private void sendOfflineMessage(Long deviceId) {
-        try {
-            // 获取设备信息
-            IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceId);
-            if (device == null) {
-                log.warn("[sendOfflineMessage][设备不存在，设备 ID: {}]", deviceId);
-                return;
-            }
-
-            // 发送离线消息
-            IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
-            deviceMessageService.sendDeviceMessage(offlineMessage, device.getProductKey(),
-                    device.getDeviceName(), serverId);
-            log.info("[sendOfflineMessage][发送离线消息，设备 ID: {}，设备名: {}]",
-                    deviceId, device.getDeviceName());
-        } catch (Exception e) {
-            log.error("[sendOfflineMessage][发送离线消息失败，设备 ID: {}]", deviceId, e);
-        }
     }
 
 }

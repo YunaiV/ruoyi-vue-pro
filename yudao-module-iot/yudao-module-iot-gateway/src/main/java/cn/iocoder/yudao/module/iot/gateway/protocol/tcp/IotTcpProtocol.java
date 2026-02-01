@@ -155,7 +155,11 @@ public class IotTcpProtocol implements IotProtocol {
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT TCP 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭 Vertx
+            // 启动失败时关闭资源
+            if (tcpServer != null) {
+                tcpServer.close();
+                tcpServer = null;
+            }
             if (vertx != null) {
                 vertx.close();
                 vertx = null;

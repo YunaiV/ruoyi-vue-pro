@@ -65,7 +65,7 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
     /**
      * 直连设备 Token：从 {@link #testAuth()} 方法获取后，粘贴到这里
      */
-    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc2OTk0ODYzOCwiZGV2aWNlTmFtZSI6InNtYWxsIn0.TrOJisXhloZ3quLBOAIyowmpq6Syp9PHiEpfj-nQ9xo";
+    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9kdWN0S2V5IjoiNGF5bVpnT1RPT0NyREtSVCIsImV4cCI6MTc3MDUyNTA0MywiZGV2aWNlTmFtZSI6InNtYWxsIn0.W9Mo-Oe1ZNLDkINndKieUeW1XhDzhVp0W0zTAwO6hJM";
 
     // ===================== 认证测试 =====================
 
@@ -120,7 +120,7 @@ public class IotDirectDeviceUdpProtocolIntegrationTest {
      */
     @Test
     public void testPropertyPost() throws Exception {
-        // 1. 构建属性上报消息（UDP 协议：token 放在 params 中）
+        // 1. 构建属性上报消息
         IotDeviceMessage request = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
                 withToken(IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()

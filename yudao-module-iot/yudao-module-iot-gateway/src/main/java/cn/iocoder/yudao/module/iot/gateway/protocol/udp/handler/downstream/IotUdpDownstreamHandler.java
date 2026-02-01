@@ -34,7 +34,7 @@ public class IotUdpDownstreamHandler {
             log.info("[handle][处理下行消息，设备 ID: {}，方法: {}，消息 ID: {}]",
                     message.getDeviceId(), message.getMethod(), message.getId());
             // 1. 检查设备会话
-            IotUdpSessionManager.SessionInfo sessionInfo = sessionManager.getSessionInfo(message.getDeviceId());
+            IotUdpSessionManager.SessionInfo sessionInfo = sessionManager.getSession(message.getDeviceId());
             if (sessionInfo == null) {
                 log.warn("[handle][会话信息不存在，设备 ID: {}，方法: {}，消息 ID: {}]",
                         message.getDeviceId(), message.getMethod(), message.getId());
