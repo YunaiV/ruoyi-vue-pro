@@ -8,7 +8,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 /**
  * IoT TCP 分隔符帧编解码器
@@ -39,7 +39,7 @@ public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {
     private final byte[] delimiterBytes;
 
     public IotTcpDelimiterFrameCodec(IotTcpConfig.CodecConfig config) {
-        Assert.hasText(config.getDelimiter(), "delimiter 不能为空");
+        Assert.notBlank(config.getDelimiter(), "delimiter 不能为空");
         this.delimiterBytes = parseDelimiter(config.getDelimiter());
     }
 

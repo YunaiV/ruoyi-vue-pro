@@ -33,7 +33,7 @@ public class IotCoapRegisterHandler extends IotCoapAbstractHandler {
         Assert.notNull(request, "请求体不能为空");
         Assert.notBlank(request.getProductKey(), "productKey 不能为空");
         Assert.notBlank(request.getDeviceName(), "deviceName 不能为空");
-        Assert.notBlank(request.getProductSecret(), "productSecret 不能为空");
+        Assert.notBlank(request.getSign(), "sign 不能为空");
 
         // 2. 调用动态注册
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(request);

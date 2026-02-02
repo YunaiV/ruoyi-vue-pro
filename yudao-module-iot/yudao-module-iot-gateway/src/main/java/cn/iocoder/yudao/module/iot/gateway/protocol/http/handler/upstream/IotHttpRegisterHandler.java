@@ -35,7 +35,7 @@ public class IotHttpRegisterHandler extends IotHttpAbstractHandler {
         Assert.notNull(request, "请求参数不能为空");
         Assert.notBlank(request.getProductKey(), "productKey 不能为空");
         Assert.notBlank(request.getDeviceName(), "deviceName 不能为空");
-        Assert.notBlank(request.getProductSecret(), "productSecret 不能为空");
+        Assert.notBlank(request.getSign(), "sign 不能为空");
 
         // 2. 调用动态注册
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(request);

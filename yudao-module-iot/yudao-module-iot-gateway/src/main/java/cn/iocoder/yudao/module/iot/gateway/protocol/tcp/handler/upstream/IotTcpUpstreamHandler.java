@@ -24,7 +24,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -167,8 +167,8 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         // 1. 解析认证参数
         IotDeviceAuthReqDTO authParams = JsonUtils.convertObject(message.getParams(), IotDeviceAuthReqDTO.class);
         Assert.notNull(authParams, "认证参数不能为空");
-        Assert.hasText(authParams.getUsername(), "username 不能为空");
-        Assert.hasText(authParams.getPassword(), "password 不能为空");
+        Assert.notBlank(authParams.getUsername(), "username 不能为空");
+        Assert.notBlank(authParams.getPassword(), "password 不能为空");
 
         // 2.1 执行认证
         CommonResult<Boolean> authResult = deviceApi.authDevice(authParams);
@@ -204,8 +204,9 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
         // 1. 解析注册参数
         IotDeviceRegisterReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceRegisterReqDTO.class);
         Assert.notNull(params, "注册参数不能为空");
-        Assert.hasText(params.getProductKey(), "productKey 不能为空");
-        Assert.hasText(params.getDeviceName(), "deviceName 不能为空");
+        Assert.notBlank(params.getProductKey(), "productKey 不能为空");
+        Assert.notBlank(params.getDeviceName(), "deviceName 不能为空");
+        Assert.notBlank(params.getSign(), "sign 不能为空");
 
         // 2. 调用动态注册
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);

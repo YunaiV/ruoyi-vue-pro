@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_AUTH_FAIL;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -43,13 +43,13 @@ public class IotMqttAuthHandler extends IotMqttAbstractHandler {
         this.serverId = serverId;
     }
 
-    // （暂时不改）TODO @AI：【动态注册】在 clientId 包含 |authType=register 时，进行动态注册设备；校验是 clientId、username、password 三者组合；它是拼接 productSecret 的哈希值；所以 IotDeviceAuthUtils 里面的 buildContent 要改造；
     /**
      * 处理 MQTT 连接（认证）请求
      *
      * @param endpoint MQTT 连接端点
      * @return 认证是否成功
      */
+    @SuppressWarnings("DataFlowIssue")
     public boolean handleAuthenticationRequest(MqttEndpoint endpoint) {
         String clientId = endpoint.clientIdentifier();
         String username = endpoint.auth() != null ? endpoint.auth().getUsername() : null;
@@ -59,9 +59,9 @@ public class IotMqttAuthHandler extends IotMqttAbstractHandler {
 
         try {
             // 1.1 解析认证参数
-            Assert.hasText(clientId, "clientId 不能为空");
-            Assert.hasText(username, "username 不能为空");
-            Assert.hasText(password, "password 不能为空");
+            Assert.notBlank(clientId, "clientId 不能为空");
+            Assert.notBlank(username, "username 不能为空");
+            Assert.notBlank(password, "password 不能为空");
             // 1.2 构建认证参数
             IotDeviceAuthReqDTO authParams = new IotDeviceAuthReqDTO()
                     .setClientId(clientId)
@@ -102,8 +102,6 @@ public class IotMqttAuthHandler extends IotMqttAbstractHandler {
                 .setDeviceId(device.getId())
                 .setProductKey(device.getProductKey())
                 .setDeviceName(device.getDeviceName())
-                .setClientId(clientId)
-                .setAuthenticated(true)
                 .setRemoteAddress(connectionManager.getEndpointAddress(endpoint));
         connectionManager.registerConnection(endpoint, device.getId(), connectionInfo);
     }

@@ -4,10 +4,10 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
 import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
 import io.netty.handler.codec.mqtt.MqttQoS;
@@ -173,36 +173,51 @@ public class IotDirectDeviceMqttProtocolIntegrationTest {
     /**
      * 直连设备动态注册测试（一型一密）
      * <p>
-     * 使用产品密钥（productSecret）验证身份，成功后返回设备密钥（deviceSecret）
+     * 认证方式：
+     * - clientId: 任意值 + "|authType=register|" 后缀
+     * - username: {deviceName}&{productKey}（与普通认证相同）
+     * - password: 签名（使用 productSecret 对 "deviceName" + deviceName + "productKey" + productKey 进行 HMAC-SHA256）
      * <p>
-     * 注意：此接口不需要认证
+     * 成功后返回设备密钥（deviceSecret），可用于后续一机一密认证
      */
     @Test
     public void testDeviceRegister() throws Exception {
-        // 1. 连接并认证（使用已有设备连接）
-        MqttClient client = connectAndAuth();
-        log.info("[testDeviceRegister][连接认证成功]");
+        // 1.1 构建注册参数
+        String deviceName = "test-mqtt-" + System.currentTimeMillis();
+        String productSecret = "test-product-secret"; // 替换为实际的 productSecret
+        String sign = IotProductAuthUtils.buildSign(PRODUCT_KEY, deviceName, productSecret);
+        // 1.2 构建 MQTT 连接参数（clientId 需要添加 |authType=register| 后缀）
+        String clientId = IotDeviceAuthUtils.buildClientId(PRODUCT_KEY, deviceName) + "|authType=register|";
+        String username = IotDeviceAuthUtils.buildUsername(PRODUCT_KEY, deviceName);
+        log.info("[testDeviceRegister][注册参数: clientId={}, username={}, sign={}]",
+                clientId, username, sign);
+        // 1.3 创建客户端并连接（连接时服务端自动处理注册）
+        MqttClientOptions options = new MqttClientOptions()
+                .setClientId(clientId)
+                .setUsername(username)
+                .setPassword(sign)
+                .setCleanSession(true)
+                .setKeepAliveInterval(60);
+        MqttClient client = MqttClient.create(vertx, options);
 
         try {
-            // 2.1 构建注册消息
-            IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO()
-                    .setProductKey(PRODUCT_KEY)
-                    .setDeviceName("test-mqtt-" + System.currentTimeMillis())
-                    .setProductSecret("test-product-secret");
-            IotDeviceMessage request = IotDeviceMessage.requestOf(
-                    IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(),
-                    registerReqDTO);
+            // 2. 设置消息处理器，接收注册响应
+            CompletableFuture<IotDeviceMessage> responseFuture = new CompletableFuture<>();
+            client.publishHandler(message -> {
+                log.info("[testDeviceRegister][收到响应: topic={}, payload={}]",
+                        message.topicName(), message.payload().toString());
+                IotDeviceMessage response = CODEC.decode(message.payload().getBytes());
+                responseFuture.complete(response);
+            });
 
-            // 2.2 订阅 _reply 主题
-            String replyTopic = String.format("/sys/%s/%s/thing/auth/register_reply",
-                    registerReqDTO.getProductKey(), registerReqDTO.getDeviceName());
-            subscribe(client, replyTopic);
+            // 3. 连接服务器（连接成功后服务端会自动处理注册并发送响应）
+            client.connect(SERVER_PORT, SERVER_HOST)
+                    .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            log.info("[testDeviceRegister][连接成功，等待注册响应...]");
 
-            // 3. 发布消息并等待响应
-            String topic = String.format("/sys/%s/%s/thing/auth/register",
-                    registerReqDTO.getProductKey(), registerReqDTO.getDeviceName());
-            IotDeviceMessage response = publishAndWaitReply(client, topic, request);
-            log.info("[testDeviceRegister][响应消息: {}]", response);
+            // 4. 等待注册响应
+            IotDeviceMessage response = responseFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            log.info("[testDeviceRegister][注册响应: {}]", response);
             log.info("[testDeviceRegister][成功后可使用返回的 deviceSecret 进行一机一密认证]");
         } finally {
             disconnect(client);

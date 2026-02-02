@@ -18,7 +18,7 @@ import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 /**
  * IoT UDP 协议实现

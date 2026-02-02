@@ -21,7 +21,7 @@ import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 /**
  * IoT TCP 协议实现

@@ -21,7 +21,7 @@ import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.Configuration;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 import java.util.concurrent.TimeUnit;
 

@@ -26,7 +26,8 @@ import io.vertx.mqtt.MqttTopicSubscription;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 
 import java.util.List;
 
@@ -39,6 +40,13 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  */
 @Slf4j
 public class IotMqttProtocol implements IotProtocol {
+
+    /**
+     * 注册连接的 clientId 标识
+     *
+     * @see #handleEndpoint(MqttEndpoint)
+     */
+    private static final String AUTH_TYPE_REGISTER = "|authType=register|";
 
     /**
      * 协议配置
@@ -93,7 +101,7 @@ public class IotMqttProtocol implements IotProtocol {
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
         IotDeviceCommonApi deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
         this.authHandler = new IotMqttAuthHandler(connectionManager, deviceMessageService, deviceApi, serverId);
-        this.registerHandler = new IotMqttRegisterHandler(connectionManager, deviceMessageService, deviceApi);
+        this.registerHandler = new IotMqttRegisterHandler(connectionManager, deviceMessageService);
         this.upstreamHandler = new IotMqttUpstreamHandler(connectionManager, deviceMessageService, serverId);
 
         // 初始化下行消息订阅者
@@ -112,7 +120,6 @@ public class IotMqttProtocol implements IotProtocol {
         return IotProtocolTypeEnum.MQTT;
     }
 
-    // done @AI：这个方法的整体注释风格，参考 IotTcpProtocol 的 start 方法。
     @Override
     public void start() {
         if (running) {
@@ -209,13 +216,18 @@ public class IotMqttProtocol implements IotProtocol {
      * @param endpoint MQTT 连接端点
      */
     private void handleEndpoint(MqttEndpoint endpoint) {
+        // 1. 如果是注册请求，注册待认证连接；否则走正常认证流程
         String clientId = endpoint.clientIdentifier();
-
-        // 1. 委托 authHandler 处理连接认证
-        // done @AI：register topic 不需要注册，需要判断下；当前逻辑已支持（设备可在未认证状态发送 register 消息，registerHandler 会处理）
-        if (!authHandler.handleAuthenticationRequest(endpoint)) {
-            endpoint.reject(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
+        if (StrUtil.endWith(clientId, AUTH_TYPE_REGISTER)) {
+            // 情况一：设备注册请求
+            registerHandler.handleRegister(endpoint);
             return;
+        } else {
+            // 情况二：普通认证请求
+            if (!authHandler.handleAuthenticationRequest(endpoint)) {
+                endpoint.reject(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
+                return;
+            }
         }
 
         // 2.1 设置异常和关闭处理器
@@ -224,9 +236,8 @@ public class IotMqttProtocol implements IotProtocol {
                     clientId, connectionManager.getEndpointAddress(endpoint), ex.getMessage());
             endpoint.close();
         });
-        // done @AI：closeHandler 处理底层连接关闭（网络中断、异常等），disconnectHandler 处理 MQTT DISCONNECT 报文
-        endpoint.closeHandler(v -> cleanupConnection(endpoint));
-        endpoint.disconnectHandler(v -> {
+        endpoint.closeHandler(v -> cleanupConnection(endpoint)); // 处理底层连接关闭（网络中断、异常等）
+        endpoint.disconnectHandler(v -> { // 处理 MQTT DISCONNECT 报文
             log.debug("[handleEndpoint][设备断开连接，客户端 ID: {}]", clientId);
             cleanupConnection(endpoint);
         });
@@ -239,7 +250,6 @@ public class IotMqttProtocol implements IotProtocol {
         endpoint.publishReleaseHandler(endpoint::publishComplete);
 
         // 4.1 设置订阅处理器
-        // done @AI：使用 CollectionUtils.convertList 简化
         endpoint.subscribeHandler(subscribe -> {
             List<String> topicNames = convertList(subscribe.topicSubscriptions(), MqttTopicSubscription::topicName);
             log.debug("[handleEndpoint][设备订阅，客户端 ID: {}，主题: {}]", clientId, topicNames);
@@ -265,21 +275,16 @@ public class IotMqttProtocol implements IotProtocol {
     private void processMessage(MqttEndpoint endpoint, MqttPublishMessage message) {
         String clientId = endpoint.clientIdentifier();
         try {
-            // 根据 topic 分发到不同 handler
+            // 1. 处理业务消息
             String topic = message.topicName();
             byte[] payload = message.payload().getBytes();
-            if (registerHandler.isRegisterMessage(topic)) {
-                registerHandler.handleRegister(endpoint, topic, payload);
-            } else {
-                upstreamHandler.handleBusinessRequest(endpoint, topic, payload);
-            }
+            upstreamHandler.handleBusinessRequest(endpoint, topic, payload);
 
-            // 根据 QoS 级别发送相应的确认消息
+            // 2. 根据 QoS 级别发送相应的确认消息
             handleQoSAck(endpoint, message);
         } catch (Exception e) {
             log.error("[processMessage][消息处理失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
                     clientId, connectionManager.getEndpointAddress(endpoint), e.getMessage());
-            cleanupConnection(endpoint);
             endpoint.close();
         }
     }

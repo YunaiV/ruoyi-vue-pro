@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// done @AI：validator 参数校验。也看看其他几个配置类有没有类似问题
 /**
  * IoT 网关 MQTT 协议配置
  *

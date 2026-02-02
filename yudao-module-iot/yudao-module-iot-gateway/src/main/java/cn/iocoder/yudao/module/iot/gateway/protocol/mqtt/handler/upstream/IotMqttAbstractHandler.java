@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public abstract class IotMqttAbstractHandler {
 
-    // done @AI：当前使用 Alink 序列化类型，后续可考虑支持更多序列化方式
+    // TODO @AI：当前使用 Alink 序列化类型，后续可考虑支持更多序列化方式
     /**
      * 默认编解码类型（MQTT 使用 Alink 协议）
      */
@@ -31,7 +31,6 @@ public abstract class IotMqttAbstractHandler {
     protected final IotDeviceMessageService deviceMessageService;
 
     // done @AI：基于 method 通过 IotMqttTopicUtils.buildTopicByMethod 计算 reply topic
-    // done @AI：当前通过 deviceMessageService.encodeDeviceMessage 编码，保持简洁
     /**
      * 发送成功响应到设备
      *
@@ -89,6 +88,6 @@ public abstract class IotMqttAbstractHandler {
         }
     }
 
-    // done @AI：当前 sendSuccessResponse/sendErrorResponse 已足够清晰，暂不抽取 writeResponse
+    // TODO @AI：当前 sendSuccessResponse/sendErrorResponse 已足够清晰，暂不抽取 writeResponse（必须抽取！！！）
 
 }
