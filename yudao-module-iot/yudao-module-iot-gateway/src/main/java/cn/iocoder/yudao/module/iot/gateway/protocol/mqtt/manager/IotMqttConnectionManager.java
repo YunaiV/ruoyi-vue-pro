@@ -73,25 +73,24 @@ public class IotMqttConnectionManager {
      * 注册设备连接（包含认证信息）
      *
      * @param endpoint       MQTT 连接端点
-     * @param deviceId       设备 ID
      * @param connectionInfo 连接信息
      */
-    // TODO @AI：移除掉 deviceId ？？？参考别的 tcp 等模块协议
-    public void registerConnection(MqttEndpoint endpoint, Long deviceId, ConnectionInfo connectionInfo) {
+    public void registerConnection(MqttEndpoint endpoint, ConnectionInfo connectionInfo) {
+        Long deviceId = connectionInfo.getDeviceId();
         // 如果设备已有其他连接，先清理旧连接
         MqttEndpoint oldEndpoint = deviceEndpointMap.get(deviceId);
         if (oldEndpoint != null && oldEndpoint != endpoint) {
             log.info("[registerConnection][设备已有其他连接，断开旧连接，设备 ID: {}，旧连接: {}]",
                     deviceId, getEndpointAddress(oldEndpoint));
-            oldEndpoint.close();
-            // 清理旧连接的映射
+            // 先清理映射，再关闭连接（避免旧连接处理器干扰）
             connectionMap.remove(oldEndpoint);
+            oldEndpoint.close();
         }
 
         // 注册新连接
         connectionMap.put(endpoint, connectionInfo);
         deviceEndpointMap.put(deviceId, endpoint);
-        log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
+        log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，productKey: {}，deviceName: {}]",
                 deviceId, getEndpointAddress(endpoint), connectionInfo.getProductKey(), connectionInfo.getDeviceName());
     }
 

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
@@ -50,12 +49,10 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
             }
             // 1.2 解析主题，获取 productKey 和 deviceName
             String[] topicParts = topic.split("/");
-            if (topicParts.length < 4 || StrUtil.hasBlank(topicParts[2], topicParts[3])) {
-                log.warn("[handleBusinessRequest][topic({}) 格式不正确，无法解析有效的 productKey 和 deviceName]", topic);
-                return;
-            }
-            productKey = topicParts[2];
-            deviceName = topicParts[3];
+            productKey = ArrayUtil.get(topicParts, 2);
+            deviceName = ArrayUtil.get(topicParts, 3);
+            Assert.notBlank(productKey, "产品 Key 不能为空");
+            Assert.notBlank(deviceName, "设备名称不能为空");
             // 1.3 校验设备信息，防止伪造设备消息
             IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(endpoint);
             Assert.notNull(connectionInfo, "无法获取连接信息");

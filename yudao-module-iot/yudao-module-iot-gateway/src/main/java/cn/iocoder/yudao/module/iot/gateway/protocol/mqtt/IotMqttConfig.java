@@ -27,13 +27,6 @@ public class IotMqttConfig {
     private Integer connectTimeoutSeconds = 60;
 
     /**
-     * 保持连接超时时间（秒）
-     */
-    @NotNull(message = "保持连接超时时间不能为空")
-    @Min(value = 1, message = "保持连接超时时间不能小于 1 秒")
-    private Integer keepAliveTimeoutSeconds = 300;
-
-    /**
      * 是否启用 SSL
      */
     @NotNull(message = "是否启用 SSL 不能为空")

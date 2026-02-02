@@ -30,7 +30,6 @@ public abstract class IotMqttAbstractHandler {
     protected final IotMqttConnectionManager connectionManager;
     protected final IotDeviceMessageService deviceMessageService;
 
-    // done @AI：基于 method 通过 IotMqttTopicUtils.buildTopicByMethod 计算 reply topic
     /**
      * 发送成功响应到设备
      *
@@ -43,20 +42,8 @@ public abstract class IotMqttAbstractHandler {
      */
     protected void sendSuccessResponse(MqttEndpoint endpoint, String productKey, String deviceName,
                                         String requestId, String method, Object data) {
-        try {
-            // 1. 构建响应消息
-            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, data, 0, null);
-
-            // 2. 编码消息（使用默认编解码器）
-            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
-
-            // 3. 构建响应主题并发送
-            String replyTopic = IotMqttTopicUtils.buildTopicByMethod(method, productKey, deviceName, true);
-            endpoint.publish(replyTopic, Buffer.buffer(encodedData), MqttQoS.AT_LEAST_ONCE, false, false);
-            log.debug("[sendSuccessResponse][发送成功响应，主题: {}]", replyTopic);
-        } catch (Exception e) {
-            log.error("[sendSuccessResponse][发送成功响应异常，客户端 ID: {}]", endpoint.clientIdentifier(), e);
-        }
+        IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, data, 0, null);
+        writeResponse(endpoint, productKey, deviceName, method, responseMessage);
     }
 
     /**
@@ -72,22 +59,32 @@ public abstract class IotMqttAbstractHandler {
      */
     protected void sendErrorResponse(MqttEndpoint endpoint, String productKey, String deviceName,
                                       String requestId, String method, Integer errorCode, String errorMessage) {
-        try {
-            // 1. 构建响应消息
-            IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, null, errorCode, errorMessage);
-
-            // 2. 编码消息（使用默认编解码器）
-            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
-
-            // 3. 构建响应主题并发送
-            String replyTopic = IotMqttTopicUtils.buildTopicByMethod(method, productKey, deviceName, true);
-            endpoint.publish(replyTopic, Buffer.buffer(encodedData), MqttQoS.AT_LEAST_ONCE, false, false);
-            log.debug("[sendErrorResponse][发送错误响应，主题: {}]", replyTopic);
-        } catch (Exception e) {
-            log.error("[sendErrorResponse][发送错误响应异常，客户端 ID: {}]", endpoint.clientIdentifier(), e);
-        }
+        IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, null, errorCode, errorMessage);
+        writeResponse(endpoint, productKey, deviceName, method, responseMessage);
     }
 
-    // TODO @AI：当前 sendSuccessResponse/sendErrorResponse 已足够清晰，暂不抽取 writeResponse（必须抽取！！！）
+    /**
+     * 写入响应消息到设备
+     *
+     * @param endpoint        MQTT 连接端点
+     * @param productKey      产品 Key
+     * @param deviceName      设备名称
+     * @param method          方法名
+     * @param responseMessage 响应消息
+     */
+    private void writeResponse(MqttEndpoint endpoint, String productKey, String deviceName,
+                               String method, IotDeviceMessage responseMessage) {
+        try {
+            // 1. 编码消息（使用默认编解码器）
+            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
+
+            // 2. 构建响应主题，并发送
+            String replyTopic = IotMqttTopicUtils.buildTopicByMethod(method, productKey, deviceName, true);
+            endpoint.publish(replyTopic, Buffer.buffer(encodedData), MqttQoS.AT_LEAST_ONCE, false, false);
+            log.debug("[writeResponse][发送响应，主题: {}，code: {}]", replyTopic, responseMessage.getCode());
+        } catch (Exception e) {
+            log.error("[writeResponse][发送响应异常，客户端 ID: {}]", endpoint.clientIdentifier(), e);
+        }
+    }
 
 }

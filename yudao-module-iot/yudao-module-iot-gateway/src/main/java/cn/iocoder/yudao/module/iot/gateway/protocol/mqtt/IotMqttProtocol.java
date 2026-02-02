@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream.IotMqttDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream.IotMqttDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttAuthHandler;
@@ -15,6 +17,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqt
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.netty.handler.codec.mqtt.MqttConnectReturnCode;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
@@ -26,12 +29,9 @@ import io.vertx.mqtt.MqttTopicSubscription;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * IoT 网关 MQTT 协议：接收设备上行消息
@@ -249,11 +249,22 @@ public class IotMqttProtocol implements IotProtocol {
         // 3.2 设置 QoS 2 消息的 PUBREL 处理器
         endpoint.publishReleaseHandler(endpoint::publishComplete);
 
-        // 4.1 设置订阅处理器
+        // 4.1 设置订阅处理器（带 ACL 校验）
         endpoint.subscribeHandler(subscribe -> {
-            List<String> topicNames = convertList(subscribe.topicSubscriptions(), MqttTopicSubscription::topicName);
-            log.debug("[handleEndpoint][设备订阅，客户端 ID: {}，主题: {}]", clientId, topicNames);
-            List<MqttQoS> grantedQoSLevels = convertList(subscribe.topicSubscriptions(), MqttTopicSubscription::qualityOfService);
+            IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(endpoint);
+            List<MqttQoS> grantedQoSLevels = new ArrayList<>();
+            for (MqttTopicSubscription sub : subscribe.topicSubscriptions()) {
+                String topicName = sub.topicName();
+                // 校验主题是否属于当前设备
+                if (connectionInfo != null && IotMqttTopicUtils.isTopicSubscribeAllowed(
+                        topicName, connectionInfo.getProductKey(), connectionInfo.getDeviceName())) {
+                    grantedQoSLevels.add(sub.qualityOfService());
+                    log.debug("[handleEndpoint][订阅成功，客户端 ID: {}，主题: {}]", clientId, topicName);
+                } else {
+                    log.warn("[handleEndpoint][订阅被拒绝，客户端 ID: {}，主题: {}]", clientId, topicName);
+                    grantedQoSLevels.add(MqttQoS.FAILURE);
+                }
+            }
             endpoint.subscribeAcknowledge(subscribe.messageId(), grantedQoSLevels);
         });
         // 4.2 设置取消订阅处理器

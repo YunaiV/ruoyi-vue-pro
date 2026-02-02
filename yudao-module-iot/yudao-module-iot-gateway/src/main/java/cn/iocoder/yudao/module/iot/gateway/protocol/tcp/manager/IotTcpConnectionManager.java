@@ -47,8 +47,8 @@ public class IotTcpConnectionManager {
      * @param deviceId       设备 ID
      * @param connectionInfo 连接信息
      */
-    public void registerConnection(NetSocket socket, Long deviceId, ConnectionInfo connectionInfo) {
-        // 检查连接数是否已达上限
+    public synchronized void registerConnection(NetSocket socket, Long deviceId, ConnectionInfo connectionInfo) {
+        // 检查连接数是否已达上限（同步方法确保检查和注册的原子性）
         if (connectionMap.size() >= maxConnections) {
             throw new IllegalStateException("连接数已达上限: " + maxConnections);
         }
@@ -57,9 +57,9 @@ public class IotTcpConnectionManager {
         if (oldSocket != null && oldSocket != socket) {
             log.info("[registerConnection][设备已有其他连接，断开旧连接，设备 ID: {}，旧连接: {}]",
                     deviceId, oldSocket.remoteAddress());
-            oldSocket.close();
-            // 清理旧连接的映射
+            // 先清理映射，再关闭连接
             connectionMap.remove(oldSocket);
+            oldSocket.close();
         }
 
         // 注册新连接

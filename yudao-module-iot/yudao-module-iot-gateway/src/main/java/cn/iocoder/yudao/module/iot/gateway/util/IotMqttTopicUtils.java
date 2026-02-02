@@ -63,4 +63,26 @@ public final class IotMqttTopicUtils {
         return SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/" + topicSuffix;
     }
 
+    /**
+     * 校验主题是否允许订阅
+     * <p>
+     * 规则：主题必须以 /sys/{productKey}/{deviceName}/ 开头，
+     * 或者是通配符形式 /sys/{productKey}/{deviceName}/#
+     *
+     * @param topic      订阅的主题
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 是否允许订阅
+     */
+    public static boolean isTopicSubscribeAllowed(String topic, String productKey, String deviceName) {
+        if (!StrUtil.isAllNotBlank(topic, productKey, deviceName)) {
+            return false;
+        }
+        // 构建设备主题前缀
+        String deviceTopicPrefix = SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/";
+        // 主题必须以设备前缀开头，或者是设备前缀的通配符形式
+        return topic.startsWith(deviceTopicPrefix)
+                || topic.equals(SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/#");
+    }
+
 }

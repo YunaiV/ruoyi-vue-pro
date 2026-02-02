@@ -103,7 +103,7 @@ public class IotMqttAuthHandler extends IotMqttAbstractHandler {
                 .setProductKey(device.getProductKey())
                 .setDeviceName(device.getDeviceName())
                 .setRemoteAddress(connectionManager.getEndpointAddress(endpoint));
-        connectionManager.registerConnection(endpoint, device.getId(), connectionInfo);
+        connectionManager.registerConnection(endpoint, connectionInfo);
     }
 
     /**

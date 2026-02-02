@@ -124,7 +124,6 @@ yudao:
           mqtt:
             max-message-size: 8192           # 最大消息大小（字节）
             connect-timeout-seconds: 60      # 连接超时时间（秒）
-            keep-alive-timeout-seconds: 300  # 保持连接超时时间（秒）
             ssl-enabled: false               # 是否启用 SSL
 
       # 协议配置（旧版，保持兼容）

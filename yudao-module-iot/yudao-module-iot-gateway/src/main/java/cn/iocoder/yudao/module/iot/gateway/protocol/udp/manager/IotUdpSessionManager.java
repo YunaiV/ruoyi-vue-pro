@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,8 +48,8 @@ public class IotUdpSessionManager {
      * @param deviceId    设备 ID
      * @param sessionInfo 会话信息
      */
-    public void registerSession(Long deviceId, SessionInfo sessionInfo) {
-        // 检查是否为新设备，且会话数已达上限
+    public synchronized void registerSession(Long deviceId, SessionInfo sessionInfo) {
+        // 检查是否为新设备，且会话数已达上限（同步方法确保检查和注册的原子性）
         if (deviceSessionCache.getIfPresent(deviceId) == null
                 && deviceSessionCache.size() >= maxSessions) {
             throw new IllegalStateException("会话数已达上限: " + maxSessions);
@@ -113,16 +114,21 @@ public class IotUdpSessionManager {
         }
         InetSocketAddress address = sessionInfo.getAddress();
         try {
+            // 使用 CompletableFuture 同步等待发送结果
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
             socket.send(Buffer.buffer(data), address.getPort(), address.getHostString(), result -> {
                 if (result.succeeded()) {
                     log.debug("[sendToDevice][发送消息成功，设备 ID: {}，地址: {}，数据长度: {} 字节]",
                             deviceId, buildAddressKey(address), data.length);
-                    return;
+                    future.complete(true);
+                } else {
+                    log.error("[sendToDevice][发送消息失败，设备 ID: {}，地址: {}]",
+                            deviceId, buildAddressKey(address), result.cause());
+                    future.complete(false);
                 }
-                log.error("[sendToDevice][发送消息失败，设备 ID: {}，地址: {}]",
-                        deviceId, buildAddressKey(address), result.cause());
             });
-            return true;
+            // 同步等待结果，超时 5 秒
+            return future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("[sendToDevice][发送消息异常，设备 ID: {}]", deviceId, e);
             return false;

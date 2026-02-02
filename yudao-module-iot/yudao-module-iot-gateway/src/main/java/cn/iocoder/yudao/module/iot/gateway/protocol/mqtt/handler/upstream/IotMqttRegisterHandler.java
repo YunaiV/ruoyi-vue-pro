@@ -77,6 +77,9 @@ public class IotMqttRegisterHandler extends IotMqttAbstractHandler {
             // 接受连接，并发送错误响应
             endpoint.accept(false);
             sendErrorResponse(endpoint, productKey, deviceName, null, method, 500, e.getMessage());
+        } finally {
+            // 注册完成后关闭连接（一型一密只用于获取 deviceSecret，不保持连接）
+            endpoint.close();
         }
     }
 
