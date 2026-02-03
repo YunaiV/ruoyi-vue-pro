@@ -117,9 +117,9 @@ yudao:
         # 针对引入的 MQTT 组件的配置
         # ====================================
         - id: mqtt-json
-          enabled: false
+          enabled: true
           protocol: mqtt
-          port: 1884
+          port: 1883
           serialize: json
           mqtt:
             max-message-size: 8192           # 最大消息大小（字节）
@@ -129,7 +129,7 @@ yudao:
         # 针对引入的 EMQX 组件的配置
         # ====================================
         - id: emqx-1
-          enabled: true
+          enabled: false
           protocol: emqx
           port: 8090 # EMQX HTTP Hook 端口（/mqtt/auth、/mqtt/event）
           emqx:

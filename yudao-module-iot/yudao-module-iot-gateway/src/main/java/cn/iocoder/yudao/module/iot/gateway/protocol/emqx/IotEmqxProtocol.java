@@ -199,7 +199,7 @@ public class IotEmqxProtocol implements IotProtocol {
         router.route().handler(BodyHandler.create().setBodyLimit(1024 * 1024)); // 限制 body 大小为 1MB，防止大包攻击
 
         // 2. 创建处理器
-        IotEmqxAuthEventHandler handler = new IotEmqxAuthEventHandler(serverId);
+        IotEmqxAuthEventHandler handler = new IotEmqxAuthEventHandler(serverId, this);
         router.post(IotMqttTopicUtils.MQTT_AUTH_PATH).handler(handler::handleAuth);
         router.post(IotMqttTopicUtils.MQTT_ACL_PATH).handler(handler::handleAcl);
         router.post(IotMqttTopicUtils.MQTT_EVENT_PATH).handler(handler::handleEvent);
@@ -515,6 +515,17 @@ public class IotEmqxProtocol implements IotProtocol {
         MqttQoS qos = MqttQoS.valueOf(emqxConfig.getMqttQos());
         mqttClient.publish(topic, Buffer.buffer(payload), qos, false, false)
                 .onFailure(e -> log.error("[publishMessage][IoT EMQX 协议 {} 发布失败, topic: {}]", getId(), topic, e));
+    }
+
+    /**
+     * 延迟发布消息到 MQTT Broker
+     *
+     * @param topic   主题
+     * @param payload 消息内容
+     * @param delayMs 延迟时间（毫秒）
+     */
+    public void publishDelayMessage(String topic, byte[] payload, long delayMs) {
+        vertx.setTimer(delayMs, id -> publishMessage(topic, payload));
     }
 
 }

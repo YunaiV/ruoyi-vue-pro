@@ -201,7 +201,12 @@ public class IotDirectDeviceMqttProtocolIntegrationTest {
         MqttClient client = MqttClient.create(vertx, options);
 
         try {
-            // 2. 设置消息处理器，接收注册响应
+            // 2. 连接服务器（连接成功后服务端会自动处理注册并发送响应）
+            client.connect(SERVER_PORT, SERVER_HOST)
+                    .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            log.info("[testDeviceRegister][连接成功，等待注册响应...]");
+
+            // 3.1 设置消息处理器，接收注册响应
             CompletableFuture<IotDeviceMessage> responseFuture = new CompletableFuture<>();
             client.publishHandler(message -> {
                 log.info("[testDeviceRegister][收到响应: topic={}, payload={}]",
@@ -209,11 +214,9 @@ public class IotDirectDeviceMqttProtocolIntegrationTest {
                 IotDeviceMessage response = CODEC.decode(message.payload().getBytes());
                 responseFuture.complete(response);
             });
-
-            // 3. 连接服务器（连接成功后服务端会自动处理注册并发送响应）
-            client.connect(SERVER_PORT, SERVER_HOST)
-                    .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            log.info("[testDeviceRegister][连接成功，等待注册响应...]");
+            // 3.2 订阅 _reply 主题
+            String replyTopic = String.format("/sys/%s/%s/thing/auth/register_reply", PRODUCT_KEY, deviceName);
+            subscribe(client, replyTopic);
 
             // 4. 等待注册响应
             IotDeviceMessage response = responseFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
