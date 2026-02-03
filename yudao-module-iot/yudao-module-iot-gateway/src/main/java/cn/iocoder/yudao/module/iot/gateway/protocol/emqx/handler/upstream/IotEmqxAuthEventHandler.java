@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.upstream;
 
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;

@@ -92,7 +92,7 @@ yudao:
         # 针对引入的 WebSocket 组件的配置
         # ====================================
         - id: websocket-json
-          enabled: true
+          enabled: false
           protocol: websocket
           port: 8094
           serialize: json
@@ -117,9 +117,9 @@ yudao:
         # 针对引入的 MQTT 组件的配置
         # ====================================
         - id: mqtt-json
-          enabled: true
+          enabled: false
           protocol: mqtt
-          port: 1883
+          port: 1884
           serialize: json
           mqtt:
             max-message-size: 8192           # 最大消息大小（字节）
@@ -132,7 +132,7 @@ yudao:
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
-          enabled: false
+          enabled: true
           http-port: 8090                       # MQTT HTTP 服务端口
           mqtt-host: 127.0.0.1                  # MQTT Broker 地址
           mqtt-port: 1883                       # MQTT Broker 端口

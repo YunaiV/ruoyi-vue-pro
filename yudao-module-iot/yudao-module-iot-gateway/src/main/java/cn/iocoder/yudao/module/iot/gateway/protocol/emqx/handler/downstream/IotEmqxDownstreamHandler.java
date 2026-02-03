@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.downstream;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
