@@ -38,6 +38,12 @@ public final class IotMqttTopicUtils {
      */
     public static final String MQTT_EVENT_PATH = "/mqtt/event";
 
+    /**
+     * MQTT ACL 接口路径
+     * 对应 EMQX HTTP ACL 插件的 ACL 请求接口
+     */
+    public static final String MQTT_ACL_PATH = "/mqtt/acl";
+
     // ========== 工具方法 ==========
 
     /**
@@ -83,6 +89,30 @@ public final class IotMqttTopicUtils {
         // 主题必须以设备前缀开头，或者是设备前缀的通配符形式
         return topic.startsWith(deviceTopicPrefix)
                 || topic.equals(SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/#");
+    }
+
+    /**
+     * 校验主题是否允许发布
+     * <p>
+     * 规则：主题必须以 /sys/{productKey}/{deviceName}/ 开头，且不允许包含通配符（+/#）。
+     *
+     * @param topic      发布的主题
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 是否允许发布
+     */
+    // TODO DONE @AI：这个逻辑，是不是 mqtt 协议，也要使用？？？答：是通用工具方法，MQTT 协议可按需调用；
+    // TODO @AI：那你改下 mqtt，也调用！！！
+    public static boolean isTopicPublishAllowed(String topic, String productKey, String deviceName) {
+        if (!StrUtil.isAllNotBlank(topic, productKey, deviceName)) {
+            return false;
+        }
+        // MQTT publish topic 不允许包含通配符，但这里做一次兜底校验
+        if (topic.contains("#") || topic.contains("+")) {
+            return false;
+        }
+        String deviceTopicPrefix = SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/";
+        return topic.startsWith(deviceTopicPrefix);
     }
 
 }

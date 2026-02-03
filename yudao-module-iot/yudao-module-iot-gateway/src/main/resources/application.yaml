@@ -125,43 +125,49 @@ yudao:
             max-message-size: 8192           # 最大消息大小（字节）
             connect-timeout-seconds: 60      # 连接超时时间（秒）
             ssl-enabled: false               # 是否启用 SSL
-
-      # 协议配置（旧版，保持兼容）
-      protocol:
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================
-        emqx:
+        - id: emqx-1
           enabled: true
-          http-port: 8090                       # MQTT HTTP 服务端口
-          mqtt-host: 127.0.0.1                  # MQTT Broker 地址
-          mqtt-port: 1883                       # MQTT Broker 端口
-          mqtt-username: admin                  # MQTT 用户名
-          mqtt-password: public                 # MQTT 密码
-          mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
-          mqtt-ssl: false                       # 是否开启 SSL
-          mqtt-topics:
-            - "/sys/#"                          # 系统主题
-          clean-session: true                   # 是否启用 Clean Session (默认: true)
-          keep-alive-interval-seconds: 60       # 心跳间隔，单位秒 (默认: 60)
-          max-inflight-queue: 10000             # 最大飞行消息队列，单位：条
-          connect-timeout-seconds: 10           # 连接超时，单位：秒
-          # 是否信任所有 SSL 证书 (默认: false)。警告：生产环境必须为 false！
-          # 仅在开发环境或内网测试时，如果使用了自签名证书，可以临时设置为 true
-          trust-all: true # 在 dev 环境可以设为 true
-          # 遗嘱消息配置 (用于网关异常下线时通知其他系统)
-          will:
-            enabled: true # 生产环境强烈建议开启
-            topic: "gateway/status/${yudao.iot.gateway.emqx.mqtt-client-id}" # 遗嘱消息主题
-            payload: "offline" # 遗嘱消息负载
-            qos: 1 # 遗嘱消息 QoS
-            retain: true # 遗嘱消息是否保留
-          # 高级 SSL/TLS 配置 (当 trust-all: false 且 mqtt-ssl: true 时生效)
-          ssl-options:
-            key-store-path: "classpath:certs/client.jks" # 客户端证书库路径
-            key-store-password: "your-keystore-password" # 客户端证书库密码
-            trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
-            trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
+          protocol: emqx
+          port: 8090 # EMQX HTTP Hook 端口（/mqtt/auth、/mqtt/event）
+          emqx:
+            mqtt-host: 127.0.0.1                  # MQTT Broker 地址
+            mqtt-port: 1883                       # MQTT Broker 端口
+            mqtt-username: admin                  # MQTT 用户名
+            mqtt-password: public                 # MQTT 密码
+            mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
+            mqtt-ssl: false                       # 是否开启 SSL
+            mqtt-topics:
+              - "/sys/#"                          # 系统主题
+            mqtt-qos: 1                           # 默认 QoS
+            clean-session: true                   # 是否启用 Clean Session (默认: true)
+            keep-alive-interval-seconds: 60       # 心跳间隔，单位秒 (默认: 60)
+            max-inflight-queue: 10000             # 最大飞行消息队列，单位：条
+            connect-timeout-seconds: 10           # 连接超时，单位：秒
+            reconnect-delay-ms: 5000              # 重连延迟，单位：毫秒
+            # 是否信任所有 SSL 证书 (默认: false)。警告：生产环境必须为 false！
+            # 仅在开发环境或内网测试时，如果使用了自签名证书，可以临时设置为 true
+            trust-all: true # 在 dev 环境可以设为 true
+            # EMQX HTTP Hook 回调网关的 HTTPS 配置（可选）
+            http:
+              ssl-enabled: false
+              # ssl-cert-path: "path/to/server.crt"
+              # ssl-key-path: "path/to/server.key"
+            # 遗嘱消息配置 (用于网关异常下线时通知其他系统)
+            will:
+              enabled: true # 生产环境强烈建议开启
+              topic: "gateway/status/iot-gateway-mqtt" # 遗嘱消息主题
+              payload: "offline" # 遗嘱消息负载
+              qos: 1 # 遗嘱消息 QoS
+              retain: true # 遗嘱消息是否保留
+            # 高级 SSL/TLS 配置 (当 trust-all: false 且 mqtt-ssl: true 时生效)
+            ssl-options:
+              key-store-path: "classpath:certs/client.jks" # 客户端证书库路径
+              key-store-password: "your-keystore-password" # 客户端证书库密码
+              trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
+              trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
 
 --- #################### 日志相关配置 ####################
 
@@ -181,7 +187,6 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.emqx: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
-    cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
     # 根日志级别

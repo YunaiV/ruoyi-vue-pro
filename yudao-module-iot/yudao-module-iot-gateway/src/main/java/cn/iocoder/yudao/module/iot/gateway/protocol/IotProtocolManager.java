@@ -5,6 +5,7 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
@@ -109,6 +110,8 @@ public class IotProtocolManager implements SmartLifecycle {
                 return createWebSocketProtocol(config);
             case MQTT:
                 return createMqttProtocol(config);
+            case EMQX:
+                return createEmqxProtocol(config);
             default:
                 throw new IllegalArgumentException(String.format(
                         "[createProtocol][协议实例 %s 的协议类型 %s 暂不支持]", config.getId(), protocolType));
@@ -173,6 +176,16 @@ public class IotProtocolManager implements SmartLifecycle {
      */
     private IotMqttProtocol createMqttProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
         return new IotMqttProtocol(config);
+    }
+
+    /**
+     * 创建 EMQX 协议实例
+     *
+     * @param config 协议实例配置
+     * @return EMQX 协议实例
+     */
+    private IotEmqxProtocol createEmqxProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+        return new IotEmqxProtocol(config);
     }
 
 }

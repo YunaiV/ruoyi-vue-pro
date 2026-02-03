@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.upstream;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +19,16 @@ public class IotEmqxUpstreamHandler {
 
     private final String serverId;
 
-    public IotEmqxUpstreamHandler(IotEmqxUpstreamProtocol protocol) {
+    public IotEmqxUpstreamHandler(String serverId) {
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
-        this.serverId = protocol.getServerId();
+        this.serverId = serverId;
     }
 
     /**
      * 处理 MQTT 发布消息
      */
     public void handle(MqttPublishMessage mqttMessage) {
-        log.info("[handle][收到 MQTT 消息, topic: {}, payload: {}]", mqttMessage.topicName(), mqttMessage.payload());
+        log.debug("[handle][收到 MQTT 消息, topic: {}, payload: {}]", mqttMessage.topicName(), mqttMessage.payload());
         String topic = mqttMessage.topicName();
         byte[] payload = mqttMessage.payload().getBytes();
         try {

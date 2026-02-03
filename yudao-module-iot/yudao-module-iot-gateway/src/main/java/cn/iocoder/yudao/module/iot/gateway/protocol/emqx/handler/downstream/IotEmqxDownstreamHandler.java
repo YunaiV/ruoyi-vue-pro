@@ -5,7 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
@@ -21,13 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IotEmqxDownstreamHandler {
 
-    private final IotEmqxUpstreamProtocol protocol;
+    private final IotEmqxProtocol protocol;
 
     private final IotDeviceService deviceService;
 
     private final IotDeviceMessageService deviceMessageService;
 
-    public IotEmqxDownstreamHandler(IotEmqxUpstreamProtocol protocol) {
+    public IotEmqxDownstreamHandler(IotEmqxProtocol protocol) {
         this.protocol = protocol;
         this.deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);

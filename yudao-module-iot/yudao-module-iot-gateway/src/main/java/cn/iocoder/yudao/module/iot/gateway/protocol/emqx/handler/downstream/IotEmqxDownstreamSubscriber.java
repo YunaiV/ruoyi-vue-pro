@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.downstream;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,20 +16,9 @@ public class IotEmqxDownstreamSubscriber extends IotProtocolDownstreamSubscriber
 
     private final IotEmqxDownstreamHandler downstreamHandler;
 
-    public IotEmqxDownstreamSubscriber(IotEmqxUpstreamProtocol protocol, IotMessageBus messageBus) {
+    public IotEmqxDownstreamSubscriber(IotEmqxProtocol protocol, IotMessageBus messageBus) {
         super(protocol, messageBus);
         this.downstreamHandler = new IotEmqxDownstreamHandler(protocol);
-    }
-
-    @PostConstruct
-    public void startSubscriber() {
-        // EMQX 模式下，由 Spring 管理 Bean 生命周期；需要显式启动订阅者，才能从消息总线消费下行消息并发布到 Broker
-        start();
-    }
-
-    @PreDestroy
-    public void stopSubscriber() {
-        stop();
     }
 
     @Override
