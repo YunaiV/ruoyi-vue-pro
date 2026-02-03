@@ -91,9 +91,9 @@ public class IotProtocolManager implements SmartLifecycle {
      */
     @SuppressWarnings({"EnhancedSwitchMigration"})
     private IotProtocol createProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
-        IotProtocolTypeEnum protocolType = IotProtocolTypeEnum.of(config.getType());
+        IotProtocolTypeEnum protocolType = IotProtocolTypeEnum.of(config.getProtocol());
         if (protocolType == null) {
-            log.error("[createProtocol][协议实例 {} 的协议类型 {} 不存在]", config.getId(), config.getType());
+            log.error("[createProtocol][协议实例 {} 的协议类型 {} 不存在]", config.getId(), config.getProtocol());
             return null;
         }
         switch (protocolType) {

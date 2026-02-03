@@ -48,7 +48,7 @@ yudao:
         # 针对引入的 HTTP 组件的配置
         # ====================================
         - id: http-json
-          type: http
+          protocol: http
           port: 8092
           enabled: false
           http:
@@ -58,7 +58,7 @@ yudao:
         # ====================================
         - id: tcp-json
           enabled: false
-          type: tcp
+          protocol: tcp
           port: 8091
           serialize: json
           tcp:
@@ -80,7 +80,7 @@ yudao:
         # ====================================
         - id: udp-json
           enabled: false
-          type: udp
+          protocol: udp
           port: 8093
           serialize: json
           udp:
@@ -93,7 +93,7 @@ yudao:
         # ====================================
         - id: websocket-json
           enabled: true
-          type: websocket
+          protocol: websocket
           port: 8094
           serialize: json
           websocket:
@@ -107,7 +107,7 @@ yudao:
         # ====================================
         - id: coap-json
           enabled: false
-          type: coap
+          protocol: coap
           port: 5683
           coap:
             max-message-size: 1024           # 最大消息大小（字节）
@@ -118,7 +118,7 @@ yudao:
         # ====================================
         - id: mqtt-json
           enabled: true
-          type: mqtt
+          protocol: mqtt
           port: 1883
           serialize: json
           mqtt:

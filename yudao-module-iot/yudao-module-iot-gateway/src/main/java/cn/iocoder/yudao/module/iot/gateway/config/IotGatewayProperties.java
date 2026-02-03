@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttConfig;
@@ -279,7 +280,7 @@ public class IotGatewayProperties {
          * @see cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum
          */
         @NotEmpty(message = "协议类型不能为空")
-        private String type;
+        private String protocol;
         /**
          * 服务端口
          */
