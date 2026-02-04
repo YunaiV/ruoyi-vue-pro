@@ -14,6 +14,8 @@ import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessa
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
+
 /**
  * IoT 网关 MQTT 设备注册处理器：处理设备动态注册消息（一型一密）
  *
@@ -76,7 +78,8 @@ public class IotMqttRegisterHandler extends IotMqttAbstractHandler {
             log.warn("[handleRegister][注册失败，客户端 ID: {}，错误: {}]", clientId, e.getMessage());
             // 接受连接，并发送错误响应
             endpoint.accept(false);
-            sendErrorResponse(endpoint, productKey, deviceName, null, method, 500, e.getMessage());
+            sendErrorResponse(endpoint, productKey, deviceName, null, method,
+                    INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
         } finally {
             // 注册完成后关闭连接（一型一密只用于获取 deviceSecret，不保持连接）
             endpoint.close();

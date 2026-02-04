@@ -43,7 +43,7 @@ public class IotMqttDownstreamHandler {
             }
 
             // 2.1 序列化消息
-            byte[] payload = deviceMessageService.encodeDeviceMessage(message, connectionInfo.getProductKey(),
+            byte[] payload = deviceMessageService.serializeDeviceMessage(message, connectionInfo.getProductKey(),
                     connectionInfo.getDeviceName());
             Assert.isTrue(payload != null && payload.length > 0, "消息编码结果不能为空");
             // 2.2 构建主题

@@ -452,16 +452,17 @@ public class IotEmqxAuthEventHandler {
         IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(username);
         Assert.notNull(deviceInfo, "设备信息不能为空");
         try {
-            // 1. 构建响应消息
+            // 1.1 构建响应消息
             String method = IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod();
             IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(null, method, result, 0, null);
-
-            // 2. 编码消息
-            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, "Alink");
-
-            // 3. 构建响应主题并延迟发布（等待设备连接成功并完成订阅）
+            // 1.2 序列化消息
+            byte[] encodedData = deviceMessageService.serializeDeviceMessage(responseMessage,
+                    cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum.JSON);
+            // 1.3 构建响应主题
             String replyTopic = IotMqttTopicUtils.buildTopicByMethod(method,
                     deviceInfo.getProductKey(), deviceInfo.getDeviceName(), true);
+
+            // 2. 构建响应主题，并延迟发布（等待设备连接成功并完成订阅）
             protocol.publishDelayMessage(replyTopic, encodedData, 5000);
             log.info("[sendRegisterResultMessage][发送注册结果: topic={}]", replyTopic);
         } catch (Exception e) {

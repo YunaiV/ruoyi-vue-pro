@@ -21,12 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public abstract class IotMqttAbstractHandler {
 
-    // TODO @AI：当前使用 Alink 序列化类型，后续可考虑支持更多序列化方式
-    /**
-     * 默认编解码类型（MQTT 使用 Alink 协议）
-     */
-    protected static final String DEFAULT_CODEC_TYPE = "Alink";
-
     protected final IotMqttConnectionManager connectionManager;
     protected final IotDeviceMessageService deviceMessageService;
 
@@ -40,8 +34,9 @@ public abstract class IotMqttAbstractHandler {
      * @param method      方法名
      * @param data        响应数据
      */
+    @SuppressWarnings("SameParameterValue")
     protected void sendSuccessResponse(MqttEndpoint endpoint, String productKey, String deviceName,
-                                        String requestId, String method, Object data) {
+                                       String requestId, String method, Object data) {
         IotDeviceMessage responseMessage = IotDeviceMessage.replyOf(requestId, method, data, 0, null);
         writeResponse(endpoint, productKey, deviceName, method, responseMessage);
     }
@@ -75,11 +70,12 @@ public abstract class IotMqttAbstractHandler {
     private void writeResponse(MqttEndpoint endpoint, String productKey, String deviceName,
                                String method, IotDeviceMessage responseMessage) {
         try {
-            // 1. 编码消息（使用默认编解码器）
-            byte[] encodedData = deviceMessageService.encodeDeviceMessage(responseMessage, DEFAULT_CODEC_TYPE);
-
-            // 2. 构建响应主题，并发送
+            // 1.1 序列化消息（根据设备配置的序列化类型）
+            byte[] encodedData = deviceMessageService.serializeDeviceMessage(responseMessage, productKey, deviceName);
+            // 1.2 构建响应主题
             String replyTopic = IotMqttTopicUtils.buildTopicByMethod(method, productKey, deviceName, true);
+
+            // 2. 发送响应消息
             endpoint.publish(replyTopic, Buffer.buffer(encodedData), MqttQoS.AT_LEAST_ONCE, false, false);
             log.debug("[writeResponse][发送响应，主题: {}，code: {}]", replyTopic, responseMessage.getCode());
         } catch (Exception e) {

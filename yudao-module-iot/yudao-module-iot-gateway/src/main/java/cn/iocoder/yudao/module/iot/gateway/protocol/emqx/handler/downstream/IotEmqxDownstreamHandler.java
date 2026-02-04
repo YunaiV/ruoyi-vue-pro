@@ -53,9 +53,10 @@ public class IotEmqxDownstreamHandler {
             return;
         }
         // 2.2 构建载荷
-        byte[] payload = deviceMessageService.encodeDeviceMessage(message, deviceInfo.getProductKey(),
+        byte[] payload = deviceMessageService.serializeDeviceMessage(message, deviceInfo.getProductKey(),
                 deviceInfo.getDeviceName());
-        // 2.3 发布消息
+
+        // 3. 发布消息
         protocol.publishMessage(topic, payload);
     }
 

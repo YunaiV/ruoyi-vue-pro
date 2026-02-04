@@ -60,7 +60,7 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
             Assert.equals(deviceName, connectionInfo.getDeviceName(), "设备名称不匹配");
 
             // 2. 反序列化消息
-            message = deviceMessageService.decodeDeviceMessage(payload, productKey, deviceName);
+            message = deviceMessageService.deserializeDeviceMessage(payload, productKey, deviceName);
             if (message == null) {
                 log.warn("[handleBusinessRequest][消息解码失败，客户端 ID: {}，主题: {}]", clientId, topic);
                 sendErrorResponse(endpoint, productKey, deviceName, null, null,

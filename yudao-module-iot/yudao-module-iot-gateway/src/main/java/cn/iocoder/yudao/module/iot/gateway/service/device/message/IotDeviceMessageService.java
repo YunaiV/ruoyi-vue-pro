@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.service.device.message;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
 /**
@@ -10,45 +11,45 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 public interface IotDeviceMessageService {
 
     /**
-     * 编码消息
+     * 序列化消息
      *
      * @param message    消息
      * @param productKey 产品 Key
      * @param deviceName 设备名称
-     * @return 编码后的消息内容
+     * @return 序列化后的消息内容
      */
-    byte[] encodeDeviceMessage(IotDeviceMessage message,
-                               String productKey, String deviceName);
+    byte[] serializeDeviceMessage(IotDeviceMessage message,
+                                  String productKey, String deviceName);
 
     /**
-     * 编码消息
+     * 序列化消息
      *
-     * @param message   消息
-     * @param codecType 编解码器类型
-     * @return 编码后的消息内容
+     * @param message       消息
+     * @param serializeType 序列化类型
+     * @return 序列化后的消息内容
      */
-    byte[] encodeDeviceMessage(IotDeviceMessage message,
-                               String codecType);
+    byte[] serializeDeviceMessage(IotDeviceMessage message,
+                                  IotSerializeTypeEnum serializeType);
 
     /**
-     * 解码消息
+     * 反序列化消息
      *
      * @param bytes      消息内容
      * @param productKey 产品 Key
      * @param deviceName 设备名称
-     * @return 解码后的消息内容
+     * @return 反序列化后的消息内容
      */
-    IotDeviceMessage decodeDeviceMessage(byte[] bytes,
-                                         String productKey, String deviceName);
+    IotDeviceMessage deserializeDeviceMessage(byte[] bytes,
+                                              String productKey, String deviceName);
 
     /**
-     * 解码消息
+     * 反序列化消息
      *
-     * @param bytes     消息内容
-     * @param codecType 编解码器类型
-     * @return 解码后的消息内容
+     * @param bytes         消息内容
+     * @param serializeType 序列化类型
+     * @return 反序列化后的消息内容
      */
-    IotDeviceMessage decodeDeviceMessage(byte[] bytes, String codecType);
+    IotDeviceMessage deserializeDeviceMessage(byte[] bytes, IotSerializeTypeEnum serializeType);
 
     /**
      * 发送消息

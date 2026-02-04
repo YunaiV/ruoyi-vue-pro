@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
+import cn.iocoder.yudao.module.iot.gateway.serialize.json.IotJsonSerializer;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -59,9 +59,9 @@ public class IotGatewaySubDeviceMqttProtocolIntegrationTest {
 
     private static Vertx vertx;
 
-    // ===================== 编解码器（MQTT 使用 Alink 协议） =====================
+    // ===================== 序列化器 =====================
 
-    private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
+    private static final IotMessageSerializer SERIALIZER = new IotJsonSerializer();
 
     // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
 
@@ -236,14 +236,14 @@ public class IotGatewaySubDeviceMqttProtocolIntegrationTest {
         client.publishHandler(message -> {
             log.info("[publishAndWaitReply][收到响应: topic={}, payload={}]",
                     message.topicName(), message.payload().toString());
-            IotDeviceMessage response = CODEC.decode(message.payload().getBytes());
+            IotDeviceMessage response = SERIALIZER.deserialize(message.payload().getBytes());
             responseFuture.complete(response);
         });
 
-        // 2. 编码并发布消息
-        byte[] payload = CODEC.encode(request);
-        log.info("[publishAndWaitReply][Codec: {}, 发送消息: topic={}, payload={}]",
-                CODEC.type(), topic, new String(payload));
+        // 2. 序列化并发布消息
+        byte[] payload = SERIALIZER.serialize(request);
+        log.info("[publishAndWaitReply][Serializer: {}, 发送消息: topic={}, payload={}]",
+                SERIALIZER.getType(), topic, new String(payload));
         client.publish(topic, Buffer.buffer(payload), MqttQoS.AT_LEAST_ONCE, false, false)
                 .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         log.info("[publishAndWaitReply][消息发布成功]");
