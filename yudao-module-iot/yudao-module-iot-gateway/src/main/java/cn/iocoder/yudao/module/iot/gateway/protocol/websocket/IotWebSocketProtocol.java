@@ -6,7 +6,8 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamHandler;
@@ -35,7 +36,7 @@ public class IotWebSocketProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
@@ -71,7 +72,7 @@ public class IotWebSocketProtocol implements IotProtocol {
      */
     private final IotMessageSerializer serializer;
 
-    public IotWebSocketProtocol(ProtocolInstanceProperties properties) {
+    public IotWebSocketProtocol(ProtocolProperties properties) {
         Assert.notNull(properties, "协议实例配置不能为空");
         Assert.notNull(properties.getWebsocket(), "WebSocket 协议配置（websocket）不能为空");
         this.properties = properties;
@@ -120,10 +121,11 @@ public class IotWebSocketProtocol implements IotProtocol {
                 .setIdleTimeout(wsConfig.getIdleTimeoutSeconds())
                 .setMaxWebSocketFrameSize(wsConfig.getMaxFrameSize())
                 .setMaxWebSocketMessageSize(wsConfig.getMaxMessageSize());
-        if (Boolean.TRUE.equals(wsConfig.getSslEnabled())) {
+        IotGatewayProperties.SslConfig sslConfig = properties.getSsl();
+        if (sslConfig != null && Boolean.TRUE.equals(sslConfig.getSsl())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
-                    .setKeyPath(wsConfig.getSslKeyPath())
-                    .setCertPath(wsConfig.getSslCertPath());
+                    .setKeyPath(sslConfig.getSslKeyPath())
+                    .setCertPath(sslConfig.getSslCertPath());
             options.setSsl(true).setKeyCertOptions(pemKeyCertOptions);
         }
 

@@ -35,7 +35,7 @@ public class IotGatewayProperties {
     /**
      * 协议实例列表
      */
-    private List<ProtocolInstanceProperties> protocols;
+    private List<ProtocolProperties> protocols;
 
     @Data
     public static class RpcProperties {
@@ -78,7 +78,7 @@ public class IotGatewayProperties {
      * 协议实例配置
      */
     @Data
-    public static class ProtocolInstanceProperties {
+    public static class ProtocolProperties {
 
         /**
          * 协议实例 ID，如 "http-alink"、"tcp-binary"
@@ -116,6 +116,14 @@ public class IotGatewayProperties {
          * 2. {@link IotProtocolTypeEnum#EMQX} 协议，目前支持根据产品（设备）配置的序列化类型来解析
          */
         private String serialize;
+
+        // ========== SSL 配置 ==========
+
+        /**
+         * SSL 配置（可选，配置文件中不配置则为 null）
+         */
+        @Valid
+        private SslConfig ssl;
 
         // ========== 各协议配置 ==========
 
@@ -157,6 +165,54 @@ public class IotGatewayProperties {
          */
         @Valid
         private IotEmqxConfig emqx;
+
+    }
+
+    /**
+     * SSL 配置
+     */
+    @Data
+    public static class SslConfig {
+
+        /**
+         * 是否启用 SSL
+         */
+        @NotNull(message = "是否启用 SSL 不能为空")
+        private Boolean ssl = false;
+
+        /**
+         * SSL 证书路径
+         */
+        @NotEmpty(message = "SSL 证书路径不能为空")
+        private String sslCertPath;
+
+        /**
+         * SSL 私钥路径
+         */
+        @NotEmpty(message = "SSL 私钥路径不能为空")
+        private String sslKeyPath;
+
+        /**
+         * 密钥库（KeyStore）路径
+         * <p>
+         * 包含客户端自己的证书和私钥，用于向服务端证明身份（双向认证）
+         */
+        private String keyStorePath;
+        /**
+         * 密钥库密码
+         */
+        private String keyStorePassword;
+
+        /**
+         * 信任库（TrustStore）路径
+         * <p>
+         * 包含服务端信任的 CA 证书，用于验证服务端的身份
+         */
+        private String trustStorePath;
+        /**
+         * 信任库密码
+         */
+        private String trustStorePassword;
 
     }
 

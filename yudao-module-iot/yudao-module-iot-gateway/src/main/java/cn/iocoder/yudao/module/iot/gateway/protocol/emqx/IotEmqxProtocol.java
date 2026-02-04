@@ -7,7 +7,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.downstream.IotEmqxDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.upstream.IotEmqxAuthEventHandler;
@@ -47,7 +47,7 @@ public class IotEmqxProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * EMQX 配置
      */
@@ -92,7 +92,7 @@ public class IotEmqxProtocol implements IotProtocol {
      */
     private final IotEmqxDownstreamSubscriber downstreamSubscriber;
 
-    public IotEmqxProtocol(ProtocolInstanceProperties properties) {
+    public IotEmqxProtocol(ProtocolProperties properties) {
         Assert.notNull(properties, "协议实例配置不能为空");
         Assert.notNull(properties.getEmqx(), "EMQX 协议配置（emqx）不能为空");
         this.properties = properties;

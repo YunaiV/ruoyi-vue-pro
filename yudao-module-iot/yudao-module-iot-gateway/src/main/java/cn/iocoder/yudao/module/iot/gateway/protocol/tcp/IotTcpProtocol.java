@@ -5,7 +5,8 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodecFactory;
@@ -36,7 +37,7 @@ public class IotTcpProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
@@ -76,7 +77,7 @@ public class IotTcpProtocol implements IotProtocol {
      */
     private final IotTcpFrameCodec frameCodec;
 
-    public IotTcpProtocol(ProtocolInstanceProperties properties) {
+    public IotTcpProtocol(ProtocolProperties properties) {
         IotTcpConfig tcpConfig = properties.getTcp();
         Assert.notNull(tcpConfig, "TCP 协议配置（tcp）不能为空");
         Assert.notNull(tcpConfig.getCodec(), "TCP 拆包配置（tcp.codec）不能为空");
@@ -128,10 +129,11 @@ public class IotTcpProtocol implements IotProtocol {
                 .setTcpNoDelay(true)
                 .setReuseAddress(true)
                 .setIdleTimeout((int) (tcpConfig.getKeepAliveTimeoutMs() / 1000)); // 设置空闲超时
-        if (Boolean.TRUE.equals(tcpConfig.getSslEnabled())) {
+        IotGatewayProperties.SslConfig sslConfig = properties.getSsl();
+        if (sslConfig != null && Boolean.TRUE.equals(sslConfig.getSsl())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
-                    .setKeyPath(tcpConfig.getSslKeyPath())
-                    .setCertPath(tcpConfig.getSslCertPath());
+                    .setKeyPath(sslConfig.getSslKeyPath())
+                    .setCertPath(sslConfig.getSslCertPath());
             options.setSsl(true).setKeyCertOptions(pemKeyCertOptions);
         }
 

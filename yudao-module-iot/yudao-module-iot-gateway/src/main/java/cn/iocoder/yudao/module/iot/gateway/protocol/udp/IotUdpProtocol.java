@@ -4,7 +4,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.handler.downstream.IotUdpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.handler.downstream.IotUdpDownstreamSubscriber;
@@ -33,7 +33,7 @@ public class IotUdpProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
@@ -70,7 +70,7 @@ public class IotUdpProtocol implements IotProtocol {
      */
     private final IotMessageSerializer serializer;
 
-    public IotUdpProtocol(ProtocolInstanceProperties properties) {
+    public IotUdpProtocol(ProtocolProperties properties) {
         IotUdpConfig udpConfig = properties.getUdp();
         Assert.notNull(udpConfig, "UDP 协议配置（udp）不能为空");
         this.properties = properties;

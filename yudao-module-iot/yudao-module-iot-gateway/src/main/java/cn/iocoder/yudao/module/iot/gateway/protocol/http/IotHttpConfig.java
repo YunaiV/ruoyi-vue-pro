@@ -10,19 +10,4 @@ import lombok.Data;
 @Data
 public class IotHttpConfig {
 
-    /**
-     * 是否启用 SSL
-     */
-    private Boolean sslEnabled = false;
-
-    /**
-     * SSL 证书路径
-     */
-    private String sslCertPath;
-
-    /**
-     * SSL 私钥路径
-     */
-    private String sslKeyPath;
-
 }

@@ -8,7 +8,8 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream.IotMqttDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.downstream.IotMqttDownstreamSubscriber;
@@ -51,7 +52,7 @@ public class IotMqttProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
@@ -88,7 +89,7 @@ public class IotMqttProtocol implements IotProtocol {
     private final IotMqttRegisterHandler registerHandler;
     private final IotMqttUpstreamHandler upstreamHandler;
 
-    public IotMqttProtocol(ProtocolInstanceProperties properties) {
+    public IotMqttProtocol(ProtocolProperties properties) {
         IotMqttConfig mqttConfig = properties.getMqtt();
         Assert.notNull(mqttConfig, "MQTT 协议配置（mqtt）不能为空");
         this.properties = properties;
@@ -136,10 +137,11 @@ public class IotMqttProtocol implements IotProtocol {
                 .setPort(properties.getPort())
                 .setMaxMessageSize(mqttConfig.getMaxMessageSize())
                 .setTimeoutOnConnect(mqttConfig.getConnectTimeoutSeconds());
-        if (Boolean.TRUE.equals(mqttConfig.getSslEnabled())) {
+        IotGatewayProperties.SslConfig sslConfig = properties.getSsl();
+        if (sslConfig != null && Boolean.TRUE.equals(sslConfig.getSsl())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
-                    .setKeyPath(mqttConfig.getSslKeyPath())
-                    .setCertPath(mqttConfig.getSslCertPath());
+                    .setKeyPath(sslConfig.getSslKeyPath())
+                    .setCertPath(sslConfig.getSslCertPath());
             options.setSsl(true).setKeyCertOptions(pemKeyCertOptions);
         }
 

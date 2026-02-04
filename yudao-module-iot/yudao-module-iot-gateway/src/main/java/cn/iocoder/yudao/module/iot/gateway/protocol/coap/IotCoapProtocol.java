@@ -4,7 +4,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.downstream.IotCoapDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstream.IotCoapAuthHandler;
@@ -43,7 +43,7 @@ public class IotCoapProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
@@ -66,7 +66,7 @@ public class IotCoapProtocol implements IotProtocol {
      */
     private final IotCoapDownstreamSubscriber downstreamSubscriber;
 
-    public IotCoapProtocol(ProtocolInstanceProperties properties) {
+    public IotCoapProtocol(ProtocolProperties properties) {
         IotCoapConfig coapConfig = properties.getCoap();
         Assert.notNull(coapConfig, "CoAP 协议配置（coap）不能为空");
         this.properties = properties;

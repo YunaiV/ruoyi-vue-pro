@@ -45,13 +45,13 @@ public class IotProtocolManager implements SmartLifecycle {
         if (running) {
             return;
         }
-        List<IotGatewayProperties.ProtocolInstanceProperties> protocolConfigs = gatewayProperties.getProtocols();
+        List<IotGatewayProperties.ProtocolProperties> protocolConfigs = gatewayProperties.getProtocols();
         if (CollUtil.isEmpty(protocolConfigs)) {
             log.info("[start][没有配置协议实例，跳过启动]");
             return;
         }
 
-        for (IotGatewayProperties.ProtocolInstanceProperties config : protocolConfigs) {
+        for (IotGatewayProperties.ProtocolProperties config : protocolConfigs) {
             if (BooleanUtil.isFalse(config.getEnabled())) {
                 log.info("[start][协议实例 {} 未启用，跳过]", config.getId());
                 continue;
@@ -91,7 +91,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @return 协议实例
      */
     @SuppressWarnings({"EnhancedSwitchMigration"})
-    private IotProtocol createProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotProtocol createProtocol(IotGatewayProperties.ProtocolProperties config) {
         IotProtocolTypeEnum protocolType = IotProtocolTypeEnum.of(config.getProtocol());
         if (protocolType == null) {
             log.error("[createProtocol][协议实例 {} 的协议类型 {} 不存在]", config.getId(), config.getProtocol());
@@ -124,7 +124,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return HTTP 协议实例
      */
-    private IotHttpProtocol createHttpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotHttpProtocol createHttpProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotHttpProtocol(config);
     }
 
@@ -134,7 +134,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return TCP 协议实例
      */
-    private IotTcpProtocol createTcpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotTcpProtocol createTcpProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotTcpProtocol(config);
     }
 
@@ -144,7 +144,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return UDP 协议实例
      */
-    private IotUdpProtocol createUdpProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotUdpProtocol createUdpProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotUdpProtocol(config);
     }
 
@@ -154,7 +154,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return CoAP 协议实例
      */
-    private IotCoapProtocol createCoapProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotCoapProtocol createCoapProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotCoapProtocol(config);
     }
 
@@ -164,7 +164,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return WebSocket 协议实例
      */
-    private IotWebSocketProtocol createWebSocketProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotWebSocketProtocol createWebSocketProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotWebSocketProtocol(config);
     }
 
@@ -174,7 +174,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return MQTT 协议实例
      */
-    private IotMqttProtocol createMqttProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotMqttProtocol createMqttProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotMqttProtocol(config);
     }
 
@@ -184,7 +184,7 @@ public class IotProtocolManager implements SmartLifecycle {
      * @param config 协议实例配置
      * @return EMQX 协议实例
      */
-    private IotEmqxProtocol createEmqxProtocol(IotGatewayProperties.ProtocolInstanceProperties config) {
+    private IotEmqxProtocol createEmqxProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotEmqxProtocol(config);
     }
 
