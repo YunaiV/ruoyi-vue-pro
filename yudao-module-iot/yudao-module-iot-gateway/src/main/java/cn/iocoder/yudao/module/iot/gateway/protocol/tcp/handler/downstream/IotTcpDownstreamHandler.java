@@ -45,8 +45,8 @@ public class IotTcpDownstreamHandler {
             }
 
             // 2. 序列化 + 帧编码
-            byte[] serializedData = serializer.serialize(message);
-            Buffer frameData = codec.encode(serializedData);
+            byte[] payload = serializer.serialize(message);
+            Buffer frameData = codec.encode(payload);
 
             // 3. 发送到设备
             boolean success = connectionManager.sendToDevice(message.getDeviceId(), frameData.getBytes());

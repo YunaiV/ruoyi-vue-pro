@@ -28,20 +28,6 @@ public class IotTcpConfig {
     private Long keepAliveTimeoutMs = 30000L;
 
     /**
-     * 是否启用 SSL
-     */
-    @NotNull(message = "是否启用 SSL 不能为空")
-    private Boolean sslEnabled = false;
-    /**
-     * SSL 证书路径
-     */
-    private String sslCertPath;
-    /**
-     * SSL 私钥路径
-     */
-    private String sslKeyPath;
-
-    /**
      * 拆包配置
      */
     @Valid

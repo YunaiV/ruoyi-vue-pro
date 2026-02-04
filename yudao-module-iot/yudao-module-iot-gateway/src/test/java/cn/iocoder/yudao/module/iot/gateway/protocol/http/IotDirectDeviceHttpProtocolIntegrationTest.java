@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -158,10 +159,13 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
         // 1.1 构建请求
         String url = String.format("http://%s:%d/auth/register/device", SERVER_HOST, SERVER_PORT);
         // 1.2 构建请求参数
+        String deviceName = "test-" + System.currentTimeMillis();
+        String productSecret = "test-product-secret"; // 替换为实际的 productSecret
+        String sign = IotProductAuthUtils.buildSign(PRODUCT_KEY, deviceName, productSecret);
         IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO()
                 .setProductKey(PRODUCT_KEY)
-                .setDeviceName("test-" + System.currentTimeMillis())
-                .setProductSecret("test-product-secret");
+                .setDeviceName(deviceName)
+                .setSign(sign);
         String payload = JsonUtils.toJsonString(reqDTO);
         // 1.3 输出请求
         log.info("[testDeviceRegister][请求 URL: {}]", url);

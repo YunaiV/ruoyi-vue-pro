@@ -23,7 +23,7 @@ import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessa
 import io.vertx.core.Handler;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import cn.hutool.core.lang.Assert;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -109,7 +109,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             // 1.2 解码消息
             message = serializer.deserialize(payload);
             Assert.notNull(message, "消息反序列化失败");
-            Assert.hasText(message.getMethod(), "method 不能为空");
+            Assert.notBlank(message.getMethod(), "method 不能为空");
 
             // 2. 根据消息类型路由处理
             if (AUTH_METHOD.equals(message.getMethod())) {
@@ -150,8 +150,8 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
         // 1. 解析认证参数
         IotDeviceAuthReqDTO authParams = JsonUtils.convertObject(message.getParams(), IotDeviceAuthReqDTO.class);
         Assert.notNull(authParams, "认证参数不能为空");
-        Assert.hasText(authParams.getUsername(), "username 不能为空");
-        Assert.hasText(authParams.getPassword(), "password 不能为空");
+        Assert.notBlank(authParams.getUsername(), "username 不能为空");
+        Assert.notBlank(authParams.getPassword(), "password 不能为空");
 
         // 2.1 执行认证
         CommonResult<Boolean> authResult = deviceApi.authDevice(authParams);
@@ -187,8 +187,9 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
         // 1. 解析注册参数
         IotDeviceRegisterReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceRegisterReqDTO.class);
         Assert.notNull(params, "注册参数不能为空");
-        Assert.hasText(params.getProductKey(), "productKey 不能为空");
-        Assert.hasText(params.getDeviceName(), "deviceName 不能为空");
+        Assert.notBlank(params.getProductKey(), "productKey 不能为空");
+        Assert.notBlank(params.getDeviceName(), "deviceName 不能为空");
+        Assert.notBlank(params.getSign(), "sign 不能为空");
 
         // 2. 调用动态注册
         CommonResult<IotDeviceRegisterRespDTO> result = deviceApi.registerDevice(params);

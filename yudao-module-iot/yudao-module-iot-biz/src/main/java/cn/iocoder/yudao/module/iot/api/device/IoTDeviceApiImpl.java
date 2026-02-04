@@ -75,7 +75,7 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
         return success(BeanUtils.toBean(device, IotDeviceRespDTO.class, deviceDTO -> {
             IotProductDO product = productService.getProductFromCache(deviceDTO.getProductId());
             if (product != null) {
-                deviceDTO.setCodecType(product.getCodecType());
+                deviceDTO.setProtocolType(product.getProtocolType()).setSerializeType(product.getSerializeType());
             }
         }));
     }

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -13,8 +12,8 @@ import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoAddReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoDeleteReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
+import cn.iocoder.yudao.module.iot.gateway.serialize.json.IotJsonSerializer;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -27,10 +26,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,9 +65,9 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
 
     private static Vertx vertx;
 
-    // ===================== 编解码器（MQTT 使用 Alink 协议） =====================
+    // ===================== 序列化器 =====================
 
-    private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
+    private static final IotMessageSerializer SERIALIZER = new IotJsonSerializer();
 
     // ===================== 网关设备信息（根据实际情况修改，从 iot_device 表查询网关设备） =====================
 
@@ -103,8 +100,6 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
      */
     @Test
     public void testAuth() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
-
         // 1. 构建认证信息
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(
                 GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME, GATEWAY_DEVICE_SECRET);
@@ -112,31 +107,13 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
                 authInfo.getClientId(), authInfo.getUsername(), authInfo.getPassword());
 
         // 2. 创建客户端并连接
-        MqttClient client = connect(authInfo);
-        client.connect(SERVER_PORT, SERVER_HOST)
-                .onComplete(ar -> {
-                    if (ar.succeeded()) {
-                        log.info("[testAuth][连接成功，客户端 ID: {}]", client.clientId());
-                        // 断开连接
-                        client.disconnect()
-                                .onComplete(disconnectAr -> {
-                                    if (disconnectAr.succeeded()) {
-                                        log.info("[testAuth][断开连接成功]");
-                                    } else {
-                                        log.error("[testAuth][断开连接失败]", disconnectAr.cause());
-                                    }
-                                    latch.countDown();
-                                });
-                    } else {
-                        log.error("[testAuth][连接失败]", ar.cause());
-                        latch.countDown();
-                    }
-                });
-
-        // 3. 等待测试完成
-        boolean completed = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        if (!completed) {
-            log.warn("[testAuth][测试超时]");
+        MqttClient client = createClient(authInfo);
+        try {
+            client.connect(SERVER_PORT, SERVER_HOST)
+                    .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            log.info("[testAuth][连接成功，客户端 ID: {}]", client.clientId());
+        } finally {
+            disconnect(client);
         }
     }
 
@@ -153,36 +130,35 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
         MqttClient client = connectAndAuth();
         log.info("[testTopoAdd][连接认证成功]");
 
-        // 2.1 订阅 _reply 主题
-        String replyTopic = String.format("/sys/%s/%s/thing/topo/add_reply",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        subscribeReply(client, replyTopic);
+        try {
+            // 2.1 构建子设备认证信息
+            IotDeviceAuthReqDTO subAuthInfo = IotDeviceAuthUtils.getAuthInfo(
+                    SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME, SUB_DEVICE_SECRET);
+            IotDeviceAuthReqDTO subDeviceAuth = new IotDeviceAuthReqDTO()
+                    .setClientId(subAuthInfo.getClientId())
+                    .setUsername(subAuthInfo.getUsername())
+                    .setPassword(subAuthInfo.getPassword());
 
-        // 2.2 构建子设备认证信息
-        IotDeviceAuthReqDTO subAuthInfo = IotDeviceAuthUtils.getAuthInfo(
-                SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME, SUB_DEVICE_SECRET);
-        IotDeviceAuthReqDTO subDeviceAuth = new IotDeviceAuthReqDTO()
-                .setClientId(subAuthInfo.getClientId())
-                .setUsername(subAuthInfo.getUsername())
-                .setPassword(subAuthInfo.getPassword());
+            // 2.2 构建请求消息
+            IotDeviceTopoAddReqDTO params = new IotDeviceTopoAddReqDTO()
+                    .setSubDevices(Collections.singletonList(subDeviceAuth));
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
+                    IotDeviceMessageMethodEnum.TOPO_ADD.getMethod(),
+                    params);
 
-        // 2.3 构建请求消息
-        IotDeviceTopoAddReqDTO params = new IotDeviceTopoAddReqDTO();
-        params.setSubDevices(Collections.singletonList(subDeviceAuth));
-        IotDeviceMessage request = IotDeviceMessage.of(
-                IdUtil.fastSimpleUUID(),
-                IotDeviceMessageMethodEnum.TOPO_ADD.getMethod(),
-                params,
-                null, null, null);
+            // 2.3 订阅 _reply 主题
+            String replyTopic = String.format("/sys/%s/%s/thing/topo/add_reply",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            subscribe(client, replyTopic);
 
-        // 3. 发布消息并等待响应
-        String topic = String.format("/sys/%s/%s/thing/topo/add",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        IotDeviceMessage response = publishAndWaitReply(client, topic, request);
-        log.info("[testTopoAdd][响应消息: {}]", response);
-
-        // 4. 断开连接
-        disconnect(client);
+            // 3. 发布消息并等待响应
+            String topic = String.format("/sys/%s/%s/thing/topo/add",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            IotDeviceMessage response = publishAndWaitReply(client, topic, request);
+            log.info("[testTopoAdd][响应消息: {}]", response);
+        } finally {
+            disconnect(client);
+        }
     }
 
     /**
@@ -196,29 +172,28 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
         MqttClient client = connectAndAuth();
         log.info("[testTopoDelete][连接认证成功]");
 
-        // 2.1 订阅 _reply 主题
-        String replyTopic = String.format("/sys/%s/%s/thing/topo/delete_reply",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        subscribeReply(client, replyTopic);
+        try {
+            // 2.1 构建请求消息
+            IotDeviceTopoDeleteReqDTO params = new IotDeviceTopoDeleteReqDTO()
+                    .setSubDevices(Collections.singletonList(
+                            new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME)));
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
+                    IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod(),
+                    params);
 
-        // 2.2 构建请求消息
-        IotDeviceTopoDeleteReqDTO params = new IotDeviceTopoDeleteReqDTO();
-        params.setSubDevices(Collections.singletonList(
-                new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME)));
-        IotDeviceMessage request = IotDeviceMessage.of(
-                IdUtil.fastSimpleUUID(),
-                IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod(),
-                params,
-                null, null, null);
+            // 2.2 订阅 _reply 主题
+            String replyTopic = String.format("/sys/%s/%s/thing/topo/delete_reply",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            subscribe(client, replyTopic);
 
-        // 3. 发布消息并等待响应
-        String topic = String.format("/sys/%s/%s/thing/topo/delete",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        IotDeviceMessage response = publishAndWaitReply(client, topic, request);
-        log.info("[testTopoDelete][响应消息: {}]", response);
-
-        // 4. 断开连接
-        disconnect(client);
+            // 3. 发布消息并等待响应
+            String topic = String.format("/sys/%s/%s/thing/topo/delete",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            IotDeviceMessage response = publishAndWaitReply(client, topic, request);
+            log.info("[testTopoDelete][响应消息: {}]", response);
+        } finally {
+            disconnect(client);
+        }
     }
 
     /**
@@ -232,27 +207,26 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
         MqttClient client = connectAndAuth();
         log.info("[testTopoGet][连接认证成功]");
 
-        // 2.1 订阅 _reply 主题
-        String replyTopic = String.format("/sys/%s/%s/thing/topo/get_reply",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        subscribeReply(client, replyTopic);
+        try {
+            // 2.1 构建请求消息
+            IotDeviceTopoGetReqDTO params = new IotDeviceTopoGetReqDTO();
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
+                    IotDeviceMessageMethodEnum.TOPO_GET.getMethod(),
+                    params);
 
-        // 2.2 构建请求消息
-        IotDeviceTopoGetReqDTO params = new IotDeviceTopoGetReqDTO();
-        IotDeviceMessage request = IotDeviceMessage.of(
-                IdUtil.fastSimpleUUID(),
-                IotDeviceMessageMethodEnum.TOPO_GET.getMethod(),
-                params,
-                null, null, null);
+            // 2.2 订阅 _reply 主题
+            String replyTopic = String.format("/sys/%s/%s/thing/topo/get_reply",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            subscribe(client, replyTopic);
 
-        // 3. 发布消息并等待响应
-        String topic = String.format("/sys/%s/%s/thing/topo/get",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        IotDeviceMessage response = publishAndWaitReply(client, topic, request);
-        log.info("[testTopoGet][响应消息: {}]", response);
-
-        // 4. 断开连接
-        disconnect(client);
+            // 3. 发布消息并等待响应
+            String topic = String.format("/sys/%s/%s/thing/topo/get",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            IotDeviceMessage response = publishAndWaitReply(client, topic, request);
+            log.info("[testTopoGet][响应消息: {}]", response);
+        } finally {
+            disconnect(client);
+        }
     }
 
     // ===================== 子设备注册测试 =====================
@@ -270,29 +244,28 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
         MqttClient client = connectAndAuth();
         log.info("[testSubDeviceRegister][连接认证成功]");
 
-        // 2.1 订阅 _reply 主题
-        String replyTopic = String.format("/sys/%s/%s/thing/auth/sub-device/register_reply",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        subscribeReply(client, replyTopic);
+        try {
+            // 2.1 构建请求消息
+            IotSubDeviceRegisterReqDTO subDevice = new IotSubDeviceRegisterReqDTO()
+                    .setProductKey(SUB_DEVICE_PRODUCT_KEY)
+                    .setDeviceName("mougezishebei-mqtt");
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
+                    IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod(),
+                    Collections.singletonList(subDevice));
 
-        // 2.2 构建请求消息
-        IotSubDeviceRegisterReqDTO subDevice = new IotSubDeviceRegisterReqDTO();
-        subDevice.setProductKey(SUB_DEVICE_PRODUCT_KEY);
-        subDevice.setDeviceName("mougezishebei-mqtt");
-        IotDeviceMessage request = IotDeviceMessage.of(
-                IdUtil.fastSimpleUUID(),
-                IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod(),
-                Collections.singletonList(subDevice),
-                null, null, null);
+            // 2.2 订阅 _reply 主题
+            String replyTopic = String.format("/sys/%s/%s/thing/auth/sub-device/register_reply",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            subscribe(client, replyTopic);
 
-        // 3. 发布消息并等待响应
-        String topic = String.format("/sys/%s/%s/thing/auth/sub-device/register",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        IotDeviceMessage response = publishAndWaitReply(client, topic, request);
-        log.info("[testSubDeviceRegister][响应消息: {}]", response);
-
-        // 4. 断开连接
-        disconnect(client);
+            // 3. 发布消息并等待响应
+            String topic = String.format("/sys/%s/%s/thing/auth/sub-device/register",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            IotDeviceMessage response = publishAndWaitReply(client, topic, request);
+            log.info("[testSubDeviceRegister][响应消息: {}]", response);
+        } finally {
+            disconnect(client);
+        }
     }
 
     // ===================== 批量上报测试 =====================
@@ -308,64 +281,63 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
         MqttClient client = connectAndAuth();
         log.info("[testPropertyPackPost][连接认证成功]");
 
-        // 2.1 订阅 _reply 主题
-        String replyTopic = String.format("/sys/%s/%s/thing/event/property/pack/post_reply",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        subscribeReply(client, replyTopic);
+        try {
+            // 2.1 构建【网关设备】自身属性
+            Map<String, Object> gatewayProperties = MapUtil.<String, Object>builder()
+                    .put("temperature", 25.5)
+                    .build();
 
-        // 2.2 构建【网关设备】自身属性
-        Map<String, Object> gatewayProperties = MapUtil.<String, Object>builder()
-                .put("temperature", 25.5)
-                .build();
+            // 2.2 构建【网关设备】自身事件
+            IotDevicePropertyPackPostReqDTO.EventValue gatewayEvent = new IotDevicePropertyPackPostReqDTO.EventValue()
+                    .setValue(MapUtil.builder().put("message", "gateway started").build())
+                    .setTime(System.currentTimeMillis());
+            Map<String, IotDevicePropertyPackPostReqDTO.EventValue> gatewayEvents = MapUtil
+                    .<String, IotDevicePropertyPackPostReqDTO.EventValue>builder()
+                    .put("statusReport", gatewayEvent)
+                    .build();
 
-        // 2.3 构建【网关设备】自身事件
-        IotDevicePropertyPackPostReqDTO.EventValue gatewayEvent = new IotDevicePropertyPackPostReqDTO.EventValue();
-        gatewayEvent.setValue(MapUtil.builder().put("message", "gateway started").build());
-        gatewayEvent.setTime(System.currentTimeMillis());
-        Map<String, IotDevicePropertyPackPostReqDTO.EventValue> gatewayEvents = MapUtil
-                .<String, IotDevicePropertyPackPostReqDTO.EventValue>builder()
-                .put("statusReport", gatewayEvent)
-                .build();
+            // 2.3 构建【网关子设备】属性
+            Map<String, Object> subDeviceProperties = MapUtil.<String, Object>builder()
+                    .put("power", 100)
+                    .build();
 
-        // 2.4 构建【网关子设备】属性
-        Map<String, Object> subDeviceProperties = MapUtil.<String, Object>builder()
-                .put("power", 100)
-                .build();
+            // 2.4 构建【网关子设备】事件
+            IotDevicePropertyPackPostReqDTO.EventValue subDeviceEvent = new IotDevicePropertyPackPostReqDTO.EventValue()
+                    .setValue(MapUtil.builder().put("errorCode", 0).build())
+                    .setTime(System.currentTimeMillis());
+            Map<String, IotDevicePropertyPackPostReqDTO.EventValue> subDeviceEvents = MapUtil
+                    .<String, IotDevicePropertyPackPostReqDTO.EventValue>builder()
+                    .put("healthCheck", subDeviceEvent)
+                    .build();
 
-        // 2.5 构建【网关子设备】事件
-        IotDevicePropertyPackPostReqDTO.EventValue subDeviceEvent = new IotDevicePropertyPackPostReqDTO.EventValue();
-        subDeviceEvent.setValue(MapUtil.builder().put("errorCode", 0).build());
-        subDeviceEvent.setTime(System.currentTimeMillis());
-        Map<String, IotDevicePropertyPackPostReqDTO.EventValue> subDeviceEvents = MapUtil
-                .<String, IotDevicePropertyPackPostReqDTO.EventValue>builder()
-                .put("healthCheck", subDeviceEvent)
-                .build();
+            // 2.5 构建子设备数据
+            IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData = new IotDevicePropertyPackPostReqDTO.SubDeviceData()
+                    .setIdentity(new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME))
+                    .setProperties(subDeviceProperties)
+                    .setEvents(subDeviceEvents);
 
-        // 2.6 构建子设备数据
-        IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData = new IotDevicePropertyPackPostReqDTO.SubDeviceData();
-        subDeviceData.setIdentity(new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME));
-        subDeviceData.setProperties(subDeviceProperties);
-        subDeviceData.setEvents(subDeviceEvents);
+            // 2.6 构建请求消息
+            IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO()
+                    .setProperties(gatewayProperties)
+                    .setEvents(gatewayEvents)
+                    .setSubDevices(ListUtil.of(subDeviceData));
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
+                    IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod(),
+                    params);
 
-        // 2.7 构建请求消息
-        IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO();
-        params.setProperties(gatewayProperties);
-        params.setEvents(gatewayEvents);
-        params.setSubDevices(ListUtil.of(subDeviceData));
-        IotDeviceMessage request = IotDeviceMessage.of(
-                IdUtil.fastSimpleUUID(),
-                IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod(),
-                params,
-                null, null, null);
+            // 2.7 订阅 _reply 主题
+            String replyTopic = String.format("/sys/%s/%s/thing/event/property/pack/post_reply",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            subscribe(client, replyTopic);
 
-        // 3. 发布消息并等待响应
-        String topic = String.format("/sys/%s/%s/thing/event/property/pack/post",
-                GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
-        IotDeviceMessage response = publishAndWaitReply(client, topic, request);
-        log.info("[testPropertyPackPost][响应消息: {}]", response);
-
-        // 4. 断开连接
-        disconnect(client);
+            // 3. 发布消息并等待响应
+            String topic = String.format("/sys/%s/%s/thing/event/property/pack/post",
+                    GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME);
+            IotDeviceMessage response = publishAndWaitReply(client, topic, request);
+            log.info("[testPropertyPackPost][响应消息: {}]", response);
+        } finally {
+            disconnect(client);
+        }
     }
 
     // ===================== 辅助方法 =====================
@@ -376,7 +348,7 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
      * @param authInfo 认证信息
      * @return MQTT 客户端
      */
-    private MqttClient connect(IotDeviceAuthReqDTO authInfo) {
+    private MqttClient createClient(IotDeviceAuthReqDTO authInfo) {
         MqttClientOptions options = new MqttClientOptions()
                 .setClientId(authInfo.getClientId())
                 .setUsername(authInfo.getUsername())
@@ -392,45 +364,24 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
      * @return 已认证的 MQTT 客户端
      */
     private MqttClient connectAndAuth() throws Exception {
-        // 1. 创建客户端并连接
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(
                 GATEWAY_PRODUCT_KEY, GATEWAY_DEVICE_NAME, GATEWAY_DEVICE_SECRET);
-        MqttClient client = connect(authInfo);
-
-        // 2.1 连接
-        CompletableFuture<MqttClient> future = new CompletableFuture<>();
+        MqttClient client = createClient(authInfo);
         client.connect(SERVER_PORT, SERVER_HOST)
-                .onComplete(ar -> {
-                    if (ar.succeeded()) {
-                        future.complete(client);
-                    } else {
-                        future.completeExceptionally(ar.cause());
-                    }
-                });
-        // 2.2 等待连接结果
-        return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        return client;
     }
 
     /**
-     * 订阅响应主题
+     * 订阅主题
      *
-     * @param client     MQTT 客户端
-     * @param replyTopic 响应主题
+     * @param client MQTT 客户端
+     * @param topic  主题
      */
-    private void subscribeReply(MqttClient client, String replyTopic) throws Exception {
-        // 1. 订阅响应主题
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        client.subscribe(replyTopic, MqttQoS.AT_LEAST_ONCE.value())
-                .onComplete(ar -> {
-                    if (ar.succeeded()) {
-                        log.info("[subscribeReply][订阅响应主题成功: {}]", replyTopic);
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(ar.cause());
-                    }
-                });
-        // 2. 等待订阅结果
-        future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    private void subscribe(MqttClient client, String topic) throws Exception {
+        client.subscribe(topic, MqttQoS.AT_LEAST_ONCE.value())
+                .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        log.info("[subscribe][订阅主题成功: {}]", topic);
     }
 
     /**
@@ -441,34 +392,28 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
      * @param request 请求消息
      * @return 响应消息
      */
-    private IotDeviceMessage publishAndWaitReply(MqttClient client, String topic, IotDeviceMessage request) {
+    private IotDeviceMessage publishAndWaitReply(MqttClient client, String topic, IotDeviceMessage request)
+            throws Exception {
         // 1. 设置消息处理器，接收响应
-        CompletableFuture<IotDeviceMessage> future = new CompletableFuture<>();
+        CompletableFuture<IotDeviceMessage> responseFuture = new CompletableFuture<>();
         client.publishHandler(message -> {
             log.info("[publishAndWaitReply][收到响应: topic={}, payload={}]",
                     message.topicName(), message.payload().toString());
-            IotDeviceMessage response = CODEC.decode(message.payload().getBytes());
-            future.complete(response);
+            IotDeviceMessage response = SERIALIZER.deserialize(message.payload().getBytes());
+            responseFuture.complete(response);
         });
 
-        // 2. 编码并发布消息
-        byte[] payload = CODEC.encode(request);
-        log.info("[publishAndWaitReply][Codec: {}, 发送消息: topic={}, payload={}]",
-                CODEC.type(), topic, new String(payload));
-
+        // 2. 序列化并发布消息
+        byte[] payload = SERIALIZER.serialize(request);
+        log.info("[publishAndWaitReply][Serializer: {}, 发送消息: topic={}, payload={}]",
+                SERIALIZER.getType(), topic, new String(payload));
         client.publish(topic, Buffer.buffer(payload), MqttQoS.AT_LEAST_ONCE, false, false)
-                .onComplete(ar -> {
-                    if (ar.succeeded()) {
-                        log.info("[publishAndWaitReply][消息发布成功，messageId={}]", ar.result());
-                    } else {
-                        log.error("[publishAndWaitReply][消息发布失败]", ar.cause());
-                        future.completeExceptionally(ar.cause());
-                    }
-                });
+                .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        log.info("[publishAndWaitReply][消息发布成功]");
 
-        // 3. 等待响应（超时返回 null）
+        // 3. 等待响应
         try {
-            return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            return responseFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.warn("[publishAndWaitReply][等待响应超时或失败]");
             return null;
@@ -481,19 +426,9 @@ public class IotGatewayDeviceMqttProtocolIntegrationTest {
      * @param client MQTT 客户端
      */
     private void disconnect(MqttClient client) throws Exception {
-        // 1. 断开连接
-        CompletableFuture<Void> future = new CompletableFuture<>();
         client.disconnect()
-                .onComplete(ar -> {
-                    if (ar.succeeded()) {
-                        log.info("[disconnect][断开连接成功]");
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(ar.cause());
-                    }
-                });
-        // 2. 等待断开结果
-        future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                .toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        log.info("[disconnect][断开连接成功]");
     }
 
 }

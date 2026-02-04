@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.serialize.json.IotJsonSerializer;
 import io.vertx.core.Vertx;
@@ -131,10 +132,13 @@ public class IotDirectDeviceWebSocketProtocolIntegrationTest {
     @Test
     public void testDeviceRegister() throws Exception {
         // 1.1 构建注册消息
-        IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO();
-        registerReqDTO.setProductKey(PRODUCT_KEY);
-        registerReqDTO.setDeviceName("test-ws-" + System.currentTimeMillis());
-        registerReqDTO.setProductSecret("test-product-secret");
+        String deviceName = "test-ws-" + System.currentTimeMillis();
+        String productSecret = "test-product-secret"; // 替换为实际的 productSecret
+        String sign = IotProductAuthUtils.buildSign(PRODUCT_KEY, deviceName, productSecret);
+        IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO()
+                .setProductKey(PRODUCT_KEY)
+                .setDeviceName(deviceName)
+                .setSign(sign);
         IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(),
                 IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerReqDTO, null, null, null);
         // 1.2 序列化

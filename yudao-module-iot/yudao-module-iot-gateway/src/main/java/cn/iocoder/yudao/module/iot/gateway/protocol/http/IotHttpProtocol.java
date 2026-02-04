@@ -4,7 +4,8 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolInstanceProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.downstream.IotHttpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream.IotHttpAuthHandler;
@@ -33,7 +34,7 @@ public class IotHttpProtocol implements IotProtocol {
     /**
      * 协议配置
      */
-    private final ProtocolInstanceProperties properties;
+    private final ProtocolProperties properties;
     /**
      * 服务器 ID（用于消息追踪，全局唯一）
      */
@@ -60,7 +61,7 @@ public class IotHttpProtocol implements IotProtocol {
      */
     private IotHttpDownstreamSubscriber downstreamSubscriber;
 
-    public IotHttpProtocol(ProtocolInstanceProperties properties) {
+    public IotHttpProtocol(ProtocolProperties properties) {
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
 
@@ -104,12 +105,12 @@ public class IotHttpProtocol implements IotProtocol {
         router.post(IotHttpUpstreamHandler.PATH).handler(upstreamHandler);
 
         // 1.4 启动 HTTP 服务器
-        IotHttpConfig httpConfig = properties.getHttp();
         HttpServerOptions options = new HttpServerOptions().setPort(properties.getPort());
-        if (httpConfig != null && Boolean.TRUE.equals(httpConfig.getSslEnabled())) {
+        IotGatewayProperties.SslConfig sslConfig = properties.getSsl();
+        if (sslConfig != null && Boolean.TRUE.equals(sslConfig.getSsl())) {
             PemKeyCertOptions pemKeyCertOptions = new PemKeyCertOptions()
-                    .setKeyPath(httpConfig.getSslKeyPath())
-                    .setCertPath(httpConfig.getSslCertPath());
+                    .setKeyPath(sslConfig.getSslKeyPath())
+                    .setCertPath(sslConfig.getSslCertPath());
             options = options.setSsl(true).setKeyCertOptions(pemKeyCertOptions);
         }
         try {
@@ -125,7 +126,11 @@ public class IotHttpProtocol implements IotProtocol {
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT HTTP 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭 Vertx
+            // 启动失败时关闭资源
+            if (httpServer != null) {
+                httpServer.close();
+                httpServer = null;
+            }
             if (vertx != null) {
                 vertx.close();
                 vertx = null;

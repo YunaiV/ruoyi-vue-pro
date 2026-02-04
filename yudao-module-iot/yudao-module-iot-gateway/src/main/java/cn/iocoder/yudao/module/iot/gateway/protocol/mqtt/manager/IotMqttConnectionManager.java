@@ -66,7 +66,6 @@ public class IotMqttConnectionManager {
         } catch (Exception ignored) {
             // 连接已关闭，忽略异常
         }
-
         return realTimeAddress;
     }
 
@@ -74,24 +73,24 @@ public class IotMqttConnectionManager {
      * 注册设备连接（包含认证信息）
      *
      * @param endpoint       MQTT 连接端点
-     * @param deviceId       设备 ID
      * @param connectionInfo 连接信息
      */
-    public void registerConnection(MqttEndpoint endpoint, Long deviceId, ConnectionInfo connectionInfo) {
+    public void registerConnection(MqttEndpoint endpoint, ConnectionInfo connectionInfo) {
+        Long deviceId = connectionInfo.getDeviceId();
         // 如果设备已有其他连接，先清理旧连接
         MqttEndpoint oldEndpoint = deviceEndpointMap.get(deviceId);
         if (oldEndpoint != null && oldEndpoint != endpoint) {
             log.info("[registerConnection][设备已有其他连接，断开旧连接，设备 ID: {}，旧连接: {}]",
                     deviceId, getEndpointAddress(oldEndpoint));
-            oldEndpoint.close();
-            // 清理旧连接的映射
+            // 先清理映射，再关闭连接（避免旧连接处理器干扰）
             connectionMap.remove(oldEndpoint);
+            oldEndpoint.close();
         }
 
         // 注册新连接
         connectionMap.put(endpoint, connectionInfo);
         deviceEndpointMap.put(deviceId, endpoint);
-        log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，product key: {}，device name: {}]",
+        log.info("[registerConnection][注册设备连接，设备 ID: {}，连接: {}，productKey: {}，deviceName: {}]",
                 deviceId, getEndpointAddress(endpoint), connectionInfo.getProductKey(), connectionInfo.getDeviceName());
     }
 
@@ -129,23 +128,8 @@ public class IotMqttConnectionManager {
         if (endpoint == null) {
             return null;
         }
-
         // 获取连接信息
         return getConnectionInfo(endpoint);
-    }
-
-    /**
-     * 检查设备是否在线
-     */
-    public boolean isDeviceOnline(Long deviceId) {
-        return deviceEndpointMap.containsKey(deviceId);
-    }
-
-    /**
-     * 检查设备是否离线
-     */
-    public boolean isDeviceOffline(Long deviceId) {
-        return !isDeviceOnline(deviceId);
     }
 
     /**
@@ -192,26 +176,14 @@ public class IotMqttConnectionManager {
          * 设备 ID
          */
         private Long deviceId;
-
         /**
          * 产品 Key
          */
         private String productKey;
-
         /**
          * 设备名称
          */
         private String deviceName;
-
-        /**
-         * 客户端 ID
-         */
-        private String clientId;
-
-        /**
-         * 是否已认证
-         */
-        private boolean authenticated;
 
         /**
          * 连接地址

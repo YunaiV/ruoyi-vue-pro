@@ -1,10 +1,9 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.emqx;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.downstream;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router.IotEmqxDownstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +16,7 @@ public class IotEmqxDownstreamSubscriber extends IotProtocolDownstreamSubscriber
 
     private final IotEmqxDownstreamHandler downstreamHandler;
 
-    public IotEmqxDownstreamSubscriber(IotEmqxUpstreamProtocol protocol, IotMessageBus messageBus) {
+    public IotEmqxDownstreamSubscriber(IotEmqxProtocol protocol, IotMessageBus messageBus) {
         super(protocol, messageBus);
         this.downstreamHandler = new IotEmqxDownstreamHandler(protocol);
     }

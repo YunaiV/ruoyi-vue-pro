@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpCodecTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodecFactory;
@@ -146,10 +147,13 @@ public class IotDirectDeviceTcpProtocolIntegrationTest {
     @Test
     public void testDeviceRegister() throws Exception {
         // 1. 构建注册消息
+        String deviceName = "test-tcp-" + System.currentTimeMillis();
+        String productSecret = "test-product-secret"; // 替换为实际的 productSecret
+        String sign = IotProductAuthUtils.buildSign(PRODUCT_KEY, deviceName, productSecret);
         IotDeviceRegisterReqDTO registerReqDTO = new IotDeviceRegisterReqDTO()
                 .setProductKey(PRODUCT_KEY)
-                .setDeviceName("test-tcp-" + System.currentTimeMillis())
-                .setProductSecret("test-product-secret");
+                .setDeviceName(deviceName)
+                .setSign(sign);
         IotDeviceMessage request = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod(), registerReqDTO);
 
