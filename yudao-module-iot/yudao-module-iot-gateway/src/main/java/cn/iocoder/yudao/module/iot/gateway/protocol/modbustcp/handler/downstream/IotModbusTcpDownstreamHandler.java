@@ -1,12 +1,13 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.downstream;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client.IotModbusTcpClient;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConnectionManager;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 /**
  * IoT Modbus TCP 下行消息处理器
- *
+ * <p>
  * 负责：
  * 1. 处理下行消息（如属性设置 thing.service.property.set）
  * 2. 执行 Modbus 写入操作
@@ -38,8 +39,7 @@ public class IotModbusTcpDownstreamHandler {
     @SuppressWarnings("unchecked")
     public void handle(IotDeviceMessage message) {
         // 1.1 检查是否是属性设置消息
-        // TODO @AI：要使用枚举
-        if (!"thing.service.property.set".equals(message.getMethod())) {
+        if (!IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod().equals(message.getMethod())) {
             log.debug("[handle][忽略非属性设置消息: {}]", message.getMethod());
             return;
         }

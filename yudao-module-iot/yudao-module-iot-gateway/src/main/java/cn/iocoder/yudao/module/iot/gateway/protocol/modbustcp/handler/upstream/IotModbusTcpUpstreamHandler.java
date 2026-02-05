@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.upstream;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -22,14 +21,14 @@ public class IotModbusTcpUpstreamHandler {
 
     private final IotDeviceMessageService messageService;
     private final IotModbusDataConverter dataConverter;
-
-    @Setter
-    private String serverId;
+    private final String serverId;
 
     public IotModbusTcpUpstreamHandler(IotDeviceMessageService messageService,
-                                        IotModbusDataConverter dataConverter) {
+                                       IotModbusDataConverter dataConverter,
+                                       String serverId) {
         this.messageService = messageService;
         this.dataConverter = dataConverter;
+        this.serverId = serverId;
     }
 
     /**
@@ -40,8 +39,8 @@ public class IotModbusTcpUpstreamHandler {
      * @param rawValue 原始值（int 数组）
      */
     public void handleReadResult(IotModbusDeviceConfigRespDTO config,
-                                  IotModbusPointRespDTO point,
-                                  int[] rawValue) {
+                                 IotModbusPointRespDTO point,
+                                 int[] rawValue) {
         try {
             // 1.1 转换原始值为物模型属性值
             Object convertedValue = dataConverter.convertToPropertyValue(rawValue, point);

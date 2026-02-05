@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.IotModbusTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
@@ -166,6 +167,12 @@ public class IotGatewayProperties {
         @Valid
         private IotEmqxConfig emqx;
 
+        /**
+         * Modbus TCP 协议配置
+         */
+        @Valid
+        private IotModbusTcpConfig modbusTcp;
+
     }
 
     /**
@@ -213,33 +220,6 @@ public class IotGatewayProperties {
          * 信任库密码
          */
         private String trustStorePassword;
-
-    }
-
-    @Data
-    public static class ProtocolProperties {
-
-        /**
-         * Modbus TCP 组件配置
-         */
-        private ModbusTcpProperties modbusTcp;
-
-    }
-
-    @Data
-    public static class ModbusTcpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 配置刷新间隔（秒）
-         */
-        @NotNull(message = "配置刷新间隔不能为空")
-        private Integer configRefreshInterval = 30;
 
     }
 

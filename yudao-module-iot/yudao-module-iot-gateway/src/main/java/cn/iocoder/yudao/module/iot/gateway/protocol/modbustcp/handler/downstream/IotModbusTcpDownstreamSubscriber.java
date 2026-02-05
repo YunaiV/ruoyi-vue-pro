@@ -1,11 +1,10 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.downstream;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.router.IotModbusTcpDownstreamHandler;
-import jakarta.annotation.PostConstruct;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.IotModbusTcpProtocol;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,19 +17,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IotModbusTcpDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
 
-    private final IotModbusTcpUpstreamProtocol upstreamProtocol;
+    private final IotModbusTcpProtocol protocol;
     private final IotModbusTcpDownstreamHandler downstreamHandler;
     private final IotMessageBus messageBus;
 
-    @PostConstruct
-    public void subscribe() {
+    /**
+     * 启动订阅
+     */
+    public void start() {
         messageBus.register(this);
-        log.info("[subscribe][Modbus TCP 下行消息订阅器已启动, topic={}]", getTopic());
+        log.info("[start][Modbus TCP 下行消息订阅器已启动, topic={}]", getTopic());
+    }
+
+    /**
+     * 停止订阅
+     */
+    public void stop() {
+        messageBus.unregister(this);
+        log.info("[stop][Modbus TCP 下行消息订阅器已停止]");
     }
 
     @Override
     public String getTopic() {
-        return IotDeviceMessageUtils.buildMessageBusGatewayDeviceMessageTopic(upstreamProtocol.getServerId());
+        return IotDeviceMessageUtils.buildMessageBusGatewayDeviceMessageTopic(protocol.getServerId());
     }
 
     @Override
