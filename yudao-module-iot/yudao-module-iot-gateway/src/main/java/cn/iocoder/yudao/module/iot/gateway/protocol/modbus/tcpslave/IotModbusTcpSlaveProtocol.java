@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
@@ -12,9 +11,8 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameCodec;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusRecordParserFactory;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.handler.downstream.IotModbusTcpSlaveDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.handler.downstream.IotModbusTcpSlaveDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.handler.upstream.IotModbusTcpSlaveUpstreamHandler;
@@ -23,6 +21,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotM
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager.ConnectionInfo;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlavePendingRequestManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlavePollScheduler;
+import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetServer;
@@ -33,19 +32,15 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-// TODO @AI：不用主动上报！
+// DONE @AI：不用主动上报！
 /**
  * IoT 网关 Modbus TCP Slave 协议
  * <p>
  * 作为 TCP Server 接收设备主动连接：
  * 1. 设备通过自定义功能码（FC 65）发送认证请求
- * 2. 认证成功后，根据设备配置的 mode 决定工作模式：
- * - mode=1（云端轮询）：网关主动发送 Modbus 读请求，设备响应
- * - mode=2（主动上报）：设备主动上报数据，网关透传
+ * 2. 认证成功后，网关主动发送 Modbus 读请求，设备响应（云端轮询模式）
  *
  * @author 芋道源码
  */
@@ -85,20 +80,16 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
      */
     private Long requestCleanupTimerId;
 
-    /**
-     * 未认证连接的帧格式缓存：socket → 检测到的帧格式
-     */
-    private final Map<NetSocket, IotModbusFrameFormatEnum> pendingFrameFormats = new ConcurrentHashMap<>();
-
     // ========== 各组件 ==========
+    // TODO @芋艿：稍后排序下，有点小乱；
 
     private final IotModbusTcpSlaveConfig slaveConfig;
-    private final IotModbusFrameCodec frameCodec;
+    private final IotModbusFrameDecoder frameDecoder;
+    private final IotModbusFrameEncoder frameEncoder;
     private final IotModbusTcpSlaveConnectionManager connectionManager;
     private final IotModbusTcpSlaveConfigCacheService configCacheService;
     private final IotModbusTcpSlavePendingRequestManager pendingRequestManager;
     private final IotModbusTcpSlaveUpstreamHandler upstreamHandler;
-    private final IotModbusTcpSlaveDownstreamHandler downstreamHandler;
     private final IotModbusTcpSlaveDownstreamSubscriber downstreamSubscriber;
     private final IotModbusTcpSlavePollScheduler pollScheduler;
 
@@ -118,33 +109,27 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
         this.pendingRequestManager = new IotModbusTcpSlavePendingRequestManager();
 
         // 初始化帧编解码器
-        this.frameCodec = new IotModbusFrameCodec(slaveConfig.getCustomFunctionCode());
+        this.frameDecoder = new IotModbusFrameDecoder(slaveConfig.getCustomFunctionCode());
+        this.frameEncoder = new IotModbusFrameEncoder(slaveConfig.getCustomFunctionCode());
+
+        // 初始化轮询调度器
+        this.pollScheduler = new IotModbusTcpSlavePollScheduler(
+                vertx, connectionManager, frameEncoder, pendingRequestManager,
+                slaveConfig.getRequestTimeout());
 
         // 初始化 Handler
         IotModbusDataConverter dataConverter = new IotModbusDataConverter();
         IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        IotDeviceService deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.upstreamHandler = new IotModbusTcpSlaveUpstreamHandler(
-                deviceApi, messageService, dataConverter, frameCodec,
-                connectionManager, configCacheService, pendingRequestManager, serverId);
-        this.downstreamHandler = new IotModbusTcpSlaveDownstreamHandler(
-                connectionManager, configCacheService, dataConverter, frameCodec);
-
-        // 初始化轮询调度器
-        this.pollScheduler = new IotModbusTcpSlavePollScheduler(
-                vertx, connectionManager, frameCodec, pendingRequestManager,
-                slaveConfig.getRequestTimeout());
-
-        // 设置认证成功回调：启动轮询
-        // TODO @AI：感觉直接去调用，不用注册回调了（更简洁）
-        this.upstreamHandler.setOnAuthSuccess((deviceId, config) -> {
-            if (config.getMode() != null
-                    && config.getMode().equals(IotModbusModeEnum.POLLING.getMode())) {
-                pollScheduler.updatePolling(config);
-            }
-        });
+                deviceApi, messageService, dataConverter, frameEncoder,
+                connectionManager, configCacheService, pendingRequestManager,
+                pollScheduler, deviceService, serverId);
 
         // 初始化下行消息订阅者
         IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+        IotModbusTcpSlaveDownstreamHandler downstreamHandler = new IotModbusTcpSlaveDownstreamHandler(
+                connectionManager, configCacheService, dataConverter, frameEncoder);
         this.downstreamSubscriber = new IotModbusTcpSlaveDownstreamSubscriber(
                 this, downstreamHandler, messageBus);
     }
@@ -168,6 +153,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
 
         try {
             // 1.1 首次加载配置
+            // TODO @AI：可能首次不用加载；你在想想；
             refreshConfig();
             // 1.2 启动配置刷新定时器
             int refreshInterval = slaveConfig.getConfigRefreshInterval();
@@ -190,10 +176,21 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
             downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT Modbus TCP Slave 协议 {} 启动失败]", getId(), e);
+            if (configRefreshTimerId != null) {
+                vertx.cancelTimer(configRefreshTimerId);
+                configRefreshTimerId = null;
+            }
+            if (requestCleanupTimerId != null) {
+                vertx.cancelTimer(requestCleanupTimerId);
+                requestCleanupTimerId = null;
+            }
+            connectionManager.closeAll();
+            if (netServer != null) {
+                netServer.close();
+            }
             if (vertx != null) {
                 vertx.close();
             }
-            // TODO @AI：其它相关的 close；
             throw e;
         }
     }
@@ -252,20 +249,19 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
      * 启动 TCP Server
      */
     private void startTcpServer() {
-        // TODO @AI：host 一定要设置么？
         // 1. 创建 TCP Server
         NetServerOptions options = new NetServerOptions()
-                .setPort(properties.getPort())
-                .setHost("0.0.0.0");
+                .setPort(properties.getPort());
         netServer = vertx.createNetServer(options);
 
         // 2. 设置连接处理器
         netServer.connectHandler(this::handleConnection);
-        // TODO @AI：是不是 sync 就好，不用 onSuccess/onFailure 了？感觉更简洁。失败，肯定就要抛出异常，结束初始化了！
-        netServer.listen()
-                .onSuccess(server -> log.info("[startTcpServer][TCP Server 启动成功, port={}]",
-                        server.actualPort()))
-                .onFailure(e -> log.error("[startTcpServer][TCP Server 启动失败]", e));
+        try {
+            netServer.listen().toCompletionStage().toCompletableFuture().get();
+            log.info("[startTcpServer][TCP Server 启动成功, port={}]", properties.getPort());
+        } catch (Exception e) {
+            throw new RuntimeException("[startTcpServer][TCP Server 启动失败]", e);
+        }
     }
 
     /**
@@ -274,58 +270,24 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
     private void handleConnection(NetSocket socket) {
         log.info("[handleConnection][新连接, remoteAddress={}]", socket.remoteAddress());
 
-        // 1.1 创建带帧格式检测的 RecordParser
-        // TODO @AI：看看怎么从这个类里面，拿出去；让这个类的职责更单一；
-        RecordParser parser = IotModbusRecordParserFactory.create(
-                slaveConfig.getCustomFunctionCode(),
-                // 完整帧回调
-                // TODO @AI：感觉搞个独立的类，稍微好点？！
-                frameBuffer -> {
-                    byte[] frameBytes = frameBuffer.getBytes();
-                    // 获取该连接的帧格式
-                    ConnectionInfo connInfo = connectionManager.getConnectionInfo(socket);
-                    IotModbusFrameFormatEnum frameFormat = connInfo != null ? connInfo.getFrameFormat() : null;
-                    if (frameFormat == null) {
-                        // 未认证的连接，使用首帧检测到的帧格式
-                        frameFormat = pendingFrameFormats.get(socket);
-                    }
-                    if (frameFormat == null) {
-                        log.warn("[handleConnection][帧格式未检测到, remoteAddress={}]", socket.remoteAddress());
-                        return;
-                    }
-
-                    // 解码帧
-                    IotModbusFrame frame = frameCodec.decodeResponse(frameBytes, frameFormat);
-                    // 交给 UpstreamHandler 处理
-                    upstreamHandler.handleFrame(socket, frame, frameFormat);
-                },
-                // 帧格式检测回调：保存到未认证缓存
-                detectedFormat -> {
-                    // TODO @AI：是不是不用缓存，每次都探测；因为一般 auth 首包后，基本也没探测的诉求了！
-                    pendingFrameFormats.put(socket, detectedFormat);
-                    // 如果连接已注册（不太可能在检测阶段），也更新
-                    // TODO @AI：是否非必须？！
-                    connectionManager.setFrameFormat(socket, detectedFormat);
-                    log.debug("[handleConnection][帧格式检测: {}, remoteAddress={}]",
-                            detectedFormat, socket.remoteAddress());
-                }
-        );
-        // 1.2 设置数据处理器
-        socket.handler(parser);
+        // 1. 创建 RecordParser 并设置为数据处理器
+        RecordParser recordParser =  frameDecoder.createRecordParser((frame, frameFormat) -> {
+            // 【重要】帧处理分发，即消息处理
+            upstreamHandler.handleFrame(socket, frame, frameFormat);
+        });
+        socket.handler(recordParser);
 
         // 2.1 连接关闭处理
         socket.closeHandler(v -> {
-            pendingFrameFormats.remove(socket);
             ConnectionInfo info = connectionManager.removeConnection(socket);
-            // TODO @AI：if return 简化下；
-            if (info != null && info.getDeviceId() != null) {
-                pollScheduler.stopPolling(info.getDeviceId());
-                pendingRequestManager.removeDevice(info.getDeviceId());
-                log.info("[handleConnection][连接关闭, deviceId={}, remoteAddress={}]",
-                        info.getDeviceId(), socket.remoteAddress());
-            } else {
+            if (info == null || info.getDeviceId() == null) {
                 log.info("[handleConnection][未认证连接关闭, remoteAddress={}]", socket.remoteAddress());
+                return;
             }
+            pollScheduler.stopPolling(info.getDeviceId());
+            pendingRequestManager.removeDevice(info.getDeviceId());
+            log.info("[handleConnection][连接关闭, deviceId={}, remoteAddress={}]",
+                    info.getDeviceId(), socket.remoteAddress());
         });
         // 2.2 异常处理
         socket.exceptionHandler(e -> {

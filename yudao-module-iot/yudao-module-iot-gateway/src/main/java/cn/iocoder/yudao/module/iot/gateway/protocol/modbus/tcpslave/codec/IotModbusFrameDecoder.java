@@ -4,116 +4,205 @@ import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.function.Consumer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.function.BiConsumer;
 
-// TODO @AI：看看是不是不要搞成 factory，而是直接 new；（可以一起讨论下）
 /**
- * IoT Modbus RecordParser 工厂
+ * IoT Modbus 帧解码器：集成 TCP 拆包 + 帧格式探测 + 帧解码，一条龙完成从 TCP 字节流到 IotModbusFrame 的转换。
  * <p>
- * 创建带自动帧格式检测的 RecordParser：
+ * 流程：
  * 1. 首帧检测：读前 6 字节，判断 MODBUS_TCP（ProtocolId==0x0000 且 Length 合理）或 MODBUS_RTU
- * 2. 检测后自动切换到对应的拆包模式
+ * 2. 检测后切换到对应的拆包 Handler，并将首包 6 字节通过 handleFirstBytes() 交给新 Handler 处理
+ * 3. 拆包完成后解码为 IotModbusFrame，通过回调返回
  * - MODBUS_TCP：两阶段 RecordParser（MBAP length 字段驱动）
  * - MODBUS_RTU：功能码驱动的状态机
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotModbusRecordParserFactory {
+public class IotModbusFrameDecoder {
+
+    private final int customFunctionCode;
+
+    public IotModbusFrameDecoder(int customFunctionCode) {
+        this.customFunctionCode = customFunctionCode;
+    }
 
     /**
      * 创建带自动帧格式检测的 RecordParser
      *
-     * @param customFunctionCode 自定义功能码
-     * @param frameHandler       完整帧回调
-     * @param onFormatDetected   帧格式检测回调
+     * @param frameHandler 完整帧回调（解码后的 IotModbusFrame + 检测到的帧格式）
      * @return RecordParser 实例
      */
-    public static RecordParser create(int customFunctionCode,
-                                      Handler<Buffer> frameHandler,
-                                      Consumer<IotModbusFrameFormatEnum> onFormatDetected) {
-        // 先创建一个 RecordParser，使用 fixedSizeMode(6) 读取首帧前 6 字节进行帧格式检测
-        // TODO @AI：最小需要 6 个字节么？有可能更小的情况下，就探测出来？！
+    public RecordParser createRecordParser(BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler) {
+        // 先创建一个 RecordParser：使用 fixedSizeMode(6) 读取首帧前 6 字节进行帧格式检测
         RecordParser parser = RecordParser.newFixed(6);
-        parser.handler(new DetectPhaseHandler(parser, customFunctionCode, frameHandler, onFormatDetected));
+        parser.handler(new DetectPhaseHandler(parser, customFunctionCode, frameHandler));
         return parser;
     }
 
+    // ==================== 帧解码 ====================
+
     /**
-     * 帧格式检测阶段 Handler
+     * 解码响应帧（拆包后的完整帧 byte[]）
+     *
+     * @param data   完整帧字节数组
+     * @param format 帧格式
+     * @return 解码后的 IotModbusFrame
+     */
+    private IotModbusFrame decodeResponse(byte[] data, IotModbusFrameFormatEnum format) {
+        if (format == IotModbusFrameFormatEnum.MODBUS_TCP) {
+            return decodeTcpResponse(data);
+        } else {
+            return decodeRtuResponse(data);
+        }
+    }
+
+    /**
+     * 解码 MODBUS_TCP 响应
+     * 格式：[TransactionId(2)] [ProtocolId(2)] [Length(2)] [UnitId(1)] [FC(1)] [Data...]
+     */
+    private IotModbusFrame decodeTcpResponse(byte[] data) {
+        if (data.length < 8) {
+            log.warn("[decodeTcpResponse][数据长度不足: {}]", data.length);
+            return null;
+        }
+        ByteBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
+        int transactionId = buf.getShort() & 0xFFFF;
+        buf.getShort(); // protocolId：固定 0x0000，Modbus 协议标识
+        buf.getShort(); // length：后续字节数（UnitId + PDU），拆包阶段已使用
+        int slaveId = buf.get() & 0xFF;
+        int functionCode = buf.get() & 0xFF;
+        // 提取 PDU 数据（从 functionCode 之后到末尾）
+        byte[] pdu = new byte[data.length - 8];
+        System.arraycopy(data, 8, pdu, 0, pdu.length);
+
+        return buildFrame(slaveId, functionCode, pdu, transactionId);
+    }
+
+    /**
+     * 解码 MODBUS_RTU 响应
+     * 格式：[SlaveId(1)] [FC(1)] [Data...] [CRC(2)]
+     */
+    private IotModbusFrame decodeRtuResponse(byte[] data) {
+        if (data.length < 4) {
+            log.warn("[decodeRtuResponse][数据长度不足: {}]", data.length);
+            return null;
+        }
+        // 校验 CRC
+        if (!IotModbusUtils.verifyCrc16(data)) {
+            log.warn("[decodeRtuResponse][CRC 校验失败]");
+            return null;
+        }
+        int slaveId = data[0] & 0xFF;
+        int functionCode = data[1] & 0xFF;
+        // PDU 数据（不含 slaveId、functionCode、CRC）
+        byte[] pdu = new byte[data.length - 4];
+        System.arraycopy(data, 2, pdu, 0, pdu.length);
+
+        return buildFrame(slaveId, functionCode, pdu, null);
+    }
+
+    /**
+     * 构建 IotModbusFrame
+     */
+    private IotModbusFrame buildFrame(int slaveId, int functionCode, byte[] pdu, Integer transactionId) {
+        IotModbusFrame frame = new IotModbusFrame()
+                .setSlaveId(slaveId)
+                .setFunctionCode(functionCode)
+                .setPdu(pdu)
+                .setTransactionId(transactionId);
+        // 异常响应
+        // TODO @AI：0x80 看看是不是要枚举；
+        if ((functionCode & 0x80) != 0) {
+            frame.setException(true);
+            // TODO @AI：0x7f 看看是不是要枚举；
+            frame.setFunctionCode(functionCode & 0x7F);
+            if (pdu.length >= 1) {
+                frame.setExceptionCode(pdu[0] & 0xFF);
+            }
+            return frame;
+        }
+        // 自定义功能码
+        if (functionCode == customFunctionCode) {
+            // data 区格式：[byteCount(1)] [JSON data(N)]
+            if (pdu.length >= 1) {
+                int byteCount = pdu[0] & 0xFF;
+                if (pdu.length >= 1 + byteCount) {
+                    frame.setCustomData(new String(pdu, 1, byteCount, StandardCharsets.UTF_8));
+                }
+            }
+        }
+        return frame;
+    }
+
+    // ==================== 拆包 Handler ====================
+
+    /**
+     * 帧格式检测阶段 Handler（仅处理首包，探测后切换到对应的拆包 Handler）
      */
     @SuppressWarnings("ClassCanBeRecord")
-    private static class DetectPhaseHandler implements Handler<Buffer> {
+    @RequiredArgsConstructor
+    private class DetectPhaseHandler implements Handler<Buffer> {
 
         private final RecordParser parser;
         private final int customFunctionCode;
-        private final Handler<Buffer> frameHandler;
-        private final Consumer<IotModbusFrameFormatEnum> onFormatDetected;
-
-        // TODO @AI：简化构造方法，使用 lombok；
-        DetectPhaseHandler(RecordParser parser, int customFunctionCode,
-                           Handler<Buffer> frameHandler,
-                           Consumer<IotModbusFrameFormatEnum> onFormatDetected) {
-            this.parser = parser;
-            this.customFunctionCode = customFunctionCode;
-            this.frameHandler = frameHandler;
-            this.onFormatDetected = onFormatDetected;
-        }
+        private final BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler;
 
         @Override
         public void handle(Buffer buffer) {
-            byte[] header = buffer.getBytes();
-            // 检测：byte[2]==0x00 && byte[3]==0x00 && 1<=length<=253
-            int protocolId = ((header[2] & 0xFF) << 8) | (header[3] & 0xFF);
-            int length = ((header[4] & 0xFF) << 8) | (header[5] & 0xFF);
+            // 检测帧格式：protocolId==0x0000 且 length 合法 → MODBUS_TCP，否则 → MODBUS_RTU
+            byte[] bytes = buffer.getBytes();
+            int protocolId = ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
+            int length = ((bytes[4] & 0xFF) << 8) | (bytes[5] & 0xFF);
 
+            // 分别处理 MODBUS_TCP、MODBUS_RTU 两种情况
             if (protocolId == 0x0000 && length >= 1 && length <= 253) {
-                // MODBUS_TCP
+                // MODBUS_TCP：切换到 TCP 拆包 Handler
                 log.debug("[DetectPhaseHandler][检测到 MODBUS_TCP 帧格式]");
-                onFormatDetected.accept(IotModbusFrameFormatEnum.MODBUS_TCP);
-                // 切换到 TCP 拆包模式，处理当前首帧
                 TcpFrameHandler tcpHandler = new TcpFrameHandler(parser, frameHandler);
                 parser.handler(tcpHandler);
-                // 当前 header 是 MBAP 的前 6 字节，需要继续读 length 字节
-                tcpHandler.handleMbapHeader(header, length);
+                // 当前 bytes 就是 MBAP 的前 6 字节，直接交给 tcpHandler 处理
+                tcpHandler.handleFirstBytes(bytes);
             } else {
-                // MODBUS_RTU
+                // MODBUS_RTU：切换到 RTU 拆包 Handler
                 log.debug("[DetectPhaseHandler][检测到 MODBUS_RTU 帧格式]");
-                onFormatDetected.accept(IotModbusFrameFormatEnum.MODBUS_RTU);
-                // 切换到 RTU 拆包模式，处理当前首帧
-                RtuFrameHandler rtuHandler = new RtuFrameHandler(parser, customFunctionCode, frameHandler);
+                RtuFrameHandler rtuHandler = new RtuFrameHandler(parser, frameHandler, customFunctionCode);
                 parser.handler(rtuHandler);
-                // 当前 header 包含前 6 字节（slaveId + FC + 部分数据），需要拼接处理
-                rtuHandler.handleInitialBytes(header);
+                // 当前 bytes 包含前 6 字节（slaveId + FC + 部分数据），交给 rtuHandler 处理
+                rtuHandler.handleFirstBytes(bytes);
             }
         }
     }
 
     /**
      * MODBUS_TCP 拆包 Handler（两阶段 RecordParser）
+     * <p>
      * Phase 1: fixedSizeMode(6) → 读 MBAP 前 6 字节，提取 length
      * Phase 2: fixedSizeMode(length) → 读 unitId + PDU
      */
-    private static class TcpFrameHandler implements Handler<Buffer> {
+    @RequiredArgsConstructor
+    private class TcpFrameHandler implements Handler<Buffer> {
 
         private final RecordParser parser;
-        private final Handler<Buffer> frameHandler;
+        private final BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler;
+
         private byte[] mbapHeader;
         private boolean waitingForBody = false;
 
-        // TODO @AI：lombok
-        TcpFrameHandler(RecordParser parser, Handler<Buffer> frameHandler) {
-            this.parser = parser;
-            this.frameHandler = frameHandler;
-        }
-
         /**
-         * 处理首帧的 MBAP 头
+         * 处理探测阶段传来的首帧 6 字节（即 MBAP 头）
+         *
+         * @param bytes 探测阶段消费的 6 字节
          */
-        void handleMbapHeader(byte[] header, int length) {
-            this.mbapHeader = header;
+        void handleFirstBytes(byte[] bytes) {
+            int length = ((bytes[4] & 0xFF) << 8) | (bytes[5] & 0xFF);
+            this.mbapHeader = bytes;
             this.waitingForBody = true;
             parser.fixedSizeMode(length);
         }
@@ -124,10 +213,14 @@ public class IotModbusRecordParserFactory {
                 // Phase 2: 收到 body（unitId + PDU）
                 byte[] body = buffer.getBytes();
                 // 拼接完整帧：MBAP(6) + body
-                Buffer frame = Buffer.buffer(mbapHeader.length + body.length);
-                frame.appendBytes(mbapHeader);
-                frame.appendBytes(body);
-                frameHandler.handle(frame);
+                byte[] fullFrame = new byte[mbapHeader.length + body.length];
+                System.arraycopy(mbapHeader, 0, fullFrame, 0, mbapHeader.length);
+                System.arraycopy(body, 0, fullFrame, mbapHeader.length, body.length);
+                // 解码并回调
+                IotModbusFrame frame = decodeResponse(fullFrame, IotModbusFrameFormatEnum.MODBUS_TCP);
+                if (frame != null) {
+                    frameHandler.accept(frame, IotModbusFrameFormatEnum.MODBUS_TCP);
+                }
                 // 切回 Phase 1
                 waitingForBody = false;
                 mbapHeader = null;
@@ -159,7 +252,8 @@ public class IotModbusRecordParserFactory {
      * - FC05/06 响应：fixedSizeMode(6) → addr(2) + value(2) + CRC(2)
      * - FC15/16 响应：fixedSizeMode(6) → addr(2) + quantity(2) + CRC(2)
      */
-    private static class RtuFrameHandler implements Handler<Buffer> {
+    @RequiredArgsConstructor
+    private class RtuFrameHandler implements Handler<Buffer> {
 
         private static final int STATE_HEADER = 0;
         private static final int STATE_EXCEPTION_BODY = 1;
@@ -168,50 +262,41 @@ public class IotModbusRecordParserFactory {
         private static final int STATE_WRITE_BODY = 4;
 
         private final RecordParser parser;
+        private final BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler;
         private final int customFunctionCode;
-        private final Handler<Buffer> frameHandler;
 
         private int state = STATE_HEADER;
         private byte slaveId;
         private byte functionCode;
         private byte byteCount;
-
-        // TODO @AI：lombok
-        RtuFrameHandler(RecordParser parser, int customFunctionCode, Handler<Buffer> frameHandler) {
-            this.parser = parser;
-            this.customFunctionCode = customFunctionCode;
-            this.frameHandler = frameHandler;
-        }
+        private Buffer pendingData;
+        private int expectedDataLen;
 
         /**
-         * 处理首帧检测阶段传来的初始 6 字节
-         * 由于 RTU 首帧跳过了格式检测，我们需要拼接处理
+         * 处理探测阶段传来的首帧 6 字节
+         * <p>
+         * 由于 RTU 首帧被探测阶段消费了 6 字节，这里需要从中提取 slaveId + FC 并根据 FC 处理剩余数据
+         *
+         * @param bytes 探测阶段消费的 6 字节：[slaveId][FC][...4 bytes...]
          */
-        void handleInitialBytes(byte[] initialBytes) {
-            // initialBytes 包含 6 字节：[slaveId][FC][...4 bytes...]
-            this.slaveId = initialBytes[0];
-            this.functionCode = initialBytes[1];
+        void handleFirstBytes(byte[] bytes) {
+            this.slaveId = bytes[0];
+            this.functionCode = bytes[1];
             int fc = functionCode & 0xFF;
-
-            // 根据功能码，确定还需要多少字节
             if ((fc & 0x80) != 0) {
-                // 异常响应：还需要 exceptionCode(1) + CRC(2) = 3 字节
-                // 我们已经有 4 字节剩余（initialBytes[2..5]），足够
-                // 拼接完整帧并交付
-                // 完整帧 = slaveId(1) + FC(1) + exceptionCode(1) + CRC(2) = 5
+                // 异常响应：完整帧 = slaveId(1) + FC(1) + exceptionCode(1) + CRC(2) = 5 字节
+                // 已有 6 字节（多 1 字节），取前 5 字节组装
                 Buffer frame = Buffer.buffer(5);
                 frame.appendByte(slaveId);
                 frame.appendByte(functionCode);
-                frame.appendBytes(initialBytes, 2, 3); // exceptionCode + CRC
-                frameHandler.handle(frame);
-                // 剩余 1 字节需要留给下一帧，但 RecordParser 不支持回推
-                // 简化处理：重置状态，开始读下一帧
+                frame.appendBytes(bytes, 2, 3); // exceptionCode + CRC
+                emitFrame(frame);
                 resetToHeader();
             } else if (isReadResponse(fc) || fc == customFunctionCode) {
-                // 读响应或自定义 FC：initialBytes[2] = byteCount
-                this.byteCount = initialBytes[2];
+                // 读响应或自定义 FC：bytes[2] = byteCount
+                this.byteCount = bytes[2];
                 int bc = byteCount & 0xFF;
-                // 已有数据：initialBytes[3..5] = 3 字节
+                // 已有数据：bytes[3..5] = 3 字节
                 // 还需：byteCount + CRC(2) - 3 字节已有
                 int remaining = bc + 2 - 3;
                 if (remaining <= 0) {
@@ -221,35 +306,29 @@ public class IotModbusRecordParserFactory {
                     frame.appendByte(slaveId);
                     frame.appendByte(functionCode);
                     frame.appendByte(byteCount);
-                    frame.appendBytes(initialBytes, 3, bc + 2); // data + CRC
-                    frameHandler.handle(frame);
+                    frame.appendBytes(bytes, 3, bc + 2); // data + CRC
+                    emitFrame(frame);
                     resetToHeader();
                 } else {
                     // 需要继续读
                     state = STATE_READ_DATA;
-                    // 保存已有数据片段
-                    parser.fixedSizeMode(remaining);
-                    // 在 handle() 中需要拼接 initialBytes[3..5] + 新读取的数据
-                    // 为了简化，我们用一个 Buffer 暂存
                     this.pendingData = Buffer.buffer();
-                    this.pendingData.appendBytes(initialBytes, 3, 3);
+                    this.pendingData.appendBytes(bytes, 3, 3); // 暂存已有的 3 字节
                     this.expectedDataLen = bc + 2; // byteCount 个数据 + 2 CRC
+                    parser.fixedSizeMode(remaining);
                 }
             } else if (isWriteResponse(fc)) {
-                // 写响应：FC05/06/15/16，总长 = slaveId(1) + FC(1) + addr(2) + value/qty(2) + CRC(2) = 8
+                // 写响应：总长 = slaveId(1) + FC(1) + addr(2) + value/qty(2) + CRC(2) = 8 字节
                 // 已有 6 字节，还需 2 字节
                 state = STATE_WRITE_BODY;
                 this.pendingData = Buffer.buffer();
-                this.pendingData.appendBytes(initialBytes, 2, 4); // 4 bytes already
-                parser.fixedSizeMode(2); // need 2 more bytes (CRC)
+                this.pendingData.appendBytes(bytes, 2, 4); // 暂存已有的 4 字节
+                parser.fixedSizeMode(2); // 还需 2 字节（CRC）
             } else {
                 log.warn("[RtuFrameHandler][未知功能码: 0x{}]", Integer.toHexString(fc));
                 resetToHeader();
             }
         }
-
-        private Buffer pendingData;
-        private int expectedDataLen;
 
         @Override
         public void handle(Buffer buffer) {
@@ -279,7 +358,6 @@ public class IotModbusRecordParserFactory {
             this.slaveId = header[0];
             this.functionCode = header[1];
             int fc = functionCode & 0xFF;
-
             if ((fc & 0x80) != 0) {
                 // 异常响应
                 state = STATE_EXCEPTION_BODY;
@@ -305,7 +383,7 @@ public class IotModbusRecordParserFactory {
             frame.appendByte(slaveId);
             frame.appendByte(functionCode);
             frame.appendBuffer(buffer);
-            frameHandler.handle(frame);
+            emitFrame(frame);
             resetToHeader();
         }
 
@@ -327,7 +405,7 @@ public class IotModbusRecordParserFactory {
                 frame.appendByte(functionCode);
                 frame.appendByte(byteCount);
                 frame.appendBuffer(pendingData);
-                frameHandler.handle(frame);
+                emitFrame(frame);
                 resetToHeader();
             }
             // 否则继续等待（不应该发生，因为我们精确设置了 fixedSizeMode）
@@ -340,8 +418,18 @@ public class IotModbusRecordParserFactory {
             frame.appendByte(slaveId);
             frame.appendByte(functionCode);
             frame.appendBuffer(pendingData);
-            frameHandler.handle(frame);
+            emitFrame(frame);
             resetToHeader();
+        }
+
+        /**
+         * 发射完整帧：解码并回调
+         */
+        private void emitFrame(Buffer frameBuffer) {
+            IotModbusFrame frame = decodeResponse(frameBuffer.getBytes(), IotModbusFrameFormatEnum.MODBUS_RTU);
+            if (frame != null) {
+                frameHandler.accept(frame, IotModbusFrameFormatEnum.MODBUS_RTU);
+            }
         }
 
         private void resetToHeader() {
@@ -350,6 +438,7 @@ public class IotModbusRecordParserFactory {
             parser.fixedSizeMode(2); // slaveId + FC
         }
 
+        // TODO @AI：可以抽到 IotModbusUtils 里？
         private boolean isReadResponse(int fc) {
             return fc >= 1 && fc <= 4;
         }

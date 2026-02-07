@@ -1,127 +1,23 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * IoT Modbus 帧编解码器
+ * IoT Modbus 帧编码器
  * <p>
- * 纯 Modbus 协议编解码，不处理 TCP 粘包（由 RecordParser 处理）。
- * 支持 MODBUS_TCP（MBAP）和 MODBUS_RTU（CRC16）两种帧格式，以及自定义功能码扩展。
+ * 负责将 Modbus 请求/响应编码为字节数组，支持 MODBUS_TCP（MBAP）和 MODBUS_RTU（CRC16）两种帧格式。
  *
  * @author 芋道源码
  */
+@RequiredArgsConstructor
 @Slf4j
-public class IotModbusFrameCodec {
+public class IotModbusFrameEncoder {
 
     private final int customFunctionCode;
-
-    public IotModbusFrameCodec(int customFunctionCode) {
-        this.customFunctionCode = customFunctionCode;
-    }
-
-    // ==================== 解码 ====================
-
-    /**
-     * 解码响应帧（拆包后的完整帧 byte[]）
-     *
-     * @param data   完整帧字节数组
-     * @param format 帧格式
-     * @return 解码后的 IotModbusFrame
-     */
-    public IotModbusFrame decodeResponse(byte[] data, IotModbusFrameFormatEnum format) {
-        if (format == IotModbusFrameFormatEnum.MODBUS_TCP) {
-            return decodeTcpResponse(data);
-        } else {
-            return decodeRtuResponse(data);
-        }
-    }
-
-    /**
-     * 解码 MODBUS_TCP 响应
-     * 格式：[TransactionId(2)] [ProtocolId(2)] [Length(2)] [UnitId(1)] [FC(1)] [Data...]
-     */
-    private IotModbusFrame decodeTcpResponse(byte[] data) {
-        if (data.length < 8) {
-            log.warn("[decodeTcpResponse][数据长度不足: {}]", data.length);
-            return null;
-        }
-        ByteBuffer buf = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
-        int transactionId = buf.getShort() & 0xFFFF;
-        buf.getShort(); // protocolId（跳过）// TODO @AI：跳过原因，最好写下；
-        buf.getShort(); // length（跳过）// TODO @AI：跳过原因，最好写下；
-        int slaveId = buf.get() & 0xFF;
-        int functionCode = buf.get() & 0xFF;
-        // 提取 PDU 数据（从 functionCode 之后到末尾）
-        byte[] pdu = new byte[data.length - 8];
-        System.arraycopy(data, 8, pdu, 0, pdu.length);
-
-        // 构建 IotModbusFrame
-        return buildFrame(slaveId, functionCode, pdu, transactionId);
-    }
-
-    /**
-     * 解码 MODBUS_RTU 响应
-     * 格式：[SlaveId(1)] [FC(1)] [Data...] [CRC(2)]
-     */
-    private IotModbusFrame decodeRtuResponse(byte[] data) {
-        if (data.length < 4) {
-            log.warn("[decodeRtuResponse][数据长度不足: {}]", data.length);
-            return null;
-        }
-        // 校验 CRC
-        if (!verifyCrc16(data)) {
-            log.warn("[decodeRtuResponse][CRC 校验失败]");
-            return null;
-        }
-        int slaveId = data[0] & 0xFF;
-        int functionCode = data[1] & 0xFF;
-        // PDU 数据（不含 slaveId、functionCode、CRC）
-        byte[] pdu = new byte[data.length - 4];
-        System.arraycopy(data, 2, pdu, 0, pdu.length);
-
-        // 构建 IotModbusFrame
-        return buildFrame(slaveId, functionCode, pdu, null);
-    }
-
-    /**
-     * 构建 IotModbusFrame
-     */
-    private IotModbusFrame buildFrame(int slaveId, int functionCode, byte[] pdu, Integer transactionId) {
-        IotModbusFrame frame = new IotModbusFrame()
-                .setSlaveId(slaveId)
-                .setFunctionCode(functionCode)
-                .setPdu(pdu)
-                .setTransactionId(transactionId);
-
-        // 异常响应
-        // TODO @AI：0x80 看看是不是要枚举；
-        if ((functionCode & 0x80) != 0) {
-            frame.setException(true);
-            // TODO @AI：0x7f 看看是不是要枚举；
-            frame.setFunctionCode(functionCode & 0x7F);
-            if (pdu.length >= 1) {
-                frame.setExceptionCode(pdu[0] & 0xFF);
-            }
-            return frame;
-        }
-
-        // 自定义功能码
-        if (functionCode == customFunctionCode) {
-            // data 区格式：[byteCount(1)] [JSON data(N)]
-            if (pdu.length >= 1) {
-                int byteCount = pdu[0] & 0xFF;
-                if (pdu.length >= 1 + byteCount) {
-                    frame.setCustomData(new String(pdu, 1, byteCount, StandardCharsets.UTF_8));
-                }
-            }
-        }
-        return frame;
-    }
 
     // ==================== 编码 ====================
 
@@ -269,49 +165,10 @@ public class IotModbusFrameCodec {
         frame[0] = (byte) slaveId;
         System.arraycopy(pdu, 0, frame, 1, pdu.length);
         // 计算并追加 CRC16
-        int crc = calculateCrc16(frame, frame.length - 2);
+        int crc = IotModbusUtils.calculateCrc16(frame, frame.length - 2);
         frame[frame.length - 2] = (byte) (crc & 0xFF);        // CRC Low
         frame[frame.length - 1] = (byte) ((crc >> 8) & 0xFF); // CRC High
         return frame;
-    }
-
-    // ==================== CRC16 工具 ====================
-
-    // TODO @AI：hutool 等，有没工具类可以用
-    /**
-     * 计算 CRC-16/MODBUS
-     *
-     * @param data   数据
-     * @param length 计算长度
-     * @return CRC16 值
-     */
-    public static int calculateCrc16(byte[] data, int length) {
-        int crc = 0xFFFF;
-        for (int i = 0; i < length; i++) {
-            crc ^= (data[i] & 0xFF);
-            for (int j = 0; j < 8; j++) {
-                if ((crc & 0x0001) != 0) {
-                    crc >>= 1;
-                    crc ^= 0xA001;
-                } else {
-                    crc >>= 1;
-                }
-            }
-        }
-        return crc;
-    }
-
-    // TODO @AI：hutool 等，有没工具类可以用
-    /**
-     * 校验 CRC16
-     */
-    private boolean verifyCrc16(byte[] data) {
-        if (data.length < 3) {
-            return false;
-        }
-        int computed = calculateCrc16(data, data.length - 2);
-        int received = (data[data.length - 2] & 0xFF) | ((data[data.length - 1] & 0xFF) << 8);
-        return computed == received;
     }
 
 }

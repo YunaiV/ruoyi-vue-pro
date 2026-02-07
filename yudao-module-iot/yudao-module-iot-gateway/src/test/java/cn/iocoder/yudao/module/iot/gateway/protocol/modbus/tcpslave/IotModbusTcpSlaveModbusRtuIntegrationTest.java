@@ -6,8 +6,9 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameCodec;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusRecordParserFactory;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
@@ -59,7 +60,8 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
 
     // ===================== 编解码器 =====================
 
-    private static final IotModbusFrameCodec FRAME_CODEC = new IotModbusFrameCodec(CUSTOM_FC);
+    private static final IotModbusFrameDecoder FRAME_DECODER = new IotModbusFrameDecoder(CUSTOM_FC);
+    private static final IotModbusFrameEncoder FRAME_ENCODER = new IotModbusFrameEncoder(CUSTOM_FC);
 
     // ===================== 设备信息（根据实际情况修改，从 iot_device 表查询） =====================
 
@@ -111,7 +113,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
     // ===================== 轮询响应测试 =====================
 
     /**
-     * 轮询响应测试：认证后等待网关下发 FC03 读请求（RTU 格式），构造读响应帧发回
+     * 轮询响应测试：认证后持续监听网关下发的读请求（RTU 格式），每次收到都自动构造读响应帧发回
      */
     @Test
     public void testPollingResponse() throws Exception {
@@ -121,30 +123,32 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
             IotModbusFrame authResponse = authenticate(socket);
             log.info("[testPollingResponse][认证响应: {}]", authResponse.getCustomData());
 
-            // 2. 等待网关下发读请求
-            log.info("[testPollingResponse][等待网关下发读请求...]");
-            IotModbusFrame readRequest = waitForRequest(socket);
-            log.info("[testPollingResponse][收到读请求: slaveId={}, FC={}]",
-                    readRequest.getSlaveId(), readRequest.getFunctionCode());
+            // 2. 设置持续监听：每收到一个读请求，自动回复
+            log.info("[testPollingResponse][开始持续监听网关下发的读请求...]");
+            CompletableFuture<Void> done = new CompletableFuture<>();
+            RecordParser parser = FRAME_DECODER.createRecordParser((frame, frameFormat) -> {
+                log.info("[testPollingResponse][收到请求: slaveId={}, FC={}]",
+                        frame.getSlaveId(), frame.getFunctionCode());
+                // 解析读请求中的起始地址和数量
+                byte[] pdu = frame.getPdu();
+                int startAddress = ((pdu[0] & 0xFF) << 8) | (pdu[1] & 0xFF);
+                int quantity = ((pdu[2] & 0xFF) << 8) | (pdu[3] & 0xFF);
+                log.info("[testPollingResponse][读请求参数: startAddress={}, quantity={}]", startAddress, quantity);
 
-            // 3. 解析读请求中的起始地址和数量
-            byte[] pdu = readRequest.getPdu();
-            int startAddress = ((pdu[0] & 0xFF) << 8) | (pdu[1] & 0xFF);
-            int quantity = ((pdu[2] & 0xFF) << 8) | (pdu[3] & 0xFF);
-            log.info("[testPollingResponse][读请求参数: startAddress={}, quantity={}]", startAddress, quantity);
+                // 构造读响应帧（模拟寄存器数据，RTU 格式）
+                int[] registerValues = new int[quantity];
+                for (int i = 0; i < quantity; i++) {
+                    registerValues[i] = 100 + i * 100; // 模拟值: 100, 200, 300, ...
+                }
+                byte[] responseData = buildReadResponse(frame.getSlaveId(),
+                        frame.getFunctionCode(), registerValues);
+                socket.write(Buffer.buffer(responseData));
+                log.info("[testPollingResponse][已发送读响应, registerValues={}]", registerValues);
+            });
+            socket.handler(parser);
 
-            // 4. 构造读响应帧（模拟寄存器数据，RTU 格式）
-            int[] registerValues = new int[quantity];
-            for (int i = 0; i < quantity; i++) {
-                registerValues[i] = 100 + i * 100; // 模拟值: 100, 200, 300, ...
-            }
-            byte[] responseData = buildReadResponse(readRequest.getSlaveId(),
-                    readRequest.getFunctionCode(), registerValues);
-            socket.write(Buffer.buffer(responseData));
-            log.info("[testPollingResponse][已发送读响应, registerValues={}]", registerValues);
-
-            // 5. 等待一段时间让网关处理
-            Thread.sleep(20000);
+            // 3. 持续等待（200 秒），期间会自动回复所有收到的读请求
+            Thread.sleep(200000);
         } finally {
             socket.close();
         }
@@ -199,23 +203,20 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
     }
 
     /**
-     * 发送帧并等待响应（使用 IotModbusRecordParserFactory 自动检测帧格式）
+     * 发送帧并等待响应（使用 IotModbusFrameDecoder 自动检测帧格式并解码）
      */
     private IotModbusFrame sendAndReceive(NetSocket socket, byte[] frameData) throws Exception {
         CompletableFuture<IotModbusFrame> responseFuture = new CompletableFuture<>();
-        // 使用 RecordParserFactory 创建拆包器（自动检测帧格式）
-        RecordParser parser = IotModbusRecordParserFactory.create(CUSTOM_FC,
-                buffer -> {
+        // 使用 FrameDecoder 创建拆包器（自动检测帧格式 + 解码，直接回调 IotModbusFrame）
+        RecordParser parser = FRAME_DECODER.createRecordParser(
+                (frame, frameFormat) -> {
                     try {
-                        // 检测到的帧格式应该是 RTU，使用 RTU 格式解码
-                        IotModbusFrame frame = FRAME_CODEC.decodeResponse(
-                                buffer.getBytes(), IotModbusFrameFormatEnum.MODBUS_RTU);
+                        log.info("[sendAndReceive][检测到帧格式: {}]", frameFormat);
                         responseFuture.complete(frame);
                     } catch (Exception e) {
                         responseFuture.completeExceptionally(e);
                     }
-                },
-                format -> log.info("[sendAndReceive][检测到帧格式: {}]", format));
+                });
         socket.handler(parser);
 
         // 发送请求
@@ -231,18 +232,16 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
      */
     private IotModbusFrame waitForRequest(NetSocket socket) throws Exception {
         CompletableFuture<IotModbusFrame> requestFuture = new CompletableFuture<>();
-        // 使用 RecordParserFactory 创建拆包器
-        RecordParser parser = IotModbusRecordParserFactory.create(CUSTOM_FC,
-                buffer -> {
+        // 使用 FrameDecoder 创建拆包器（直接回调 IotModbusFrame）
+        RecordParser parser = FRAME_DECODER.createRecordParser(
+                (frame, frameFormat) -> {
                     try {
-                        IotModbusFrame frame = FRAME_CODEC.decodeResponse(
-                                buffer.getBytes(), IotModbusFrameFormatEnum.MODBUS_RTU);
+                        log.info("[waitForRequest][检测到帧格式: {}]", frameFormat);
                         requestFuture.complete(frame);
                     } catch (Exception e) {
                         requestFuture.completeExceptionally(e);
                     }
-                },
-                format -> log.info("[waitForRequest][检测到帧格式: {}]", format));
+                });
         socket.handler(parser);
 
         // 等待（超时 30 秒，因为轮询间隔可能比较长）
@@ -264,7 +263,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
         JSONObject json = new JSONObject();
         json.set("method", "auth");
         json.set("params", params);
-        return FRAME_CODEC.encodeCustomFrame(SLAVE_ID, json.toString(),
+        return FRAME_ENCODER.encodeCustomFrame(SLAVE_ID, json.toString(),
                 IotModbusFrameFormatEnum.MODBUS_RTU, 0);
     }
 
@@ -286,7 +285,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
             frame[3 + i * 2 + 1] = (byte) (registerValues[i] & 0xFF);
         }
         // 计算 CRC16
-        int crc = IotModbusFrameCodec.calculateCrc16(frame, totalLength - 2);
+        int crc = IotModbusUtils.calculateCrc16(frame, totalLength - 2);
         frame[totalLength - 2] = (byte) (crc & 0xFF);        // CRC Low
         frame[totalLength - 1] = (byte) ((crc >> 8) & 0xFF); // CRC High
         return frame;

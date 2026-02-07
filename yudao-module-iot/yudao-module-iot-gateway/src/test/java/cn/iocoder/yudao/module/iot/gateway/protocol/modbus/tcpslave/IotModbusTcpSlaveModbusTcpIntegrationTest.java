@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameCodec;
-import io.vertx.core.Handler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
@@ -61,7 +61,8 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
 
     // ===================== 编解码器 =====================
 
-    private static final IotModbusFrameCodec FRAME_CODEC = new IotModbusFrameCodec(CUSTOM_FC);
+    private static final IotModbusFrameDecoder FRAME_DECODER = new IotModbusFrameDecoder(CUSTOM_FC);
+    private static final IotModbusFrameEncoder FRAME_ENCODER = new IotModbusFrameEncoder(CUSTOM_FC);
 
     // ===================== 设备信息（根据实际情况修改，从 iot_device 表查询） =====================
 
@@ -113,7 +114,7 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
     // ===================== 轮询响应测试 =====================
 
     /**
-     * 轮询响应测试：认证后等待网关下发 FC03 读请求，构造读响应帧发回
+     * 轮询响应测试：认证后持续监听网关下发的读请求，每次收到都自动构造读响应帧发回
      */
     @Test
     public void testPollingResponse() throws Exception {
@@ -123,29 +124,31 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
             IotModbusFrame authResponse = authenticate(socket);
             log.info("[testPollingResponse][认证响应: {}]", authResponse.getCustomData());
 
-            // 2. 等待网关下发读请求
-            log.info("[testPollingResponse][等待网关下发读请求...]");
-            IotModbusFrame readRequest = waitForRequest(socket);
-            log.info("[testPollingResponse][收到读请求: slaveId={}, FC={}, transactionId={}]",
-                    readRequest.getSlaveId(), readRequest.getFunctionCode(), readRequest.getTransactionId());
+            // 2. 设置持续监听：每收到一个读请求，自动回复
+            log.info("[testPollingResponse][开始持续监听网关下发的读请求...]");
+            CompletableFuture<Void> done = new CompletableFuture<>();
+            RecordParser parser = FRAME_DECODER.createRecordParser((frame, frameFormat) -> {
+                log.info("[testPollingResponse][收到请求: slaveId={}, FC={}, transactionId={}]",
+                        frame.getSlaveId(), frame.getFunctionCode(), frame.getTransactionId());
+                // 解析读请求中的起始地址和数量
+                byte[] pdu = frame.getPdu();
+                int startAddress = ((pdu[0] & 0xFF) << 8) | (pdu[1] & 0xFF);
+                int quantity = ((pdu[2] & 0xFF) << 8) | (pdu[3] & 0xFF);
+                log.info("[testPollingResponse][读请求参数: startAddress={}, quantity={}]", startAddress, quantity);
 
-            // 3. 解析读请求中的起始地址和数量
-            byte[] pdu = readRequest.getPdu();
-            int startAddress = ((pdu[0] & 0xFF) << 8) | (pdu[1] & 0xFF);
-            int quantity = ((pdu[2] & 0xFF) << 8) | (pdu[3] & 0xFF);
-            log.info("[testPollingResponse][读请求参数: startAddress={}, quantity={}]", startAddress, quantity);
+                // 构造读响应帧（模拟寄存器数据）
+                int[] registerValues = new int[quantity];
+                for (int i = 0; i < quantity; i++) {
+                    registerValues[i] = 100 + i * 100; // 模拟值: 100, 200, 300, ...
+                }
+                byte[] responseData = buildReadResponse(frame.getTransactionId(),
+                        frame.getSlaveId(), frame.getFunctionCode(), registerValues);
+                socket.write(Buffer.buffer(responseData));
+                log.info("[testPollingResponse][已发送读响应, registerValues={}]", registerValues);
+            });
+            socket.handler(parser);
 
-            // 4. 构造读响应帧（模拟寄存器数据）
-            int[] registerValues = new int[quantity];
-            for (int i = 0; i < quantity; i++) {
-                registerValues[i] = 100 + i * 100; // 模拟值: 100, 200, 300, ...
-            }
-            byte[] responseData = buildReadResponse(readRequest.getTransactionId(),
-                    readRequest.getSlaveId(), readRequest.getFunctionCode(), registerValues);
-            socket.write(Buffer.buffer(responseData));
-            log.info("[testPollingResponse][已发送读响应, registerValues={}]", registerValues);
-
-            // 5. 等待一段时间让网关处理
+            // 3. 持续等待（200 秒），期间会自动回复所有收到的读请求
             Thread.sleep(200000);
         } finally {
             socket.close();
@@ -201,15 +204,20 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
     }
 
     /**
-     * 发送帧并等待响应（MODBUS_TCP 格式）
-     * <p>
-     * 使用两阶段 RecordParser 拆包：fixedSizeMode(6) 读 MBAP 头 → fixedSizeMode(length) 读 body
+     * 发送帧并等待响应（使用 IotModbusFrameDecoder 自动检测帧格式并解码）
      */
     private IotModbusFrame sendAndReceive(NetSocket socket, byte[] frameData) throws Exception {
         CompletableFuture<IotModbusFrame> responseFuture = new CompletableFuture<>();
-        // 创建 TCP 两阶段拆包 RecordParser
-        RecordParser parser = RecordParser.newFixed(6);
-        parser.handler(new TcpRecordParserHandler(parser, responseFuture));
+        // 使用 FrameDecoder 创建拆包器（自动检测帧格式 + 解码，直接回调 IotModbusFrame）
+        RecordParser parser = FRAME_DECODER.createRecordParser(
+                (frame, frameFormat) -> {
+                    try {
+                        log.info("[sendAndReceive][检测到帧格式: {}]", frameFormat);
+                        responseFuture.complete(frame);
+                    } catch (Exception e) {
+                        responseFuture.completeExceptionally(e);
+                    }
+                });
         socket.handler(parser);
 
         // 发送请求
@@ -225,52 +233,20 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
      */
     private IotModbusFrame waitForRequest(NetSocket socket) throws Exception {
         CompletableFuture<IotModbusFrame> requestFuture = new CompletableFuture<>();
-        RecordParser parser = RecordParser.newFixed(6);
-        parser.handler(new TcpRecordParserHandler(parser, requestFuture));
+        // 使用 FrameDecoder 创建拆包器（直接回调 IotModbusFrame）
+        RecordParser parser = FRAME_DECODER.createRecordParser(
+                (frame, frameFormat) -> {
+                    try {
+                        log.info("[waitForRequest][检测到帧格式: {}]", frameFormat);
+                        requestFuture.complete(frame);
+                    } catch (Exception e) {
+                        requestFuture.completeExceptionally(e);
+                    }
+                });
         socket.handler(parser);
 
         // 等待（超时 30 秒，因为轮询间隔可能比较长）
         return requestFuture.get(30000, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * MODBUS_TCP 两阶段拆包 Handler
-     */
-    private class TcpRecordParserHandler implements Handler<Buffer> {
-
-        private final RecordParser parser;
-        private final CompletableFuture<IotModbusFrame> future;
-        private byte[] mbapHeader;
-        private boolean waitingForBody = false;
-
-        TcpRecordParserHandler(RecordParser parser, CompletableFuture<IotModbusFrame> future) {
-            this.parser = parser;
-            this.future = future;
-        }
-
-        @Override
-        public void handle(Buffer buffer) {
-            try {
-                if (waitingForBody) {
-                    // Phase 2: 收到 body（unitId + PDU）
-                    byte[] body = buffer.getBytes();
-                    byte[] fullFrame = new byte[mbapHeader.length + body.length];
-                    System.arraycopy(mbapHeader, 0, fullFrame, 0, mbapHeader.length);
-                    System.arraycopy(body, 0, fullFrame, mbapHeader.length, body.length);
-
-                    IotModbusFrame frame = FRAME_CODEC.decodeResponse(fullFrame, IotModbusFrameFormatEnum.MODBUS_TCP);
-                    future.complete(frame);
-                } else {
-                    // Phase 1: 收到 MBAP 头 6 字节
-                    this.mbapHeader = buffer.getBytes();
-                    int length = ((mbapHeader[4] & 0xFF) << 8) | (mbapHeader[5] & 0xFF);
-                    this.waitingForBody = true;
-                    parser.fixedSizeMode(length);
-                }
-            } catch (Exception e) {
-                future.completeExceptionally(e);
-            }
-        }
     }
 
     /**
@@ -286,7 +262,7 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
         JSONObject json = new JSONObject();
         json.set("method", "auth");
         json.set("params", params);
-        return FRAME_CODEC.encodeCustomFrame(SLAVE_ID, json.toString(),
+        return FRAME_ENCODER.encodeCustomFrame(SLAVE_ID, json.toString(),
                 IotModbusFrameFormatEnum.MODBUS_TCP, 1);
     }
 

@@ -3,14 +3,61 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT Modbus 响应值提取器
+ * IoT Modbus 工具类
  * <p>
- * 从解码后的 IotModbusFrame 中提取寄存器值，用于后续的点位翻译。
+ * 提供：
+ * 1. CRC-16/MODBUS 计算和校验
+ * 2. 从解码后的 IotModbusFrame 中提取寄存器值（用于后续的点位翻译）
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotModbusResponseParser {
+public class IotModbusUtils {
+
+    // TODO @AI：可以把 1、2、3、4、5 这些 fucntion code 在这里枚举下。
+    // TODO @AI：一些枚举 0x80 这些可以这里枚举；
+
+    // ==================== CRC16 工具 ====================
+
+    /**
+     * 计算 CRC-16/MODBUS
+     *
+     * @param data   数据
+     * @param length 计算长度
+     * @return CRC16 值
+     */
+    public static int calculateCrc16(byte[] data, int length) {
+        int crc = 0xFFFF;
+        for (int i = 0; i < length; i++) {
+            crc ^= (data[i] & 0xFF);
+            for (int j = 0; j < 8; j++) {
+                if ((crc & 0x0001) != 0) {
+                    crc >>= 1;
+                    crc ^= 0xA001;
+                } else {
+                    crc >>= 1;
+                }
+            }
+        }
+        return crc;
+    }
+
+    /**
+     * 校验 CRC16
+     *
+     * @param data 包含 CRC 的完整数据
+     * @return 校验是否通过
+     */
+    public static boolean verifyCrc16(byte[] data) {
+        if (data.length < 3) {
+            return false;
+        }
+        int computed = calculateCrc16(data, data.length - 2);
+        int received = (data[data.length - 2] & 0xFF) | ((data[data.length - 1] & 0xFF) << 8);
+        return computed == received;
+    }
+
+    // ==================== 响应值提取 ====================
 
     /**
      * 从帧中提取寄存器值（FC01-04 读响应）

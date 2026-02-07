@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameCodec;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager.ConnectionInfo;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlavePendingRequestManager.PendingRequest;
 import io.vertx.core.Vertx;
@@ -37,7 +37,7 @@ public class IotModbusTcpSlavePollScheduler {
 
     private final Vertx vertx;
     private final IotModbusTcpSlaveConnectionManager connectionManager;
-    private final IotModbusFrameCodec frameCodec;
+    private final IotModbusFrameEncoder frameEncoder;
     private final IotModbusTcpSlavePendingRequestManager pendingRequestManager;
     private final int requestTimeout;
 
@@ -163,7 +163,7 @@ public class IotModbusTcpSlavePollScheduler {
         int transactionId = transactionIdCounter.incrementAndGet() & 0xFFFF;
         int slaveId = connInfo.getSlaveId() != null ? connInfo.getSlaveId() : 1;
         // 2.2 编码读请求
-        byte[] data = frameCodec.encodeReadRequest(slaveId, point.getFunctionCode(),
+        byte[] data = frameEncoder.encodeReadRequest(slaveId, point.getFunctionCode(),
                 point.getRegisterAddress(), point.getRegisterCount(), frameFormat, transactionId);
         // 2.3 注册 PendingRequest
         PendingRequest pendingRequest = new PendingRequest(

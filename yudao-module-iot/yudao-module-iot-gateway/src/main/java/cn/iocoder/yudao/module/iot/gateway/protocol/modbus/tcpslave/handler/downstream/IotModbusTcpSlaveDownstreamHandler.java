@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameCodec;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager.ConnectionInfo;
@@ -35,7 +35,7 @@ public class IotModbusTcpSlaveDownstreamHandler {
     private final IotModbusTcpSlaveConnectionManager connectionManager;
     private final IotModbusTcpSlaveConfigCacheService configCacheService;
     private final IotModbusDataConverter dataConverter;
-    private final IotModbusFrameCodec frameCodec;
+    private final IotModbusFrameEncoder frameEncoder;
 
     /**
      * TCP 事务 ID 自增器
@@ -117,11 +117,11 @@ public class IotModbusTcpSlaveDownstreamHandler {
         }
         if (rawValues.length == 1 && fcEnum.getWriteSingleCode() != null) {
             // 单个值：使用单写功能码（FC05/FC06）
-            data = frameCodec.encodeWriteSingleRequest(slaveId, fcEnum.getWriteSingleCode(),
+            data = frameEncoder.encodeWriteSingleRequest(slaveId, fcEnum.getWriteSingleCode(),
                     point.getRegisterAddress(), rawValues[0], frameFormat, transactionId);
         } else if (fcEnum.getWriteMultipleCode() != null) {
             // 多个值：使用多写功能码（FC15/FC16）
-            data = frameCodec.encodeWriteMultipleRegistersRequest(slaveId,
+            data = frameEncoder.encodeWriteMultipleRegistersRequest(slaveId,
                     point.getRegisterAddress(), rawValues, frameFormat, transactionId);
         } else {
             log.warn("[writeProperty][点位 {} 不支持写操作]", point.getIdentifier());
