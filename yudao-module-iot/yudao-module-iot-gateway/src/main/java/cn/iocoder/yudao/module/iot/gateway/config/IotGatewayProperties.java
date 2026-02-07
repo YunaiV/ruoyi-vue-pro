@@ -4,7 +4,8 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.IotModbusTcpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.IotModbusTcpMasterConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.IotModbusTcpSlaveConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
@@ -168,10 +169,16 @@ public class IotGatewayProperties {
         private IotEmqxConfig emqx;
 
         /**
-         * Modbus TCP 协议配置
+         * Modbus TCP Master 协议配置
          */
         @Valid
-        private IotModbusTcpConfig modbusTcp;
+        private IotModbusTcpMasterConfig modbusTcpMaster;
+
+        /**
+         * Modbus TCP Slave 协议配置
+         */
+        @Valid
+        private IotModbusTcpSlaveConfig modbusTcpSlave;
 
     }
 

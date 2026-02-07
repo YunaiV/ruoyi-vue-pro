@@ -47,8 +47,16 @@ public class IotModbusDeviceConfigRespDTO {
      * 重试间隔，单位：毫秒
      */
     private Integer retryInterval;
+    /**
+     * 模式
+     */
+    private Integer mode;
+    /**
+     * 数据帧格式
+     */
+    private String frameFormat;
 
-    // ========== 点位配置 ==========
+    // ========== Modbus 点位配置 ==========
 
     /**
      * 点位列表

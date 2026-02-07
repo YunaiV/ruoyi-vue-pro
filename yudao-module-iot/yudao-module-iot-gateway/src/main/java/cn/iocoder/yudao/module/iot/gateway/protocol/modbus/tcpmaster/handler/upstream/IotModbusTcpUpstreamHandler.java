@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.upstream;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.upstream;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.extern.slf4j.Slf4j;
 

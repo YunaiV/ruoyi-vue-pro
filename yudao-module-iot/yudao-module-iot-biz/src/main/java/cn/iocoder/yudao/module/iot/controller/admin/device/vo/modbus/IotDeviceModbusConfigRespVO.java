@@ -33,6 +33,14 @@ public class IotDeviceModbusConfigRespVO {
     @Schema(description = "重试间隔（毫秒）", example = "1000")
     private Integer retryInterval;
 
+    // TODO @AI：不要【：1-云端轮询 2-主动上报】
+    @Schema(description = "模式：1-云端轮询 2-主动上报", example = "1")
+    private Integer mode;
+
+    // TODO @AI：还是换成 int，然后写注释；不要【：modbus_tcp / modbus_rtu】
+    @Schema(description = "数据帧格式：modbus_tcp / modbus_rtu", example = "modbus_tcp")
+    private String frameFormat;
+
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;
 

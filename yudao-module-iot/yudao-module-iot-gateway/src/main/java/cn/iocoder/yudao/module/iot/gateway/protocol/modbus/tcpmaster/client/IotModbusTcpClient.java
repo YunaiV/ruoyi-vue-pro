@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.procimg.InputRegister;
@@ -12,6 +12,7 @@ import com.ghgande.j2mod.modbus.util.BitVector;
 import io.vertx.core.Future;
 import lombok.extern.slf4j.Slf4j;
 
+// TODO @AI：感觉它更像一个工具类；但是名字叫 client 很奇怪；
 /**
  * IoT Modbus TCP 客户端
  * <p>

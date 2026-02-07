@@ -25,7 +25,8 @@ public enum IotProtocolTypeEnum implements ArrayValuable<String> {
     MQTT("mqtt"),
     EMQX("emqx"),
     COAP("coap"),
-    MODBUS_TCP("modbus_tcp");
+    MODBUS_TCP_MASTER("modbus_tcp_master"),
+    MODBUS_TCP_SLAVE("modbus_tcp_slave");
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotProtocolTypeEnum::getType).toArray(String[]::new);
 

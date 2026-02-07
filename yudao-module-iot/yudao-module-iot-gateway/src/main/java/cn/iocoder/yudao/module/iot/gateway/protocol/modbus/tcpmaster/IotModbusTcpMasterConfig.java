@@ -1,16 +1,16 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * IoT Modbus TCP 协议配置
+ * IoT Modbus TCP Master 协议配置
  *
  * @author 芋道源码
  */
 @Data
-public class IotModbusTcpConfig {
+public class IotModbusTcpMasterConfig {
 
     /**
      * 配置刷新间隔（秒）

@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client.IotModbusTcpClient;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.upstream.IotModbusTcpUpstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client.IotModbusTcpClient;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.upstream.IotModbusTcpUpstreamHandler;
 import io.vertx.core.Vertx;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
+// TODO @AI：类的命名上，要体现上 master。其它类似 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/main/java/cn/iocoder/yudao/module/iot/gateway/protocol/modbus/tcpmaster 也要！
 /**
  * IoT Modbus TCP 轮询调度器：管理点位的轮询定时器，调度读取任务并上报结果
  *

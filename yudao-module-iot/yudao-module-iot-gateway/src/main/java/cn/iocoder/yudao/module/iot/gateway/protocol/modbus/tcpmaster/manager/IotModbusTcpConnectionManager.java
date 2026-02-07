@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;

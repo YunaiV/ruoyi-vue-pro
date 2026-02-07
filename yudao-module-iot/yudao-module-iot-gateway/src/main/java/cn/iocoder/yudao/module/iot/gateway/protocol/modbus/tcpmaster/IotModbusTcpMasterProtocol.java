@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
@@ -9,14 +9,14 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.client.IotModbusTcpClient;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.codec.IotModbusDataConverter;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.downstream.IotModbusTcpDownstreamHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.downstream.IotModbusTcpDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.handler.upstream.IotModbusTcpUpstreamHandler;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConfigCacheService;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpConnectionManager;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp.manager.IotModbusTcpPollScheduler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client.IotModbusTcpClient;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.downstream.IotModbusTcpDownstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.downstream.IotModbusTcpDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.upstream.IotModbusTcpUpstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConfigCacheService;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpPollScheduler;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
 import lombok.Getter;
@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * IoT 网关 Modbus TCP 协议：主动轮询 Modbus 从站设备数据
+ * IoT 网关 Modbus TCP Master 协议：主动轮询 Modbus 从站设备数据
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotModbusTcpProtocol implements IotProtocol {
+public class IotModbusTcpMasterProtocol implements IotProtocol {
 
     /**
      * 协议配置
@@ -71,9 +71,9 @@ public class IotModbusTcpProtocol implements IotProtocol {
     private final IotModbusTcpConfigCacheService configCacheService;
     private final IotModbusTcpPollScheduler pollScheduler;
 
-    public IotModbusTcpProtocol(ProtocolProperties properties) {
-        IotModbusTcpConfig modbusTcpConfig = properties.getModbusTcp();
-        Assert.notNull(modbusTcpConfig, "Modbus TCP 协议配置（modbusTcp）不能为空");
+    public IotModbusTcpMasterProtocol(ProtocolProperties properties) {
+        IotModbusTcpMasterConfig modbusTcpMasterConfig = properties.getModbusTcpMaster();
+        Assert.notNull(modbusTcpMasterConfig, "Modbus TCP Master 协议配置（modbusTcpMaster）不能为空");
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
 
@@ -109,13 +109,13 @@ public class IotModbusTcpProtocol implements IotProtocol {
 
     @Override
     public IotProtocolTypeEnum getType() {
-        return IotProtocolTypeEnum.MODBUS_TCP;
+        return IotProtocolTypeEnum.MODBUS_TCP_MASTER;
     }
 
     @Override
     public void start() {
         if (running) {
-            log.warn("[start][IoT Modbus TCP 协议 {} 已经在运行中]", getId());
+            log.warn("[start][IoT Modbus TCP Master 协议 {} 已经在运行中]", getId());
             return;
         }
 
@@ -123,18 +123,18 @@ public class IotModbusTcpProtocol implements IotProtocol {
             // 1.1 首次加载配置
             refreshConfig();
             // 1.2 启动配置刷新定时器
-            int refreshInterval = properties.getModbusTcp().getConfigRefreshInterval();
+            int refreshInterval = properties.getModbusTcpMaster().getConfigRefreshInterval();
             configRefreshTimerId = vertx.setPeriodic(
                     TimeUnit.SECONDS.toMillis(refreshInterval),
                     id -> refreshConfig()
             );
             running = true;
-            log.info("[start][IoT Modbus TCP 协议 {} 启动成功，serverId={}]", getId(), serverId);
+            log.info("[start][IoT Modbus TCP Master 协议 {} 启动成功，serverId={}]", getId(), serverId);
 
             // 2. 启动下行消息订阅者
             this.downstreamSubscriber.start();
         } catch (Exception e) {
-            log.error("[start][IoT Modbus TCP 协议 {} 启动失败]", getId(), e);
+            log.error("[start][IoT Modbus TCP Master 协议 {} 启动失败]", getId(), e);
             // 启动失败时关闭资源
             if (vertx != null) {
                 vertx.close();
@@ -151,9 +151,9 @@ public class IotModbusTcpProtocol implements IotProtocol {
         // 1. 停止下行消息订阅者
         try {
             downstreamSubscriber.stop();
-            log.info("[stop][IoT Modbus TCP 协议 {} 下行消息订阅者已停止]", getId());
+            log.info("[stop][IoT Modbus TCP Master 协议 {} 下行消息订阅者已停止]", getId());
         } catch (Exception e) {
-            log.error("[stop][IoT Modbus TCP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            log.error("[stop][IoT Modbus TCP Master 协议 {} 下行消息订阅者停止失败]", getId(), e);
         }
 
         // 2.1 取消配置刷新定时器
@@ -163,22 +163,22 @@ public class IotModbusTcpProtocol implements IotProtocol {
         }
         // 2.2 停止轮询调度器
         pollScheduler.stopAll();
-        log.info("[stop][IoT Modbus TCP 协议 {} 轮询调度器已停止]", getId());
+        log.info("[stop][IoT Modbus TCP Master 协议 {} 轮询调度器已停止]", getId());
         // 2.3 关闭所有连接
         connectionManager.closeAll();
-        log.info("[stop][IoT Modbus TCP 协议 {} 连接管理器已关闭]", getId());
+        log.info("[stop][IoT Modbus TCP Master 协议 {} 连接管理器已关闭]", getId());
 
         // 3. 关闭 Vert.x 实例
         if (vertx != null) {
             try {
                 vertx.close().result();
-                log.info("[stop][IoT Modbus TCP 协议 {} Vertx 已关闭]", getId());
+                log.info("[stop][IoT Modbus TCP Master 协议 {} Vertx 已关闭]", getId());
             } catch (Exception e) {
-                log.error("[stop][IoT Modbus TCP 协议 {} Vertx 关闭失败]", getId(), e);
+                log.error("[stop][IoT Modbus TCP Master 协议 {} Vertx 关闭失败]", getId(), e);
             }
         }
         running = false;
-        log.info("[stop][IoT Modbus TCP 协议 {} 已停止]", getId());
+        log.info("[stop][IoT Modbus TCP Master 协议 {} 已停止]", getId());
     }
 
     /**

@@ -164,14 +164,26 @@ yudao:
               trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
               trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
         # ====================================
-        # 针对引入的 Modbus TCP 组件的配置
+        # 针对引入的 Modbus TCP Master 组件的配置
         # ====================================
-        - id: modbus-tcp-1
-          enabled: true
-          protocol: modbus_tcp
+        - id: modbus-tcp-master-1
+          enabled: false
+          protocol: modbus_tcp_master
           port: 502
-          modbus-tcp:
+          modbus-tcp-master:
             config-refresh-interval: 30  # 配置刷新间隔（秒）
+        # ====================================
+        # 针对引入的 Modbus TCP Slave 组件的配置
+        # ====================================
+        - id: modbus-tcp-slave-1
+          enabled: true
+          protocol: modbus_tcp_slave
+          port: 503
+          modbus-tcp-slave:
+            config-refresh-interval: 30     # 配置刷新间隔（秒）
+            custom-function-code: 65        # 自定义功能码（用于认证等扩展交互）
+            request-timeout: 5000           # Pending Request 超时时间（毫秒）
+            request-cleanup-interval: 10000 # Pending Request 清理间隔（毫秒）
 
 --- #################### 日志相关配置 ####################
 
@@ -193,7 +205,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
-    cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.modbus: DEBUG
     # 根日志级别
     root: INFO
 

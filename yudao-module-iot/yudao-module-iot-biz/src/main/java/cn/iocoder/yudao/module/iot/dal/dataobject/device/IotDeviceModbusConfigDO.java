@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -24,7 +25,12 @@ public class IotDeviceModbusConfigDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
-    // TODO @AI：增加 productId；
+    /**
+     * 产品编号
+     *
+     * 关联 {@link IotProductDO#getId()}
+     */
+    private Long productId;
     /**
      * 设备编号
      *
@@ -52,6 +58,18 @@ public class IotDeviceModbusConfigDO extends TenantBaseDO {
      * 重试间隔，单位：毫秒
      */
     private Integer retryInterval;
+    /**
+     * 模式
+     *
+     * @see cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum
+     */
+    private Integer mode;
+    /**
+     * 数据帧格式
+     *
+     * @see cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum
+     */
+    private String frameFormat;
     /**
      * 状态
      *

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbustcp;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster;
 
 import com.ghgande.j2mod.modbus.procimg.*;
 import com.ghgande.j2mod.modbus.slave.ModbusSlave;
