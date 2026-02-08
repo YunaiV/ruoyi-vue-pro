@@ -32,6 +32,10 @@ public abstract class AbstractIotModbusPollScheduler {
      * 同设备最小请求间隔（毫秒），防止 Modbus 设备性能不足时请求堆积
      */
     private static final long MIN_REQUEST_INTERVAL = 1000;
+    /**
+     * 每个设备请求队列的最大长度，超出时丢弃最旧请求
+     */
+    private static final int MAX_QUEUE_SIZE = 1000;
 
     /**
      * 设备点位的定时器映射：deviceId -> (pointId -> PointTimerInfo)
@@ -159,6 +163,11 @@ public abstract class AbstractIotModbusPollScheduler {
     private void submitPollRequest(Long deviceId, Long pointId) {
         // 1. 【重要】将请求添加到设备的请求队列
         Queue<Runnable> queue = deviceRequestQueues.computeIfAbsent(deviceId, k -> new ConcurrentLinkedQueue<>());
+        while (queue.size() >= MAX_QUEUE_SIZE) {
+            // 超出上限时，丢弃最旧的请求
+            queue.poll();
+            log.warn("[submitPollRequest][设备 {} 请求队列已满({}), 丢弃最旧请求]", deviceId, MAX_QUEUE_SIZE);
+        }
         queue.offer(() -> pollPoint(deviceId, pointId));
 
         // 2. 处理设备请求队列（如果没有延迟 timer 在等待）

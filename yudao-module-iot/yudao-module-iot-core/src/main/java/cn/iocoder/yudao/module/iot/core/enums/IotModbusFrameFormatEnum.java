@@ -13,26 +13,22 @@ import java.util.Arrays;
  */
 @Getter
 @RequiredArgsConstructor
-public enum IotModbusFrameFormatEnum implements ArrayValuable<String> {
+public enum IotModbusFrameFormatEnum implements ArrayValuable<Integer> {
 
-    MODBUS_TCP("modbus_tcp", "Modbus TCP"),
-    MODBUS_RTU("modbus_rtu", "Modbus RTU");
+    MODBUS_TCP(1),
+    MODBUS_RTU(2);
 
-    public static final String[] ARRAYS = Arrays.stream(values())
+    public static final Integer[] ARRAYS = Arrays.stream(values())
             .map(IotModbusFrameFormatEnum::getFormat)
-            .toArray(String[]::new);
+            .toArray(Integer[]::new);
 
     /**
      * 格式
      */
-    private final String format;
-    /**
-     * 名称
-     */
-    private final String name;
+    private final Integer format;
 
     @Override
-    public String[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

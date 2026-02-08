@@ -1,13 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.biz;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
-
-import java.util.List;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.*;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
@@ -54,10 +48,11 @@ public interface IotDeviceCommonApi {
     CommonResult<List<IotSubDeviceRegisterRespDTO>> registerSubDevices(IotSubDeviceRegisterFullReqDTO reqDTO);
 
     /**
-     * 获取所有启用的 Modbus 设备配置列表
+     * 获取 Modbus 设备配置列表
      *
+     * @param listReqDTO 查询参数
      * @return Modbus 设备配置列表
      */
-    CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs();
+    CommonResult<List<IotModbusDeviceConfigRespDTO>> getModbusDeviceConfigList(IotModbusDeviceConfigListReqDTO listReqDTO);
 
 }

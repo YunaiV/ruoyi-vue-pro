@@ -29,7 +29,7 @@ public class IotModbusFrame {
     /**
      * 事务标识符
      * <p>
-     * 仅 {@link IotModbusFrameFormatEnum#MODBUS_TCP} 格式有值，
+     * 仅 {@link IotModbusFrameFormatEnum#MODBUS_TCP} 格式有值
      */
     private Integer transactionId;
 
@@ -37,14 +37,13 @@ public class IotModbusFrame {
      * 异常码
      * <p>
      * 当功能码最高位为 1 时（异常响应），此字段存储异常码。
-     * 为 null 表示非异常响应。
      *
      * @see IotModbusCommonUtils#FC_EXCEPTION_MASK
      */
     private Integer exceptionCode;
 
     /**
-     * 自定义功能码时的 JSON 字符串
+     * 自定义功能码时的 JSON 字符串（用于 auth 认证等等）
      */
     private String customData;
 

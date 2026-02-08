@@ -1,41 +1,42 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.downstream;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusTcpMasterUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConfigCacheService;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpMasterConfigCacheService;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpMasterConnectionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 /**
- * IoT Modbus TCP 下行消息处理器
+ * IoT Modbus TCP Master 下行消息处理器
  * <p>
  * 负责：
  * 1. 处理下行消息（如属性设置 thing.service.property.set）
- * 2. 执行 Modbus 写入操作
+ * 2. 将属性值转换为 Modbus 写指令，通过 TCP 连接发送给设备
  *
  * @author 芋道源码
  */
 @RequiredArgsConstructor
 @Slf4j
-public class IotModbusTcpDownstreamHandler {
+public class IotModbusTcpMasterDownstreamHandler {
 
-    private final IotModbusTcpConnectionManager connectionManager;
-    private final IotModbusTcpConfigCacheService configCacheService;
+    private final IotModbusTcpMasterConnectionManager connectionManager;
+    private final IotModbusTcpMasterConfigCacheService configCacheService;
 
     /**
      * 处理下行消息
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "DuplicatedCode"})
     public void handle(IotDeviceMessage message) {
         // 1.1 检查是否是属性设置消息
-        if (!IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod().equals(message.getMethod())) {
+        if (ObjUtil.notEqual(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), message.getMethod())) {
             log.debug("[handle][忽略非属性设置消息: {}]", message.getMethod());
             return;
         }
@@ -78,7 +79,7 @@ public class IotModbusTcpDownstreamHandler {
      */
     private void writeProperty(IotModbusDeviceConfigRespDTO config, IotModbusPointRespDTO point, Object value) {
         // 1.1 获取连接
-        IotModbusTcpConnectionManager.ModbusConnection connection = connectionManager.getConnection(config.getDeviceId());
+        IotModbusTcpMasterConnectionManager.ModbusConnection connection = connectionManager.getConnection(config.getDeviceId());
         if (connection == null) {
             log.warn("[writeProperty][设备 {} 没有连接]", config.getDeviceId());
             return;

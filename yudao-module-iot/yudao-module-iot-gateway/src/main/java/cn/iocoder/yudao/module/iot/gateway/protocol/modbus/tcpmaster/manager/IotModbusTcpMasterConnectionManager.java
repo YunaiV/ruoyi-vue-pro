@@ -2,12 +2,13 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -26,14 +27,16 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author 芋道源码
  */
-@RequiredArgsConstructor
 @Slf4j
-public class IotModbusTcpConnectionManager {
+public class IotModbusTcpMasterConnectionManager {
 
     private static final String LOCK_KEY_PREFIX = "iot:modbus-tcp:connection:";
 
     private final RedissonClient redissonClient;
     private final Vertx vertx;
+    private final IotDeviceMessageService messageService;
+    private final IotModbusTcpMasterConfigCacheService configCacheService;
+    private final String serverId;
 
     /**
      * 连接池：key = ip:port
@@ -45,8 +48,21 @@ public class IotModbusTcpConnectionManager {
      */
     private final Map<Long, String> deviceConnectionMap = new ConcurrentHashMap<>();
 
+    public IotModbusTcpMasterConnectionManager(RedissonClient redissonClient, Vertx vertx,
+                                                IotDeviceMessageService messageService,
+                                                IotModbusTcpMasterConfigCacheService configCacheService,
+                                                String serverId) {
+        this.redissonClient = redissonClient;
+        this.vertx = vertx;
+        this.messageService = messageService;
+        this.configCacheService = configCacheService;
+        this.serverId = serverId;
+    }
+
     /**
      * 确保连接存在
+     * <p>
+     * 首次建连成功时，直接发送设备上线消息
      *
      * @param config 设备配置
      */
@@ -59,37 +75,39 @@ public class IotModbusTcpConnectionManager {
                     config.getDeviceId(), oldConnectionKey, connectionKey);
             removeDevice(config.getDeviceId());
         }
-        // 1.2 记录设备与连接的关系
+        // 1.2 记录设备与连接的映射
         deviceConnectionMap.put(config.getDeviceId(), connectionKey);
 
-        // 2. 情况一：连接已存在，添加设备引用
+        // 2. 情况一：连接已存在，注册设备并发送上线消息
         ModbusConnection connection = connectionPool.get(connectionKey);
         if (connection != null) {
-            connection.addDevice(config.getDeviceId(), config.getSlaveId());
+            addDeviceAndOnline(connection, config);
             return;
         }
 
-        // 3. 情况二：连接不存在，创建新连接
-        // 3.1 尝试获取分布式锁
+        // 3. 情况二：连接不存在，加分布式锁创建新连接
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + connectionKey);
         if (!lock.tryLock()) {
             log.debug("[ensureConnection][获取锁失败, 由其他节点负责: {}]", connectionKey);
             return;
         }
-        // 3.2 double-check：拿到锁后再次检查，避免并发创建重复连接
         try {
+            // 3.1 double-check：拿到锁后再次检查，避免并发创建重复连接
             connection = connectionPool.get(connectionKey);
             if (connection != null) {
-                connection.addDevice(config.getDeviceId(), config.getSlaveId());
-                lock.unlock();
+                addDeviceAndOnline(connection, config);
                 return;
             }
-            // 3.3 创建新连接
-            connection = createConnection(config, lock);
+            // 3.2 创建新连接
+            connection = createConnection(config);
             connectionPool.put(connectionKey, connection);
             log.info("[ensureConnection][创建 Modbus 连接成功: {}]", connectionKey);
+            // 3.3 注册设备并发送上线消息
+            addDeviceAndOnline(connection, config);
         } catch (Exception e) {
             log.error("[ensureConnection][创建 Modbus 连接失败: {}]", connectionKey, e);
+        } finally {
+            // TODO @AI：如果这里释放，会不会出现，集群模式下，多个节点同时创建连接的情况？需要验证一下 Redisson 的分布式锁特性？！
             lock.unlock();
         }
     }
@@ -97,7 +115,7 @@ public class IotModbusTcpConnectionManager {
     /**
      * 创建 Modbus TCP 连接
      */
-    private ModbusConnection createConnection(IotModbusDeviceConfigRespDTO config, RLock lock) throws Exception {
+    private ModbusConnection createConnection(IotModbusDeviceConfigRespDTO config) throws Exception {
         // 1. 创建 TCP 连接
         TCPMasterConnection tcpConnection = new TCPMasterConnection(InetAddress.getByName(config.getIp()));
         tcpConnection.setPort(config.getPort());
@@ -105,12 +123,10 @@ public class IotModbusTcpConnectionManager {
         tcpConnection.connect();
 
         // 2. 创建 Modbus 连接对象
-        ModbusConnection connection = new ModbusConnection()
+        return new ModbusConnection()
                 .setConnectionKey(buildConnectionKey(config.getIp(), config.getPort()))
-                .setTcpConnection(tcpConnection).setLock(lock).setContext(vertx.getOrCreateContext())
+                .setTcpConnection(tcpConnection).setContext(vertx.getOrCreateContext())
                 .setTimeout(config.getTimeout()).setRetryInterval(config.getRetryInterval());
-        connection.addDevice(config.getDeviceId(), config.getSlaveId());
-        return connection;
     }
 
     /**
@@ -137,22 +153,68 @@ public class IotModbusTcpConnectionManager {
 
     /**
      * 移除设备
+     * <p>
+     * 移除时直接发送设备下线消息
      */
     public void removeDevice(Long deviceId) {
-        // 1. 移除设备引用
+        // 1.1 移除设备时，发送下线消息
+        sendOfflineMessage(deviceId);
+        // 1.2 移除设备引用
         String connectionKey = deviceConnectionMap.remove(deviceId);
         if (connectionKey == null) {
             return;
         }
+
+        // 2.1 移除连接中的设备引用
         ModbusConnection connection = connectionPool.get(connectionKey);
         if (connection == null) {
             return;
         }
         connection.removeDevice(deviceId);
-
-        // 2. 如果没有设备引用了，关闭连接
+        // 2.2 如果没有设备引用了，关闭连接
         if (connection.getDeviceCount() == 0) {
             closeConnection(connectionKey);
+        }
+    }
+
+    // ==================== 设备连接 & 上下线消息 ====================
+
+    /**
+     * 注册设备到连接，并发送上线消息
+     */
+    private void addDeviceAndOnline(ModbusConnection connection,
+                                    IotModbusDeviceConfigRespDTO config) {
+        connection.addDevice(config.getDeviceId(), config.getSlaveId());
+        sendOnlineMessage(config);
+    }
+
+    /**
+     * 发送设备上线消息
+     */
+    private void sendOnlineMessage(IotModbusDeviceConfigRespDTO config) {
+        try {
+            IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
+            messageService.sendDeviceMessage(onlineMessage,
+                    config.getProductKey(), config.getDeviceName(), serverId);
+        } catch (Exception ex) {
+            log.error("[sendOnlineMessage][发送设备上线消息失败, deviceId={}]", config.getDeviceId(), ex);
+        }
+    }
+
+    /**
+     * 发送设备下线消息
+     */
+    private void sendOfflineMessage(Long deviceId) {
+        IotModbusDeviceConfigRespDTO config = configCacheService.getConfig(deviceId);
+        if (config == null) {
+            return;
+        }
+        try {
+            IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
+            messageService.sendDeviceMessage(offlineMessage,
+                    config.getProductKey(), config.getDeviceName(), serverId);
+        } catch (Exception ex) {
+            log.error("[sendOfflineMessage][发送设备下线消息失败, deviceId={}]", deviceId, ex);
         }
     }
 
@@ -170,10 +232,10 @@ public class IotModbusTcpConnectionManager {
                 connection.getTcpConnection().close();
             }
             // 强制解锁，避免死锁（正常情况下应该不会发生锁未释放的情况）
-            RLock lock = connection.getLock();
-            if (lock != null && lock.isLocked()) {
-                lock.forceUnlock();
-            }
+//            RLock lock = connection.getLock();
+//            if (lock != null && lock.isLocked()) {
+//                lock.forceUnlock();
+//            }
             log.info("[closeConnection][关闭 Modbus 连接: {}]", connectionKey);
         } catch (Exception e) {
             log.error("[closeConnection][关闭连接失败: {}]", connectionKey, e);
@@ -202,10 +264,13 @@ public class IotModbusTcpConnectionManager {
 
         private String connectionKey;
         private TCPMasterConnection tcpConnection;
-        private RLock lock;
         private Integer timeout;
         private Integer retryInterval;
+
         private Context context;
+
+        // TODO @AI：是不是需要 lock？！避免集群模式下的竞争（肯定不能让别的节点连接上）！！！【另外，RLock 在节点（持有所锁的节点） cransh 的时候，会自动释放】
+//        private RLock lock;
 
         /**
          * 设备 ID 到 slave ID 的映射

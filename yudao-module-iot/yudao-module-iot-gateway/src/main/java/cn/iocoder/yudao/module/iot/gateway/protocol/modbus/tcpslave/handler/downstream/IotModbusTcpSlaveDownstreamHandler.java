@@ -51,7 +51,7 @@ public class IotModbusTcpSlaveDownstreamHandler {
     /**
      * 处理下行消息
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "DuplicatedCode"})
     public void handle(IotDeviceMessage message) {
         // 1.1 检查是否是属性设置消息
         if (ObjUtil.notEqual(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), message.getMethod())) {
@@ -125,17 +125,26 @@ public class IotModbusTcpSlaveDownstreamHandler {
                     point.getRegisterAddress(), rawValues[0], frameFormat, transactionId);
         } else if (writeMultipleCode != null) {
             // 多个值：使用多写功能码（FC15/FC16）
-            data = frameEncoder.encodeWriteMultipleRegistersRequest(slaveId,
-                    point.getRegisterAddress(), rawValues, frameFormat, transactionId);
+            if (writeMultipleCode == IotModbusCommonUtils.FC_WRITE_MULTIPLE_COILS) {
+                data = frameEncoder.encodeWriteMultipleCoilsRequest(slaveId,
+                        point.getRegisterAddress(), rawValues, frameFormat, transactionId);
+            } else {
+                data = frameEncoder.encodeWriteMultipleRegistersRequest(slaveId,
+                        point.getRegisterAddress(), rawValues, frameFormat, transactionId);
+            }
         } else {
             log.warn("[writeProperty][点位 {} 不支持写操作, 功能码={}]", point.getIdentifier(), readFunctionCode);
             return;
         }
 
-        // 2. 发送
-        connectionManager.sendToDevice(deviceId, data);
-        log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
-                deviceId, point.getIdentifier(), value);
+        // 2. 发送消息
+        connectionManager.sendToDevice(deviceId, data).onSuccess(v ->
+                log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
+                        deviceId, point.getIdentifier(), value)
+        ).onFailure(e ->
+                log.error("[writeProperty][写入失败, deviceId={}, identifier={}, value={}]",
+                        deviceId, point.getIdentifier(), value, e)
+        );
     }
 
 }

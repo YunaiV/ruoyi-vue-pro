@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -13,12 +15,14 @@ public class IotDeviceModbusConfigSaveReqVO {
     @NotNull(message = "设备编号不能为空")
     private Long deviceId;
 
-    @Schema(description = "Modbus 服务器 IP 地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "192.168.1.100")
-    @NotEmpty(message = "Modbus 服务器 IP 地址不能为空")
+    @Schema(description = "Modbus 服务器 IP 地址", example = "192.168.1.100")
+//    @NotEmpty(message = "Modbus 服务器 IP 地址不能为空")
+    // TODO @AI：这个字段，要根据情况校验；
     private String ip;
 
-    @Schema(description = "Modbus 端口", requiredMode = Schema.RequiredMode.REQUIRED, example = "502")
-    @NotNull(message = "Modbus 端口不能为空")
+    @Schema(description = "Modbus 端口", example = "502")
+//    @NotNull(message = "Modbus 端口不能为空")
+    // TODO @AI：这个字段，要根据情况校验；
     private Integer port;
 
     @Schema(description = "从站地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -31,13 +35,13 @@ public class IotDeviceModbusConfigSaveReqVO {
     @Schema(description = "重试间隔（毫秒）", example = "1000")
     private Integer retryInterval;
 
-    // TODO @AI：不要【：1-云端轮询 2-主动上报】
-    @Schema(description = "模式：1-云端轮询 2-主动上报", example = "1")
+    @Schema(description = "工作模式", example = "1")
+    @InEnum(IotModbusModeEnum.class)
     private Integer mode;
 
-    // TODO @AI：不要【：1-云端轮询 2-主动上报】
-    @Schema(description = "数据帧格式：modbus_tcp / modbus_rtu", example = "modbus_tcp")
-    private String frameFormat;
+    @Schema(description = "数据帧格式", example = "1")
+    @InEnum(IotModbusFrameFormatEnum.class)
+    private Integer frameFormat;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")

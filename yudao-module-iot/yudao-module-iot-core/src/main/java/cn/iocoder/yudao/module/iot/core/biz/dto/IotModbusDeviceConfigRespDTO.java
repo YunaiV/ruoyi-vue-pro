@@ -54,7 +54,7 @@ public class IotModbusDeviceConfigRespDTO {
     /**
      * 数据帧格式
      */
-    private String frameFormat;
+    private Integer frameFormat;
 
     // ========== Modbus 点位配置 ==========
 

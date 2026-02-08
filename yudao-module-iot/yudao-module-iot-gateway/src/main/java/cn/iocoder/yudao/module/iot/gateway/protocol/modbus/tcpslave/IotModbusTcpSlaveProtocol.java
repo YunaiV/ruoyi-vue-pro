@@ -81,22 +81,27 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
      */
     private Long requestCleanupTimerId;
 
-    // ========== 各组件 ==========
-    // TODO @芋艿：稍后排序下，有点小乱；
-
-    private final IotModbusTcpSlaveConfig slaveConfig;
-    private final IotModbusFrameDecoder frameDecoder;
-    private final IotModbusFrameEncoder frameEncoder;
+    /**
+     * 连接管理器
+     */
     private final IotModbusTcpSlaveConnectionManager connectionManager;
+    /**
+     * 下行消息订阅者
+     */
+    private final IotModbusTcpSlaveDownstreamSubscriber downstreamSubscriber;
+
+    private final IotModbusFrameDecoder frameDecoder;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final IotModbusFrameEncoder frameEncoder;
+
     private final IotModbusTcpSlaveConfigCacheService configCacheService;
     private final IotModbusTcpSlavePendingRequestManager pendingRequestManager;
     private final IotModbusTcpSlaveUpstreamHandler upstreamHandler;
-    private final IotModbusTcpSlaveDownstreamSubscriber downstreamSubscriber;
     private final IotModbusTcpSlavePollScheduler pollScheduler;
     private final IotDeviceMessageService messageService;
 
     public IotModbusTcpSlaveProtocol(ProtocolProperties properties) {
-        this.slaveConfig = properties.getModbusTcpSlave();
+        IotModbusTcpSlaveConfig slaveConfig = properties.getModbusTcpSlave();
         Assert.notNull(slaveConfig, "Modbus TCP Slave 协议配置（modbusTcpSlave）不能为空");
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
@@ -124,10 +129,9 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
 
         // 初始化 Handler
         this.messageService = SpringUtil.getBean(IotDeviceMessageService.class);
-        IotDeviceMessageService messageService = this.messageService;
         IotDeviceService deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.upstreamHandler = new IotModbusTcpSlaveUpstreamHandler(
-                deviceApi, messageService, frameEncoder,
+                deviceApi, this.messageService, frameEncoder,
                 connectionManager, configCacheService, pendingRequestManager,
                 pollScheduler, deviceService, serverId);
 
@@ -158,9 +162,9 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
 
         try {
             // 1. 启动配置刷新定时器
-            int refreshInterval = slaveConfig.getConfigRefreshInterval();
+            IotModbusTcpSlaveConfig slaveConfig = properties.getModbusTcpSlave();
             configRefreshTimerId = vertx.setPeriodic(
-                    TimeUnit.SECONDS.toMillis(refreshInterval),
+                    TimeUnit.SECONDS.toMillis(slaveConfig.getConfigRefreshInterval()),
                     id -> refreshConfig());
 
             // 2.1 启动 TCP Server
@@ -178,6 +182,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
             downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT Modbus TCP Slave 协议 {} 启动失败]", getId(), e);
+            // TODO @芋艿：后续统一优化 stop 逻辑；
             if (configRefreshTimerId != null) {
                 vertx.cancelTimer(configRefreshTimerId);
                 configRefreshTimerId = null;
@@ -223,9 +228,9 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
         pollScheduler.stopAll();
         // 2.3 清理 PendingRequest
         pendingRequestManager.clear();
-        // 2.3 关闭所有连接
+        // 2.4 关闭所有连接
         connectionManager.closeAll();
-        // 2.4 关闭 TCP Server
+        // 2.5 关闭 TCP Server
         if (netServer != null) {
             try {
                 netServer.close().result();
@@ -308,9 +313,6 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
 
     /**
      * 刷新已连接设备的配置（定时调用）
-     * <p>
-     * 与 tcpmaster 不同，slave 只刷新已连接设备的配置，不做全量 diff。
-     * 设备的新增（认证时）和删除（断连时）分别在 {@link #handleConnection} 中处理。
      */
     private synchronized void refreshConfig() {
         try {
@@ -321,6 +323,10 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
             }
             List<IotModbusDeviceConfigRespDTO> configs =
                     configCacheService.refreshConnectedDeviceConfigList(connectedDeviceIds);
+            if (configs == null) {
+                log.warn("[refreshConfig][刷新配置失败，跳过本次刷新]");
+                return;
+            }
             log.debug("[refreshConfig][刷新了 {} 个已连接设备的配置]", configs.size());
 
             // 2. 更新已连接设备的轮询任务

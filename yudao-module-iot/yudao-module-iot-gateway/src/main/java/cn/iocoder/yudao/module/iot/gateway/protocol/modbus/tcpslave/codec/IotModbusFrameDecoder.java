@@ -20,19 +20,19 @@ import java.util.function.BiConsumer;
  * 1. 首帧检测：读前 6 字节，判断 MODBUS_TCP（ProtocolId==0x0000 且 Length 合理）或 MODBUS_RTU
  * 2. 检测后切换到对应的拆包 Handler，并将首包 6 字节通过 handleFirstBytes() 交给新 Handler 处理
  * 3. 拆包完成后解码为 IotModbusFrame，通过回调返回
- * - MODBUS_TCP：两阶段 RecordParser（MBAP length 字段驱动）
- * - MODBUS_RTU：功能码驱动的状态机
+ *      - MODBUS_TCP：两阶段 RecordParser（MBAP length 字段驱动）
+ *      - MODBUS_RTU：功能码驱动的状态机
  *
  * @author 芋道源码
  */
+@RequiredArgsConstructor
 @Slf4j
 public class IotModbusFrameDecoder {
 
+    /**
+     * 自定义功能码
+     */
     private final int customFunctionCode;
-
-    public IotModbusFrameDecoder(int customFunctionCode) {
-        this.customFunctionCode = customFunctionCode;
-    }
 
     /**
      * 创建带自动帧格式检测的 RecordParser
@@ -82,7 +82,7 @@ public class IotModbusFrameDecoder {
         // 提取 PDU 数据（从 functionCode 之后到末尾）
         byte[] pdu = new byte[data.length - 8];
         System.arraycopy(data, 8, pdu, 0, pdu.length);
-
+        // 构建 IotModbusFrame
         return buildFrame(slaveId, functionCode, pdu, transactionId);
     }
 
@@ -105,7 +105,7 @@ public class IotModbusFrameDecoder {
         // PDU 数据（不含 slaveId、functionCode、CRC）
         byte[] pdu = new byte[data.length - 4];
         System.arraycopy(data, 2, pdu, 0, pdu.length);
-
+        // 构建 IotModbusFrame
         return buildFrame(slaveId, functionCode, pdu, null);
     }
 
@@ -144,7 +144,6 @@ public class IotModbusFrameDecoder {
     /**
      * 帧格式检测阶段 Handler（仅处理首包，探测后切换到对应的拆包 Handler）
      */
-    @SuppressWarnings("ClassCanBeRecord")
     @RequiredArgsConstructor
     private class DetectPhaseHandler implements Handler<Buffer> {
 

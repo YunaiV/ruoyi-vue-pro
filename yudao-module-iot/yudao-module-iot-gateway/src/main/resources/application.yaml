@@ -167,7 +167,7 @@ yudao:
         # 针对引入的 Modbus TCP Master 组件的配置
         # ====================================
         - id: modbus-tcp-master-1
-          enabled: false
+          enabled: true
           protocol: modbus_tcp_master
           port: 502
           modbus-tcp-master:

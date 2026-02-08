@@ -172,6 +172,11 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    public List<IotProductDO> getProductList(Collection<Long> ids) {
+        return productMapper.selectByIds(ids);
+    }
+
+    @Override
     public void validateProductsExist(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;

@@ -67,9 +67,9 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
 
     // ===================== 设备信息（根据实际情况修改，从 iot_device 表查询） =====================
 
-    private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
-    private static final String DEVICE_NAME = "small";
-    private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
+    private static final String PRODUCT_KEY = "modbus_tcp_slave_product_demo";
+    private static final String DEVICE_NAME = "modbus_tcp_slave_device_demo_tcp";
+    private static final String DEVICE_SECRET = "8e4adeb3d25342ab88643421d3fba3f6";
 
     @BeforeAll
     static void setUp() {
@@ -128,7 +128,6 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
 
             // 2. 设置持续监听：每收到一个读请求，自动回复
             log.info("[testPollingResponse][开始持续监听网关下发的读请求...]");
-            CompletableFuture<Void> done = new CompletableFuture<>();
             RecordParser parser = FRAME_DECODER.createRecordParser((frame, frameFormat) -> {
                 log.info("[testPollingResponse][收到请求: slaveId={}, FC={}, transactionId={}]",
                         frame.getSlaveId(), frame.getFunctionCode(), frame.getTransactionId());
@@ -201,6 +200,7 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
      */
     private IotModbusFrame authenticate(NetSocket socket) throws Exception {
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+        authInfo.setClientId("");  // 特殊：考虑到 modbus 消息长度限制，默认 clientId 不发送
         byte[] authFrame = buildAuthFrame(authInfo.getClientId(), authInfo.getUsername(), authInfo.getPassword());
         return sendAndReceive(socket, authFrame);
     }

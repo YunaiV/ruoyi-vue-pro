@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
@@ -331,10 +332,10 @@ public class IotModbusCommonUtils {
         // 其他字节序调整
         byte[] result = new byte[bytes.length];
         switch (byteOrderEnum) {
-            case BA: // 小端序（16 位）
-                if (bytes.length >= 2) {
-                    result[0] = bytes[1];
-                    result[1] = bytes[0];
+            case BA: // 小端序：按每 2 字节一组交换（16 位场景 [1,0]，32 位场景 [1,0,3,2]）
+                for (int i = 0; i + 1 < bytes.length; i += 2) {
+                    result[i] = bytes[i + 1];
+                    result[i + 1] = bytes[i];
                 }
                 break;
             case CDAB: // 大端字交换（32 位）
@@ -509,6 +510,9 @@ public class IotModbusCommonUtils {
      * @return 匹配的点位配置，未找到返回 null
      */
     public static IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
+        if (config == null || StrUtil.isBlank(identifier)) {
+            return null;
+        }
         return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
     }
 
@@ -520,6 +524,9 @@ public class IotModbusCommonUtils {
      * @return 匹配的点位配置，未找到返回 null
      */
     public static IotModbusPointRespDTO findPointById(IotModbusDeviceConfigRespDTO config, Long pointId) {
+        if (config == null || pointId == null) {
+            return null;
+        }
         return CollUtil.findOne(config.getPoints(), p -> p.getId().equals(pointId));
     }
 

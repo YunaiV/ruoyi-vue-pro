@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpMasterConnectionManager;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.procimg.InputRegister;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.I
  * <p>
  * 封装基于 j2mod 的 Modbus TCP 读写操作：
  * 1. 根据功能码创建对应的 Modbus 读/写请求
- * 2. 通过 {@link IotModbusTcpConnectionManager.ModbusConnection} 执行事务
+ * 2. 通过 {@link IotModbusTcpMasterConnectionManager.ModbusConnection} 执行事务
  * 3. 从响应中提取原始值
  *
  * @author 芋道源码
@@ -36,9 +36,9 @@ public class IotModbusTcpMasterUtils {
      * @param point      点位配置
      * @return 原始值（int 数组）
      */
-    public static Future<int[]> read(IotModbusTcpConnectionManager.ModbusConnection connection,
-                              Integer slaveId,
-                              IotModbusPointRespDTO point) {
+    public static Future<int[]> read(IotModbusTcpMasterConnectionManager.ModbusConnection connection,
+                                     Integer slaveId,
+                                     IotModbusPointRespDTO point) {
         return connection.executeBlocking(tcpConnection -> {
             try {
                 // 1. 创建请求
@@ -70,10 +70,10 @@ public class IotModbusTcpMasterUtils {
      * @param values     要写入的值
      * @return 是否成功
      */
-    public static Future<Boolean> write(IotModbusTcpConnectionManager.ModbusConnection connection,
-                                  Integer slaveId,
-                                  IotModbusPointRespDTO point,
-                                  int[] values) {
+    public static Future<Boolean> write(IotModbusTcpMasterConnectionManager.ModbusConnection connection,
+                                        Integer slaveId,
+                                        IotModbusPointRespDTO point,
+                                        int[] values) {
         return connection.executeBlocking(tcpConnection -> {
             try {
                 // 1. 创建请求

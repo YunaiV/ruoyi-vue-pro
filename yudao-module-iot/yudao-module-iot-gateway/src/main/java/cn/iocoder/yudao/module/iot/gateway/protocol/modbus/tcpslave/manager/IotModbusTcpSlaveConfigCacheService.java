@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,16 +18,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * IoT Modbus TCP Slave 配置缓存服务
- * <p>
- * 与 tcpmaster 的 {@code IotModbusTcpConfigCacheService} 不同：
- * - tcpmaster 启动时拉全量配置 → 主动建连，需要全量 diff 检测新增/删除设备
- * - tcpslave 设备主动连接 → 认证时按需加载配置，断连时清理，定时刷新已连接设备的配置
- * <p>
- * 配置生命周期：
- * 1. 认证时：{@link #loadDeviceConfig(Long)} 按 deviceId 从 API 加载配置到缓存
- * 2. 断连时：{@link #removeConfig(Long)} 从缓存中移除
- * 3. 定时刷新：{@link #refreshConnectedDeviceConfigList(Set)} 批量刷新已连接设备的配置
+ * IoT Modbus TCP Slave 配置缓存：认证时按需加载，断连时清理，定时刷新已连接设备
  *
  * @author 芋道源码
  */
@@ -41,44 +37,33 @@ public class IotModbusTcpSlaveConfigCacheService {
 
     /**
      * 加载单个设备的配置（认证成功后调用）
-     * <p>
-     * 从远程 API 获取全量配置，然后按 deviceId 匹配。
-     * 如果远程获取失败，尝试从 Mock 数据中匹配。
      *
      * @param deviceId 设备 ID
-     * @return 设备配置，未找到返回 null
+     * @return 设备配置
      */
     public IotModbusDeviceConfigRespDTO loadDeviceConfig(Long deviceId) {
         try {
-            // 1. 从远程 API 获取全量配置
-            // TODO @AI：等待修复，不着急；
-            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getEnabledModbusDeviceConfigs();
-            if (result != null && result.isSuccess() && result.getData() != null) {
-                for (IotModbusDeviceConfigRespDTO config : result.getData()) {
-                    // 顺便更新缓存（其他已连接设备也受益）
-                    configCache.put(config.getDeviceId(), config);
-                    if (config.getDeviceId().equals(deviceId)) {
-                        return config;
-                    }
-                }
+            // 1. 从远程 API 获取配置
+            IotModbusDeviceConfigListReqDTO reqDTO = new IotModbusDeviceConfigListReqDTO()
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus())
+                    .setMode(IotModbusModeEnum.POLLING.getMode())
+                    .setProtocolType(IotProtocolTypeEnum.MODBUS_TCP_SLAVE.getType())
+                    .setDeviceIds(Collections.singleton(deviceId));
+            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getModbusDeviceConfigList(reqDTO);
+            result.checkError();
+            IotModbusDeviceConfigRespDTO modbusConfig = CollUtil.getFirst(result.getData());
+            if (modbusConfig == null) {
+                log.warn("[loadDeviceConfig][远程获取配置失败，未找到数据, deviceId={}]", deviceId);
+                return null;
             }
+
+            // 2. 更新缓存并返回
+            configCache.put(modbusConfig.getDeviceId(), modbusConfig);
+            return modbusConfig;
         } catch (Exception e) {
             log.error("[loadDeviceConfig][从远程获取配置失败, deviceId={}]", deviceId, e);
+            return null;
         }
-
-        // 2. 远程未找到，尝试 Mock 数据（仅 mockEnabled=true 时）
-        // DONE @AI：【from codex】【中】Mock 数据已通过 mockEnabled 配置开关控制，线上环境不会污染真实配置。
-        // TODO @芋艿：测试完成后移除
-        if (true) {
-            for (IotModbusDeviceConfigRespDTO mockConfig : buildMockConfigs()) {
-                configCache.put(mockConfig.getDeviceId(), mockConfig);
-                if (mockConfig.getDeviceId().equals(deviceId)) {
-                    return mockConfig;
-                }
-            }
-        }
-
-        return configCache.get(deviceId);
     }
 
     // ==================== 定时刷新（已连接设备） ====================
@@ -96,26 +81,25 @@ public class IotModbusTcpSlaveConfigCacheService {
             return Collections.emptyList();
         }
         try {
-            // 1. 从远程获取全量配置
-            // TODO @AI：传递 ids 批量查询；需要分批啦；
-            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getEnabledModbusDeviceConfigs();
-            List<IotModbusDeviceConfigRespDTO> allConfigs;
-            if (result != null && result.isSuccess() && result.getData() != null) {
-                allConfigs = new ArrayList<>(result.getData());
-            } else {
-                log.warn("[refreshConnectedDeviceConfigList][获取 Modbus 配置失败: {}]", result);
-                allConfigs = new ArrayList<>();
-            }
+            // 1. 从远程获取已连接设备的配置
+            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getModbusDeviceConfigList(
+                    new IotModbusDeviceConfigListReqDTO().setStatus(CommonStatusEnum.ENABLE.getStatus())
+                            .setMode(IotModbusModeEnum.POLLING.getMode())
+                            .setProtocolType(IotProtocolTypeEnum.MODBUS_TCP_SLAVE.getType())
+                            .setDeviceIds(connectedDeviceIds));
+            List<IotModbusDeviceConfigRespDTO> modbusConfigs = result.getCheckedData();
 
             // 2. 追加 Mock 测试数据（仅 mockEnabled=true 时）
             // TODO @芋艿：测试完成后移除
+            // TODO @claude-code：【严重】同上，if(true) 导致 mockEnabled 开关失效，Mock 数据永远加载
             if (true) {
-                allConfigs.addAll(buildMockConfigs());
+                modbusConfigs.addAll(buildMockConfigs());
             }
 
-            // 3. 只保留已连接设备的配置，更新缓存
+            // 2. 只保留已连接设备的配置，更新缓存
+            // TODO @AI：是不是直接添加到 configCache 缓存（或者覆盖），然后返回 modbusConfigs 就 ok 了？！
             List<IotModbusDeviceConfigRespDTO> connectedConfigs = new ArrayList<>();
-            for (IotModbusDeviceConfigRespDTO config : allConfigs) {
+            for (IotModbusDeviceConfigRespDTO config : modbusConfigs) {
                 if (connectedDeviceIds.contains(config.getDeviceId())) {
                     configCache.put(config.getDeviceId(), config);
                     connectedConfigs.add(config);
@@ -124,15 +108,7 @@ public class IotModbusTcpSlaveConfigCacheService {
             return connectedConfigs;
         } catch (Exception e) {
             log.error("[refreshConnectedDeviceConfigList][刷新配置失败]", e);
-            // 降级：返回缓存中已连接设备的配置
-            List<IotModbusDeviceConfigRespDTO> fallback = new ArrayList<>();
-            for (Long deviceId : connectedDeviceIds) {
-                IotModbusDeviceConfigRespDTO config = configCache.get(deviceId);
-                if (config != null) {
-                    fallback.add(config);
-                }
-            }
-            return fallback;
+            return null;
         }
     }
 
@@ -142,7 +118,12 @@ public class IotModbusTcpSlaveConfigCacheService {
      * 获取设备配置
      */
     public IotModbusDeviceConfigRespDTO getConfig(Long deviceId) {
-        return configCache.get(deviceId);
+        IotModbusDeviceConfigRespDTO config = configCache.get(deviceId);
+        if (config != null) {
+            return config;
+        }
+        // 缓存未命中，从远程 API 获取
+        return loadDeviceConfig(deviceId);
     }
 
     /**
@@ -169,7 +150,7 @@ public class IotModbusTcpSlaveConfigCacheService {
         config.setDeviceName("small");
         config.setSlaveId(1);
         config.setMode(1); // 云端轮询
-        config.setFrameFormat("modbus_tcp");
+        config.setFrameFormat(IotModbusFrameFormatEnum.MODBUS_TCP.getFormat());
 
         // 点位列表
         List<IotModbusPointRespDTO> points = new ArrayList<>();

@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotModbusTcpDownstreamSubscriber extends AbstractIotProtocolDownstreamSubscriber {
+public class IotModbusTcpMasterDownstreamSubscriber extends AbstractIotProtocolDownstreamSubscriber {
 
-    private final IotModbusTcpDownstreamHandler downstreamHandler;
+    private final IotModbusTcpMasterDownstreamHandler downstreamHandler;
 
-    public IotModbusTcpDownstreamSubscriber(IotModbusTcpMasterProtocol protocol,
-                                             IotModbusTcpDownstreamHandler downstreamHandler,
-                                             IotMessageBus messageBus) {
+    public IotModbusTcpMasterDownstreamSubscriber(IotModbusTcpMasterProtocol protocol,
+                                                  IotModbusTcpMasterDownstreamHandler downstreamHandler,
+                                                  IotMessageBus messageBus) {
         super(protocol, messageBus);
         this.downstreamHandler = downstreamHandler;
     }

@@ -69,7 +69,7 @@ public class IotDeviceModbusConfigDO extends TenantBaseDO {
      *
      * @see cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum
      */
-    private String frameFormat;
+    private Integer frameFormat;
     /**
      * 状态
      *

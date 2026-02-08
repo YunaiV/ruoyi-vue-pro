@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -76,8 +77,9 @@ public class IotModbusTcpSlavePendingRequestManager {
         if (frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP && frame.getTransactionId() != null) {
             return matchByTransactionId(queue, frame.getTransactionId());
         }
-        // RTU 模式：FIFO，匹配 slaveId + functionCode
-        return matchByFifo(queue, frame.getSlaveId(), frame.getFunctionCode());
+        // RTU 模式：FIFO，匹配 slaveId + functionCode + registerCount
+        int responseRegisterCount = extractRegisterCountFromResponse(frame);
+        return matchByFifo(queue, frame.getSlaveId(), frame.getFunctionCode(), responseRegisterCount);
     }
 
     /**
@@ -96,18 +98,44 @@ public class IotModbusTcpSlavePendingRequestManager {
     }
 
     /**
-     * 按 FIFO 匹配
+     * 按 FIFO 匹配（slaveId + functionCode + registerCount）
      */
-    private PendingRequest matchByFifo(Deque<PendingRequest> queue, int slaveId, int functionCode) {
+    private PendingRequest matchByFifo(Deque<PendingRequest> queue, int slaveId, int functionCode,
+                                        int responseRegisterCount) {
         Iterator<PendingRequest> it = queue.iterator();
         while (it.hasNext()) {
             PendingRequest req = it.next();
-            if (req.getSlaveId() == slaveId && req.getFunctionCode() == functionCode) {
+            if (req.getSlaveId() == slaveId
+                    && req.getFunctionCode() == functionCode
+                    && (responseRegisterCount <= 0 || req.getRegisterCount() == responseRegisterCount)) {
                 it.remove();
                 return req;
             }
         }
         return null;
+    }
+
+    // TODO @AI：是不是放到 modbus 工具类里，更合适？
+    /**
+     * 从响应帧中提取 registerCount（通过 PDU 的 byteCount 推断）
+     *
+     * @return registerCount，无法提取时返回 -1（匹配时跳过校验）
+     */
+    private int extractRegisterCountFromResponse(IotModbusFrame frame) {
+        byte[] pdu = frame.getPdu();
+        if (pdu == null || pdu.length < 1) {
+            return -1;
+        }
+        int byteCount = pdu[0] & 0xFF;
+        int fc = frame.getFunctionCode();
+        // FC03/04 寄存器读响应：registerCount = byteCount / 2
+        if (fc == IotModbusCommonUtils.FC_READ_HOLDING_REGISTERS
+                || fc == IotModbusCommonUtils.FC_READ_INPUT_REGISTERS) {
+            return byteCount / 2;
+        }
+        // FC01/02 线圈/离散输入读响应：registerCount = byteCount * 8（线圈数量）
+        // 但因为按 bit 打包有余位，无法精确反推，返回 -1 跳过校验
+        return -1;
     }
 
     /**

@@ -1,16 +1,14 @@
 package cn.iocoder.yudao.module.iot.api.device;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.RpcConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.*;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
@@ -34,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -81,12 +77,13 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     }
 
     @Override
-    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/modbus/enabled-configs")
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/modbus/config-list")
     @PermitAll
     @TenantIgnore
-    public CommonResult<List<IotModbusDeviceConfigRespDTO>> getEnabledModbusDeviceConfigs() {
-        // 1. 获取所有启用的 Modbus 连接配置
-        List<IotDeviceModbusConfigDO> configList = modbusConfigService.getEnabledDeviceModbusConfigList();
+    public CommonResult<List<IotModbusDeviceConfigRespDTO>> getModbusDeviceConfigList(
+            @RequestBody IotModbusDeviceConfigListReqDTO listReqDTO) {
+        // 1. 获取 Modbus 连接配置
+        List<IotDeviceModbusConfigDO> configList = modbusConfigService.getDeviceModbusConfigList(listReqDTO);
         if (CollUtil.isEmpty(configList)) {
             return success(new ArrayList<>());
         }
@@ -95,6 +92,7 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
         Set<Long> deviceIds = convertSet(configList, IotDeviceModbusConfigDO::getDeviceId);
         Map<Long, IotDeviceDO> deviceMap = deviceService.getDeviceMap(deviceIds);
         Map<Long, List<IotDeviceModbusPointDO>> pointMap = modbusPointService.getEnabledDeviceModbusPointMapByDeviceIds(deviceIds);
+        Map<Long, IotProductDO> productMap = productService.getProductMap(convertSet(deviceMap.values(), IotDeviceDO::getProductId));
         List<IotModbusDeviceConfigRespDTO> result = new ArrayList<>(configList.size());
         for (IotDeviceModbusConfigDO config : configList) {
             // 3.1 获取设备信息
@@ -102,12 +100,20 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
             if (device == null) {
                 continue;
             }
-            // 3.2 获取启用的点位列表
+            // 3.2 按 protocolType 筛选（如果非空）
+            if (StrUtil.isNotEmpty(listReqDTO.getProtocolType())) {
+                IotProductDO product = productMap.get(device.getProductId());
+                if (product == null || ObjUtil.notEqual(listReqDTO.getProtocolType(), product.getProtocolType())) {
+                    continue;
+                }
+            }
+            // 3.3 获取启用的点位列表
             List<IotDeviceModbusPointDO> pointList = pointMap.get(config.getDeviceId());
             if (CollUtil.isEmpty(pointList)) {
                 continue;
             }
-            // 3.3 构建 IotModbusDeviceConfigRespDTO 对象
+
+            // 3.4 构建 IotModbusDeviceConfigRespDTO 对象
             IotModbusDeviceConfigRespDTO configDTO = BeanUtils.toBean(config, IotModbusDeviceConfigRespDTO.class, o ->
                     o.setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName())
                             .setPoints(BeanUtils.toBean(pointList, IotModbusPointRespDTO.class)));

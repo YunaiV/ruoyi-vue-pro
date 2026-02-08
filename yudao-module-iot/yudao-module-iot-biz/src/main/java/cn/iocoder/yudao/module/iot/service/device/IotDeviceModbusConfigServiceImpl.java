@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigSaveReqVO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceModbusConfigMapper;
 import jakarta.annotation.Resource;
@@ -54,8 +54,8 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
     }
 
     @Override
-    public List<IotDeviceModbusConfigDO> getEnabledDeviceModbusConfigList() {
-        return modbusConfigMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+    public List<IotDeviceModbusConfigDO> getDeviceModbusConfigList(IotModbusDeviceConfigListReqDTO listReqDTO) {
+        return modbusConfigMapper.selectList(listReqDTO);
     }
 
 }

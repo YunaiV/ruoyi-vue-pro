@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.handler.upstream;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
@@ -61,6 +61,7 @@ public class IotModbusTcpSlaveUpstreamHandler {
     private final IotModbusTcpSlavePendingRequestManager pendingRequestManager;
     private final IotModbusTcpSlavePollScheduler pollScheduler;
     private final IotDeviceService deviceService;
+
     private final String serverId;
 
     public IotModbusTcpSlaveUpstreamHandler(IotDeviceCommonApi deviceApi,
@@ -153,16 +154,20 @@ public class IotModbusTcpSlaveUpstreamHandler {
         // 1. 解析认证参数
         IotDeviceAuthReqDTO request = JsonUtils.convertObject(params, IotDeviceAuthReqDTO.class);
         Assert.notNull(request, "认证参数不能为空");
-        Assert.notBlank(request.getClientId(), "clientId 不能为空");
         Assert.notBlank(request.getUsername(), "username 不能为空");
         Assert.notBlank(request.getPassword(), "password 不能为空");
+        // 特殊：考虑到 modbus 消息体积较小，默认 clientId 传递空串
+        if (StrUtil.isBlank(request.getClientId())) {
+            request.setClientId(IotDeviceAuthUtils.buildClientIdFromUsername(request.getUsername()));
+        }
+        Assert.notBlank(request.getClientId(), "clientId 不能为空");
 
         // 2.1 调用认证 API
         CommonResult<Boolean> result = deviceApi.authDevice(request);
         result.checkError();
         if (BooleanUtil.isFalse(result.getData())) {
             log.warn("[handleAuth][认证失败, clientId={}, username={}]", request.getClientId(), request.getUsername());
-            sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH, 1, "认证失败");
+            sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH, BAD_REQUEST.getCode(), "认证失败");
             return;
         }
         // 2.2 解析设备信息
@@ -171,7 +176,21 @@ public class IotModbusTcpSlaveUpstreamHandler {
         // 2.3 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         Assert.notNull(device, "设备不存在");
-        // TODO @AI：2.4 必须找到连接配置；
+        // 2.4 加载设备 Modbus 配置，无配置则阻断认证
+        IotModbusDeviceConfigRespDTO modbusConfig = configCacheService.loadDeviceConfig(device.getId());
+        if (modbusConfig == null) {
+            log.warn("[handleAuth][设备 {} 没有 Modbus 点位配置, 拒绝认证]", device.getId());
+            sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH, BAD_REQUEST.getCode(), "设备无 Modbus 配置");
+            return;
+        }
+        // 2.5 协议不一致，阻断认证
+        if (ObjUtil.notEqual(frameFormat.getFormat(), modbusConfig.getFrameFormat())) {
+            log.warn("[handleAuth][设备 {} frameFormat 不一致, 连接协议={}, 设备配置={}，拒绝认证]",
+                    device.getId(), frameFormat.getFormat(), modbusConfig.getFrameFormat());
+            sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH, BAD_REQUEST.getCode(),
+                    "frameFormat 协议不一致");
+            return;
+        }
 
         // 3.1 注册连接
         ConnectionInfo connectionInfo = new ConnectionInfo()
@@ -189,13 +208,8 @@ public class IotModbusTcpSlaveUpstreamHandler {
                 GlobalErrorCodeConstants.SUCCESS.getCode(), "success");
         log.info("[handleAuth][认证成功, clientId={}, deviceId={}]", request.getClientId(), device.getId());
 
-        // 4. 加载设备配置并启动轮询
-        IotModbusDeviceConfigRespDTO config = configCacheService.loadDeviceConfig(device.getId());
-        if (config != null) {
-            pollScheduler.updatePolling(config);
-        } else {
-            log.warn("[handleAuth][认证成功但未找到设备配置, deviceId={}]", device.getId());
-        }
+        // 4. 启动轮询
+        pollScheduler.updatePolling(modbusConfig);
     }
 
     /**
@@ -245,20 +259,19 @@ public class IotModbusTcpSlaveUpstreamHandler {
         }
         // 2.3 查找点位配置
         IotModbusDeviceConfigRespDTO config = configCacheService.getConfig(info.getDeviceId());
-        if (config == null || CollUtil.isEmpty(config.getPoints())) {
-            return;
-        }
         IotModbusPointRespDTO point = IotModbusCommonUtils.findPointById(config, request.getPointId());
         if (point == null) {
             return;
         }
 
-        // 3.1 点位翻译
+        // 3.1 转换原始值为物模型属性值（点位翻译）
         Object convertedValue = IotModbusCommonUtils.convertToPropertyValue(rawValues, point);
-        // 3.2 上报属性
+        // 3.2 构造属性上报消息
         Map<String, Object> params = MapUtil.of(request.getIdentifier(), convertedValue);
         IotDeviceMessage message = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), params);
+
+        // 4. 发送到消息总线
         messageService.sendDeviceMessage(message, info.getProductKey(), info.getDeviceName(), serverId);
         log.debug("[handlePollingResponse][设备={}, 属性={}, 原始值={}, 转换值={}]",
                 info.getDeviceId(), request.getIdentifier(), rawValues, convertedValue);

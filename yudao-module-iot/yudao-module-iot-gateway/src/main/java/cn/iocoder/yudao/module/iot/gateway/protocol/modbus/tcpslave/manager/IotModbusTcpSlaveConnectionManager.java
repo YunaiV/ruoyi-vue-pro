@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
@@ -129,21 +130,25 @@ public class IotModbusTcpSlaveConnectionManager {
 
     /**
      * 发送数据到设备
+     *
+     * @return 发送结果 Future
      */
-    public void sendToDevice(Long deviceId, byte[] data) {
+    public Future<Void> sendToDevice(Long deviceId, byte[] data) {
         NetSocket socket = deviceSocketMap.get(deviceId);
         if (socket == null) {
             log.warn("[sendToDevice][设备 {} 没有连接]", deviceId);
-            return;
+            return Future.failedFuture("设备 " + deviceId + " 没有连接");
         }
-        sendToSocket(socket, data);
+        return sendToSocket(socket, data);
     }
 
     /**
      * 发送数据到指定 socket
+     *
+     * @return 发送结果 Future
      */
-    public void sendToSocket(NetSocket socket, byte[] data) {
-        socket.write(Buffer.buffer(data));
+    public Future<Void> sendToSocket(NetSocket socket, byte[] data) {
+        return socket.write(Buffer.buffer(data));
     }
 
     /**

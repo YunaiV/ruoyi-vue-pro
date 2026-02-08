@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.AbstractIotModbusPollScheduler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusTcpMasterUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.upstream.IotModbusTcpUpstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.upstream.IotModbusTcpMasterUpstreamHandler;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,16 +17,16 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotModbusTcpPollScheduler extends AbstractIotModbusPollScheduler {
+public class IotModbusTcpMasterPollScheduler extends AbstractIotModbusPollScheduler {
 
-    private final IotModbusTcpConnectionManager connectionManager;
-    private final IotModbusTcpUpstreamHandler upstreamHandler;
-    private final IotModbusTcpConfigCacheService configCacheService;
+    private final IotModbusTcpMasterConnectionManager connectionManager;
+    private final IotModbusTcpMasterUpstreamHandler upstreamHandler;
+    private final IotModbusTcpMasterConfigCacheService configCacheService;
 
-    public IotModbusTcpPollScheduler(Vertx vertx,
-                                     IotModbusTcpConnectionManager connectionManager,
-                                     IotModbusTcpUpstreamHandler upstreamHandler,
-                                     IotModbusTcpConfigCacheService configCacheService) {
+    public IotModbusTcpMasterPollScheduler(Vertx vertx,
+                                           IotModbusTcpMasterConnectionManager connectionManager,
+                                           IotModbusTcpMasterUpstreamHandler upstreamHandler,
+                                           IotModbusTcpMasterConfigCacheService configCacheService) {
         super(vertx);
         this.connectionManager = connectionManager;
         this.upstreamHandler = upstreamHandler;
@@ -54,7 +54,7 @@ public class IotModbusTcpPollScheduler extends AbstractIotModbusPollScheduler {
         }
 
         // 2.1 获取连接
-        IotModbusTcpConnectionManager.ModbusConnection connection = connectionManager.getConnection(deviceId);
+        IotModbusTcpMasterConnectionManager.ModbusConnection connection = connectionManager.getConnection(deviceId);
         if (connection == null) {
             log.warn("[pollPoint][设备 {} 没有连接]", deviceId);
             return;

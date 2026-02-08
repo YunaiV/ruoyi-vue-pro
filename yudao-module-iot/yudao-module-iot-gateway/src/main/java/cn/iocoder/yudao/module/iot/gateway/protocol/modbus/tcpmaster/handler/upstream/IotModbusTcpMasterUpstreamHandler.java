@@ -17,13 +17,14 @@ import java.util.Map;
  * @author 芋道源码
  */
 @Slf4j
-public class IotModbusTcpUpstreamHandler {
+public class IotModbusTcpMasterUpstreamHandler {
 
     private final IotDeviceMessageService messageService;
+
     private final String serverId;
 
-    public IotModbusTcpUpstreamHandler(IotDeviceMessageService messageService,
-                                       String serverId) {
+    public IotModbusTcpMasterUpstreamHandler(IotDeviceMessageService messageService,
+                                             String serverId) {
         this.messageService = messageService;
         this.serverId = serverId;
     }
@@ -39,7 +40,7 @@ public class IotModbusTcpUpstreamHandler {
                                  IotModbusPointRespDTO point,
                                  int[] rawValue) {
         try {
-            // 1.1 转换原始值为物模型属性值
+            // 1.1 转换原始值为物模型属性值（点位翻译）
             Object convertedValue = IotModbusCommonUtils.convertToPropertyValue(rawValue, point);
             log.debug("[handleReadResult][设备={}, 属性={}, 原始值={}, 转换值={}]",
                     config.getDeviceId(), point.getIdentifier(), rawValue, convertedValue);

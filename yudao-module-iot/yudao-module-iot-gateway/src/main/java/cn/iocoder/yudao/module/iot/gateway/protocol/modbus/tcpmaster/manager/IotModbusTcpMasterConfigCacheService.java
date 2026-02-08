@@ -1,25 +1,31 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
- * IoT Modbus TCP 配置缓存服务，负责：从 biz 拉取 Modbus 设备配置，缓存配置数据，并检测配置变更
+ * IoT Modbus TCP Master 配置缓存服务
  *
  * @author 芋道源码
  */
 @RequiredArgsConstructor
 @Slf4j
-public class IotModbusTcpConfigCacheService {
+public class IotModbusTcpMasterConfigCacheService {
 
     private final IotDeviceCommonApi deviceApi;
 
@@ -31,7 +37,7 @@ public class IotModbusTcpConfigCacheService {
     /**
      * 已知的设备 ID 集合（作用：用于检测已删除的设备）
      *
-     * @see #cleanupRemovedDevices(List, Consumer)
+     * @see #cleanupRemovedDevices(List)
      */
     private final Set<Long> knownDeviceIds = ConcurrentHashMap.newKeySet();
 
@@ -43,7 +49,9 @@ public class IotModbusTcpConfigCacheService {
     public List<IotModbusDeviceConfigRespDTO> refreshConfig() {
         try {
             // 1. 从远程获取配置
-            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getEnabledModbusDeviceConfigs();
+            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getModbusDeviceConfigList(
+                    new IotModbusDeviceConfigListReqDTO().setStatus(CommonStatusEnum.ENABLE.getStatus())
+                            .setMode(IotModbusModeEnum.POLLING.getMode()).setProtocolType(IotProtocolTypeEnum.MODBUS_TCP_MASTER.getType()));
             result.checkError();
             List<IotModbusDeviceConfigRespDTO> configs = result.getData();
 
@@ -69,28 +77,30 @@ public class IotModbusTcpConfigCacheService {
     }
 
     /**
-     * 清理已删除设备的资源，并更新已知设备 ID 集合
+     * 计算已删除设备的 ID 集合，清理缓存，并更新已知设备 ID 集合
+     *
+     * DONE @AI：不再使用 callback 模式，返回已删除的设备 ID 集合，由调用方直接清理
      *
      * @param currentConfigs 当前有效的配置列表
-     * @param cleanupAction  清理动作
+     * @return 已删除的设备 ID 集合
      */
-    public void cleanupRemovedDevices(List<IotModbusDeviceConfigRespDTO> currentConfigs, Consumer<Long> cleanupAction) {
+    public Set<Long> cleanupRemovedDevices(List<IotModbusDeviceConfigRespDTO> currentConfigs) {
         // 1.1 获取当前有效的设备 ID
         Set<Long> currentDeviceIds = convertSet(currentConfigs, IotModbusDeviceConfigRespDTO::getDeviceId);
         // 1.2 找出已删除的设备（基于旧的 knownDeviceIds）
         Set<Long> removedDeviceIds = new HashSet<>(knownDeviceIds);
         removedDeviceIds.removeAll(currentDeviceIds);
 
-        // 2. 清理已删除设备（先执行 cleanupAction，再从缓存移除，保证 action 中仍可获取 config）
+        // 2. 清理已删除设备的缓存
         for (Long deviceId : removedDeviceIds) {
             log.info("[cleanupRemovedDevices][清理已删除设备: {}]", deviceId);
-            cleanupAction.accept(deviceId);
             configCache.remove(deviceId);
         }
 
         // 3. 更新已知设备 ID 集合为当前有效的设备 ID
         knownDeviceIds.clear();
         knownDeviceIds.addAll(currentDeviceIds);
+        return removedDeviceIds;
     }
 
 }

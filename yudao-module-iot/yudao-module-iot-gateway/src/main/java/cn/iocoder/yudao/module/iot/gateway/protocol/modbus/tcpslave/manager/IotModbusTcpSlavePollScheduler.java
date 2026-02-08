@@ -55,6 +55,7 @@ public class IotModbusTcpSlavePollScheduler extends AbstractIotModbusPollSchedul
      * 轮询单个点位
      */
     @Override
+    @SuppressWarnings("DuplicatedCode")
     protected void pollPoint(Long deviceId, Long pointId) {
         // 1.1 从 configCache 获取最新配置
         IotModbusDeviceConfigRespDTO config = configCacheService.getConfig(deviceId);
@@ -78,7 +79,7 @@ public class IotModbusTcpSlavePollScheduler extends AbstractIotModbusPollSchedul
         // 2.2 获取 slave ID
         IotModbusFrameFormatEnum frameFormat = connection.getFrameFormat();
         Assert.notNull(frameFormat, "设备 {} 的帧格式不能为空", deviceId);
-        int slaveId = connection.getSlaveId();
+        Integer slaveId = connection.getSlaveId();
         Assert.notNull(connection.getSlaveId(), "设备 {} 的 slaveId 不能为空", deviceId);
 
         // 3.1 编码读请求
@@ -96,10 +97,13 @@ public class IotModbusTcpSlavePollScheduler extends AbstractIotModbusPollSchedul
                 System.currentTimeMillis() + requestTimeout);
         pendingRequestManager.addRequest(pendingRequest);
         // 3.3 发送读请求
-        connectionManager.sendToDevice(deviceId, data);
-        log.debug("[pollPoint][设备={}, 点位={}, FC={}, 地址={}, 数量={}]",
-                deviceId, point.getIdentifier(), point.getFunctionCode(),
-                point.getRegisterAddress(), point.getRegisterCount());
+        connectionManager.sendToDevice(deviceId, data).onSuccess(v ->
+                log.debug("[pollPoint][设备={}, 点位={}, FC={}, 地址={}, 数量={}]",
+                        deviceId, point.getIdentifier(), point.getFunctionCode(),
+                        point.getRegisterAddress(), point.getRegisterCount())
+        ).onFailure(e ->
+                log.warn("[pollPoint][发送失败, 设备={}, 点位={}]", deviceId, point.getIdentifier(), e)
+        );
     }
 
 }
