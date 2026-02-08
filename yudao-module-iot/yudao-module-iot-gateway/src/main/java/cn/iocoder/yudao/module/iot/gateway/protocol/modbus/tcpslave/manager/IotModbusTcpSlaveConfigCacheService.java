@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
@@ -10,15 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-
-// TODO @AI：和 IotModbusTcpConfigCacheService 基本一致？！
 /**
  * IoT Modbus TCP Slave 配置缓存服务
  * <p>
- * 负责：从 biz 拉取 Modbus 设备配置，缓存配置数据，并检测配置变更
+ * 与 tcpmaster 的 {@code IotModbusTcpConfigCacheService} 不同：
+ * - tcpmaster 启动时拉全量配置 → 主动建连，需要全量 diff 检测新增/删除设备
+ * - tcpslave 设备主动连接 → 认证时按需加载配置，断连时清理，定时刷新已连接设备的配置
+ * <p>
+ * 配置生命周期：
+ * 1. 认证时：{@link #loadDeviceConfig(Long)} 按 deviceId 从 API 加载配置到缓存
+ * 2. 断连时：{@link #removeConfig(Long)} 从缓存中移除
+ * 3. 定时刷新：{@link #refreshConnectedDeviceConfigList(Set)} 批量刷新已连接设备的配置
  *
  * @author 芋道源码
  */
@@ -33,42 +37,117 @@ public class IotModbusTcpSlaveConfigCacheService {
      */
     private final Map<Long, IotModbusDeviceConfigRespDTO> configCache = new ConcurrentHashMap<>();
 
-    // TODO @AI：它的 diff 算法，是不是不用和 IotModbusTcpConfigCacheService 完全一致；更多是1）首次连接时，查找；2）断开连接，移除；3）定时轮询更新；
-    /**
-     * 已知的设备 ID 集合
-     */
-    private final Set<Long> knownDeviceIds = ConcurrentHashMap.newKeySet();
+    // ==================== 按需加载（认证时） ====================
 
     /**
-     * 刷新配置
+     * 加载单个设备的配置（认证成功后调用）
+     * <p>
+     * 从远程 API 获取全量配置，然后按 deviceId 匹配。
+     * 如果远程获取失败，尝试从 Mock 数据中匹配。
      *
-     * @return 最新的配置列表
+     * @param deviceId 设备 ID
+     * @return 设备配置，未找到返回 null
      */
-    public List<IotModbusDeviceConfigRespDTO> refreshConfig() {
+    public IotModbusDeviceConfigRespDTO loadDeviceConfig(Long deviceId) {
         try {
-            // 1. 从远程获取配置
-            // TODO @AI：需要过滤下，只查找连接的设备列表；并且只有主动轮询的，才会处理；方法名，应该是 List 结尾；
+            // 1. 从远程 API 获取全量配置
+            // TODO @AI：等待修复，不着急；
             CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getEnabledModbusDeviceConfigs();
-            if (result == null || !result.isSuccess() || result.getData() == null) {
-                log.warn("[refreshConfig][获取 Modbus 配置失败: {}]", result);
-                return new ArrayList<>(configCache.values());
+            if (result != null && result.isSuccess() && result.getData() != null) {
+                for (IotModbusDeviceConfigRespDTO config : result.getData()) {
+                    // 顺便更新缓存（其他已连接设备也受益）
+                    configCache.put(config.getDeviceId(), config);
+                    if (config.getDeviceId().equals(deviceId)) {
+                        return config;
+                    }
+                }
             }
-            List<IotModbusDeviceConfigRespDTO> configs = new ArrayList<>(result.getData());
-
-            // 2. 追加 Mock 测试数据（一次性测试用途）
-            // TODO @芋艿：测试完成后移除
-            configs.addAll(buildMockConfigs());
-
-            // 3. 更新缓存
-            for (IotModbusDeviceConfigRespDTO config : configs) {
-                configCache.put(config.getDeviceId(), config);
-            }
-            return configs;
         } catch (Exception e) {
-            log.error("[refreshConfig][刷新配置失败]", e);
-            return new ArrayList<>(configCache.values());
+            log.error("[loadDeviceConfig][从远程获取配置失败, deviceId={}]", deviceId, e);
+        }
+
+        // 2. 远程未找到，尝试 Mock 数据
+        // TODO @芋艿：测试完成后移除
+        for (IotModbusDeviceConfigRespDTO mockConfig : buildMockConfigs()) {
+            configCache.put(mockConfig.getDeviceId(), mockConfig);
+            if (mockConfig.getDeviceId().equals(deviceId)) {
+                return mockConfig;
+            }
+        }
+
+        return configCache.get(deviceId);
+    }
+
+    // ==================== 定时刷新（已连接设备） ====================
+
+    /**
+     * 刷新已连接设备的配置缓存
+     * <p>
+     * 定时调用，从远程 API 拉取最新配置，只更新已连接设备的缓存。
+     *
+     * @param connectedDeviceIds 当前已连接的设备 ID 集合
+     * @return 已连接设备的最新配置列表
+     */
+    public List<IotModbusDeviceConfigRespDTO> refreshConnectedDeviceConfigList(Set<Long> connectedDeviceIds) {
+        if (CollUtil.isEmpty(connectedDeviceIds)) {
+            return Collections.emptyList();
+        }
+        try {
+            // 1. 从远程获取全量配置
+            // TODO @AI：传递 ids 批量查询；需要分批啦；
+            CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getEnabledModbusDeviceConfigs();
+            List<IotModbusDeviceConfigRespDTO> allConfigs;
+            if (result != null && result.isSuccess() && result.getData() != null) {
+                allConfigs = new ArrayList<>(result.getData());
+            } else {
+                log.warn("[refreshConnectedDeviceConfigList][获取 Modbus 配置失败: {}]", result);
+                allConfigs = new ArrayList<>();
+            }
+
+            // 2. 追加 Mock 测试数据
+            // TODO @芋艿：测试完成后移除
+            allConfigs.addAll(buildMockConfigs());
+
+            // 3. 只保留已连接设备的配置，更新缓存
+            List<IotModbusDeviceConfigRespDTO> connectedConfigs = new ArrayList<>();
+            for (IotModbusDeviceConfigRespDTO config : allConfigs) {
+                if (connectedDeviceIds.contains(config.getDeviceId())) {
+                    configCache.put(config.getDeviceId(), config);
+                    connectedConfigs.add(config);
+                }
+            }
+            return connectedConfigs;
+        } catch (Exception e) {
+            log.error("[refreshConnectedDeviceConfigList][刷新配置失败]", e);
+            // 降级：返回缓存中已连接设备的配置
+            List<IotModbusDeviceConfigRespDTO> fallback = new ArrayList<>();
+            for (Long deviceId : connectedDeviceIds) {
+                IotModbusDeviceConfigRespDTO config = configCache.get(deviceId);
+                if (config != null) {
+                    fallback.add(config);
+                }
+            }
+            return fallback;
         }
     }
+
+    // ==================== 缓存操作 ====================
+
+    /**
+     * 获取设备配置
+     */
+    public IotModbusDeviceConfigRespDTO getConfig(Long deviceId) {
+        return configCache.get(deviceId);
+    }
+
+    /**
+     * 移除设备配置缓存（设备断连时调用）
+     */
+    public void removeConfig(Long deviceId) {
+        configCache.remove(deviceId);
+    }
+
+    // ==================== Mock 数据 ====================
 
     /**
      * 构建 Mock 测试配置数据（一次性测试用途）
@@ -121,52 +200,6 @@ public class IotModbusTcpSlaveConfigCacheService {
         config.setPoints(points);
         log.info("[buildMockConfigs][已加载 Mock 配置, deviceId={}, points={}]", config.getDeviceId(), points.size());
         return Collections.singletonList(config);
-    }
-
-    /**
-     * 获取设备配置
-     */
-    public IotModbusDeviceConfigRespDTO getConfig(Long deviceId) {
-        return configCache.get(deviceId);
-    }
-
-    // TODO @AI：这个逻辑，是不是非必须？
-    /**
-     * 通过 clientId + username + password 查找设备配置（认证用）
-     * 暂通过遍历缓存实现，后续可优化为索引
-     */
-    public IotModbusDeviceConfigRespDTO findConfigByAuth(String clientId, String username, String password) {
-        // TODO @芋艿：测试完成后移除 mock 逻辑，改为正式查找
-        // Mock：通过 clientId（格式 productKey.deviceName）匹配缓存中的设备
-        if (clientId != null && clientId.contains(".")) {
-            String[] parts = clientId.split("\\.", 2);
-            String productKey = parts[0];
-            String deviceName = parts[1];
-            for (IotModbusDeviceConfigRespDTO config : configCache.values()) {
-                if (productKey.equals(config.getProductKey()) && deviceName.equals(config.getDeviceName())) {
-                    return config;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 清理已删除设备的资源
-     */
-    public void cleanupRemovedDevices(List<IotModbusDeviceConfigRespDTO> currentConfigs, Consumer<Long> cleanupAction) {
-        Set<Long> currentDeviceIds = convertSet(currentConfigs, IotModbusDeviceConfigRespDTO::getDeviceId);
-        Set<Long> removedDeviceIds = new HashSet<>(knownDeviceIds);
-        removedDeviceIds.removeAll(currentDeviceIds);
-
-        for (Long deviceId : removedDeviceIds) {
-            log.info("[cleanupRemovedDevices][清理已删除设备: {}]", deviceId);
-            configCache.remove(deviceId);
-            cleanupAction.accept(deviceId);
-        }
-
-        knownDeviceIds.clear();
-        knownDeviceIds.addAll(currentDeviceIds);
     }
 
 }

@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
@@ -32,9 +32,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-// DONE @AI：不用主动上报！
 /**
  * IoT 网关 Modbus TCP Slave 协议
  * <p>
@@ -152,10 +152,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
         }
 
         try {
-            // 1.1 首次加载配置
-            // TODO @AI：可能首次不用加载；你在想想；
-            refreshConfig();
-            // 1.2 启动配置刷新定时器
+            // 1. 启动配置刷新定时器
             int refreshInterval = slaveConfig.getConfigRefreshInterval();
             configRefreshTimerId = vertx.setPeriodic(
                     TimeUnit.SECONDS.toMillis(refreshInterval),
@@ -286,6 +283,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
             }
             pollScheduler.stopPolling(info.getDeviceId());
             pendingRequestManager.removeDevice(info.getDeviceId());
+            configCacheService.removeConfig(info.getDeviceId());
             log.info("[handleConnection][连接关闭, deviceId={}, remoteAddress={}]",
                     info.getDeviceId(), socket.remoteAddress());
         });
@@ -297,35 +295,30 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
     }
 
     /**
-     * 刷新配置
+     * 刷新已连接设备的配置（定时调用）
+     * <p>
+     * 与 tcpmaster 不同，slave 只刷新已连接设备的配置，不做全量 diff。
+     * 设备的新增（认证时）和删除（断连时）分别在 {@link #handleConnection} 中处理。
      */
     private synchronized void refreshConfig() {
         try {
-            // 1. 从 biz 拉取最新配置
-            List<IotModbusDeviceConfigRespDTO> configs = configCacheService.refreshConfig();
-            log.debug("[refreshConfig][获取到 {} 个 Modbus 设备配置]", configs.size());
+            // 1. 只刷新已连接设备的配置
+            Set<Long> connectedDeviceIds = connectionManager.getConnectedDeviceIds();
+            if (CollUtil.isEmpty(connectedDeviceIds)) {
+                return;
+            }
+            List<IotModbusDeviceConfigRespDTO> configs =
+                    configCacheService.refreshConnectedDeviceConfigList(connectedDeviceIds);
+            log.debug("[refreshConfig][刷新了 {} 个已连接设备的配置]", configs.size());
 
-            // 2. 更新已连接设备的轮询任务（仅 mode=1）
+            // 2. 更新已连接设备的轮询任务
             for (IotModbusDeviceConfigRespDTO config : configs) {
                 try {
-                    if (config.getMode() != null
-                            && config.getMode().equals(IotModbusModeEnum.POLLING.getMode())) {
-                        // 只有已连接的设备才启动轮询
-                        ConnectionInfo connInfo = connectionManager.getConnectionInfoByDeviceId(config.getDeviceId());
-                        if (connInfo != null) {
-                            pollScheduler.updatePolling(config);
-                        }
-                    }
+                    pollScheduler.updatePolling(config);
                 } catch (Exception e) {
                     log.error("[refreshConfig][处理设备配置失败, deviceId={}]", config.getDeviceId(), e);
                 }
             }
-
-            // 3. 清理已删除设备的资源
-            configCacheService.cleanupRemovedDevices(configs, deviceId -> {
-                pollScheduler.stopPolling(deviceId);
-                pendingRequestManager.removeDevice(deviceId);
-            });
         } catch (Exception e) {
             log.error("[refreshConfig][刷新配置失败]", e);
         }

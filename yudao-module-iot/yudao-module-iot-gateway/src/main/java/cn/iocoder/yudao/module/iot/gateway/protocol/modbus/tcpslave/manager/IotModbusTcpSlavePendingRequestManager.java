@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -66,26 +68,24 @@ public class IotModbusTcpSlavePendingRequestManager {
     public PendingRequest matchResponse(Long deviceId, IotModbusFrame frame,
                                         IotModbusFrameFormatEnum frameFormat) {
         Deque<PendingRequest> queue = pendingRequests.get(deviceId);
-        // TODO @AI：CollUtil.isEmpty(queue)
-        if (queue == null || queue.isEmpty()) {
+        if (CollUtil.isEmpty(queue)) {
             return null;
         }
 
+        // TCP 模式：按 transactionId 精确匹配
         if (frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP && frame.getTransactionId() != null) {
-            // TCP 模式：按 transactionId 精确匹配
             return matchByTransactionId(queue, frame.getTransactionId());
-        } else {
-            // RTU 模式：FIFO，匹配 slaveId + functionCode
-            return matchByFifo(queue, frame.getSlaveId(), frame.getFunctionCode());
         }
+        // RTU 模式：FIFO，匹配 slaveId + functionCode
+        return matchByFifo(queue, frame.getSlaveId(), frame.getFunctionCode());
     }
 
     /**
      * 按 transactionId 匹配
      */
     private PendingRequest matchByTransactionId(Deque<PendingRequest> queue, int transactionId) {
-        // TODO @AI：需要兼容 jdk8；
-        for (var it = queue.iterator(); it.hasNext(); ) {
+        Iterator<PendingRequest> it = queue.iterator();
+        while (it.hasNext()) {
             PendingRequest req = it.next();
             if (req.getTransactionId() != null && req.getTransactionId() == transactionId) {
                 it.remove();
@@ -99,8 +99,8 @@ public class IotModbusTcpSlavePendingRequestManager {
      * 按 FIFO 匹配
      */
     private PendingRequest matchByFifo(Deque<PendingRequest> queue, int slaveId, int functionCode) {
-        // TODO @AI：需要兼容 jdk8；
-        for (var it = queue.iterator(); it.hasNext(); ) {
+        Iterator<PendingRequest> it = queue.iterator();
+        while (it.hasNext()) {
             PendingRequest req = it.next();
             if (req.getSlaveId() == slaveId && req.getFunctionCode() == functionCode) {
                 it.remove();
@@ -120,13 +120,11 @@ public class IotModbusTcpSlavePendingRequestManager {
             int removed = 0;
             while (!queue.isEmpty()) {
                 PendingRequest req = queue.peekFirst();
-                // TODO @AI：if return 减少括号层级；
-                if (req != null && req.getExpireAt() < now) {
-                    queue.pollFirst();
-                    removed++;
-                } else {
+                if (req == null || req.getExpireAt() >= now) {
                     break; // 队列有序，后面的没过期
                 }
+                queue.pollFirst();
+                removed++;
             }
             if (removed > 0) {
                 log.debug("[cleanupExpired][设备 {} 清理了 {} 个过期请求]", entry.getKey(), removed);

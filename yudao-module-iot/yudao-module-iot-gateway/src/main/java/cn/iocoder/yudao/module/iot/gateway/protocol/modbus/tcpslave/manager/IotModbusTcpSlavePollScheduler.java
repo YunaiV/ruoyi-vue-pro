@@ -19,12 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-// TODO @AI：和 IotModbusTcpPollScheduler 很像，是不是可以做一些复用？
 /**
  * IoT Modbus TCP Slave 轮询调度器
  * <p>
- * 管理点位的轮询定时器，为 mode=1（云端轮询）的设备调度读取任务。
- * 与 tcpmaster 不同，这里不直接通过 j2mod 读取，而是：
+ * 管理点位的轮询定时器，为云端轮询模式的设备调度读取任务。
+ * 与 tcpmaster 的 {@code IotModbusTcpPollScheduler} 不同，这里不通过 j2mod 直接读取，而是：
  * 1. 编码 Modbus 读请求帧
  * 2. 通过 ConnectionManager 发送到设备的 TCP 连接
  * 3. 将请求注册到 PendingRequestManager，等待设备响应
@@ -154,13 +153,15 @@ public class IotModbusTcpSlavePollScheduler {
         }
 
         // 2.1 确定帧格式和事务 ID
-        // TODO @AI：不允许为空！
         IotModbusFrameFormatEnum frameFormat = connInfo.getFrameFormat();
         if (frameFormat == null) {
-            frameFormat = IotModbusFrameFormatEnum.MODBUS_TCP;
+            log.warn("[pollPoint][设备 {} 帧格式为空，跳过轮询]", deviceId);
+            return;
         }
-        // TODO @AI：transactionId 需要根据设备来么？然后递增也根据 IotModbusFrameFormatEnum.MODBUS_TCP 提前判断；
-        int transactionId = transactionIdCounter.incrementAndGet() & 0xFFFF;
+        // TODO @AI：是不是得按照设备递增？
+        Integer transactionId = frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP
+                ? (transactionIdCounter.incrementAndGet() & 0xFFFF)
+                : null;
         int slaveId = connInfo.getSlaveId() != null ? connInfo.getSlaveId() : 1;
         // 2.2 编码读请求
         byte[] data = frameEncoder.encodeReadRequest(slaveId, point.getFunctionCode(),
@@ -170,7 +171,7 @@ public class IotModbusTcpSlavePollScheduler {
                 deviceId, point.getId(), point.getIdentifier(),
                 slaveId, point.getFunctionCode(),
                 point.getRegisterAddress(), point.getRegisterCount(),
-                frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP ? transactionId : null,
+                transactionId,
                 System.currentTimeMillis() + requestTimeout);
         pendingRequestManager.addRequest(pendingRequest);
 

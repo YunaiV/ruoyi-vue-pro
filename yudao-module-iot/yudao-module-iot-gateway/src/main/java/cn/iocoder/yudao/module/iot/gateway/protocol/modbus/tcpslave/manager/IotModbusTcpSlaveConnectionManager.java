@@ -4,9 +4,11 @@ import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,6 +35,7 @@ public class IotModbusTcpSlaveConnectionManager {
      * 连接信息
      */
     @Data
+    @Accessors(chain = true)
     public static class ConnectionInfo {
 
         /**
@@ -57,12 +60,6 @@ public class IotModbusTcpSlaveConnectionManager {
          */
         private IotModbusFrameFormatEnum frameFormat;
 
-        // TODO @AI：mode 是否非必须？！
-        /**
-         * 模式：1-云端轮询 2-主动上报
-         */
-        private Integer mode;
-
     }
 
     /**
@@ -73,17 +70,6 @@ public class IotModbusTcpSlaveConnectionManager {
         deviceSocketMap.put(info.getDeviceId(), socket);
         log.info("[registerConnection][设备 {} 连接已注册, remoteAddress={}]",
                 info.getDeviceId(), socket.remoteAddress());
-    }
-
-    // TODO @芋艿：待定是不是要保留？！
-    /**
-     * 设置连接的帧格式（首帧检测后调用）
-     */
-    public void setFrameFormat(NetSocket socket, IotModbusFrameFormatEnum frameFormat) {
-        ConnectionInfo info = connectionMap.get(socket);
-        if (info != null) {
-            info.setFrameFormat(frameFormat);
-        }
     }
 
     /**
@@ -101,12 +87,11 @@ public class IotModbusTcpSlaveConnectionManager {
         return socket != null ? connectionMap.get(socket) : null;
     }
 
-    // TODO @AI：不用判断连接是否认证；
     /**
-     * 判断连接是否已认证
+     * 获取所有已连接设备的 ID 集合
      */
-    public boolean isAuthenticated(NetSocket socket) {
-        return connectionMap.containsKey(socket);
+    public Set<Long> getConnectedDeviceIds() {
+        return deviceSocketMap.keySet();
     }
 
     /**
@@ -130,8 +115,7 @@ public class IotModbusTcpSlaveConnectionManager {
             log.warn("[sendToDevice][设备 {} 没有连接]", deviceId);
             return;
         }
-        // TODO @AI：直接复用 sendToSocket 方法？！
-        socket.write(Buffer.buffer(data));
+        sendToSocket(socket, data);
     }
 
     /**
@@ -141,7 +125,6 @@ public class IotModbusTcpSlaveConnectionManager {
         socket.write(Buffer.buffer(data));
     }
 
-    // TODO @AI：貌似别的都没这个，是不是可以去掉哈？！
     /**
      * 关闭所有连接
      */
