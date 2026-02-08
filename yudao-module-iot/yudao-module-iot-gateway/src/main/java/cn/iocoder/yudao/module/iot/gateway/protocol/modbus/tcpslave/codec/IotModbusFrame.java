@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -25,19 +27,19 @@ public class IotModbusFrame {
      */
     private byte[] pdu;
     /**
-     * 事务标识符（TCP 模式特有）
-     *
-     * // TODO @AI：最好是 @某个类型独有；
+     * 事务标识符
+     * <p>
+     * 仅 {@link IotModbusFrameFormatEnum#MODBUS_TCP} 格式有值，
      */
     private Integer transactionId;
 
     /**
-     * 是否异常响应
-     */
-    private boolean exception;
-    // TODO @AI：是不是要枚举一些异常；另外，是不是覆盖掉 exception；因为只要判断有异常码是不是就可以了；
-    /**
-     * 异常码（当 exception=true 时有效）
+     * 异常码
+     * <p>
+     * 当功能码最高位为 1 时（异常响应），此字段存储异常码。
+     * 为 null 表示非异常响应。
+     *
+     * @see IotModbusUtils#FC_EXCEPTION_MASK
      */
     private Integer exceptionCode;
 
@@ -45,5 +47,12 @@ public class IotModbusFrame {
      * 自定义功能码时的 JSON 字符串
      */
     private String customData;
+
+    /**
+     * 是否异常响应（基于 exceptionCode 是否有值判断）
+     */
+    public boolean isException() {
+        return exceptionCode != null;
+    }
 
 }

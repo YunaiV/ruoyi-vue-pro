@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;

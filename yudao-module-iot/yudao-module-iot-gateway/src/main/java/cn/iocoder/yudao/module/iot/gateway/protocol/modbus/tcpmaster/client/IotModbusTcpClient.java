@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
@@ -11,6 +10,8 @@ import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 import com.ghgande.j2mod.modbus.util.BitVector;
 import io.vertx.core.Future;
 import lombok.extern.slf4j.Slf4j;
+
+import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils.*;
 
 // TODO @AI：感觉它更像一个工具类；但是名字叫 client 很奇怪；
 /**
@@ -98,18 +99,14 @@ public class IotModbusTcpClient {
      */
     @SuppressWarnings("EnhancedSwitchMigration")
     private ModbusRequest createReadRequest(Integer functionCode, Integer address, Integer count) {
-        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
-        if (functionCodeEnum == null) {
-            throw new IllegalArgumentException("不支持的功能码: " + functionCode);
-        }
-        switch (functionCodeEnum) {
-            case READ_COILS:
+        switch (functionCode) {
+            case FC_READ_COILS:
                 return new ReadCoilsRequest(address, count);
-            case READ_DISCRETE_INPUTS:
+            case FC_READ_DISCRETE_INPUTS:
                 return new ReadInputDiscretesRequest(address, count);
-            case READ_HOLDING_REGISTERS:
+            case FC_READ_HOLDING_REGISTERS:
                 return new ReadMultipleRegistersRequest(address, count);
-            case READ_INPUT_REGISTERS:
+            case FC_READ_INPUT_REGISTERS:
                 return new ReadInputRegistersRequest(address, count);
             default:
                 throw new IllegalArgumentException("不支持的功能码: " + functionCode);
@@ -119,13 +116,10 @@ public class IotModbusTcpClient {
     /**
      * 创建写入请求
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private ModbusRequest createWriteRequest(Integer functionCode, Integer address, Integer count, int[] values) {
-        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
-        if (functionCodeEnum == null) {
-            throw new IllegalArgumentException("不支持的功能码: " + functionCode);
-        }
-        switch (functionCodeEnum) {
-            case READ_COILS: // 写线圈（使用功能码 5 或 15）
+        switch (functionCode) {
+            case FC_READ_COILS: // 写线圈（使用功能码 5 或 15）
                 if (count == 1) {
                     return new WriteCoilRequest(address, values[0] != 0);
                 } else {
@@ -135,7 +129,7 @@ public class IotModbusTcpClient {
                     }
                     return new WriteMultipleCoilsRequest(address, bv);
                 }
-            case READ_HOLDING_REGISTERS: // 写保持寄存器（使用功能码 6 或 16）
+            case FC_READ_HOLDING_REGISTERS: // 写保持寄存器（使用功能码 6 或 16）
                 if (count == 1) {
                     return new WriteSingleRegisterRequest(address, new SimpleRegister(values[0]));
                 } else {
@@ -145,8 +139,8 @@ public class IotModbusTcpClient {
                     }
                     return new WriteMultipleRegistersRequest(address, registers);
                 }
-            case READ_DISCRETE_INPUTS: // 只读
-            case READ_INPUT_REGISTERS: // 只读
+            case FC_READ_DISCRETE_INPUTS: // 只读
+            case FC_READ_INPUT_REGISTERS: // 只读
                 return null;
             default:
                 throw new IllegalArgumentException("不支持的功能码: " + functionCode);
@@ -156,13 +150,10 @@ public class IotModbusTcpClient {
     /**
      * 从响应中提取值
      */
+    @SuppressWarnings("EnhancedSwitchMigration")
     private int[] extractValues(ModbusResponse response, Integer functionCode) {
-        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
-        if (functionCodeEnum == null) {
-            throw new IllegalArgumentException("不支持的功能码: " + functionCode);
-        }
-        switch (functionCodeEnum) {
-            case READ_COILS:
+        switch (functionCode) {
+            case FC_READ_COILS:
                 ReadCoilsResponse coilsResponse = (ReadCoilsResponse) response;
                 int bitCount = coilsResponse.getBitCount();
                 int[] coilValues = new int[bitCount];
@@ -170,7 +161,7 @@ public class IotModbusTcpClient {
                     coilValues[i] = coilsResponse.getCoilStatus(i) ? 1 : 0;
                 }
                 return coilValues;
-            case READ_DISCRETE_INPUTS:
+            case FC_READ_DISCRETE_INPUTS:
                 ReadInputDiscretesResponse discretesResponse = (ReadInputDiscretesResponse) response;
                 int discreteCount = discretesResponse.getBitCount();
                 int[] discreteValues = new int[discreteCount];
@@ -178,7 +169,7 @@ public class IotModbusTcpClient {
                     discreteValues[i] = discretesResponse.getDiscreteStatus(i) ? 1 : 0;
                 }
                 return discreteValues;
-            case READ_HOLDING_REGISTERS:
+            case FC_READ_HOLDING_REGISTERS:
                 ReadMultipleRegistersResponse holdingResponse = (ReadMultipleRegistersResponse) response;
                 InputRegister[] holdingRegisters = holdingResponse.getRegisters();
                 int[] holdingValues = new int[holdingRegisters.length];
@@ -186,7 +177,7 @@ public class IotModbusTcpClient {
                     holdingValues[i] = holdingRegisters[i].getValue();
                 }
                 return holdingValues;
-            case READ_INPUT_REGISTERS:
+            case FC_READ_INPUT_REGISTERS:
                 ReadInputRegistersResponse inputResponse = (ReadInputRegistersResponse) response;
                 InputRegister[] inputRegisters = inputResponse.getRegisters();
                 int[] inputValues = new int[inputRegisters.length];

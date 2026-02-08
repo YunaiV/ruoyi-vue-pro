@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class IotModbusTcpSlaveConfig {
      */
     @NotNull(message = "自定义功能码不能为空")
     @Min(value = 65, message = "自定义功能码不能小于 65")
-    // TODO @AI：搞个范围；
+    @Max(value = 72, message = "自定义功能码不能大于 72")
     private Integer customFunctionCode = 65;
 
     /**

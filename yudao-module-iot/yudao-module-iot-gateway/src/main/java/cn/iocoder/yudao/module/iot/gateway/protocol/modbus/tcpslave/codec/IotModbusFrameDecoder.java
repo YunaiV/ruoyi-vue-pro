@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
@@ -118,11 +119,8 @@ public class IotModbusFrameDecoder {
                 .setPdu(pdu)
                 .setTransactionId(transactionId);
         // 异常响应
-        // TODO @AI：0x80 看看是不是要枚举；
-        if ((functionCode & 0x80) != 0) {
-            frame.setException(true);
-            // TODO @AI：0x7f 看看是不是要枚举；
-            frame.setFunctionCode(functionCode & 0x7F);
+        if (IotModbusUtils.isExceptionResponse(functionCode)) {
+            frame.setFunctionCode(IotModbusUtils.extractOriginalFunctionCode(functionCode));
             if (pdu.length >= 1) {
                 frame.setExceptionCode(pdu[0] & 0xFF);
             }
@@ -247,7 +245,7 @@ public class IotModbusFrameDecoder {
      * 状态机流程：
      * Phase 1: fixedSizeMode(2) → 读 slaveId + functionCode
      * Phase 2: 根据 functionCode 确定剩余长度：
-     * - 异常响应 (FC & 0x80)：fixedSizeMode(3) → exceptionCode(1) + CRC(2)
+     * - 异常响应 (FC & EXCEPTION_MASK)：fixedSizeMode(3) → exceptionCode(1) + CRC(2)
      * - 自定义 FC / FC01-04 响应：fixedSizeMode(1) → 读 byteCount → fixedSizeMode(byteCount + 2)
      * - FC05/06 响应：fixedSizeMode(6) → addr(2) + value(2) + CRC(2)
      * - FC15/16 响应：fixedSizeMode(6) → addr(2) + quantity(2) + CRC(2)
@@ -283,7 +281,7 @@ public class IotModbusFrameDecoder {
             this.slaveId = bytes[0];
             this.functionCode = bytes[1];
             int fc = functionCode & 0xFF;
-            if ((fc & 0x80) != 0) {
+            if (IotModbusUtils.isExceptionResponse(fc)) {
                 // 异常响应：完整帧 = slaveId(1) + FC(1) + exceptionCode(1) + CRC(2) = 5 字节
                 // 已有 6 字节（多 1 字节），取前 5 字节组装
                 Buffer frame = Buffer.buffer(5);
@@ -292,7 +290,7 @@ public class IotModbusFrameDecoder {
                 frame.appendBytes(bytes, 2, 3); // exceptionCode + CRC
                 emitFrame(frame);
                 resetToHeader();
-            } else if (isReadResponse(fc) || fc == customFunctionCode) {
+            } else if (IotModbusUtils.isReadResponse(fc) || fc == customFunctionCode) {
                 // 读响应或自定义 FC：bytes[2] = byteCount
                 this.byteCount = bytes[2];
                 int bc = byteCount & 0xFF;
@@ -317,7 +315,7 @@ public class IotModbusFrameDecoder {
                     this.expectedDataLen = bc + 2; // byteCount 个数据 + 2 CRC
                     parser.fixedSizeMode(remaining);
                 }
-            } else if (isWriteResponse(fc)) {
+            } else if (IotModbusUtils.isWriteResponse(fc)) {
                 // 写响应：总长 = slaveId(1) + FC(1) + addr(2) + value/qty(2) + CRC(2) = 8 字节
                 // 已有 6 字节，还需 2 字节
                 state = STATE_WRITE_BODY;
@@ -358,15 +356,15 @@ public class IotModbusFrameDecoder {
             this.slaveId = header[0];
             this.functionCode = header[1];
             int fc = functionCode & 0xFF;
-            if ((fc & 0x80) != 0) {
+            if (IotModbusUtils.isExceptionResponse(fc)) {
                 // 异常响应
                 state = STATE_EXCEPTION_BODY;
                 parser.fixedSizeMode(3); // exceptionCode(1) + CRC(2)
-            } else if (isReadResponse(fc) || fc == customFunctionCode) {
+            } else if (IotModbusUtils.isReadResponse(fc) || fc == customFunctionCode) {
                 // 读响应或自定义 FC
                 state = STATE_READ_BYTE_COUNT;
                 parser.fixedSizeMode(1); // byteCount
-            } else if (isWriteResponse(fc)) {
+            } else if (IotModbusUtils.isWriteResponse(fc)) {
                 // 写响应
                 state = STATE_WRITE_BODY;
                 pendingData = Buffer.buffer();
@@ -438,14 +436,6 @@ public class IotModbusFrameDecoder {
             parser.fixedSizeMode(2); // slaveId + FC
         }
 
-        // TODO @AI：可以抽到 IotModbusUtils 里？
-        private boolean isReadResponse(int fc) {
-            return fc >= 1 && fc <= 4;
-        }
-
-        private boolean isWriteResponse(int fc) {
-            return fc == 5 || fc == 6 || fc == 15 || fc == 16;
-        }
     }
 
 }

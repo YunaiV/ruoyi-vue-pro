@@ -80,7 +80,7 @@ public class IotModbusTcpSlaveConfigCacheService {
      */
     private List<IotModbusDeviceConfigRespDTO> buildMockConfigs() {
         IotModbusDeviceConfigRespDTO config = new IotModbusDeviceConfigRespDTO();
-        config.setDeviceId(1L);
+        config.setDeviceId(25L);
         config.setProductKey("4aymZgOTOOCrDKRT");
         config.setDeviceName("small");
         config.setSlaveId(1);

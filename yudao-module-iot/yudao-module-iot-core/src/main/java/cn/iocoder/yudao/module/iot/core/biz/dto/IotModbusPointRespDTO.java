@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.biz.dto;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusByteOrderEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusRawDataTypeEnum;
 import lombok.Data;
 
@@ -33,7 +32,7 @@ public class IotModbusPointRespDTO {
     /**
      * Modbus 功能码
      *
-     * 枚举 {@link IotModbusFunctionCodeEnum}
+     * 取值范围：FC01-04（读线圈、读离散输入、读保持寄存器、读输入寄存器）
      */
     private Integer functionCode;
     /**

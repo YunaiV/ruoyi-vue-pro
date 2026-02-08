@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.downstream;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client.IotModbusTcpClient;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
@@ -60,19 +59,19 @@ public class IotModbusTcpDownstreamHandler {
         for (Map.Entry<String, Object> entry : propertyMap.entrySet()) {
             String identifier = entry.getKey();
             Object value = entry.getValue();
-            // 2.1.1 查找对应的点位配置
-            IotModbusPointRespDTO point = findPoint(config, identifier);
+            // 2.1 查找对应的点位配置
+            IotModbusPointRespDTO point = IotModbusUtils.findPoint(config, identifier);
             if (point == null) {
                 log.warn("[handle][设备 {} 没有点位配置: {}]", message.getDeviceId(), identifier);
                 continue;
             }
-            // 2.1.2 检查是否支持写操作
-            if (!isWritable(point.getFunctionCode())) {
+            // 2.2 检查是否支持写操作
+            if (!IotModbusUtils.isWritable(point.getFunctionCode())) {
                 log.warn("[handle][点位 {} 不支持写操作, 功能码={}]", identifier, point.getFunctionCode());
                 continue;
             }
 
-            // 2.2 执行写入
+            // 2.3 执行写入
             writeProperty(config, point, value);
         }
     }
@@ -102,21 +101,6 @@ public class IotModbusTcpDownstreamHandler {
                         config.getDeviceId(), point.getIdentifier(), value))
                 .onFailure(e -> log.error("[writeProperty][写入失败, deviceId={}, identifier={}]",
                         config.getDeviceId(), point.getIdentifier(), e));
-    }
-
-    /**
-     * 查找点位配置
-     */
-    private IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
-        return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
-    }
-
-    /**
-     * 检查功能码是否支持写操作
-     */
-    private boolean isWritable(Integer functionCode) {
-        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
-        return functionCodeEnum != null && Boolean.TRUE.equals(functionCodeEnum.getWritable());
     }
 
 }

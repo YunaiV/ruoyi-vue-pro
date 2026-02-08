@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.handler.downstream;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFunctionCodeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager;
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO @AI：看看能不能和 /Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-iot/yudao-module-iot-gateway/src/main/java/cn/iocoder/yudao/module/iot/gateway/protocol/modbus/tcpmaster/handler/downstream/IotModbusTcpDownstreamHandler.java 有一些复用逻辑；
 /**
  * IoT Modbus TCP Slave 下行消息处理器
  * <p>
@@ -48,7 +48,7 @@ public class IotModbusTcpSlaveDownstreamHandler {
     @SuppressWarnings("unchecked")
     public void handle(IotDeviceMessage message) {
         // 1.1 检查是否是属性设置消息
-        if (!IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod().equals(message.getMethod())) {
+        if (ObjUtil.notEqual(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), message.getMethod())) {
             log.debug("[handle][忽略非属性设置消息: {}]", message.getMethod());
             return;
         }
@@ -76,13 +76,13 @@ public class IotModbusTcpSlaveDownstreamHandler {
             String identifier = entry.getKey();
             Object value = entry.getValue();
             // 2.1 查找对应的点位配置
-            IotModbusPointRespDTO point = findPoint(config, identifier);
+            IotModbusPointRespDTO point = IotModbusUtils.findPoint(config, identifier);
             if (point == null) {
                 log.warn("[handle][设备 {} 没有点位配置: {}]", message.getDeviceId(), identifier);
                 continue;
             }
             // 2.2 检查是否支持写操作
-            if (!isWritable(point.getFunctionCode())) {
+            if (!IotModbusUtils.isWritable(point.getFunctionCode())) {
                 log.warn("[handle][点位 {} 不支持写操作, 功能码={}]", identifier, point.getFunctionCode());
                 continue;
             }
@@ -97,56 +97,36 @@ public class IotModbusTcpSlaveDownstreamHandler {
      */
     private void writeProperty(Long deviceId, ConnectionInfo connInfo,
                                 IotModbusPointRespDTO point, Object value) {
-        // 1. 转换属性值为原始值
+        // 1.1 转换属性值为原始值
         int[] rawValues = dataConverter.convertToRawValues(value, point);
 
-        // 2. 确定帧格式和事务 ID
+        // 1.2 确定帧格式和事务 ID
         IotModbusFrameFormatEnum frameFormat = connInfo.getFrameFormat();
-        if (frameFormat == null) {
-            frameFormat = IotModbusFrameFormatEnum.MODBUS_TCP;
-        }
+        Assert.notNull(frameFormat, "连接帧格式不能为空");
         int transactionId = transactionIdCounter.incrementAndGet() & 0xFFFF;
         int slaveId = connInfo.getSlaveId() != null ? connInfo.getSlaveId() : 1;
-
-        // 3. 编码写请求
+        // 1.3 编码写请求
         byte[] data;
-        IotModbusFunctionCodeEnum fcEnum = IotModbusFunctionCodeEnum.valueOf(point.getFunctionCode());
-        if (fcEnum == null) {
-            log.warn("[writeProperty][未知功能码: {}]", point.getFunctionCode());
-            return;
-        }
-        if (rawValues.length == 1 && fcEnum.getWriteSingleCode() != null) {
+        int readFunctionCode = point.getFunctionCode();
+        Integer writeSingleCode = IotModbusUtils.getWriteSingleFunctionCode(readFunctionCode);
+        Integer writeMultipleCode = IotModbusUtils.getWriteMultipleFunctionCode(readFunctionCode);
+        if (rawValues.length == 1 && writeSingleCode != null) {
             // 单个值：使用单写功能码（FC05/FC06）
-            data = frameEncoder.encodeWriteSingleRequest(slaveId, fcEnum.getWriteSingleCode(),
+            data = frameEncoder.encodeWriteSingleRequest(slaveId, writeSingleCode,
                     point.getRegisterAddress(), rawValues[0], frameFormat, transactionId);
-        } else if (fcEnum.getWriteMultipleCode() != null) {
+        } else if (writeMultipleCode != null) {
             // 多个值：使用多写功能码（FC15/FC16）
             data = frameEncoder.encodeWriteMultipleRegistersRequest(slaveId,
                     point.getRegisterAddress(), rawValues, frameFormat, transactionId);
         } else {
-            log.warn("[writeProperty][点位 {} 不支持写操作]", point.getIdentifier());
+            log.warn("[writeProperty][点位 {} 不支持写操作, 功能码={}]", point.getIdentifier(), readFunctionCode);
             return;
         }
 
-        // 4. 发送
+        // 2. 发送
         connectionManager.sendToDevice(deviceId, data);
         log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
                 deviceId, point.getIdentifier(), value);
-    }
-
-    /**
-     * 查找点位配置
-     */
-    private IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
-        return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
-    }
-
-    /**
-     * 检查功能码是否支持写操作
-     */
-    private boolean isWritable(Integer functionCode) {
-        IotModbusFunctionCodeEnum functionCodeEnum = IotModbusFunctionCodeEnum.valueOf(functionCode);
-        return functionCodeEnum != null && Boolean.TRUE.equals(functionCodeEnum.getWritable());
     }
 
 }

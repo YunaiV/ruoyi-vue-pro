@@ -5,14 +5,15 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
@@ -20,9 +21,9 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager.ConnectionInfo;
@@ -40,14 +41,12 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 
-// DONE @AI：逻辑有点多，看看是不是分区域！ => 已按区域划分：认证 / 轮询响应
 /**
  * IoT Modbus TCP Slave 上行数据处理器
  * <p>
  * 处理：
  * 1. 自定义 FC 认证
- * 2. 轮询响应（mode=1）→ 点位翻译 → thing.property.post
- * // DONE @AI：不用主动上报；主动上报走标准 tcp 即可
+ * 2. 轮询响应 → 点位翻译 → thing.property.post
  *
  * @author 芋道源码
  */
@@ -105,29 +104,14 @@ public class IotModbusTcpSlaveUpstreamHandler {
             return;
         }
 
-        // 2. 自定义功能码（认证等扩展）
+        // 2. 情况一：自定义功能码（认证等扩展）
         if (StrUtil.isNotEmpty(frame.getCustomData())) {
             handleCustomFrame(socket, frame, frameFormat);
             return;
         }
 
-        // 1.2 未认证连接，丢弃
-        // TODO @AI：把 1.2、1.3 拿到 handlePollingResponse 里；是否需要登录，自己知道！
-        if (!connectionManager.isAuthenticated(socket)) {
-            log.warn("[handleFrame][未认证连接, 丢弃数据, remoteAddress={}]", socket.remoteAddress());
-            return;
-        }
-
-        // 3. DONE @AI：断言必须是云端轮询（不再支持主动上报）
-        // TODO @AI：貌似只能轮询到一次？！
-        // 1.3  标准 Modbus 响应（只支持云端轮询模式）
-        // TODO @AI：可以把
-        ConnectionInfo info = connectionManager.getConnectionInfo(socket);
-        if (info == null) {
-            log.warn("[handleFrame][已认证但连接信息为空, remoteAddress={}]", socket.remoteAddress());
-            return;
-        }
-        handlePollingResponse(info, frame, frameFormat);
+        // 3. 情况二：标准 Modbus 响应 → 轮询响应处理
+        handlePollingResponse(socket, frame, frameFormat);
     }
 
     // ========== 自定义 FC 处理（认证等） ==========
@@ -138,96 +122,83 @@ public class IotModbusTcpSlaveUpstreamHandler {
      * 异常分层翻译，参考 {@link cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.upstream.IotHttpAbstractHandler}
      */
     private void handleCustomFrame(NetSocket socket, IotModbusFrame frame, IotModbusFrameFormatEnum frameFormat) {
+        String method = null;
         try {
-            JSONObject json = JSONUtil.parseObj(frame.getCustomData());
-            String method = json.getStr("method");
+            IotDeviceMessage message = JsonUtils.parseObject(frame.getCustomData(), IotDeviceMessage.class);
+            if (message == null) {
+                throw invalidParamException("自定义 FC 数据解析失败");
+            }
+            method = message.getMethod();
             if (METHOD_AUTH.equals(method)) {
-                handleAuth(socket, frame, json, frameFormat);
+                handleAuth(socket, frame, frameFormat, message.getParams());
                 return;
             }
             log.warn("[handleCustomFrame][未知 method: {}, frame: slaveId={}, FC={}, customData={}]",
                     method, frame.getSlaveId(), frame.getFunctionCode(), frame.getCustomData());
         } catch (ServiceException e) {
             // 已知业务异常，返回对应的错误码和错误信息
-            sendCustomResponse(socket, frame, frameFormat, e.getCode(), e.getMessage());
+            sendCustomResponse(socket, frame, frameFormat, method, e.getCode(), e.getMessage());
         } catch (IllegalArgumentException e) {
             // 参数校验异常，返回 400 错误
-            sendCustomResponse(socket, frame, frameFormat, BAD_REQUEST.getCode(), e.getMessage());
+            sendCustomResponse(socket, frame, frameFormat, method, BAD_REQUEST.getCode(), e.getMessage());
         } catch (Exception e) {
             // 其他未知异常，返回 500 错误
             log.error("[handleCustomFrame][解析自定义 FC 数据失败, frame: slaveId={}, FC={}, customData={}]",
                     frame.getSlaveId(), frame.getFunctionCode(), frame.getCustomData(), e);
-            sendCustomResponse(socket, frame, frameFormat,
+            sendCustomResponse(socket, frame, frameFormat, method,
                     INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
         }
     }
 
-    // TODO @芋艿：在 review 下这个类；
-    // TODO @AI：不传递 json，直接在 frame
     /**
      * 处理认证请求
      */
-    private void handleAuth(NetSocket socket, IotModbusFrame frame, JSONObject json,
-                            IotModbusFrameFormatEnum frameFormat) {
-        // TODO @AI：是不是可以 JsonUtils.convert(json, IotDeviceAuthReqDTO.class)；
-        JSONObject params = json.getJSONObject("params");
-        if (params == null) {
-            throw invalidParamException("params 不能为空");
-        }
-        // DONE @AI：参数判空
-        String clientId = params.getStr("clientId");
-        String username = params.getStr("username");
-        String password = params.getStr("password");
-        // TODO @AI：逐个判空；
-        if (StrUtil.hasBlank(clientId, username, password)) {
-            throw invalidParamException("clientId、username、password 不能为空");
-        }
+    @SuppressWarnings("DataFlowIssue")
+    private void handleAuth(NetSocket socket, IotModbusFrame frame, IotModbusFrameFormatEnum frameFormat, Object params) {
+        // 1. 解析认证参数
+        IotDeviceAuthReqDTO request = JsonUtils.convertObject(params, IotDeviceAuthReqDTO.class);
+        Assert.notNull(request, "认证参数不能为空");
+        Assert.notBlank(request.getClientId(), "clientId 不能为空");
+        Assert.notBlank(request.getUsername(), "username 不能为空");
+        Assert.notBlank(request.getPassword(), "password 不能为空");
 
-        // 1. 调用认证 API
-        IotDeviceAuthReqDTO authReq = new IotDeviceAuthReqDTO()
-                .setClientId(clientId).setUsername(username).setPassword(password);
-        CommonResult<Boolean> authResult = deviceApi.authDevice(authReq);
-        authResult.checkError();
-        if (BooleanUtil.isFalse(authResult.getData())) {
-            log.warn("[handleAuth][认证失败, clientId={}, username={}]", clientId, username);
-            sendCustomResponse(socket, frame, frameFormat, 1, "认证失败");
+        // 2.1 调用认证 API
+        CommonResult<Boolean> result = deviceApi.authDevice(request);
+        result.checkError();
+        if (BooleanUtil.isFalse(result.getData())) {
+            log.warn("[handleAuth][认证失败, clientId={}, username={}]", request.getClientId(), request.getUsername());
+            sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH, 1, "认证失败");
             return;
         }
-
-        // 2.1 认证成功，查找设备配置
-        IotModbusDeviceConfigRespDTO config = configCacheService.findConfigByAuth(clientId, username, password);
-        if (config == null) {
-            log.info("[handleAuth][认证成功但未找到设备配置, clientId={}, username={}]", clientId, username);
-        }
         // 2.2 解析设备信息
-        IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(username);
+        IotDeviceIdentity deviceInfo = IotDeviceAuthUtils.parseUsername(request.getUsername());
         Assert.notNull(deviceInfo, "解析设备信息失败");
         // 2.3 获取设备信息
-        // DONE @AI：IotDeviceService 作为构造参数传入，不通过 SpringUtil.getBean
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         Assert.notNull(device, "设备不存在");
 
-        // 3. 注册连接
+        // 3.1 注册连接
         ConnectionInfo connectionInfo = new ConnectionInfo()
                 .setDeviceId(device.getId())
+                .setProductKey(deviceInfo.getProductKey())
+                .setDeviceName(deviceInfo.getDeviceName())
                 .setSlaveId(frame.getSlaveId())
-                .setFrameFormat(frameFormat)
-                .setMode(config != null ? config.getMode() : IotModbusModeEnum.POLLING.getMode());
-        if (config != null) {
-            connectionInfo.setDeviceId(config.getDeviceId())
-                    .setProductKey(config.getProductKey())
-                    .setDeviceName(config.getDeviceName());
-        }
+                .setFrameFormat(frameFormat);
         connectionManager.registerConnection(socket, connectionInfo);
+        // 3.2 发送上线消息
+        IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
+        messageService.sendDeviceMessage(onlineMessage, deviceInfo.getProductKey(), deviceInfo.getDeviceName(), serverId);
+        // 3.3 发送成功响应
+        sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH,
+                GlobalErrorCodeConstants.SUCCESS.getCode(), "success");
+        log.info("[handleAuth][认证成功, clientId={}, deviceId={}]", request.getClientId(), device.getId());
 
-        // 4. 发送认证成功响应
-        sendCustomResponse(socket, frame, frameFormat, 0, "success");
-        log.info("[handleAuth][认证成功, clientId={}, deviceId={}]", clientId,
-                config != null ? config.getDeviceId() : device.getId());
-
-        // 5. 直接启动轮询
+        // 4. 加载设备配置并启动轮询
+        IotModbusDeviceConfigRespDTO config = configCacheService.loadDeviceConfig(device.getId());
         if (config != null) {
             pollScheduler.updatePolling(config);
+        } else {
+            log.warn("[handleAuth][认证成功但未找到设备配置, deviceId={}]", device.getId());
         }
     }
 
@@ -236,12 +207,13 @@ public class IotModbusTcpSlaveUpstreamHandler {
      */
     private void sendCustomResponse(NetSocket socket, IotModbusFrame frame,
                                     IotModbusFrameFormatEnum frameFormat,
-                                    int code, String message) {
-        JSONObject resp = new JSONObject();
-        resp.set("method", METHOD_AUTH);
-        resp.set("code", code);
-        resp.set("message", message);
-        byte[] data = frameEncoder.encodeCustomFrame(frame.getSlaveId(), resp.toString(),
+                                    String method, int code, String message) {
+        Map<String, Object> response = MapUtil.<String, Object>builder()
+                .put("method", method)
+                .put("code", code)
+                .put("message", message)
+                .build();
+        byte[] data = frameEncoder.encodeCustomFrame(frame.getSlaveId(), JsonUtils.toJsonString(response),
                 frameFormat, frame.getTransactionId() != null ? frame.getTransactionId() : 0);
         connectionManager.sendToSocket(socket, data);
     }
@@ -251,9 +223,16 @@ public class IotModbusTcpSlaveUpstreamHandler {
     /**
      * 处理轮询响应（云端轮询模式）
      */
-    private void handlePollingResponse(ConnectionInfo info, IotModbusFrame frame,
+    private void handlePollingResponse(NetSocket socket, IotModbusFrame frame,
                                        IotModbusFrameFormatEnum frameFormat) {
-        // 1.1 匹配 PendingRequest
+        // 1. 获取连接信息（未认证连接丢弃）
+        ConnectionInfo info = connectionManager.getConnectionInfo(socket);
+        if (info == null) {
+            log.warn("[handlePollingResponse][未认证连接, 丢弃数据, remoteAddress={}]", socket.remoteAddress());
+            return;
+        }
+
+        // 2.1 匹配 PendingRequest
         PendingRequest request = pendingRequestManager.matchResponse(
                 info.getDeviceId(), frame, frameFormat);
         if (request == null) {
@@ -261,26 +240,27 @@ public class IotModbusTcpSlaveUpstreamHandler {
                     info.getDeviceId(), frame.getFunctionCode());
             return;
         }
-        // 1.2 提取寄存器值
+        // 2.2 提取寄存器值
         int[] rawValues = IotModbusUtils.extractValues(frame);
         if (rawValues == null) {
             log.warn("[handlePollingResponse][提取寄存器值失败, deviceId={}, identifier={}]",
                     info.getDeviceId(), request.getIdentifier());
             return;
         }
-        // 1.3 查找点位配置
+        // 2.3 查找点位配置
         IotModbusDeviceConfigRespDTO config = configCacheService.getConfig(info.getDeviceId());
         if (config == null || CollUtil.isEmpty(config.getPoints())) {
             return;
         }
-        var point = CollUtil.findOne(config.getPoints(), p -> p.getId().equals(request.getPointId()));
+        IotModbusPointRespDTO point = CollUtil.findOne(config.getPoints(),
+                p -> p.getId().equals(request.getPointId()));
         if (point == null) {
             return;
         }
 
-        // 2.1 点位翻译
+        // 3.1 点位翻译
         Object convertedValue = dataConverter.convertToPropertyValue(rawValues, point);
-        // 2.2 上报属性
+        // 3.2 上报属性
         Map<String, Object> params = MapUtil.of(request.getIdentifier(), convertedValue);
         IotDeviceMessage message = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), params);

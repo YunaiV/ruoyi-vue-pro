@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
