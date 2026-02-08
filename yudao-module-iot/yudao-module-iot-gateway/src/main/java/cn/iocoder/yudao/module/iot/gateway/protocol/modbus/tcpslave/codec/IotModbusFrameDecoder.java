@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.RecordParser;
@@ -96,7 +96,7 @@ public class IotModbusFrameDecoder {
             return null;
         }
         // 校验 CRC
-        if (!IotModbusUtils.verifyCrc16(data)) {
+        if (!IotModbusCommonUtils.verifyCrc16(data)) {
             log.warn("[decodeRtuResponse][CRC 校验失败]");
             return null;
         }
@@ -119,8 +119,8 @@ public class IotModbusFrameDecoder {
                 .setPdu(pdu)
                 .setTransactionId(transactionId);
         // 异常响应
-        if (IotModbusUtils.isExceptionResponse(functionCode)) {
-            frame.setFunctionCode(IotModbusUtils.extractOriginalFunctionCode(functionCode));
+        if (IotModbusCommonUtils.isExceptionResponse(functionCode)) {
+            frame.setFunctionCode(IotModbusCommonUtils.extractOriginalFunctionCode(functionCode));
             if (pdu.length >= 1) {
                 frame.setExceptionCode(pdu[0] & 0xFF);
             }
@@ -281,7 +281,7 @@ public class IotModbusFrameDecoder {
             this.slaveId = bytes[0];
             this.functionCode = bytes[1];
             int fc = functionCode & 0xFF;
-            if (IotModbusUtils.isExceptionResponse(fc)) {
+            if (IotModbusCommonUtils.isExceptionResponse(fc)) {
                 // 异常响应：完整帧 = slaveId(1) + FC(1) + exceptionCode(1) + CRC(2) = 5 字节
                 // 已有 6 字节（多 1 字节），取前 5 字节组装
                 Buffer frame = Buffer.buffer(5);
@@ -290,7 +290,7 @@ public class IotModbusFrameDecoder {
                 frame.appendBytes(bytes, 2, 3); // exceptionCode + CRC
                 emitFrame(frame);
                 resetToHeader();
-            } else if (IotModbusUtils.isReadResponse(fc) || fc == customFunctionCode) {
+            } else if (IotModbusCommonUtils.isReadResponse(fc) || fc == customFunctionCode) {
                 // 读响应或自定义 FC：bytes[2] = byteCount
                 this.byteCount = bytes[2];
                 int bc = byteCount & 0xFF;
@@ -315,7 +315,7 @@ public class IotModbusFrameDecoder {
                     this.expectedDataLen = bc + 2; // byteCount 个数据 + 2 CRC
                     parser.fixedSizeMode(remaining);
                 }
-            } else if (IotModbusUtils.isWriteResponse(fc)) {
+            } else if (IotModbusCommonUtils.isWriteResponse(fc)) {
                 // 写响应：总长 = slaveId(1) + FC(1) + addr(2) + value/qty(2) + CRC(2) = 8 字节
                 // 已有 6 字节，还需 2 字节
                 state = STATE_WRITE_BODY;
@@ -356,15 +356,15 @@ public class IotModbusFrameDecoder {
             this.slaveId = header[0];
             this.functionCode = header[1];
             int fc = functionCode & 0xFF;
-            if (IotModbusUtils.isExceptionResponse(fc)) {
+            if (IotModbusCommonUtils.isExceptionResponse(fc)) {
                 // 异常响应
                 state = STATE_EXCEPTION_BODY;
                 parser.fixedSizeMode(3); // exceptionCode(1) + CRC(2)
-            } else if (IotModbusUtils.isReadResponse(fc) || fc == customFunctionCode) {
+            } else if (IotModbusCommonUtils.isReadResponse(fc) || fc == customFunctionCode) {
                 // 读响应或自定义 FC
                 state = STATE_READ_BYTE_COUNT;
                 parser.fixedSizeMode(1); // byteCount
-            } else if (IotModbusUtils.isWriteResponse(fc)) {
+            } else if (IotModbusCommonUtils.isWriteResponse(fc)) {
                 // 写响应
                 state = STATE_WRITE_BODY;
                 pendingData = Buffer.buffer();

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +60,7 @@ public class IotModbusFrameEncoder {
     public byte[] encodeWriteSingleRequest(int slaveId, int functionCode, int address, int value,
                                            IotModbusFrameFormatEnum format, Integer transactionId) {
         // FC05 单写线圈：Modbus 标准要求 value 为 0xFF00（ON）或 0x0000（OFF）
-        if (functionCode == IotModbusUtils.FC_WRITE_SINGLE_COIL) {
+        if (functionCode == IotModbusCommonUtils.FC_WRITE_SINGLE_COIL) {
             value = (value != 0) ? 0xFF00 : 0x0000;
         }
         // PDU: [FC(1)] [Address(2)] [Value(2)]
@@ -120,7 +120,7 @@ public class IotModbusFrameEncoder {
         int quantity = values.length;
         int byteCount = (quantity + 7) / 8; // 向上取整
         byte[] pdu = new byte[6 + byteCount];
-        pdu[0] = (byte) IotModbusUtils.FC_WRITE_MULTIPLE_COILS; // FC15
+        pdu[0] = (byte) IotModbusCommonUtils.FC_WRITE_MULTIPLE_COILS; // FC15
         pdu[1] = (byte) ((address >> 8) & 0xFF);
         pdu[2] = (byte) (address & 0xFF);
         pdu[3] = (byte) ((quantity >> 8) & 0xFF);
@@ -204,7 +204,7 @@ public class IotModbusFrameEncoder {
         frame[0] = (byte) slaveId;
         System.arraycopy(pdu, 0, frame, 1, pdu.length);
         // 计算并追加 CRC16
-        int crc = IotModbusUtils.calculateCrc16(frame, frame.length - 2);
+        int crc = IotModbusCommonUtils.calculateCrc16(frame, frame.length - 2);
         frame[frame.length - 2] = (byte) (crc & 0xFF);        // CRC Low
         frame[frame.length - 1] = (byte) ((crc >> 8) & 0xFF); // CRC High
         return frame;

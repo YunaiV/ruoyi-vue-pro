@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -34,7 +34,7 @@ import java.nio.ByteOrder;
  */
 @UtilityClass
 @Slf4j
-public class IotModbusUtils {
+public class IotModbusCommonUtils {
 
     /** FC01: 读线圈 */
     public static final int FC_READ_COILS = 1;
@@ -510,6 +510,17 @@ public class IotModbusUtils {
      */
     public static IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
         return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
+    }
+
+    /**
+     * 根据点位 ID 查找点位配置
+     *
+     * @param config  设备 Modbus 配置
+     * @param pointId 点位 ID
+     * @return 匹配的点位配置，未找到返回 null
+     */
+    public static IotModbusPointRespDTO findPointById(IotModbusDeviceConfigRespDTO config, Long pointId) {
+        return CollUtil.findOne(config.getPoints(), p -> p.getId().equals(pointId));
     }
 
 }

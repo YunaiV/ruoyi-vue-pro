@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http.handler.downstream;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.AbstractIotProtocolDownstreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class IotHttpDownstreamSubscriber extends IotProtocolDownstreamSubscriber {
+public class IotHttpDownstreamSubscriber extends AbstractIotProtocolDownstreamSubscriber {
 
     public IotHttpDownstreamSubscriber(IotProtocol protocol, IotMessageBus messageBus) {
         super(protocol, messageBus);

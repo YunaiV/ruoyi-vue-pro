@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client;
+package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils;
 
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
@@ -12,7 +12,7 @@ import io.vertx.core.Future;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils.*;
+import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils.*;
 
 /**
  * IoT Modbus TCP 客户端工具类
@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModb
  */
 @UtilityClass
 @Slf4j
-public class IotModbusTcpClientUtils {
+public class IotModbusTcpMasterUtils {
 
     /**
      * 读取 Modbus 数据

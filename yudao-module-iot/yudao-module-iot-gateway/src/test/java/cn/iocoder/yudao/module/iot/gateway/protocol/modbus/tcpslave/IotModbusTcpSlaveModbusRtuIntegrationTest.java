@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
@@ -285,7 +285,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
             frame[3 + i * 2 + 1] = (byte) (registerValues[i] & 0xFF);
         }
         // 计算 CRC16
-        int crc = IotModbusUtils.calculateCrc16(frame, totalLength - 2);
+        int crc = IotModbusCommonUtils.calculateCrc16(frame, totalLength - 2);
         frame[totalLength - 2] = (byte) (crc & 0xFF);        // CRC Low
         frame[totalLength - 1] = (byte) ((crc >> 8) & 0xFF); // CRC High
         return frame;

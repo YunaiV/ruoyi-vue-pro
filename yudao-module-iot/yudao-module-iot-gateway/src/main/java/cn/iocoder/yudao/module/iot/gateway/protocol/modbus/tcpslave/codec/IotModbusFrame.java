@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -39,7 +39,7 @@ public class IotModbusFrame {
      * 当功能码最高位为 1 时（异常响应），此字段存储异常码。
      * 为 null 表示非异常响应。
      *
-     * @see IotModbusUtils#FC_EXCEPTION_MASK
+     * @see IotModbusCommonUtils#FC_EXCEPTION_MASK
      */
     private Integer exceptionCode;
 

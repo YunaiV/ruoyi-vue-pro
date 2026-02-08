@@ -75,8 +75,8 @@ public class IotModbusTcpSlaveConnectionManager {
             try {
                 oldSocket.close();
             } catch (Exception e) {
-                // TODO @AI：这里日志可以打的更完整一点，方便追溯；比如：设备 ID、旧连接地址等
-                log.warn("[registerConnection][关闭旧 socket 失败]", e);
+                log.warn("[registerConnection][关闭旧 socket 失败, deviceId={}, oldRemote={}]",
+                        info.getDeviceId(), oldSocket.remoteAddress(), e);
             }
         }
 

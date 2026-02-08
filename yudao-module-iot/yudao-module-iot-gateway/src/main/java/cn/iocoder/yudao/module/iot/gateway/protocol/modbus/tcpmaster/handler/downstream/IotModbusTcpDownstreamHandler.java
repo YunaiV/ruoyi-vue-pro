@@ -4,8 +4,8 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client.IotModbusTcpClientUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusTcpMasterUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager.IotModbusTcpConnectionManager;
 import lombok.RequiredArgsConstructor;
@@ -57,13 +57,13 @@ public class IotModbusTcpDownstreamHandler {
             String identifier = entry.getKey();
             Object value = entry.getValue();
             // 2.1 查找对应的点位配置
-            IotModbusPointRespDTO point = IotModbusUtils.findPoint(config, identifier);
+            IotModbusPointRespDTO point = IotModbusCommonUtils.findPoint(config, identifier);
             if (point == null) {
                 log.warn("[handle][设备 {} 没有点位配置: {}]", message.getDeviceId(), identifier);
                 continue;
             }
             // 2.2 检查是否支持写操作
-            if (!IotModbusUtils.isWritable(point.getFunctionCode())) {
+            if (!IotModbusCommonUtils.isWritable(point.getFunctionCode())) {
                 log.warn("[handle][点位 {} 不支持写操作, 功能码={}]", identifier, point.getFunctionCode());
                 continue;
             }
@@ -91,9 +91,9 @@ public class IotModbusTcpDownstreamHandler {
         }
 
         // 2.1 转换属性值为原始值
-        int[] rawValues = IotModbusUtils.convertToRawValues(value, point);
+        int[] rawValues = IotModbusCommonUtils.convertToRawValues(value, point);
         // 2.2 执行 Modbus 写入
-        IotModbusTcpClientUtils.write(connection, slaveId, point, rawValues)
+        IotModbusTcpMasterUtils.write(connection, slaveId, point, rawValues)
                 .onSuccess(success -> log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
                         config.getDeviceId(), point.getIdentifier(), value))
                 .onFailure(e -> log.error("[writeProperty][写入失败, deviceId={}, identifier={}]",

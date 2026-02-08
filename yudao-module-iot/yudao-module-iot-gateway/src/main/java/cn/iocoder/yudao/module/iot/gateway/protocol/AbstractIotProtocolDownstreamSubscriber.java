@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @AllArgsConstructor
 @Slf4j
-public abstract class IotProtocolDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
+public abstract class AbstractIotProtocolDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
 
     private final IotProtocol protocol;
 

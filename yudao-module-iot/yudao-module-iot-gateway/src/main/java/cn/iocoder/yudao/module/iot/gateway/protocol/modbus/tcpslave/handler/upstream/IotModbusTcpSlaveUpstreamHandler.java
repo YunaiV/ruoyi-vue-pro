@@ -19,7 +19,7 @@ import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConfigCacheService;
@@ -237,7 +237,7 @@ public class IotModbusTcpSlaveUpstreamHandler {
             return;
         }
         // 2.2 提取寄存器值
-        int[] rawValues = IotModbusUtils.extractValues(frame);
+        int[] rawValues = IotModbusCommonUtils.extractValues(frame);
         if (rawValues == null) {
             log.warn("[handlePollingResponse][提取寄存器值失败, deviceId={}, identifier={}]",
                     info.getDeviceId(), request.getIdentifier());
@@ -248,14 +248,13 @@ public class IotModbusTcpSlaveUpstreamHandler {
         if (config == null || CollUtil.isEmpty(config.getPoints())) {
             return;
         }
-        IotModbusPointRespDTO point = CollUtil.findOne(config.getPoints(),
-                p -> p.getId().equals(request.getPointId()));
+        IotModbusPointRespDTO point = IotModbusCommonUtils.findPointById(config, request.getPointId());
         if (point == null) {
             return;
         }
 
         // 3.1 点位翻译
-        Object convertedValue = IotModbusUtils.convertToPropertyValue(rawValues, point);
+        Object convertedValue = IotModbusCommonUtils.convertToPropertyValue(rawValues, point);
         // 3.2 上报属性
         Map<String, Object> params = MapUtil.of(request.getIdentifier(), convertedValue);
         IotDeviceMessage message = IotDeviceMessage.requestOf(

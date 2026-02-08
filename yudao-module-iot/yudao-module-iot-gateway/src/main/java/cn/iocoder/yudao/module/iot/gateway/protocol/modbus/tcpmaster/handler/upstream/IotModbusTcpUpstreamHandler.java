@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +40,7 @@ public class IotModbusTcpUpstreamHandler {
                                  int[] rawValue) {
         try {
             // 1.1 转换原始值为物模型属性值
-            Object convertedValue = IotModbusUtils.convertToPropertyValue(rawValue, point);
+            Object convertedValue = IotModbusCommonUtils.convertToPropertyValue(rawValue, point);
             log.debug("[handleReadResult][设备={}, 属性={}, 原始值={}, 转换值={}]",
                     config.getDeviceId(), point.getIdentifier(), rawValue, convertedValue);
             // 1.2 构造属性上报消息
