@@ -29,7 +29,12 @@ public class IotDeviceModbusPointDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
-    // TODO @AI：增加 productId；
+    /**
+     * 产品编号
+     *
+     * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
+     */
+    private Long productId;
     /**
      * 设备编号
      *
@@ -42,7 +47,6 @@ public class IotDeviceModbusPointDO extends TenantBaseDO {
      * 关联 {@link IotThingModelDO#getId()}
      */
     private Long thingModelId;
-    // TODO @AI：每次物模型的变更时，需要按需刷下 identifier、name 配置；
     /**
      * 属性标识符
      *

@@ -6,15 +6,15 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,8 +32,6 @@ public class IotModbusTcpSlaveConfigCacheService {
      * 配置缓存：deviceId -> 配置
      */
     private final Map<Long, IotModbusDeviceConfigRespDTO> configCache = new ConcurrentHashMap<>();
-
-    // ==================== 按需加载（认证时） ====================
 
     /**
      * 加载单个设备的配置（认证成功后调用）
@@ -66,8 +64,6 @@ public class IotModbusTcpSlaveConfigCacheService {
         }
     }
 
-    // ==================== 定时刷新（已连接设备） ====================
-
     /**
      * 刷新已连接设备的配置缓存
      * <p>
@@ -89,30 +85,16 @@ public class IotModbusTcpSlaveConfigCacheService {
                             .setDeviceIds(connectedDeviceIds));
             List<IotModbusDeviceConfigRespDTO> modbusConfigs = result.getCheckedData();
 
-            // 2. 追加 Mock 测试数据（仅 mockEnabled=true 时）
-            // TODO @芋艿：测试完成后移除
-            // TODO @claude-code：【严重】同上，if(true) 导致 mockEnabled 开关失效，Mock 数据永远加载
-            if (true) {
-                modbusConfigs.addAll(buildMockConfigs());
-            }
-
-            // 2. 只保留已连接设备的配置，更新缓存
-            // TODO @AI：是不是直接添加到 configCache 缓存（或者覆盖），然后返回 modbusConfigs 就 ok 了？！
-            List<IotModbusDeviceConfigRespDTO> connectedConfigs = new ArrayList<>();
+            // 2. 更新缓存并返回
             for (IotModbusDeviceConfigRespDTO config : modbusConfigs) {
-                if (connectedDeviceIds.contains(config.getDeviceId())) {
-                    configCache.put(config.getDeviceId(), config);
-                    connectedConfigs.add(config);
-                }
+                configCache.put(config.getDeviceId(), config);
             }
-            return connectedConfigs;
+            return modbusConfigs;
         } catch (Exception e) {
             log.error("[refreshConnectedDeviceConfigList][刷新配置失败]", e);
             return null;
         }
     }
-
-    // ==================== 缓存操作 ====================
 
     /**
      * 获取设备配置
@@ -131,61 +113,6 @@ public class IotModbusTcpSlaveConfigCacheService {
      */
     public void removeConfig(Long deviceId) {
         configCache.remove(deviceId);
-    }
-
-    // ==================== Mock 数据 ====================
-
-    /**
-     * 构建 Mock 测试配置数据（一次性测试用途）
-     *
-     * 设备：PRODUCT_KEY=4aymZgOTOOCrDKRT, DEVICE_NAME=small
-     * 点位：temperature（FC03, 地址 0）、humidity（FC03, 地址 1）
-     *
-     * TODO @芋艿：测试完成后移除
-     */
-    private List<IotModbusDeviceConfigRespDTO> buildMockConfigs() {
-        IotModbusDeviceConfigRespDTO config = new IotModbusDeviceConfigRespDTO();
-        config.setDeviceId(25L);
-        config.setProductKey("4aymZgOTOOCrDKRT");
-        config.setDeviceName("small");
-        config.setSlaveId(1);
-        config.setMode(1); // 云端轮询
-        config.setFrameFormat(IotModbusFrameFormatEnum.MODBUS_TCP.getFormat());
-
-        // 点位列表
-        List<IotModbusPointRespDTO> points = new ArrayList<>();
-
-        // 点位 1：温度 - 保持寄存器 FC03, 地址 0, 1 个寄存器, INT16
-        IotModbusPointRespDTO point1 = new IotModbusPointRespDTO();
-        point1.setId(1L);
-        point1.setIdentifier("temperature");
-        point1.setName("温度");
-        point1.setFunctionCode(3); // FC03 读保持寄存器
-        point1.setRegisterAddress(0);
-        point1.setRegisterCount(1);
-        point1.setRawDataType("INT16");
-        point1.setByteOrder("BIG_ENDIAN");
-        point1.setScale(new BigDecimal("0.1"));
-        point1.setPollInterval(5000); // 5 秒轮询一次
-        points.add(point1);
-
-        // 点位 2：湿度 - 保持寄存器 FC03, 地址 1, 1 个寄存器, UINT16
-        IotModbusPointRespDTO point2 = new IotModbusPointRespDTO();
-        point2.setId(2L);
-        point2.setIdentifier("humidity");
-        point2.setName("湿度");
-        point2.setFunctionCode(3); // FC03 读保持寄存器
-        point2.setRegisterAddress(1);
-        point2.setRegisterCount(1);
-        point2.setRawDataType("UINT16");
-        point2.setByteOrder("BIG_ENDIAN");
-        point2.setScale(new BigDecimal("0.1"));
-        point2.setPollInterval(5000); // 5 秒轮询一次
-        points.add(point2);
-
-        config.setPoints(points);
-        log.info("[buildMockConfigs][已加载 Mock 配置, deviceId={}, points={}]", config.getDeviceId(), points.size());
-        return Collections.singletonList(config);
     }
 
 }

@@ -41,10 +41,4 @@ public class IotModbusTcpSlaveConfig {
     @NotNull(message = "请求清理间隔不能为空")
     private Integer requestCleanupInterval = 10000;
 
-    // TODO @AI：可以去掉这个开关，因为本身就是模拟的，稍后我自己也会手动或者让你去掉（听我指令！）
-    /**
-     * 是否启用 Mock 测试数据（仅开发/测试环境使用，线上务必关闭）
-     */
-    private Boolean mockEnabled = false;
-
 }

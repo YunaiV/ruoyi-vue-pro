@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,6 +59,11 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
             Assert.notNull(connectionInfo, "无法获取连接信息");
             Assert.equals(productKey, connectionInfo.getProductKey(), "产品 Key 不匹配");
             Assert.equals(deviceName, connectionInfo.getDeviceName(), "设备名称不匹配");
+            // 1.4 校验 topic 是否允许发布
+            if (!IotMqttTopicUtils.isTopicPublishAllowed(topic, productKey, deviceName)) {
+                log.warn("[handleBusinessRequest][topic 不允许发布，客户端 ID: {}，主题: {}]", clientId, topic);
+                return;
+            }
 
             // 2. 反序列化消息
             message = deviceMessageService.deserializeDeviceMessage(payload, productKey, deviceName);

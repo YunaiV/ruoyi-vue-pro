@@ -500,6 +500,27 @@ public class IotModbusCommonUtils {
         return values;
     }
 
+    /**
+     * 从响应帧中提取 registerCount（通过 PDU 的 byteCount 推断）
+     *
+     * @param frame 解码后的 Modbus 响应帧
+     * @return registerCount，无法提取时返回 -1（匹配时跳过校验）
+     */
+    public static int extractRegisterCountFromResponse(IotModbusFrame frame) {
+        byte[] pdu = frame.getPdu();
+        if (pdu == null || pdu.length < 1) {
+            return -1;
+        }
+        int byteCount = pdu[0] & 0xFF;
+        int fc = frame.getFunctionCode();
+        // FC03/04 寄存器读响应：registerCount = byteCount / 2
+        if (fc == FC_READ_HOLDING_REGISTERS || fc == FC_READ_INPUT_REGISTERS) {
+            return byteCount / 2;
+        }
+        // FC01/02 线圈/离散输入读响应：按 bit 打包有余位，无法精确反推，返回 -1 跳过校验
+        return -1;
+    }
+
     // ==================== 点位查找 ====================
 
     /**

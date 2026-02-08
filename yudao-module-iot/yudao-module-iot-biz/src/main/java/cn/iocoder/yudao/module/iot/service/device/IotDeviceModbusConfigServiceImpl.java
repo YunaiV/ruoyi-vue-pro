@@ -1,10 +1,16 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceModbusConfigMapper;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -25,11 +31,17 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
 
     @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotProductService productService;
 
     @Override
     public void saveDeviceModbusConfig(IotDeviceModbusConfigSaveReqVO saveReqVO) {
-        // 1. 校验设备存在
-        deviceService.validateDeviceExists(saveReqVO.getDeviceId());
+        // 1.1 校验设备存在
+        IotDeviceDO device = deviceService.validateDeviceExists(saveReqVO.getDeviceId());
+        // 1.2 根据产品 protocolType 条件校验
+        IotProductDO product = productService.getProduct(device.getProductId());
+        Assert.notNull(product, "产品不存在");
+        validateModbusConfigByProtocolType(saveReqVO, product.getProtocolType());
 
         // 2. 根据数据库中是否已有配置，决定是新增还是更新
         IotDeviceModbusConfigDO existConfig = modbusConfigMapper.selectByDeviceId(saveReqVO.getDeviceId());
@@ -56,6 +68,23 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
     @Override
     public List<IotDeviceModbusConfigDO> getDeviceModbusConfigList(IotModbusDeviceConfigListReqDTO listReqDTO) {
         return modbusConfigMapper.selectList(listReqDTO);
+    }
+
+    // TODO @AI：还是希望在 IotDeviceModbusConfigSaveReqVO 里，通过 validator 校验？！或者通过 group 来处理？
+    private void validateModbusConfigByProtocolType(IotDeviceModbusConfigSaveReqVO saveReqVO, String protocolType) {
+        IotProtocolTypeEnum protocolTypeEnum = IotProtocolTypeEnum.of(protocolType);
+        if (protocolTypeEnum == null) {
+            return;
+        }
+        if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_MASTER) {
+            Assert.isTrue(StrUtil.isNotEmpty(saveReqVO.getIp()), "Master 模式下，IP 地址不能为空");
+            Assert.notNull(saveReqVO.getPort(), "Master 模式下，端口不能为空");
+            Assert.notNull(saveReqVO.getTimeout(), "Master 模式下，连接超时时间不能为空");
+            Assert.notNull(saveReqVO.getRetryInterval(), "Master 模式下，重试间隔不能为空");
+        } else if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_SLAVE) {
+            Assert.notNull(saveReqVO.getMode(), "Slave 模式下，工作模式不能为空");
+            Assert.notNull(saveReqVO.getFrameFormat(), "Slave 模式下，数据帧格式不能为空");
+        }
     }
 
 }

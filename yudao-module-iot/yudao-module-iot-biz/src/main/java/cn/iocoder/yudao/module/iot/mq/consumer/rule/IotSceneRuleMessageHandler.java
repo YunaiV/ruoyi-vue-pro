@@ -9,7 +9,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-// TODO @puhui999：后面重构哈
 /**
  * 针对 {@link IotDeviceMessage} 的消费者，处理规则场景
  *

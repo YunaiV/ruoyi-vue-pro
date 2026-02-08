@@ -101,8 +101,6 @@ public final class IotMqttTopicUtils {
      * @param deviceName 设备名称
      * @return 是否允许发布
      */
-    // TODO DONE @AI：这个逻辑，是不是 mqtt 协议，也要使用？？？答：是通用工具方法，MQTT 协议可按需调用；
-    // TODO @AI：那你改下 mqtt，也调用！！！
     public static boolean isTopicPublishAllowed(String topic, String productKey, String deviceName) {
         if (!StrUtil.isAllNotBlank(topic, productKey, deviceName)) {
             return false;

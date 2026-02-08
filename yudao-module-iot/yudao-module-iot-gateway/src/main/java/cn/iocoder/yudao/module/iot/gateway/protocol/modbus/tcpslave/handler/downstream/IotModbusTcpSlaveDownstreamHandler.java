@@ -109,7 +109,6 @@ public class IotModbusTcpSlaveDownstreamHandler {
         // 1.2 确定帧格式和事务 ID
         IotModbusFrameFormatEnum frameFormat = connInfo.getFrameFormat();
         Assert.notNull(frameFormat, "连接帧格式不能为空");
-        // TODO @AI：【from 芋艿】需要和按照 deviceId 进行自增么？？？
         Integer transactionId = frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP
                 ? (transactionIdCounter.incrementAndGet() & 0xFFFF)
                 : null;

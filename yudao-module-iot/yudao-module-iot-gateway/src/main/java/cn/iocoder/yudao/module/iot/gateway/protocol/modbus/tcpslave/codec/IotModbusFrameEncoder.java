@@ -46,9 +46,6 @@ public class IotModbusFrameEncoder {
     /**
      * 编码写请求（单个寄存器 FC06 / 单个线圈 FC05）
      *
-     * DONE @AI：【from codex】【高】FC05 写线圈时，value 已转换为 Modbus 标准值（非0 → 0xFF00，0 → 0x0000）；
-     *  新增 encodeWriteMultipleCoilsRequest 方法用于 FC15 编码（按 bit 打包）。
-     *
      * @param slaveId       从站地址
      * @param functionCode  功能码
      * @param address       寄存器地址

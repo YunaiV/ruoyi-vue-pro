@@ -56,6 +56,15 @@ public interface IotDeviceModbusPointService {
     PageResult<IotDeviceModbusPointDO> getDeviceModbusPointPage(IotDeviceModbusPointPageReqVO pageReqVO);
 
     /**
+     * 物模型变更时，更新关联点位的冗余字段（identifier、name）
+     *
+     * @param thingModelId 物模型编号
+     * @param identifier   物模型标识符
+     * @param name         物模型名称
+     */
+    void updateDeviceModbusPointByThingModel(Long thingModelId, String identifier, String name);
+
+    /**
      * 根据设备编号批量获得启用的点位配置 Map
      *
      * @param deviceIds 设备编号集合

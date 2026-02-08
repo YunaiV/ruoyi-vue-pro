@@ -91,7 +91,6 @@ public class IotUdpUpstreamHandler {
         this.deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
     }
 
-    // TODO done @AI：vertx 有 udp 的实现么？当前已使用 Vert.x DatagramSocket 实现
     /**
      * 处理 UDP 数据包
      *

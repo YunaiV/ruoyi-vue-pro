@@ -78,7 +78,7 @@ public class IotModbusTcpSlavePendingRequestManager {
             return matchByTransactionId(queue, frame.getTransactionId());
         }
         // RTU 模式：FIFO，匹配 slaveId + functionCode + registerCount
-        int responseRegisterCount = extractRegisterCountFromResponse(frame);
+        int responseRegisterCount = IotModbusCommonUtils.extractRegisterCountFromResponse(frame);
         return matchByFifo(queue, frame.getSlaveId(), frame.getFunctionCode(), responseRegisterCount);
     }
 
@@ -113,29 +113,6 @@ public class IotModbusTcpSlavePendingRequestManager {
             }
         }
         return null;
-    }
-
-    // TODO @AI：是不是放到 modbus 工具类里，更合适？
-    /**
-     * 从响应帧中提取 registerCount（通过 PDU 的 byteCount 推断）
-     *
-     * @return registerCount，无法提取时返回 -1（匹配时跳过校验）
-     */
-    private int extractRegisterCountFromResponse(IotModbusFrame frame) {
-        byte[] pdu = frame.getPdu();
-        if (pdu == null || pdu.length < 1) {
-            return -1;
-        }
-        int byteCount = pdu[0] & 0xFF;
-        int fc = frame.getFunctionCode();
-        // FC03/04 寄存器读响应：registerCount = byteCount / 2
-        if (fc == IotModbusCommonUtils.FC_READ_HOLDING_REGISTERS
-                || fc == IotModbusCommonUtils.FC_READ_INPUT_REGISTERS) {
-            return byteCount / 2;
-        }
-        // FC01/02 线圈/离散输入读响应：registerCount = byteCount * 8（线圈数量）
-        // 但因为按 bit 打包有余位，无法精确反推，返回 -1 跳过校验
-        return -1;
     }
 
     /**

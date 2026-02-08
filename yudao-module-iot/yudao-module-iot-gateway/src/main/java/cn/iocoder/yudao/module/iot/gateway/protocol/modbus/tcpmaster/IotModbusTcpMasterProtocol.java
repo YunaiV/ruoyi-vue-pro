@@ -84,7 +84,6 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
         IotDeviceCommonApi deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
         IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
         this.configCacheService = new IotModbusTcpMasterConfigCacheService(deviceApi);
-        // DONE @AI：上线/下线消息已移到 ConnectionManager 内部处理，不再走回调
         this.connectionManager = new IotModbusTcpMasterConnectionManager(redissonClient, vertx,
                 messageService, configCacheService, serverId);
 

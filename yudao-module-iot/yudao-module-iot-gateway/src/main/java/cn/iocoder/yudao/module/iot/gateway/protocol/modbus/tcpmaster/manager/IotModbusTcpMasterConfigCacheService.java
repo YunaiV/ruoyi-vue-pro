@@ -79,8 +79,6 @@ public class IotModbusTcpMasterConfigCacheService {
     /**
      * 计算已删除设备的 ID 集合，清理缓存，并更新已知设备 ID 集合
      *
-     * DONE @AI：不再使用 callback 模式，返回已删除的设备 ID 集合，由调用方直接清理
-     *
      * @param currentConfigs 当前有效的配置列表
      * @return 已删除的设备 ID 集合
      */

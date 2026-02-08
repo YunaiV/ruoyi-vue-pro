@@ -75,7 +75,12 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
         modbusPointMapper.updateById(updateObj);
     }
 
-    // TODO @AI：物模型更新的时候，更新下 identifier、name 信息；例如说 updateDeviceModbusPoint(thingModelId, identifier、name) 方法；
+    @Override
+    public void updateDeviceModbusPointByThingModel(Long thingModelId, String identifier, String name) {
+        IotDeviceModbusPointDO updateObj = new IotDeviceModbusPointDO()
+                .setIdentifier(identifier).setName(name);
+        modbusPointMapper.updateByThingModelId(thingModelId, updateObj);
+    }
 
     private IotThingModelDO validateThingModelExists(Long id) {
         IotThingModelDO thingModel = thingModelService.getThingModel(id);

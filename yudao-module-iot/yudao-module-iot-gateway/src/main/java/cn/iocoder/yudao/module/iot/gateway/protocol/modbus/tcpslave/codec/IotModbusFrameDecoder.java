@@ -29,21 +29,36 @@ import java.util.function.BiConsumer;
 @Slf4j
 public class IotModbusFrameDecoder {
 
+    private static final Boolean REQUEST_MODE_DEFAULT = false;
+
     /**
      * 自定义功能码
      */
     private final int customFunctionCode;
 
     /**
-     * 创建带自动帧格式检测的 RecordParser
+     * 创建带自动帧格式检测的 RecordParser（默认响应模式）
      *
      * @param frameHandler 完整帧回调（解码后的 IotModbusFrame + 检测到的帧格式）
      * @return RecordParser 实例
      */
     public RecordParser createRecordParser(BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler) {
+        return createRecordParser(frameHandler, REQUEST_MODE_DEFAULT);
+    }
+
+    /**
+     * 创建带自动帧格式检测的 RecordParser
+     *
+     * @param frameHandler 完整帧回调（解码后的 IotModbusFrame + 检测到的帧格式）
+     * @param requestMode  是否为请求模式（true：接收方收到的是 Modbus 请求帧，FC01-04 按固定 8 字节解析；
+     *                     false：接收方收到的是 Modbus 响应帧，FC01-04 按 byteCount 变长解析）
+     * @return RecordParser 实例
+     */
+    public RecordParser createRecordParser(BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler,
+                                           boolean requestMode) {
         // 先创建一个 RecordParser：使用 fixedSizeMode(6) 读取首帧前 6 字节进行帧格式检测
         RecordParser parser = RecordParser.newFixed(6);
-        parser.handler(new DetectPhaseHandler(parser, customFunctionCode, frameHandler));
+        parser.handler(new DetectPhaseHandler(parser, customFunctionCode, frameHandler, requestMode));
         return parser;
     }
 
@@ -150,6 +165,7 @@ public class IotModbusFrameDecoder {
         private final RecordParser parser;
         private final int customFunctionCode;
         private final BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler;
+        private final boolean requestMode;
 
         @Override
         public void handle(Buffer buffer) {
@@ -169,7 +185,7 @@ public class IotModbusFrameDecoder {
             } else {
                 // MODBUS_RTU：切换到 RTU 拆包 Handler
                 log.debug("[DetectPhaseHandler][检测到 MODBUS_RTU 帧格式]");
-                RtuFrameHandler rtuHandler = new RtuFrameHandler(parser, frameHandler, customFunctionCode);
+                RtuFrameHandler rtuHandler = new RtuFrameHandler(parser, frameHandler, customFunctionCode, requestMode);
                 parser.handler(rtuHandler);
                 // 当前 bytes 包含前 6 字节（slaveId + FC + 部分数据），交给 rtuHandler 处理
                 rtuHandler.handleFirstBytes(bytes);
@@ -248,6 +264,9 @@ public class IotModbusFrameDecoder {
      * - 自定义 FC / FC01-04 响应：fixedSizeMode(1) → 读 byteCount → fixedSizeMode(byteCount + 2)
      * - FC05/06 响应：fixedSizeMode(6) → addr(2) + value(2) + CRC(2)
      * - FC15/16 响应：fixedSizeMode(6) → addr(2) + quantity(2) + CRC(2)
+     * <p>
+     * 请求模式（requestMode=true）时，FC01-04 按固定 8 字节解析（与写响应相同路径），
+     * 因为读请求格式为 [SlaveId(1)][FC(1)][StartAddr(2)][Quantity(2)][CRC(2)]
      */
     @RequiredArgsConstructor
     private class RtuFrameHandler implements Handler<Buffer> {
@@ -261,6 +280,12 @@ public class IotModbusFrameDecoder {
         private final RecordParser parser;
         private final BiConsumer<IotModbusFrame, IotModbusFrameFormatEnum> frameHandler;
         private final int customFunctionCode;
+        /**
+         * 请求模式：
+         *    - true 表示接收方收到的是 Modbus 请求帧（如设备端收到网关下发的读请求），FC01-04 按固定 8 字节帧解析
+         *    - false 表示接收方收到的是 Modbus 响应帧，FC01-04 按 byteCount 变长解析
+         */
+        private final boolean requestMode;
 
         private int state = STATE_HEADER;
         private byte slaveId;
@@ -289,6 +314,13 @@ public class IotModbusFrameDecoder {
                 frame.appendBytes(bytes, 2, 3); // exceptionCode + CRC
                 emitFrame(frame);
                 resetToHeader();
+            } else if (IotModbusCommonUtils.isReadResponse(fc) && requestMode) {
+                // 请求模式下的读请求：固定 8 字节 [SlaveId(1)][FC(1)][StartAddr(2)][Quantity(2)][CRC(2)]
+                // 已有 6 字节，还需 2 字节（CRC）
+                state = STATE_WRITE_BODY;
+                this.pendingData = Buffer.buffer();
+                this.pendingData.appendBytes(bytes, 2, 4); // 暂存已有的 4 字节（StartAddr + Quantity）
+                parser.fixedSizeMode(2); // 还需 2 字节（CRC）
             } else if (IotModbusCommonUtils.isReadResponse(fc) || fc == customFunctionCode) {
                 // 读响应或自定义 FC：bytes[2] = byteCount
                 this.byteCount = bytes[2];
@@ -359,6 +391,11 @@ public class IotModbusFrameDecoder {
                 // 异常响应
                 state = STATE_EXCEPTION_BODY;
                 parser.fixedSizeMode(3); // exceptionCode(1) + CRC(2)
+            } else if (IotModbusCommonUtils.isReadResponse(fc) && requestMode) {
+                // 请求模式下的读请求：固定 8 字节，已读 2 字节（slaveId + FC），还需 6 字节
+                state = STATE_WRITE_BODY;
+                pendingData = Buffer.buffer();
+                parser.fixedSizeMode(6); // StartAddr(2) + Quantity(2) + CRC(2)
             } else if (IotModbusCommonUtils.isReadResponse(fc) || fc == customFunctionCode) {
                 // 读响应或自定义 FC
                 state = STATE_READ_BYTE_COUNT;

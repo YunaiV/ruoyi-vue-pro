@@ -96,18 +96,19 @@ public class IotModbusTcpMasterConnectionManager {
             connection = connectionPool.get(connectionKey);
             if (connection != null) {
                 addDeviceAndOnline(connection, config);
+                lock.unlock();
                 return;
             }
             // 3.2 创建新连接
             connection = createConnection(config);
+            connection.setLock(lock);
             connectionPool.put(connectionKey, connection);
             log.info("[ensureConnection][创建 Modbus 连接成功: {}]", connectionKey);
             // 3.3 注册设备并发送上线消息
             addDeviceAndOnline(connection, config);
         } catch (Exception e) {
             log.error("[ensureConnection][创建 Modbus 连接失败: {}]", connectionKey, e);
-        } finally {
-            // TODO @AI：如果这里释放，会不会出现，集群模式下，多个节点同时创建连接的情况？需要验证一下 Redisson 的分布式锁特性？！
+            // 建连失败，释放锁让其他节点可重试
             lock.unlock();
         }
     }
@@ -231,11 +232,11 @@ public class IotModbusTcpMasterConnectionManager {
             if (connection.getTcpConnection() != null) {
                 connection.getTcpConnection().close();
             }
-            // 强制解锁，避免死锁（正常情况下应该不会发生锁未释放的情况）
-//            RLock lock = connection.getLock();
-//            if (lock != null && lock.isLocked()) {
-//                lock.forceUnlock();
-//            }
+            // 释放分布式锁，让其他节点可接管
+            RLock lock = connection.getLock();
+            if (lock != null && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
             log.info("[closeConnection][关闭 Modbus 连接: {}]", connectionKey);
         } catch (Exception e) {
             log.error("[closeConnection][关闭连接失败: {}]", connectionKey, e);
@@ -266,16 +267,20 @@ public class IotModbusTcpMasterConnectionManager {
         private TCPMasterConnection tcpConnection;
         private Integer timeout;
         private Integer retryInterval;
-
-        private Context context;
-
-        // TODO @AI：是不是需要 lock？！避免集群模式下的竞争（肯定不能让别的节点连接上）！！！【另外，RLock 在节点（持有所锁的节点） cransh 的时候，会自动释放】
-//        private RLock lock;
-
         /**
          * 设备 ID 到 slave ID 的映射
          */
         private final Map<Long, Integer> deviceSlaveMap = new ConcurrentHashMap<>();
+
+        /**
+         * 分布式锁，锁住连接的创建和销毁，避免多节点重复连接同一从站
+         */
+        private RLock lock;
+
+        /**
+         * Vert.x Context，用于 executeBlocking 执行 Modbus 操作，保证同一连接的操作串行执行
+         */
+        private Context context;
 
         public void addDevice(Long deviceId, Integer slaveId) {
             deviceSlaveMap.put(deviceId, slaveId);

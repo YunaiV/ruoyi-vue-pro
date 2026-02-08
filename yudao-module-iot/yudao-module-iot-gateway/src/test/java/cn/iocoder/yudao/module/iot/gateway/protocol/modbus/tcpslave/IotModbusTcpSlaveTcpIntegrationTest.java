@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave;
 
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
@@ -8,7 +9,6 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
@@ -21,18 +21,22 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
- * IoT Modbus TCP Slave 协议集成测试 — MODBUS_RTU 帧格式（手动测试）
+ * IoT Modbus TCP Slave 协议集成测试 — MODBUS_TCP 帧格式（手动测试）
  *
- * <p>测试场景：设备（TCP Client）连接到网关（TCP Server），使用 MODBUS_RTU（CRC16）帧格式通信
+ * <p>测试场景：设备（TCP Client）连接到网关（TCP Server），使用 MODBUS_TCP（MBAP 头）帧格式通信
  *
  * <p>使用步骤：
  * <ol>
  *     <li>启动 yudao-module-iot-gateway 服务（需开启 modbus-tcp-slave 协议，默认端口 503）</li>
- *     <li>确保数据库有对应的 Modbus 设备配置（mode=1, frameFormat=modbus_rtu）</li>
+ *     <li>确保数据库有对应的 Modbus 设备配置（mode=1, frameFormat=modbus_tcp）</li>
  *     <li>运行以下测试方法：
  *         <ul>
  *             <li>{@link #testAuth()} - 自定义功能码认证</li>
@@ -46,7 +50,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Disabled
-public class IotModbusTcpSlaveModbusRtuIntegrationTest {
+public class IotModbusTcpSlaveTcpIntegrationTest {
 
     private static final String SERVER_HOST = "127.0.0.1";
     private static final int SERVER_PORT = 503;
@@ -65,9 +69,9 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
 
     // ===================== 设备信息（根据实际情况修改，从 iot_device 表查询） =====================
 
-    private static final String PRODUCT_KEY = "4aymZgOTOOCrDKRT";
-    private static final String DEVICE_NAME = "small";
-    private static final String DEVICE_SECRET = "0baa4c2ecc104ae1a26b4070c218bdf3";
+    private static final String PRODUCT_KEY = "modbus_tcp_slave_product_demo";
+    private static final String DEVICE_NAME = "modbus_tcp_slave_device_demo_tcp";
+    private static final String DEVICE_SECRET = "8e4adeb3d25342ab88643421d3fba3f6";
 
     @BeforeAll
     static void setUp() {
@@ -91,7 +95,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
     // ===================== 认证测试 =====================
 
     /**
-     * 认证测试：发送自定义功能码 FC65 认证帧（RTU 格式），验证认证成功响应
+     * 认证测试：发送自定义功能码 FC65 认证帧，验证认证成功响应
      */
     @Test
     public void testAuth() throws Exception {
@@ -104,6 +108,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
             log.info("[testAuth][认证响应帧: slaveId={}, FC={}, customData={}]",
                     response.getSlaveId(), response.getFunctionCode(), response.getCustomData());
             JSONObject json = JSONUtil.parseObj(response.getCustomData());
+            assertEquals(0, json.getInt("code"));
             log.info("[testAuth][认证结果: code={}, message={}]", json.getInt("code"), json.getStr("message"));
         } finally {
             socket.close();
@@ -113,7 +118,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
     // ===================== 轮询响应测试 =====================
 
     /**
-     * 轮询响应测试：认证后持续监听网关下发的读请求（RTU 格式），每次收到都自动构造读响应帧发回
+     * 轮询响应测试：认证后持续监听网关下发的读请求，每次收到都自动构造读响应帧发回
      */
     @Test
     public void testPollingResponse() throws Exception {
@@ -122,26 +127,27 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
             // 1. 先认证
             IotModbusFrame authResponse = authenticate(socket);
             log.info("[testPollingResponse][认证响应: {}]", authResponse.getCustomData());
+            JSONObject authJson = JSONUtil.parseObj(authResponse.getCustomData());
+            assertEquals(0, authJson.getInt("code"));
 
             // 2. 设置持续监听：每收到一个读请求，自动回复
             log.info("[testPollingResponse][开始持续监听网关下发的读请求...]");
-            CompletableFuture<Void> done = new CompletableFuture<>();
             RecordParser parser = FRAME_DECODER.createRecordParser((frame, frameFormat) -> {
-                log.info("[testPollingResponse][收到请求: slaveId={}, FC={}]",
-                        frame.getSlaveId(), frame.getFunctionCode());
+                log.info("[testPollingResponse][收到请求: slaveId={}, FC={}, transactionId={}]",
+                        frame.getSlaveId(), frame.getFunctionCode(), frame.getTransactionId());
                 // 解析读请求中的起始地址和数量
                 byte[] pdu = frame.getPdu();
                 int startAddress = ((pdu[0] & 0xFF) << 8) | (pdu[1] & 0xFF);
                 int quantity = ((pdu[2] & 0xFF) << 8) | (pdu[3] & 0xFF);
                 log.info("[testPollingResponse][读请求参数: startAddress={}, quantity={}]", startAddress, quantity);
 
-                // 构造读响应帧（模拟寄存器数据，RTU 格式）
+                // 构造读响应帧（模拟寄存器数据）
                 int[] registerValues = new int[quantity];
                 for (int i = 0; i < quantity; i++) {
                     registerValues[i] = 100 + i * 100; // 模拟值: 100, 200, 300, ...
                 }
-                byte[] responseData = buildReadResponse(frame.getSlaveId(),
-                        frame.getFunctionCode(), registerValues);
+                byte[] responseData = buildReadResponse(frame.getTransactionId(),
+                        frame.getSlaveId(), frame.getFunctionCode(), registerValues);
                 socket.write(Buffer.buffer(responseData));
                 log.info("[testPollingResponse][已发送读响应, registerValues={}]", registerValues);
             });
@@ -157,7 +163,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
     // ===================== 属性设置测试 =====================
 
     /**
-     * 属性设置测试：认证后等待接收网关下发的 FC06/FC16 写请求（RTU 格式）
+     * 属性设置测试：认证后等待接收网关下发的 FC06/FC16 写请求
      * <p>
      * 注意：需手动在平台触发 property.set
      */
@@ -172,9 +178,9 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
             // 2. 等待网关下发写请求（需手动在平台触发 property.set）
             log.info("[testPropertySetWrite][等待网关下发写请求（请在平台触发 property.set）...]");
             IotModbusFrame writeRequest = waitForRequest(socket);
-            log.info("[testPropertySetWrite][收到写请求: slaveId={}, FC={}, pdu={}]",
+            log.info("[testPropertySetWrite][收到写请求: slaveId={}, FC={}, transactionId={}, pdu={}]",
                     writeRequest.getSlaveId(), writeRequest.getFunctionCode(),
-                    bytesToHex(writeRequest.getPdu()));
+                    writeRequest.getTransactionId(), HexUtil.encodeHexStr(writeRequest.getPdu()));
         } finally {
             socket.close();
         }
@@ -198,6 +204,7 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
      */
     private IotModbusFrame authenticate(NetSocket socket) throws Exception {
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+        authInfo.setClientId("");  // 特殊：考虑到 modbus 消息长度限制，默认 clientId 不发送
         byte[] authFrame = buildAuthFrame(authInfo.getClientId(), authInfo.getUsername(), authInfo.getPassword());
         return sendAndReceive(socket, authFrame);
     }
@@ -249,11 +256,9 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
     }
 
     /**
-     * 构造认证帧（MODBUS_RTU 格式）
+     * 构造认证帧（MODBUS_TCP 格式）
      * <p>
      * JSON: {"method":"auth","params":{"clientId":"...","username":"...","password":"..."}}
-     * <p>
-     * RTU 帧格式：[SlaveId(1)] [FC=0x41(1)] [ByteCount(1)] [JSON(N)] [CRC16(2)]
      */
     private byte[] buildAuthFrame(String clientId, String username, String password) {
         JSONObject params = new JSONObject();
@@ -264,45 +269,34 @@ public class IotModbusTcpSlaveModbusRtuIntegrationTest {
         json.set("method", "auth");
         json.set("params", params);
         return FRAME_ENCODER.encodeCustomFrame(SLAVE_ID, json.toString(),
-                IotModbusFrameFormatEnum.MODBUS_RTU, 0);
+                IotModbusFrameFormatEnum.MODBUS_TCP, 1);
     }
 
     /**
-     * 构造 FC03/FC01-04 读响应帧（MODBUS_RTU 格式）
+     * 构造 FC03/FC01-04 读响应帧（MODBUS_TCP 格式）
      * <p>
-     * RTU 帧格式：[SlaveId(1)] [FC(1)] [ByteCount(1)] [RegisterData(N*2)] [CRC16(2)]
+     * 格式：[MBAP(6)] [UnitId(1)] [FC(1)] [ByteCount(1)] [RegisterData(N*2)]
      */
-    private byte[] buildReadResponse(int slaveId, int functionCode, int[] registerValues) {
+    private byte[] buildReadResponse(int transactionId, int slaveId, int functionCode, int[] registerValues) {
         int byteCount = registerValues.length * 2;
-        // 帧长度：SlaveId(1) + FC(1) + ByteCount(1) + Data(N*2) + CRC(2)
-        int totalLength = 1 + 1 + 1 + byteCount + 2;
-        byte[] frame = new byte[totalLength];
-        frame[0] = (byte) slaveId;
-        frame[1] = (byte) functionCode;
-        frame[2] = (byte) byteCount;
-        for (int i = 0; i < registerValues.length; i++) {
-            frame[3 + i * 2] = (byte) ((registerValues[i] >> 8) & 0xFF);
-            frame[3 + i * 2 + 1] = (byte) (registerValues[i] & 0xFF);
+        // PDU: FC(1) + ByteCount(1) + Data(N*2)
+        int pduLength = 1 + 1 + byteCount;
+        // 完整帧：MBAP(6) + UnitId(1) + PDU
+        int totalLength = 6 + 1 + pduLength;
+        ByteBuffer buf = ByteBuffer.allocate(totalLength).order(ByteOrder.BIG_ENDIAN);
+        // MBAP Header
+        buf.putShort((short) transactionId);  // Transaction ID
+        buf.putShort((short) 0);              // Protocol ID
+        buf.putShort((short) (1 + pduLength)); // Length (UnitId + PDU)
+        // UnitId
+        buf.put((byte) slaveId);
+        // PDU
+        buf.put((byte) functionCode);
+        buf.put((byte) byteCount);
+        for (int value : registerValues) {
+            buf.putShort((short) value);
         }
-        // 计算 CRC16
-        int crc = IotModbusCommonUtils.calculateCrc16(frame, totalLength - 2);
-        frame[totalLength - 2] = (byte) (crc & 0xFF);        // CRC Low
-        frame[totalLength - 1] = (byte) ((crc >> 8) & 0xFF); // CRC High
-        return frame;
-    }
-
-    /**
-     * 字节数组转十六进制字符串
-     */
-    private static String bytesToHex(byte[] bytes) {
-        if (bytes == null) {
-            return "null";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02X ", b));
-        }
-        return sb.toString().trim();
+        return buf.array();
     }
 
 }

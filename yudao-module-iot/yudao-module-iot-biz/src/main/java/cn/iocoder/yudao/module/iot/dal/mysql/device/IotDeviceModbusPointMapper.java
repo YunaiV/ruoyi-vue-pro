@@ -39,4 +39,9 @@ public interface IotDeviceModbusPointMapper extends BaseMapperX<IotDeviceModbusP
                 IotDeviceModbusPointDO::getIdentifier, identifier);
     }
 
+    default void updateByThingModelId(Long thingModelId, IotDeviceModbusPointDO updateObj) {
+        update(updateObj, new LambdaQueryWrapperX<IotDeviceModbusPointDO>()
+                .eq(IotDeviceModbusPointDO::getThingModelId, thingModelId));
+    }
+
 }

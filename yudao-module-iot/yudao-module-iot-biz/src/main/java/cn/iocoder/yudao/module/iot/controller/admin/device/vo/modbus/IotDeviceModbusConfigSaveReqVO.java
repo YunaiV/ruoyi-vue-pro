@@ -16,13 +16,9 @@ public class IotDeviceModbusConfigSaveReqVO {
     private Long deviceId;
 
     @Schema(description = "Modbus 服务器 IP 地址", example = "192.168.1.100")
-//    @NotEmpty(message = "Modbus 服务器 IP 地址不能为空")
-    // TODO @AI：这个字段，要根据情况校验；
     private String ip;
 
     @Schema(description = "Modbus 端口", example = "502")
-//    @NotNull(message = "Modbus 端口不能为空")
-    // TODO @AI：这个字段，要根据情况校验；
     private Integer port;
 
     @Schema(description = "从站地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
