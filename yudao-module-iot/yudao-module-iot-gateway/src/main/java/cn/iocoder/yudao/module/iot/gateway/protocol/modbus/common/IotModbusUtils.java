@@ -1,22 +1,38 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusByteOrderEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotModbusRawDataTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
- * IoT Modbus 工具类
+ * IoT Modbus 协议工具类
  * <p>
- * 提供：
- * 1. Modbus 协议常量（功能码、掩码等）
- * 2. CRC-16/MODBUS 计算和校验
- * 3. 功能码分类判断
- * 4. 从解码后的 ${IotModbusFrame} 中提取寄存器值（用于后续的点位翻译）
+ * 提供 Modbus 协议全链路能力：
+ * <ul>
+ *   <li>协议常量：功能码（FC01~FC16）、异常掩码等</li>
+ *   <li>功能码判断：读/写/异常分类、可写判断、写功能码映射</li>
+ *   <li>CRC-16/MODBUS 计算和校验</li>
+ *   <li>数据转换：原始值 ↔ 物模型属性值（{@link #convertToPropertyValue} / {@link #convertToRawValues}）</li>
+ *   <li>帧值提取：从 Modbus 帧提取寄存器/线圈值（{@link #extractValues}）</li>
+ *   <li>点位查找（{@link #findPoint}）</li>
+ * </ul>
  *
  * @author 芋道源码
  */
+@UtilityClass
 @Slf4j
 public class IotModbusUtils {
 
@@ -139,19 +155,6 @@ public class IotModbusUtils {
         }
     }
 
-    // ==================== 点位查找 ====================
-
-    /**
-     * 查找点位配置
-     *
-     * @param config     设备 Modbus 配置
-     * @param identifier 点位标识符
-     * @return 匹配的点位配置，未找到返回 null
-     */
-    public static IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
-        return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
-    }
-
     // ==================== CRC16 工具 ====================
 
     /**
@@ -192,7 +195,253 @@ public class IotModbusUtils {
         return computed == received;
     }
 
-    // ==================== 响应值提取 ====================
+    // ==================== 数据转换 ====================
+
+    /**
+     * 将原始值转换为物模型属性值
+     *
+     * @param rawValues 原始值数组（寄存器值或线圈值）
+     * @param point     点位配置
+     * @return 转换后的属性值
+     */
+    public static Object convertToPropertyValue(int[] rawValues, IotModbusPointRespDTO point) {
+        if (ArrayUtil.isEmpty(rawValues)) {
+            return null;
+        }
+        String rawDataType = point.getRawDataType();
+        String byteOrder = point.getByteOrder();
+        BigDecimal scale = ObjectUtil.defaultIfNull(point.getScale(), BigDecimal.ONE);
+
+        // 1. 根据原始数据类型解析原始数值
+        Number rawNumber = parseRawValue(rawValues, rawDataType, byteOrder);
+        if (rawNumber == null) {
+            return null;
+        }
+
+        // 2. 应用缩放因子：实际值 = 原始值 × scale
+        BigDecimal actualValue = new BigDecimal(rawNumber.toString()).multiply(scale);
+
+        // 3. 根据数据类型返回合适的 Java 类型
+        return formatValue(actualValue, rawDataType);
+    }
+
+    /**
+     * 将物模型属性值转换为原始寄存器值
+     *
+     * @param propertyValue 属性值
+     * @param point         点位配置
+     * @return 原始值数组
+     */
+    public static int[] convertToRawValues(Object propertyValue, IotModbusPointRespDTO point) {
+        if (propertyValue == null) {
+            return new int[0];
+        }
+        String rawDataType = point.getRawDataType();
+        String byteOrder = point.getByteOrder();
+        BigDecimal scale = ObjectUtil.defaultIfNull(point.getScale(), BigDecimal.ONE);
+        int registerCount = ObjectUtil.defaultIfNull(point.getRegisterCount(), 1);
+
+        // 1. 转换为 BigDecimal
+        BigDecimal actualValue = new BigDecimal(propertyValue.toString());
+
+        // 2. 应用缩放因子：原始值 = 实际值 ÷ scale
+        BigDecimal rawValue = actualValue.divide(scale, 0, RoundingMode.HALF_UP);
+
+        // 3. 根据原始数据类型编码为寄存器值
+        return encodeToRegisters(rawValue, rawDataType, byteOrder, registerCount);
+    }
+
+    @SuppressWarnings("EnhancedSwitchMigration")
+    private static Number parseRawValue(int[] rawValues, String rawDataType, String byteOrder) {
+        IotModbusRawDataTypeEnum dataTypeEnum = IotModbusRawDataTypeEnum.getByType(rawDataType);
+        if (dataTypeEnum == null) {
+            log.warn("[parseRawValue][不支持的数据类型: {}]", rawDataType);
+            return rawValues[0];
+        }
+        switch (dataTypeEnum) {
+            case BOOLEAN:
+                return rawValues[0] != 0 ? 1 : 0;
+            case INT16:
+                return (short) rawValues[0];
+            case UINT16:
+                return rawValues[0] & 0xFFFF;
+            case INT32:
+                return parseInt32(rawValues, byteOrder);
+            case UINT32:
+                return parseUint32(rawValues, byteOrder);
+            case FLOAT:
+                return parseFloat(rawValues, byteOrder);
+            case DOUBLE:
+                return parseDouble(rawValues, byteOrder);
+            default:
+                log.warn("[parseRawValue][不支持的数据类型: {}]", rawDataType);
+                return rawValues[0];
+        }
+    }
+
+    private static int parseInt32(int[] rawValues, String byteOrder) {
+        if (rawValues.length < 2) {
+            return rawValues[0];
+        }
+        byte[] bytes = reorderBytes(registersToBytes(rawValues, 2), byteOrder);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getInt();
+    }
+
+    private static long parseUint32(int[] rawValues, String byteOrder) {
+        if (rawValues.length < 2) {
+            return rawValues[0] & 0xFFFFFFFFL;
+        }
+        byte[] bytes = reorderBytes(registersToBytes(rawValues, 2), byteOrder);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getInt() & 0xFFFFFFFFL;
+    }
+
+    private static float parseFloat(int[] rawValues, String byteOrder) {
+        if (rawValues.length < 2) {
+            return (float) rawValues[0];
+        }
+        byte[] bytes = reorderBytes(registersToBytes(rawValues, 2), byteOrder);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getFloat();
+    }
+
+    private static double parseDouble(int[] rawValues, String byteOrder) {
+        if (rawValues.length < 4) {
+            return rawValues[0];
+        }
+        byte[] bytes = reorderBytes(registersToBytes(rawValues, 4), byteOrder);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getDouble();
+    }
+
+    private static byte[] registersToBytes(int[] registers, int count) {
+        byte[] bytes = new byte[count * 2];
+        for (int i = 0; i < Math.min(registers.length, count); i++) {
+            bytes[i * 2] = (byte) ((registers[i] >> 8) & 0xFF);
+            bytes[i * 2 + 1] = (byte) (registers[i] & 0xFF);
+        }
+        return bytes;
+    }
+
+    @SuppressWarnings("EnhancedSwitchMigration")
+    private static byte[] reorderBytes(byte[] bytes, String byteOrder) {
+        IotModbusByteOrderEnum byteOrderEnum = IotModbusByteOrderEnum.getByOrder(byteOrder);
+        // null 或者大端序，不需要调整
+        if (ObjectUtils.equalsAny(byteOrderEnum, null, IotModbusByteOrderEnum.ABCD, IotModbusByteOrderEnum.AB)) {
+            return bytes;
+        }
+
+        // 其他字节序调整
+        byte[] result = new byte[bytes.length];
+        switch (byteOrderEnum) {
+            case BA: // 小端序（16 位）
+                if (bytes.length >= 2) {
+                    result[0] = bytes[1];
+                    result[1] = bytes[0];
+                }
+                break;
+            case CDAB: // 大端字交换（32 位）
+                if (bytes.length >= 4) {
+                    result[0] = bytes[2];
+                    result[1] = bytes[3];
+                    result[2] = bytes[0];
+                    result[3] = bytes[1];
+                }
+                break;
+            case DCBA: // 小端序（32 位）
+                if (bytes.length >= 4) {
+                    result[0] = bytes[3];
+                    result[1] = bytes[2];
+                    result[2] = bytes[1];
+                    result[3] = bytes[0];
+                }
+                break;
+            case BADC: // 小端字交换（32 位）
+                if (bytes.length >= 4) {
+                    result[0] = bytes[1];
+                    result[1] = bytes[0];
+                    result[2] = bytes[3];
+                    result[3] = bytes[2];
+                }
+                break;
+            default:
+                return bytes;
+        }
+        return result;
+    }
+
+    @SuppressWarnings("EnhancedSwitchMigration")
+    private static int[] encodeToRegisters(BigDecimal rawValue, String rawDataType, String byteOrder, int registerCount) {
+        IotModbusRawDataTypeEnum dataTypeEnum = IotModbusRawDataTypeEnum.getByType(rawDataType);
+        if (dataTypeEnum == null) {
+            return new int[]{rawValue.intValue()};
+        }
+        switch (dataTypeEnum) {
+            case BOOLEAN:
+                return new int[]{rawValue.intValue() != 0 ? 1 : 0};
+            case INT16:
+            case UINT16:
+                return new int[]{rawValue.intValue() & 0xFFFF};
+            case INT32:
+            case UINT32:
+                return encodeInt32(rawValue.intValue(), byteOrder);
+            case FLOAT:
+                return encodeFloat(rawValue.floatValue(), byteOrder);
+            case DOUBLE:
+                return encodeDouble(rawValue.doubleValue(), byteOrder);
+            default:
+                return new int[]{rawValue.intValue()};
+        }
+    }
+
+    private static int[] encodeInt32(int value, String byteOrder) {
+        byte[] bytes = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(value).array();
+        bytes = reorderBytes(bytes, byteOrder);
+        return bytesToRegisters(bytes);
+    }
+
+    private static int[] encodeFloat(float value, String byteOrder) {
+        byte[] bytes = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putFloat(value).array();
+        bytes = reorderBytes(bytes, byteOrder);
+        return bytesToRegisters(bytes);
+    }
+
+    private static int[] encodeDouble(double value, String byteOrder) {
+        byte[] bytes = ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN).putDouble(value).array();
+        bytes = reorderBytes(bytes, byteOrder);
+        return bytesToRegisters(bytes);
+    }
+
+    private static int[] bytesToRegisters(byte[] bytes) {
+        int[] registers = new int[bytes.length / 2];
+        for (int i = 0; i < registers.length; i++) {
+            registers[i] = ((bytes[i * 2] & 0xFF) << 8) | (bytes[i * 2 + 1] & 0xFF);
+        }
+        return registers;
+    }
+
+    @SuppressWarnings("EnhancedSwitchMigration")
+    private static Object formatValue(BigDecimal value, String rawDataType) {
+        IotModbusRawDataTypeEnum dataTypeEnum = IotModbusRawDataTypeEnum.getByType(rawDataType);
+        if (dataTypeEnum == null) {
+            return value;
+        }
+        switch (dataTypeEnum) {
+            case BOOLEAN:
+                return value.intValue() != 0;
+            case INT16:
+            case INT32:
+                return value.intValue();
+            case UINT16:
+            case UINT32:
+                return value.longValue();
+            case FLOAT:
+                return value.floatValue();
+            case DOUBLE:
+                return value.doubleValue();
+            default:
+                return value;
+        }
+    }
+
+    // ==================== 帧值提取 ====================
 
     /**
      * 从帧中提取寄存器值（FC01-04 读响应）
@@ -224,10 +473,6 @@ public class IotModbusUtils {
         }
     }
 
-    /**
-     * 提取线圈/离散输入值
-     * PDU 格式（FC01/02 响应）：[ByteCount(1)] [CoilStatus(N)]
-     */
     private static int[] extractCoilValues(byte[] pdu) {
         if (pdu.length < 2) {
             return null;
@@ -241,10 +486,6 @@ public class IotModbusUtils {
         return values;
     }
 
-    /**
-     * 提取寄存器值
-     * PDU 格式（FC03/04 响应）：[ByteCount(1)] [RegisterData(N*2)]
-     */
     private static int[] extractRegisterValues(byte[] pdu) {
         if (pdu.length < 2) {
             return null;
@@ -256,6 +497,19 @@ public class IotModbusUtils {
             values[i] = ((pdu[1 + i * 2] & 0xFF) << 8) | (pdu[1 + i * 2 + 1] & 0xFF);
         }
         return values;
+    }
+
+    // ==================== 点位查找 ====================
+
+    /**
+     * 查找点位配置
+     *
+     * @param config     设备 Modbus 配置
+     * @param identifier 点位标识符
+     * @return 匹配的点位配置，未找到返回 null
+     */
+    public static IotModbusPointRespDTO findPoint(IotModbusDeviceConfigRespDTO config, String identifier) {
+        return CollUtil.findOne(config.getPoints(), p -> identifier.equals(p.getIdentifier()));
     }
 
 }

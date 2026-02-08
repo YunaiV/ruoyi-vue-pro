@@ -7,13 +7,11 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager.ConnectionInfo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -28,19 +26,27 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author 芋道源码
  */
-@RequiredArgsConstructor
 @Slf4j
 public class IotModbusTcpSlaveDownstreamHandler {
 
     private final IotModbusTcpSlaveConnectionManager connectionManager;
     private final IotModbusTcpSlaveConfigCacheService configCacheService;
-    private final IotModbusDataConverter dataConverter;
     private final IotModbusFrameEncoder frameEncoder;
 
     /**
-     * TCP 事务 ID 自增器
+     * TCP 事务 ID 自增器（与 PollScheduler 共享）
      */
-    private final AtomicInteger transactionIdCounter = new AtomicInteger(0);
+    private final AtomicInteger transactionIdCounter;
+
+    public IotModbusTcpSlaveDownstreamHandler(IotModbusTcpSlaveConnectionManager connectionManager,
+                                              IotModbusTcpSlaveConfigCacheService configCacheService,
+                                              IotModbusFrameEncoder frameEncoder,
+                                              AtomicInteger transactionIdCounter) {
+        this.connectionManager = connectionManager;
+        this.configCacheService = configCacheService;
+        this.frameEncoder = frameEncoder;
+        this.transactionIdCounter = transactionIdCounter;
+    }
 
     /**
      * 处理下行消息
@@ -98,12 +104,15 @@ public class IotModbusTcpSlaveDownstreamHandler {
     private void writeProperty(Long deviceId, ConnectionInfo connInfo,
                                 IotModbusPointRespDTO point, Object value) {
         // 1.1 转换属性值为原始值
-        int[] rawValues = dataConverter.convertToRawValues(value, point);
+        int[] rawValues = IotModbusUtils.convertToRawValues(value, point);
 
         // 1.2 确定帧格式和事务 ID
         IotModbusFrameFormatEnum frameFormat = connInfo.getFrameFormat();
         Assert.notNull(frameFormat, "连接帧格式不能为空");
-        int transactionId = transactionIdCounter.incrementAndGet() & 0xFFFF;
+        // TODO @AI：【from 芋艿】需要和按照 deviceId 进行自增么？？？
+        Integer transactionId = frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP
+                ? (transactionIdCounter.incrementAndGet() & 0xFFFF)
+                : null;
         int slaveId = connInfo.getSlaveId() != null ? connInfo.getSlaveId() : 1;
         // 1.3 编码写请求
         byte[] data;

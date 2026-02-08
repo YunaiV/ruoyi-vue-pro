@@ -66,6 +66,21 @@ public class IotModbusTcpSlaveConnectionManager {
      * 注册已认证的连接
      */
     public void registerConnection(NetSocket socket, ConnectionInfo info) {
+        // 先检查该设备是否有旧连接，若有且不是同一个 socket，关闭旧 socket
+        NetSocket oldSocket = deviceSocketMap.get(info.getDeviceId());
+        if (oldSocket != null && oldSocket != socket) {
+            log.info("[registerConnection][设备 {} 存在旧连接, 关闭旧 socket, oldRemote={}, newRemote={}]",
+                    info.getDeviceId(), oldSocket.remoteAddress(), socket.remoteAddress());
+            connectionMap.remove(oldSocket);
+            try {
+                oldSocket.close();
+            } catch (Exception e) {
+                // TODO @AI：这里日志可以打的更完整一点，方便追溯；比如：设备 ID、旧连接地址等
+                log.warn("[registerConnection][关闭旧 socket 失败]", e);
+            }
+        }
+
+        // 注册新连接
         connectionMap.put(socket, info);
         deviceSocketMap.put(info.getDeviceId(), socket);
         log.info("[registerConnection][设备 {} 连接已注册, remoteAddress={}]",
@@ -100,8 +115,14 @@ public class IotModbusTcpSlaveConnectionManager {
     public ConnectionInfo removeConnection(NetSocket socket) {
         ConnectionInfo info = connectionMap.remove(socket);
         if (info != null && info.getDeviceId() != null) {
-            deviceSocketMap.remove(info.getDeviceId());
-            log.info("[removeConnection][设备 {} 连接已移除]", info.getDeviceId());
+            // 使用两参数 remove：只有当 deviceSocketMap 中对应的 socket 就是当前 socket 时才删除，
+            // 避免新 socket 已注册后旧 socket 关闭时误删新映射
+            boolean removed = deviceSocketMap.remove(info.getDeviceId(), socket);
+            if (removed) {
+                log.info("[removeConnection][设备 {} 连接已移除]", info.getDeviceId());
+            } else {
+                log.info("[removeConnection][设备 {} 旧连接关闭, 新连接仍在线, 跳过清理]", info.getDeviceId());
+            }
         }
         return info;
     }

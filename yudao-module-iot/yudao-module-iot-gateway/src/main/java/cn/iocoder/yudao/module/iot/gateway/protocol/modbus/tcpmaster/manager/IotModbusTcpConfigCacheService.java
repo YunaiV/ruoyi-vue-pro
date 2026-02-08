@@ -38,16 +38,13 @@ public class IotModbusTcpConfigCacheService {
     /**
      * 刷新配置
      *
-     * @return 最新的配置列表
+     * @return 最新的配置列表；API 失败时返回 null（调用方应跳过 cleanup）
      */
     public List<IotModbusDeviceConfigRespDTO> refreshConfig() {
         try {
             // 1. 从远程获取配置
             CommonResult<List<IotModbusDeviceConfigRespDTO>> result = deviceApi.getEnabledModbusDeviceConfigs();
-            if (result == null || !result.isSuccess() || result.getData() == null) {
-                log.warn("[refreshConfig][获取 Modbus 配置失败: {}]", result);
-                return new ArrayList<>(configCache.values());
-            }
+            result.checkError();
             List<IotModbusDeviceConfigRespDTO> configs = result.getData();
 
             // 2. 更新缓存（注意：不在这里更新 knownDeviceIds，由 cleanupRemovedDevices 统一管理）
@@ -57,7 +54,7 @@ public class IotModbusTcpConfigCacheService {
             return configs;
         } catch (Exception e) {
             log.error("[refreshConfig][刷新配置失败]", e);
-            return new ArrayList<>(configCache.values());
+            return null;
         }
     }
 
@@ -84,11 +81,11 @@ public class IotModbusTcpConfigCacheService {
         Set<Long> removedDeviceIds = new HashSet<>(knownDeviceIds);
         removedDeviceIds.removeAll(currentDeviceIds);
 
-        // 2. 清理已删除设备
+        // 2. 清理已删除设备（先执行 cleanupAction，再从缓存移除，保证 action 中仍可获取 config）
         for (Long deviceId : removedDeviceIds) {
             log.info("[cleanupRemovedDevices][清理已删除设备: {}]", deviceId);
-            configCache.remove(deviceId);
             cleanupAction.accept(deviceId);
+            configCache.remove(deviceId);
         }
 
         // 3. 更新已知设备 ID 集合为当前有效的设备 ID

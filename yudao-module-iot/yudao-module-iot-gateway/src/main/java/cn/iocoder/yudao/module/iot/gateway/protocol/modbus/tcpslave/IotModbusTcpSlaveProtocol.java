@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameDecoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.handler.downstream.IotModbusTcpSlaveDownstreamHandler;
@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * IoT 网关 Modbus TCP Slave 协议
@@ -92,6 +93,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
     private final IotModbusTcpSlaveUpstreamHandler upstreamHandler;
     private final IotModbusTcpSlaveDownstreamSubscriber downstreamSubscriber;
     private final IotModbusTcpSlavePollScheduler pollScheduler;
+    private final IotDeviceMessageService messageService;
 
     public IotModbusTcpSlaveProtocol(ProtocolProperties properties) {
         this.slaveConfig = properties.getModbusTcpSlave();
@@ -112,24 +114,27 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
         this.frameDecoder = new IotModbusFrameDecoder(slaveConfig.getCustomFunctionCode());
         this.frameEncoder = new IotModbusFrameEncoder(slaveConfig.getCustomFunctionCode());
 
+        // 初始化共享事务 ID 自增器（PollScheduler 和 DownstreamHandler 共用，避免 transactionId 冲突）
+        AtomicInteger transactionIdCounter = new AtomicInteger(0);
+
         // 初始化轮询调度器
         this.pollScheduler = new IotModbusTcpSlavePollScheduler(
                 vertx, connectionManager, frameEncoder, pendingRequestManager,
-                slaveConfig.getRequestTimeout());
+                slaveConfig.getRequestTimeout(), transactionIdCounter, configCacheService);
 
         // 初始化 Handler
-        IotModbusDataConverter dataConverter = new IotModbusDataConverter();
-        IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        this.messageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        IotDeviceMessageService messageService = this.messageService;
         IotDeviceService deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.upstreamHandler = new IotModbusTcpSlaveUpstreamHandler(
-                deviceApi, messageService, dataConverter, frameEncoder,
+                deviceApi, messageService, frameEncoder,
                 connectionManager, configCacheService, pendingRequestManager,
                 pollScheduler, deviceService, serverId);
 
         // 初始化下行消息订阅者
         IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
         IotModbusTcpSlaveDownstreamHandler downstreamHandler = new IotModbusTcpSlaveDownstreamHandler(
-                connectionManager, configCacheService, dataConverter, frameEncoder);
+                connectionManager, configCacheService, frameEncoder, transactionIdCounter);
         this.downstreamSubscriber = new IotModbusTcpSlaveDownstreamSubscriber(
                 this, downstreamHandler, messageBus);
     }
@@ -284,6 +289,13 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
             pollScheduler.stopPolling(info.getDeviceId());
             pendingRequestManager.removeDevice(info.getDeviceId());
             configCacheService.removeConfig(info.getDeviceId());
+            // 发送设备下线消息
+            try {
+                IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
+                messageService.sendDeviceMessage(offlineMessage, info.getProductKey(), info.getDeviceName(), serverId);
+            } catch (Exception ex) {
+                log.error("[handleConnection][发送设备下线消息失败, deviceId={}]", info.getDeviceId(), ex);
+            }
             log.info("[handleConnection][连接关闭, deviceId={}, remoteAddress={}]",
                     info.getDeviceId(), socket.remoteAddress());
         });

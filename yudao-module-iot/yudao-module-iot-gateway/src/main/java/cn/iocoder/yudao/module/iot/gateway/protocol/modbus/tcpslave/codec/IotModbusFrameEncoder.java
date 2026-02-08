@@ -8,9 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 
 /**
- * IoT Modbus 帧编码器
- * <p>
- * 负责将 Modbus 请求/响应编码为字节数组，支持 MODBUS_TCP（MBAP）和 MODBUS_RTU（CRC16）两种帧格式。
+ * IoT Modbus 帧编码器：负责将 Modbus 请求/响应编码为字节数组，支持 MODBUS_TCP（MBAP）和 MODBUS_RTU（CRC16）两种帧格式。
  *
  * @author 芋道源码
  */
@@ -30,11 +28,11 @@ public class IotModbusFrameEncoder {
      * @param startAddress  起始寄存器地址
      * @param quantity      寄存器数量
      * @param format        帧格式
-     * @param transactionId 事务 ID（TCP 模式下使用）
+     * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式传 null）
      * @return 编码后的字节数组
      */
     public byte[] encodeReadRequest(int slaveId, int functionCode, int startAddress, int quantity,
-                                    IotModbusFrameFormatEnum format, int transactionId) {
+                                    IotModbusFrameFormatEnum format, Integer transactionId) {
         // PDU: [FC(1)] [StartAddress(2)] [Quantity(2)]
         byte[] pdu = new byte[5];
         pdu[0] = (byte) functionCode;
@@ -48,16 +46,23 @@ public class IotModbusFrameEncoder {
     /**
      * 编码写请求（单个寄存器 FC06 / 单个线圈 FC05）
      *
+     * DONE @AI：【from codex】【高】FC05 写线圈时，value 已转换为 Modbus 标准值（非0 → 0xFF00，0 → 0x0000）；
+     *  新增 encodeWriteMultipleCoilsRequest 方法用于 FC15 编码（按 bit 打包）。
+     *
      * @param slaveId       从站地址
      * @param functionCode  功能码
      * @param address       寄存器地址
      * @param value         值
      * @param format        帧格式
-     * @param transactionId 事务 ID
+     * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式传 null）
      * @return 编码后的字节数组
      */
     public byte[] encodeWriteSingleRequest(int slaveId, int functionCode, int address, int value,
-                                           IotModbusFrameFormatEnum format, int transactionId) {
+                                           IotModbusFrameFormatEnum format, Integer transactionId) {
+        // FC05 单写线圈：Modbus 标准要求 value 为 0xFF00（ON）或 0x0000（OFF）
+        if (functionCode == IotModbusUtils.FC_WRITE_SINGLE_COIL) {
+            value = (value != 0) ? 0xFF00 : 0x0000;
+        }
         // PDU: [FC(1)] [Address(2)] [Value(2)]
         byte[] pdu = new byte[5];
         pdu[0] = (byte) functionCode;
@@ -75,11 +80,11 @@ public class IotModbusFrameEncoder {
      * @param address       起始地址
      * @param values        值数组
      * @param format        帧格式
-     * @param transactionId 事务 ID
+     * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式传 null）
      * @return 编码后的字节数组
      */
     public byte[] encodeWriteMultipleRegistersRequest(int slaveId, int address, int[] values,
-                                                      IotModbusFrameFormatEnum format, int transactionId) {
+                                                      IotModbusFrameFormatEnum format, Integer transactionId) {
         // PDU: [FC(1)] [Address(2)] [Quantity(2)] [ByteCount(1)] [Values(N*2)]
         int quantity = values.length;
         int byteCount = quantity * 2;
@@ -98,16 +103,49 @@ public class IotModbusFrameEncoder {
     }
 
     /**
+     * 编码写多个线圈请求（FC15）
+     * <p>
+     * 按 Modbus FC15 标准，线圈值按 bit 打包（每个 byte 包含 8 个线圈状态）。
+     *
+     * @param slaveId       从站地址
+     * @param address       起始地址
+     * @param values        线圈值数组（int[]，非0 表示 ON，0 表示 OFF）
+     * @param format        帧格式
+     * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式传 null）
+     * @return 编码后的字节数组
+     */
+    public byte[] encodeWriteMultipleCoilsRequest(int slaveId, int address, int[] values,
+                                                   IotModbusFrameFormatEnum format, Integer transactionId) {
+        // PDU: [FC(1)] [Address(2)] [Quantity(2)] [ByteCount(1)] [CoilValues(N)]
+        int quantity = values.length;
+        int byteCount = (quantity + 7) / 8; // 向上取整
+        byte[] pdu = new byte[6 + byteCount];
+        pdu[0] = (byte) IotModbusUtils.FC_WRITE_MULTIPLE_COILS; // FC15
+        pdu[1] = (byte) ((address >> 8) & 0xFF);
+        pdu[2] = (byte) (address & 0xFF);
+        pdu[3] = (byte) ((quantity >> 8) & 0xFF);
+        pdu[4] = (byte) (quantity & 0xFF);
+        pdu[5] = (byte) byteCount;
+        // 按 bit 打包：每个 byte 的 bit0 对应最低地址的线圈
+        for (int i = 0; i < quantity; i++) {
+            if (values[i] != 0) {
+                pdu[6 + i / 8] |= (byte) (1 << (i % 8));
+            }
+        }
+        return wrapFrame(slaveId, pdu, format, transactionId);
+    }
+
+    /**
      * 编码自定义功能码帧（认证响应等）
      *
      * @param slaveId       从站地址
      * @param jsonData      JSON 数据
      * @param format        帧格式
-     * @param transactionId 事务 ID
+     * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式传 null）
      * @return 编码后的字节数组
      */
     public byte[] encodeCustomFrame(int slaveId, String jsonData,
-                                    IotModbusFrameFormatEnum format, int transactionId) {
+                                    IotModbusFrameFormatEnum format, Integer transactionId) {
         byte[] jsonBytes = jsonData.getBytes(StandardCharsets.UTF_8);
         // PDU: [FC(1)] [ByteCount(1)] [JSON data(N)]
         byte[] pdu = new byte[2 + jsonBytes.length];
@@ -125,12 +163,12 @@ public class IotModbusFrameEncoder {
      * @param slaveId       从站地址
      * @param pdu           PDU 数据（含 functionCode）
      * @param format        帧格式
-     * @param transactionId 事务 ID（TCP 模式下使用）
+     * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式可为 null）
      * @return 完整帧字节数组
      */
-    private byte[] wrapFrame(int slaveId, byte[] pdu, IotModbusFrameFormatEnum format, int transactionId) {
+    private byte[] wrapFrame(int slaveId, byte[] pdu, IotModbusFrameFormatEnum format, Integer transactionId) {
         if (format == IotModbusFrameFormatEnum.MODBUS_TCP) {
-            return wrapTcpFrame(slaveId, pdu, transactionId);
+            return wrapTcpFrame(slaveId, pdu, transactionId != null ? transactionId : 0);
         } else {
             return wrapRtuFrame(slaveId, pdu);
         }

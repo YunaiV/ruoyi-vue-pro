@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.manager;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import io.vertx.core.Context;
@@ -50,8 +51,15 @@ public class IotModbusTcpConnectionManager {
      * @param config 设备配置
      */
     public void ensureConnection(IotModbusDeviceConfigRespDTO config) {
-        // 1. 记录设备与连接的关系
+        // 1.1 检查设备是否切换了 IP/端口，若是则先清理旧连接
         String connectionKey = buildConnectionKey(config.getIp(), config.getPort());
+        String oldConnectionKey = deviceConnectionMap.get(config.getDeviceId());
+        if (oldConnectionKey != null && ObjUtil.notEqual(oldConnectionKey, connectionKey)) {
+            log.info("[ensureConnection][设备 {} IP/端口变更: {} -> {}, 清理旧连接]",
+                    config.getDeviceId(), oldConnectionKey, connectionKey);
+            removeDevice(config.getDeviceId());
+        }
+        // 1.2 记录设备与连接的关系
         deviceConnectionMap.put(config.getDeviceId(), connectionKey);
 
         // 2. 情况一：连接已存在，添加设备引用
@@ -68,8 +76,15 @@ public class IotModbusTcpConnectionManager {
             log.debug("[ensureConnection][获取锁失败, 由其他节点负责: {}]", connectionKey);
             return;
         }
-        // 3.2 创建新连接
+        // 3.2 double-check：拿到锁后再次检查，避免并发创建重复连接
         try {
+            connection = connectionPool.get(connectionKey);
+            if (connection != null) {
+                connection.addDevice(config.getDeviceId(), config.getSlaveId());
+                lock.unlock();
+                return;
+            }
+            // 3.3 创建新连接
             connection = createConnection(config, lock);
             connectionPool.put(connectionKey, connection);
             log.info("[ensureConnection][创建 Modbus 连接成功: {}]", connectionKey);
@@ -154,10 +169,10 @@ public class IotModbusTcpConnectionManager {
             if (connection.getTcpConnection() != null) {
                 connection.getTcpConnection().close();
             }
-            // 安全释放锁：先检查锁存在且被锁定，再检查是否当前线程持有
+            // 强制解锁，避免死锁（正常情况下应该不会发生锁未释放的情况）
             RLock lock = connection.getLock();
-            if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
-                lock.unlock();
+            if (lock != null && lock.isLocked()) {
+                lock.forceUnlock();
             }
             log.info("[closeConnection][关闭 Modbus 连接: {}]", connectionKey);
         } catch (Exception e) {

@@ -6,11 +6,10 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.client.IotModbusTcpClient;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.downstream.IotModbusTcpDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.downstream.IotModbusTcpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpmaster.handler.upstream.IotModbusTcpUpstreamHandler;
@@ -70,6 +69,7 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
 
     private final IotModbusTcpConfigCacheService configCacheService;
     private final IotModbusTcpPollScheduler pollScheduler;
+    private final IotDeviceMessageService messageService;
 
     public IotModbusTcpMasterProtocol(ProtocolProperties properties) {
         IotModbusTcpMasterConfig modbusTcpMasterConfig = properties.getModbusTcpMaster();
@@ -87,15 +87,14 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
         this.configCacheService = new IotModbusTcpConfigCacheService(deviceApi);
 
         // 初始化 Handler
-        IotModbusDataConverter dataConverter = new IotModbusDataConverter();
-        IotModbusTcpClient modbusClient = new IotModbusTcpClient();
-        IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
-        IotModbusTcpUpstreamHandler upstreamHandler = new IotModbusTcpUpstreamHandler(messageService, dataConverter, serverId);
+        this.messageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        IotDeviceMessageService messageService = this.messageService;
+        IotModbusTcpUpstreamHandler upstreamHandler = new IotModbusTcpUpstreamHandler(messageService, serverId);
         IotModbusTcpDownstreamHandler downstreamHandler = new IotModbusTcpDownstreamHandler(connectionManager,
-                modbusClient, dataConverter, configCacheService);
+                configCacheService);
 
         // 初始化轮询调度器
-        this.pollScheduler = new IotModbusTcpPollScheduler(vertx, connectionManager, modbusClient, upstreamHandler);
+        this.pollScheduler = new IotModbusTcpPollScheduler(vertx, connectionManager, upstreamHandler, configCacheService);
 
         // 初始化下行消息订阅者
         IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
@@ -186,24 +185,54 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
      */
     private synchronized void refreshConfig() {
         try {
-            // 1. 从 biz 拉取最新配置
+            // 1. 从 biz 拉取最新配置（API 失败时返回 null）
             List<IotModbusDeviceConfigRespDTO> configs = configCacheService.refreshConfig();
+            if (configs == null) {
+                log.warn("[refreshConfig][API 失败，跳过本轮刷新]");
+                return;
+            }
             log.debug("[refreshConfig][获取到 {} 个 Modbus 设备配置]", configs.size());
 
             // 2. 更新连接和轮询任务
             for (IotModbusDeviceConfigRespDTO config : configs) {
                 try {
-                    // 2.1 确保连接存在
+                    // 2.1 检测是否为首次连接
+                    boolean isNewConnection = connectionManager.getConnection(config.getDeviceId()) == null;
+                    // 2.2 确保连接存在
                     connectionManager.ensureConnection(config);
-                    // 2.2 更新轮询任务
+                    // 2.3 首次建连成功后发送上线消息
+                    // TODO @AI：在这里判断上线 ，会不会有点奇怪？？？
+                    if (isNewConnection && connectionManager.getConnection(config.getDeviceId()) != null) {
+                        try {
+                            IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
+                            messageService.sendDeviceMessage(onlineMessage,
+                                    config.getProductKey(), config.getDeviceName(), serverId);
+                        } catch (Exception ex) {
+                            log.error("[refreshConfig][发送设备上线消息失败, deviceId={}]", config.getDeviceId(), ex);
+                        }
+                    }
+                    // 2.4 更新轮询任务
                     pollScheduler.updatePolling(config);
                 } catch (Exception e) {
                     log.error("[refreshConfig][处理设备配置失败, deviceId={}]", config.getDeviceId(), e);
                 }
             }
 
-            // 3. 清理已删除设备的资源
+            // 3. 清理已删除设备的资源（仅 API 成功时才执行）
             configCacheService.cleanupRemovedDevices(configs, deviceId -> {
+                // 3.1 发送设备下线消息
+                // TODO @AI：在这里判断上线 ，会不会有点奇怪？？？
+                IotModbusDeviceConfigRespDTO removedConfig = configCacheService.getConfig(deviceId);
+                if (removedConfig != null) {
+                    try {
+                        IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
+                        messageService.sendDeviceMessage(offlineMessage,
+                                removedConfig.getProductKey(), removedConfig.getDeviceName(), serverId);
+                    } catch (Exception ex) {
+                        log.error("[refreshConfig][发送设备下线消息失败, deviceId={}]", deviceId, ex);
+                    }
+                }
+                // 3.2 停止轮询和移除连接
                 pollScheduler.stopPolling(deviceId);
                 connectionManager.removeDevice(deviceId);
             });

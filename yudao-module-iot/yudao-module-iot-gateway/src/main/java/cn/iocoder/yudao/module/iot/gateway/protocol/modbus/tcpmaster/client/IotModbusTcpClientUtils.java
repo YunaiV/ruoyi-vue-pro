@@ -9,22 +9,24 @@ import com.ghgande.j2mod.modbus.procimg.Register;
 import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 import com.ghgande.j2mod.modbus.util.BitVector;
 import io.vertx.core.Future;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils.*;
 
-// TODO @AI：感觉它更像一个工具类；但是名字叫 client 很奇怪；
 /**
- * IoT Modbus TCP 客户端
+ * IoT Modbus TCP 客户端工具类
  * <p>
- * 封装 Modbus 协议读写操作：
- * 1. 封装 Modbus 读/写操作
- * 2. 根据功能码，执行对应的 Modbus 请求
+ * 封装基于 j2mod 的 Modbus TCP 读写操作：
+ * 1. 根据功能码创建对应的 Modbus 读/写请求
+ * 2. 通过 {@link IotModbusTcpConnectionManager.ModbusConnection} 执行事务
+ * 3. 从响应中提取原始值
  *
  * @author 芋道源码
  */
+@UtilityClass
 @Slf4j
-public class IotModbusTcpClient {
+public class IotModbusTcpClientUtils {
 
     /**
      * 读取 Modbus 数据
@@ -34,7 +36,7 @@ public class IotModbusTcpClient {
      * @param point      点位配置
      * @return 原始值（int 数组）
      */
-    public Future<int[]> read(IotModbusTcpConnectionManager.ModbusConnection connection,
+    public static Future<int[]> read(IotModbusTcpConnectionManager.ModbusConnection connection,
                               Integer slaveId,
                               IotModbusPointRespDTO point) {
         return connection.executeBlocking(tcpConnection -> {
@@ -68,7 +70,7 @@ public class IotModbusTcpClient {
      * @param values     要写入的值
      * @return 是否成功
      */
-    public Future<Boolean> write(IotModbusTcpConnectionManager.ModbusConnection connection,
+    public static Future<Boolean> write(IotModbusTcpConnectionManager.ModbusConnection connection,
                                   Integer slaveId,
                                   IotModbusPointRespDTO point,
                                   int[] values) {
@@ -98,7 +100,7 @@ public class IotModbusTcpClient {
      * 创建读取请求
      */
     @SuppressWarnings("EnhancedSwitchMigration")
-    private ModbusRequest createReadRequest(Integer functionCode, Integer address, Integer count) {
+    private static ModbusRequest createReadRequest(Integer functionCode, Integer address, Integer count) {
         switch (functionCode) {
             case FC_READ_COILS:
                 return new ReadCoilsRequest(address, count);
@@ -117,7 +119,7 @@ public class IotModbusTcpClient {
      * 创建写入请求
      */
     @SuppressWarnings("EnhancedSwitchMigration")
-    private ModbusRequest createWriteRequest(Integer functionCode, Integer address, Integer count, int[] values) {
+    private static ModbusRequest createWriteRequest(Integer functionCode, Integer address, Integer count, int[] values) {
         switch (functionCode) {
             case FC_READ_COILS: // 写线圈（使用功能码 5 或 15）
                 if (count == 1) {
@@ -151,7 +153,7 @@ public class IotModbusTcpClient {
      * 从响应中提取值
      */
     @SuppressWarnings("EnhancedSwitchMigration")
-    private int[] extractValues(ModbusResponse response, Integer functionCode) {
+    private static int[] extractValues(ModbusResponse response, Integer functionCode) {
         switch (functionCode) {
             case FC_READ_COILS:
                 ReadCoilsResponse coilsResponse = (ReadCoilsResponse) response;

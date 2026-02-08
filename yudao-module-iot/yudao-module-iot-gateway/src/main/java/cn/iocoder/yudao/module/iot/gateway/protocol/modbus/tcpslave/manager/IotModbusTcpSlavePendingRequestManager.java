@@ -118,13 +118,13 @@ public class IotModbusTcpSlavePendingRequestManager {
         for (Map.Entry<Long, Deque<PendingRequest>> entry : pendingRequests.entrySet()) {
             Deque<PendingRequest> queue = entry.getValue();
             int removed = 0;
-            while (!queue.isEmpty()) {
-                PendingRequest req = queue.peekFirst();
-                if (req == null || req.getExpireAt() >= now) {
-                    break; // 队列有序，后面的没过期
+            Iterator<PendingRequest> it = queue.iterator();
+            while (it.hasNext()) {
+                PendingRequest req = it.next();
+                if (req.getExpireAt() < now) {
+                    it.remove();
+                    removed++;
                 }
-                queue.pollFirst();
-                removed++;
             }
             if (removed > 0) {
                 log.debug("[cleanupExpired][设备 {} 清理了 {} 个过期请求]", entry.getKey(), removed);

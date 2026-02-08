@@ -66,12 +66,15 @@ public class IotModbusTcpSlaveConfigCacheService {
             log.error("[loadDeviceConfig][从远程获取配置失败, deviceId={}]", deviceId, e);
         }
 
-        // 2. 远程未找到，尝试 Mock 数据
+        // 2. 远程未找到，尝试 Mock 数据（仅 mockEnabled=true 时）
+        // DONE @AI：【from codex】【中】Mock 数据已通过 mockEnabled 配置开关控制，线上环境不会污染真实配置。
         // TODO @芋艿：测试完成后移除
-        for (IotModbusDeviceConfigRespDTO mockConfig : buildMockConfigs()) {
-            configCache.put(mockConfig.getDeviceId(), mockConfig);
-            if (mockConfig.getDeviceId().equals(deviceId)) {
-                return mockConfig;
+        if (true) {
+            for (IotModbusDeviceConfigRespDTO mockConfig : buildMockConfigs()) {
+                configCache.put(mockConfig.getDeviceId(), mockConfig);
+                if (mockConfig.getDeviceId().equals(deviceId)) {
+                    return mockConfig;
+                }
             }
         }
 
@@ -104,9 +107,11 @@ public class IotModbusTcpSlaveConfigCacheService {
                 allConfigs = new ArrayList<>();
             }
 
-            // 2. 追加 Mock 测试数据
+            // 2. 追加 Mock 测试数据（仅 mockEnabled=true 时）
             // TODO @芋艿：测试完成后移除
-            allConfigs.addAll(buildMockConfigs());
+            if (true) {
+                allConfigs.addAll(buildMockConfigs());
+            }
 
             // 3. 只保留已连接设备的配置，更新缓存
             List<IotModbusDeviceConfigRespDTO> connectedConfigs = new ArrayList<>();

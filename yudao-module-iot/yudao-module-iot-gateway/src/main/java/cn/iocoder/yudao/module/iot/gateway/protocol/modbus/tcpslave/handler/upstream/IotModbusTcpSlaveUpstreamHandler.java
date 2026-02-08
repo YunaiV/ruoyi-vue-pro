@@ -19,7 +19,6 @@ import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusDataConverter;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.IotModbusUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrameEncoder;
@@ -56,7 +55,6 @@ public class IotModbusTcpSlaveUpstreamHandler {
 
     private final IotDeviceCommonApi deviceApi;
     private final IotDeviceMessageService messageService;
-    private final IotModbusDataConverter dataConverter;
     private final IotModbusFrameEncoder frameEncoder;
     private final IotModbusTcpSlaveConnectionManager connectionManager;
     private final IotModbusTcpSlaveConfigCacheService configCacheService;
@@ -67,7 +65,6 @@ public class IotModbusTcpSlaveUpstreamHandler {
 
     public IotModbusTcpSlaveUpstreamHandler(IotDeviceCommonApi deviceApi,
                                             IotDeviceMessageService messageService,
-                                            IotModbusDataConverter dataConverter,
                                             IotModbusFrameEncoder frameEncoder,
                                             IotModbusTcpSlaveConnectionManager connectionManager,
                                             IotModbusTcpSlaveConfigCacheService configCacheService,
@@ -77,7 +74,6 @@ public class IotModbusTcpSlaveUpstreamHandler {
                                             String serverId) {
         this.deviceApi = deviceApi;
         this.messageService = messageService;
-        this.dataConverter = dataConverter;
         this.frameEncoder = frameEncoder;
         this.connectionManager = connectionManager;
         this.configCacheService = configCacheService;
@@ -175,6 +171,7 @@ public class IotModbusTcpSlaveUpstreamHandler {
         // 2.3 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         Assert.notNull(device, "设备不存在");
+        // TODO @AI：2.4 必须找到连接配置；
 
         // 3.1 注册连接
         ConnectionInfo connectionInfo = new ConnectionInfo()
@@ -213,7 +210,7 @@ public class IotModbusTcpSlaveUpstreamHandler {
                 .put("message", message)
                 .build();
         byte[] data = frameEncoder.encodeCustomFrame(frame.getSlaveId(), JsonUtils.toJsonString(response),
-                frameFormat, frame.getTransactionId() != null ? frame.getTransactionId() : 0);
+                frameFormat, frame.getTransactionId());
         connectionManager.sendToSocket(socket, data);
     }
 
@@ -258,7 +255,7 @@ public class IotModbusTcpSlaveUpstreamHandler {
         }
 
         // 3.1 点位翻译
-        Object convertedValue = dataConverter.convertToPropertyValue(rawValues, point);
+        Object convertedValue = IotModbusUtils.convertToPropertyValue(rawValues, point);
         // 3.2 上报属性
         Map<String, Object> params = MapUtil.of(request.getIdentifier(), convertedValue);
         IotDeviceMessage message = IotDeviceMessage.requestOf(

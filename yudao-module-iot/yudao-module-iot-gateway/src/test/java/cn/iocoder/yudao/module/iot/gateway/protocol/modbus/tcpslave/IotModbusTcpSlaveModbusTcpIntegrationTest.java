@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+// TODO @芋艿：【晚点改】单测需要简化！
 /**
  * IoT Modbus TCP Slave 协议集成测试 — MODBUS_TCP 帧格式（手动测试）
  *
@@ -123,6 +124,7 @@ public class IotModbusTcpSlaveModbusTcpIntegrationTest {
             // 1. 先认证
             IotModbusFrame authResponse = authenticate(socket);
             log.info("[testPollingResponse][认证响应: {}]", authResponse.getCustomData());
+            // TODO @AI：这里断言下，认证必须成功！
 
             // 2. 设置持续监听：每收到一个读请求，自动回复
             log.info("[testPollingResponse][开始持续监听网关下发的读请求...]");
