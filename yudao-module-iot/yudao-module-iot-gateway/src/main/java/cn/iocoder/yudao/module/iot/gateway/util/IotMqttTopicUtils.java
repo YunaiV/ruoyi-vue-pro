@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.gateway.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
 /**
  * IoT 网关 MQTT 主题工具类
@@ -43,6 +45,32 @@ public final class IotMqttTopicUtils {
      * 对应 EMQX HTTP ACL 插件的 ACL 请求接口
      */
     public static final String MQTT_ACL_PATH = "/mqtt/acl";
+
+    // ========== 消息方法标准化 ==========
+
+    /**
+     * 标准化设备回复消息的 method
+     * <p>
+     * MQTT 协议中，设备回复下行指令时，topic 和 method 会携带 _reply 后缀
+     * （如 thing.service.invoke_reply）。平台内部统一使用基础 method（如 thing.service.invoke），
+     * 通过 {@link IotDeviceMessage#getCode()} 非空来识别回复消息。
+     * <p>
+     * 此方法剥离 _reply 后缀，并确保 code 字段被设置。
+     *
+     * @param message 设备消息
+     */
+    public static void normalizeReplyMethod(IotDeviceMessage message) {
+        String method = message.getMethod();
+        if (!StrUtil.endWith(method, REPLY_TOPIC_SUFFIX)) {
+            return;
+        }
+        // 1. 剥离 _reply 后缀
+        message.setMethod(method.substring(0, method.length() - REPLY_TOPIC_SUFFIX.length()));
+        // 2. 确保 code 被设置，使 isReplyMessage() 能正确识别
+        if (message.getCode() == null) {
+            message.setCode(GlobalErrorCodeConstants.SUCCESS.getCode());
+        }
+    }
 
     // ========== 工具方法 ==========
 

@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,8 +52,10 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     @Resource
     private IotProductService productService;
     @Resource
+    @Lazy // 延迟加载，解决循环依赖
     private IotDeviceModbusConfigService modbusConfigService;
     @Resource
+    @Lazy // 延迟加载，解决循环依赖
     private IotDeviceModbusPointService modbusPointService;
 
     @Override

@@ -17,6 +17,7 @@ import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -41,9 +42,10 @@ public class IotProductServiceImpl implements IotProductService {
     private IotProductMapper productMapper;
 
     @Resource
-    private IotDevicePropertyService devicePropertyDataService;
-    @Resource
     private IotDeviceService deviceService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotDevicePropertyService devicePropertyDataService;
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
