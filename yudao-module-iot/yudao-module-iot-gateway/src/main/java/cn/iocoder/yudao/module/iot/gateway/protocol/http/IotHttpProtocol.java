@@ -64,10 +64,6 @@ public class IotHttpProtocol implements IotProtocol {
     public IotHttpProtocol(ProtocolProperties properties) {
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        this.downstreamSubscriber = new IotHttpDownstreamSubscriber(this, messageBus);
     }
 
     @Override
@@ -87,7 +83,7 @@ public class IotHttpProtocol implements IotProtocol {
             return;
         }
 
-        // 1.1 创建 Vertx 实例（每个 Protocol 独立管理）
+        // 1.1 创建 Vertx 实例
         this.vertx = Vertx.vertx();
 
         // 1.2 创建路由
@@ -123,18 +119,12 @@ public class IotHttpProtocol implements IotProtocol {
                     getId(), properties.getPort(), serverId);
 
             // 2. 启动下行消息订阅者
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            this.downstreamSubscriber = new IotHttpDownstreamSubscriber(this, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT HTTP 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭资源
-            if (httpServer != null) {
-                httpServer.close();
-                httpServer = null;
-            }
-            if (vertx != null) {
-                vertx.close();
-                vertx = null;
-            }
+            stop0();
             throw e;
         }
     }
@@ -144,6 +134,10 @@ public class IotHttpProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
         if (downstreamSubscriber != null) {
             try {

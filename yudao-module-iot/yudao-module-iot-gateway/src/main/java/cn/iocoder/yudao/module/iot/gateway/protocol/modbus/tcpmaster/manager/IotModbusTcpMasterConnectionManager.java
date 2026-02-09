@@ -14,6 +14,8 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -185,8 +187,11 @@ public class IotModbusTcpMasterConnectionManager {
      */
     private void addDeviceAndOnline(ModbusConnection connection,
                                     IotModbusDeviceConfigRespDTO config) {
-        connection.addDevice(config.getDeviceId(), config.getSlaveId());
-        sendOnlineMessage(config);
+        Integer previous = connection.addDevice(config.getDeviceId(), config.getSlaveId());
+        // 首次注册，发送上线消息
+        if (previous == null) {
+            sendOnlineMessage(config);
+        }
     }
 
     /**
@@ -247,7 +252,9 @@ public class IotModbusTcpMasterConnectionManager {
      * 关闭所有连接
      */
     public void closeAll() {
-        for (String connectionKey : connectionPool.keySet()) {
+        // 先复制再遍历，避免 closeConnection 中 remove 导致并发修改
+        List<String> connectionKeys = new ArrayList<>(connectionPool.keySet());
+        for (String connectionKey : connectionKeys) {
             closeConnection(connectionKey);
         }
         deviceConnectionMap.clear();
@@ -282,8 +289,8 @@ public class IotModbusTcpMasterConnectionManager {
          */
         private Context context;
 
-        public void addDevice(Long deviceId, Integer slaveId) {
-            deviceSlaveMap.put(deviceId, slaveId);
+        public Integer addDevice(Long deviceId, Integer slaveId) {
+            return deviceSlaveMap.putIfAbsent(deviceId, slaveId);
         }
 
         public void removeDevice(Long deviceId) {

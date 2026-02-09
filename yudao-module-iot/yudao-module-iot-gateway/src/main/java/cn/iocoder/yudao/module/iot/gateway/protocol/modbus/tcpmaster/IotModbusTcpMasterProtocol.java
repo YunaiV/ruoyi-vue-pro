@@ -65,7 +65,7 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotModbusTcpMasterDownstreamSubscriber downstreamSubscriber;
+    private IotModbusTcpMasterDownstreamSubscriber downstreamSubscriber;
 
     private final IotModbusTcpMasterConfigCacheService configCacheService;
     private final IotModbusTcpMasterPollScheduler pollScheduler;
@@ -89,15 +89,9 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
 
         // 初始化 Handler
         IotModbusTcpMasterUpstreamHandler upstreamHandler = new IotModbusTcpMasterUpstreamHandler(messageService, serverId);
-        IotModbusTcpMasterDownstreamHandler downstreamHandler = new IotModbusTcpMasterDownstreamHandler(connectionManager,
-                configCacheService);
 
         // 初始化轮询调度器
         this.pollScheduler = new IotModbusTcpMasterPollScheduler(vertx, connectionManager, upstreamHandler, configCacheService);
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        this.downstreamSubscriber = new IotModbusTcpMasterDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -130,13 +124,14 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
             log.info("[start][IoT Modbus TCP Master 协议 {} 启动成功，serverId={}]", getId(), serverId);
 
             // 2. 启动下行消息订阅者
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            IotModbusTcpMasterDownstreamHandler downstreamHandler = new IotModbusTcpMasterDownstreamHandler(connectionManager,
+                    configCacheService);
+            this.downstreamSubscriber = new IotModbusTcpMasterDownstreamSubscriber(this, downstreamHandler, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT Modbus TCP Master 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭资源
-            if (vertx != null) {
-                vertx.close();
-            }
+            stop0();
             throw e;
         }
     }
@@ -146,12 +141,19 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT Modbus TCP Master 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT Modbus TCP Master 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT Modbus TCP Master 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT Modbus TCP Master 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
         // 2.1 取消配置刷新定时器
@@ -161,10 +163,8 @@ public class IotModbusTcpMasterProtocol implements IotProtocol {
         }
         // 2.2 停止轮询调度器
         pollScheduler.stopAll();
-        log.info("[stop][IoT Modbus TCP Master 协议 {} 轮询调度器已停止]", getId());
         // 2.3 关闭所有连接
         connectionManager.closeAll();
-        log.info("[stop][IoT Modbus TCP Master 协议 {} 连接管理器已关闭]", getId());
 
         // 3. 关闭 Vert.x 实例
         if (vertx != null) {

@@ -90,7 +90,7 @@ public class IotEmqxProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotEmqxDownstreamSubscriber downstreamSubscriber;
+    private IotEmqxDownstreamSubscriber downstreamSubscriber;
 
     public IotEmqxProtocol(ProtocolProperties properties) {
         Assert.notNull(properties, "协议实例配置不能为空");
@@ -101,10 +101,6 @@ public class IotEmqxProtocol implements IotProtocol {
                 "MQTT 连接超时时间(emqx.connect-timeout-seconds)不能为空");
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
         this.upstreamHandler = new IotEmqxUpstreamHandler(serverId);
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        this.downstreamSubscriber = new IotEmqxDownstreamSubscriber(this, messageBus);
     }
 
     @Override
@@ -124,7 +120,7 @@ public class IotEmqxProtocol implements IotProtocol {
             return;
         }
 
-        // 1.1 创建 Vertx 实例
+        // 1.1 创建 Vertx 实例 和 下行消息订阅者
         this.vertx = Vertx.vertx();
 
         try {
@@ -138,6 +134,8 @@ public class IotEmqxProtocol implements IotProtocol {
                     getId(), properties.getPort(), serverId);
 
             // 2. 启动下行消息订阅者
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            this.downstreamSubscriber = new IotEmqxDownstreamSubscriber(this, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT EMQX 协议 {} 启动失败]", getId(), e);
@@ -157,11 +155,14 @@ public class IotEmqxProtocol implements IotProtocol {
 
     private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT EMQX 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT EMQX 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT EMQX 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT EMQX 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
         // 2.1 先置为 false：避免 closeHandler 触发重连

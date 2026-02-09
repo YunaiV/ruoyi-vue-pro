@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -155,15 +157,18 @@ public class IotModbusTcpSlaveConnectionManager {
      * 关闭所有连接
      */
     public void closeAll() {
-        for (NetSocket socket : connectionMap.keySet()) {
+        // 1. 先复制再清空，避免 closeHandler 回调时并发修改
+        List<NetSocket> sockets = new ArrayList<>(connectionMap.keySet());
+        connectionMap.clear();
+        deviceSocketMap.clear();
+        // 2. 关闭所有 socket（closeHandler 中 removeConnection 发现 map 为空会安全跳过）
+        for (NetSocket socket : sockets) {
             try {
                 socket.close();
             } catch (Exception e) {
                 log.error("[closeAll][关闭连接失败]", e);
             }
         }
-        connectionMap.clear();
-        deviceSocketMap.clear();
     }
 
 }

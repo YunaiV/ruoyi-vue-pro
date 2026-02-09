@@ -88,7 +88,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotModbusTcpSlaveDownstreamSubscriber downstreamSubscriber;
+    private IotModbusTcpSlaveDownstreamSubscriber downstreamSubscriber;
 
     private final IotModbusFrameDecoder frameDecoder;
     @SuppressWarnings("FieldCanBeLocal")
@@ -121,7 +121,6 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
 
         // 初始化共享事务 ID 自增器（PollScheduler 和 DownstreamHandler 共用，避免 transactionId 冲突）
         AtomicInteger transactionIdCounter = new AtomicInteger(0);
-
         // 初始化轮询调度器
         this.pollScheduler = new IotModbusTcpSlavePollScheduler(
                 vertx, connectionManager, frameEncoder, pendingRequestManager,
@@ -134,13 +133,6 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
                 deviceApi, this.messageService, frameEncoder,
                 connectionManager, configCacheService, pendingRequestManager,
                 pollScheduler, deviceService, serverId);
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        IotModbusTcpSlaveDownstreamHandler downstreamHandler = new IotModbusTcpSlaveDownstreamHandler(
-                connectionManager, configCacheService, frameEncoder, transactionIdCounter);
-        this.downstreamSubscriber = new IotModbusTcpSlaveDownstreamSubscriber(
-                this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -179,25 +171,15 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
                     getId(), serverId, properties.getPort());
 
             // 3. 启动下行消息订阅
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            IotModbusTcpSlaveDownstreamHandler downstreamHandler = new IotModbusTcpSlaveDownstreamHandler(
+                    connectionManager, configCacheService, frameEncoder, this.pollScheduler.getTransactionIdCounter());
+            this.downstreamSubscriber = new IotModbusTcpSlaveDownstreamSubscriber(
+                    this, downstreamHandler, messageBus);
             downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT Modbus TCP Slave 协议 {} 启动失败]", getId(), e);
-            // TODO @芋艿：后续统一优化 stop 逻辑；
-            if (configRefreshTimerId != null) {
-                vertx.cancelTimer(configRefreshTimerId);
-                configRefreshTimerId = null;
-            }
-            if (requestCleanupTimerId != null) {
-                vertx.cancelTimer(requestCleanupTimerId);
-                requestCleanupTimerId = null;
-            }
-            connectionManager.closeAll();
-            if (netServer != null) {
-                netServer.close();
-            }
-            if (vertx != null) {
-                vertx.close();
-            }
+            stop0();
             throw e;
         }
     }
@@ -207,12 +189,18 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
 
+    private void stop0() {
         // 1. 停止下行消息订阅
-        try {
-            downstreamSubscriber.stop();
-        } catch (Exception e) {
-            log.error("[stop][下行消息订阅器停止失败]", e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+            } catch (Exception e) {
+                log.error("[stop][下行消息订阅器停止失败]", e);
+            }
+            downstreamSubscriber = null;
         }
 
         // 2.1 取消定时器
@@ -238,6 +226,7 @@ public class IotModbusTcpSlaveProtocol implements IotProtocol {
             } catch (Exception e) {
                 log.error("[stop][TCP Server 关闭失败]", e);
             }
+            netServer = null;
         }
 
         // 3. 关闭 Vertx

@@ -63,7 +63,7 @@ public class IotUdpProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotUdpDownstreamSubscriber downstreamSubscriber;
+    private IotUdpDownstreamSubscriber downstreamSubscriber;
 
     /**
      * 消息序列化器
@@ -85,10 +85,6 @@ public class IotUdpProtocol implements IotProtocol {
         // 初始化会话管理器
         this.sessionManager = new IotUdpSessionManager(udpConfig.getMaxSessions(), udpConfig.getSessionTimeoutMs());
 
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        IotUdpDownstreamHandler downstreamHandler = new IotUdpDownstreamHandler(this, sessionManager, serializer);
-        this.downstreamSubscriber = new IotUdpDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -108,8 +104,11 @@ public class IotUdpProtocol implements IotProtocol {
             return;
         }
 
-        // 1.1 创建 Vertx 实例
+        // 1.1 创建 Vertx 实例 和 下行消息订阅者
         this.vertx = Vertx.vertx();
+        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+        IotUdpDownstreamHandler downstreamHandler = new IotUdpDownstreamHandler(this, sessionManager, serializer);
+        this.downstreamSubscriber = new IotUdpDownstreamSubscriber(this, downstreamHandler, messageBus);
 
         // 1.2 创建 UDP Socket 选项
         IotUdpConfig udpConfig = properties.getUdp();
@@ -137,15 +136,7 @@ public class IotUdpProtocol implements IotProtocol {
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT UDP 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭资源
-            if (udpSocket != null) {
-                udpSocket.close();
-                udpSocket = null;
-            }
-            if (vertx != null) {
-                vertx.close();
-                vertx = null;
-            }
+            stop0();
             throw e;
         }
     }
@@ -155,12 +146,19 @@ public class IotUdpProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT UDP 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT UDP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT UDP 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT UDP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
         // 2.1 关闭 UDP Socket

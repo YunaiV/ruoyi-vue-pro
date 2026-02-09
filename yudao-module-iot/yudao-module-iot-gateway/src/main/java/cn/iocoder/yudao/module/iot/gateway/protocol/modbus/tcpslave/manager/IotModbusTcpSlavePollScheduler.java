@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotMod
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlaveConnectionManager.ConnectionInfo;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager.IotModbusTcpSlavePendingRequestManager.PendingRequest;
 import io.vertx.core.Vertx;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,6 +32,7 @@ public class IotModbusTcpSlavePollScheduler extends AbstractIotModbusPollSchedul
     /**
      * TCP 事务 ID 自增器（与 DownstreamHandler 共享）
      */
+    @Getter
     private final AtomicInteger transactionIdCounter;
 
     public IotModbusTcpSlavePollScheduler(Vertx vertx,

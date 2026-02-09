@@ -167,7 +167,7 @@ yudao:
         # 针对引入的 Modbus TCP Master 组件的配置
         # ====================================
         - id: modbus-tcp-master-1
-          enabled: true
+          enabled: false
           protocol: modbus_tcp_master
           port: 502
           modbus-tcp-master:
@@ -176,7 +176,7 @@ yudao:
         # 针对引入的 Modbus TCP Slave 组件的配置
         # ====================================
         - id: modbus-tcp-slave-1
-          enabled: true
+          enabled: false
           protocol: modbus_tcp_slave
           port: 503
           modbus-tcp-slave:

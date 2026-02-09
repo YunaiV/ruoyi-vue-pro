@@ -381,8 +381,11 @@ public class IotModbusCommonUtils {
             case UINT16:
                 return new int[]{rawValue.intValue() & 0xFFFF};
             case INT32:
-            case UINT32:
                 return encodeInt32(rawValue.intValue(), byteOrder);
+            case UINT32:
+                // 使用 longValue() 避免超过 Integer.MAX_VALUE 时溢出，
+                // 强转 int 保留低 32 位 bit pattern，写入寄存器的字节是正确的无符号值
+                return encodeInt32((int) rawValue.longValue(), byteOrder);
             case FLOAT:
                 return encodeFloat(rawValue.floatValue(), byteOrder);
             case DOUBLE:

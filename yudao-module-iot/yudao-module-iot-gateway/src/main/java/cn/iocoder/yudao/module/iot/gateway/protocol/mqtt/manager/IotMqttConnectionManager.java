@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -164,6 +166,24 @@ public class IotMqttConnectionManager {
      */
     public MqttEndpoint getDeviceEndpoint(Long deviceId) {
         return deviceEndpointMap.get(deviceId);
+    }
+
+    /**
+     * 关闭所有连接
+     */
+    public void closeAll() {
+        // 1. 先复制再清空，避免 closeHandler 回调时并发修改
+        List<MqttEndpoint> endpoints = new ArrayList<>(connectionMap.keySet());
+        connectionMap.clear();
+        deviceEndpointMap.clear();
+        // 2. 关闭所有连接（closeHandler 中 unregisterConnection 发现 map 为空会安全跳过）
+        for (MqttEndpoint endpoint : endpoints) {
+            try {
+                endpoint.close();
+            } catch (Exception ignored) {
+                // 连接可能已关闭，忽略异常
+            }
+        }
     }
 
     /**

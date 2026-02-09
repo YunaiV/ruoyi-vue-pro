@@ -81,7 +81,7 @@ public class IotMqttProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotMqttDownstreamSubscriber downstreamSubscriber;
+    private IotMqttDownstreamSubscriber downstreamSubscriber;
 
     private final IotDeviceMessageService deviceMessageService;
 
@@ -104,11 +104,6 @@ public class IotMqttProtocol implements IotProtocol {
         this.authHandler = new IotMqttAuthHandler(connectionManager, deviceMessageService, deviceApi, serverId);
         this.registerHandler = new IotMqttRegisterHandler(connectionManager, deviceMessageService);
         this.upstreamHandler = new IotMqttUpstreamHandler(connectionManager, deviceMessageService, serverId);
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        IotMqttDownstreamHandler downstreamHandler = new IotMqttDownstreamHandler(deviceMessageService, connectionManager);
-        this.downstreamSubscriber = new IotMqttDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -157,18 +152,13 @@ public class IotMqttProtocol implements IotProtocol {
                     getId(), properties.getPort(), serverId);
 
             // 2. 启动下行消息订阅者
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            IotMqttDownstreamHandler downstreamHandler = new IotMqttDownstreamHandler(deviceMessageService, connectionManager);
+            this.downstreamSubscriber = new IotMqttDownstreamSubscriber(this, downstreamHandler, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT MQTT 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭资源
-            if (mqttServer != null) {
-                mqttServer.close();
-                mqttServer = null;
-            }
-            if (vertx != null) {
-                vertx.close();
-                vertx = null;
-            }
+            stop0();
             throw e;
         }
     }
@@ -178,15 +168,24 @@ public class IotMqttProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT MQTT 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT MQTT 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT MQTT 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT MQTT 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
-        // 2.1 关闭 MQTT 服务器
+        // 2.1 关闭所有连接
+        connectionManager.closeAll();
+        // 2.2 关闭 MQTT 服务器
         if (mqttServer != null) {
             try {
                 mqttServer.close().result();
@@ -196,7 +195,7 @@ public class IotMqttProtocol implements IotProtocol {
             }
             mqttServer = null;
         }
-        // 2.2 关闭 Vertx 实例
+        // 2.3 关闭 Vertx 实例
         if (vertx != null) {
             try {
                 vertx.close().result();

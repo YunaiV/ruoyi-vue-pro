@@ -70,7 +70,6 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
         return modbusConfigMapper.selectList(listReqDTO);
     }
 
-    // TODO @AI：还是希望在 IotDeviceModbusConfigSaveReqVO 里，通过 validator 校验？！或者通过 group 来处理？
     private void validateModbusConfigByProtocolType(IotDeviceModbusConfigSaveReqVO saveReqVO, String protocolType) {
         IotProtocolTypeEnum protocolTypeEnum = IotProtocolTypeEnum.of(protocolType);
         if (protocolTypeEnum == null) {
