@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -34,6 +35,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
  *
  * @author ahh
  */
+@Slf4j
 @Service
 @Validated
 public class IotProductServiceImpl implements IotProductService {
@@ -176,6 +178,27 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public List<IotProductDO> getProductList(Collection<Long> ids) {
         return productMapper.selectByIds(ids);
+    }
+
+    @Override
+    public void syncProductPropertyTable() {
+        // 1. 获取所有已发布的产品
+        List<IotProductDO> products = productMapper.selectListByStatus(
+                IotProductStatusEnum.PUBLISHED.getStatus());
+        log.info("[syncProductPropertyTable][开始同步，已发布产品数量({})]", products.size());
+
+        // 2. 遍历同步 TDengine 表结构（创建产品超级表数据模型）
+        int successCount = 0;
+        for (IotProductDO product : products) {
+            try {
+                devicePropertyDataService.defineDevicePropertyData(product.getId());
+                successCount++;
+                log.info("[syncProductPropertyTable][产品({}/{}) 同步成功]", product.getId(), product.getName());
+            } catch (Exception e) {
+                log.error("[syncProductPropertyTable][产品({}/{}) 同步失败]", product.getId(), product.getName(), e);
+            }
+        }
+        log.info("[syncProductPropertyTable][同步完成，成功({}/{})个]", successCount, products.size());
     }
 
     @Override

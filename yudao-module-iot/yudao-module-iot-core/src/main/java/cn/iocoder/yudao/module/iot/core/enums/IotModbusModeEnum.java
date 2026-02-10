@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * IoT Modbus 模式枚举
+ * IoT Modbus 工作模式枚举
  *
  * @author 芋道源码
  */
@@ -16,18 +16,18 @@ import java.util.Arrays;
 public enum IotModbusModeEnum implements ArrayValuable<Integer> {
 
     POLLING(1, "云端轮询"),
-    ACTIVE_REPORT(2, "主动上报");
+    ACTIVE_REPORT(2, "边缘采集");
 
     public static final Integer[] ARRAYS = Arrays.stream(values())
             .map(IotModbusModeEnum::getMode)
             .toArray(Integer[]::new);
 
     /**
-     * 模式
+     * 工作模式
      */
     private final Integer mode;
     /**
-     * 名称
+     * 模式名称
      */
     private final String name;
 

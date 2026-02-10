@@ -1,0 +1,5 @@
+### 请求 /iot/product/sync-property-table 接口 => 成功
+POST {{baseUrl}}/iot/product/sync-property-table
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}

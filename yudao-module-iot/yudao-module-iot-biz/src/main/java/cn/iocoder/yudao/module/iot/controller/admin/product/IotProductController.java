@@ -141,6 +141,14 @@ public class IotProductController {
                 result.getData().getList());
     }
 
+    @PostMapping("/sync-property-table")
+    @Operation(summary = "同步产品属性表结构到 TDengine")
+    @PreAuthorize("@ss.hasPermission('iot:product:update')")
+    public CommonResult<Boolean> syncProductPropertyTable() {
+        productService.syncProductPropertyTable();
+        return success(true);
+    }
+
     @GetMapping("/simple-list")
     @Operation(summary = "获取产品的精简信息列表", description = "主要用于前端的下拉选项")
     @Parameter(name = "deviceType", description = "设备类型", example = "1")
