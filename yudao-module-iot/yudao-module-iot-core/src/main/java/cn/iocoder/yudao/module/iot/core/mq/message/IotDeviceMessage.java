@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.core.mq.message;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

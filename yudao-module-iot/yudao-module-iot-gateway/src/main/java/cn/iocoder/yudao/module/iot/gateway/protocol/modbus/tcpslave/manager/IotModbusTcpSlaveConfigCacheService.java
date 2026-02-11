@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusModeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusModeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

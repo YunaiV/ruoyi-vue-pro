@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
 import lombok.AllArgsConstructor;

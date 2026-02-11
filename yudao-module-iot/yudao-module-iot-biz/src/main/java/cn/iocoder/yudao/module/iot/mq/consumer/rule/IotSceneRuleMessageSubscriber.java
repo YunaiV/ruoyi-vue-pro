@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class IotSceneRuleMessageHandler implements IotMessageSubscriber<IotDeviceMessage> {
+public class IotSceneRuleMessageSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
 
     @Resource
     private IotSceneRuleService sceneRuleService;

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.manager;
 
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusFrameFormatEnum;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFrameFormatEnum;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;

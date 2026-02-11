@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.biz.dto;
 
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusByteOrderEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotModbusRawDataTypeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusByteOrderEnum;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusRawDataTypeEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
