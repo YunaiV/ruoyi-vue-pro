@@ -30,12 +30,6 @@ public class IotDeviceModbusPointDO extends TenantBaseDO {
     @TableId
     private Long id;
     /**
-     * 产品编号
-     *
-     * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
-     */
-    private Long productId;
-    /**
      * 设备编号
      *
      * 关联 {@link IotDeviceDO#getId()}

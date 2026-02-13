@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusByteOrderEnum;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusRawDataTypeEnum;
-import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpslave.codec.IotModbusFrame;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.codec.IotModbusFrame;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 

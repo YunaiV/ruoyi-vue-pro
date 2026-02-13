@@ -75,14 +75,14 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
         if (protocolTypeEnum == null) {
             return;
         }
-        if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_MASTER) {
-            Assert.isTrue(StrUtil.isNotEmpty(saveReqVO.getIp()), "Master 模式下，IP 地址不能为空");
-            Assert.notNull(saveReqVO.getPort(), "Master 模式下，端口不能为空");
-            Assert.notNull(saveReqVO.getTimeout(), "Master 模式下，连接超时时间不能为空");
-            Assert.notNull(saveReqVO.getRetryInterval(), "Master 模式下，重试间隔不能为空");
-        } else if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_SLAVE) {
-            Assert.notNull(saveReqVO.getMode(), "Slave 模式下，工作模式不能为空");
-            Assert.notNull(saveReqVO.getFrameFormat(), "Slave 模式下，数据帧格式不能为空");
+        if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_CLIENT) {
+            Assert.isTrue(StrUtil.isNotEmpty(saveReqVO.getIp()), "Client 模式下，IP 地址不能为空");
+            Assert.notNull(saveReqVO.getPort(), "Client 模式下，端口不能为空");
+            Assert.notNull(saveReqVO.getTimeout(), "Client 模式下，连接超时时间不能为空");
+            Assert.notNull(saveReqVO.getRetryInterval(), "Client 模式下，重试间隔不能为空");
+        } else if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_SERVER) {
+            Assert.notNull(saveReqVO.getMode(), "Server 模式下，工作模式不能为空");
+            Assert.notNull(saveReqVO.getFrameFormat(), "Server 模式下，数据帧格式不能为空");
         }
     }
 

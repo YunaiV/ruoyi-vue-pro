@@ -164,22 +164,22 @@ yudao:
               trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
               trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
         # ====================================
-        # 针对引入的 Modbus TCP Master 组件的配置
+        # 针对引入的 Modbus TCP Client 组件的配置
         # ====================================
-        - id: modbus-tcp-master-1
+        - id: modbus-tcp-client-1
           enabled: false
-          protocol: modbus_tcp_master
+          protocol: modbus_tcp_client
           port: 502
-          modbus-tcp-master:
+          modbus-tcp-client:
             config-refresh-interval: 30  # 配置刷新间隔（秒）
         # ====================================
-        # 针对引入的 Modbus TCP Slave 组件的配置
+        # 针对引入的 Modbus TCP Server 组件的配置
         # ====================================
-        - id: modbus-tcp-slave-1
+        - id: modbus-tcp-server-1
           enabled: false
-          protocol: modbus_tcp_slave
+          protocol: modbus_tcp_server
           port: 503
-          modbus-tcp-slave:
+          modbus-tcp-server:
             config-refresh-interval: 30     # 配置刷新间隔（秒）
             custom-function-code: 65        # 自定义功能码（用于认证等扩展交互）
             request-timeout: 5000           # Pending Request 超时时间（毫秒）
