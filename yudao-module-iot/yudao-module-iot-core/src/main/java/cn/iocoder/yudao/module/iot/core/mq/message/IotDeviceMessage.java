@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.core.mq.message;
 
-import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.topic.state.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -149,20 +149,12 @@ public class IotDeviceMessage {
 
     public static IotDeviceMessage buildStateUpdateOnline() {
         return requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
-                MapUtil.of("state", IotDeviceStateEnum.ONLINE.getState()));
+                new IotDeviceStateUpdateReqDTO(IotDeviceStateEnum.ONLINE.getState()));
     }
 
     public static IotDeviceMessage buildStateOffline() {
         return requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
-                MapUtil.of("state", IotDeviceStateEnum.OFFLINE.getState()));
-    }
-
-    public static IotDeviceMessage buildOtaUpgrade(String version, String fileUrl, Long fileSize,
-                                                   String fileDigestAlgorithm, String fileDigestValue) {
-        return requestOf(IotDeviceMessageMethodEnum.OTA_UPGRADE.getMethod(), MapUtil.builder()
-                .put("version", version).put("fileUrl", fileUrl).put("fileSize", fileSize)
-                .put("fileDigestAlgorithm", fileDigestAlgorithm).put("fileDigestValue", fileDigestValue)
-                .build());
+                new IotDeviceStateUpdateReqDTO(IotDeviceStateEnum.OFFLINE.getState()));
     }
 
 }
