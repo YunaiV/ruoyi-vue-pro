@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * IoT 设备属性设置的 {@link IotSceneRuleAction} 实现类
@@ -24,7 +23,7 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class IotDeviceControlSceneRuleAction implements IotSceneRuleAction {
+public class IotDevicePropertySetSceneRuleAction implements IotSceneRuleAction {
 
     @Resource
     private IotDeviceService deviceService;
