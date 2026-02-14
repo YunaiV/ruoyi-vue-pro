@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusPointPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusPointSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusPointDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

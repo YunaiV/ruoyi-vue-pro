@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**

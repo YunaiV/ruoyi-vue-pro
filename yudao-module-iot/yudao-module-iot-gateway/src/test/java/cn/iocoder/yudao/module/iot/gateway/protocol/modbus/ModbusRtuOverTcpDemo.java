@@ -6,6 +6,8 @@ import com.ghgande.j2mod.modbus.procimg.*;
 import com.ghgande.j2mod.modbus.slave.ModbusSlave;
 import com.ghgande.j2mod.modbus.slave.ModbusSlaveFactory;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -156,8 +158,8 @@ public class ModbusRtuOverTcpDemo {
     private static void bridge(Socket src, Socket dst) {
         try {
             byte[] buf = new byte[1024];
-            var in = src.getInputStream();
-            var out = dst.getOutputStream();
+            InputStream in = src.getInputStream();
+            OutputStream out = dst.getOutputStream();
             int len;
             while ((len = in.read(buf)) != -1) {
                 out.write(buf, 0, len);

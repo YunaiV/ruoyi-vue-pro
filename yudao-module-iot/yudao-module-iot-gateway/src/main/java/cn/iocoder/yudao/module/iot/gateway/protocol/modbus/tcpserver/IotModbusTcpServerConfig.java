@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * IoT Modbus TCP Server 协议配置

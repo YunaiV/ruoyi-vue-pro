@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * IoT WebSocket 协议配置

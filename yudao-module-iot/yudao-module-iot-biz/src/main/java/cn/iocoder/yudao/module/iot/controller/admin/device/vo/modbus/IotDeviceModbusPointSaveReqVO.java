@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Schema(description = "管理后台 - IoT 设备 Modbus 点位配置新增/修改 Request VO")

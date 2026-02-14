@@ -20,8 +20,6 @@ import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusConfigService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusPointService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
