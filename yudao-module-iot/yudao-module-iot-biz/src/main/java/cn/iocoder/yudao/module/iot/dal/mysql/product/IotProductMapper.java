@@ -38,6 +38,10 @@ public interface IotProductMapper extends BaseMapperX<IotProductDO> {
                 .apply("LOWER(product_key) = {0}", productKey.toLowerCase()));
     }
 
+    default List<IotProductDO> selectListByStatus(Integer status) {
+        return selectList(IotProductDO::getStatus, status);
+    }
+
     default Long selectCountByCreateTime(@Nullable LocalDateTime createTime) {
         return selectCount(new LambdaQueryWrapperX<IotProductDO>()
                 .geIfPresent(IotProductDO::getCreateTime, createTime));

@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.util.IotCoapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
@@ -21,6 +20,8 @@ import org.eclipse.californium.elements.config.UdpConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstream.IotCoapAbstractHandler.OPTION_TOKEN;
 
 /**
  * IoT 网关子设备 CoAP 协议集成测试（手动测试）
@@ -137,7 +138,7 @@ public class IotGatewaySubDeviceCoapProtocolIntegrationTest {
             request.setURI(uri);
             request.setPayload(payload);
             request.getOptions().setContentFormat(MediaTypeRegistry.APPLICATION_JSON);
-            request.getOptions().addOption(new Option(IotCoapUtils.OPTION_TOKEN, TOKEN));
+            request.getOptions().addOption(new Option(OPTION_TOKEN, TOKEN));
 
             CoapResponse response = client.advanced(request);
             // 2.2 输出结果
@@ -185,7 +186,7 @@ public class IotGatewaySubDeviceCoapProtocolIntegrationTest {
             request.setURI(uri);
             request.setPayload(payload);
             request.getOptions().setContentFormat(MediaTypeRegistry.APPLICATION_JSON);
-            request.getOptions().addOption(new Option(IotCoapUtils.OPTION_TOKEN, TOKEN));
+            request.getOptions().addOption(new Option(OPTION_TOKEN, TOKEN));
 
             CoapResponse response = client.advanced(request);
             // 2.2 输出结果

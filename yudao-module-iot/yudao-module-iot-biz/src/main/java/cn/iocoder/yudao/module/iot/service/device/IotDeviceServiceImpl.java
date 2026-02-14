@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoChangeReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoDeleteReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.topo.IotDeviceTopoGetRespDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
@@ -819,8 +820,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (BooleanUtil.isFalse(product.getRegisterEnabled())) {
             throw exception(DEVICE_REGISTER_DISABLED);
         }
-        // 1.3 验证 productSecret
-        if (ObjUtil.notEqual(product.getProductSecret(), reqDTO.getProductSecret())) {
+        // 1.3 【重要！！！】验证签名
+        if (!IotProductAuthUtils.verifySign(reqDTO.getProductKey(), reqDTO.getDeviceName(),
+                product.getProductSecret(), reqDTO.getSign())) {
             throw exception(DEVICE_REGISTER_SECRET_INVALID);
         }
         return TenantUtils.execute(product.getTenantId(), () -> {

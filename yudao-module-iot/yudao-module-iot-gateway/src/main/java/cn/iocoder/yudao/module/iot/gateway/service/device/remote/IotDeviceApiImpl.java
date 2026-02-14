@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
@@ -23,6 +25,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
@@ -44,7 +48,7 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     public void init() {
         IotGatewayProperties.RpcProperties rpc = gatewayProperties.getRpc();
         restTemplate = new RestTemplateBuilder()
-                .rootUri(rpc.getUrl() + "/rpc-api/iot/device")
+                .rootUri(rpc.getUrl())
                 .readTimeout(rpc.getReadTimeout())
                 .connectTimeout(rpc.getConnectTimeout())
                 .build();
@@ -52,12 +56,17 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
 
     @Override
     public CommonResult<Boolean> authDevice(IotDeviceAuthReqDTO authReqDTO) {
-        return doPost("/auth", authReqDTO, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/device/auth", authReqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override
     public CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO getReqDTO) {
-        return doPost("/get", getReqDTO, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/device/get", getReqDTO, new ParameterizedTypeReference<>() { });
+    }
+
+    @Override
+    public CommonResult<List<IotModbusDeviceConfigRespDTO>> getModbusDeviceConfigList(IotModbusDeviceConfigListReqDTO listReqDTO) {
+        return doPost("/rpc-api/iot/modbus/config-list", listReqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override

@@ -26,4 +26,16 @@ public interface IotMessageSubscriber<T> {
      */
     void onMessage(T message);
 
+    /**
+     * 启动订阅
+     */
+    default void start() {
+    }
+
+    /**
+     * 停止订阅
+     */
+    default void stop() {
+    }
+
 }

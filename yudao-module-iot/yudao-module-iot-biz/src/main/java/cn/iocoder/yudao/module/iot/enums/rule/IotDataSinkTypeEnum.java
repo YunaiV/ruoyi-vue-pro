@@ -19,9 +19,9 @@ public enum IotDataSinkTypeEnum implements ArrayValuable<Integer> {
     TCP(2, "TCP"),
     WEBSOCKET(3, "WebSocket"),
 
-    MQTT(10, "MQTT"), // TODO 待实现；
+    MQTT(10, "MQTT"), // TODO @puhui999：待实现；
 
-    DATABASE(20, "Database"), // TODO @puhui999：待实现；可以简单点，对应的表名是什么，字段先固定了。
+    DATABASE(20, "Database"), // TODO @puhui999：待实现；
     REDIS(21, "Redis"),
 
     ROCKETMQ(30, "RocketMQ"),

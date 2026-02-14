@@ -14,8 +14,6 @@ import java.time.Duration;
 
 // TODO @芋艿：数据库
 // TODO @芋艿：mqtt
-// TODO @芋艿：tcp
-// TODO @芋艿：websocket
 
 /**
  * 可缓存的 {@link IotDataRuleAction} 抽象实现

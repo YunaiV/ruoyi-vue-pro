@@ -38,7 +38,7 @@ public class IotDeviceMessageRespVO {
     @Schema(description = "请求编号", example = "req_123")
     private String requestId;
 
-    @Schema(description = "请求方法", requiredMode = Schema.RequiredMode.REQUIRED, example = "thing.property.report")
+    @Schema(description = "请求方法", requiredMode = Schema.RequiredMode.REQUIRED, example = "thing.property.post")
     private String method;
 
     @Schema(description = "请求参数")

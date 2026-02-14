@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.alink.IotAlinkDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
+import cn.iocoder.yudao.module.iot.gateway.serialize.json.IotJsonSerializer;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketClient;
@@ -60,9 +60,9 @@ public class IotGatewaySubDeviceWebSocketProtocolIntegrationTest {
 
     private static Vertx vertx;
 
-    // ===================== 编解码器选择 =====================
+    // ===================== 序列化器选择 =====================
 
-    private static final IotDeviceMessageCodec CODEC = new IotAlinkDeviceMessageCodec();
+    private static final IotMessageSerializer SERIALIZER = new IotJsonSerializer();
 
     // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
 
@@ -96,10 +96,10 @@ public class IotGatewaySubDeviceWebSocketProtocolIntegrationTest {
                 .setUsername(authInfo.getUsername())
                 .setPassword(authInfo.getPassword());
         IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
-        // 1.2 编码
-        byte[] payload = CODEC.encode(request);
+        // 1.2 序列化
+        byte[] payload = SERIALIZER.serialize(request);
         String jsonMessage = StrUtil.utf8Str(payload);
-        log.info("[testAuth][Codec: {}, 请求消息: {}]", CODEC.type(), request);
+        log.info("[testAuth][Serialize: {}, 请求消息: {}]", SERIALIZER.getType(), request);
 
         // 2.1 创建 WebSocket 连接（同步）
         WebSocket ws = createWebSocketConnection();
@@ -110,7 +110,7 @@ public class IotGatewaySubDeviceWebSocketProtocolIntegrationTest {
 
         // 3. 解码响应
         if (response != null) {
-            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            IotDeviceMessage responseMessage = SERIALIZER.deserialize(StrUtil.utf8Bytes(response));
             log.info("[testAuth][响应消息: {}]", responseMessage);
         } else {
             log.warn("[testAuth][未收到响应]");
@@ -146,16 +146,16 @@ public class IotGatewaySubDeviceWebSocketProtocolIntegrationTest {
                         .put("temperature", 36.5)
                         .build()),
                 null, null, null);
-        // 2.2 编码
-        byte[] payload = CODEC.encode(request);
+        // 2.2 序列化
+        byte[] payload = SERIALIZER.serialize(request);
         String jsonMessage = StrUtil.utf8Str(payload);
-        log.info("[testPropertyPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
+        log.info("[testPropertyPost][Serialize: {}, 请求消息: {}]", SERIALIZER.getType(), request);
 
         // 3.1 发送并等待响应
         String response = sendAndReceive(ws, jsonMessage);
         // 3.2 解码响应
         if (response != null) {
-            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            IotDeviceMessage responseMessage = SERIALIZER.deserialize(StrUtil.utf8Bytes(response));
             log.info("[testPropertyPost][响应消息: {}]", responseMessage);
         } else {
             log.warn("[testPropertyPost][未收到响应]");
@@ -195,16 +195,16 @@ public class IotGatewaySubDeviceWebSocketProtocolIntegrationTest {
                                 .build(),
                         System.currentTimeMillis()),
                 null, null, null);
-        // 2.2 编码
-        byte[] payload = CODEC.encode(request);
+        // 2.2 序列化
+        byte[] payload = SERIALIZER.serialize(request);
         String jsonMessage = StrUtil.utf8Str(payload);
-        log.info("[testEventPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
+        log.info("[testEventPost][Serialize: {}, 请求消息: {}]", SERIALIZER.getType(), request);
 
         // 3.1 发送并等待响应
         String response = sendAndReceive(ws, jsonMessage);
         // 3.2 解码响应
         if (response != null) {
-            IotDeviceMessage responseMessage = CODEC.decode(StrUtil.utf8Bytes(response));
+            IotDeviceMessage responseMessage = SERIALIZER.deserialize(StrUtil.utf8Bytes(response));
             log.info("[testEventPost][响应消息: {}]", responseMessage);
         } else {
             log.warn("[testEventPost][未收到响应]");
@@ -274,13 +274,13 @@ public class IotGatewaySubDeviceWebSocketProtocolIntegrationTest {
                 .setPassword(authInfo.getPassword());
         IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
 
-        byte[] payload = CODEC.encode(request);
+        byte[] payload = SERIALIZER.serialize(request);
         String jsonMessage = StrUtil.utf8Str(payload);
         log.info("[authenticate][发送认证请求: {}]", jsonMessage);
 
         String response = sendAndReceive(ws, jsonMessage);
         if (response != null) {
-            return CODEC.decode(StrUtil.utf8Bytes(response));
+            return SERIALIZER.deserialize(StrUtil.utf8Bytes(response));
         }
         return null;
     }

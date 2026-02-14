@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.core.mq.message;
 
-import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.topic.state.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,7 +60,7 @@ public class IotDeviceMessage {
      */
     private String serverId;
 
-    // ========== codec（编解码）字段 ==========
+    // ========== serialize（序列化）相关字段 ==========
 
     /**
      * 请求编号
@@ -72,7 +72,7 @@ public class IotDeviceMessage {
      * 请求方法
      *
      * 枚举 {@link IotDeviceMessageMethodEnum}
-     * 例如说：thing.property.report 属性上报
+     * 例如说：thing.property.post 属性上报
      */
     private String method;
     /**
@@ -94,7 +94,7 @@ public class IotDeviceMessage {
      */
     private String msg;
 
-    // ========== 基础方法：只传递"codec（编解码）字段" ==========
+    // ========== 基础方法：只传递"serialize（序列化）相关字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {
         return requestOf(null, method, null);
@@ -149,20 +149,12 @@ public class IotDeviceMessage {
 
     public static IotDeviceMessage buildStateUpdateOnline() {
         return requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
-                MapUtil.of("state", IotDeviceStateEnum.ONLINE.getState()));
+                new IotDeviceStateUpdateReqDTO(IotDeviceStateEnum.ONLINE.getState()));
     }
 
     public static IotDeviceMessage buildStateOffline() {
         return requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
-                MapUtil.of("state", IotDeviceStateEnum.OFFLINE.getState()));
-    }
-
-    public static IotDeviceMessage buildOtaUpgrade(String version, String fileUrl, Long fileSize,
-                                                   String fileDigestAlgorithm, String fileDigestValue) {
-        return requestOf(IotDeviceMessageMethodEnum.OTA_UPGRADE.getMethod(), MapUtil.builder()
-                .put("version", version).put("fileUrl", fileUrl).put("fileSize", fileSize)
-                .put("fileDigestAlgorithm", fileDigestAlgorithm).put("fileDigestValue", fileDigestValue)
-                .build());
+                new IotDeviceStateUpdateReqDTO(IotDeviceStateEnum.OFFLINE.getState()));
     }
 
 }
