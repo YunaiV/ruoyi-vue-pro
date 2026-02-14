@@ -66,7 +66,7 @@ public class IotTcpProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotTcpDownstreamSubscriber downstreamSubscriber;
+    private IotTcpDownstreamSubscriber downstreamSubscriber;
 
     /**
      * 消息序列化器
@@ -94,11 +94,6 @@ public class IotTcpProtocol implements IotProtocol {
 
         // 初始化连接管理器
         this.connectionManager = new IotTcpConnectionManager(tcpConfig.getMaxConnections());
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        IotTcpDownstreamHandler downstreamHandler = new IotTcpDownstreamHandler(connectionManager, frameCodec, serializer);
-        this.downstreamSubscriber = new IotTcpDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -152,18 +147,13 @@ public class IotTcpProtocol implements IotProtocol {
                     getId(), properties.getPort(), serverId);
 
             // 2. 启动下行消息订阅者
+            IotTcpDownstreamHandler downstreamHandler = new IotTcpDownstreamHandler(connectionManager, frameCodec, serializer);
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            this.downstreamSubscriber = new IotTcpDownstreamSubscriber(this, downstreamHandler, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT TCP 协议 {} 启动失败]", getId(), e);
-            // 启动失败时关闭资源
-            if (tcpServer != null) {
-                tcpServer.close();
-                tcpServer = null;
-            }
-            if (vertx != null) {
-                vertx.close();
-                vertx = null;
-            }
+            stop0();
             throw e;
         }
     }
@@ -173,15 +163,24 @@ public class IotTcpProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT TCP 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT TCP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT TCP 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT TCP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
-        // 2.1 关闭 TCP 服务器
+        // 2.1 关闭所有连接
+        connectionManager.closeAll();
+        // 2.2 关闭 TCP 服务器
         if (tcpServer != null) {
             try {
                 tcpServer.close().result();
@@ -191,7 +190,7 @@ public class IotTcpProtocol implements IotProtocol {
             }
             tcpServer = null;
         }
-        // 2.2 关闭 Vertx 实例
+        // 2.3 关闭 Vertx 实例
         if (vertx != null) {
             try {
                 vertx.close().result();

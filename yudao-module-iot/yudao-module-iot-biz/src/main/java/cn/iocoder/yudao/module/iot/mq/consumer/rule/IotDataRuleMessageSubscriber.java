@@ -1,26 +1,26 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.service.rule.scene.IotSceneRuleService;
+import cn.iocoder.yudao.module.iot.service.rule.data.IotDataRuleService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-// TODO @puhui999：后面重构哈
 /**
- * 针对 {@link IotDeviceMessage} 的消费者，处理规则场景
+ * 针对 {@link IotDeviceMessage} 的消费者，处理数据流转
  *
  * @author 芋道源码
  */
 @Component
 @Slf4j
-public class IotSceneRuleMessageHandler implements IotMessageSubscriber<IotDeviceMessage> {
+public class IotDataRuleMessageSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
 
     @Resource
-    private IotSceneRuleService sceneRuleService;
+    private IotDataRuleService dataRuleService;
 
     @Resource
     private IotMessageBus messageBus;
@@ -37,13 +37,12 @@ public class IotSceneRuleMessageHandler implements IotMessageSubscriber<IotDevic
 
     @Override
     public String getGroup() {
-        return "iot_rule_consumer";
+        return "iot_data_rule_consumer";
     }
 
     @Override
     public void onMessage(IotDeviceMessage message) {
-        log.info("[onMessage][消息内容({})]", message);
-        sceneRuleService.executeSceneRuleByDevice(message);
+        TenantUtils.execute(message.getTenantId(), () -> dataRuleService.executeDataRule(message));
     }
 
 }

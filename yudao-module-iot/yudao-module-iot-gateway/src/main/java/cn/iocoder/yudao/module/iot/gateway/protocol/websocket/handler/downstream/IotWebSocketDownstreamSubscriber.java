@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstrea
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.AbstractIotProtocolDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketProtocol;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotWebSocketDownstreamSubscriber extends IotProtocolDownstreamSubscriber {
+public class IotWebSocketDownstreamSubscriber extends AbstractIotProtocolDownstreamSubscriber {
 
     private final IotWebSocketDownstreamHandler downstreamHandler;
 

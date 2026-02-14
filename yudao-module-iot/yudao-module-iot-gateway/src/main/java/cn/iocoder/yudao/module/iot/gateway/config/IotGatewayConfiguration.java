@@ -6,6 +6,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * IoT 网关配置类
+ *
+ * @author 芋道源码
+ */
 @Configuration
 @EnableConfigurationProperties(IotGatewayProperties.class)
 public class IotGatewayConfiguration {

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
@@ -9,8 +10,8 @@ import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.downstream.IotWebSocketDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.handler.upstream.IotWebSocketUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
@@ -21,7 +22,6 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import cn.hutool.core.lang.Assert;
 
 /**
  * IoT WebSocket 协议实现
@@ -65,7 +65,7 @@ public class IotWebSocketProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotWebSocketDownstreamSubscriber downstreamSubscriber;
+    private IotWebSocketDownstreamSubscriber downstreamSubscriber;
 
     /**
      * 消息序列化器
@@ -87,10 +87,6 @@ public class IotWebSocketProtocol implements IotProtocol {
         // 初始化连接管理器
         this.connectionManager = new IotWebSocketConnectionManager();
 
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        IotWebSocketDownstreamHandler downstreamHandler = new IotWebSocketDownstreamHandler(serializer, connectionManager);
-        this.downstreamSubscriber = new IotWebSocketDownstreamSubscriber(this, downstreamHandler, messageBus);
     }
 
     @Override
@@ -152,17 +148,13 @@ public class IotWebSocketProtocol implements IotProtocol {
                     getId(), properties.getPort(), wsConfig.getPath(), serverId);
 
             // 2. 启动下行消息订阅者
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            IotWebSocketDownstreamHandler downstreamHandler = new IotWebSocketDownstreamHandler(serializer, connectionManager);
+            this.downstreamSubscriber = new IotWebSocketDownstreamSubscriber(this, downstreamHandler, messageBus);
             downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT WebSocket 协议 {} 启动失败]", getId(), e);
-            if (httpServer != null) {
-                httpServer.close();
-                httpServer = null;
-            }
-            if (vertx != null) {
-                vertx.close();
-                vertx = null;
-            }
+            stop0();
             throw e;
         }
     }
@@ -172,15 +164,24 @@ public class IotWebSocketProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT WebSocket 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT WebSocket 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT WebSocket 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT WebSocket 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
-        // 2.1 关闭 WebSocket 服务器
+        // 2.1 关闭所有连接
+        connectionManager.closeAll();
+        // 2.2 关闭 WebSocket 服务器
         if (httpServer != null) {
             try {
                 httpServer.close().result();
@@ -190,7 +191,7 @@ public class IotWebSocketProtocol implements IotProtocol {
             }
             httpServer = null;
         }
-        // 2.2 关闭 Vertx 实例
+        // 2.3 关闭 Vertx 实例
         if (vertx != null) {
             try {
                 vertx.close().result();

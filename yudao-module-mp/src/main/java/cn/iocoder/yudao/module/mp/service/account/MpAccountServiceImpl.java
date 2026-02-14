@@ -60,7 +60,7 @@ public class MpAccountServiceImpl implements MpAccountService {
     private MpAccountMapper mpAccountMapper;
 
     @Resource
-    @Lazy // 延迟加载，解决循环依赖的问题
+    @Lazy // 延迟加载，解决循环依赖
     private MpServiceFactory mpServiceFactory;
 
     @Override

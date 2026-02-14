@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.IotModbusTcpClientProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.IotModbusTcpServerProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpProtocol;
@@ -112,6 +114,10 @@ public class IotProtocolManager implements SmartLifecycle {
                 return createMqttProtocol(config);
             case EMQX:
                 return createEmqxProtocol(config);
+            case MODBUS_TCP_CLIENT:
+                return createModbusTcpClientProtocol(config);
+            case MODBUS_TCP_SERVER:
+                return createModbusTcpServerProtocol(config);
             default:
                 throw new IllegalArgumentException(String.format(
                         "[createProtocol][协议实例 %s 的协议类型 %s 暂不支持]", config.getId(), protocolType));
@@ -186,6 +192,26 @@ public class IotProtocolManager implements SmartLifecycle {
      */
     private IotEmqxProtocol createEmqxProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotEmqxProtocol(config);
+    }
+
+    /**
+     * 创建 Modbus TCP Client 协议实例
+     *
+     * @param config 协议实例配置
+     * @return Modbus TCP Client 协议实例
+     */
+    private IotModbusTcpClientProtocol createModbusTcpClientProtocol(IotGatewayProperties.ProtocolProperties config) {
+        return new IotModbusTcpClientProtocol(config);
+    }
+
+    /**
+     * 创建 Modbus TCP Server 协议实例
+     *
+     * @param config 协议实例配置
+     * @return Modbus TCP Server 协议实例
+     */
+    private IotModbusTcpServerProtocol createModbusTcpServerProtocol(IotGatewayProperties.ProtocolProperties config) {
+        return new IotModbusTcpServerProtocol(config);
     }
 
 }

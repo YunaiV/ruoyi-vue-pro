@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.downstream;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager.IotTcpConnectionManager;
@@ -33,9 +35,17 @@ public class IotTcpDownstreamHandler {
      */
     public void handle(IotDeviceMessage message) {
         try {
+            // 1.1 检查是否是属性设置消息
+            if (ObjUtil.equals(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), message.getMethod())) {
+                return;
+            }
+            if (ObjUtil.notEqual(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), message.getMethod())) {
+                log.warn("[handle][忽略非属性设置消息: {}]", message.getMethod());
+                return;
+            }
             log.info("[handle][处理下行消息，设备 ID: {}，方法: {}，消息 ID: {}]",
                     message.getDeviceId(), message.getMethod(), message.getId());
-            // 1. 检查设备连接
+            // 1.2 检查设备连接
             IotTcpConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfoByDeviceId(
                     message.getDeviceId());
             if (connectionInfo == null) {

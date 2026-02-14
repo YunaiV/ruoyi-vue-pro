@@ -5,6 +5,8 @@ import io.vertx.core.net.NetSocket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -119,6 +121,24 @@ public class IotTcpConnectionManager {
             // 发送失败时清理连接
             unregisterConnection(socket);
             return false;
+        }
+    }
+
+    /**
+     * 关闭所有连接
+     */
+    public void closeAll() {
+        // 1. 先复制再清空，避免 closeHandler 回调时并发修改
+        List<NetSocket> sockets = new ArrayList<>(connectionMap.keySet());
+        connectionMap.clear();
+        deviceSocketMap.clear();
+        // 2. 关闭所有连接（closeHandler 中 unregisterConnection 发现 map 为空会安全跳过）
+        for (NetSocket socket : sockets) {
+            try {
+                socket.close();
+            } catch (Exception ignored) {
+                // 连接可能已关闭，忽略异常
+            }
         }
     }
 

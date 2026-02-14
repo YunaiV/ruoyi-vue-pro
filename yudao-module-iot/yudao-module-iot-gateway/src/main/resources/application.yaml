@@ -51,8 +51,6 @@ yudao:
           protocol: http
           port: 8092
           enabled: false
-          http:
-            ssl-enabled: false
         # ====================================
         # 针对引入的 TCP 组件的配置
         # ====================================
@@ -64,7 +62,6 @@ yudao:
           tcp:
             max-connections: 1000
             keep-alive-timeout-ms: 30000
-            ssl-enabled: false
             codec:
               type: delimiter              # 拆包类型：length_field / delimiter / fixed_length
               delimiter: "\\n"             # 分隔符（支持转义：\\n=换行, \\r=回车, \\t=制表符）
@@ -101,7 +98,6 @@ yudao:
             max-message-size: 65536          # 最大消息大小（字节，默认 64KB）
             max-frame-size: 65536            # 最大帧大小（字节，默认 64KB）
             idle-timeout-seconds: 60         # 空闲超时时间（秒，默认 60）
-            ssl-enabled: false               # 是否启用 SSL（wss://）
         # ====================================
         # 针对引入的 CoAP 组件的配置
         # ====================================
@@ -117,14 +113,13 @@ yudao:
         # 针对引入的 MQTT 组件的配置
         # ====================================
         - id: mqtt-json
-          enabled: true
+          enabled: false
           protocol: mqtt
           port: 1883
           serialize: json
           mqtt:
             max-message-size: 8192           # 最大消息大小（字节）
             connect-timeout-seconds: 60      # 连接超时时间（秒）
-            ssl-enabled: false               # 是否启用 SSL
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================
@@ -168,6 +163,27 @@ yudao:
               key-store-password: "your-keystore-password" # 客户端证书库密码
               trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
               trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
+        # ====================================
+        # 针对引入的 Modbus TCP Client 组件的配置
+        # ====================================
+        - id: modbus-tcp-client-1
+          enabled: false
+          protocol: modbus_tcp_client
+          port: 502
+          modbus-tcp-client:
+            config-refresh-interval: 30  # 配置刷新间隔（秒）
+        # ====================================
+        # 针对引入的 Modbus TCP Server 组件的配置
+        # ====================================
+        - id: modbus-tcp-server-1
+          enabled: false
+          protocol: modbus_tcp_server
+          port: 503
+          modbus-tcp-server:
+            config-refresh-interval: 30     # 配置刷新间隔（秒）
+            custom-function-code: 65        # 自定义功能码（用于认证等扩展交互）
+            request-timeout: 5000           # Pending Request 超时时间（毫秒）
+            request-cleanup-interval: 10000 # Pending Request 清理间隔（毫秒）
 
 --- #################### 日志相关配置 ####################
 
@@ -189,6 +205,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.modbus: DEBUG
     # 根日志级别
     root: INFO
 

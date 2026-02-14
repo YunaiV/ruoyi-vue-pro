@@ -64,17 +64,13 @@ public class IotCoapProtocol implements IotProtocol {
     /**
      * 下行消息订阅者
      */
-    private final IotCoapDownstreamSubscriber downstreamSubscriber;
+    private IotCoapDownstreamSubscriber downstreamSubscriber;
 
     public IotCoapProtocol(ProtocolProperties properties) {
         IotCoapConfig coapConfig = properties.getCoap();
         Assert.notNull(coapConfig, "CoAP 协议配置（coap）不能为空");
         this.properties = properties;
         this.serverId = IotDeviceMessageUtils.generateServerId(properties.getPort());
-
-        // 初始化下行消息订阅者
-        IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
-        this.downstreamSubscriber = new IotCoapDownstreamSubscriber(this, messageBus);
     }
 
     @Override
@@ -94,9 +90,9 @@ public class IotCoapProtocol implements IotProtocol {
             return;
         }
 
-        IotCoapConfig coapConfig = properties.getCoap();
         try {
             // 1.1 创建 CoAP 配置
+            IotCoapConfig coapConfig = properties.getCoap();
             Configuration config = Configuration.createStandardWithoutFile();
             config.set(CoapConfig.COAP_PORT, properties.getPort());
             config.set(CoapConfig.MAX_MESSAGE_SIZE, coapConfig.getMaxMessageSize());
@@ -131,13 +127,12 @@ public class IotCoapProtocol implements IotProtocol {
                     getId(), properties.getPort(), serverId);
 
             // 4. 启动下行消息订阅者
+            IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
+            this.downstreamSubscriber = new IotCoapDownstreamSubscriber(this, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT CoAP 协议 {} 启动失败]", getId(), e);
-            if (coapServer != null) {
-                coapServer.destroy();
-                coapServer = null;
-            }
+            stop0();
             throw e;
         }
     }
@@ -147,12 +142,19 @@ public class IotCoapProtocol implements IotProtocol {
         if (!running) {
             return;
         }
+        stop0();
+    }
+
+    private void stop0() {
         // 1. 停止下行消息订阅者
-        try {
-            downstreamSubscriber.stop();
-            log.info("[stop][IoT CoAP 协议 {} 下行消息订阅者已停止]", getId());
-        } catch (Exception e) {
-            log.error("[stop][IoT CoAP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+        if (downstreamSubscriber != null) {
+            try {
+                downstreamSubscriber.stop();
+                log.info("[stop][IoT CoAP 协议 {} 下行消息订阅者已停止]", getId());
+            } catch (Exception e) {
+                log.error("[stop][IoT CoAP 协议 {} 下行消息订阅者停止失败]", getId(), e);
+            }
+            downstreamSubscriber = null;
         }
 
         // 2. 关闭 CoAP 服务器

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.handler.downstream;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolDownstreamSubscriber;
+import cn.iocoder.yudao.module.iot.gateway.protocol.AbstractIotProtocolDownstreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author 芋道源码
  */
 @Slf4j
-public class IotTcpDownstreamSubscriber extends IotProtocolDownstreamSubscriber {
+public class IotTcpDownstreamSubscriber extends AbstractIotProtocolDownstreamSubscriber {
 
     private final IotTcpDownstreamHandler downstreamHandler;
 

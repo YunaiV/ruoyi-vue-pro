@@ -239,12 +239,28 @@ public class IotDirectDeviceMqttProtocolIntegrationTest {
         log.info("[testSubscribe][连接认证成功]");
 
         try {
-            // 2. 设置消息处理器
-            client.publishHandler(message -> log.info("[testSubscribe][收到消息: topic={}, payload={}]",
-                    message.topicName(), message.payload().toString()));
+            // 2. 设置消息处理器：收到属性设置时，回复 _reply 消息
+            client.publishHandler(message -> {
+                log.info("[testSubscribe][收到消息: topic={}, payload={}]",
+                        message.topicName(), message.payload().toString());
+                // 收到属性设置消息时，回复 _reply
+                if (message.topicName().endsWith("/thing/property/set")) {
+                    try {
+                        IotDeviceMessage received = SERIALIZER.deserialize(message.payload().getBytes());
+                        IotDeviceMessage reply = IotDeviceMessage.replyOf(
+                                received.getRequestId(), "thing.property.set_reply", null, 0, null);
+                        String replyTopic = String.format("/sys/%s/%s/thing/property/set_reply", PRODUCT_KEY, DEVICE_NAME);
+                        byte[] replyPayload = SERIALIZER.serialize(reply);
+                        client.publish(replyTopic, Buffer.buffer(replyPayload), MqttQoS.AT_LEAST_ONCE, false, false);
+                        log.info("[testSubscribe][已回复属性设置: topic={}]", replyTopic);
+                    } catch (Exception e) {
+                        log.error("[testSubscribe][回复属性设置异常]", e);
+                    }
+                }
+            });
 
-            // 3. 订阅下行主题
-            String topic = String.format("/sys/%s/%s/thing/service/#", PRODUCT_KEY, DEVICE_NAME);
+            // 3. 订阅下行主题（属性设置 + 服务调用）
+            String topic = String.format("/sys/%s/%s/#", PRODUCT_KEY, DEVICE_NAME);
             log.info("[testSubscribe][订阅主题: {}]", topic);
             subscribe(client, topic);
             log.info("[testSubscribe][订阅成功，等待下行消息... (30秒后自动断开)]");

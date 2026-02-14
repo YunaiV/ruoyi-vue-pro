@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.iot.core.topic.auth;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 /**
  * IoT 子设备动态注册 Request DTO
  * <p>
- * 用于 thing.auth.register.sub 消息的 params 数组元素
- *
+ * 用于 {@link IotDeviceMessageMethodEnum#SUB_DEVICE_REGISTER} 消息的 params 数组元素
+ * <p>
  * 特殊：网关子设备的动态注册，必须已经创建好该网关子设备（不然哪来的 {@link #deviceName} 字段）。更多的好处，是设备不用提前烧录 deviceSecret 密钥。
  *
  * @author 芋道源码
