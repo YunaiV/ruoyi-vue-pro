@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.topic.property;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * IoT 设备属性批量上报 Request DTO
  * <p>
- * 用于 thing.event.property.pack.post 消息的 params 参数
+ * 用于 {@link IotDeviceMessageMethodEnum#PROPERTY_PACK_POST} 消息的 params 参数
  *
  * @author 芋道源码
  * @see <a href="http://help.aliyun.com/zh/marketplace/gateway-reports-data-in-batches">阿里云 - 网关批量上报数据</a>

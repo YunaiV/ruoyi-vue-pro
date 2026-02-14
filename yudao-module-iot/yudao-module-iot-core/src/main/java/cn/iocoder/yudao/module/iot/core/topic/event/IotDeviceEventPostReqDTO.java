@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.iot.core.topic.event;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import lombok.Data;
 
 /**
  * IoT 设备事件上报 Request DTO
  * <p>
- * 用于 thing.event.post 消息的 params 参数
+ * 用于 {@link IotDeviceMessageMethodEnum#EVENT_POST} 消息的 params 参数
  *
  * @author 芋道源码
  * @see <a href="http://help.aliyun.com/zh/marketplace/device-reporting-events">阿里云 - 设备上报事件</a>
