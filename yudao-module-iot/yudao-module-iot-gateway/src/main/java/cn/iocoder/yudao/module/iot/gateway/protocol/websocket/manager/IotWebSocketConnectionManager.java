@@ -4,7 +4,6 @@ import io.vertx.core.http.ServerWebSocket;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 芋道源码
  */
 @Slf4j
-@Component
 public class IotWebSocketConnectionManager {
 
     /**
@@ -69,7 +67,8 @@ public class IotWebSocketConnectionManager {
             return;
         }
         Long deviceId = connectionInfo.getDeviceId();
-        deviceSocketMap.remove(deviceId);
+        // 仅当 deviceSocketMap 中的 socket 是当前 socket 时才移除，避免误删新连接
+        deviceSocketMap.remove(deviceId, socket);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
                 deviceId, socket.remoteAddress());
     }
@@ -134,15 +133,6 @@ public class IotWebSocketConnectionManager {
          * 设备名称
          */
         private String deviceName;
-
-        /**
-         * 客户端 ID
-         */
-        private String clientId;
-        /**
-         * 消息编解码类型（认证后确定）
-         */
-        private String codecType;
 
     }
 

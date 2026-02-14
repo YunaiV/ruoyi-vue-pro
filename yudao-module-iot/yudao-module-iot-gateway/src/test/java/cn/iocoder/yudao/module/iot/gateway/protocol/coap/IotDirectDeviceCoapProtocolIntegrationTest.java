@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.coap.util.IotCoapUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
@@ -22,6 +22,8 @@ import org.eclipse.californium.elements.config.UdpConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstream.IotCoapAbstractHandler.OPTION_TOKEN;
 
 /**
  * IoT 直连设备 CoAP 协议集成测试（手动测试）
@@ -134,7 +136,7 @@ public class IotDirectDeviceCoapProtocolIntegrationTest {
             request.setURI(uri);
             request.setPayload(payload);
             request.getOptions().setContentFormat(MediaTypeRegistry.APPLICATION_JSON);
-            request.getOptions().addOption(new Option(IotCoapUtils.OPTION_TOKEN, TOKEN));
+            request.getOptions().addOption(new Option(OPTION_TOKEN, TOKEN));
 
             CoapResponse response = client.advanced(request);
             // 2.2 输出结果
@@ -177,7 +179,7 @@ public class IotDirectDeviceCoapProtocolIntegrationTest {
             request.setURI(uri);
             request.setPayload(payload);
             request.getOptions().setContentFormat(MediaTypeRegistry.APPLICATION_JSON);
-            request.getOptions().addOption(new Option(IotCoapUtils.OPTION_TOKEN, TOKEN));
+            request.getOptions().addOption(new Option(OPTION_TOKEN, TOKEN));
 
             CoapResponse response = client.advanced(request);
             // 2.2 输出结果
@@ -202,10 +204,13 @@ public class IotDirectDeviceCoapProtocolIntegrationTest {
         // 1.1 构建请求
         String uri = String.format("coap://%s:%d/auth/register/device", SERVER_HOST, SERVER_PORT);
         // 1.2 构建请求参数
-        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO();
-        reqDTO.setProductKey(PRODUCT_KEY);
-        reqDTO.setDeviceName("test-" + System.currentTimeMillis());
-        reqDTO.setProductSecret("test-product-secret");
+        String deviceName = "test-" + System.currentTimeMillis();
+        String productSecret = "test-product-secret"; // 替换为实际的 productSecret
+        String sign = IotProductAuthUtils.buildSign(PRODUCT_KEY, deviceName, productSecret);
+        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO()
+                .setProductKey(PRODUCT_KEY)
+                .setDeviceName(deviceName)
+                .setSign(sign);
         String payload = JsonUtils.toJsonString(reqDTO);
         // 1.3 输出请求
         log.info("[testDeviceRegister][请求 URI: {}]", uri);

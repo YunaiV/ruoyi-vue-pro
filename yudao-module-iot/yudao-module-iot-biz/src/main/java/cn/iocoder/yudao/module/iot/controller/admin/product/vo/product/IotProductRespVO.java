@@ -67,10 +67,15 @@ public class IotProductRespVO {
     @DictFormat(DictTypeConstants.NET_TYPE)
     private Integer netType;
 
-    @Schema(description = "数据格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty(value = "数据格式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.CODEC_TYPE)
-    private String codecType;
+    @Schema(description = "协议类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "mqtt")
+    @ExcelProperty(value = "协议类型", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.PROTOCOL_TYPE)
+    private String protocolType;
+
+    @Schema(description = "序列化类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "json")
+    @ExcelProperty(value = "序列化类型", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.SERIALIZE_TYPE)
+    private String serializeType;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

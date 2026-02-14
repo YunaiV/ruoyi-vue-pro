@@ -1,5 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.coap.IotCoapConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,9 +33,9 @@ public class IotGatewayProperties {
     private TokenProperties token;
 
     /**
-     * 协议配置
+     * 协议实例列表
      */
-    private ProtocolProperties protocol;
+    private List<ProtocolProperties> protocols;
 
     @Data
     public static class RpcProperties {
@@ -65,581 +74,145 @@ public class IotGatewayProperties {
 
     }
 
+    /**
+     * 协议实例配置
+     */
     @Data
     public static class ProtocolProperties {
 
         /**
-         * HTTP 组件配置
+         * 协议实例 ID，如 "http-alink"、"tcp-binary"
          */
-        private HttpProperties http;
-
+        @NotEmpty(message = "协议实例 ID 不能为空")
+        private String id;
         /**
-         * EMQX 组件配置
+         * 是否启用
          */
-        private EmqxProperties emqx;
-
+        @NotNull(message = "是否启用不能为空")
+        private Boolean enabled = true;
         /**
-         * TCP 组件配置
+         * 协议类型
+         *
+         * @see cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum
          */
-        private TcpProperties tcp;
-
-        /**
-         * MQTT 组件配置
-         */
-        private MqttProperties mqtt;
-
-        /**
-         * MQTT WebSocket 组件配置
-         */
-        private MqttWsProperties mqttWs;
-
-        /**
-         * UDP 组件配置
-         */
-        private UdpProperties udp;
-
-        /**
-         * CoAP 组件配置
-         */
-        private CoapProperties coap;
-
-        /**
-         * WebSocket 组件配置
-         */
-        private WebSocketProperties websocket;
-
-    }
-
-    @Data
-    public static class HttpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
+        @NotEmpty(message = "协议类型不能为空")
+        private String protocol;
         /**
          * 服务端口
-         */
-        private Integer serverPort;
-
-        /**
-         * 是否开启 SSL
-         */
-        @NotNull(message = "是否开启 SSL 不能为空")
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 证书路径
-         */
-        private String sslKeyPath;
-        /**
-         * SSL 证书路径
-         */
-        private String sslCertPath;
-
-    }
-
-    @Data
-    public static class EmqxProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * HTTP 服务端口（默认：8090）
-         */
-        private Integer httpPort = 8090;
-
-        /**
-         * MQTT 服务器地址
-         */
-        @NotEmpty(message = "MQTT 服务器地址不能为空")
-        private String mqttHost;
-
-        /**
-         * MQTT 服务器端口（默认：1883）
-         */
-        @NotNull(message = "MQTT 服务器端口不能为空")
-        private Integer mqttPort = 1883;
-
-        /**
-         * MQTT 用户名
-         */
-        @NotEmpty(message = "MQTT 用户名不能为空")
-        private String mqttUsername;
-
-        /**
-         * MQTT 密码
-         */
-        @NotEmpty(message = "MQTT 密码不能为空")
-        private String mqttPassword;
-
-        /**
-         * MQTT 客户端的 SSL 开关
-         */
-        @NotNull(message = "MQTT 是否开启 SSL 不能为空")
-        private Boolean mqttSsl = false;
-
-        /**
-         * MQTT 客户端 ID（如果为空，系统将自动生成）
-         */
-        @NotEmpty(message = "MQTT 客户端 ID 不能为空")
-        private String mqttClientId;
-
-        /**
-         * MQTT 订阅的主题
-         */
-        @NotEmpty(message = "MQTT 主题不能为空")
-        private List<@NotEmpty(message = "MQTT 主题不能为空") String> mqttTopics;
-
-        /**
-         * 默认 QoS 级别
          * <p>
-         * 0 - 最多一次
-         * 1 - 至少一次
-         * 2 - 刚好一次
+         * 不同协议含义不同：
+         * 1. TCP/UDP/HTTP/WebSocket/MQTT/CoAP：对应网关自身监听的服务端口
+         * 2. EMQX：对应网关提供给 EMQX 回调的 HTTP Hook 端口（/mqtt/auth、/mqtt/acl、/mqtt/event）
          */
-        private Integer mqttQos = 1;
+        @NotNull(message = "服务端口不能为空")
+        private Integer port;
+        /**
+         * 序列化类型（可选）
+         *
+         * @see cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum
+         *
+         * 为什么是可选的呢？
+         * 1. {@link IotProtocolTypeEnum#HTTP}、{@link IotProtocolTypeEnum#COAP} 协议，目前强制是 JSON 格式
+         * 2. {@link IotProtocolTypeEnum#EMQX} 协议，目前支持根据产品（设备）配置的序列化类型来解析
+         */
+        private String serialize;
+
+        // ========== SSL 配置 ==========
 
         /**
-         * 连接超时时间（秒）
+         * SSL 配置（可选，配置文件中不配置则为 null）
          */
-        private Integer connectTimeoutSeconds = 10;
+        @Valid
+        private SslConfig ssl;
+
+        // ========== 各协议配置 ==========
 
         /**
-         * 重连延迟时间（毫秒）
+         * HTTP 协议配置
          */
-        private Long reconnectDelayMs = 5000L;
+        @Valid
+        private IotHttpConfig http;
+        /**
+         * WebSocket 协议配置
+         */
+        @Valid
+        private IotWebSocketConfig websocket;
 
         /**
-         * 是否启用 Clean Session (清理会话)
-         * true: 每次连接都是新会话，Broker 不保留离线消息和订阅关系。
-         * 对于网关这类“永远在线”且会主动重新订阅的应用，建议为 true。
+         * TCP 协议配置
          */
-        private Boolean cleanSession = true;
+        @Valid
+        private IotTcpConfig tcp;
+        /**
+         * UDP 协议配置
+         */
+        @Valid
+        private IotUdpConfig udp;
 
         /**
-         * 心跳间隔（秒）
-         * 用于保持连接活性，及时发现网络中断。
+         * CoAP 协议配置
          */
-        private Integer keepAliveIntervalSeconds = 60;
+        @Valid
+        private IotCoapConfig coap;
 
         /**
-         * 最大未确认消息队列大小
-         * 限制已发送但未收到 Broker 确认的 QoS 1/2 消息数量，用于流量控制。
+         * MQTT 协议配置
          */
-        private Integer maxInflightQueue = 10000;
-
+        @Valid
+        private IotMqttConfig mqtt;
         /**
-         * 是否信任所有 SSL 证书
-         * 警告：此配置会绕过证书验证，仅建议在开发和测试环境中使用！
-         * 在生产环境中，应设置为 false，并配置正确的信任库。
+         * EMQX 协议配置
          */
-        private Boolean trustAll = false;
-
-        /**
-         * 遗嘱消息配置 (用于网关异常下线时通知其他系统)
-         */
-        private final Will will = new Will();
-
-        /**
-         * 高级 SSL/TLS 配置 (用于生产环境)
-         */
-        private final Ssl sslOptions = new Ssl();
-
-        /**
-         * 遗嘱消息 (Last Will and Testament)
-         */
-        @Data
-        public static class Will {
-
-            /**
-             * 是否启用遗嘱消息
-             */
-            private boolean enabled = false;
-            /**
-             * 遗嘱消息主题
-             */
-            private String topic;
-            /**
-             * 遗嘱消息内容
-             */
-            private String payload;
-            /**
-             * 遗嘱消息 QoS 等级
-             */
-            private Integer qos = 1;
-            /**
-             * 遗嘱消息是否作为保留消息发布
-             */
-            private boolean retain = true;
-
-        }
-
-        /**
-         * 高级 SSL/TLS 配置
-         */
-        @Data
-        public static class Ssl {
-
-            /**
-             * 密钥库（KeyStore）路径，例如：classpath:certs/client.jks
-             * 包含客户端自己的证书和私钥，用于向服务端证明身份（双向认证）。
-             */
-            private String keyStorePath;
-            /**
-             * 密钥库密码
-             */
-            private String keyStorePassword;
-            /**
-             * 信任库（TrustStore）路径，例如：classpath:certs/trust.jks
-             * 包含服务端信任的 CA 证书，用于验证服务端的身份，防止中间人攻击。
-             */
-            private String trustStorePath;
-            /**
-             * 信任库密码
-             */
-            private String trustStorePassword;
-
-        }
+        @Valid
+        private IotEmqxConfig emqx;
 
     }
 
+    /**
+     * SSL 配置
+     */
     @Data
-    public static class TcpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口
-         */
-        private Integer port = 8091;
-
-        /**
-         * 心跳超时时间（毫秒）
-         */
-        private Long keepAliveTimeoutMs = 30000L;
-
-        /**
-         * 最大连接数
-         */
-        private Integer maxConnections = 1000;
-
-        /**
-         * 是否启用SSL
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL证书路径
-         */
-        private String sslCertPath;
-
-        /**
-         * SSL私钥路径
-         */
-        private String sslKeyPath;
-
-    }
-
-    @Data
-    public static class MqttProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口
-         */
-        private Integer port = 1883;
-
-        /**
-         * 最大消息大小（字节）
-         */
-        private Integer maxMessageSize = 8192;
-
-        /**
-         * 连接超时时间（秒）
-         */
-        private Integer connectTimeoutSeconds = 60;
-        /**
-         * 保持连接超时时间（秒）
-         */
-        private Integer keepAliveTimeoutSeconds = 300;
+    public static class SslConfig {
 
         /**
          * 是否启用 SSL
          */
-        private Boolean sslEnabled = false;
-        /**
-         * SSL 配置
-         */
-        private SslOptions sslOptions = new SslOptions();
-
-        /**
-         * SSL 配置选项
-         */
-        @Data
-        public static class SslOptions {
-
-            /**
-             * 密钥证书选项
-             */
-            private io.vertx.core.net.KeyCertOptions keyCertOptions;
-            /**
-             * 信任选项
-             */
-            private io.vertx.core.net.TrustOptions trustOptions;
-            /**
-             * SSL 证书路径
-             */
-            private String certPath;
-            /**
-             * SSL 私钥路径
-             */
-            private String keyPath;
-            /**
-             * 信任存储路径
-             */
-            private String trustStorePath;
-            /**
-             * 信任存储密码
-             */
-            private String trustStorePassword;
-
-        }
-
-    }
-
-    @Data
-    public static class MqttWsProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * WebSocket 服务器端口（默认：8083）
-         */
-        private Integer port = 8083;
-
-        /**
-         * WebSocket 路径（默认：/mqtt）
-         */
-        @NotEmpty(message = "WebSocket 路径不能为空")
-        private String path = "/mqtt";
-
-        /**
-         * 最大消息大小（字节）
-         */
-        private Integer maxMessageSize = 8192;
-
-        /**
-         * 连接超时时间（秒）
-         */
-        private Integer connectTimeoutSeconds = 60;
-
-        /**
-         * 保持连接超时时间（秒）
-         */
-        private Integer keepAliveTimeoutSeconds = 300;
-
-        /**
-         * 是否启用 SSL（wss://）
-         */
-        private Boolean sslEnabled = false;
-
-        /**
-         * SSL 配置
-         */
-        private SslOptions sslOptions = new SslOptions();
-
-        /**
-         * WebSocket 子协议（通常为 "mqtt" 或 "mqttv3.1"）
-         */
-        @NotEmpty(message = "WebSocket 子协议不能为空")
-        private String subProtocol = "mqtt";
-
-        /**
-         * 最大帧大小（字节）
-         */
-        private Integer maxFrameSize = 65536;
-
-        /**
-         * SSL 配置选项
-         */
-        @Data
-        public static class SslOptions {
-
-            /**
-             * 密钥证书选项
-             */
-            private io.vertx.core.net.KeyCertOptions keyCertOptions;
-
-            /**
-             * 信任选项
-             */
-            private io.vertx.core.net.TrustOptions trustOptions;
-
-            /**
-             * SSL 证书路径
-             */
-            private String certPath;
-
-            /**
-             * SSL 私钥路径
-             */
-            private String keyPath;
-
-            /**
-             * 信任存储路径
-             */
-            private String trustStorePath;
-
-            /**
-             * 信任存储密码
-             */
-            private String trustStorePassword;
-
-        }
-
-    }
-
-    @Data
-    public static class UdpProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务端口（默认 8093）
-         */
-        private Integer port = 8093;
-
-        /**
-         * 接收缓冲区大小（默认 64KB）
-         */
-        private Integer receiveBufferSize = 65536;
-
-        /**
-         * 发送缓冲区大小（默认 64KB）
-         */
-        private Integer sendBufferSize = 65536;
-
-        /**
-         * 会话超时时间（毫秒，默认 60 秒）
-         * <p>
-         * 用于清理不活跃的设备地址映射
-         */
-        private Long sessionTimeoutMs = 60000L;
-
-        /**
-         * 会话清理间隔（毫秒，默认 30 秒）
-         */
-        private Long sessionCleanIntervalMs = 30000L;
-
-    }
-
-    @Data
-    public static class CoapProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务端口（CoAP 默认端口 5683）
-         */
-        @NotNull(message = "服务端口不能为空")
-        private Integer port = 5683;
-
-        /**
-         * 最大消息大小（字节）
-         */
-        @NotNull(message = "最大消息大小不能为空")
-        private Integer maxMessageSize = 1024;
-
-        /**
-         * ACK 超时时间（毫秒）
-         */
-        @NotNull(message = "ACK 超时时间不能为空")
-        private Integer ackTimeout = 2000;
-
-        /**
-         * 最大重传次数
-         */
-        @NotNull(message = "最大重传次数不能为空")
-        private Integer maxRetransmit = 4;
-
-    }
-
-    @Data
-    public static class WebSocketProperties {
-
-        /**
-         * 是否开启
-         */
-        @NotNull(message = "是否开启不能为空")
-        private Boolean enabled;
-
-        /**
-         * 服务器端口（默认：8094）
-         */
-        private Integer port = 8094;
-
-        /**
-         * WebSocket 路径（默认：/ws）
-         */
-        @NotEmpty(message = "WebSocket 路径不能为空")
-        private String path = "/ws";
-
-        /**
-         * 最大消息大小（字节，默认 64KB）
-         */
-        private Integer maxMessageSize = 65536;
-
-        /**
-         * 最大帧大小（字节，默认 64KB）
-         */
-        private Integer maxFrameSize = 65536;
-
-        /**
-         * 空闲超时时间（秒，默认 60）
-         */
-        private Integer idleTimeoutSeconds = 60;
-
-        /**
-         * 是否启用 SSL（wss://）
-         */
-        private Boolean sslEnabled = false;
+        @NotNull(message = "是否启用 SSL 不能为空")
+        private Boolean ssl = false;
 
         /**
          * SSL 证书路径
          */
+        @NotEmpty(message = "SSL 证书路径不能为空")
         private String sslCertPath;
 
         /**
          * SSL 私钥路径
          */
+        @NotEmpty(message = "SSL 私钥路径不能为空")
         private String sslKeyPath;
+
+        /**
+         * 密钥库（KeyStore）路径
+         * <p>
+         * 包含客户端自己的证书和私钥，用于向服务端证明身份（双向认证）
+         */
+        private String keyStorePath;
+        /**
+         * 密钥库密码
+         */
+        private String keyStorePassword;
+
+        /**
+         * 信任库（TrustStore）路径
+         * <p>
+         * 包含服务端信任的 CA 证书，用于验证服务端的身份
+         */
+        private String trustStorePath;
+        /**
+         * 信任库密码
+         */
+        private String trustStorePassword;
 
     }
 

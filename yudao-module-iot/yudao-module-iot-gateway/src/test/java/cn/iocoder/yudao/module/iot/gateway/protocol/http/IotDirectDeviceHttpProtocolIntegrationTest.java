@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -11,6 +10,7 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotProductAuthUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -92,9 +92,7 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
         String url = String.format("http://%s:%d/topic/sys/%s/%s/thing/property/post",
                 SERVER_HOST, SERVER_PORT, PRODUCT_KEY, DEVICE_NAME);
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())
-                .put("version", "1.0")
                 .put("params", IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
                         .put("width", 1)
                         .put("height", "2")
@@ -126,9 +124,7 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
         String url = String.format("http://%s:%d/topic/sys/%s/%s/thing/event/post",
                 SERVER_HOST, SERVER_PORT, PRODUCT_KEY, DEVICE_NAME);
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.EVENT_POST.getMethod())
-                .put("version", "1.0")
                 .put("params", IotDeviceEventPostReqDTO.of(
                         "eat",
                         MapUtil.<String, Object>builder().put("rice", 3).build(),
@@ -163,10 +159,13 @@ public class IotDirectDeviceHttpProtocolIntegrationTest {
         // 1.1 构建请求
         String url = String.format("http://%s:%d/auth/register/device", SERVER_HOST, SERVER_PORT);
         // 1.2 构建请求参数
-        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO();
-        reqDTO.setProductKey(PRODUCT_KEY);
-        reqDTO.setDeviceName("test-" + System.currentTimeMillis());
-        reqDTO.setProductSecret("test-product-secret");
+        String deviceName = "test-" + System.currentTimeMillis();
+        String productSecret = "test-product-secret"; // 替换为实际的 productSecret
+        String sign = IotProductAuthUtils.buildSign(PRODUCT_KEY, deviceName, productSecret);
+        IotDeviceRegisterReqDTO reqDTO = new IotDeviceRegisterReqDTO()
+                .setProductKey(PRODUCT_KEY)
+                .setDeviceName(deviceName)
+                .setSign(sign);
         String payload = JsonUtils.toJsonString(reqDTO);
         // 1.3 输出请求
         log.info("[testDeviceRegister][请求 URL: {}]", url);

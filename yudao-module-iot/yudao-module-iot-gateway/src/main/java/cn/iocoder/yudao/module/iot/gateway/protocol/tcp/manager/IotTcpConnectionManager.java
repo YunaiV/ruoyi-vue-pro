@@ -4,7 +4,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 芋道源码
  */
 @Slf4j
-@Component
 public class IotTcpConnectionManager {
+
+    /**
+     * 最大连接数
+     */
+    private final int maxConnections;
 
     /**
      * 连接信息映射：NetSocket -> 连接信息
@@ -33,6 +36,10 @@ public class IotTcpConnectionManager {
      */
     private final Map<Long, NetSocket> deviceSocketMap = new ConcurrentHashMap<>();
 
+    public IotTcpConnectionManager(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
+
     /**
      * 注册设备连接（包含认证信息）
      *
@@ -40,15 +47,19 @@ public class IotTcpConnectionManager {
      * @param deviceId       设备 ID
      * @param connectionInfo 连接信息
      */
-    public void registerConnection(NetSocket socket, Long deviceId, ConnectionInfo connectionInfo) {
+    public synchronized void registerConnection(NetSocket socket, Long deviceId, ConnectionInfo connectionInfo) {
+        // 检查连接数是否已达上限（同步方法确保检查和注册的原子性）
+        if (connectionMap.size() >= maxConnections) {
+            throw new IllegalStateException("连接数已达上限: " + maxConnections);
+        }
         // 如果设备已有其他连接，先清理旧连接
         NetSocket oldSocket = deviceSocketMap.get(deviceId);
         if (oldSocket != null && oldSocket != socket) {
             log.info("[registerConnection][设备已有其他连接，断开旧连接，设备 ID: {}，旧连接: {}]",
                     deviceId, oldSocket.remoteAddress());
-            oldSocket.close();
-            // 清理旧连接的映射
+            // 先清理映射，再关闭连接
             connectionMap.remove(oldSocket);
+            oldSocket.close();
         }
 
         // 注册新连接
@@ -69,23 +80,9 @@ public class IotTcpConnectionManager {
             return;
         }
         Long deviceId = connectionInfo.getDeviceId();
-        deviceSocketMap.remove(deviceId);
+        // 仅当 deviceSocketMap 中的 socket 是当前 socket 时才移除，避免误删新连接
+        deviceSocketMap.remove(deviceId, socket);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, socket.remoteAddress());
-    }
-
-    /**
-     * 检查连接是否已认证
-     */
-    public boolean isAuthenticated(NetSocket socket) {
-        ConnectionInfo info = connectionMap.get(socket);
-        return info != null;
-    }
-
-    /**
-     * 检查连接是否未认证
-     */
-    public boolean isNotAuthenticated(NetSocket socket) {
-        return !isAuthenticated(socket);
     }
 
     /**
@@ -143,15 +140,6 @@ public class IotTcpConnectionManager {
          * 设备名称
          */
         private String deviceName;
-
-        /**
-         * 客户端 ID
-         */
-        private String clientId;
-        /**
-         * 消息编解码类型（认证后确定）
-         */
-        private String codecType;
 
     }
 

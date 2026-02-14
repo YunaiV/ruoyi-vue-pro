@@ -60,7 +60,7 @@ public class IotDeviceMessage {
      */
     private String serverId;
 
-    // ========== codec（编解码）字段 ==========
+    // ========== serialize（序列化）相关字段 ==========
 
     /**
      * 请求编号
@@ -94,7 +94,7 @@ public class IotDeviceMessage {
      */
     private String msg;
 
-    // ========== 基础方法：只传递"codec（编解码）字段" ==========
+    // ========== 基础方法：只传递"serialize（序列化）相关字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {
         return requestOf(null, method, null);
