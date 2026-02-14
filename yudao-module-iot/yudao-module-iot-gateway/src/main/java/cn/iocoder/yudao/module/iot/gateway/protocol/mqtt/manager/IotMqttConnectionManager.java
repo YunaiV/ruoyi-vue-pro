@@ -124,7 +124,7 @@ public class IotMqttConnectionManager {
      * @param deviceId 设备 ID
      * @return 连接信息
      */
-    public IotMqttConnectionManager.ConnectionInfo getConnectionInfoByDeviceId(Long deviceId) {
+    public ConnectionInfo getConnectionInfoByDeviceId(Long deviceId) {
         // 通过设备 ID 获取连接端点
         MqttEndpoint endpoint = getDeviceEndpoint(deviceId);
         if (endpoint == null) {

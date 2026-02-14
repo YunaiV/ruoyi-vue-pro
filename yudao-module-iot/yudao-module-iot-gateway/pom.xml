@@ -52,7 +52,6 @@
         <dependency>
             <groupId>com.ghgande</groupId>
             <artifactId>j2mod</artifactId>
-            <version>3.2.1</version>
         </dependency>
 
         <!-- CoAP 相关 - Eclipse Californium -->
