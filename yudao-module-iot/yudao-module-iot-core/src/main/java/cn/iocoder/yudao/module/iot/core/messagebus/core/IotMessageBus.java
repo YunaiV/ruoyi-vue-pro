@@ -24,4 +24,14 @@ public interface IotMessageBus {
      */
     void register(IotMessageSubscriber<?> subscriber);
 
+    /**
+     * 取消注册消息订阅者
+     *
+     * @param subscriber 订阅者
+     */
+    default void unregister(IotMessageSubscriber<?> subscriber) {
+        // TODO 芋艿：暂时不实现，需求量不大，但是
+        // throw new UnsupportedOperationException("取消注册消息订阅者功能，尚未实现");
+    }
+
 }

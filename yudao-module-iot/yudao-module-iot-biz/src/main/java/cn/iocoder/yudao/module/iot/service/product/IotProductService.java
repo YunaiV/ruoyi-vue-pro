@@ -10,6 +10,9 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * IoT 产品 Service 接口
@@ -122,10 +125,35 @@ public interface IotProductService {
     Long getProductCount(@Nullable LocalDateTime createTime);
 
     /**
+     * 批量获得产品列表
+     *
+     * @param ids 产品编号集合
+     * @return 产品列表
+     */
+    List<IotProductDO> getProductList(Collection<Long> ids);
+
+    /**
+     * 批量获得产品 Map
+     *
+     * @param ids 产品编号集合
+     * @return 产品 Map（key: 产品编号, value: 产品）
+     */
+    default Map<Long, IotProductDO> getProductMap(Collection<Long> ids) {
+        return convertMap(getProductList(ids), IotProductDO::getId);
+    }
+
+    /**
      * 批量校验产品存在
      *
      * @param ids 产品编号集合
      */
     void validateProductsExist(Collection<Long> ids);
+
+    /**
+     * 同步产品的 TDengine 表结构
+     *
+     * 目的：当 MySQL 和 TDengine 不同步时，强制将已发布产品的表结构同步到 TDengine 中
+     */
+    void syncProductPropertyTable();
 
 }

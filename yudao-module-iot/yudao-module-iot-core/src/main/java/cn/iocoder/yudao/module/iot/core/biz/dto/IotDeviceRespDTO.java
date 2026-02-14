@@ -34,8 +34,12 @@ public class IotDeviceRespDTO {
      */
     private Long productId;
     /**
-     * 编解码器类型
+     * 协议类型
      */
-    private String codecType;
+    private String protocolType;
+    /**
+     * 序列化类型
+     */
+    private String serializeType;
 
 }

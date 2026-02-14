@@ -3,11 +3,15 @@ package cn.iocoder.yudao.module.iot.service.ota;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.ota.IotDeviceOtaProgressReqDTO;
+import cn.iocoder.yudao.module.iot.core.topic.ota.IotDeviceOtaUpgradeReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
@@ -133,9 +137,9 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
     public boolean pushOtaTaskRecord(IotOtaTaskRecordDO record, IotOtaFirmwareDO fireware, IotDeviceDO device) {
         try {
             // 1. 推送 OTA 任务记录
-            IotDeviceMessage message = IotDeviceMessage.buildOtaUpgrade(
-                    fireware.getVersion(), fireware.getFileUrl(), fireware.getFileSize(),
-                    fireware.getFileDigestAlgorithm(), fireware.getFileDigestValue());
+            IotDeviceOtaUpgradeReqDTO params = BeanUtils.toBean(fireware, IotDeviceOtaUpgradeReqDTO.class);
+            IotDeviceMessage message = IotDeviceMessage.requestOf(
+                    IotDeviceMessageMethodEnum.OTA_UPGRADE.getMethod(), params);
             deviceMessageService.sendDeviceMessage(message, device);
 
             // 2. 更新 OTA 升级记录状态为进行中
@@ -163,17 +167,16 @@ public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @SuppressWarnings("unchecked")
     public void updateOtaRecordProgress(IotDeviceDO device, IotDeviceMessage message) {
         // 1.1 参数解析
-        Map<String, Object> params = (Map<String, Object>) message.getParams();
-        String version = MapUtil.getStr(params, "version");
+        IotDeviceOtaProgressReqDTO params = JsonUtils.convertObject(message.getParams(), IotDeviceOtaProgressReqDTO.class);
+        String version = params.getVersion();
         Assert.notBlank(version, "version 不能为空");
-        Integer status = MapUtil.getInt(params, "status");
+        Integer status = params.getStatus();
         Assert.notNull(status, "status 不能为空");
         Assert.notNull(IotOtaTaskRecordStatusEnum.of(status), "status 状态不正确");
-        String description = MapUtil.getStr(params, "description");
-        Integer progress = MapUtil.getInt(params, "progress");
+        String description = params.getDescription();
+        Integer progress = params.getProgress();
         Assert.notNull(progress, "progress 不能为空");
         Assert.isTrue(progress >= 0 && progress <= 100, "progress 必须在 0-100 之间");
         // 1.2 查询 OTA 升级记录

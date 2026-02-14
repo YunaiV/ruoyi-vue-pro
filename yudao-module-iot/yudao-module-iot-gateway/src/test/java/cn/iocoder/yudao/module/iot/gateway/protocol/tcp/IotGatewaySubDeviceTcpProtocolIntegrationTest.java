@@ -1,23 +1,31 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpBinaryDeviceMessageCodec;
-import cn.iocoder.yudao.module.iot.gateway.codec.tcp.IotTcpJsonDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpCodecTypeEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodec;
+import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.codec.IotTcpFrameCodecFactory;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
+import cn.iocoder.yudao.module.iot.gateway.serialize.json.IotJsonSerializer;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetClientOptions;
+import io.vertx.core.net.NetSocket;
+import io.vertx.core.parsetools.RecordParser;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * IoT 网关子设备 TCP 协议集成测试（手动测试）
@@ -26,17 +34,10 @@ import java.net.Socket;
  *
  * <p><b>重要说明：子设备无法直接连接平台，所有请求均由网关设备（Gateway）代为转发。</b>
  *
- * <p>支持两种编解码格式：
- * <ul>
- *     <li>{@link IotTcpJsonDeviceMessageCodec} - JSON 格式</li>
- *     <li>{@link IotTcpBinaryDeviceMessageCodec} - 二进制格式</li>
- * </ul>
- *
  * <p>使用步骤：
  * <ol>
  *     <li>启动 yudao-module-iot-gateway 服务（TCP 端口 8091）</li>
  *     <li>确保子设备已通过 {@link IotGatewayDeviceTcpProtocolIntegrationTest#testTopoAdd()} 绑定到网关</li>
- *     <li>修改 {@link #CODEC} 选择测试的编解码格式</li>
  *     <li>运行以下测试方法：
  *         <ul>
  *             <li>{@link #testAuth()} - 子设备认证</li>
@@ -58,16 +59,56 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
     private static final int SERVER_PORT = 8091;
     private static final int TIMEOUT_MS = 5000;
 
-    // ===================== 编解码器选择（修改此处切换 JSON / Binary） =====================
+    private static Vertx vertx;
+    private static NetClient netClient;
 
-    private static final IotDeviceMessageCodec CODEC = new IotTcpJsonDeviceMessageCodec();
-//    private static final IotDeviceMessageCodec CODEC = new IotTcpBinaryDeviceMessageCodec();
+    // ===================== 编解码器 =====================
+
+    /**
+     * 消息序列化器
+     */
+    private static final IotMessageSerializer SERIALIZER = new IotJsonSerializer();
+
+    /**
+     * TCP 帧编解码器
+     */
+    private static final IotTcpFrameCodec FRAME_CODEC = IotTcpFrameCodecFactory.create(
+            new IotTcpConfig.CodecConfig()
+                    .setType(IotTcpCodecTypeEnum.DELIMITER.getType())
+                    .setDelimiter("\\n")
+//                    .setType(IotTcpCodecTypeEnum.LENGTH_FIELD.getType())
+//                    .setLengthFieldOffset(0)
+//                    .setLengthFieldLength(4)
+//                    .setLengthAdjustment(0)
+//                    .setInitialBytesToStrip(4)
+//                    .setType(IotTcpCodecTypeEnum.LENGTH_FIELD.getType())
+//                    .setFixedLength(256)
+    );
 
     // ===================== 网关子设备信息（根据实际情况修改，从 iot_device 表查询子设备） =====================
 
     private static final String PRODUCT_KEY = "jAufEMTF1W6wnPhn";
     private static final String DEVICE_NAME = "chazuo-it";
     private static final String DEVICE_SECRET = "d46ef9b28ab14238b9c00a3a668032af";
+
+    @BeforeAll
+    static void setUp() {
+        vertx = Vertx.vertx();
+        NetClientOptions options = new NetClientOptions()
+                .setConnectTimeout(TIMEOUT_MS)
+                .setIdleTimeout(TIMEOUT_MS);
+        netClient = vertx.createNetClient(options);
+    }
+
+    @AfterAll
+    static void tearDown() {
+        if (netClient != null) {
+            netClient.close();
+        }
+        if (vertx != null) {
+            vertx.close();
+        }
+    }
 
     // ===================== 认证测试 =====================
 
@@ -76,28 +117,21 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
      */
     @Test
     public void testAuth() throws Exception {
-        // 1.1 构建认证消息
+        // 1. 构建认证消息
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
         IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
                 .setClientId(authInfo.getClientId())
                 .setUsername(authInfo.getUsername())
                 .setPassword(authInfo.getPassword());
-        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
-        // 1.2 编码
-        byte[] payload = CODEC.encode(request);
-        log.info("[testAuth][Codec: {}, 请求消息: {}, 数据包长度: {} 字节]", CODEC.type(), request, payload.length);
+        IotDeviceMessage request = IotDeviceMessage.requestOf("auth", authReqDTO);
 
-        // 2.1 发送请求
-        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
-            socket.setSoTimeout(TIMEOUT_MS);
-            byte[] responseBytes = sendAndReceive(socket, payload);
-            // 2.2 解码响应
-            if (responseBytes != null) {
-                IotDeviceMessage response = CODEC.decode(responseBytes);
-                log.info("[testAuth][响应消息: {}]", response);
-            } else {
-                log.warn("[testAuth][未收到响应]");
-            }
+        // 2. 发送并接收响应
+        NetSocket socket = connect().get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        try {
+            IotDeviceMessage response = sendAndReceive(socket, request);
+            log.info("[testAuth][响应消息: {}]", response);
+        } finally {
+            socket.close();
         }
     }
 
@@ -108,37 +142,27 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
      */
     @Test
     public void testPropertyPost() throws Exception {
-        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
-            socket.setSoTimeout(TIMEOUT_MS);
-
+        NetSocket socket = connect().get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        try {
             // 1. 先进行认证
             IotDeviceMessage authResponse = authenticate(socket);
             log.info("[testPropertyPost][认证响应: {}]", authResponse);
 
-            // 2.1 构建属性上报消息
-            IotDeviceMessage request = IotDeviceMessage.of(
-                    IdUtil.fastSimpleUUID(),
+            // 2. 构建属性上报消息
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
                     IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
                     IotDevicePropertyPostReqDTO.of(MapUtil.<String, Object>builder()
                             .put("power", 100)
                             .put("status", "online")
                             .put("temperature", 36.5)
-                            .build()),
-                    null, null, null);
-            // 2.2 编码
-            byte[] payload = CODEC.encode(request);
+                            .build()));
             log.info("[testPropertyPost][子设备属性上报 - 请求实际由 Gateway 代为转发]");
-            log.info("[testPropertyPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
-            // 3.1 发送请求
-            byte[] responseBytes = sendAndReceive(socket, payload);
-            // 3.2 解码响应
-            if (responseBytes != null) {
-                IotDeviceMessage response = CODEC.decode(responseBytes);
-                log.info("[testPropertyPost][响应消息: {}]", response);
-            } else {
-                log.warn("[testPropertyPost][未收到响应]");
-            }
+            // 3. 发送并接收响应
+            IotDeviceMessage response = sendAndReceive(socket, request);
+            log.info("[testPropertyPost][响应消息: {}]", response);
+        } finally {
+            socket.close();
         }
     }
 
@@ -149,16 +173,14 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
      */
     @Test
     public void testEventPost() throws Exception {
-        try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT)) {
-            socket.setSoTimeout(TIMEOUT_MS);
-
+        NetSocket socket = connect().get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        try {
             // 1. 先进行认证
             IotDeviceMessage authResponse = authenticate(socket);
             log.info("[testEventPost][认证响应: {}]", authResponse);
 
-            // 2.1 构建事件上报消息
-            IotDeviceMessage request = IotDeviceMessage.of(
-                    IdUtil.fastSimpleUUID(),
+            // 2. 构建事件上报消息
+            IotDeviceMessage request = IotDeviceMessage.requestOf(
                     IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
                     IotDeviceEventPostReqDTO.of(
                             "alarm",
@@ -168,26 +190,31 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
                                     .put("threshold", 40)
                                     .put("current", 42)
                                     .build(),
-                            System.currentTimeMillis()),
-                    null, null, null);
-            // 2.2 编码
-            byte[] payload = CODEC.encode(request);
+                            System.currentTimeMillis()));
             log.info("[testEventPost][子设备事件上报 - 请求实际由 Gateway 代为转发]");
-            log.info("[testEventPost][Codec: {}, 请求消息: {}]", CODEC.type(), request);
 
-            // 3.1 发送请求
-            byte[] responseBytes = sendAndReceive(socket, payload);
-            // 3.2 解码响应
-            if (responseBytes != null) {
-                IotDeviceMessage response = CODEC.decode(responseBytes);
-                log.info("[testEventPost][响应消息: {}]", response);
-            } else {
-                log.warn("[testEventPost][未收到响应]");
-            }
+            // 3. 发送并接收响应
+            IotDeviceMessage response = sendAndReceive(socket, request);
+            log.info("[testEventPost][响应消息: {}]", response);
+        } finally {
+            socket.close();
         }
     }
 
     // ===================== 辅助方法 =====================
+
+    /**
+     * 建立 TCP 连接
+     *
+     * @return 连接 Future
+     */
+    private CompletableFuture<NetSocket> connect() {
+        CompletableFuture<NetSocket> future = new CompletableFuture<>();
+        netClient.connect(SERVER_PORT, SERVER_HOST)
+                .onSuccess(future::complete)
+                .onFailure(future::completeExceptionally);
+        return future;
+    }
 
     /**
      * 执行子设备认证
@@ -195,51 +222,45 @@ public class IotGatewaySubDeviceTcpProtocolIntegrationTest {
      * @param socket TCP 连接
      * @return 认证响应消息
      */
-    private IotDeviceMessage authenticate(Socket socket) throws Exception {
+    private IotDeviceMessage authenticate(NetSocket socket) throws Exception {
         IotDeviceAuthReqDTO authInfo = IotDeviceAuthUtils.getAuthInfo(PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
-        IotDeviceAuthReqDTO authReqDTO = new IotDeviceAuthReqDTO()
-                .setClientId(authInfo.getClientId())
-                .setUsername(authInfo.getUsername())
-                .setPassword(authInfo.getPassword());
-        IotDeviceMessage request = IotDeviceMessage.of(IdUtil.fastSimpleUUID(), "auth", authReqDTO, null, null, null);
-        byte[] payload = CODEC.encode(request);
-        byte[] responseBytes = sendAndReceive(socket, payload);
-        if (responseBytes != null) {
-            return CODEC.decode(responseBytes);
-        }
-        return null;
+        IotDeviceMessage request = IotDeviceMessage.requestOf("auth", authInfo);
+        return sendAndReceive(socket, request);
     }
 
     /**
-     * 发送 TCP 请求并接收响应
+     * 发送消息并接收响应（复用 IotTcpFrameCodec 编解码逻辑）
      *
-     * @param socket  TCP Socket
-     * @param payload 请求数据
-     * @return 响应数据
+     * @param socket  TCP 连接
+     * @param request 请求消息
+     * @return 响应消息
      */
-    private byte[] sendAndReceive(Socket socket, byte[] payload) throws Exception {
-        // 1. 发送请求
-        OutputStream out = socket.getOutputStream();
-        InputStream in = socket.getInputStream();
-        out.write(payload);
-        out.flush();
-
-        // 2.1 等待一小段时间让服务器处理
-        Thread.sleep(100);
-        // 2.2 接收响应
-        byte[] buffer = new byte[4096];
-        try {
-            int length = in.read(buffer);
-            if (length > 0) {
-                byte[] response = new byte[length];
-                System.arraycopy(buffer, 0, response, 0, length);
-                return response;
+    private IotDeviceMessage sendAndReceive(NetSocket socket, IotDeviceMessage request) throws Exception {
+        // 1. 使用 FRAME_CODEC 创建解码器（复用 gateway 的拆包逻辑）
+        CompletableFuture<IotDeviceMessage> responseFuture = new CompletableFuture<>();
+        RecordParser parser = FRAME_CODEC.createDecodeParser(buffer -> {
+            try {
+                // 反序列化响应
+                IotDeviceMessage response = SERIALIZER.deserialize(buffer.getBytes());
+                responseFuture.complete(response);
+            } catch (Exception e) {
+                responseFuture.completeExceptionally(e);
             }
-            return null;
-        } catch (java.net.SocketTimeoutException e) {
-            log.warn("[sendAndReceive][接收响应超时]");
-            return null;
-        }
+        });
+        socket.handler(parser);
+
+        // 2.1 序列化 + 帧编码
+        byte[] serializedData = SERIALIZER.serialize(request);
+        Buffer frameData = FRAME_CODEC.encode(serializedData);
+        log.info("[sendAndReceive][发送消息: {}，数据长度: {} 字节]", request.getMethod(), frameData.length());
+        // 2.2 发送请求
+        socket.write(frameData);
+
+        // 3. 等待响应
+        IotDeviceMessage response = responseFuture.get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        log.info("[sendAndReceive][收到响应，数据长度: {} 字节]",
+                SERIALIZER.serialize(response).length);
+        return response;
     }
 
 }

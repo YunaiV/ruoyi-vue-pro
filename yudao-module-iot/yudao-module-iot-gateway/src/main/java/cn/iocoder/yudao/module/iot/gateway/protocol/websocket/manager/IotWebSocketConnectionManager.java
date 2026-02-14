@@ -4,8 +4,9 @@ import io.vertx.core.http.ServerWebSocket;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 芋道源码
  */
 @Slf4j
-@Component
 public class IotWebSocketConnectionManager {
 
     /**
@@ -69,7 +69,8 @@ public class IotWebSocketConnectionManager {
             return;
         }
         Long deviceId = connectionInfo.getDeviceId();
-        deviceSocketMap.remove(deviceId);
+        // 仅当 deviceSocketMap 中的 socket 是当前 socket 时才移除，避免误删新连接
+        deviceSocketMap.remove(deviceId, socket);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]",
                 deviceId, socket.remoteAddress());
     }
@@ -116,6 +117,24 @@ public class IotWebSocketConnectionManager {
     }
 
     /**
+     * 关闭所有连接
+     */
+    public void closeAll() {
+        // 1. 先复制再清空，避免 closeHandler 回调时并发修改
+        List<ServerWebSocket> sockets = new ArrayList<>(connectionMap.keySet());
+        connectionMap.clear();
+        deviceSocketMap.clear();
+        // 2. 关闭所有连接（closeHandler 中 unregisterConnection 发现 map 为空会安全跳过）
+        for (ServerWebSocket socket : sockets) {
+            try {
+                socket.close();
+            } catch (Exception ignored) {
+                // 连接可能已关闭，忽略异常
+            }
+        }
+    }
+
+    /**
      * 连接信息（包含认证信息）
      */
     @Data
@@ -134,15 +153,6 @@ public class IotWebSocketConnectionManager {
          * 设备名称
          */
         private String deviceName;
-
-        /**
-         * 客户端 ID
-         */
-        private String clientId;
-        /**
-         * 消息编解码类型（认证后确定）
-         */
-        private String codecType;
 
     }
 

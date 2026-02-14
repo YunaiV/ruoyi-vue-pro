@@ -25,6 +25,14 @@ public class IotDeviceAuthUtils {
         return String.format("%s.%s", productKey, deviceName);
     }
 
+    public static String buildClientIdFromUsername(String username) {
+        IotDeviceIdentity identity = parseUsername(username);
+        if (identity == null) {
+            return null;
+        }
+        return buildClientId(identity.getProductKey(), identity.getDeviceName());
+    }
+
     public static String buildUsername(String productKey, String deviceName) {
         return String.format("%s&%s", deviceName, productKey);
     }

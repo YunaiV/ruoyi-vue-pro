@@ -41,98 +41,148 @@ yudao:
         secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
         expiration: 7d
 
-      # 协议配置
-      protocol:
+      # 协议实例列表
+      protocols:
         # ====================================
         # 针对引入的 HTTP 组件的配置
         # ====================================
-        http:
-          enabled: true
-          server-port: 8092
-        # ====================================
-        # 针对引入的 EMQX 组件的配置
-        # ====================================
-        emqx:
+        - id: http-json
+          protocol: http
+          port: 8092
           enabled: false
-          http-port: 8090                       # MQTT HTTP 服务端口
-          mqtt-host: 127.0.0.1                  # MQTT Broker 地址
-          mqtt-port: 1883                       # MQTT Broker 端口
-          mqtt-username: admin                  # MQTT 用户名
-          mqtt-password: public                 # MQTT 密码
-          mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
-          mqtt-ssl: false                       # 是否开启 SSL
-          mqtt-topics:
-            - "/sys/#"                          # 系统主题
-          clean-session: true                   # 是否启用 Clean Session (默认: true)
-          keep-alive-interval-seconds: 60       # 心跳间隔，单位秒 (默认: 60)
-          max-inflight-queue: 10000             # 最大飞行消息队列，单位：条
-          connect-timeout-seconds: 10           # 连接超时，单位：秒
-          # 是否信任所有 SSL 证书 (默认: false)。警告：生产环境必须为 false！
-          # 仅在开发环境或内网测试时，如果使用了自签名证书，可以临时设置为 true
-          trust-all: true # 在 dev 环境可以设为 true
-          # 遗嘱消息配置 (用于网关异常下线时通知其他系统)
-          will:
-            enabled: true # 生产环境强烈建议开启
-            topic: "gateway/status/${yudao.iot.gateway.emqx.mqtt-client-id}" # 遗嘱消息主题
-            payload: "offline" # 遗嘱消息负载
-            qos: 1 # 遗嘱消息 QoS
-            retain: true # 遗嘱消息是否保留
-          # 高级 SSL/TLS 配置 (当 trust-all: false 且 mqtt-ssl: true 时生效)
-          ssl-options:
-            key-store-path: "classpath:certs/client.jks" # 客户端证书库路径
-            key-store-password: "your-keystore-password" # 客户端证书库密码
-            trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
-            trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
         # ====================================
         # 针对引入的 TCP 组件的配置
         # ====================================
-        tcp:
+        - id: tcp-json
           enabled: false
+          protocol: tcp
           port: 8091
-          keep-alive-timeout-ms: 30000
-          max-connections: 1000
-          ssl-enabled: false
-          ssl-cert-path: "classpath:certs/client.jks"
-          ssl-key-path: "classpath:certs/client.jks"
+          serialize: json
+          tcp:
+            max-connections: 1000
+            keep-alive-timeout-ms: 30000
+            codec:
+              type: delimiter              # 拆包类型：length_field / delimiter / fixed_length
+              delimiter: "\\n"             # 分隔符（支持转义：\\n=换行, \\r=回车, \\t=制表符）
+#              type: length_field           # 拆包类型：length_field / delimiter / fixed_length
+#              length-field-offset: 0       # 长度字段偏移量
+#              length-field-length: 4       # 长度字段长度
+#              length-adjustment: 0         # 长度调整值
+#              initial-bytes-to-strip: 4    # 初始跳过的字节数
+#              type: fixed_length           # 拆包类型：length_field / delimiter / fixed_length
+#              fixed-length: 256            # 固定长度
         # ====================================
         # 针对引入的 UDP 组件的配置
         # ====================================
-        udp:
-          enabled: false                       # 是否启用 UDP
-          port: 8093                           # UDP 服务端口
-          receive-buffer-size: 65536           # 接收缓冲区大小（字节，默认 64KB）
-          send-buffer-size: 65536              # 发送缓冲区大小（字节，默认 64KB）
-          session-timeout-ms: 60000            # 会话超时时间（毫秒，默认 60 秒）
-          session-clean-interval-ms: 30000     # 会话清理间隔（毫秒，默认 30 秒）
-        # ====================================
-        # 针对引入的 MQTT 组件的配置
-        # ====================================
-        mqtt:
+        - id: udp-json
           enabled: false
-          port: 1883
-          max-message-size: 8192
-          connect-timeout-seconds: 60
-          ssl-enabled: false
-        # ====================================
-        # 针对引入的 CoAP 组件的配置
-        # ====================================
-        coap:
-          enabled: false                       # 是否启用 CoAP 协议
-          port: 5683                           # CoAP 服务端口（默认 5683）
-          max-message-size: 1024               # 最大消息大小（字节）
-          ack-timeout: 2000                    # ACK 超时时间（毫秒）
-          max-retransmit: 4                    # 最大重传次数
+          protocol: udp
+          port: 8093
+          serialize: json
+          udp:
+            max-sessions: 1000               # 最大会话数
+            session-timeout-ms: 60000        # 会话超时时间（毫秒），基于 Guava Cache 自动过期
+            receive-buffer-size: 65536       # 接收缓冲区大小（字节）
+            send-buffer-size: 65536          # 发送缓冲区大小（字节）
         # ====================================
         # 针对引入的 WebSocket 组件的配置
         # ====================================
-        websocket:
-          enabled: false                       # 是否启用 WebSocket 协议
-          port: 8094                           # WebSocket 服务端口（默认 8094）
-          path: /ws                            # WebSocket 路径（默认 /ws）
-          max-message-size: 65536              # 最大消息大小（字节，默认 64KB）
-          max-frame-size: 65536                # 最大帧大小（字节，默认 64KB）
-          idle-timeout-seconds: 60             # 空闲超时时间（秒，默认 60）
-          ssl-enabled: false                   # 是否启用 SSL（wss://）
+        - id: websocket-json
+          enabled: false
+          protocol: websocket
+          port: 8094
+          serialize: json
+          websocket:
+            path: /ws
+            max-message-size: 65536          # 最大消息大小（字节，默认 64KB）
+            max-frame-size: 65536            # 最大帧大小（字节，默认 64KB）
+            idle-timeout-seconds: 60         # 空闲超时时间（秒，默认 60）
+        # ====================================
+        # 针对引入的 CoAP 组件的配置
+        # ====================================
+        - id: coap-json
+          enabled: false
+          protocol: coap
+          port: 5683
+          coap:
+            max-message-size: 1024           # 最大消息大小（字节）
+            ack-timeout-ms: 2000             # ACK 超时时间（毫秒）
+            max-retransmit: 4                # 最大重传次数
+        # ====================================
+        # 针对引入的 MQTT 组件的配置
+        # ====================================
+        - id: mqtt-json
+          enabled: false
+          protocol: mqtt
+          port: 1883
+          serialize: json
+          mqtt:
+            max-message-size: 8192           # 最大消息大小（字节）
+            connect-timeout-seconds: 60      # 连接超时时间（秒）
+        # ====================================
+        # 针对引入的 EMQX 组件的配置
+        # ====================================
+        - id: emqx-1
+          enabled: false
+          protocol: emqx
+          port: 8090 # EMQX HTTP Hook 端口（/mqtt/auth、/mqtt/event）
+          emqx:
+            mqtt-host: 127.0.0.1                  # MQTT Broker 地址
+            mqtt-port: 1883                       # MQTT Broker 端口
+            mqtt-username: admin                  # MQTT 用户名
+            mqtt-password: public                 # MQTT 密码
+            mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
+            mqtt-ssl: false                       # 是否开启 SSL
+            mqtt-topics:
+              - "/sys/#"                          # 系统主题
+            mqtt-qos: 1                           # 默认 QoS
+            clean-session: true                   # 是否启用 Clean Session (默认: true)
+            keep-alive-interval-seconds: 60       # 心跳间隔，单位秒 (默认: 60)
+            max-inflight-queue: 10000             # 最大飞行消息队列，单位：条
+            connect-timeout-seconds: 10           # 连接超时，单位：秒
+            reconnect-delay-ms: 5000              # 重连延迟，单位：毫秒
+            # 是否信任所有 SSL 证书 (默认: false)。警告：生产环境必须为 false！
+            # 仅在开发环境或内网测试时，如果使用了自签名证书，可以临时设置为 true
+            trust-all: true # 在 dev 环境可以设为 true
+            # EMQX HTTP Hook 回调网关的 HTTPS 配置（可选）
+            http:
+              ssl-enabled: false
+              # ssl-cert-path: "path/to/server.crt"
+              # ssl-key-path: "path/to/server.key"
+            # 遗嘱消息配置 (用于网关异常下线时通知其他系统)
+            will:
+              enabled: true # 生产环境强烈建议开启
+              topic: "gateway/status/iot-gateway-mqtt" # 遗嘱消息主题
+              payload: "offline" # 遗嘱消息负载
+              qos: 1 # 遗嘱消息 QoS
+              retain: true # 遗嘱消息是否保留
+            # 高级 SSL/TLS 配置 (当 trust-all: false 且 mqtt-ssl: true 时生效)
+            ssl-options:
+              key-store-path: "classpath:certs/client.jks" # 客户端证书库路径
+              key-store-password: "your-keystore-password" # 客户端证书库密码
+              trust-store-path: "classpath:certs/trust.jks" # 信任的 CA 证书库路径
+              trust-store-password: "your-truststore-password" # 信任的 CA 证书库密码
+        # ====================================
+        # 针对引入的 Modbus TCP Client 组件的配置
+        # ====================================
+        - id: modbus-tcp-client-1
+          enabled: false
+          protocol: modbus_tcp_client
+          port: 502
+          modbus-tcp-client:
+            config-refresh-interval: 30  # 配置刷新间隔（秒）
+        # ====================================
+        # 针对引入的 Modbus TCP Server 组件的配置
+        # ====================================
+        - id: modbus-tcp-server-1
+          enabled: false
+          protocol: modbus_tcp_server
+          port: 503
+          modbus-tcp-server:
+            config-refresh-interval: 30     # 配置刷新间隔（秒）
+            custom-function-code: 65        # 自定义功能码（用于认证等扩展交互）
+            request-timeout: 5000           # Pending Request 超时时间（毫秒）
+            request-cleanup-interval: 10000 # Pending Request 清理间隔（毫秒）
 
 --- #################### 日志相关配置 ####################
 
@@ -152,9 +202,9 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.emqx: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
-    cn.iocoder.yudao.module.iot.gateway.protocol.mqttws: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.modbus: DEBUG
     # 根日志级别
     root: INFO
 

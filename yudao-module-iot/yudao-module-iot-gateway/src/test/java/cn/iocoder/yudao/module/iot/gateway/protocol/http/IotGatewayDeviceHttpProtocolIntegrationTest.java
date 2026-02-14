@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -120,9 +119,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         IotDeviceTopoAddReqDTO params = new IotDeviceTopoAddReqDTO();
         params.setSubDevices(Collections.singletonList(subDeviceAuth));
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.TOPO_ADD.getMethod())
-                .put("version", "1.0")
                 .put("params", params)
                 .build());
         // 1.4 输出请求
@@ -154,9 +151,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         params.setSubDevices(Collections.singletonList(
                 new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME)));
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.TOPO_DELETE.getMethod())
-                .put("version", "1.0")
                 .put("params", params)
                 .build());
         // 1.3 输出请求
@@ -186,9 +181,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         // 1.2 构建请求参数（目前为空，预留扩展）
         IotDeviceTopoGetReqDTO params = new IotDeviceTopoGetReqDTO();
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.TOPO_GET.getMethod())
-                .put("version", "1.0")
                 .put("params", params)
                 .build());
         // 1.3 输出请求
@@ -207,8 +200,6 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
 
     // ===================== 子设备注册测试 =====================
 
-    // TODO @芋艿：待测试
-
     /**
      * 子设备动态注册测试
      * <p>
@@ -226,9 +217,7 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
         subDevice.setProductKey(SUB_DEVICE_PRODUCT_KEY);
         subDevice.setDeviceName("mougezishebei");
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.SUB_DEVICE_REGISTER.getMethod())
-                .put("version", "1.0")
                 .put("params", Collections.singletonList(subDevice))
                 .build());
         // 1.3 输出请求
@@ -262,9 +251,9 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
                 .put("temperature", 25.5)
                 .build();
         // 1.3 构建【网关设备】自身事件
-        IotDevicePropertyPackPostReqDTO.EventValue gatewayEvent = new IotDevicePropertyPackPostReqDTO.EventValue();
-        gatewayEvent.setValue(MapUtil.builder().put("message", "gateway started").build());
-        gatewayEvent.setTime(System.currentTimeMillis());
+        IotDevicePropertyPackPostReqDTO.EventValue gatewayEvent = new IotDevicePropertyPackPostReqDTO.EventValue()
+                .setValue(MapUtil.builder().put("message", "gateway started").build())
+                .setTime(System.currentTimeMillis());
         Map<String, IotDevicePropertyPackPostReqDTO.EventValue> gatewayEvents = MapUtil.<String, IotDevicePropertyPackPostReqDTO.EventValue>builder()
                 .put("statusReport", gatewayEvent)
                 .build();
@@ -273,26 +262,24 @@ public class IotGatewayDeviceHttpProtocolIntegrationTest {
                 .put("power", 100)
                 .build();
         // 1.5 构建【网关子设备】事件
-        IotDevicePropertyPackPostReqDTO.EventValue subDeviceEvent = new IotDevicePropertyPackPostReqDTO.EventValue();
-        subDeviceEvent.setValue(MapUtil.builder().put("errorCode", 0).build());
-        subDeviceEvent.setTime(System.currentTimeMillis());
+        IotDevicePropertyPackPostReqDTO.EventValue subDeviceEvent = new IotDevicePropertyPackPostReqDTO.EventValue()
+                .setValue(MapUtil.builder().put("errorCode", 0).build())
+                .setTime(System.currentTimeMillis());
         Map<String, IotDevicePropertyPackPostReqDTO.EventValue> subDeviceEvents = MapUtil.<String, IotDevicePropertyPackPostReqDTO.EventValue>builder()
                 .put("healthCheck", subDeviceEvent)
                 .build();
         // 1.6 构建子设备数据
-        IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData = new IotDevicePropertyPackPostReqDTO.SubDeviceData();
-        subDeviceData.setIdentity(new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME));
-        subDeviceData.setProperties(subDeviceProperties);
-        subDeviceData.setEvents(subDeviceEvents);
+        IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData = new IotDevicePropertyPackPostReqDTO.SubDeviceData()
+                .setIdentity(new IotDeviceIdentity(SUB_DEVICE_PRODUCT_KEY, SUB_DEVICE_NAME))
+                .setProperties(subDeviceProperties)
+                .setEvents(subDeviceEvents);
         // 1.7 构建请求参数
         IotDevicePropertyPackPostReqDTO params = new IotDevicePropertyPackPostReqDTO();
         params.setProperties(gatewayProperties);
         params.setEvents(gatewayEvents);
         params.setSubDevices(ListUtil.of(subDeviceData));
         String payload = JsonUtils.toJsonString(MapUtil.builder()
-                .put("id", IdUtil.fastSimpleUUID())
                 .put("method", IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod())
-                .put("version", "1.0")
                 .put("params", params)
                 .build());
         // 1.8 输出请求

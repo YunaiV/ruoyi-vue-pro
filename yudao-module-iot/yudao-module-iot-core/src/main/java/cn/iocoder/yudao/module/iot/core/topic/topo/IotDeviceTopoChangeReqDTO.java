@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.topic.topo;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * IoT 设备拓扑关系变更通知 Request DTO
  * <p>
- * 用于 thing.topo.change 下行消息的 params 参数
+ * 用于 {@link IotDeviceMessageMethodEnum#TOPO_CHANGE} 下行消息的 params 参数
  *
  * @author 芋道源码
  * @see <a href="https://help.aliyun.com/zh/marketplace/notify-gateway-topology-changes">阿里云 - 通知网关拓扑关系变化</a>

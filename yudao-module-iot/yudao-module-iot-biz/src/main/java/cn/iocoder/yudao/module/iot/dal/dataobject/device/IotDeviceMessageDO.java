@@ -84,7 +84,7 @@ public class IotDeviceMessageDO {
      * 请求方法
      *
      * 枚举 {@link IotDeviceMessageMethodEnum}
-     * 例如说：thing.property.report 属性上报
+     * 例如说：thing.property.post 属性上报
      */
     private String method;
     /**

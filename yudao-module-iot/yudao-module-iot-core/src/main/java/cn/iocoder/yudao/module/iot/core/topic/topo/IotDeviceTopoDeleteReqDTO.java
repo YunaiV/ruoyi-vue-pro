@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.topic.topo;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * IoT 设备拓扑删除 Request DTO
  * <p>
- * 用于 thing.topo.delete 消息的 params 参数
+ * 用于 {@link IotDeviceMessageMethodEnum#TOPO_DELETE} 消息的 params 参数
  *
  * @author 芋道源码
  * @see <a href="https://help.aliyun.com/zh/marketplace/delete-a-topological-relationship">阿里云 - 删除拓扑关系</a>

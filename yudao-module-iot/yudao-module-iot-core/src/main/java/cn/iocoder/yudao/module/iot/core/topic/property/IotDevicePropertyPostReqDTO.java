@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.iot.core.topic.property;
 
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * IoT 设备属性上报 Request DTO
  * <p>
- * 用于 thing.property.post 消息的 params 参数
+ * 用于 {@link IotDeviceMessageMethodEnum#PROPERTY_POST} 消息的 params 参数
  * <p>
  * 本质是一个 Map，key 为属性标识符，value 为属性值
  *

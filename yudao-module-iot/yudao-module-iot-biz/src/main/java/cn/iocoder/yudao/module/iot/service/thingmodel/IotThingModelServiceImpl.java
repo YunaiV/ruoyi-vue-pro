@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.thingmodel.IotThingModelMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusPointService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -50,6 +51,9 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖
     private IotProductService productService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotDeviceModbusPointService deviceModbusPointService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -84,7 +88,11 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         IotThingModelDO thingModel = IotThingModelConvert.INSTANCE.convert(updateReqVO);
         thingModelMapper.updateById(thingModel);
 
-        // 3. 删除缓存
+        // 3. 同步更新 Modbus 点位的冗余字段（identifier、name）
+        deviceModbusPointService.updateDeviceModbusPointByThingModel(
+                updateReqVO.getId(), updateReqVO.getIdentifier(), updateReqVO.getName());
+
+        // 4. 删除缓存
         deleteThingModelListCache(updateReqVO.getProductId());
     }
 

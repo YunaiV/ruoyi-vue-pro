@@ -64,7 +64,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     // ========== OTA 固件 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/perform-ota-updates
 
-    OTA_UPGRADE("thing.ota.upgrade", "OTA 固定信息推送", false),
+    OTA_UPGRADE("thing.ota.upgrade", "OTA 固件信息推送", false),
     OTA_PROGRESS("thing.ota.progress", "OTA 升级进度上报", true),
 
     ;

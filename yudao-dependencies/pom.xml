@@ -72,6 +72,7 @@
         <vertx.version>4.5.22</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
         <californium.version>3.12.0</californium.version>
+        <j2mod.version>3.2.1</j2mod.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.40.15</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
@@ -616,6 +617,13 @@
                 <groupId>org.eclipse.californium</groupId>
                 <artifactId>californium-core</artifactId>
                 <version>${californium.version}</version>
+            </dependency>
+
+            <!-- Modbus 相关 -->
+            <dependency>
+                <groupId>com.ghgande</groupId>
+                <artifactId>j2mod</artifactId>
+                <version>${j2mod.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

@@ -33,7 +33,7 @@
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
             <!-- TODO @芋艿：消息队列，后续可能去掉，默认不使用 rocketmq -->
-<!--            <optional>true</optional> -->
+            <optional>true</optional>
         </dependency>
 
         <!-- 工具类相关 -->
@@ -46,6 +46,12 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-mqtt</artifactId>
+        </dependency>
+
+        <!-- Modbus 相关 -->
+        <dependency>
+            <groupId>com.ghgande</groupId>
+            <artifactId>j2mod</artifactId>
         </dependency>
 
         <!-- CoAP 相关 - Eclipse Californium -->

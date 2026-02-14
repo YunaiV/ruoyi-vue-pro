@@ -1,20 +1,20 @@
 package cn.iocoder.yudao.module.iot.gateway.service.device.message;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.codec.IotDeviceMessageCodec;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_NOT_EXISTS;
@@ -28,80 +28,70 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVIC
 @Slf4j
 public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
-    /**
-     * 编解码器
-     */
-    private final Map<String, IotDeviceMessageCodec> codes;
-
     @Resource
     private IotDeviceService deviceService;
 
     @Resource
     private IotDeviceMessageProducer deviceMessageProducer;
 
-    public IotDeviceMessageServiceImpl(List<IotDeviceMessageCodec> codes) {
-        this.codes = CollectionUtils.convertMap(codes, IotDeviceMessageCodec::type);
-    }
+    @Resource
+    private IotMessageSerializerManager messageSerializerManager;
 
     @Override
-    public byte[] encodeDeviceMessage(IotDeviceMessage message,
-                                      String productKey, String deviceName) {
+    public byte[] serializeDeviceMessage(IotDeviceMessage message,
+                                         String productKey, String deviceName) {
         // 1.1 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
         if (device == null) {
             throw exception(DEVICE_NOT_EXISTS, productKey, deviceName);
         }
-        // 1.2 获取编解码器
-        IotDeviceMessageCodec codec = codes.get(device.getCodecType());
-        if (codec == null) {
-            throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", device.getCodecType()));
-        }
+        // 1.2 获取序列化器
+        IotSerializeTypeEnum serializeType = IotSerializeTypeEnum.of(device.getSerializeType());
+        Assert.notNull(serializeType, "设备序列化类型不能为空");
 
-        // 2. 编码消息
-        return codec.encode(message);
+        // 2. 序列化消息
+        return serializeDeviceMessage(message, serializeType);
     }
 
     @Override
-    public byte[] encodeDeviceMessage(IotDeviceMessage message,
-                                      String codecType) {
-        // 1. 获取编解码器
-        IotDeviceMessageCodec codec = codes.get(codecType);
-        if (codec == null) {
-            throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", codecType));
+    public byte[] serializeDeviceMessage(IotDeviceMessage message,
+                                         IotSerializeTypeEnum serializeType) {
+        // 1. 获取序列化器
+        IotMessageSerializer serializer = messageSerializerManager.get(serializeType);
+        if (serializer == null) {
+            throw new IllegalArgumentException(StrUtil.format("序列化器({}) 不存在", serializeType));
         }
 
-        // 2. 编码消息
-        return codec.encode(message);
+        // 2. 序列化消息
+        return serializer.serialize(message);
     }
 
     @Override
-    public IotDeviceMessage decodeDeviceMessage(byte[] bytes,
-                                                String productKey, String deviceName) {
+    public IotDeviceMessage deserializeDeviceMessage(byte[] bytes,
+                                                     String productKey, String deviceName) {
         // 1.1 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
         if (device == null) {
             throw exception(DEVICE_NOT_EXISTS, productKey, deviceName);
         }
-        // 1.2 获取编解码器
-        IotDeviceMessageCodec codec = codes.get(device.getCodecType());
-        if (codec == null) {
-            throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", device.getCodecType()));
-        }
+        // 1.2 获取序列化器
+        IotSerializeTypeEnum serializeType = IotSerializeTypeEnum.of(device.getSerializeType());
+        Assert.notNull(serializeType, "设备序列化类型不能为空");
 
-        // 2. 解码消息
-        return codec.decode(bytes);
+        // 2. 反序列化消息
+        return deserializeDeviceMessage(bytes, serializeType);
     }
 
     @Override
-    public IotDeviceMessage decodeDeviceMessage(byte[] bytes, String codecType) {
-        // 1. 获取编解码器
-        IotDeviceMessageCodec codec = codes.get(codecType);
-        if (codec == null) {
-            throw new IllegalArgumentException(StrUtil.format("编解码器({}) 不存在", codecType));
+    public IotDeviceMessage deserializeDeviceMessage(byte[] bytes, IotSerializeTypeEnum serializeType) {
+        // 1. 获取序列化器
+        IotMessageSerializer serializer = messageSerializerManager.get(serializeType);
+        if (serializer == null) {
+            throw new IllegalArgumentException(StrUtil.format("序列化器({}) 不存在", serializeType));
         }
 
-        // 2. 解码消息
-        return codec.decode(bytes);
+        // 2. 反序列化消息
+        return serializer.deserialize(bytes);
     }
 
     @Override
