@@ -4712,8 +4712,8 @@ CREATE TABLE IF NOT EXISTS `pay_notify_log` (
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`            bit(1)        NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付通知日志';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付通知日志';
 
 
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
@@ -4771,8 +4771,8 @@ CREATE TABLE IF NOT EXISTS `pay_order` (
     `updater`              varchar(64)            DEFAULT '',
     `update_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`              bit(1)        NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单';
 
 
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
@@ -4794,8 +4794,8 @@ CREATE TABLE IF NOT EXISTS `pay_order_extension` (
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`            bit(1)        NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单拓展';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单拓展';
 
 
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
@@ -4829,8 +4829,8 @@ CREATE TABLE IF NOT EXISTS `pay_refund` (
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`            bit(1)        NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '退款订单';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '退款订单';
 
 
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
@@ -4861,8 +4861,8 @@ CREATE TABLE IF NOT EXISTS `pay_transfer` (
     `updater`              varchar(64)   NULL     DEFAULT '',
     `update_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`              bit(1)        NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '转账单';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '转账单';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
@@ -5106,8 +5106,8 @@ CREATE TABLE IF NOT EXISTS `promotion_coupon_template`
     `updater`              varchar(255)           DEFAULT '',
     `update_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`              bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
@@ -5139,8 +5139,8 @@ CREATE TABLE IF NOT EXISTS `promotion_coupon_template`
     `updater`              varchar(255)           DEFAULT '',
     `update_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`              bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
@@ -5158,8 +5158,8 @@ CREATE TABLE IF NOT EXISTS `promotion_discount_activity`
     `updater`     varchar(255)           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`     bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '限时折扣活动';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '限时折扣活动';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
@@ -5222,8 +5222,8 @@ CREATE TABLE IF NOT EXISTS `promotion_reward_activity`
     `updater`         varchar(255)           DEFAULT '',
     `update_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`         bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '满减送活动';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '满减送活动';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
@@ -5382,8 +5382,8 @@ CREATE TABLE IF NOT EXISTS `trade_after_sale`
     `updater`        varchar(255)           DEFAULT '',
     `update_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`        bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后表';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后表';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
@@ -5404,8 +5404,8 @@ CREATE TABLE IF NOT EXISTS `trade_after_sale_log`
     `updater`       varchar(255)           DEFAULT '',
     `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`       bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后日志';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后日志';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
@@ -5498,8 +5498,8 @@ CREATE TABLE IF NOT EXISTS `trade_delivery_express`
     `updater`     varchar(255)           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`     bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金提现';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金提现';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
@@ -5566,8 +5566,8 @@ CREATE TABLE IF NOT EXISTS `trade_order`
     `updater`                 varchar(255)           DEFAULT '',
     `update_time`             datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`                 bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单表';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单表';
 
 
 -- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
@@ -5602,8 +5602,8 @@ CREATE TABLE IF NOT EXISTS `trade_order_item`
     `updater`           varchar(255)           DEFAULT '',
     `update_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`           bit(1) NOT NULL DEFAULT b'0',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单明细表';
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+    PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单明细表';
 
 
 -- ============================
