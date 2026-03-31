@@ -4248,7 +4248,7 @@ CREATE TABLE IF NOT EXISTS `bpm_category` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '分类';
 
@@ -4266,7 +4266,7 @@ CREATE TABLE IF NOT EXISTS `bpm_form` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '动态表单';
 
@@ -4283,7 +4283,7 @@ CREATE TABLE IF NOT EXISTS `bpm_user_group` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户组';
 
@@ -4301,7 +4301,7 @@ CREATE TABLE IF NOT EXISTS `iot_alert_config` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 告警配置表';
@@ -4326,7 +4326,7 @@ CREATE TABLE IF NOT EXISTS `iot_alert_record` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 告警记录表';
@@ -4355,7 +4355,7 @@ CREATE TABLE IF NOT EXISTS `iot_device` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 设备表';
@@ -4391,7 +4391,7 @@ CREATE TABLE IF NOT EXISTS `iot_ota_firmware` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT OTA 固件表';
@@ -4413,7 +4413,7 @@ CREATE TABLE IF NOT EXISTS `iot_ota_record` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT OTA 升级记录表';
@@ -4432,7 +4432,7 @@ CREATE TABLE IF NOT EXISTS `iot_ota_task` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT OTA 升级任务表';
@@ -4456,7 +4456,7 @@ CREATE TABLE IF NOT EXISTS `iot_product` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 产品表';
@@ -4475,7 +4475,7 @@ CREATE TABLE IF NOT EXISTS `iot_scene_rule` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 场景联动规则表';
@@ -4495,7 +4495,7 @@ CREATE TABLE IF NOT EXISTS `iot_thing_model` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 物模型表';
@@ -4519,7 +4519,7 @@ CREATE TABLE IF NOT EXISTS `market_activity`
     `create_time`           datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`               varchar(64)          DEFAULT '',
     `update_time`           datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`               bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`               bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`             bigint(20)  NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '促销活动';
@@ -4538,7 +4538,7 @@ CREATE TABLE IF NOT EXISTS `member_address` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `creator` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `updater` varchar(64) DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户收件地址';
@@ -4563,7 +4563,7 @@ CREATE TABLE IF NOT EXISTS `member_brokerage_record`
     `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`       varchar           DEFAULT '',
     `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`       bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`       bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`      bigint   not null default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金记录';
@@ -4581,7 +4581,7 @@ CREATE TABLE IF NOT EXISTS `member_group`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`      bigint   not null default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户分组';
@@ -4602,7 +4602,7 @@ CREATE TABLE IF NOT EXISTS `member_level`
     `create_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`        varchar           DEFAULT '',
     `update_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`        bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`        bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`      bigint   not null default '0',
     `status` tinyint NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
@@ -4619,7 +4619,7 @@ CREATE TABLE IF NOT EXISTS `member_tag`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`   bigint   NOT NULL default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会员标签';
@@ -4652,7 +4652,7 @@ CREATE TABLE IF NOT EXISTS `member_user`
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updater`     varchar(64)  NULL     DEFAULT '' COMMENT '更新者',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`     bit(1)(1)       NOT NULL DEFAULT '0' COMMENT '是否删除',
+    `deleted`     bit(1)       NOT NULL DEFAULT b'0' COMMENT '是否删除',
     `tenant_id`   bigint       not null default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会员表';
@@ -4672,7 +4672,7 @@ CREATE TABLE IF NOT EXISTS `pay_app` (
     `create_time`       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`           varchar(64)            DEFAULT '',
     `update_time`       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`           bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`           bit(1)        NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付应用';
 
@@ -4691,7 +4691,7 @@ CREATE TABLE IF NOT EXISTS `pay_channel` (
     `create_time` datetime       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar(64)    NULL     DEFAULT '',
     `update_time` datetime       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1)         NOT NULL DEFAULT b'0',
+    `deleted`     bit(1)         NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付渠道';
@@ -4709,7 +4709,7 @@ CREATE TABLE IF NOT EXISTS `pay_notify_log` (
     `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`            bit(1)        NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付通知日志';
 
@@ -4732,7 +4732,7 @@ CREATE TABLE IF NOT EXISTS `pay_notify_task` (
     `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`            bit(1)        NOT NULL DEFAULT b'0',
     `tenant_id`           bigint(20)    NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付通知任务';
@@ -4768,7 +4768,7 @@ CREATE TABLE IF NOT EXISTS `pay_order` (
     `create_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`              varchar(64)            DEFAULT '',
     `update_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`              bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`              bit(1)        NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单';
 
@@ -4791,7 +4791,7 @@ CREATE TABLE IF NOT EXISTS `pay_order_extension` (
     `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`            bit(1)        NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单拓展';
 
@@ -4826,7 +4826,7 @@ CREATE TABLE IF NOT EXISTS `pay_refund` (
     `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar(64)   NULL     DEFAULT '',
     `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`            bit(1)        NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '退款订单';
 
@@ -4858,7 +4858,7 @@ CREATE TABLE IF NOT EXISTS `pay_transfer` (
     `create_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`              varchar(64)   NULL     DEFAULT '',
     `update_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`              bit(1)(1)        NOT NULL DEFAULT b'0',
+    `deleted`              bit(1)        NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '转账单';
 
@@ -4876,7 +4876,7 @@ CREATE TABLE IF NOT EXISTS `product_brand` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品品牌';
@@ -4896,7 +4896,7 @@ CREATE TABLE IF NOT EXISTS `product_category` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品分类';
@@ -4912,7 +4912,7 @@ CREATE TABLE IF NOT EXISTS `product_property` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     `remark` varchar(255) DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`id`)
@@ -4930,7 +4930,7 @@ CREATE TABLE IF NOT EXISTS `product_property_value` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     `remark` varchar(255) DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`id`)
@@ -4958,7 +4958,7 @@ CREATE TABLE IF NOT EXISTS `product_sku` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品sku';
@@ -4981,20 +4981,20 @@ CREATE TABLE IF NOT EXISTS `product_spu` (
     `unit` tinyint NOT NULL COMMENT '单位',
     `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
     `status` tinyint NOT NULL COMMENT '商品状态: 0 上架（开启） 1 下架（禁用）-1 回收',
-    `spec_type` bit(1)(1) NOT NULL COMMENT '规格类型：0 单规格 1 多规格',
+    `spec_type` bit(1) NOT NULL COMMENT '规格类型：0 单规格 1 多规格',
     `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位使用：分',
     `market_price` int NOT NULL COMMENT '市场价，单位使用：分',
     `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
     `stock` int NOT NULL DEFAULT '0' COMMENT '库存',
     `delivery_template_id` bigint NOT NULL COMMENT '物流配置模板编号',
-    `recommend_hot` bit(1)(1) NOT NULL COMMENT '是否热卖推荐: 0 默认 1 热卖',
-    `recommend_benefit` bit(1)(1) NOT NULL COMMENT '是否优惠推荐: 0 默认 1 优选',
-    `recommend_best` bit(1)(1) NOT NULL COMMENT '是否精品推荐: 0 默认 1 精品',
-    `recommend_new` bit(1)(1) NOT NULL COMMENT '是否新品推荐: 0 默认 1 新品',
-    `recommend_good` bit(1)(1) NOT NULL COMMENT '是否优品推荐',
+    `recommend_hot` bit(1) NOT NULL COMMENT '是否热卖推荐: 0 默认 1 热卖',
+    `recommend_benefit` bit(1) NOT NULL COMMENT '是否优惠推荐: 0 默认 1 优选',
+    `recommend_best` bit(1) NOT NULL COMMENT '是否精品推荐: 0 默认 1 精品',
+    `recommend_new` bit(1) NOT NULL COMMENT '是否新品推荐: 0 默认 1 新品',
+    `recommend_good` bit(1) NOT NULL COMMENT '是否优品推荐',
     `give_integral` int NOT NULL COMMENT '赠送积分',
     `give_coupon_template_ids` varchar(512)  DEFAULT '' COMMENT '赠送的优惠劵编号的数组',
-    `sub_commission_type` bit(1)(1) NOT NULL COMMENT '分销类型',
+    `sub_commission_type` bit(1) NOT NULL COMMENT '分销类型',
     `activity_orders` varchar(16) NOT NULL DEFAULT '' COMMENT '活动显示排序0=默认, 1=秒杀，2=砍价，3=拼团',
     `sales_count` int DEFAULT '0' COMMENT '商品销量',
     `virtual_sales_count` int DEFAULT '0' COMMENT '虚拟销量',
@@ -5003,7 +5003,7 @@ CREATE TABLE IF NOT EXISTS `product_spu` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品spu';
@@ -5022,7 +5022,7 @@ CREATE TABLE IF NOT EXISTS `promotion_article_category`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`   bigint   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文章分类表';
@@ -5041,7 +5041,7 @@ CREATE TABLE IF NOT EXISTS `promotion_article_category`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`   bigint   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文章分类表';
@@ -5069,7 +5069,7 @@ CREATE TABLE IF NOT EXISTS `promotion_combination_activity`
     `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar           DEFAULT '',
     `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`            bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`          bigint   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动';
@@ -5103,7 +5103,7 @@ CREATE TABLE IF NOT EXISTS `promotion_coupon_template`
     `create_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`              varchar           DEFAULT '',
     `update_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`              bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`              bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
 
@@ -5136,7 +5136,7 @@ CREATE TABLE IF NOT EXISTS `promotion_coupon_template`
     `create_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`              varchar           DEFAULT '',
     `update_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`              bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`              bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
 
@@ -5155,7 +5155,7 @@ CREATE TABLE IF NOT EXISTS `promotion_discount_activity`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '限时折扣活动';
 
@@ -5174,7 +5174,7 @@ CREATE TABLE IF NOT EXISTS `promotion_diy_page`
     `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar           DEFAULT '',
     `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`            bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`          bigint   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '装修页面';
@@ -5195,7 +5195,7 @@ CREATE TABLE IF NOT EXISTS `promotion_diy_template`
     `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar           DEFAULT '',
     `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`            bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`          bigint   NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '装修模板';
@@ -5219,7 +5219,7 @@ CREATE TABLE IF NOT EXISTS `promotion_reward_activity`
     `create_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`         varchar           DEFAULT '',
     `update_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`         bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`         bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '满减送活动';
 
@@ -5248,7 +5248,7 @@ CREATE TABLE IF NOT EXISTS `promotion_seckill_activity`
     `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`            varchar           DEFAULT '',
     `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`            bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`          bigint   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀活动';
@@ -5268,7 +5268,7 @@ CREATE TABLE IF NOT EXISTS `promotion_seckill_config`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`   bigint   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀时段配置';
@@ -5287,7 +5287,7 @@ CREATE TABLE IF NOT EXISTS `report_go_view_project` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'GoView 项目表';
 
@@ -5307,7 +5307,7 @@ CREATE TABLE IF NOT EXISTS `system_user_session` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater` varchar(64) DEFAULT '' ,
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户在线 Session';
@@ -5323,7 +5323,7 @@ CREATE TABLE IF NOT EXISTS `system_post` (
     `create_time` datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar(64)          DEFAULT '',
     `update_time` datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '岗位信息表';
@@ -5336,7 +5336,7 @@ CREATE TABLE IF NOT EXISTS `system_user_post`(
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar(64)        DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`   bigint    not null default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户岗位表';
@@ -5379,7 +5379,7 @@ CREATE TABLE IF NOT EXISTS `trade_after_sale`
     `create_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`        varchar           DEFAULT '',
     `update_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`        bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`        bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后表';
 
@@ -5401,7 +5401,7 @@ CREATE TABLE IF NOT EXISTS `trade_after_sale_log`
     `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`       varchar           DEFAULT '',
     `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`       bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`       bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后日志';
 
@@ -5425,7 +5425,7 @@ CREATE TABLE IF NOT EXISTS `trade_brokerage_record`
     `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`       varchar           DEFAULT '',
     `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`       bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`       bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金记录';
@@ -5446,7 +5446,7 @@ CREATE TABLE IF NOT EXISTS `trade_brokerage_user`
     `create_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`           varchar           DEFAULT '',
     `update_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`           bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`           bit(1) NOT NULL DEFAULT b'0',
     `tenant_id`         bigint   NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '分销用户';
@@ -5475,7 +5475,7 @@ CREATE TABLE IF NOT EXISTS `trade_brokerage_withdraw`
     `create_time`         datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`             varchar           DEFAULT '',
     `update_time`         datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`             bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`             bit(1) NOT NULL DEFAULT b'0',
     `tenant_id` bigint not null default '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金提现';
@@ -5495,7 +5495,7 @@ CREATE TABLE IF NOT EXISTS `trade_delivery_express`
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`     varchar           DEFAULT '',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金提现';
 
@@ -5563,7 +5563,7 @@ CREATE TABLE IF NOT EXISTS `trade_order`
     `create_time`             datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`                 varchar           DEFAULT '',
     `update_time`             datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`                 bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`                 bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单表';
 
@@ -5599,7 +5599,7 @@ CREATE TABLE IF NOT EXISTS `trade_order_item`
     `create_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updater`           varchar           DEFAULT '',
     `update_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`           bit(1)(1) NOT NULL DEFAULT b'0',
+    `deleted`           bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单明细表';
 
