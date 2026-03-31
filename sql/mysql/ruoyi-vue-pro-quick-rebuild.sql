@@ -4662,17 +4662,19 @@ CREATE TABLE IF NOT EXISTS `member_user`
 DROP TABLE IF EXISTS `pay_app`;
 CREATE TABLE IF NOT EXISTS `pay_app` (
     `id` bigint NOT NULL AUTO_INCREMENT,
-    `app_key`              varchar(64)   NOT NULL,
-    `name`              varchar(64)   NOT NULL,
-    `status`            tinyint       NOT NULL,
-    `remark`            varchar(255)           DEFAULT NULL,
-    `order_notify_url`    varchar(1024) NOT NULL,
+    `app_key` varchar(64) NOT NULL,
+    `name` varchar(64) NOT NULL,
+    `status` tinyint NOT NULL,
+    `remark` varchar(255) DEFAULT NULL,
+    `order_notify_url` varchar(1024) NOT NULL,
     `refund_notify_url` varchar(1024) NOT NULL,
-    `creator`           varchar(64)            DEFAULT '',
-    `create_time`       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updater`           varchar(64)            DEFAULT '',
-    `update_time`       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `deleted`           bit(1)        NOT NULL DEFAULT b'0',
+    `transfer_notify_url` varchar(1024) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted` bit(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付应用';
 
