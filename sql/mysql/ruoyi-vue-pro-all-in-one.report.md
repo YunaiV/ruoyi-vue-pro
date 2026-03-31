@@ -1,0 +1,234 @@
+# All-in-one MySQL bootstrap report
+
+- Output: `/Users/ripflowers/workspace/ningxx/ruoyi-vue-pro/sql/mysql/ruoyi-vue-pro-all-in-one.sql`
+- Source SQL files: **10**
+- Final selected tables: **194**
+
+## Source order
+- `ruoyi-vue-pro.sql`
+- `bpm-2025-10-04-传播违法.sql`
+- `crm-2024-09-30.sql`
+- `erp-2024-05-03.sql`
+- `member-2024-01-18.sql`
+- `mp-2025-12-07 传播违法.sql`
+- `pay-2025-07-27传播违法.sql`
+- `go-view.sql`
+- `quartz.sql`
+- `jimureport.mysql5.7.create.sql`
+
+## Duplicate table resolution (latest file wins)
+
+## Final tables by source
+### ruoyi-vue-pro.sql
+- `infra_api_access_log`
+- `infra_api_error_log`
+- `infra_codegen_column`
+- `infra_codegen_table`
+- `infra_config`
+- `infra_data_source_config`
+- `infra_file`
+- `infra_file_config`
+- `infra_file_content`
+- `infra_job`
+- `infra_job_log`
+- `system_dept`
+- `system_dict_data`
+- `system_dict_type`
+- `system_login_log`
+- `system_mail_account`
+- `system_mail_log`
+- `system_mail_template`
+- `system_menu`
+- `system_notice`
+- `system_notify_message`
+- `system_notify_template`
+- `system_oauth2_access_token`
+- `system_oauth2_approve`
+- `system_oauth2_client`
+- `system_oauth2_code`
+- `system_oauth2_refresh_token`
+- `system_operate_log`
+- `system_post`
+- `system_role`
+- `system_role_menu`
+- `system_sms_channel`
+- `system_sms_code`
+- `system_sms_log`
+- `system_sms_template`
+- `system_social_client`
+- `system_social_user`
+- `system_social_user_bind`
+- `system_tenant`
+- `system_tenant_package`
+- `system_user_post`
+- `system_user_role`
+- `system_users`
+- `yudao_demo01_contact`
+- `yudao_demo02_category`
+- `yudao_demo03_course`
+- `yudao_demo03_grade`
+- `yudao_demo03_student`
+
+### bpm-2025-10-04-传播违法.sql
+- `bpm_category`
+- `bpm_form`
+- `bpm_oa_leave`
+- `bpm_process_definition_info`
+- `bpm_process_expression`
+- `bpm_process_instance_copy`
+- `bpm_process_listener`
+- `bpm_user_group`
+
+### crm-2024-09-30.sql
+- `crm_business`
+- `crm_business_product`
+- `crm_business_status`
+- `crm_business_status_type`
+- `crm_clue`
+- `crm_contact`
+- `crm_contact_business`
+- `crm_contract`
+- `crm_contract_config`
+- `crm_contract_product`
+- `crm_customer`
+- `crm_customer_limit_config`
+- `crm_customer_pool_config`
+- `crm_follow_up_record`
+- `crm_permission`
+- `crm_product`
+- `crm_product_category`
+- `crm_receivable`
+- `crm_receivable_plan`
+
+### erp-2024-05-03.sql
+- `erp_account`
+- `erp_customer`
+- `erp_finance_payment`
+- `erp_finance_payment_item`
+- `erp_finance_receipt`
+- `erp_finance_receipt_item`
+- `erp_product`
+- `erp_product_category`
+- `erp_product_unit`
+- `erp_purchase_in`
+- `erp_purchase_in_items`
+- `erp_purchase_order`
+- `erp_purchase_order_items`
+- `erp_purchase_return`
+- `erp_purchase_return_items`
+- `erp_sale_order`
+- `erp_sale_order_items`
+- `erp_sale_out`
+- `erp_sale_out_items`
+- `erp_sale_return`
+- `erp_sale_return_items`
+- `erp_stock`
+- `erp_stock_check`
+- `erp_stock_check_item`
+- `erp_stock_in`
+- `erp_stock_in_item`
+- `erp_stock_move`
+- `erp_stock_move_item`
+- `erp_stock_out`
+- `erp_stock_out_item`
+- `erp_stock_record`
+- `erp_supplier`
+- `erp_warehouse`
+
+### member-2024-01-18.sql
+- `member_address`
+- `member_config`
+- `member_experience_record`
+- `member_group`
+- `member_level`
+- `member_level_record`
+- `member_point_record`
+- `member_sign_in_config`
+- `member_sign_in_record`
+- `member_tag`
+- `member_user`
+
+### mp-2025-12-07 传播违法.sql
+- `mp_account`
+- `mp_auto_reply`
+- `mp_material`
+- `mp_menu`
+- `mp_message`
+- `mp_message_template`
+- `mp_tag`
+- `mp_user`
+
+### pay-2025-07-27传播违法.sql
+- `pay_app`
+- `pay_channel`
+- `pay_demo_order`
+- `pay_demo_withdraw`
+- `pay_notify_log`
+- `pay_notify_task`
+- `pay_order`
+- `pay_order_extension`
+- `pay_refund`
+- `pay_transfer`
+- `pay_wallet`
+- `pay_wallet_recharge`
+- `pay_wallet_recharge_package`
+- `pay_wallet_transaction`
+
+### go-view.sql
+- `report_go_view_project`
+
+### quartz.sql
+- `QRTZ_BLOB_TRIGGERS`
+- `QRTZ_CALENDARS`
+- `QRTZ_CRON_TRIGGERS`
+- `QRTZ_FIRED_TRIGGERS`
+- `QRTZ_JOB_DETAILS`
+- `QRTZ_LOCKS`
+- `QRTZ_PAUSED_TRIGGER_GRPS`
+- `QRTZ_SCHEDULER_STATE`
+- `QRTZ_SIMPLE_TRIGGERS`
+- `QRTZ_SIMPROP_TRIGGERS`
+- `QRTZ_TRIGGERS`
+
+### jimureport.mysql5.7.create.sql
+- `huiyuan_age`
+- `huiyuan_fengongsi`
+- `huiyuan_huoyuedu`
+- `huiyuan_sex`
+- `huiyuan_work`
+- `huiyuan_wxtl`
+- `huiyuan_wxtlshuliang`
+- `huiyuan_xueli`
+- `jimu_dict`
+- `jimu_dict_item`
+- `jimu_report`
+- `jimu_report_category`
+- `jimu_report_data_source`
+- `jimu_report_db`
+- `jimu_report_db_field`
+- `jimu_report_db_param`
+- `jimu_report_export_job`
+- `jimu_report_export_log`
+- `jimu_report_icon_lib`
+- `jimu_report_link`
+- `jimu_report_map`
+- `jimu_report_share`
+- `onl_drag_comp`
+- `onl_drag_dataset_head`
+- `onl_drag_dataset_item`
+- `onl_drag_dataset_param`
+- `onl_drag_page`
+- `onl_drag_page_comp`
+- `onl_drag_share`
+- `onl_drag_table_relation`
+- `rep_demo_dxtj`
+- `rep_demo_employee`
+- `rep_demo_gongsi`
+- `rep_demo_jianpiao`
+- `rep_demo_xiaoshou`
+- `test_customer`
+- `test_order`
+- `test_order_pros`
+- `test_resume`
+- `tmp_report_data_1`
+- `tmp_report_data_income`
