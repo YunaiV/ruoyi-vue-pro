@@ -1,0 +1,125 @@
+# MySQL quick rebuild coverage report
+
+- Base file: `/Users/ripflowers/workspace/ningxx/ruoyi-vue-pro/sql/mysql/ruoyi-vue-pro.sql`
+- Target file: `/Users/ripflowers/workspace/ningxx/ruoyi-vue-pro/sql/mysql/ruoyi-vue-pro-quick-rebuild.sql`
+- Test SQL files scanned: **10**
+- Tables found in test `create_tables.sql`: **97**
+- Tables already present in MySQL base SQL: **42**
+- Missing tables supplemented this round: **55**
+
+## Scanned files
+- `yudao-module-bpm/src/test/resources/sql/create_tables.sql` — 3 tables
+- `yudao-module-infra/src/test/resources/sql/create_tables.sql` — 10 tables
+- `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql` — 10 tables
+- `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql` — 6 tables
+- `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql` — 12 tables
+- `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql` — 8 tables
+- `yudao-module-member/src/test/resources/sql/create_tables.sql` — 6 tables
+- `yudao-module-pay/src/test/resources/sql/create_tables.sql` — 8 tables
+- `yudao-module-report/src/test/resources/sql/create_tables.sql` — 1 tables
+- `yudao-module-system/src/test/resources/sql/create_tables.sql` — 33 tables
+
+## Supplemented missing tables
+- `bpm_category` ← `yudao-module-bpm/src/test/resources/sql/create_tables.sql`
+- `bpm_form` ← `yudao-module-bpm/src/test/resources/sql/create_tables.sql`
+- `bpm_user_group` ← `yudao-module-bpm/src/test/resources/sql/create_tables.sql`
+- `iot_alert_config` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_alert_record` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_device` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_device_data` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_ota_firmware` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_ota_record` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_ota_task` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_product` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_scene_rule` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `iot_thing_model` ← `yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql`
+- `market_activity` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `member_address` ← `yudao-module-member/src/test/resources/sql/create_tables.sql`
+- `member_brokerage_record` ← `yudao-module-member/src/test/resources/sql/create_tables.sql`
+- `member_group` ← `yudao-module-member/src/test/resources/sql/create_tables.sql`
+- `member_level` ← `yudao-module-member/src/test/resources/sql/create_tables.sql`
+- `member_tag` ← `yudao-module-member/src/test/resources/sql/create_tables.sql`
+- `member_user` ← `yudao-module-member/src/test/resources/sql/create_tables.sql`
+- `pay_app` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_channel` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_notify_log` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_notify_task` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_order` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_order_extension` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_refund` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `pay_transfer` ← `yudao-module-pay/src/test/resources/sql/create_tables.sql`
+- `product_brand` ← `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql`
+- `product_category` ← `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql`
+- `product_property` ← `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql`
+- `product_property_value` ← `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql`
+- `product_sku` ← `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql`
+- `product_spu` ← `yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql`
+- `promotion_article` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_article_category` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_combination_activity` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_coupon` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_coupon_template` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_discount_activity` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_diy_page` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_diy_template` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_reward_activity` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_seckill_activity` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `promotion_seckill_config` ← `yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql`
+- `report_go_view_project` ← `yudao-module-report/src/test/resources/sql/create_tables.sql`
+- `system_user_session` ← `yudao-module-system/src/test/resources/sql/create_tables.sql`
+- `trade_after_sale` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_after_sale_log` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_brokerage_record` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_brokerage_user` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_brokerage_withdraw` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_delivery_express` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_order` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+- `trade_order_item` ← `yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql`
+
+## Tables in test SQL already covered by base MySQL SQL
+- `infra_api_access_log`
+- `infra_api_error_log`
+- `infra_codegen_column`
+- `infra_codegen_table`
+- `infra_config`
+- `infra_data_source_config`
+- `infra_file`
+- `infra_file_config`
+- `infra_job`
+- `infra_job_log`
+- `system_dept`
+- `system_dict_data`
+- `system_dict_type`
+- `system_login_log`
+- `system_mail_account`
+- `system_mail_log`
+- `system_mail_template`
+- `system_menu`
+- `system_notice`
+- `system_notify_message`
+- `system_notify_template`
+- `system_oauth2_access_token`
+- `system_oauth2_approve`
+- `system_oauth2_client`
+- `system_oauth2_code`
+- `system_oauth2_refresh_token`
+- `system_operate_log`
+- `system_post`
+- `system_role`
+- `system_role_menu`
+- `system_sms_channel`
+- `system_sms_code`
+- `system_sms_log`
+- `system_sms_template`
+- `system_social_client`
+- `system_social_user`
+- `system_social_user_bind`
+- `system_tenant`
+- `system_tenant_package`
+- `system_user_post`
+- `system_user_role`
+- `system_users`
+
+## Notes
+- `member_config` 仍保留为手工补充表。
+- 本轮补充是将测试 SQL 尽量转成 MySQL 可执行格式，不保证 100% 零兼容问题，但足够用于快速启动排障。

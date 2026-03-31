@@ -4232,6 +4232,1379 @@ COMMIT;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================
+-- Auto supplements from module test SQL
+-- ============================
+
+-- ===== Supplement from yudao-module-bpm/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `bpm_category`;
+CREATE TABLE IF NOT EXISTS `bpm_category` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(63) NOT NULL,
+    `code` varchar(63) NOT NULL,
+    `description` varchar(255) NOT NULL,
+    `status` tinyint NOT NULL,
+    `sort` int NOT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '分类';
+
+
+-- ===== Supplement from yudao-module-bpm/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `bpm_form`;
+CREATE TABLE IF NOT EXISTS `bpm_form` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(63) NOT NULL,
+    `status` tinyint NOT NULL,
+    `fields` varchar(255) NOT NULL,
+    `conf` varchar(255) NOT NULL,
+    `remark` varchar(255),
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '动态表单';
+
+
+-- ===== Supplement from yudao-module-bpm/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `bpm_user_group`;
+CREATE TABLE IF NOT EXISTS `bpm_user_group` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(63) NOT NULL,
+    `description` varchar(255) NOT NULL,
+    `status` tinyint NOT NULL,
+    `user_ids` varchar(255) NOT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户组';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_alert_config`;
+CREATE TABLE IF NOT EXISTS `iot_alert_config` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `product_id` bigint NOT NULL,
+    `device_id` bigint DEFAULT NULL,
+    `rule_id` bigint DEFAULT NULL,
+    `status` tinyint NOT NULL DEFAULT '0',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 告警配置表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_alert_record`;
+CREATE TABLE IF NOT EXISTS `iot_alert_record` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `alert_config_id` bigint NOT NULL,
+    `alert_name` varchar(255) NOT NULL DEFAULT '',
+    `product_id` bigint NOT NULL,
+    `device_id` bigint DEFAULT NULL,
+    `rule_id` bigint DEFAULT NULL,
+    `alert_data` text,
+    `alert_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deal_status` tinyint NOT NULL DEFAULT '0',
+    `deal_time` datetime DEFAULT NULL,
+    `deal_user_id` bigint DEFAULT NULL,
+    `deal_remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 告警记录表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_device`;
+CREATE TABLE IF NOT EXISTS `iot_device` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `device_name` varchar(255) NOT NULL DEFAULT '',
+    `product_id` bigint NOT NULL,
+    `device_key` varchar(100) NOT NULL DEFAULT '',
+    `device_secret` varchar(100) NOT NULL DEFAULT '',
+    `nickname` varchar(255) DEFAULT NULL,
+    `status` tinyint NOT NULL DEFAULT '0',
+    `status_last_update_time` datetime DEFAULT NULL,
+    `last_online_time` datetime DEFAULT NULL,
+    `last_offline_time` datetime DEFAULT NULL,
+    `active_time` datetime DEFAULT NULL,
+    `ip` varchar(50) DEFAULT NULL,
+    `firmware_version` varchar(50) DEFAULT NULL,
+    `device_type` tinyint NOT NULL DEFAULT '0',
+    `gateway_id` bigint DEFAULT NULL,
+    `sub_device_count` int NOT NULL DEFAULT '0',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 设备表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_device_data`;
+CREATE TABLE IF NOT EXISTS `iot_device_data` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `device_id` bigint NOT NULL,
+    `product_id` bigint NOT NULL,
+    `identifier` varchar(100) NOT NULL DEFAULT '',
+    `type` tinyint NOT NULL DEFAULT '1',
+    `data` text,
+    `ts` bigint NOT NULL DEFAULT '0',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 设备数据表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_ota_firmware`;
+CREATE TABLE IF NOT EXISTS `iot_ota_firmware` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `product_id` bigint NOT NULL,
+    `version` varchar(50) NOT NULL DEFAULT '',
+    `description` varchar(500) DEFAULT NULL,
+    `file_url` varchar(500) DEFAULT NULL,
+    `file_size` bigint NOT NULL DEFAULT '0',
+    `status` tinyint NOT NULL DEFAULT '0',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT OTA 固件表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_ota_record`;
+CREATE TABLE IF NOT EXISTS `iot_ota_record` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `task_id` bigint NOT NULL,
+    `firmware_id` bigint NOT NULL,
+    `device_id` bigint NOT NULL,
+    `status` tinyint NOT NULL DEFAULT '0',
+    `progress` int NOT NULL DEFAULT '0',
+    `error_msg` varchar(500) DEFAULT NULL,
+    `start_time` datetime DEFAULT NULL,
+    `end_time` datetime DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT OTA 升级记录表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_ota_task`;
+CREATE TABLE IF NOT EXISTS `iot_ota_task` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `firmware_id` bigint NOT NULL,
+    `product_id` bigint NOT NULL,
+    `upgrade_type` tinyint NOT NULL DEFAULT '0',
+    `status` tinyint NOT NULL DEFAULT '0',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT OTA 升级任务表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_product`;
+CREATE TABLE IF NOT EXISTS `iot_product` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `product_key` varchar(100) NOT NULL DEFAULT '',
+    `protocol_type` tinyint NOT NULL DEFAULT '0',
+    `category_id` bigint DEFAULT NULL,
+    `description` varchar(500) DEFAULT NULL,
+    `data_format` tinyint NOT NULL DEFAULT '0',
+    `device_type` tinyint NOT NULL DEFAULT '0',
+    `net_type` tinyint NOT NULL DEFAULT '0',
+    `validate_type` tinyint NOT NULL DEFAULT '0',
+    `status` tinyint NOT NULL DEFAULT '0',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 产品表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_scene_rule`;
+CREATE TABLE IF NOT EXISTS `iot_scene_rule` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `description` varchar(500) DEFAULT NULL,
+    `status` tinyint NOT NULL DEFAULT '0',
+    `triggers` text,
+    `actions` text,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 场景联动规则表';
+
+
+-- ===== Supplement from yudao-module-iot/yudao-module-iot-biz/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `iot_thing_model`;
+CREATE TABLE IF NOT EXISTS `iot_thing_model` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `product_id` bigint NOT NULL,
+    `identifier` varchar(100) NOT NULL DEFAULT '',
+    `name` varchar(255) NOT NULL DEFAULT '',
+    `description` varchar(500) DEFAULT NULL,
+    `type` tinyint NOT NULL DEFAULT '1',
+    `property` text,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IoT 物模型表';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `market_activity`;
+CREATE TABLE IF NOT EXISTS `market_activity`
+(
+    `id`                    bigint(20)  NOT NULL AUTO_INCREMENT,
+    `title`                 varchar(50) NOT NULL,
+    `activity_type`         tinyint(4)  NOT NULL,
+    `status`                tinyint(4)  NOT NULL,
+    `start_time`            datetime    NOT NULL,
+    `end_time`              datetime    NOT NULL,
+    `invalid_time`          datetime,
+    `delete_time`           datetime,
+    `time_limited_discount` varchar(2000),
+    `full_privilege`        varchar(2000),
+    `creator`               varchar(64)          DEFAULT '',
+    `create_time`           datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`               varchar(64)          DEFAULT '',
+    `update_time`           datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`               bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`             bigint(20)  NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '促销活动';
+
+
+-- ===== Supplement from yudao-module-member/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `member_address`;
+CREATE TABLE IF NOT EXISTS `member_address` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `user_id` bigint(20) NOT NULL,
+    `name` varchar(10) NOT NULL,
+    `mobile` varchar(20) NOT NULL,
+    `area_id` bigint(20) NOT NULL,
+    `detail_address` varchar(250) NOT NULL,
+    `default_status` bit(1) NOT NULL,
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `creator` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `updater` varchar(64) DEFAULT '',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户收件地址';
+
+
+-- ===== Supplement from yudao-module-member/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `member_brokerage_record`;
+CREATE TABLE IF NOT EXISTS `member_brokerage_record`
+(
+    `id`            int      NOT NULL AUTO_INCREMENT,
+    `user_id`       bigint   NOT NULL,
+    `biz_id`        varchar  NOT NULL,
+    `biz_type`      varchar  NOT NULL,
+    `title`         varchar  NOT NULL,
+    `price`         int      NOT NULL,
+    `total_price`   int      NOT NULL,
+    `description`   varchar  NOT NULL,
+    `status`        varchar  NOT NULL,
+    `frozen_days`   int      NOT NULL,
+    `unfreeze_time` varchar,
+    `creator`       varchar           DEFAULT '',
+    `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`       varchar           DEFAULT '',
+    `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`       bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`      bigint   not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金记录';
+
+
+-- ===== Supplement from yudao-module-member/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `member_group`;
+CREATE TABLE IF NOT EXISTS `member_group`
+(
+    `id`          bigint   NOT NULL AUTO_INCREMENT,
+    `name`        varchar  NOT NULL,
+    `remark`      varchar  NOT NULL,
+    `status` tinyint NOT NULL DEFAULT '0',
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`      bigint   not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户分组';
+
+
+-- ===== Supplement from yudao-module-member/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `member_level`;
+CREATE TABLE IF NOT EXISTS `member_level`
+(
+    `id`             bigint   NOT NULL AUTO_INCREMENT,
+    `name`           varchar  NOT NULL,
+    `experience`     int      NOT NULL,
+    `level`          int      NOT NULL,
+    `discount_percent`       int      NOT NULL,
+    `icon`           varchar  NOT NULL,
+    `background_url` varchar  NOT NULL,
+    `creator`        varchar           DEFAULT '',
+    `create_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`        varchar           DEFAULT '',
+    `update_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`        bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`      bigint   not null default '0',
+    `status` tinyint NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会员等级';
+
+
+-- ===== Supplement from yudao-module-member/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `member_tag`;
+CREATE TABLE IF NOT EXISTS `member_tag`
+(
+    `id`          bigint   NOT NULL AUTO_INCREMENT,
+    `name`        varchar  NOT NULL,
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`   bigint   NOT NULL default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会员标签';
+
+
+-- ===== Supplement from yudao-module-member/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `member_user`;
+CREATE TABLE IF NOT EXISTS `member_user`
+(
+    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '编号',
+    `nickname`    varchar(30)  NOT NULL DEFAULT '' COMMENT '用户昵称',
+    `name`        varchar(30)  NULL COMMENT '真实名字',
+    sex           tinyint      null comment '性别',
+    birthday      datetime     null comment '出生日期',
+    area_id       int          null comment '所在地',
+    mark          varchar(255) null comment '用户备注',
+    point         int                   default 0 null comment '积分',
+    `avatar`      varchar(255) NOT NULL DEFAULT '' COMMENT '头像',
+    `status`      tinyint      NOT NULL COMMENT '状态',
+    `mobile`      varchar(11)  NOT NULL COMMENT '手机号',
+    `password`    varchar(100) NOT NULL DEFAULT '' COMMENT '密码',
+    `register_ip` varchar(32)  NOT NULL COMMENT '注册 IP',
+    `login_ip`    varchar(50)  NULL     DEFAULT '' COMMENT '最后登录IP',
+    `login_date`  datetime     NULL     DEFAULT NULL COMMENT '最后登录时间',
+    `tag_ids`     varchar(255) NULL     DEFAULT NULL COMMENT '用户标签编号列表,以逗号分隔',
+    `level_id`    bigint       NULL     DEFAULT NULL COMMENT '等级编号',
+    `experience`  bigint       NULL     DEFAULT NULL COMMENT '经验',
+    `group_id`    bigint       NULL     DEFAULT NULL COMMENT '用户分组编号',
+    `creator`     varchar(64)  NULL     DEFAULT '' COMMENT '创建者',
+    `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater`     varchar(64)  NULL     DEFAULT '' COMMENT '更新者',
+    `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`     bit(1)(1)       NOT NULL DEFAULT '0' COMMENT '是否删除',
+    `tenant_id`   bigint       not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '会员表';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_app`;
+CREATE TABLE IF NOT EXISTS `pay_app` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `app_key`              varchar(64)   NOT NULL,
+    `name`              varchar(64)   NOT NULL,
+    `status`            tinyint       NOT NULL,
+    `remark`            varchar(255)           DEFAULT NULL,
+    `order_notify_url`    varchar(1024) NOT NULL,
+    `refund_notify_url` varchar(1024) NOT NULL,
+    `creator`           varchar(64)            DEFAULT '',
+    `create_time`       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`           varchar(64)            DEFAULT '',
+    `update_time`       datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`           bit(1)(1)        NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付应用';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_channel`;
+CREATE TABLE IF NOT EXISTS `pay_channel` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `code`        varchar(32)    NOT NULL,
+    `status`      tinyint(4)     NOT NULL,
+    `remark`      varchar(255)            DEFAULT NULL,
+    `fee_rate`    double         NOT NULL DEFAULT 0,
+    `app_id`      bigint(20)     NOT NULL,
+    `config`      varchar(10240) NOT NULL,
+    `creator`     varchar(64)    NULL     DEFAULT '',
+    `create_time` datetime       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar(64)    NULL     DEFAULT '',
+    `update_time` datetime       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1)         NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付渠道';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_notify_log`;
+CREATE TABLE IF NOT EXISTS `pay_notify_log` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `task_id`             bigint(20)    NOT NULL,
+    `notify_times`         int    NOT NULL,
+    `response`         varchar(1024) NOT NULL,
+    `status`             tinyint(4)    NOT NULL,
+    `creator`            varchar(64)   NULL     DEFAULT '',
+    `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar(64)   NULL     DEFAULT '',
+    `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付通知日志';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_notify_task`;
+CREATE TABLE IF NOT EXISTS `pay_notify_task` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `app_id`             bigint(20)    NOT NULL,
+    `type`               tinyint(4)    NOT NULL,
+    `data_id`           bigint(20)    NOT NULL,
+    `merchant_order_id`           varchar(64)    NOT NULL,
+    `status`             tinyint(4)    NOT NULL,
+    `next_notify_time`       datetime(0)   NULL     DEFAULT NULL,
+    `last_execute_time`       datetime(0)   NULL     DEFAULT NULL,
+    `notify_times`         int    NOT NULL,
+    `max_notify_times`         int    NOT NULL,
+    `notify_url`         varchar(1024) NOT NULL,
+    `creator`            varchar(64)   NULL     DEFAULT '',
+    `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar(64)   NULL     DEFAULT '',
+    `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    `tenant_id`           bigint(20)    NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付通知任务';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_order`;
+CREATE TABLE IF NOT EXISTS `pay_order` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `app_id`               bigint(20)    NOT NULL,
+    `channel_id`           bigint(20)             DEFAULT NULL,
+    `channel_code`         varchar(32)            DEFAULT NULL,
+    `merchant_order_id`    varchar(64)   NOT NULL,
+    `subject`              varchar(32)   NOT NULL,
+    `body`                 varchar(128)  NOT NULL,
+    `notify_url`           varchar(1024) NOT NULL,
+    `price`                bigint(20)    NOT NULL,
+    `channel_fee_rate`     double                 DEFAULT 0,
+    `channel_fee_price`    bigint(20)             DEFAULT 0,
+    `status`               tinyint(4)    NOT NULL,
+    `user_ip`              varchar(50)   NOT NULL,
+    `user_id`              bigint(20)             DEFAULT NULL,
+    `user_type`            tinyint(4)             DEFAULT NULL,
+    `expire_time`          datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `success_time`         datetime(0)            DEFAULT CURRENT_TIMESTAMP,
+    `notify_time`          datetime(0)            DEFAULT CURRENT_TIMESTAMP,
+    `extension_id` bigint(20)             DEFAULT NULL,
+    `no`                   varchar(64)   NULL,
+    `refund_price`         bigint(20)    NOT NULL,
+    `channel_user_id`      varchar(255)           DEFAULT NULL,
+    `channel_order_no`     varchar(64)            DEFAULT NULL,
+    `creator`              varchar(64)            DEFAULT '',
+    `create_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`              varchar(64)            DEFAULT '',
+    `update_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`              bit(1)(1)        NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_order_extension`;
+CREATE TABLE IF NOT EXISTS `pay_order_extension` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `no`           varchar(64)         NOT NULL,
+    `order_id`           bigint(20)    NOT NULL,
+    `channel_id`         bigint(20)    NOT NULL,
+    `channel_code`       varchar(32)   NOT NULL,
+    `user_ip`            varchar(50)   NULL     DEFAULT NULL,
+    `status`             tinyint(4)    NOT NULL,
+    `channel_extras`     varchar(1024) NULL     DEFAULT NULL,
+    `channel_error_code`  varchar(64)  NULL,
+    `channel_error_msg` varchar(64)    NULL,
+    `channel_notify_data` varchar(1024)  NULL,
+    `creator`            varchar(64)   NULL     DEFAULT '',
+    `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar(64)   NULL     DEFAULT '',
+    `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '支付订单拓展';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_refund`;
+CREATE TABLE IF NOT EXISTS `pay_refund` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `no`           varchar(64)         NOT NULL,
+    `app_id`             bigint(20)    NOT NULL,
+    `channel_id`         bigint(20)    NOT NULL,
+    `channel_code`       varchar(32)   NOT NULL,
+    `order_id`           bigint(20)    NOT NULL,
+    `order_no`           varchar(64)    NOT NULL,
+    `merchant_order_id`  varchar(64)   NOT NULL,
+    `merchant_refund_id` varchar(64)   NOT NULL,
+    `notify_url`         varchar(1024) NOT NULL,
+    `status`             tinyint(4)    NOT NULL,
+    `pay_price`         bigint(20)    NOT NULL,
+    `refund_price`      bigint(20)    NOT NULL,
+    `reason`             varchar(256)  NOT NULL,
+    `user_ip`            varchar(50)   NULL     DEFAULT NULL,
+    `user_id`            bigint(20)    NULL     DEFAULT NULL,
+    `user_type`          tinyint(4)    NULL     DEFAULT NULL,
+    `channel_order_no`   varchar(64)   NOT NULL,
+    `channel_refund_no`  varchar(64)   NULL     DEFAULT NULL,
+    `success_time`       datetime(0)   NULL     DEFAULT NULL,
+    `channel_error_code` varchar(128)  NULL     DEFAULT NULL,
+    `channel_error_msg`  varchar(256)  NULL     DEFAULT NULL,
+    `channel_notify_data` varchar(1024)  NULL,
+    `creator`            varchar(64)   NULL     DEFAULT '',
+    `create_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar(64)   NULL     DEFAULT '',
+    `update_time`        datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1)        NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '退款订单';
+
+
+-- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `pay_transfer`;
+CREATE TABLE IF NOT EXISTS `pay_transfer` (
+    `id` number NOT NULL AUTO_INCREMENT,
+    `no`                   varchar(64)   NOT NULL,
+    `app_id`               bigint(20)    NOT NULL,
+    `channel_id`           bigint(20)    NOT NULL,
+    `channel_code`         varchar(32)   NOT NULL,
+    `user_id`              bigint(20)    NULL     DEFAULT NULL,
+    `user_type`            tinyint(4)    NULL     DEFAULT NULL,
+    `merchant_transfer_id` varchar(64)   NOT NULL,
+    `price`                bigint(20)    NOT NULL,
+    `subject`              varchar(256)  NOT NULL,
+    `user_account`         varchar(256)  NOT NULL,
+    `user_name`            varchar(64)   NULL     DEFAULT NULL,
+    `status`               tinyint(4)    NOT NULL,
+    `notify_url`           varchar(1024) NULL     DEFAULT NULL,
+    `channel_transfer_no`  varchar(64)   NULL     DEFAULT NULL,
+    `success_time`         datetime(0)   NULL     DEFAULT NULL,
+    `channel_error_code`   varchar(128)  NULL     DEFAULT NULL,
+    `channel_error_msg`    varchar(256)  NULL     DEFAULT NULL,
+    `channel_notify_data`  varchar(1024) NULL     DEFAULT NULL,
+    `channel_extras`       varchar(1024) NULL     DEFAULT NULL,
+    `creator`              varchar(64)   NULL     DEFAULT '',
+    `create_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`              varchar(64)   NULL     DEFAULT '',
+    `update_time`          datetime(0)   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`              bit(1)(1)        NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '转账单';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `product_brand`;
+CREATE TABLE IF NOT EXISTS `product_brand` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '品牌编号',
+    `name` varchar(255) NOT NULL COMMENT '品牌名称',
+    `pic_url` varchar(255) NOT NULL COMMENT '品牌图片',
+    `sort` int DEFAULT '0' COMMENT '品牌排序',
+    `description` varchar(1024) DEFAULT NULL COMMENT '品牌描述',
+    `status` tinyint NOT NULL COMMENT '状态',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品品牌';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `product_category`;
+CREATE TABLE IF NOT EXISTS `product_category` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类编号',
+    `parent_id` bigint NOT NULL COMMENT '父分类编号',
+    `name` varchar(255) NOT NULL COMMENT '分类名称',
+    `pic_url` varchar(255) NOT NULL COMMENT '移动端分类图',
+    `big_pic_url` varchar(255) DEFAULT NULL COMMENT 'PC 端分类图',
+    `sort` int DEFAULT '0' COMMENT '分类排序',
+    `status` tinyint NOT NULL COMMENT '开启状态',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品分类';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `product_property`;
+CREATE TABLE IF NOT EXISTS `product_property` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `name` varchar(64) DEFAULT NULL COMMENT '规格名称',
+    `status` tinyint DEFAULT NULL COMMENT '状态： 0 开启 ，1 禁用',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '规格名称';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `product_property_value`;
+CREATE TABLE IF NOT EXISTS `product_property_value` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `property_id` bigint DEFAULT NULL COMMENT '规格键id',
+    `name` varchar(128) DEFAULT NULL COMMENT '规格值名字',
+    `status` tinyint DEFAULT NULL COMMENT '状态： 1 开启 ，2 禁用',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '规格值';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `product_sku`;
+CREATE TABLE IF NOT EXISTS `product_sku` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `spu_id` bigint NOT NULL COMMENT 'spu编号',
+    `properties` varchar(512)  DEFAULT NULL COMMENT '属性数组，JSON 格式',
+    `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位：分',
+    `market_price` int DEFAULT NULL COMMENT '市场价，单位：分',
+    `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
+    `bar_code` varchar(64)  DEFAULT NULL COMMENT 'SKU 的条形码',
+    `pic_url` varchar(256)  NOT NULL COMMENT '图片地址',
+    `stock` int DEFAULT NULL COMMENT '库存',
+    `weight` double DEFAULT NULL COMMENT '商品重量，单位：kg 千克',
+    `volume` double DEFAULT NULL COMMENT '商品体积，单位：m^3 平米',
+    `sub_commission_first_price` int DEFAULT NULL COMMENT '一级分销的佣金，单位：分',
+    `sub_commission_second_price` int DEFAULT NULL COMMENT '二级分销的佣金，单位：分',
+    `sales_count` int DEFAULT NULL COMMENT '商品销量',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品sku';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-product/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `product_spu`;
+CREATE TABLE IF NOT EXISTS `product_spu` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商品 SPU 编号，自增',
+    `name` varchar(128) NOT NULL COMMENT '商品名称',
+    `keyword` varchar(256) NOT NULL COMMENT '关键字',
+    `introduction` varchar(256) NOT NULL COMMENT '商品简介',
+    `description` text NOT NULL COMMENT '商品详情',
+    `bar_code` varchar(64) NOT NULL COMMENT '条形码',
+    `category_id` bigint NOT NULL COMMENT '商品分类编号',
+    `brand_id` int DEFAULT NULL COMMENT '商品品牌编号',
+    `pic_url` varchar(256) NOT NULL COMMENT '商品封面图',
+    `slider_pic_urls` varchar(2000)  DEFAULT '' COMMENT '商品轮播图地址\n 数组，以逗号分隔\n 最多上传15张',
+    `video_url` varchar(256) DEFAULT NULL COMMENT '商品视频',
+    `unit` tinyint NOT NULL COMMENT '单位',
+    `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
+    `status` tinyint NOT NULL COMMENT '商品状态: 0 上架（开启） 1 下架（禁用）-1 回收',
+    `spec_type` bit(1)(1) NOT NULL COMMENT '规格类型：0 单规格 1 多规格',
+    `price` int NOT NULL DEFAULT '-1' COMMENT '商品价格，单位使用：分',
+    `market_price` int NOT NULL COMMENT '市场价，单位使用：分',
+    `cost_price` int NOT NULL DEFAULT '-1' COMMENT '成本价，单位： 分',
+    `stock` int NOT NULL DEFAULT '0' COMMENT '库存',
+    `delivery_template_id` bigint NOT NULL COMMENT '物流配置模板编号',
+    `recommend_hot` bit(1)(1) NOT NULL COMMENT '是否热卖推荐: 0 默认 1 热卖',
+    `recommend_benefit` bit(1)(1) NOT NULL COMMENT '是否优惠推荐: 0 默认 1 优选',
+    `recommend_best` bit(1)(1) NOT NULL COMMENT '是否精品推荐: 0 默认 1 精品',
+    `recommend_new` bit(1)(1) NOT NULL COMMENT '是否新品推荐: 0 默认 1 新品',
+    `recommend_good` bit(1)(1) NOT NULL COMMENT '是否优品推荐',
+    `give_integral` int NOT NULL COMMENT '赠送积分',
+    `give_coupon_template_ids` varchar(512)  DEFAULT '' COMMENT '赠送的优惠劵编号的数组',
+    `sub_commission_type` bit(1)(1) NOT NULL COMMENT '分销类型',
+    `activity_orders` varchar(16) NOT NULL DEFAULT '' COMMENT '活动显示排序0=默认, 1=秒杀，2=砍价，3=拼团',
+    `sales_count` int DEFAULT '0' COMMENT '商品销量',
+    `virtual_sales_count` int DEFAULT '0' COMMENT '虚拟销量',
+    `browse_count` int DEFAULT '0' COMMENT '商品点击量',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '商品spu';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_article`;
+CREATE TABLE IF NOT EXISTS `promotion_article_category`
+(
+    `id`          bigint   NOT NULL AUTO_INCREMENT,
+    `name`        varchar  NOT NULL,
+    `pic_url`     varchar,
+    `status`      int      NOT NULL,
+    `sort`        int      NOT NULL,
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`   bigint   NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文章分类表';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_article_category`;
+CREATE TABLE IF NOT EXISTS `promotion_article_category`
+(
+    `id`          bigint   NOT NULL AUTO_INCREMENT,
+    `name`        varchar  NOT NULL,
+    `pic_url`     varchar,
+    `status`      int      NOT NULL,
+    `sort`        int      NOT NULL,
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`   bigint   NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文章分类表';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_combination_activity`;
+CREATE TABLE IF NOT EXISTS `promotion_combination_activity`
+(
+    `id`                 bigint   NOT NULL AUTO_INCREMENT,
+    `name`               varchar  NOT NULL,
+    `spu_id`             bigint,
+    `total_limit_count`  int      NOT NULL,
+    `single_limit_count` int      NOT NULL,
+    `start_time`         varchar  NOT NULL,
+    `end_time`           varchar  NOT NULL,
+    `user_size`          int      NOT NULL,
+    `total_num`          int      NOT NULL,
+    `success_num`        int      NOT NULL,
+    `order_user_count`   int      NOT NULL,
+    `virtual_group`      int      NOT NULL,
+    `status`             int      NOT NULL,
+    `limit_duration`     int      NOT NULL,
+    `creator`            varchar           DEFAULT '',
+    `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar           DEFAULT '',
+    `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`          bigint   NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_coupon`;
+CREATE TABLE IF NOT EXISTS `promotion_coupon_template`
+(
+    `id`                   bigint   NOT NULL AUTO_INCREMENT,
+    `name`                 varchar  NOT NULL,
+    `status`               int      NOT NULL,
+    `total_count`          int      NOT NULL,
+    `take_limit_count`     int      NOT NULL,
+    `take_type`            int      NOT NULL,
+    `use_price`            int      NOT NULL,
+    `product_scope`        int      NOT NULL,
+    `product_spu_ids`      varchar,
+    `validity_type`        int      NOT NULL,
+    `valid_start_time`     datetime,
+    `valid_end_time`       datetime,
+    `fixed_start_term`     int,
+    `fixed_end_term`       int,
+    `discount_type`        int      NOT NULL,
+    `discount_percent`     int,
+    `discount_price`       int,
+    `discount_limit_price` int,
+    `take_count`           int      NOT NULL DEFAULT 0,
+    `use_count`            int      NOT NULL DEFAULT 0,
+    `creator`              varchar           DEFAULT '',
+    `create_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`              varchar           DEFAULT '',
+    `update_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`              bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_coupon_template`;
+CREATE TABLE IF NOT EXISTS `promotion_coupon_template`
+(
+    `id`                   bigint   NOT NULL AUTO_INCREMENT,
+    `name`                 varchar  NOT NULL,
+    `status`               int      NOT NULL,
+    `total_count`          int      NOT NULL,
+    `take_limit_count`     int      NOT NULL,
+    `take_type`            int      NOT NULL,
+    `use_price`            int      NOT NULL,
+    `product_scope`        int      NOT NULL,
+    `product_spu_ids`      varchar,
+    `validity_type`        int      NOT NULL,
+    `valid_start_time`     datetime,
+    `valid_end_time`       datetime,
+    `fixed_start_term`     int,
+    `fixed_end_term`       int,
+    `discount_type`        int      NOT NULL,
+    `discount_percent`     int,
+    `discount_price`       int,
+    `discount_limit_price` int,
+    `take_count`           int      NOT NULL DEFAULT 0,
+    `use_count`            int      NOT NULL DEFAULT 0,
+    `creator`              varchar           DEFAULT '',
+    `create_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`              varchar           DEFAULT '',
+    `update_time`          datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`              bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '优惠劵模板';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_discount_activity`;
+CREATE TABLE IF NOT EXISTS `promotion_discount_activity`
+(
+    `id`          bigint   NOT NULL AUTO_INCREMENT,
+    `name`        varchar  NOT NULL,
+    `status`      int      NOT NULL,
+    `start_time`  datetime NOT NULL,
+    `end_time`    datetime NOT NULL,
+    `remark`      varchar,
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '限时折扣活动';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_diy_page`;
+CREATE TABLE IF NOT EXISTS `promotion_diy_page`
+(
+    `id`                 bigint   NOT NULL AUTO_INCREMENT,
+    `template_id`        bigint   NOT NULL,
+    `name`               varchar  NOT NULL,
+    `remark`             varchar,
+    `preview_pic_urls`   varchar,
+    `property`           varchar,
+    `creator`            varchar           DEFAULT '',
+    `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar           DEFAULT '',
+    `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`          bigint   NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '装修页面';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_diy_template`;
+CREATE TABLE IF NOT EXISTS `promotion_diy_template`
+(
+    `id`                 bigint   NOT NULL AUTO_INCREMENT,
+    `name`               varchar  NOT NULL,
+    `used`               bit(1)      NOT NULL,
+    `used_time`          varchar,
+    `remark`             varchar,
+    `preview_pic_urls`   varchar,
+    `property`           varchar  NOT NULL,
+    `creator`            varchar           DEFAULT '',
+    `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar           DEFAULT '',
+    `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`          bigint   NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '装修模板';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_reward_activity`;
+CREATE TABLE IF NOT EXISTS `promotion_reward_activity`
+(
+    `id`              bigint   NOT NULL AUTO_INCREMENT,
+    `name`            varchar  NOT NULL,
+    `status`          int      NOT NULL,
+    `start_time`      datetime NOT NULL,
+    `end_time`        datetime NOT NULL,
+    `remark`          varchar,
+    `condition_type`  int      NOT NULL,
+    `product_scope`   int      NOT NULL,
+    `product_spu_ids` varchar,
+    `rules`           varchar,
+    `creator`         varchar           DEFAULT '',
+    `create_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`         varchar           DEFAULT '',
+    `update_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`         bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '满减送活动';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_seckill_activity`;
+CREATE TABLE IF NOT EXISTS `promotion_seckill_activity`
+(
+    `id`                 bigint   NOT NULL AUTO_INCREMENT,
+    `spu_id`             bigint   NOT NULL,
+    `name`               varchar  NOT NULL,
+    `status`             int      NOT NULL,
+    `remark`             varchar,
+    `start_time`         varchar  NOT NULL,
+    `end_time`           varchar  NOT NULL,
+    `sort`               int      NOT NULL,
+    `config_ids`         varchar  NOT NULL,
+    `order_count`        int      NOT NULL,
+    `user_count`         int      NOT NULL,
+    `total_price`        int      NOT NULL,
+    `total_limit_count`  int,
+    `single_limit_count` int,
+    `stock`              int,
+    `total_stock`        int,
+    `creator`            varchar           DEFAULT '',
+    `create_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`            varchar           DEFAULT '',
+    `update_time`        datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`            bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`          bigint   NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀活动';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-promotion/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `promotion_seckill_config`;
+CREATE TABLE IF NOT EXISTS `promotion_seckill_config`
+(
+    `id`          bigint   NOT NULL AUTO_INCREMENT,
+    `name`        varchar  NOT NULL,
+    `start_time`  varchar  NOT NULL,
+    `end_time`    varchar  NOT NULL,
+    `pic_url`     varchar  NOT NULL,
+    `status`      int      NOT NULL,
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`   bigint   NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀时段配置';
+
+
+-- ===== Supplement from yudao-module-report/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `report_go_view_project`;
+CREATE TABLE IF NOT EXISTS `report_go_view_project` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar NOT NULL,
+    `pic_url` varchar,
+    `content` varchar,
+    `status` varchar NOT NULL,
+    `remark` varchar,
+    `creator` varchar DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'GoView 项目表';
+
+
+-- ===== Supplement from yudao-module-system/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `system_user_session`;
+CREATE TABLE IF NOT EXISTS `system_user_session` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `token` varchar(32) NOT NULL,
+    `user_id` bigint DEFAULT NULL,
+    `user_type` tinyint NOT NULL,
+    `username` varchar(50) NOT NULL DEFAULT '',
+    `user_ip` varchar(50) DEFAULT NULL,
+    `user_agent` varchar(512) DEFAULT NULL,
+    `session_timeout` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '' ,
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户在线 Session';
+
+CREATE TABLE IF NOT EXISTS `system_post` (
+    `id`          bigint      NOT NULL AUTO_INCREMENT,
+    `code`        varchar(64) NOT NULL,
+    `name`        varchar(50) NOT NULL,
+    `sort`        integer     NOT NULL,
+    `status`      tinyint     NOT NULL,
+    `remark`      varchar(500)         DEFAULT NULL,
+    `creator`     varchar(64)          DEFAULT '',
+    `create_time` datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar(64)          DEFAULT '',
+    `update_time` datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '岗位信息表';
+
+CREATE TABLE IF NOT EXISTS `system_user_post`(
+    `id`          bigint    NOT NULL AUTO_INCREMENT,
+    `user_id`     bigint             DEFAULT NULL,
+    `post_id`     bigint             DEFAULT NULL,
+    `creator`     varchar(64)        DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar(64)        DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`   bigint    not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户岗位表';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_after_sale`;
+CREATE TABLE IF NOT EXISTS `trade_after_sale`
+(
+    `id`             bigint   NOT NULL AUTO_INCREMENT,
+    `no`             varchar  NOT NULL,
+    `status`         int      NOT NULL,
+    `type`           int      NOT NULL,
+    `way`            int      NOT NULL,
+    `user_id`        bigint   NOT NULL,
+    `apply_reason`   varchar  NOT NULL,
+    `apply_description` varchar,
+    `apply_pic_urls` varchar,
+    `order_id`       bigint   NOT NULL,
+    `order_no`       varchar  NOT NULL,
+    `order_item_id`  bigint   NOT NULL,
+    `spu_id`         bigint   NOT NULL,
+    `spu_name`       varchar  NOT NULL,
+    `sku_id`         bigint   NOT NULL,
+    `properties`     varchar,
+    `pic_url`        varchar,
+    `count`          int      NOT NULL,
+    `audit_time`     varchar,
+    `audit_user_id`  bigint,
+    `audit_reason`   varchar,
+    `refund_price`   int      NOT NULL,
+    `pay_refund_id`  bigint,
+    `refund_time`    varchar,
+    `logistics_id`   bigint,
+    `logistics_no`   varchar,
+    `delivery_time`  varchar,
+    `receive_time`   varchar,
+    `receive_reason` varchar,
+    `creator`        varchar           DEFAULT '',
+    `create_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`        varchar           DEFAULT '',
+    `update_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`        bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后表';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_after_sale_log`;
+CREATE TABLE IF NOT EXISTS `trade_after_sale_log`
+(
+    `id`            bigint   NOT NULL AUTO_INCREMENT,
+    `user_id`       bigint   NOT NULL,
+    `user_type`     int      NOT NULL,
+    `after_sale_id` bigint   NOT NULL,
+    `order_id`      bigint   NOT NULL,
+    `order_item_id` bigint   NOT NULL,
+    `before_status` int,
+    `after_status`  int      NOT NULL,
+    `content`       varchar  NOT NULL,
+    `creator`       varchar           DEFAULT '',
+    `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`       varchar           DEFAULT '',
+    `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`       bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易售后日志';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_brokerage_record`;
+CREATE TABLE IF NOT EXISTS `trade_brokerage_record`
+(
+    `id`            int      NOT NULL AUTO_INCREMENT,
+    `user_id`       bigint   NOT NULL,
+    `biz_id`        varchar  NOT NULL,
+    `biz_type`      varchar  NOT NULL,
+    `title`         varchar  NOT NULL,
+    `price`         int      NOT NULL,
+    `total_price`   int      NOT NULL,
+    `description`   varchar  NOT NULL,
+    `status`        varchar  NOT NULL,
+    `frozen_days`   int      NOT NULL,
+    `unfreeze_time` varchar,
+    `creator`       varchar           DEFAULT '',
+    `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`       varchar           DEFAULT '',
+    `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`       bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金记录';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_brokerage_user`;
+CREATE TABLE IF NOT EXISTS `trade_brokerage_user`
+(
+    `id`                bigint   NOT NULL AUTO_INCREMENT,
+    `bind_user_id`      bigint   NOT NULL,
+    `bind_user_time`    varchar,
+    `brokerage_enabled` bit(1)      NOT NULL,
+    `brokerage_time`    varchar,
+    `price`             int      NOT NULL,
+    `frozen_price`      int      NOT NULL,
+    `creator`           varchar           DEFAULT '',
+    `create_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`           varchar           DEFAULT '',
+    `update_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`           bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id`         bigint   NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '分销用户';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_brokerage_withdraw`;
+CREATE TABLE IF NOT EXISTS `trade_brokerage_withdraw`
+(
+    `id`                  int      NOT NULL AUTO_INCREMENT,
+    `user_id`             bigint   NOT NULL,
+    `price`               int      NOT NULL,
+    `fee_price`           int      NOT NULL,
+    `total_price`         int      NOT NULL,
+    `type`                varchar  NOT NULL,
+    `name`                varchar,
+    `account_no`          varchar,
+    `bank_name`           varchar,
+    `bank_address`        varchar,
+    `account_qr_code_url` varchar,
+    `status`              varchar  NOT NULL,
+    `audit_reason`        varchar,
+    `audit_time`          varchar,
+    `remark`              varchar,
+    `creator`             varchar           DEFAULT '',
+    `create_time`         datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`             varchar           DEFAULT '',
+    `update_time`         datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`             bit(1)(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金提现';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_delivery_express`;
+CREATE TABLE IF NOT EXISTS `trade_delivery_express`
+(
+    `id`          int      NOT NULL AUTO_INCREMENT,
+    `code`        varchar  NULL,
+    `name`        varchar,
+    `logo`        varchar  NULL,
+    `sort`        int      NOT NULL,
+    `status`      int      NOT NULL,
+    `creator`     varchar           DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar           DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`     bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金提现';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_order`;
+CREATE TABLE IF NOT EXISTS `trade_order`
+(
+    `id`                      bigint   NOT NULL AUTO_INCREMENT,
+    `no`                      varchar  NOT NULL,
+    `type`                    int      NOT NULL,
+    `terminal`                int      NOT NULL,
+    `user_id`                 bigint   NOT NULL,
+    `user_ip`                 varchar  NOT NULL,
+    `user_remark`             varchar,
+    `status`                  int      NOT NULL,
+    `product_count`           int      NOT NULL,
+    `cancel_type`             int,
+    `remark`                  varchar,
+    `comment_status`          boolean,
+    `brokerage_user_id`       bigint,
+    `pay_status`              bit(1)      NOT NULL,
+    `pay_time`                datetime,
+    `finish_time`             datetime,
+    `cancel_time`             datetime,
+    `total_price`             int      NULL,
+    `order_price`             int      NULL,
+    `discount_price`          int      NOT NULL,
+    `delivery_price`          int      NOT NULL,
+    `adjust_price`            int      NOT NULL,
+    `pay_price`               int      NOT NULL,
+    `delivery_type`           int      NOT NULL,
+    `pay_order_id`            bigint,
+    `pay_channel_code`        varchar,
+    `delivery_template_id`    bigint,
+    `logistics_id`            bigint,
+    `logistics_no`            varchar,
+    `delivery_time`           datetime,
+    `receive_time`            datetime,
+    `receiver_name`           varchar  NOT NULL,
+    `receiver_mobile`         varchar  NOT NULL,
+    `receiver_area_id`        int      NOT NULL,
+    `receiver_post_code`      int,
+    `receiver_detail_address` varchar  NOT NULL,
+    `pick_up_store_id`        long     NULL,
+    `pick_up_verify_code`     varchar  NULL,
+    `refund_status`           int      NULL,
+    `refund_price`            int      NULL,
+    `after_sale_status`       int      NULL,
+    `coupon_id`               bigint   NOT NULL,
+    `coupon_price`            int      NOT NULL,
+    `use_point`               int      NULL,
+    `point_price`             int      NOT NULL,
+    `give_point`              int      NULL,
+    `refund_point`            int      NULL,
+    `vip_price`               int      NULL,
+    `give_coupons_map`        varchar  NULL,
+    `seckill_activity_id`     long     NULL,
+    `bargain_activity_id`     long     NULL,
+    `bargain_record_id`       long     NULL,
+    `combination_activity_id` long     NULL,
+    `combination_head_id`     long     NULL,
+    `combination_record_id`   long     NULL,
+    `creator`                 varchar           DEFAULT '',
+    `create_time`             datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`                 varchar           DEFAULT '',
+    `update_time`             datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`                 bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单表';
+
+
+-- ===== Supplement from yudao-module-mall/yudao-module-trade/src/test/resources/sql/create_tables.sql =====
+DROP TABLE IF EXISTS `trade_order_item`;
+CREATE TABLE IF NOT EXISTS `trade_order_item`
+(
+    `id`                bigint   NOT NULL AUTO_INCREMENT,
+    `user_id`           bigint   NOT NULL,
+    `order_id`          bigint   NOT NULL,
+    `cart_id`           int      NULL,
+    `spu_id`            bigint   NOT NULL,
+    `spu_name`          varchar  NOT NULL,
+    `sku_id`            bigint   NOT NULL,
+    `properties`        varchar,
+    `pic_url`           varchar,
+    `count`             int      NOT NULL,
+    `comment_status`    boolean  NULL,
+    `price`             int      NOT NULL,
+    `discount_price`    int      NOT NULL,
+    `delivery_price`    int      NULL,
+    `adjust_price`      int      NULL,
+    `pay_price`         int      NOT NULL,
+    `coupon_price`      int      NULL,
+    `point_price`       int      NULL,
+    `use_point`         int      NULL,
+    `give_point`        int      NULL,
+    `vip_price`         int      NULL,
+    `after_sale_id`     long     NULL,
+    `after_sale_status` int      NOT NULL,
+    `creator`           varchar           DEFAULT '',
+    `create_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`           varchar           DEFAULT '',
+    `update_time`       datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted`           bit(1)(1) NOT NULL DEFAULT b'0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '交易订单明细表';
+
+
+-- ============================
 -- Manual supplement: member_config
 -- ============================
 DROP TABLE IF EXISTS `member_config`;
