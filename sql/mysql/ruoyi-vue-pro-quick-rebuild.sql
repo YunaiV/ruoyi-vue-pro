@@ -5605,6 +5605,1044 @@ CREATE TABLE IF NOT EXISTS `trade_order_item`
 
 
 -- ============================
+-- Entity-based supplements from @TableName
+-- ============================
+-- ===== Entity supplement: ai_chat_message =====
+DROP TABLE IF EXISTS `ai_chat_message`;
+CREATE TABLE `ai_chat_message` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `conversation_id` bigint DEFAULT 0,
+  `reply_id` bigint DEFAULT 0,
+  `type` varchar(255) DEFAULT '',
+  `user_id` bigint DEFAULT 0,
+  `role_id` bigint DEFAULT 0,
+  `model` varchar(255) DEFAULT '',
+  `model_id` bigint DEFAULT 0,
+  `content` varchar(255) DEFAULT '',
+  `reasoning_content` varchar(255) DEFAULT '',
+  `use_context` bit(1) DEFAULT b'0',
+  `segment_ids` varchar(255) DEFAULT '',
+  `attachment_urls` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiChatMessage';
+
+-- ===== Entity supplement: ai_chat_role =====
+DROP TABLE IF EXISTS `ai_chat_role`;
+CREATE TABLE `ai_chat_role` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `avatar` varchar(255) DEFAULT '',
+  `category` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `system_message` varchar(255) DEFAULT '',
+  `user_id` bigint DEFAULT 0,
+  `model_id` bigint DEFAULT 0,
+  `knowledge_ids` varchar(255) DEFAULT '',
+  `tool_ids` varchar(255) DEFAULT '',
+  `mcp_client_names` varchar(255) DEFAULT '',
+  `public_status` bit(1) DEFAULT b'0',
+  `sort` int DEFAULT 0,
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiChatRole';
+
+-- ===== Entity supplement: ai_image =====
+DROP TABLE IF EXISTS `ai_image`;
+CREATE TABLE `ai_image` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint DEFAULT 0,
+  `prompt` varchar(255) DEFAULT '',
+  `platform` varchar(255) DEFAULT '',
+  `model_id` bigint DEFAULT 0,
+  `model` varchar(255) DEFAULT '',
+  `width` int DEFAULT 0,
+  `height` int DEFAULT 0,
+  `status` int DEFAULT 0,
+  `finish_time` datetime,
+  `error_message` varchar(255) DEFAULT '',
+  `pic_url` varchar(255) DEFAULT '',
+  `public_status` bit(1) DEFAULT b'0',
+  `task_id` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiImage';
+
+-- ===== Entity supplement: ai_knowledge =====
+DROP TABLE IF EXISTS `ai_knowledge`;
+CREATE TABLE `ai_knowledge` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `embedding_model_id` bigint DEFAULT 0,
+  `embedding_model` varchar(255) DEFAULT '',
+  `top_k` int DEFAULT 0,
+  `similarity_threshold` double DEFAULT 0,
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiKnowledge';
+
+-- ===== Entity supplement: ai_knowledge_document =====
+DROP TABLE IF EXISTS `ai_knowledge_document`;
+CREATE TABLE `ai_knowledge_document` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `knowledge_id` bigint DEFAULT 0,
+  `name` varchar(255) DEFAULT '',
+  `url` varchar(255) DEFAULT '',
+  `content` varchar(255) DEFAULT '',
+  `content_length` int DEFAULT 0,
+  `tokens` int DEFAULT 0,
+  `segment_max_tokens` int DEFAULT 0,
+  `retrieval_count` int DEFAULT 0,
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiKnowledgeDocument';
+
+-- ===== Entity supplement: ai_knowledge_segment =====
+DROP TABLE IF EXISTS `ai_knowledge_segment`;
+CREATE TABLE `ai_knowledge_segment` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `knowledge_id` bigint DEFAULT 0,
+  `document_id` bigint DEFAULT 0,
+  `content` varchar(255) DEFAULT '',
+  `content_length` int DEFAULT 0,
+  `vector_id` varchar(255) DEFAULT '',
+  `tokens` int DEFAULT 0,
+  `retrieval_count` int DEFAULT 0,
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiKnowledgeSegment';
+
+-- ===== Entity supplement: ai_mind_map =====
+DROP TABLE IF EXISTS `ai_mind_map`;
+CREATE TABLE `ai_mind_map` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint DEFAULT 0,
+  `platform` varchar(255) DEFAULT '',
+  `model_id` bigint DEFAULT 0,
+  `model` varchar(255) DEFAULT '',
+  `prompt` varchar(255) DEFAULT '',
+  `generated_content` varchar(255) DEFAULT '',
+  `error_message` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiMindMap';
+
+-- ===== Entity supplement: ai_music =====
+DROP TABLE IF EXISTS `ai_music`;
+CREATE TABLE `ai_music` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint DEFAULT 0,
+  `title` varchar(255) DEFAULT '',
+  `lyric` varchar(255) DEFAULT '',
+  `image_url` varchar(255) DEFAULT '',
+  `audio_url` varchar(255) DEFAULT '',
+  `video_url` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `generate_mode` int DEFAULT 0,
+  `description` varchar(255) DEFAULT '',
+  `platform` varchar(255) DEFAULT '',
+  `model` varchar(255) DEFAULT '',
+  `tags` varchar(255) DEFAULT '',
+  `duration` double DEFAULT 0,
+  `public_status` bit(1) DEFAULT b'0',
+  `task_id` varchar(255) DEFAULT '',
+  `error_message` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiMusic';
+
+-- ===== Entity supplement: ai_workflow =====
+DROP TABLE IF EXISTS `ai_workflow`;
+CREATE TABLE `ai_workflow` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `code` varchar(255) DEFAULT '',
+  `graph` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'AiWorkflow';
+
+-- ===== Entity supplement: bpm_process_definition_info =====
+DROP TABLE IF EXISTS `bpm_process_definition_info`;
+CREATE TABLE `bpm_process_definition_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `process_definition_id` varchar(255) DEFAULT '',
+  `model_id` varchar(255) DEFAULT '',
+  `model_type` int DEFAULT 0,
+  `category` varchar(255) DEFAULT '',
+  `icon` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `form_type` int DEFAULT 0,
+  `form_id` bigint DEFAULT 0,
+  `form_conf` varchar(255) DEFAULT '',
+  `form_fields` varchar(255) DEFAULT '',
+  `form_custom_create_path` varchar(255) DEFAULT '',
+  `form_custom_view_path` varchar(255) DEFAULT '',
+  `simple_model` varchar(255) DEFAULT '',
+  `visible` bit(1) DEFAULT b'0',
+  `sort` bigint DEFAULT 0,
+  `start_user_ids` varchar(255) DEFAULT '',
+  `start_dept_ids` varchar(255) DEFAULT '',
+  `manager_user_ids` varchar(255) DEFAULT '',
+  `allow_cancel_running_process` bit(1) DEFAULT b'0',
+  `allow_withdraw_task` bit(1) DEFAULT b'0',
+  `auto_approval_type` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BpmProcessDefinitionInfo';
+
+-- ===== Entity supplement: bpm_process_instance_copy =====
+DROP TABLE IF EXISTS `bpm_process_instance_copy`;
+CREATE TABLE `bpm_process_instance_copy` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `start_user_id` bigint DEFAULT 0,
+  `process_instance_name` varchar(255) DEFAULT '',
+  `process_instance_id` varchar(255) DEFAULT '',
+  `process_definition_id` varchar(255) DEFAULT '',
+  `category` varchar(255) DEFAULT '',
+  `activity_id` varchar(255) DEFAULT '',
+  `activity_name` varchar(255) DEFAULT '',
+  `task_id` varchar(255) DEFAULT '',
+  `user_id` bigint DEFAULT 0,
+  `reason` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BpmProcessInstanceCopy';
+
+-- ===== Entity supplement: bpm_process_listener =====
+DROP TABLE IF EXISTS `bpm_process_listener`;
+CREATE TABLE `bpm_process_listener` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `type` varchar(255) DEFAULT '',
+  `event` varchar(255) DEFAULT '',
+  `value_type` varchar(255) DEFAULT '',
+  `value` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BpmProcessListener';
+
+-- ===== Entity supplement: crm_business_status_type =====
+DROP TABLE IF EXISTS `crm_business_status_type`;
+CREATE TABLE `crm_business_status_type` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `dept_ids` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CrmBusinessStatusType';
+
+-- ===== Entity supplement: crm_customer =====
+DROP TABLE IF EXISTS `crm_customer`;
+CREATE TABLE `crm_customer` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `follow_up_status` bit(1) DEFAULT b'0',
+  `contact_last_time` datetime,
+  `contact_last_content` varchar(255) DEFAULT '',
+  `contact_next_time` datetime,
+  `owner_user_id` bigint DEFAULT 0,
+  `owner_time` datetime,
+  `lock_status` bit(1) DEFAULT b'0',
+  `deal_status` bit(1) DEFAULT b'0',
+  `mobile` varchar(255) DEFAULT '',
+  `telephone` varchar(255) DEFAULT '',
+  `qq` varchar(255) DEFAULT '',
+  `wechat` varchar(255) DEFAULT '',
+  `email` varchar(255) DEFAULT '',
+  `area_id` int DEFAULT 0,
+  `detail_address` varchar(255) DEFAULT '',
+  `industry_id` int DEFAULT 0,
+  `level` int DEFAULT 0,
+  `source` int DEFAULT 0,
+  `remark` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CrmCustomer';
+
+-- ===== Entity supplement: crm_customer_limit_config =====
+DROP TABLE IF EXISTS `crm_customer_limit_config`;
+CREATE TABLE `crm_customer_limit_config` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `type` int DEFAULT 0,
+  `user_ids` varchar(255) DEFAULT '',
+  `dept_ids` varchar(255) DEFAULT '',
+  `max_count` int DEFAULT 0,
+  `deal_count_enabled` bit(1) DEFAULT b'0',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CrmCustomerLimitConfig';
+
+-- ===== Entity supplement: crm_customer_pool_config =====
+DROP TABLE IF EXISTS `crm_customer_pool_config`;
+CREATE TABLE `crm_customer_pool_config` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `enabled` bit(1) DEFAULT b'0',
+  `contact_expire_days` int DEFAULT 0,
+  `deal_expire_days` int DEFAULT 0,
+  `notify_enabled` bit(1) DEFAULT b'0',
+  `notify_days` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CrmCustomerPoolConfig';
+
+-- ===== Entity supplement: crm_follow_up_record =====
+DROP TABLE IF EXISTS `crm_follow_up_record`;
+CREATE TABLE `crm_follow_up_record` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `biz_type` int DEFAULT 0,
+  `biz_id` bigint DEFAULT 0,
+  `type` int DEFAULT 0,
+  `content` varchar(255) DEFAULT '',
+  `next_time` datetime,
+  `pic_urls` varchar(255) DEFAULT '',
+  `file_urls` varchar(255) DEFAULT '',
+  `business_ids` varchar(255) DEFAULT '',
+  `contact_ids` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CrmFollowUpRecord';
+
+-- ===== Entity supplement: erp_purchase_in =====
+DROP TABLE IF EXISTS `erp_purchase_in`;
+CREATE TABLE `erp_purchase_in` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `supplier_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `in_time` datetime,
+  `order_id` bigint DEFAULT 0,
+  `order_no` varchar(255) DEFAULT '',
+  `total_count` decimal(24, 6) DEFAULT 0,
+  `total_price` decimal(24, 6) DEFAULT 0,
+  `payment_price` decimal(24, 6) DEFAULT 0,
+  `total_product_price` decimal(24, 6) DEFAULT 0,
+  `total_tax_price` decimal(24, 6) DEFAULT 0,
+  `discount_percent` decimal(24, 6) DEFAULT 0,
+  `discount_price` decimal(24, 6) DEFAULT 0,
+  `other_price` decimal(24, 6) DEFAULT 0,
+  `file_url` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ErpPurchaseIn';
+
+-- ===== Entity supplement: erp_purchase_order =====
+DROP TABLE IF EXISTS `erp_purchase_order`;
+CREATE TABLE `erp_purchase_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `supplier_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `order_time` datetime,
+  `total_count` decimal(24, 6) DEFAULT 0,
+  `total_price` decimal(24, 6) DEFAULT 0,
+  `total_product_price` decimal(24, 6) DEFAULT 0,
+  `total_tax_price` decimal(24, 6) DEFAULT 0,
+  `discount_percent` decimal(24, 6) DEFAULT 0,
+  `discount_price` decimal(24, 6) DEFAULT 0,
+  `deposit_price` decimal(24, 6) DEFAULT 0,
+  `file_url` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `in_count` decimal(24, 6) DEFAULT 0,
+  `return_count` decimal(24, 6) DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ErpPurchaseOrder';
+
+-- ===== Entity supplement: erp_purchase_return =====
+DROP TABLE IF EXISTS `erp_purchase_return`;
+CREATE TABLE `erp_purchase_return` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `supplier_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `return_time` datetime,
+  `order_id` bigint DEFAULT 0,
+  `order_no` varchar(255) DEFAULT '',
+  `total_count` decimal(24, 6) DEFAULT 0,
+  `total_price` decimal(24, 6) DEFAULT 0,
+  `refund_price` decimal(24, 6) DEFAULT 0,
+  `total_product_price` decimal(24, 6) DEFAULT 0,
+  `total_tax_price` decimal(24, 6) DEFAULT 0,
+  `discount_percent` decimal(24, 6) DEFAULT 0,
+  `discount_price` decimal(24, 6) DEFAULT 0,
+  `other_price` decimal(24, 6) DEFAULT 0,
+  `file_url` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ErpPurchaseReturn';
+
+-- ===== Entity supplement: erp_sale_order =====
+DROP TABLE IF EXISTS `erp_sale_order`;
+CREATE TABLE `erp_sale_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `customer_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `sale_user_id` bigint DEFAULT 0,
+  `order_time` datetime,
+  `total_count` decimal(24, 6) DEFAULT 0,
+  `total_price` decimal(24, 6) DEFAULT 0,
+  `total_product_price` decimal(24, 6) DEFAULT 0,
+  `total_tax_price` decimal(24, 6) DEFAULT 0,
+  `discount_percent` decimal(24, 6) DEFAULT 0,
+  `discount_price` decimal(24, 6) DEFAULT 0,
+  `deposit_price` decimal(24, 6) DEFAULT 0,
+  `file_url` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `out_count` decimal(24, 6) DEFAULT 0,
+  `return_count` decimal(24, 6) DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ErpSaleOrder';
+
+-- ===== Entity supplement: erp_sale_out =====
+DROP TABLE IF EXISTS `erp_sale_out`;
+CREATE TABLE `erp_sale_out` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `customer_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `sale_user_id` bigint DEFAULT 0,
+  `out_time` datetime,
+  `order_id` bigint DEFAULT 0,
+  `order_no` varchar(255) DEFAULT '',
+  `total_count` decimal(24, 6) DEFAULT 0,
+  `total_price` decimal(24, 6) DEFAULT 0,
+  `receipt_price` decimal(24, 6) DEFAULT 0,
+  `total_product_price` decimal(24, 6) DEFAULT 0,
+  `total_tax_price` decimal(24, 6) DEFAULT 0,
+  `discount_percent` decimal(24, 6) DEFAULT 0,
+  `discount_price` decimal(24, 6) DEFAULT 0,
+  `other_price` decimal(24, 6) DEFAULT 0,
+  `file_url` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ErpSaleOut';
+
+-- ===== Entity supplement: erp_sale_return =====
+DROP TABLE IF EXISTS `erp_sale_return`;
+CREATE TABLE `erp_sale_return` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `customer_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `sale_user_id` bigint DEFAULT 0,
+  `return_time` datetime,
+  `order_id` bigint DEFAULT 0,
+  `order_no` varchar(255) DEFAULT '',
+  `total_count` decimal(24, 6) DEFAULT 0,
+  `total_price` decimal(24, 6) DEFAULT 0,
+  `refund_price` decimal(24, 6) DEFAULT 0,
+  `total_product_price` decimal(24, 6) DEFAULT 0,
+  `total_tax_price` decimal(24, 6) DEFAULT 0,
+  `discount_percent` decimal(24, 6) DEFAULT 0,
+  `discount_price` decimal(24, 6) DEFAULT 0,
+  `other_price` decimal(24, 6) DEFAULT 0,
+  `file_url` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ErpSaleReturn';
+
+-- ===== Entity supplement: iot_data_rule =====
+DROP TABLE IF EXISTS `iot_data_rule`;
+CREATE TABLE `iot_data_rule` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `source_configs` varchar(255) DEFAULT '',
+  `sink_ids` varchar(255) DEFAULT '',
+  `method` varchar(255) DEFAULT '',
+  `product_id` bigint DEFAULT 0,
+  `device_id` bigint DEFAULT 0,
+  `identifier` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IotDataRule';
+
+-- ===== Entity supplement: iot_data_sink =====
+DROP TABLE IF EXISTS `iot_data_sink`;
+CREATE TABLE `iot_data_sink` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `type` int DEFAULT 0,
+  `config` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IotDataSink';
+
+-- ===== Entity supplement: iot_ota_task_record =====
+DROP TABLE IF EXISTS `iot_ota_task_record`;
+CREATE TABLE `iot_ota_task_record` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `firmware_id` bigint DEFAULT 0,
+  `task_id` bigint DEFAULT 0,
+  `device_id` bigint DEFAULT 0,
+  `from_firmware_id` bigint DEFAULT 0,
+  `status` int DEFAULT 0,
+  `progress` int DEFAULT 0,
+  `description` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'IotOtaTaskRecord';
+
+-- ===== Entity supplement: mp_auto_reply =====
+DROP TABLE IF EXISTS `mp_auto_reply`;
+CREATE TABLE `mp_auto_reply` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `account_id` bigint DEFAULT 0,
+  `app_id` varchar(255) DEFAULT '',
+  `type` int DEFAULT 0,
+  `request_keyword` varchar(255) DEFAULT '',
+  `request_match` int DEFAULT 0,
+  `request_message_type` varchar(255) DEFAULT '',
+  `response_message_type` varchar(255) DEFAULT '',
+  `response_content` varchar(255) DEFAULT '',
+  `response_media_id` varchar(255) DEFAULT '',
+  `response_media_url` varchar(255) DEFAULT '',
+  `response_title` varchar(255) DEFAULT '',
+  `response_description` varchar(255) DEFAULT '',
+  `response_thumb_media_id` varchar(255) DEFAULT '',
+  `response_thumb_media_url` varchar(255) DEFAULT '',
+  `response_music_url` varchar(255) DEFAULT '',
+  `response_hq_music_url` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MpAutoReply';
+
+-- ===== Entity supplement: mp_menu =====
+DROP TABLE IF EXISTS `mp_menu`;
+CREATE TABLE `mp_menu` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `account_id` bigint DEFAULT 0,
+  `app_id` varchar(255) DEFAULT '',
+  `name` varchar(255) DEFAULT '',
+  `menu_key` varchar(255) DEFAULT '',
+  `parent_id` bigint DEFAULT 0,
+  `type` varchar(255) DEFAULT '',
+  `url` varchar(255) DEFAULT '',
+  `mini_program_app_id` varchar(255) DEFAULT '',
+  `mini_program_page_path` varchar(255) DEFAULT '',
+  `article_id` varchar(255) DEFAULT '',
+  `reply_message_type` varchar(255) DEFAULT '',
+  `reply_content` varchar(255) DEFAULT '',
+  `reply_media_id` varchar(255) DEFAULT '',
+  `reply_media_url` varchar(255) DEFAULT '',
+  `reply_title` varchar(255) DEFAULT '',
+  `reply_description` varchar(255) DEFAULT '',
+  `reply_thumb_media_id` varchar(255) DEFAULT '',
+  `reply_thumb_media_url` varchar(255) DEFAULT '',
+  `reply_music_url` varchar(255) DEFAULT '',
+  `reply_hq_music_url` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MpMenu';
+
+-- ===== Entity supplement: mp_message =====
+DROP TABLE IF EXISTS `mp_message`;
+CREATE TABLE `mp_message` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `msg_id` bigint DEFAULT 0,
+  `account_id` bigint DEFAULT 0,
+  `app_id` varchar(255) DEFAULT '',
+  `user_id` bigint DEFAULT 0,
+  `openid` varchar(255) DEFAULT '',
+  `type` varchar(255) DEFAULT '',
+  `send_from` int DEFAULT 0,
+  `content` varchar(255) DEFAULT '',
+  `media_id` varchar(255) DEFAULT '',
+  `media_url` varchar(255) DEFAULT '',
+  `recognition` varchar(255) DEFAULT '',
+  `format` varchar(255) DEFAULT '',
+  `title` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `thumb_media_id` varchar(255) DEFAULT '',
+  `thumb_media_url` varchar(255) DEFAULT '',
+  `url` varchar(255) DEFAULT '',
+  `location_x` double DEFAULT 0,
+  `location_y` double DEFAULT 0,
+  `scale` double DEFAULT 0,
+  `label` varchar(255) DEFAULT '',
+  `articles` varchar(255) DEFAULT '',
+  `music_url` varchar(255) DEFAULT '',
+  `hq_music_url` varchar(255) DEFAULT '',
+  `event` varchar(255) DEFAULT '',
+  `event_key` varchar(255) DEFAULT '',
+  `title` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `pic_url` varchar(255) DEFAULT '',
+  `url` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MpMessage';
+
+-- ===== Entity supplement: mp_user =====
+DROP TABLE IF EXISTS `mp_user`;
+CREATE TABLE `mp_user` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `openid` varchar(255) DEFAULT '',
+  `union_id` varchar(255) DEFAULT '',
+  `subscribe_status` int DEFAULT 0,
+  `subscribe_time` datetime,
+  `unsubscribe_time` datetime,
+  `nickname` varchar(255) DEFAULT '',
+  `head_image_url` varchar(255) DEFAULT '',
+  `language` varchar(255) DEFAULT '',
+  `country` varchar(255) DEFAULT '',
+  `province` varchar(255) DEFAULT '',
+  `city` varchar(255) DEFAULT '',
+  `remark` varchar(255) DEFAULT '',
+  `tag_ids` varchar(255) DEFAULT '',
+  `account_id` bigint DEFAULT 0,
+  `app_id` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'MpUser';
+
+-- ===== Entity supplement: pay_demo_withdraw =====
+DROP TABLE IF EXISTS `pay_demo_withdraw`;
+CREATE TABLE `pay_demo_withdraw` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `subject` varchar(255) DEFAULT '',
+  `price` int DEFAULT 0,
+  `user_account` varchar(255) DEFAULT '',
+  `user_name` varchar(255) DEFAULT '',
+  `type` int DEFAULT 0,
+  `status` int DEFAULT 0,
+  `pay_transfer_id` bigint DEFAULT 0,
+  `transfer_channel_code` varchar(255) DEFAULT '',
+  `transfer_time` datetime,
+  `transfer_error_msg` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'PayDemoWithdraw';
+
+-- ===== Entity supplement: pay_wallet =====
+DROP TABLE IF EXISTS `pay_wallet`;
+CREATE TABLE `pay_wallet` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint DEFAULT 0,
+  `user_type` int DEFAULT 0,
+  `balance` int DEFAULT 0,
+  `freeze_price` int DEFAULT 0,
+  `total_expense` int DEFAULT 0,
+  `total_recharge` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'PayWallet';
+
+-- ===== Entity supplement: pay_wallet_recharge =====
+DROP TABLE IF EXISTS `pay_wallet_recharge`;
+CREATE TABLE `pay_wallet_recharge` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `wallet_id` bigint DEFAULT 0,
+  `total_price` int DEFAULT 0,
+  `pay_price` int DEFAULT 0,
+  `bonus_price` int DEFAULT 0,
+  `package_id` bigint DEFAULT 0,
+  `pay_status` bit(1) DEFAULT b'0',
+  `pay_order_id` bigint DEFAULT 0,
+  `pay_channel_code` varchar(255) DEFAULT '',
+  `pay_time` datetime,
+  `pay_refund_id` bigint DEFAULT 0,
+  `refund_total_price` int DEFAULT 0,
+  `refund_pay_price` int DEFAULT 0,
+  `refund_bonus_price` int DEFAULT 0,
+  `refund_time` datetime,
+  `refund_status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'PayWalletRecharge';
+
+-- ===== Entity supplement: pay_wallet_recharge_package =====
+DROP TABLE IF EXISTS `pay_wallet_recharge_package`;
+CREATE TABLE `pay_wallet_recharge_package` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `pay_price` int DEFAULT 0,
+  `bonus_price` int DEFAULT 0,
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'PayWalletRechargePackage';
+
+-- ===== Entity supplement: pay_wallet_transaction =====
+DROP TABLE IF EXISTS `pay_wallet_transaction`;
+CREATE TABLE `pay_wallet_transaction` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `no` varchar(255) DEFAULT '',
+  `wallet_id` bigint DEFAULT 0,
+  `biz_type` int DEFAULT 0,
+  `biz_id` varchar(255) DEFAULT '',
+  `title` varchar(255) DEFAULT '',
+  `price` int DEFAULT 0,
+  `balance` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'PayWalletTransaction';
+
+-- ===== Entity supplement: product_comment =====
+DROP TABLE IF EXISTS `product_comment`;
+CREATE TABLE `product_comment` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint DEFAULT 0,
+  `user_nickname` varchar(255) DEFAULT '',
+  `user_avatar` varchar(255) DEFAULT '',
+  `anonymous` bit(1) DEFAULT b'0',
+  `order_id` bigint DEFAULT 0,
+  `order_item_id` bigint DEFAULT 0,
+  `spu_id` bigint DEFAULT 0,
+  `spu_name` varchar(255) DEFAULT '',
+  `sku_id` bigint DEFAULT 0,
+  `sku_pic_url` varchar(255) DEFAULT '',
+  `visible` bit(1) DEFAULT b'0',
+  `scores` int DEFAULT 0,
+  `description_scores` int DEFAULT 0,
+  `benefit_scores` int DEFAULT 0,
+  `content` varchar(255) DEFAULT '',
+  `pic_urls` varchar(255) DEFAULT '',
+  `reply_status` bit(1) DEFAULT b'0',
+  `reply_user_id` bigint DEFAULT 0,
+  `reply_content` varchar(255) DEFAULT '',
+  `reply_time` datetime,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ProductComment';
+
+-- ===== Entity supplement: promotion_discount_product =====
+DROP TABLE IF EXISTS `promotion_discount_product`;
+CREATE TABLE `promotion_discount_product` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `activity_id` bigint DEFAULT 0,
+  `spu_id` bigint DEFAULT 0,
+  `sku_id` bigint DEFAULT 0,
+  `discount_type` int DEFAULT 0,
+  `discount_percent` int DEFAULT 0,
+  `discount_price` int DEFAULT 0,
+  `activity_name` varchar(255) DEFAULT '',
+  `activity_status` int DEFAULT 0,
+  `activity_start_time` datetime,
+  `activity_end_time` datetime,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'DiscountProduct';
+
+-- ===== Entity supplement: promotion_point_activity =====
+DROP TABLE IF EXISTS `promotion_point_activity`;
+CREATE TABLE `promotion_point_activity` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `spu_id` bigint DEFAULT 0,
+  `status` int DEFAULT 0,
+  `remark` varchar(255) DEFAULT '',
+  `sort` int DEFAULT 0,
+  `stock` int DEFAULT 0,
+  `total_stock` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'PointActivity';
+
+-- ===== Entity supplement: trade_config =====
+DROP TABLE IF EXISTS `trade_config`;
+CREATE TABLE `trade_config` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `after_sale_refund_reasons` varchar(255) DEFAULT '',
+  `after_sale_return_reasons` varchar(255) DEFAULT '',
+  `delivery_express_free_enabled` bit(1) DEFAULT b'0',
+  `delivery_express_free_price` int DEFAULT 0,
+  `delivery_pick_up_enabled` bit(1) DEFAULT b'0',
+  `brokerage_enabled` bit(1) DEFAULT b'0',
+  `brokerage_enabled_condition` int DEFAULT 0,
+  `brokerage_bind_mode` int DEFAULT 0,
+  `brokerage_poster_urls` varchar(255) DEFAULT '',
+  `brokerage_first_percent` int DEFAULT 0,
+  `brokerage_second_percent` int DEFAULT 0,
+  `brokerage_withdraw_min_price` int DEFAULT 0,
+  `brokerage_withdraw_fee_percent` int DEFAULT 0,
+  `brokerage_frozen_days` int DEFAULT 0,
+  `brokerage_withdraw_types` varchar(255) DEFAULT '',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'TradeConfig';
+
+-- ===== Entity supplement: trade_delivery_express_template_charge =====
+DROP TABLE IF EXISTS `trade_delivery_express_template_charge`;
+CREATE TABLE `trade_delivery_express_template_charge` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `template_id` bigint DEFAULT 0,
+  `area_ids` varchar(255) DEFAULT '',
+  `charge_mode` int DEFAULT 0,
+  `start_count` double DEFAULT 0,
+  `start_price` int DEFAULT 0,
+  `extra_count` double DEFAULT 0,
+  `extra_price` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'DeliveryExpressTemplateCharge';
+
+-- ===== Entity supplement: trade_delivery_express_template_free =====
+DROP TABLE IF EXISTS `trade_delivery_express_template_free`;
+CREATE TABLE `trade_delivery_express_template_free` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `template_id` bigint DEFAULT 0,
+  `area_ids` varchar(255) DEFAULT '',
+  `free_price` int DEFAULT 0,
+  `free_count` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'DeliveryExpressTemplateFree';
+
+-- ===== Entity supplement: trade_delivery_pick_up_store =====
+DROP TABLE IF EXISTS `trade_delivery_pick_up_store`;
+CREATE TABLE `trade_delivery_pick_up_store` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) DEFAULT '',
+  `introduction` varchar(255) DEFAULT '',
+  `phone` varchar(255) DEFAULT '',
+  `area_id` int DEFAULT 0,
+  `detail_address` varchar(255) DEFAULT '',
+  `logo` varchar(255) DEFAULT '',
+  `opening_time` time,
+  `closing_time` time,
+  `latitude` double DEFAULT 0,
+  `longitude` double DEFAULT 0,
+  `verify_user_ids` varchar(255) DEFAULT '',
+  `status` int DEFAULT 0,
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'DeliveryPickUpStore';
+
+-- ============================
 -- Manual supplement: member_config
 -- ============================
 DROP TABLE IF EXISTS `member_config`;

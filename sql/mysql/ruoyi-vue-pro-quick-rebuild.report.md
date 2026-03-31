@@ -124,46 +124,49 @@
 - `member_config` 仍保留为手工补充表。
 - 本轮补充是将测试 SQL 尽量转成 MySQL 可执行格式，不保证 100% 零兼容问题，但足够用于快速启动排障。
 
+## Entity-based supplements added this round
+- `ai_chat_message` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/chat/AiChatMessageDO.java`
+- `ai_chat_role` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/model/AiChatRoleDO.java`
+- `ai_image` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/image/AiImageDO.java`
+- `ai_knowledge` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/knowledge/AiKnowledgeDO.java`
+- `ai_knowledge_document` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/knowledge/AiKnowledgeDocumentDO.java`
+- `ai_knowledge_segment` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/knowledge/AiKnowledgeSegmentDO.java`
+- `ai_mind_map` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/mindmap/AiMindMapDO.java`
+- `ai_music` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/music/AiMusicDO.java`
+- `ai_workflow` ← `yudao-module-ai/src/main/java/cn/iocoder/yudao/module/ai/dal/dataobject/workflow/AiWorkflowDO.java`
+- `bpm_process_definition_info` ← `yudao-module-bpm/src/main/java/cn/iocoder/yudao/module/bpm/dal/dataobject/definition/BpmProcessDefinitionInfoDO.java`
+- `bpm_process_instance_copy` ← `yudao-module-bpm/src/main/java/cn/iocoder/yudao/module/bpm/dal/dataobject/task/BpmProcessInstanceCopyDO.java`
+- `bpm_process_listener` ← `yudao-module-bpm/src/main/java/cn/iocoder/yudao/module/bpm/dal/dataobject/definition/BpmProcessListenerDO.java`
+- `crm_business_status_type` ← `yudao-module-crm/src/main/java/cn/iocoder/yudao/module/crm/dal/dataobject/business/CrmBusinessStatusTypeDO.java`
+- `crm_customer` ← `yudao-module-crm/src/main/java/cn/iocoder/yudao/module/crm/dal/dataobject/customer/CrmCustomerDO.java`
+- `crm_customer_limit_config` ← `yudao-module-crm/src/main/java/cn/iocoder/yudao/module/crm/dal/dataobject/customer/CrmCustomerLimitConfigDO.java`
+- `crm_customer_pool_config` ← `yudao-module-crm/src/main/java/cn/iocoder/yudao/module/crm/dal/dataobject/customer/CrmCustomerPoolConfigDO.java`
+- `crm_follow_up_record` ← `yudao-module-crm/src/main/java/cn/iocoder/yudao/module/crm/dal/dataobject/followup/CrmFollowUpRecordDO.java`
+- `erp_purchase_in` ← `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/purchase/ErpPurchaseInDO.java`
+- `erp_purchase_order` ← `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/purchase/ErpPurchaseOrderDO.java`
+- `erp_purchase_return` ← `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/purchase/ErpPurchaseReturnDO.java`
+- `erp_sale_order` ← `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/sale/ErpSaleOrderDO.java`
+- `erp_sale_out` ← `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/sale/ErpSaleOutDO.java`
+- `erp_sale_return` ← `yudao-module-erp/src/main/java/cn/iocoder/yudao/module/erp/dal/dataobject/sale/ErpSaleReturnDO.java`
+- `iot_data_rule` ← `yudao-module-iot/yudao-module-iot-biz/src/main/java/cn/iocoder/yudao/module/iot/dal/dataobject/rule/IotDataRuleDO.java`
+- `iot_data_sink` ← `yudao-module-iot/yudao-module-iot-biz/src/main/java/cn/iocoder/yudao/module/iot/dal/dataobject/rule/IotDataSinkDO.java`
+- `iot_ota_task_record` ← `yudao-module-iot/yudao-module-iot-biz/src/main/java/cn/iocoder/yudao/module/iot/dal/dataobject/ota/IotOtaTaskRecordDO.java`
+- `mp_auto_reply` ← `yudao-module-mp/src/main/java/cn/iocoder/yudao/module/mp/dal/dataobject/message/MpAutoReplyDO.java`
+- `mp_menu` ← `yudao-module-mp/src/main/java/cn/iocoder/yudao/module/mp/dal/dataobject/menu/MpMenuDO.java`
+- `mp_message` ← `yudao-module-mp/src/main/java/cn/iocoder/yudao/module/mp/dal/dataobject/message/MpMessageDO.java`
+- `mp_user` ← `yudao-module-mp/src/main/java/cn/iocoder/yudao/module/mp/dal/dataobject/user/MpUserDO.java`
+- `pay_demo_withdraw` ← `yudao-module-pay/src/main/java/cn/iocoder/yudao/module/pay/dal/dataobject/demo/PayDemoWithdrawDO.java`
+- `pay_wallet` ← `yudao-module-pay/src/main/java/cn/iocoder/yudao/module/pay/dal/dataobject/wallet/PayWalletDO.java`
+- `pay_wallet_recharge` ← `yudao-module-pay/src/main/java/cn/iocoder/yudao/module/pay/dal/dataobject/wallet/PayWalletRechargeDO.java`
+- `pay_wallet_recharge_package` ← `yudao-module-pay/src/main/java/cn/iocoder/yudao/module/pay/dal/dataobject/wallet/PayWalletRechargePackageDO.java`
+- `pay_wallet_transaction` ← `yudao-module-pay/src/main/java/cn/iocoder/yudao/module/pay/dal/dataobject/wallet/PayWalletTransactionDO.java`
+- `product_comment` ← `yudao-module-mall/yudao-module-product/src/main/java/cn/iocoder/yudao/module/product/dal/dataobject/comment/ProductCommentDO.java`
+- `promotion_discount_product` ← `yudao-module-mall/yudao-module-promotion/src/main/java/cn/iocoder/yudao/module/promotion/dal/dataobject/discount/DiscountProductDO.java`
+- `promotion_point_activity` ← `yudao-module-mall/yudao-module-promotion/src/main/java/cn/iocoder/yudao/module/promotion/dal/dataobject/point/PointActivityDO.java`
+- `trade_config` ← `yudao-module-mall/yudao-module-trade/src/main/java/cn/iocoder/yudao/module/trade/dal/dataobject/config/TradeConfigDO.java`
+- `trade_delivery_express_template_charge` ← `yudao-module-mall/yudao-module-trade/src/main/java/cn/iocoder/yudao/module/trade/dal/dataobject/delivery/DeliveryExpressTemplateChargeDO.java`
+- `trade_delivery_express_template_free` ← `yudao-module-mall/yudao-module-trade/src/main/java/cn/iocoder/yudao/module/trade/dal/dataobject/delivery/DeliveryExpressTemplateFreeDO.java`
+- `trade_delivery_pick_up_store` ← `yudao-module-mall/yudao-module-trade/src/main/java/cn/iocoder/yudao/module/trade/dal/dataobject/delivery/DeliveryPickUpStoreDO.java`
+
 ## Entity tables still not covered by quick rebuild SQL
-- `ai_chat_message`
-- `ai_chat_role`
-- `ai_image`
-- `ai_knowledge`
-- `ai_knowledge_document`
-- `ai_knowledge_segment`
-- `ai_mind_map`
-- `ai_music`
-- `ai_workflow`
-- `bpm_process_definition_info`
-- `bpm_process_instance_copy`
-- `bpm_process_listener`
-- `crm_business_status_type`
-- `crm_customer`
-- `crm_customer_limit_config`
-- `crm_customer_pool_config`
-- `crm_follow_up_record`
-- `erp_purchase_in`
-- `erp_purchase_order`
-- `erp_purchase_return`
-- `erp_sale_order`
-- `erp_sale_out`
-- `erp_sale_return`
-- `iot_data_rule`
-- `iot_data_sink`
-- `iot_ota_task_record`
-- `mp_auto_reply`
-- `mp_menu`
-- `mp_message`
-- `mp_user`
-- `pay_demo_withdraw`
-- `pay_wallet`
-- `pay_wallet_recharge`
-- `pay_wallet_recharge_package`
-- `pay_wallet_transaction`
-- `product_comment`
-- `promotion_discount_product`
-- `promotion_point_activity`
-- `trade_config`
-- `trade_delivery_express_template_charge`
-- `trade_delivery_express_template_free`
-- `trade_delivery_pick_up_store`
+- None
