@@ -2692,21 +2692,21 @@ COMMIT;
 -- Table structure for system_post
 -- ----------------------------
 DROP TABLE IF EXISTS `system_post`;
-CREATE TABLE `system_post`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
-  `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '岗位编码',
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '岗位名称',
-  `sort` int NOT NULL COMMENT '显示顺序',
-  `status` tinyint NOT NULL COMMENT '状态（0正常 1停用）',
-  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '岗位信息表';
+CREATE TABLE IF NOT EXISTS `system_post` (
+    `id`          bigint      NOT NULL AUTO_INCREMENT,
+    `code`        varchar(64) NOT NULL,
+    `name`        varchar(50) NOT NULL,
+    `sort`        integer     NOT NULL,
+    `status`      tinyint     NOT NULL,
+    `remark`      varchar(500)         DEFAULT NULL,
+    `creator`     varchar(64)          DEFAULT '',
+    `create_time` datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar(64)          DEFAULT '',
+    `update_time` datetime   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
+    `tenant_id` bigint not null default  '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '岗位信息表';
 
 -- ----------------------------
 -- Records of system_post
@@ -3948,18 +3948,18 @@ COMMIT;
 -- Table structure for system_user_post
 -- ----------------------------
 DROP TABLE IF EXISTS `system_user_post`;
-CREATE TABLE `system_user_post`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `user_id` bigint NOT NULL DEFAULT 0 COMMENT '用户ID',
-  `post_id` bigint NOT NULL DEFAULT 0 COMMENT '岗位ID',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 130 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户岗位表';
+CREATE TABLE IF NOT EXISTS `system_user_post`(
+    `id`          bigint    NOT NULL AUTO_INCREMENT,
+    `user_id`     bigint             DEFAULT NULL,
+    `post_id`     bigint             DEFAULT NULL,
+    `creator`     varchar(64)        DEFAULT '',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater`     varchar(64)        DEFAULT '',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted`     bit(1) NOT NULL DEFAULT b'0',
+    `tenant_id`   bigint    not null default '0',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户岗位表';
 
 -- ----------------------------
 -- Records of system_user_post
@@ -4540,6 +4540,7 @@ CREATE TABLE IF NOT EXISTS `member_address` (
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted` bit(1) NOT NULL DEFAULT b'0',
     `updater` varchar(64) DEFAULT '',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户收件地址';
 
