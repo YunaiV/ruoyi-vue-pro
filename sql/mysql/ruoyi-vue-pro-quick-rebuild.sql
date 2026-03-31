@@ -4661,7 +4661,7 @@ CREATE TABLE IF NOT EXISTS `member_user`
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_app`;
 CREATE TABLE IF NOT EXISTS `pay_app` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `app_key`              varchar(64)   NOT NULL,
     `name`              varchar(64)   NOT NULL,
     `status`            tinyint       NOT NULL,
@@ -4680,7 +4680,7 @@ CREATE TABLE IF NOT EXISTS `pay_app` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_channel`;
 CREATE TABLE IF NOT EXISTS `pay_channel` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `code`        varchar(32)    NOT NULL,
     `status`      tinyint(4)     NOT NULL,
     `remark`      varchar(255)            DEFAULT NULL,
@@ -4700,7 +4700,7 @@ CREATE TABLE IF NOT EXISTS `pay_channel` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_notify_log`;
 CREATE TABLE IF NOT EXISTS `pay_notify_log` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `task_id`             bigint(20)    NOT NULL,
     `notify_times`         int    NOT NULL,
     `response`         varchar(1024) NOT NULL,
@@ -4717,7 +4717,7 @@ CREATE TABLE IF NOT EXISTS `pay_notify_log` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_notify_task`;
 CREATE TABLE IF NOT EXISTS `pay_notify_task` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `app_id`             bigint(20)    NOT NULL,
     `type`               tinyint(4)    NOT NULL,
     `data_id`           bigint(20)    NOT NULL,
@@ -4741,7 +4741,7 @@ CREATE TABLE IF NOT EXISTS `pay_notify_task` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_order`;
 CREATE TABLE IF NOT EXISTS `pay_order` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `app_id`               bigint(20)    NOT NULL,
     `channel_id`           bigint(20)             DEFAULT NULL,
     `channel_code`         varchar(32)            DEFAULT NULL,
@@ -4776,7 +4776,7 @@ CREATE TABLE IF NOT EXISTS `pay_order` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_order_extension`;
 CREATE TABLE IF NOT EXISTS `pay_order_extension` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `no`           varchar(64)         NOT NULL,
     `order_id`           bigint(20)    NOT NULL,
     `channel_id`         bigint(20)    NOT NULL,
@@ -4799,7 +4799,7 @@ CREATE TABLE IF NOT EXISTS `pay_order_extension` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_refund`;
 CREATE TABLE IF NOT EXISTS `pay_refund` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `no`           varchar(64)         NOT NULL,
     `app_id`             bigint(20)    NOT NULL,
     `channel_id`         bigint(20)    NOT NULL,
@@ -4834,7 +4834,7 @@ CREATE TABLE IF NOT EXISTS `pay_refund` (
 -- ===== Supplement from yudao-module-pay/src/test/resources/sql/create_tables.sql =====
 DROP TABLE IF EXISTS `pay_transfer`;
 CREATE TABLE IF NOT EXISTS `pay_transfer` (
-    `id` number NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
     `no`                   varchar(64)   NOT NULL,
     `app_id`               bigint(20)    NOT NULL,
     `channel_id`           bigint(20)    NOT NULL,
