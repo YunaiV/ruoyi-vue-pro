@@ -1,0 +1,147 @@
+server:
+  port: 48080
+
+--- #################### 数据库相关配置 ####################
+spring:
+  autoconfigure:
+    exclude:
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+  datasource:
+    druid:
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        allow:
+        url-pattern: /druid/*
+        login-username:
+        login-password:
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 100
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+    dynamic:
+      druid:
+        initial-size: 5
+        min-idle: 10
+        max-active: 20
+        max-wait: 60000
+        time-between-eviction-runs-millis: 60000
+        min-evictable-idle-time-millis: 600000
+        max-evictable-idle-time-millis: 1800000
+        validation-query: SELECT 1
+        test-while-idle: true
+        test-on-borrow: false
+        test-on-return: false
+        pool-prepared-statements: true
+        max-pool-prepared-statement-per-connection-size: 20
+      primary: master
+      datasource:
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://42.193.122.75:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: root
+          password: 123456
+        slave:
+          lazy: true
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://42.193.122.75:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: root
+          password: 123456
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+
+--- #################### 定时任务相关配置 ####################
+
+spring:
+  quartz:
+    auto-startup: true
+    scheduler-name: schedulerName
+    job-store-type: jdbc
+    wait-for-jobs-to-complete-on-shutdown: true
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: schedulerName
+            instanceId: AUTO
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            isClustered: true
+            clusterCheckinInterval: 15000
+            misfireThreshold: 60000
+          threadPool:
+            threadCount: 25
+            threadPriority: 5
+            class: org.quartz.simpl.SimpleThreadPool
+    jdbc:
+      initialize-schema: NEVER
+
+--- #################### 消息队列相关 ####################
+
+rocketmq:
+  name-server: 127.0.0.1:9876
+
+spring:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+
+--- #################### 服务保障相关配置 ####################
+
+lock4j:
+  acquire-timeout: 3000
+  expire: 30000
+
+--- #################### 监控相关配置 ####################
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: '*'
+
+spring:
+  boot:
+    admin:
+      client:
+        url: http://127.0.0.1:${server.port}/${spring.boot.admin.context-path}
+        instance:
+          service-host-type: IP
+        username: admin
+        password: admin
+      context-path: /admin
+
+logging:
+  file:
+    name: ${user.home}/logs/${spring.application.name}.log
+
+--- #################### 芋道相关配置 ####################
+
+yudao:
+  captcha:
+    enable: false
+  security:
+    mock-enable: false
+  pay:
+    order-notify-url: http://127.0.0.1:48080/admin-api/pay/notify/order
+    refund-notify-url: http://127.0.0.1:48080/admin-api/pay/notify/refund
+    transfer-notify-url: http://127.0.0.1:48080/admin-api/pay/notify/transfer
+  access-log:
+    enable: true
+  demo: false

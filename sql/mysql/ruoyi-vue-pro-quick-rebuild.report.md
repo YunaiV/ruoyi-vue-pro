@@ -123,3 +123,47 @@
 ## Notes
 - `member_config` 仍保留为手工补充表。
 - 本轮补充是将测试 SQL 尽量转成 MySQL 可执行格式，不保证 100% 零兼容问题，但足够用于快速启动排障。
+
+## Entity tables still not covered by quick rebuild SQL
+- `ai_chat_message`
+- `ai_chat_role`
+- `ai_image`
+- `ai_knowledge`
+- `ai_knowledge_document`
+- `ai_knowledge_segment`
+- `ai_mind_map`
+- `ai_music`
+- `ai_workflow`
+- `bpm_process_definition_info`
+- `bpm_process_instance_copy`
+- `bpm_process_listener`
+- `crm_business_status_type`
+- `crm_customer`
+- `crm_customer_limit_config`
+- `crm_customer_pool_config`
+- `crm_follow_up_record`
+- `erp_purchase_in`
+- `erp_purchase_order`
+- `erp_purchase_return`
+- `erp_sale_order`
+- `erp_sale_out`
+- `erp_sale_return`
+- `iot_data_rule`
+- `iot_data_sink`
+- `iot_ota_task_record`
+- `mp_auto_reply`
+- `mp_menu`
+- `mp_message`
+- `mp_user`
+- `pay_demo_withdraw`
+- `pay_wallet`
+- `pay_wallet_recharge`
+- `pay_wallet_recharge_package`
+- `pay_wallet_transaction`
+- `product_comment`
+- `promotion_discount_product`
+- `promotion_point_activity`
+- `trade_config`
+- `trade_delivery_express_template_charge`
+- `trade_delivery_express_template_free`
+- `trade_delivery_pick_up_store`
