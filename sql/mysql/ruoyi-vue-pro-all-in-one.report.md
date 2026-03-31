@@ -1,8 +1,8 @@
 # All-in-one MySQL bootstrap report
 
 - Output: `/Users/ripflowers/workspace/ningxx/ruoyi-vue-pro/sql/mysql/ruoyi-vue-pro-all-in-one.sql`
-- Source SQL files: **10**
-- Final selected tables: **194**
+- Source SQL files: **11**
+- Final selected tables: **243**
 
 ## Source order
 - `ruoyi-vue-pro.sql`
@@ -15,6 +15,7 @@
 - `go-view.sql`
 - `quartz.sql`
 - `jimureport.mysql5.7.create.sql`
+- `ruoyi-vue-pro-mall-2025-05-12传播违法.sql`
 
 ## Duplicate table resolution (latest file wins)
 
@@ -232,3 +233,54 @@
 - `test_resume`
 - `tmp_report_data_1`
 - `tmp_report_data_income`
+
+### ruoyi-vue-pro-mall-2025-05-12传播违法.sql
+- `product_brand`
+- `product_browse_history`
+- `product_category`
+- `product_comment`
+- `product_favorite`
+- `product_property`
+- `product_property_value`
+- `product_sku`
+- `product_spu`
+- `product_statistics`
+- `promotion_article`
+- `promotion_article_category`
+- `promotion_banner`
+- `promotion_bargain_activity`
+- `promotion_bargain_help`
+- `promotion_bargain_record`
+- `promotion_combination_activity`
+- `promotion_combination_product`
+- `promotion_combination_record`
+- `promotion_coupon`
+- `promotion_coupon_template`
+- `promotion_discount_activity`
+- `promotion_discount_product`
+- `promotion_diy_page`
+- `promotion_diy_template`
+- `promotion_kefu_conversation`
+- `promotion_kefu_message`
+- `promotion_point_activity`
+- `promotion_point_product`
+- `promotion_reward_activity`
+- `promotion_seckill_activity`
+- `promotion_seckill_config`
+- `promotion_seckill_product`
+- `trade_after_sale`
+- `trade_after_sale_log`
+- `trade_brokerage_record`
+- `trade_brokerage_user`
+- `trade_brokerage_withdraw`
+- `trade_cart`
+- `trade_config`
+- `trade_delivery_express`
+- `trade_delivery_express_template`
+- `trade_delivery_express_template_charge`
+- `trade_delivery_express_template_free`
+- `trade_delivery_pick_up_store`
+- `trade_order`
+- `trade_order_item`
+- `trade_order_log`
+- `trade_statistics`
