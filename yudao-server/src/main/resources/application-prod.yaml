@@ -48,13 +48,13 @@ spring:
           driver-class-name: com.mysql.cj.jdbc.Driver
           url: jdbc:mysql://42.193.122.75:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
           username: root
-          password: 123456
+          password: FaDa>Cai8
         slave:
           lazy: true
           driver-class-name: com.mysql.cj.jdbc.Driver
           url: jdbc:mysql://42.193.122.75:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
           username: root
-          password: 123456
+          password: FaDa>Cai8
 
   redis:
     host: 127.0.0.1

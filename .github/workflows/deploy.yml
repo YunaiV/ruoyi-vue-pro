@@ -1,0 +1,48 @@
+name: Build and Package for Production
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build backend package
+        run: mvn -B clean package -DskipTests
+
+      - name: Prepare deployment bundle
+        run: |
+          mkdir -p dist
+          cp yudao-server/target/yudao-server.jar dist/
+          cp yudao-server/src/main/resources/application-prod.yaml dist/
+          cat > dist/start.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          APP_DIR="$(cd "$(dirname "$0")" && pwd)"
+          java -jar "$APP_DIR/yudao-server.jar" --spring.profiles.active=prod
+          EOF
+          chmod +x dist/start.sh
+          tar -czf yudao-server-prod.tar.gz -C dist .
+
+      - name: Upload deployment bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: yudao-server-prod-bundle
+          path: yudao-server-prod.tar.gz
+          if-no-files-found: error
