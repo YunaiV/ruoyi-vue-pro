@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.tenant.core.redis;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.redis.core.TimeoutRedisCacheManager;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ import java.util.Set;
 @Slf4j
 public class TenantRedisCacheManager extends TimeoutRedisCacheManager {
 
+    private static final String SPLIT = "#";
+
     private final Set<String> ignoreCaches;
 
     public TenantRedisCacheManager(RedisCacheWriter cacheWriter,
@@ -32,10 +35,11 @@ public class TenantRedisCacheManager extends TimeoutRedisCacheManager {
 
     @Override
     public Cache getCache(String name) {
+        String[] names = StrUtil.splitToArray(name, SPLIT);
         // 如果开启多租户，则 name 拼接租户后缀
         if (!TenantContextHolder.isIgnore()
-            && TenantContextHolder.getTenantId() != null
-            && !CollUtil.contains(ignoreCaches, name)) {
+                && TenantContextHolder.getTenantId() != null
+                && !CollUtil.contains(ignoreCaches, names[0])) {
             name = name + ":" + TenantContextHolder.getTenantId();
         }
 

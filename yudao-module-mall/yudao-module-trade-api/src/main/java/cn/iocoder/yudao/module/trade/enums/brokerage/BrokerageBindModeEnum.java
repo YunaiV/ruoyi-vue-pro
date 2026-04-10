@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.brokerage;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum BrokerageBindModeEnum implements IntArrayValuable {
+public enum BrokerageBindModeEnum implements ArrayValuable<Integer> {
 
     /**
      * 只要用户没有推广人，随时都可以绑定分销关系
@@ -29,7 +29,7 @@ public enum BrokerageBindModeEnum implements IntArrayValuable {
     OVERRIDE(3, "覆盖绑定"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageBindModeEnum::getMode).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BrokerageBindModeEnum::getMode).toArray(Integer[]::new);
 
     /**
      * 模式
@@ -41,7 +41,7 @@ public enum BrokerageBindModeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

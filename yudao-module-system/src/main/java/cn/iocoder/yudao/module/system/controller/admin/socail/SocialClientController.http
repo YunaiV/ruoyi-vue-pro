@@ -1,0 +1,20 @@
+### 请求 /system/social-client/send-subscribe-message 接口 => 发送测试订阅消息
+POST {{baseUrl}}/system/social-client/send-subscribe-message
+Authorization: Bearer {{token}}
+Content-Type: application/json
+#Authorization: Bearer test100
+tenant-id: {{adminTenantId}}
+
+{
+  "userId": 247,
+  "userType": 1,
+  "socialType": 34,
+  "templateTitle": "充值成功通知",
+  "page": "",
+  "messages": {
+     "character_string1":"5616122165165",
+     "amount2":"1000.00",
+     "time3":"2024-01-01 10:10:10",
+    "phrase4": "充值成功"
+  }
+}

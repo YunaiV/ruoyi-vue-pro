@@ -1,0 +1,483 @@
+<script lang="ts" setup>
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+
+import { ref, h, reactive, onMounted, nextTick } from 'vue';
+
+import { Page, useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
+import { cloneDeep, downloadFileFromBlobPart, formatDateTime, isEmpty } from '@vben/utils';
+import { Button, Card, message, Tabs, Pagination, Form, RangePicker, DatePicker, Select, Input } from 'ant-design-vue';
+import ${simpleClassName}Form from './modules/form.vue';
+import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
+import { DictTag } from '#/components/dict-tag';
+import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+import { getRangePickerDefaultProps } from '#/utils/rangePickerProps';
+
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 || $table.templateType == 12 )
+    #foreach ($subSimpleClassName in $subSimpleClassNames)
+    #set ($index = $foreach.count - 1)
+    #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+    import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
+    #end
+#end
+
+import { $t } from '#/locales';
+#if (${table.templateType} == 2)## 树表接口
+import { handleTree } from '@vben/utils'
+import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+#else## 标准表接口
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+#end
+
+#if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
+/** 子表的列表 */
+const subTabsName = ref('$subClassNameVars.get(0)')
+#if ($table.templateType == 11)
+const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+async function onCellClick({ row }: { row: ${simpleClassName}Api.${simpleClassName} }) {
+  select${simpleClassName}.value = row
+}
+#end
+#end
+
+const loading = ref(true) // 列表的加载中
+#if ( $table.templateType == 2 )
+const list = ref<any[]>([]) // 树列表的数据
+#else
+const list = ref<${simpleClassName}Api.${simpleClassName}[]>([]) // 列表的数据
+#end
+
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
+const total = ref(0) // 列表的总页数
+#end
+const queryParams = reactive({
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
+  pageNo: 1,
+  pageSize: 10,
+#end
+#foreach ($column in $columns)
+    #if ($column.listOperation)
+        #if ($column.listOperationCondition != 'BETWEEN')
+                $column.javaField: undefined,
+        #end
+        #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                $column.javaField: undefined,
+        #end
+    #end
+#end
+})
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
+
+/** 查询列表 */
+async function getList() {
+  loading.value = true
+  try {
+    const params = cloneDeep(queryParams) as any;
+      #foreach ($column in $columns)
+          #if ($column.listOperation)
+              #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
+                  params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
+                }
+              #end
+          #end
+      #end
+      ## 特殊：树表专属逻辑（树不需要分页接口）
+      #if ( $table.templateType == 2 )
+        list.value = await get${simpleClassName}List(params);
+      #else
+        const data = await get${simpleClassName}Page(params)
+        list.value = data.list
+        total.value = data.total
+      #end
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery() {
+#if ( $table.templateType != 2 )
+  queryParams.pageNo = 1
+#end
+  getList()
+}
+
+/** 重置按钮操作 */
+function resetQuery() {
+  queryFormRef.value.resetFields()
+  handleQuery()
+}
+
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: ${simpleClassName}Form,
+  destroyOnClose: true,
+});
+
+/** 创建${table.classComment} */
+function handleCreate() {
+  formModalApi.setData(null).open();
+}
+
+/** 编辑${table.classComment} */
+function handleEdit(row: ${simpleClassName}Api.${simpleClassName}) {
+  formModalApi.setData(row).open();
+}
+
+#if (${table.templateType} == 2)## 树表特有：新增下级
+/** 新增下级${table.classComment} */
+function handleAppend(row: ${simpleClassName}Api.${simpleClassName}) {
+  formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
+}
+#end
+
+/** 删除${table.classComment} */
+async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.id]),
+    duration: 0,
+  });
+  try {
+    await delete${simpleClassName}(row.id!);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    await getList();
+  } finally {
+    hideLoading();
+  }
+}
+
+#if ($table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+async function handleDeleteBatch() {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting'),
+    duration: 0,
+  });
+  try {
+    await delete${simpleClassName}List(checkedIds.value);
+    checkedIds.value = [];
+    message.success($t('ui.actionMessage.deleteSuccess'));
+    await getList();
+  } finally {
+    hideLoading();
+  }
+}
+
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
+  records,
+}: {
+  records: ${simpleClassName}Api.${simpleClassName}[];
+}) {
+  checkedIds.value = records.map((item) => item.id!);
+}
+#end
+
+/** 导出表格 */
+async function handleExport() {
+try {
+  exportLoading.value = true;
+  const data = await export${simpleClassName}(queryParams);
+  downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
+}finally {
+  exportLoading.value = false;
+}
+}
+
+#if (${table.templateType} == 2)
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function handleExpand() {
+  isExpanded.value = !isExpanded.value;
+  tableRef.value?.setAllTreeExpand(isExpanded.value);
+}
+#end
+
+/** 初始化 */
+const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+onMounted(() => {
+  getList();
+});
+</script>
+
+<template>
+  <Page auto-content-height>
+    <FormModal @success="getList" />
+
+    <Card v-if="!hiddenSearchBar" class="mb-4">
+      <!-- 搜索工作栏 -->
+      <Form
+          :model="queryParams"
+          ref="queryFormRef"
+          layout="inline"
+      >
+          #foreach($column in $columns)
+              #if ($column.listOperation)
+                  #set ($dictType = $column.dictType)
+                  #set ($javaField = $column.javaField)
+                  #set ($javaType = $column.javaType)
+                  #set ($comment = $column.columnComment)
+                  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                      #set ($dictMethod = "number")
+                  #elseif ($javaType == "String")
+                      #set ($dictMethod = "string")
+                  #elseif ($javaType == "Boolean")
+                      #set ($dictMethod = "boolean")
+                  #end
+                  #if ($column.htmlType == "input")
+                    <Form.Item label="${comment}" name="${javaField}">
+                      <Input
+                          v-model:value="queryParams.${javaField}"
+                          placeholder="请输入${comment}"
+                          allowClear
+                          @pressEnter="handleQuery"
+                           class="w-full"
+                      />
+                    </Form.Item>
+                  #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
+                    <Form.Item label="${comment}" name="${javaField}">
+                      <Select
+                          v-model:value="queryParams.${javaField}"
+                          placeholder="请选择${comment}"
+                          allowClear
+                           class="w-full"
+                      >
+                          #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+                            <Select.Option
+                                v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
+                                :key="dict.value"
+                                :value="dict.value"
+                            >
+                              {{ dict.label }}
+                            </Select.Option>
+                          #else## 未设置 dictType 数据字典的情况
+                            <Select.Option label="请选择字典生成" value="" />
+                          #end
+                      </Select>
+                    </Form.Item>
+                  #elseif($column.htmlType == "datetime")
+                      #if ($column.listOperationCondition != "BETWEEN")## 非范围
+                        <Form.Item label="${comment}" name="${javaField}">
+                          <DatePicker
+                              v-model:value="queryParams.${javaField}"
+                              valueFormat="YYYY-MM-DD"
+                              placeholder="选择${comment}"
+                              allowClear
+                               class="w-full"
+                          />
+                        </Form.Item>
+                      #else## 范围
+                        <Form.Item label="${comment}" name="${javaField}">
+                          <RangePicker
+                              v-model:value="queryParams.${javaField}"
+                              v-bind="getRangePickerDefaultProps()"
+                              class="w-full"
+                          />
+                        </Form.Item>
+                      #end
+                  #end
+              #end
+          #end
+        <Form.Item>
+          <Button class="ml-2" @click="resetQuery"> 重置 </Button>
+          <Button class="ml-2" @click="handleQuery" type="primary">
+            搜索
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
+
+    <!-- 列表 -->
+    <Card title="${table.classComment}">
+      <template #extra>
+        <VbenVxeTableToolbar
+            ref="tableToolbarRef"
+            v-model:hidden-search="hiddenSearchBar"
+        >
+        #if (${table.templateType} == 2)
+          <Button @click="handleExpand" class="mr-2">
+            {{ isExpanded ? '收缩' : '展开' }}
+          </Button>
+        #end
+          <Button
+              class="ml-2"
+              :icon="h(Plus)"
+              type="primary"
+              @click="handleCreate"
+              v-access:code="['${permissionPrefix}:create']"
+          >
+            {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
+          </Button>
+          <Button
+              :icon="h(Download)"
+              type="primary"
+              class="ml-2"
+              :loading="exportLoading"
+              @click="handleExport"
+              v-access:code="['${permissionPrefix}:export']"
+          >
+            {{ $t('ui.actionTitle.export') }}
+          </Button>
+        #if ($table.templateType != 2 && $deleteBatchEnable)
+          <Button
+              :icon="h(Trash2)"
+              type="primary"
+              danger
+              class="ml-2"
+              :disabled="isEmpty(checkedIds)"
+              @click="handleDeleteBatch"
+              v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
+          >
+            批量删除
+          </Button>
+        #end
+        </VbenVxeTableToolbar>
+      </template>
+      <VxeTable
+          ref="tableRef"
+          :data="list"
+        #if ( $table.templateType == 2 )
+          :tree-config="{
+          parentField: '${treeParentColumn.javaField}',
+          rowField: 'id',
+          transform: true,
+          expandAll: true,
+          reserve: true,
+        }"
+        #end
+#if ($table.templateType == 11) ## erp情况
+          @cell-click="onCellClick"
+          :row-config="{
+            keyField: 'id',
+            isHover: true,
+            isCurrent: true,
+          }"
+#end
+          show-overflow
+          :loading="loading"
+#if ($table.templateType != 2 && $deleteBatchEnable)
+          @checkboxAll="handleRowCheckboxChange"
+          @checkboxChange="handleRowCheckboxChange"
+#end
+      >
+#if ($table.templateType != 2 && $deleteBatchEnable)
+        <VxeColumn type="checkbox" width="40" />
+#end
+          ## 特殊：主子表专属逻辑
+          #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
+            <!-- 子表的列表 -->
+            <VxeColumn type="expand" width="60">
+              <template #content="{ row }">
+                <!-- 子表的表单 -->
+                <Tabs v-model:active-key="subTabsName" class="mx-8">
+                    #foreach ($subTable in $subTables)
+                        #set ($index = $foreach.count - 1)
+                        #set ($subClassNameVar = $subClassNameVars.get($index))
+                        #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+                        #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+                      <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+                        <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
+                      </Tabs.TabPane>
+                    #end
+                </Tabs>
+              </template>
+            </VxeColumn>
+          #end
+          #foreach($column in $columns)
+              #if ($column.listOperationResult)
+                  #set ($dictType=$column.dictType)
+                  #set ($javaField = $column.javaField)
+                  #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+                  #set ($comment=$column.columnComment)
+                  #if ($column.javaType == "LocalDateTime")## 时间类型
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
+                      <template #default="{row}">
+                        {{formatDateTime(row.${javaField})}}
+                      </template>
+                    </VxeColumn>
+                  #elseif($column.dictType && "" != $column.dictType)## 数据字典
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
+                      <template #default="{row}">
+                        <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
+                      </template>
+                    </VxeColumn>
+                  #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
+                    <VxeColumn field="${javaField}" title="${comment}" align="center"  tree-node/>
+                  #else
+                    <VxeColumn field="${javaField}" title="${comment}" align="center" />
+                  #end
+              #end
+          #end
+        <VxeColumn field="operation" title="操作" align="center">
+          <template #default="{row}">
+#if ( $table.templateType == 2 )
+  <Button
+      size="small"
+      type="link"
+      @click="handleAppend(row)"
+      v-access:code="['${permissionPrefix}:create']"
+  >
+    新增下级
+  </Button>
+#end
+            <Button
+                size="small"
+                type="link"
+                @click="handleEdit(row)"
+                v-access:code="['${permissionPrefix}:update']"
+            >
+              {{ $t('ui.actionTitle.edit') }}
+            </Button>
+            <Button
+                size="small"
+                type="link"
+                danger
+                class="ml-2"
+                #if ( $table.templateType == 2 )
+                :disabled="!isEmpty(row?.children)"
+                #end
+                @click="handleDelete(row)"
+                v-access:code="['${permissionPrefix}:delete']"
+            >
+              {{ $t('ui.actionTitle.delete') }}
+            </Button>
+          </template>
+        </VxeColumn>
+      </VxeTable>
+#if ( $table.templateType != 2 )
+      <!-- 分页 -->
+      <div class="mt-2 flex justify-end">
+        <Pagination
+            :total="total"
+            v-model:current="queryParams.pageNo"
+            v-model:page-size="queryParams.pageSize"
+            show-size-changer
+            @change="getList"
+        />
+      </div>
+#end
+    </Card>
+#if ($table.templateType == 11) ## erp情况
+  <Card>
+    <!-- 子表的表单 -->
+    <Tabs v-model:active-key="subTabsName">
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subClassNameVar = $subClassNameVars.get($index))
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+            <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
+          </Tabs.TabPane>
+        #end
+    </Tabs>
+  </Card>
+#end
+  </Page>
+</template>

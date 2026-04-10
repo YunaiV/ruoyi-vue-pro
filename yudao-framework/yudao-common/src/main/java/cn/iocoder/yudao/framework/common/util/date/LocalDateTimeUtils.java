@@ -3,19 +3,24 @@ package cn.iocoder.yudao.framework.common.util.date;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.DateIntervalEnum;
 
+import java.sql.Timestamp;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.hutool.core.date.DatePattern.*;
+
 /**
- * 时间工具类，用于 {@link java.time.LocalDateTime}
+ * 时间工具类，用于 {@link LocalDateTime}
  *
  * @author 芋道源码
  */
@@ -25,6 +30,8 @@ public class LocalDateTimeUtils {
      * 空的 LocalDateTime 对象，主要用于 DB 唯一索引的默认值
      */
     public static LocalDateTime EMPTY = buildTime(1970, 1, 1);
+
+    public static DateTimeFormatter UTC_MS_WITH_XXX_OFFSET_FORMATTER = createFormatter(UTC_MS_WITH_XXX_OFFSET_PATTERN);
 
     /**
      * 解析时间
@@ -62,17 +69,32 @@ public class LocalDateTimeUtils {
      * 创建指定时间
      *
      * @param year  年
-     * @param mouth 月
+     * @param month 月
      * @param day   日
      * @return 指定时间
      */
-    public static LocalDateTime buildTime(int year, int mouth, int day) {
-        return LocalDateTime.of(year, mouth, day, 0, 0, 0);
+    public static LocalDateTime buildTime(int year, int month, int day) {
+        return LocalDateTime.of(year, month, day, 0, 0, 0);
     }
 
-    public static LocalDateTime[] buildBetweenTime(int year1, int mouth1, int day1,
-                                                   int year2, int mouth2, int day2) {
-        return new LocalDateTime[]{buildTime(year1, mouth1, day1), buildTime(year2, mouth2, day2)};
+    public static LocalDateTime[] buildBetweenTime(int year1, int month1, int day1,
+                                                   int year2, int month2, int day2) {
+        return new LocalDateTime[]{buildTime(year1, month1, day1), buildTime(year2, month2, day2)};
+    }
+
+    /**
+     * 判指定断时间，是否在该时间范围内
+     *
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param time 指定时间
+     * @return 是否
+     */
+    public static boolean isBetween(LocalDateTime startTime, LocalDateTime endTime, Timestamp time) {
+        if (startTime == null || endTime == null || time == null) {
+            return false;
+        }
+        return LocalDateTimeUtil.isIn(LocalDateTimeUtil.of(time), startTime, endTime);
     }
 
     /**
@@ -227,6 +249,11 @@ public class LocalDateTimeUtils {
         // 2. 循环，生成时间范围
         List<LocalDateTime[]> timeRanges = new ArrayList<>();
         switch (intervalEnum) {
+            case HOUR:
+                while (startTime.isBefore(endTime)) {
+                    timeRanges.add(new LocalDateTime[]{startTime, startTime.plusHours(1).minusNanos(1)});
+                    startTime = startTime.plusHours(1);
+                }
             case DAY:
                 while (startTime.isBefore(endTime)) {
                     timeRanges.add(new LocalDateTime[]{startTime, startTime.plusDays(1).minusNanos(1)});
@@ -290,6 +317,8 @@ public class LocalDateTimeUtils {
 
         // 2. 循环，生成时间范围
         switch (intervalEnum) {
+            case HOUR:
+                return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATETIME_MINUTE_PATTERN);
             case DAY:
                 return LocalDateTimeUtil.format(startTime, DatePattern.NORM_DATE_PATTERN);
             case WEEK:
@@ -304,6 +333,39 @@ public class LocalDateTimeUtils {
             default:
                 throw new IllegalArgumentException("Invalid interval: " + interval);
         }
+    }
+
+    /**
+     * 获取指定日期所在季度的第一天
+     *
+     * @param date 日期
+     * @return 所在季度的第一天
+     */
+    public static LocalDate getQuarterStart(LocalDate date) {
+        Month firstMonthOfQuarter = date.getMonth().firstMonthOfQuarter();
+        return LocalDate.of(date.getYear(), firstMonthOfQuarter, 1);
+    }
+
+    /**
+     * 获取指定日期所在周的第一天（周一）
+     *
+     * @param date 日期
+     * @return 所在周的周一
+     */
+    public static LocalDate getWeekStart(LocalDate date) {
+        return date.with(DayOfWeek.MONDAY);
+    }
+
+    /**
+     * 将给定的 {@link LocalDateTime} 转换为自 Unix 纪元时间（1970-01-01T00:00:00Z）以来的秒数。
+     *
+     * @param sourceDateTime 需要转换的本地日期时间，不能为空
+     * @return 自 1970-01-01T00:00:00Z 起的秒数（epoch second）
+     * @throws NullPointerException 如果 {@code sourceDateTime} 为 {@code null}
+     * @throws DateTimeException 如果转换过程中发生时间超出范围或其他时间处理异常
+     */
+    public static Long toEpochSecond(LocalDateTime sourceDateTime) {
+        return TemporalAccessorUtil.toInstant(sourceDateTime).getEpochSecond();
     }
 
 }

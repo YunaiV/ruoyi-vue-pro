@@ -1,0 +1,15 @@
+DELETE FROM "mes_md_auto_code_rule";
+DELETE FROM "mes_md_auto_code_part";
+DELETE FROM "mes_md_auto_code_record";
+DELETE FROM "mes_wm_arrival_notice";
+DELETE FROM "mes_wm_outsource_receipt";
+DELETE FROM "mes_qc_iqc";
+DELETE FROM "mes_qc_ipqc";
+DELETE FROM "mes_pro_feedback";
+DELETE FROM "mes_wm_product_produce";
+DELETE FROM "mes_wm_product_produce_line";
+DELETE FROM "mes_wm_product_produce_detail";
+DELETE FROM "mes_wm_item_receipt";
+DELETE FROM "mes_wm_item_receipt_line";
+DELETE FROM "mes_wm_item_receipt_detail";
+DELETE FROM "mes_wm_batch";

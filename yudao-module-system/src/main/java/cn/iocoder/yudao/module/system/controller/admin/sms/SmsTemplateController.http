@@ -1,0 +1,14 @@
+### 请求 /system/sms-template/send-sms 接口 => 成功
+POST {{baseUrl}}/system/sms-template/send-sms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "templateCode": "test_01",
+  "mobile": "15601691390",
+  "templateParams": {
+    "operation": "value01",
+    "code": "value02"
+  }
+}

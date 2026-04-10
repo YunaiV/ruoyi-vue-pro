@@ -1,0 +1,325 @@
+<script lang="ts" setup>
+import type { Rule } from 'ant-design-vue/es/form';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+
+import { computed, ref } from 'vue';
+
+import { useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
+#if($table.templateType == 2)## 树表需要导入这些
+import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
+import { handleTree } from '@vben/utils'
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+  #foreach ($subSimpleClassName in $subSimpleClassNames)
+  #set ($index = $foreach.count - 1)
+  #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+  import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
+  #end
+#end
+
+import { $t } from '#/locales';
+import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+
+const emit = defineEmits(['success']);
+
+const formRef = ref();
+const formData = ref<Partial<${simpleClassName}Api.${simpleClassName}>>({
+#foreach ($column in $columns)
+  #if ($column.createOperation || $column.updateOperation)
+    #if ($column.htmlType == "checkbox")
+        $column.javaField: [],
+    #else
+        $column.javaField: undefined,
+    #end
+  #end
+#end
+});
+const rules: Record<string, Rule[]> = {
+  #foreach ($column in $columns)
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+      #set($comment=$column.columnComment)
+        $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+    #end
+  #end
+};
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+const ${classNameVar}Tree = ref<any[]>([]) // 树形结构
+#end
+const getTitle = computed(() => {
+  return formData.value?.id
+    ? $t('ui.actionTitle.edit', ['${table.classComment}'])
+    : $t('ui.actionTitle.create', ['${table.classComment}']);
+});
+
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+  #if ( $subTables && $subTables.size() > 0 )
+  /** 子表的表单 */
+  const subTabsName = ref('$subClassNameVars.get(0)')
+    #foreach ($subClassNameVar in $subClassNameVars)
+      #set ($index = $foreach.count - 1)
+      #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+      const ${subClassNameVar}FormRef = ref<InstanceType<typeof ${subSimpleClassName}Form>>()
+    #end
+  #end
+#end
+
+/** 重置表单 */
+function resetForm() {
+  formData.value = {
+    #foreach ($column in $columns)
+      #if ($column.createOperation || $column.updateOperation)
+        #if ($column.htmlType == "checkbox")
+            $column.javaField: [],
+        #else
+            $column.javaField: undefined,
+        #end
+      #end
+    #end
+  };
+  formRef.value?.resetFields();
+}
+
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+/** 获得${table.classComment}树 */
+async function get${simpleClassName}Tree() {
+  ${classNameVar}Tree.value = []
+  const data = await get${simpleClassName}List({});
+  data.unshift({
+    id: 0,
+    name: '顶级${table.classComment}',
+  });
+    ${classNameVar}Tree.value = handleTree(data);
+}
+#end
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    await formRef.value?.validate();
+    ## 特殊：主子表专属逻辑
+    #if ( $table.templateType == 10 || $table.templateType == 12 )
+      #if ( $subTables && $subTables.size() > 0 )
+        // 校验子表单
+        #foreach ($subTable in $subTables)
+          #set ($index = $foreach.count - 1)
+          #set ($subClassNameVar = $subClassNameVars.get($index))
+          #if ($subTable.subJoinMany) ## 一对多
+            ## TODO 列表值校验？
+          #else
+            try {
+              await ${subClassNameVar}FormRef.value?.validate()
+            } catch (e) {
+              subTabsName.value = '${subClassNameVar}'
+              return
+            }
+          #end
+        #end
+      #end
+    #end
+    modalApi.lock();
+    // 提交表单
+    const data = formData.value as ${simpleClassName}Api.${simpleClassName};
+    ## 特殊：主子表专属逻辑
+    #if ( $table.templateType == 10 || $table.templateType == 12 )
+      #if ( $subTables && $subTables.size() > 0 )
+        // 拼接子表的数据
+        #foreach ($subTable in $subTables)
+          #set ($index = $foreach.count - 1)
+          #set ($subClassNameVar = $subClassNameVars.get($index))
+          #if ($subTable.subJoinMany)
+            data.${subClassNameVar}s = ${subClassNameVar}FormRef.value?.getData();
+          #else
+            data.${subClassNameVar} = ${subClassNameVar}FormRef.value?.getValues();
+          #end
+        #end
+      #end
+    #end
+    try {
+      await (formData.value?.id ? update${simpleClassName}(data) : create${simpleClassName}(data));
+      // 关闭并提示
+      await modalApi.close();
+      emit('success');
+      message.success({
+        content: $t('ui.actionMessage.operationSuccess'),
+      });
+    } finally {
+      modalApi.unlock();
+    }
+  },
+  async onOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      resetForm()
+      return;
+    }
+    // 加载数据
+    let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
+    if (!data) {
+      return;
+    }
+    if (data.id) {
+      modalApi.lock();
+      try {
+        data = await get${simpleClassName}(data.id);
+      } finally {
+        modalApi.unlock();
+      }
+    }
+    formData.value = data;
+#if ( $table.templateType == 2 )
+    // 加载树数据
+    await get${simpleClassName}Tree()
+#end
+  },
+});
+</script>
+
+<template>
+  <Modal :title="getTitle">
+    <Form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      :label-col="{ span: 5 }"
+      :wrapper-col="{ span: 18 }"
+    >
+      #foreach($column in $columns)
+        #if ($column.createOperation || $column.updateOperation)
+          #set ($dictType = $column.dictType)
+          #set ($javaField = $column.javaField)
+          #set ($javaType = $column.javaType)
+          #set ($comment = $column.columnComment)
+          #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+            #set ($dictMethod = "number")
+          #elseif ($javaType == "String")
+            #set ($dictMethod = "string")
+          #elseif ($javaType == "Boolean")
+            #set ($dictMethod = "boolean")
+          #end
+          #if ( $table.templateType == 2 && $column.id == $treeParentColumn.id )
+            <Form.Item label="${comment}" name="${javaField}">
+              <TreeSelect
+                      v-model:value="formData.${javaField}"
+                      :treeData="${classNameVar}Tree"
+                #if ($treeNameColumn.javaField == "name")
+                      :fieldNames="{
+            label: 'name',
+            value: 'id',
+            children: 'children',
+          }"
+                #else
+                      :fieldNames="{
+                        label: '$treeNameColumn.javaField',
+                        value: 'id',
+                        children: 'children',
+                        }"
+                #end
+                      checkable
+                      treeDefaultExpandAll
+                      placeholder="请选择${comment}"
+              />
+            </Form.Item>
+          #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
+            <Form.Item label="${comment}" name="${javaField}">
+              <Input v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
+            </Form.Item>
+          #elseif($column.htmlType == "imageUpload")## 图片上传
+            <Form.Item label="${comment}" name="${javaField}">
+              <ImageUpload v-model:value="formData.${javaField}" />
+            </Form.Item>
+          #elseif($column.htmlType == "fileUpload")## 文件上传
+            <Form.Item label="${comment}" name="${javaField}">
+              <FileUpload v-model:value="formData.${javaField}" />
+            </Form.Item>
+          #elseif($column.htmlType == "editor")## 文本编辑器
+            <Form.Item label="${comment}" name="${javaField}">
+              <RichTextarea v-model="formData.${javaField}" height="500px" />
+            </Form.Item>
+          #elseif($column.htmlType == "select")## 下拉框
+            <Form.Item label="${comment}" name="${javaField}">
+              <Select v-model:value="formData.${javaField}" placeholder="请选择${comment}">
+                #if ("" != $dictType)## 有数据字典
+                  <Select.Option
+                          v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
+                          :key="dict.value"
+                          :value="dict.value"
+                  >
+                    {{ dict.label }}
+                  </Select.Option>
+                #else##没数据字典
+                  <Select.Option label="请选择字典生成" value="" />
+                #end
+              </Select>
+            </Form.Item>
+          #elseif($column.htmlType == "checkbox")## 多选框
+            <Form.Item label="${comment}" name="${javaField}">
+              <CheckboxGroup v-model:value="formData.${javaField}">
+                #if ("" != $dictType)## 有数据字典
+                  <Checkbox
+                          v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
+                          :key="dict.value"
+                          :value="dict.value"
+                 >
+                    {{ dict.label }}
+                  </Checkbox>
+                #else##没数据字典
+                  <Checkbox label="请选择字典生成" />
+                #end
+              </CheckboxGroup>
+            </Form.Item>
+          #elseif($column.htmlType == "radio")## 单选框
+            <Form.Item label="${comment}" name="${javaField}">
+              <RadioGroup v-model:value="formData.${javaField}">
+                #if ("" != $dictType)## 有数据字典
+                  <Radio
+                          v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
+                          :key="dict.value"
+                          :value="dict.value"
+                  >
+                    {{ dict.label }}
+                  </Radio>
+                #else##没数据字典
+                  <Radio value="1">请选择字典生成</Radio>
+                #end
+              </RadioGroup>
+            </Form.Item>
+          #elseif($column.htmlType == "datetime")## 时间框
+            <Form.Item label="${comment}" name="${javaField}">
+              <DatePicker
+                      v-model:value="formData.${javaField}"
+                      valueFormat="x"
+                      placeholder="选择${comment}"
+              />
+            </Form.Item>
+          #elseif($column.htmlType == "textarea")## 文本框
+            <Form.Item label="${comment}" name="${javaField}">
+              <Textarea v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
+            </Form.Item>
+          #end
+        #end
+      #end
+    </Form>
+    ## 特殊：主子表专属逻辑
+    #if ( $table.templateType == 10 || $table.templateType == 12 )
+      <!-- 子表的表单 -->
+      <Tabs v-model:active-key="subTabsName">
+        #foreach ($subTable in $subTables)
+          #set ($index = $foreach.count - 1)
+          #set ($subClassNameVar = $subClassNameVars.get($index))
+          #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+          #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+            <${subSimpleClassName}Form ref="${subClassNameVar}FormRef" :${subJoinColumn_strikeCase}="formData?.id" />
+          </Tabs.TabPane>
+        #end
+      </Tabs>
+    #end
+  </Modal>
+</template>

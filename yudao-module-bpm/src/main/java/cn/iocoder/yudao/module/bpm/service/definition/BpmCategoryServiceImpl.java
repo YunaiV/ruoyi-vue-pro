@@ -1,0 +1,140 @@
+package cn.iocoder.yudao.module.bpm.service.definition;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.category.BpmCategoryPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.category.BpmCategorySaveReqVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
+import cn.iocoder.yudao.module.bpm.dal.mysql.category.BpmCategoryMapper;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+
+/**
+ * BPM 流程分类 Service 实现类
+ *
+ * @author 芋道源码
+ */
+@Service
+@Validated
+public class BpmCategoryServiceImpl implements BpmCategoryService {
+
+    @Resource
+    private BpmCategoryMapper bpmCategoryMapper;
+
+    @Resource
+    private BpmModelService modelService;
+
+    @Override
+    public Long createCategory(BpmCategorySaveReqVO createReqVO) {
+        // 校验唯一
+        validateCategoryNameUnique(createReqVO);
+        validateCategoryCodeUnique(createReqVO);
+        // 插入
+        BpmCategoryDO category = BeanUtils.toBean(createReqVO, BpmCategoryDO.class);
+        bpmCategoryMapper.insert(category);
+        return category.getId();
+    }
+
+    @Override
+    public void updateCategory(BpmCategorySaveReqVO updateReqVO) {
+        // 校验存在
+        validateCategoryExists(updateReqVO.getId());
+        validateCategoryNameUnique(updateReqVO);
+        validateCategoryCodeUnique(updateReqVO);
+        // 更新
+        BpmCategoryDO updateObj = BeanUtils.toBean(updateReqVO, BpmCategoryDO.class);
+        bpmCategoryMapper.updateById(updateObj);
+    }
+
+    private void validateCategoryNameUnique(BpmCategorySaveReqVO updateReqVO) {
+        BpmCategoryDO category = bpmCategoryMapper.selectByName(updateReqVO.getName());
+        if (category == null
+                || ObjUtil.equal(category.getId(), updateReqVO.getId())) {
+            return;
+        }
+        throw exception(CATEGORY_NAME_DUPLICATE, updateReqVO.getName());
+    }
+
+    private void validateCategoryCodeUnique(BpmCategorySaveReqVO updateReqVO) {
+        BpmCategoryDO category = bpmCategoryMapper.selectByCode(updateReqVO.getCode());
+        if (category == null
+                || ObjUtil.equal(category.getId(), updateReqVO.getId())) {
+            return;
+        }
+        throw exception(CATEGORY_CODE_DUPLICATE, updateReqVO.getCode());
+    }
+
+    @Override
+    public void deleteCategory(Long id) {
+        // 校验存在
+        BpmCategoryDO category = validateCategoryExists(id);
+        // 校验是否被流程模型使用
+        Long count = modelService.getModelCountByCategory(category.getCode());
+        if (count > 0) {
+            throw exception(CATEGORY_DELETE_FAIL_MODEL_USED, category.getName());
+        }
+        // 删除
+        bpmCategoryMapper.deleteById(id);
+    }
+
+    private BpmCategoryDO validateCategoryExists(Long id) {
+        BpmCategoryDO category = bpmCategoryMapper.selectById(id);
+        if (category == null) {
+            throw exception(CATEGORY_NOT_EXISTS);
+        }
+        return category;
+    }
+
+    @Override
+    public BpmCategoryDO getCategory(Long id) {
+        return bpmCategoryMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<BpmCategoryDO> getCategoryPage(BpmCategoryPageReqVO pageReqVO) {
+        return bpmCategoryMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<BpmCategoryDO> getCategoryListByCode(Collection<String> codes) {
+        if (CollUtil.isEmpty(codes)) {
+            return Collections.emptyList();
+        }
+        return bpmCategoryMapper.selectListByCode(codes);
+    }
+
+    @Override
+    public List<BpmCategoryDO> getCategoryListByStatus(Integer status) {
+        return bpmCategoryMapper.selectListByStatus(status);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCategorySortBatch(List<Long> ids) {
+        // 校验分类都存在
+        List<BpmCategoryDO> categories = bpmCategoryMapper.selectByIds(ids);
+        if (categories.size() != ids.size()) {
+            throw exception(CATEGORY_NOT_EXISTS);
+        }
+
+        // 批量更新排序
+        List<BpmCategoryDO> updateList = IntStream.range(0, ids.size())
+                .mapToObj(index -> new BpmCategoryDO().setId(ids.get(index)).setSort(index))
+                .collect(Collectors.toList());
+        bpmCategoryMapper.updateBatch(updateList);
+    }
+
+}

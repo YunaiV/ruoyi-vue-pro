@@ -1,0 +1,51 @@
+### 请求 /login 接口 => 成功
+POST {{baseUrl}}/system/auth/login
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+tag: Yunai.local
+
+{
+  "username": "admin",
+  "password": "admin123",
+  "uuid": "3acd87a09a4f48fb9118333780e94883",
+  "code": "1024"
+}
+
+### 请求 /login 接口【加密 AES】 => 成功
+POST {{baseUrl}}/system/auth/login
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+tag: Yunai.local
+X-API-ENCRYPT: true
+
+WvSX9MOrenyGfBhEM0g1/hHgq8ocktMZ9OwAJ6MOG5FUrzYF/rG5JF1eMptQM1wT73VgDS05l/37WeRtad+JrqChAul/sR/SdOsUKqjBhvvQx1JVhzxr6s8uUP67aKTSZ6Psv7O32ELxXrzSaQvG5CInzz3w6sLtbNNLd1kXe6Q=
+
+### 请求 /login 接口【加密 RSA】 => 成功
+POST {{baseUrl}}/system/auth/login
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+tag: Yunai.local
+X-API-ENCRYPT: true
+
+e7QZTork9ZV5CmgZvSd+cHZk3xdUxKtowLM02kOha+gxHK2H/daU8nVBYS3+bwuDRy5abf+Pz1QJJGVAEd27wwrXBmupOOA/bhpuzzDwcRuJRD+z+YgiNoEXFDRHERxPYlPqAe9zAHtihD0ceub1AjybQsEsROew4C3Q602XYW0=
+
+### 请求 /login 接口 => 成功（无验证码)
+POST {{baseUrl}}/system/auth/login
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### 请求 /get-permission-info 接口 => 成功
+GET {{baseUrl}}/system/auth/get-permission-info
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /list-menus 接口 => 成功
+GET {{baseUrl}}/system/list-menus
+Authorization: Bearer {{token}}
+#Authorization: Bearer a6aa7714a2e44c95aaa8a2c5adc2a67a
+tenant-id: {{adminTenantId}}

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.tenant.core.aop;
 
+import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,12 @@ public class TenantIgnoreAspect {
     public Object around(ProceedingJoinPoint joinPoint, TenantIgnore tenantIgnore) throws Throwable {
         Boolean oldIgnore = TenantContextHolder.isIgnore();
         try {
-            TenantContextHolder.setIgnore(true);
+            // 计算条件，满足的情况下，才进行忽略
+            Object enable = SpringExpressionUtils.parseExpression(tenantIgnore.enable());
+            if (Boolean.TRUE.equals(enable)) {
+                TenantContextHolder.setIgnore(true);
+            }
+
             // 执行逻辑
             return joinPoint.proceed();
         } finally {

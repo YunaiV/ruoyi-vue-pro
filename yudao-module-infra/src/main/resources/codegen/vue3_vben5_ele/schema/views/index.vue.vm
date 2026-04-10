@@ -1,0 +1,320 @@
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+<script lang="ts" setup>
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
+
+import { ref } from 'vue';
+
+import {#if ($table.templateType != 2 && $deleteBatchEnable) confirm,#end Page, useVbenModal } from '@vben/common-ui';
+import { downloadFileFromBlobPart#if ($table.templateType != 2 && $deleteBatchEnable), isEmpty#end } from '@vben/utils';
+
+import { ElLoading, ElMessage#if ($table.templateType == 11), ElTabs, ElTabPane#end } from 'element-plus';
+
+import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+#if (${table.templateType} == 2)## 树表接口
+import {
+  delete${simpleClassName},
+  export${simpleClassName},
+  get${simpleClassName}List,
+} from '#/api/${table.moduleName}/${table.businessName}';
+#else## 标准表接口
+import {
+  delete${simpleClassName},#if ($deleteBatchEnable)
+
+  delete${simpleClassName}List,#end
+  export${simpleClassName},
+  get${simpleClassName}Page,
+} from '#/api/${table.moduleName}/${table.businessName}';
+#end
+import { $t } from '#/locales';
+
+import { useGridColumns, useGridFormSchema } from './data';
+import Form from './modules/form.vue';
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 || $table.templateType == 12 )
+    #foreach ($subSimpleClassName in $subSimpleClassNames)
+    #set ($index = $foreach.count - 1)
+    #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue';
+    #end
+#end
+
+#if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
+/** 子表的列表 */
+const subTabsName = ref('$subClassNameVars.get(0)')
+#if ($table.templateType == 11)
+const select${simpleClassName} = ref<${apiName}.${simpleClassName}>();
+#end
+#end
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: Form,
+  destroyOnClose: true,
+});
+#if (${table.templateType} == 2)## 树表特有：控制表格展开收缩
+
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function handleExpand() {
+  isExpanded.value = !isExpanded.value;
+  gridApi.grid.setAllTreeExpand(isExpanded.value);
+}
+#end
+
+/** 刷新表格 */
+function handleRefresh() {
+#if ($table.templateType == 12) ## 内嵌情况
+  gridApi.reload();
+#else
+  gridApi.query();
+#end
+}
+
+/** 创建${table.classComment} */
+function handleCreate() {
+  formModalApi.setData(null).open();
+}
+#if (${table.templateType} == 2)## 树表特有：新增下级
+
+/** 添加下级${table.classComment} */
+function handleAppend(row: ${apiName}.${simpleClassName}) {
+  formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
+}
+#end
+
+/** 编辑${table.classComment} */
+function handleEdit(row: ${apiName}.${simpleClassName}) {
+  formModalApi.setData(row).open();
+}
+
+/** 删除${table.classComment} */
+async function handleDelete(row: ${apiName}.${simpleClassName}) {
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+  });
+  try {
+    await delete${simpleClassName}(row.id!);
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    handleRefresh();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+#if ($table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+async function handleDeleteBatch() {
+  await confirm($t('ui.actionMessage.deleteBatchConfirm'));
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deletingBatch'),
+  });
+  try {
+    await delete${simpleClassName}List(checkedIds.value);
+    checkedIds.value = [];
+    ElMessage.success($t('ui.actionMessage.deleteSuccess'));
+    handleRefresh();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+const checkedIds = ref<number[]>([]);
+function handleRowCheckboxChange({
+  records,
+}: {
+  records: ${apiName}.${simpleClassName}[];
+}) {
+  checkedIds.value = records.map((item) => item.id!);
+}
+#end
+
+/** 导出表格 */
+async function handleExport() {
+  const data = await export${simpleClassName}(await gridApi.formApi.getValues());
+  downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
+}
+
+const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions: {
+    schema: useGridFormSchema(),
+  },
+  gridOptions: {
+    columns: useGridColumns(),
+#if (${table.templateType} == 11)
+    height: '600px',
+#else
+    height: 'auto',
+#end
+#if (${table.templateType} == 2)## 树表设置
+    pagerConfig: {
+      enabled: false,
+    },
+#else## 标准表设置
+    keepSource: true,
+#end
+    proxyConfig: {
+      ajax: {
+#if (${table.templateType} == 2)## 树表数据加载
+        query: async (_, formValues) => {
+          return await get${simpleClassName}List(formValues);
+        },
+#else## 标准表数据加载
+        query: async ({ page }, formValues) => {
+          return await get${simpleClassName}Page({
+            pageNo: page.currentPage,
+            pageSize: page.pageSize,
+            ...formValues,
+          });
+        },
+#end
+      },
+    },
+    rowConfig: {
+      keyField: 'id',
+      isHover: true,
+#if (${table.templateType} == 11)
+      isCurrent: true,
+#end
+    },
+    toolbarConfig: {
+      refresh: true,
+      search: true,
+    },
+#if (${table.templateType} == 2)## 树表设置
+    treeConfig: {
+      parentField: '${treeParentColumn.javaField}',
+      rowField: 'id',
+      transform: true,
+      expandAll: true,
+      reserve: true,
+    },
+#end
+  } as VxeTableGridOptions<${apiName}.${simpleClassName}>,
+#if (${table.templateType} == 11 || (${table.templateType} != 2 && $deleteBatchEnable))
+  gridEvents: {
+  #if(${table.templateType} == 11)
+    cellClick: ({ row }: { row: ${apiName}.${simpleClassName}}) => {
+      select${simpleClassName}.value = row;
+    },
+  #end
+  #if (${table.templateType} != 2 && $deleteBatchEnable)
+    checkboxAll: handleRowCheckboxChange,
+    checkboxChange: handleRowCheckboxChange,
+  #end
+  },
+#end
+});
+</script>
+
+<template>
+  <Page auto-content-height>
+    <FormModal @success="handleRefresh" />
+#if ($table.templateType == 11) ## erp情况
+  <div>
+#end
+    <Grid table-title="${table.classComment}列表">
+        #if ($table.templateType == 12) ## 内嵌情况
+          <template #expand_content="{ row }">
+            <!-- 子表的表单 -->
+            <ElTabs v-model="subTabsName" class="mx-8">
+                #foreach ($subTable in $subTables)
+                    #set ($index = $foreach.count - 1)
+                    #set ($subClassNameVar = $subClassNameVars.get($index))
+                    #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+                    #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+                  <ElTabPane name="$subClassNameVar" label="${subTable.classComment}">
+                    <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
+                  </ElTabPane>
+                #end
+            </ElTabs>
+          </template>
+        #end
+      <template #toolbar-tools>
+        <TableAction
+          :actions="[
+            {
+              label: $t('ui.actionTitle.create', ['${table.classComment}']),
+              type: 'primary',
+              icon: ACTION_ICON.ADD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
+              onClick: handleCreate,
+            },
+            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
+            {
+              label: isExpanded ? '收缩' : '展开',
+              type: 'primary',
+              onClick: handleExpand,
+            },
+            #end
+            {
+              label: $t('ui.actionTitle.export'),
+              type: 'primary',
+              icon: ACTION_ICON.DOWNLOAD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:export'],
+              onClick: handleExport,
+            },
+            #if ($table.templateType != 2 && $deleteBatchEnable)
+            {
+              label: $t('ui.actionTitle.deleteBatch'),
+              type: 'danger',
+              icon: ACTION_ICON.DELETE,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+              disabled: isEmpty(checkedIds),
+              onClick: handleDeleteBatch,
+            },
+            #end
+          ]"
+        />
+      </template>
+      <template #actions="{ row }">
+        <TableAction
+          :actions="[
+            #if (${table.templateType} == 2)## 树表特有：新增下级
+            {
+              label: '新增下级',
+              type: 'primary',
+              link: true,
+              icon: ACTION_ICON.ADD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
+              onClick: handleAppend.bind(null, row),
+            },
+            #end
+            {
+              label: $t('common.edit'),
+              type: 'primary',
+              link: true,
+              icon: ACTION_ICON.EDIT,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
+              onClick: handleEdit.bind(null, row),
+            },
+            {
+              label: $t('common.delete'),
+              type: 'danger',
+              link: true,
+              icon: ACTION_ICON.DELETE,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+              popConfirm: {
+                title: $t('ui.actionMessage.deleteConfirm', [row.id]),
+                confirm: handleDelete.bind(null, row),
+              },
+            },
+          ]"
+        />
+      </template>
+    </Grid>
+#if ($table.templateType == 11) ## erp情况
+    <!-- 子表的表单 -->
+    <ElTabs v-model="subTabsName" class="mt-2">
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subClassNameVar = $subClassNameVars.get($index))
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <ElTabPane name="$subClassNameVar" label="${subTable.classComment}">
+            <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
+          </ElTabPane>
+        #end
+    </ElTabs>
+    </div>
+#end
+  </Page>
+</template>

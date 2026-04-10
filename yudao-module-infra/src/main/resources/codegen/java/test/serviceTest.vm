@@ -1,0 +1,167 @@
+package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import ${jakartaPackage}.annotation.Resource;
+
+import ${baseFrameworkPackage}.test.core.ut.BaseDbUnitTest;
+
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${PageResultClassName};
+
+import ${jakartaPackage}.annotation.Resource;
+import org.springframework.context.annotation.Import;
+import java.util.*;
+import java.time.LocalDateTime;
+
+import static cn.hutool.core.util.RandomUtil.*;
+import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
+import static ${baseFrameworkPackage}.test.core.util.AssertUtils.*;
+import static ${baseFrameworkPackage}.test.core.util.RandomUtils.*;
+import static ${LocalDateTimeUtilsClassName}.*;
+import static ${ObjectUtilsClassName}.*;
+import static ${DateUtilsClassName}.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+## 字段模板
+#macro(getPageCondition $VO)
+       // mock 数据
+       ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class, o -> { // 等会查询到
+       #foreach ($column in $columns)
+       #if (${column.listOperation})
+       #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+           o.set$JavaField(null);
+       #end
+       #end
+       });
+       ${classNameVar}Mapper.insert(db${simpleClassName});
+       #foreach ($column in $columns)
+       #if (${column.listOperation})
+       #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+       // 测试 ${column.javaField} 不匹配
+       ${classNameVar}Mapper.insert(cloneIgnoreId(db${simpleClassName}, o -> o.set$JavaField(null)));
+       #end
+       #end
+       // 准备参数
+       ${sceneEnum.prefixClass}${table.className}${VO} reqVO = new ${sceneEnum.prefixClass}${table.className}${VO}();
+       #foreach ($column in $columns)
+       #if (${column.listOperation})
+       #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+       #if (${column.listOperationCondition} == "BETWEEN")## BETWEEN 的情况
+       reqVO.set${JavaField}(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+       #else
+       reqVO.set$JavaField(null);
+       #end
+       #end
+       #end
+#end
+/**
+ * {@link ${table.className}ServiceImpl} 的单元测试类
+ *
+ * @author ${table.author}
+ */
+@Import(${table.className}ServiceImpl.class)
+public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
+
+    @Resource
+    private ${table.className}ServiceImpl ${classNameVar}Service;
+
+    @Resource
+    private ${table.className}Mapper ${classNameVar}Mapper;
+
+    @Test
+    public void testCreate${simpleClassName}_success() {
+        // 准备参数
+        ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO = randomPojo(${sceneEnum.prefixClass}${table.className}SaveReqVO.class).setId(null);
+
+        // 调用
+        ${primaryColumn.javaType} ${classNameVar}Id = ${classNameVar}Service.create${simpleClassName}(createReqVO);
+        // 断言
+        assertNotNull(${classNameVar}Id);
+        // 校验记录的属性是否正确
+        ${table.className}DO ${classNameVar} = ${classNameVar}Mapper.selectById(${classNameVar}Id);
+        assertPojoEquals(createReqVO, ${classNameVar}, "id");
+    }
+
+    @Test
+    public void testUpdate${simpleClassName}_success() {
+        // mock 数据
+        ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class);
+        ${classNameVar}Mapper.insert(db${simpleClassName});// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO = randomPojo(${sceneEnum.prefixClass}${table.className}SaveReqVO.class, o -> {
+            o.setId(db${simpleClassName}.getId()); // 设置更新的 ID
+        });
+
+        // 调用
+        ${classNameVar}Service.update${simpleClassName}(updateReqVO);
+        // 校验是否更新正确
+        ${table.className}DO ${classNameVar} = ${classNameVar}Mapper.selectById(updateReqVO.getId()); // 获取最新的
+        assertPojoEquals(updateReqVO, ${classNameVar});
+    }
+
+    @Test
+    public void testUpdate${simpleClassName}_notExists() {
+        // 准备参数
+        ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO = randomPojo(${sceneEnum.prefixClass}${table.className}SaveReqVO.class);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> ${classNameVar}Service.update${simpleClassName}(updateReqVO), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
+    }
+
+    @Test
+    public void testDelete${simpleClassName}_success() {
+        // mock 数据
+        ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class);
+        ${classNameVar}Mapper.insert(db${simpleClassName});// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        ${primaryColumn.javaType} id = db${simpleClassName}.getId();
+
+        // 调用
+        ${classNameVar}Service.delete${simpleClassName}(id);
+       // 校验数据不存在了
+       assertNull(${classNameVar}Mapper.selectById(id));
+    }
+
+    @Test
+    public void testDelete${simpleClassName}_notExists() {
+        // 准备参数
+        ${primaryColumn.javaType} id = random${primaryColumn.javaType}Id();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> ${classNameVar}Service.delete${simpleClassName}(id), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
+    }
+
+## 特殊：树表专属逻辑（树不需要分页接口）
+#if ( $table.templateType != 2 )
+    @Test
+    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
+    public void testGet${simpleClassName}Page() {
+       #getPageCondition("PageReqVO")
+
+       // 调用
+       PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(reqVO);
+       // 断言
+       assertEquals(1, pageResult.getTotal());
+       assertEquals(1, pageResult.getList().size());
+       assertPojoEquals(db${simpleClassName}, pageResult.getList().get(0));
+    }
+#else
+    @Test
+    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
+    public void testGet${simpleClassName}List() {
+       #getPageCondition("ListReqVO")
+
+       // 调用
+       List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(reqVO);
+       // 断言
+       assertEquals(1, list.size());
+       assertPojoEquals(db${simpleClassName}, list.get(0));
+    }
+#end
+
+}

@@ -1,0 +1,181 @@
+## 通用变量定义
+#set ($functionNames = ['查询', '创建', '更新', '删除', '导出'])
+#set ($functionOps = ['query', 'create', 'update', 'delete', 'export'])
+##
+## 宏定义：生成按钮 SQL（通用部分）
+#macro(insertButtonSql $parentIdVar)
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+        '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, ${parentIdVar},
+        '', '', '', 0
+    );
+#end
+#end
+##
+## ======================= MySQL / OceanBase =======================
+#if ($dbType.name() == 'MYSQL' || $dbType.name() == 'OCEAN_BASE')
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+    '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
+);
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, @parentId,
+    '', '', '', 0
+);
+#end
+##
+## ======================= Oracle / 达梦 DM =======================
+#elseif ($dbType.name() == 'ORACLE' || $dbType.name() == 'DM')
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+    '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
+);
+
+-- 按钮父菜单ID
+-- 说明：Oracle/达梦 使用序列获取上一个插入的 ID
+DECLARE
+    v_parent_id NUMBER;
+BEGIN
+    SELECT system_menu_seq.CURRVAL INTO v_parent_id FROM DUAL;
+    -- 按钮 SQL
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+        '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, v_parent_id,
+        '', '', '', 0
+    );
+#end
+END;
+/
+##
+## ======================= PostgreSQL / 人大金仓 KingbaseES =======================
+#elseif ($dbType.name() == 'POSTGRE_SQL' || $dbType.name() == 'KINGBASE_ES')
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+    '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
+);
+
+-- 按钮父菜单ID
+-- 说明：PostgreSQL/KingbaseES 使用 lastval() 获取上一个插入的序列值
+DO $$
+DECLARE
+    v_parent_id BIGINT;
+BEGIN
+    v_parent_id := lastval();
+    -- 按钮 SQL
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+        '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, v_parent_id,
+        '', '', '', 0
+    );
+#end
+END $$;
+##
+## ======================= SQL Server =======================
+#elseif ($dbType.name() == 'SQL_SERVER' || $dbType.name() == 'SQL_SERVER2005')
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+    '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
+);
+
+-- 按钮父菜单ID
+-- 说明：SQL Server 使用 SCOPE_IDENTITY() 获取上一个插入的自增 ID
+DECLARE @parentId BIGINT;
+SET @parentId = SCOPE_IDENTITY();
+
+-- 按钮 SQL
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, @parentId,
+    '', '', '', 0
+);
+#end
+##
+## ======================= 不支持的数据库类型 =======================
+#else
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- 注意：当前数据库类型 ${dbType.name()} 暂不支持自动生成菜单 SQL
+-- 请参考以下 MySQL 语法，手动修改为您的数据库对应的语法
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+-- 菜单 SQL
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status, component_name
+)
+VALUES (
+    '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 0, '${table.className}'
+);
+
+-- 按钮父菜单ID
+-- TODO: 请根据您的数据库类型，修改获取上一个插入 ID 的方式
+-- MySQL: SELECT @parentId := LAST_INSERT_ID();
+-- Oracle: SELECT system_menu_seq.CURRVAL INTO v_parent_id FROM DUAL;
+-- PostgreSQL: SELECT lastval() INTO v_parent_id;
+-- SQL Server: SET @parentId = SCOPE_IDENTITY();
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+#foreach ($functionName in $functionNames)
+#set ($index = $foreach.count - 1)
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
+)
+VALUES (
+    '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, @parentId,
+    '', '', '', 0
+);
+#end
+#end

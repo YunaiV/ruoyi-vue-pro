@@ -97,12 +97,26 @@ public class SpringExpressionUtils {
      * @return 执行界面
      */
     public static Object parseExpression(String expressionString) {
+        return parseExpression(expressionString, null);
+    }
+
+    /**
+     * 从 Bean 工厂，解析 EL 表达式的结果
+     *
+     * @param expressionString EL 表达式
+     * @param variables        变量
+     * @return 执行界面
+     */
+    public static Object parseExpression(String expressionString, Map<String, Object> variables) {
         if (StrUtil.isBlank(expressionString)) {
             return null;
         }
         Expression expression = EXPRESSION_PARSER.parseExpression(expressionString);
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(new BeanFactoryResolver(SpringUtil.getApplicationContext()));
+        if (MapUtil.isNotEmpty(variables)) {
+            context.setVariables(variables);
+        }
         return expression.getValue(context);
     }
 

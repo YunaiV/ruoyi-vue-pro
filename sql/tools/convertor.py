@@ -4,16 +4,28 @@
 Author: dhb52 (https://gitee.com/dhb52)
 
 pip install simple-ddl-parser
+
+or with uv
+uv run --with simple-ddl-parser convertor.py postgres ../mysql/ruoyi-vue-pro.sql > ../postgresql/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py sqlserver ../mysql/ruoyi-vue-pro.sql > ../sqlserver/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py kingbase ../mysql/ruoyi-vue-pro.sql > ../kingbase/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py opengauss ../mysql/ruoyi-vue-pro.sql > ../opengauss/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py oracle ../mysql/ruoyi-vue-pro.sql > ../oracle/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py dm8 ../mysql/ruoyi-vue-pro.sql > ../dm/ruoyi-vue-pro-dm8.sql
 """
 
 import argparse
 import pathlib
 import re
+import sys
 import time
 from abc import ABC, abstractmethod
 from typing import Dict, Generator, Optional, Tuple, Union
 
 from simple_ddl_parser import DDLParser
+
+# 避免 Windows 系统使用默认的 GBK 编码
+sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
 
 PREAMBLE = """/*
  Yudao Database Transfer Tool
@@ -38,16 +50,23 @@ def load_and_clean(sql_file: str) -> str:
         str: 清理后的sql文件内容
     """
     REPLACE_PAIR_LIST = (
+        (")\nVALUES ", ") VALUES "),
         (" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ", " "),
+        (" CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ", " "),
         (" KEY `", " INDEX `"),
         ("UNIQUE INDEX", "UNIQUE KEY"),
         ("b'0'", "'0'"),
         ("b'1'", "'1'"),
     )
 
-    content = open(sql_file).read()
+    content = open(sql_file, encoding="utf-8").read()
     for replace_pair in REPLACE_PAIR_LIST:
         content = content.replace(*replace_pair)
+    # 移除索引字段的前缀长度定义，例如: `name`(32) -> `name`
+    # 移除索引定义上的 USING BTREE COMMENT 部分
+    # 相关 issue：https://t.zsxq.com/96IFc 、https://t.zsxq.com/rC3A3
+    content = re.sub(r'`([^`]+)`\(\d+\)', r'`\1`', content)
+    content = re.sub(r'\s+USING\s+BTREE\s+COMMENT\s+\'[^\']+\'', '', content)
     content = re.sub(r"ENGINE.*COMMENT", "COMMENT", content)
     content = re.sub(r"ENGINE.*;", ";", content)
     return content
@@ -110,17 +129,27 @@ class Convertor(ABC):
         pass
 
     @abstractmethod
-    def gen_comment(self, table_sql: str, table_name: str) -> str:
+    def gen_comment(self, table_ddl: Dict) -> str:
         """生成字段/表注释
 
         Args:
-            table_sql (str): 原始表SQL
-            table_name (str): 表名
+            table_ddl (Dict): 表DDL
 
         Returns:
             str: 生成脚本
         """
         pass
+
+    @abstractmethod
+    def gen_uk(self, table_ddl: Dict) -> str:
+        """生成
+
+        Args:
+            table_ddl (Dict): 表DDL
+
+        Returns:
+            str: 生成脚本
+        """
 
     @abstractmethod
     def gen_insert(self, table_name: str) -> str:
@@ -179,6 +208,16 @@ class Convertor(ABC):
             yield f"CREATE INDEX idx_{table_name}_{no:02d} ON {table_name} ({columns})"
 
     @staticmethod
+    def unique_index(ddl: Dict) -> Generator:
+        if "constraints" in ddl and "uniques" in ddl["constraints"]:
+            uk_list = ddl["constraints"]["uniques"]
+            for uk in uk_list:
+                table_name = ddl["table_name"]
+                uk_name = uk["constraint_name"]
+                uk_columns = uk["columns"]
+                yield table_name, uk_name, uk_columns
+
+    @staticmethod
     def filed_comments(table_sql: str) -> Generator:
         for line in table_sql.split("\n"):
             match = re.match(r"^`([^`]+)`.* COMMENT '([^']+)'", line.strip())
@@ -188,7 +227,7 @@ class Convertor(ABC):
                 yield field, comment_string
 
     def table_comment(self, table_sql: str) -> str:
-        match = re.search(r"COMMENT \= '([^']+)';", table_sql)
+        match = re.search(r"COMMENT \='([^']+)';", table_sql)
         return match.group(1) if match else None
 
     def print(self):
@@ -226,17 +265,29 @@ class Convertor(ABC):
             if table_name.lower().startswith("qrtz"):
                 continue
 
-            # 为每个表生成个5个基本部分
+            # 解析注释
+            for column in table_ddl["columns"]:
+                column["comment"] = bytes(column["comment"], "utf-8").decode(
+                    r"unicode_escape"
+                )[1:-1]
+            table_ddl["comment"] = bytes(table_ddl["comment"], "utf-8").decode(
+                r"unicode_escape"
+            )[1:-1]
+
+            # 为每个表生成个6个基本部分
             create = self.gen_create(table_ddl)
             pk = self.gen_pk(table_name)
+            uk = self.gen_uk(table_ddl)
             index = self.gen_index(table_ddl)
-            comment = self.gen_comment(table_sql, table_name)
+            comment = self.gen_comment(table_ddl)
             inserts = self.gen_insert(table_name)
 
             # 组合当前表的DDL脚本
             script = f"""{create}
 
 {pk}
+
+{uk}
 
 {index}
 
@@ -252,8 +303,10 @@ class Convertor(ABC):
 
         # 将parse失败的脚本打印出来
         if error_scripts:
+            print("!!! 以下内容无法正常解析", file=sys.stderr)
             for script in error_scripts:
-                print(script)
+                # print to stderr
+                print(script, file=sys.stderr)
 
 
 class PostgreSQLConvertor(Convertor):
@@ -267,17 +320,19 @@ class PostgreSQLConvertor(Convertor):
 
         if type == "varchar":
             return f"varchar({size})"
-        if type == "int":
+        if type in ("int", "int unsigned"):
             return "int4"
-        if type == "bigint" or type == "bigint unsigned":
+        if type in ("bigint", "bigint unsigned"):
             return "int8"
         if type == "datetime":
             return "timestamp"
+        if type == "timestamp":
+            return f"timestamp({size})"
         if type == "bit":
             return "bool"
         if type in ("tinyint", "smallint"):
             return "int2"
-        if type == "text":
+        if type in ("text", "longtext"):
             return "text"
         if type in ("blob", "mediumblob"):
             return "bytea"
@@ -316,24 +371,37 @@ CREATE TABLE {table_name} (
     def gen_index(self, ddl: Dict) -> str:
         return "\n".join(f"{script};" for script in self.index(ddl))
 
-    def gen_comment(self, table_sql: str, table_name: str) -> str:
+    def gen_comment(self, table_ddl: Dict) -> str:
         """生成字段及表的注释"""
 
         script = ""
-        for field, comment_string in self.filed_comments(table_sql):
+        for column in table_ddl["columns"]:
+            table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_name}.{field} IS '{comment_string}';" + "\n"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                + "\n"
             )
 
-        table_comment = self.table_comment(table_sql)
+        table_comment = table_ddl["comment"]
         if table_comment:
-            script += f"COMMENT ON TABLE {table_name} IS '{table_comment}';\n"
+            script += (
+                f"COMMENT ON TABLE {table_ddl['table_name']} IS '{table_comment}';\n"
+            )
 
         return script
 
     def gen_pk(self, table_name) -> str:
         """生成主键定义"""
         return f"ALTER TABLE {table_name} ADD CONSTRAINT pk_{table_name} PRIMARY KEY (id);\n"
+
+    def gen_uk(self, table_ddl: Dict) -> str:
+        script = ""
+        uk_list = list(Convertor.unique_index(table_ddl))
+        for idx, (table_name, _, uk_columns) in enumerate(uk_list, 1):
+            uk_name = f"uk_{table_name}_{idx:02d}"
+            script += f"CREATE UNIQUE INDEX {uk_name} ON {table_name} ({', '.join(uk_columns)});\n"
+
+        return script
 
     def gen_insert(self, table_name: str) -> str:
         """生成 insert 语句，以及根据最后的 insert id+1 生成 Sequence"""
@@ -393,17 +461,19 @@ class OracleConvertor(Convertor):
 
         if type == "varchar":
             return f"varchar2({size if size < 4000 else 4000})"
-        if type == "int":
+        if type in ("int", "int unsigned"):
             return "number"
         if type == "bigint" or type == "bigint unsigned":
             return "number"
         if type == "datetime":
             return "date"
+        if type == "timestamp":
+            return f"timestamp({size})"
         if type == "bit":
             return "number(1,0)"
         if type in ("tinyint", "smallint"):
             return "smallint"
-        if type == "text":
+        if type in ("text", "longtext"):
             return "clob"
         if type in ("blob", "mediumblob"):
             return "blob"
@@ -423,6 +493,8 @@ class OracleConvertor(Convertor):
             type = col["type"].lower()
             full_type = self.translate_type(type, col["size"])
             nullable = "NULL" if col["nullable"] else "NOT NULL"
+            # Oracle的 INSERT '' 不能通过NOT NULL校验，因此对文字类型字段覆写为 NULL
+            nullable = "NULL" if type in ("varchar", "text", "longtext") else nullable
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
             # Oracle 中 size 不能作为字段名
             field_name = '"size"' if name == "size" else name
@@ -447,22 +519,35 @@ CREATE TABLE {table_name} (
     def gen_index(self, ddl: Dict) -> str:
         return "\n".join(f"{script};" for script in self.index(ddl))
 
-    def gen_comment(self, table_sql: str, table_name: str) -> str:
+    def gen_comment(self, table_ddl: Dict) -> str:
         script = ""
-        for field, comment_string in self.filed_comments(table_sql):
+        for column in table_ddl["columns"]:
+            table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_name}.{field} IS '{comment_string}';" + "\n"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                + "\n"
             )
 
-        table_comment = self.table_comment(table_sql)
+        table_comment = table_ddl["comment"]
         if table_comment:
-            script += f"COMMENT ON TABLE {table_name} IS '{table_comment}';\n"
+            script += (
+                f"COMMENT ON TABLE {table_ddl['table_name']} IS '{table_comment}';\n"
+            )
 
         return script
 
     def gen_pk(self, table_name: str) -> str:
         """生成主键定义"""
         return f"ALTER TABLE {table_name} ADD CONSTRAINT pk_{table_name} PRIMARY KEY (id);\n"
+
+    def gen_uk(self, table_ddl: Dict) -> str:
+        script = ""
+        uk_list = list(Convertor.unique_index(table_ddl))
+        for idx, (table_name, _, uk_columns) in enumerate(uk_list, 1):
+            uk_name = f"uk_{table_name}_{idx:02d}"
+            script += f"CREATE UNIQUE INDEX {uk_name} ON {table_name} ({', '.join(uk_columns)});\n"
+
+        return script
 
     def gen_index(self, ddl: Dict) -> str:
         return "\n".join(f"{script};" for script in self.index(ddl))
@@ -521,17 +606,17 @@ class SQLServerConvertor(Convertor):
 
         if type == "varchar":
             return f"nvarchar({size if size < 4000 else 4000})"
-        if type == "int":
+        if type in ("int", "int unsigned"):
             return "int"
-        if type == "bigint" or type == "bigint unsigned":
+        if type in ("bigint", "bigint unsigned"):
             return "bigint"
-        if type == "datetime":
+        if type in ("datetime", "timestamp"):
             return "datetime2"
         if type == "bit":
             return "varchar(1)"
         if type in ("tinyint", "smallint"):
             return "tinyint"
-        if type == "text":
+        if type in ("text", "longtext"):
             return "nvarchar(max)"
         if type in ("blob", "mediumblob"):
             return "varbinary(max)"
@@ -571,14 +656,18 @@ GO"""
 
         return script
 
-    def gen_comment(self, table_sql: str, table_name: str) -> str:
+    def gen_comment(self, table_ddl: Dict) -> str:
         """生成字段及表的注释"""
 
         script = ""
+        table_name = table_ddl["table_name"]
 
-        for field, comment_string in self.filed_comments(table_sql):
+        for column in table_ddl["columns"]:
+            column_comment = column["comment"]
+            field = column["name"]
+
             script += f"""EXEC sp_addextendedproperty
-    'MS_Description', N'{comment_string}',
+    'MS_Description', N'{column_comment}',
     'SCHEMA', N'dbo',
     'TABLE', N'{table_name}',
     'COLUMN', N'{field}'
@@ -586,7 +675,7 @@ GO
 
 """
 
-        table_comment = self.table_comment(table_sql)
+        table_comment = table_ddl["comment"]
         if table_comment:
             script += f"""EXEC sp_addextendedproperty
     'MS_Description', N'{table_comment}',
@@ -600,6 +689,15 @@ GO
     def gen_pk(self, table_name: str) -> str:
         """生成主键定义"""
         return ""
+
+    def gen_uk(self, table_ddl: Dict) -> str:
+        script = ""
+        uk_list = list(Convertor.unique_index(table_ddl))
+        for idx, (table_name, _, uk_columns) in enumerate(uk_list, 1):
+            uk_name = f"uk_{table_name}_{idx:02d}"
+            script += f"CREATE UNIQUE INDEX {uk_name} ON {table_name} ({', '.join(uk_columns)})\nGO"
+
+        return script
 
     def gen_index(self, ddl: Dict) -> str:
         """生成 index"""
@@ -674,22 +772,22 @@ class DM8Convertor(Convertor):
 
         if type == "varchar":
             return f"varchar({size})"
-        if type == "int":
+        if type in ("int", "int unsigned"):
             return "int"
-        if type == "bigint" or type == "bigint unsigned":
+        if type in ("bigint", "bigint unsigned"):
             return "bigint"
         if type == "datetime":
             return "datetime"
+        if type == "timestamp":
+            return f"timestamp({size})"
         if type == "bit":
             return "bit"
         if type in ("tinyint", "smallint"):
             return "smallint"
-        if type == "text":
+        if type in ("text", "longtext"):
             return "text"
-        if type == "blob":
+        if type in ("blob", "mediumblob"):
             return "blob"
-        if type == "mediumblob":
-            return "varchar(10240)"
         if type == "decimal":
             return (
                 f"decimal({','.join(str(s) for s in size)})" if len(size) else "decimal"
@@ -724,25 +822,35 @@ CREATE TABLE {table_name} (
 
         return script
 
-    def gen_index(self, ddl: Dict) -> str:
-        return "\n".join(f"{script};" for script in self.index(ddl))
-
-    def gen_comment(self, table_sql: str, table_name: str) -> str:
+    def gen_comment(self, table_ddl: Dict) -> str:
         script = ""
-        for field, comment_string in self.filed_comments(table_sql):
+        for column in table_ddl["columns"]:
+            table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_name}.{field} IS '{comment_string}';" + "\n"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                + "\n"
             )
 
-        table_comment = self.table_comment(table_sql)
+        table_comment = table_ddl["comment"]
         if table_comment:
-            script += f"COMMENT ON TABLE {table_name} IS '{table_comment}';\n"
+            script += (
+                f"COMMENT ON TABLE {table_ddl['table_name']} IS '{table_comment}';\n"
+            )
 
         return script
 
     def gen_pk(self, table_name: str) -> str:
         """生成主键定义"""
         return ""
+
+    def gen_uk(self, table_ddl: Dict) -> str:
+        script = ""
+        uk_list = list(Convertor.unique_index(table_ddl))
+        for idx, (table_name, _, uk_columns) in enumerate(uk_list, 1):
+            uk_name = f"uk_{table_name}_{idx:02d}"
+            script += f"CREATE UNIQUE INDEX {uk_name} ON {table_name} ({', '.join(uk_columns)});\n"
+
+        return script
 
     def gen_index(self, ddl: Dict) -> str:
         return "\n".join(f"{script};" for script in self.index(ddl))
@@ -784,6 +892,8 @@ class KingbaseConvertor(PostgreSQLConvertor):
             type = col["type"].lower()
             full_type = self.translate_type(type, col["size"])
             nullable = "NULL" if col["nullable"] else "NOT NULL"
+            if full_type == "text":
+                nullable = "NULL"
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
             return f"{name} {full_type} {nullable} {default}"
 
@@ -818,9 +928,15 @@ def main():
         help="目标数据库类型",
         choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
     )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="源数据库脚本路径",
+        default="../mysql/ruoyi-vue-pro.sql"
+    )
     args = parser.parse_args()
 
-    sql_file = pathlib.Path("../mysql/ruoyi-vue-pro.sql").resolve().as_posix()
+    sql_file = pathlib.Path(args.path).resolve().as_posix()
     convertor = None
     if args.type == "postgres":
         convertor = PostgreSQLConvertor(sql_file)

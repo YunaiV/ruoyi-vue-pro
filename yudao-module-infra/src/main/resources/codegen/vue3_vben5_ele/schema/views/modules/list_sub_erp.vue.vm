@@ -1,0 +1,237 @@
+#set ($subTable = $subTables.get($subIndex))##当前表
+#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+<script lang="ts" setup>
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
+
+#if ($table.templateType == 11) ## erp
+import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
+#end
+import { useVbenModal } from '@vben/common-ui';
+import { ElMessage, ElLoading } from 'element-plus';
+import { ref, computed, nextTick,watch } from 'vue';
+import { $t } from '#/locales';
+import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+
+#if ($table.templateType == 11) ## erp
+import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
+import { isEmpty } from '@vben/utils';
+#else
+#if ($subTable.subJoinMany) ## 一对多
+import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
+#else
+import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
+#end
+import { use${subSimpleClassName}GridColumns } from '../data';
+#end
+
+const props = defineProps<{
+  ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
+}>()
+
+#if ($table.templateType == 11) ## erp
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: ${subSimpleClassName}Form,
+  destroyOnClose: true,
+});
+
+/** 刷新表格 */
+async function handleRefresh() {
+#if ($table.templateType == 11) ## erp
+  await gridApi.query();
+#else
+  #if ($subTable.subJoinMany) ## 一对多
+  await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+  #else
+  await gridApi.grid.loadData([await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)]);
+  #end
+#end
+}
+
+/** 创建${subTable.classComment} */
+function handleCreate() {
+  if (!props.${subJoinColumn.javaField}){
+    ElMessage.warning("请先选择一个${table.classComment}!")
+    return
+  }
+  formModalApi.setData({${subJoinColumn.javaField}: props.${subJoinColumn.javaField}}).open();
+}
+
+/** 编辑${subTable.classComment} */
+function handleEdit(row: ${apiName}.${subSimpleClassName}) {
+  formModalApi.setData(row).open();
+}
+
+/** 删除${subTable.classComment} */
+async function handleDelete(row: ${apiName}.${subSimpleClassName}) {
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+  });
+  try {
+    await delete${subSimpleClassName}(row.id!);
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    handleRefresh();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+#if ($deleteBatchEnable)
+/** 批量删除${subTable.classComment} */
+async function handleDeleteBatch() {
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting'),
+  });
+  try {
+    await delete${subSimpleClassName}List(checkedIds.value);
+    checkedIds.value = [];
+    ElMessage.success($t('ui.actionMessage.deleteSuccess'));
+    handleRefresh();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
+  records,
+}: {
+  records: ${apiName}.${subSimpleClassName}[];
+}) {
+  checkedIds.value = records.map((item) => item.id!);
+}
+#end
+
+#end
+const [Grid, gridApi] = useVbenVxeGrid({
+#if ($table.templateType == 11)
+  formOptions: {
+    schema: use${subSimpleClassName}GridFormSchema(),
+  },
+#end
+  gridOptions: {
+#if ($table.templateType == 11)
+  columns: use${subSimpleClassName}GridColumns(),
+    proxyConfig: {
+      ajax: {
+        query: async ({ page }, formValues) => {
+          if (!props.${subJoinColumn.javaField}){
+              return []
+          }
+          return await get${subSimpleClassName}Page({
+            pageNo: page.currentPage,
+            pageSize: page.pageSize,
+            ${subJoinColumn.javaField}: props.${subJoinColumn.javaField},
+            ...formValues,
+          });
+        },
+      },
+    },
+  pagerConfig: {
+    enabled: true,
+  },
+  toolbarConfig: {
+    refresh: true,
+    search: true,
+  },
+#else
+  columns: use${subSimpleClassName}GridColumns(),
+  pagerConfig: {
+    nabled: false,
+  },
+  toolbarConfig: {
+    enabled: false,
+  },
+#end
+  height: '600px',
+  rowConfig: {
+    keyField: 'id',
+    isHover: true,
+  },
+  } as VxeTableGridOptions<${apiName}.${subSimpleClassName}>,
+  #if (${table.templateType} == 11 && $deleteBatchEnable)
+  gridEvents:{
+    checkboxAll: handleRowCheckboxChange,
+    checkboxChange: handleRowCheckboxChange,
+  }
+  #end
+});
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+  () => props.${subJoinColumn.javaField},
+  async (val) => {
+    if (!val) {
+      return;
+    }
+    await nextTick();
+    await handleRefresh()
+  },
+  { immediate: true },
+);
+</script>
+
+<template>
+    #if ($table.templateType == 11) ## erp
+      <FormModal @success="handleRefresh" />
+      <Grid table-title="${subTable.classComment}列表">
+        <template #toolbar-tools>
+          <TableAction
+            :actions="[
+              {
+                label: $t('ui.actionTitle.create', ['${table.classComment}']),
+                type: 'primary',
+                icon: ACTION_ICON.ADD,
+                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
+                onClick: handleCreate,
+              },
+              #if ($table.templateType == 11 && $deleteBatchEnable)
+              {
+                label: $t('ui.actionTitle.deleteBatch'),
+                type: 'danger',
+                icon: ACTION_ICON.DELETE,
+                disabled: isEmpty(checkedIds),
+                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+                onClick: handleDeleteBatch,
+              },
+              #end
+            ]"
+          />
+        </template>
+        <template #actions="{ row }">
+          <TableAction
+            :actions="[
+              {
+                label: $t('common.edit'),
+                type: 'primary',
+                link: true,
+                icon: ACTION_ICON.EDIT,
+                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
+                onClick: handleEdit.bind(null, row),
+              },
+              {
+                label: $t('common.delete'),
+                type: 'danger',
+                link: true,
+                icon: ACTION_ICON.DELETE,
+                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+                popConfirm: {
+                  title: $t('ui.actionMessage.deleteConfirm', [row.id]),
+                  confirm: handleDelete.bind(null, row),
+                },
+              },
+            ]"
+          />
+        </template>
+      </Grid>
+    #else
+      <Grid table-title="${subTable.classComment}列表" />
+    #end
+</template>

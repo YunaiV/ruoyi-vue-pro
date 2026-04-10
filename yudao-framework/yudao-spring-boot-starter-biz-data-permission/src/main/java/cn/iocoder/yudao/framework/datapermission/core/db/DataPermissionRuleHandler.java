@@ -12,6 +12,8 @@ import net.sf.jsqlparser.schema.Table;
 
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.skipPermissionCheck;
+
 /**
  * 基于 {@link DataPermissionRule} 的数据权限处理器
  *
@@ -27,6 +29,11 @@ public class DataPermissionRuleHandler implements MultiDataPermissionHandler {
 
     @Override
     public Expression getSqlSegment(Table table, Expression where, String mappedStatementId) {
+        // 特殊：跨租户访问
+        if (skipPermissionCheck()) {
+            return null;
+        }
+
         // 获得 Mapper 对应的数据权限的规则
         List<DataPermissionRule> rules = ruleFactory.getDataPermissionRule(mappedStatementId);
         if (CollUtil.isEmpty(rules)) {

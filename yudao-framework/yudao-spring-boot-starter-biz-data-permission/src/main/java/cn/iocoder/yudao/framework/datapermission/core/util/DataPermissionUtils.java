@@ -32,13 +32,12 @@ public class DataPermissionUtils {
      * @param runnable 逻辑
      */
     public static void executeIgnore(Runnable runnable) {
-        DataPermission dataPermission = getDisableDataPermissionDisable();
-        DataPermissionContextHolder.add(dataPermission);
+        addDisableDataPermission();
         try {
             // 执行 runnable
             runnable.run();
         } finally {
-            DataPermissionContextHolder.remove();
+            removeDataPermission();
         }
     }
 
@@ -50,14 +49,25 @@ public class DataPermissionUtils {
      */
     @SneakyThrows
     public static <T> T executeIgnore(Callable<T> callable) {
-        DataPermission dataPermission = getDisableDataPermissionDisable();
-        DataPermissionContextHolder.add(dataPermission);
+        addDisableDataPermission();
         try {
             // 执行 callable
             return callable.call();
         } finally {
-            DataPermissionContextHolder.remove();
+            removeDataPermission();
         }
+    }
+
+    /**
+     * 添加忽略数据权限
+     */
+    public static void addDisableDataPermission(){
+        DataPermission dataPermission = getDisableDataPermissionDisable();
+        DataPermissionContextHolder.add(dataPermission);
+    }
+
+    public static void removeDataPermission(){
+        DataPermissionContextHolder.remove();
     }
 
 }

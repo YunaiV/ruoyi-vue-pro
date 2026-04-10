@@ -4,3 +4,4 @@ cn.iocoder.yudao.framework.swagger.config.YudaoSwaggerAutoConfiguration
 cn.iocoder.yudao.framework.web.config.YudaoWebAutoConfiguration
 cn.iocoder.yudao.framework.xss.config.YudaoXssAutoConfiguration
 cn.iocoder.yudao.framework.banner.config.YudaoBannerAutoConfiguration
+cn.iocoder.yudao.framework.encrypt.config.YudaoApiEncryptAutoConfiguration

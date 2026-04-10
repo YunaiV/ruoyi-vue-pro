@@ -1,0 +1,112 @@
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessMultiInstanceSourceTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import lombok.Setter;
+import org.flowable.bpmn.model.*;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * 自定义的【串行】的【多个】流程任务的 assignee 负责人的分配
+ *
+ * 本质上，实现和 {@link BpmParallelMultiInstanceBehavior} 一样，只是继承的类不一样
+ *
+ * @author 芋道源码
+ */
+@Setter
+public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceBehavior {
+
+    private BpmTaskCandidateInvoker taskCandidateInvoker;
+
+    public BpmSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+        super(activity, innerActivityBehavior);
+        // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1483
+        // 在解析/构造阶段基于 activityId 初始化与 activity 绑定且不变的字段，避免在运行期修改 Behavior 实例状态
+        super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(activity.getId());
+        // 从 execution.getVariable() 读取当前所有任务处理的人的 key
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(activity.getId());
+    }
+
+    /**
+     * 逻辑和 {@link BpmParallelMultiInstanceBehavior#resolveNrOfInstances(DelegateExecution)} 类似
+     *
+     * 差异的点：是在【第二步】的时候，需要返回 LinkedHashSet 集合！因为它需要有序！
+     */
+    @Override
+    protected int resolveNrOfInstances(DelegateExecution execution) {
+        // 情况一：UserTask 节点
+        if (execution.getCurrentFlowElement() instanceof UserTask) {
+            // 获取任务的所有处理人
+            // 不使用 execution.getVariable 原因：目前依次审批任务回退后 collectionVariable 变量没有清理， 如果重新进入该任务不会重新分配审批人
+            @SuppressWarnings("unchecked")
+            Set<Long> assigneeUserIds = (Set<Long>) execution.getVariableLocal(super.collectionVariable, Set.class);
+            if (assigneeUserIds == null) {
+                assigneeUserIds = new LinkedHashSet<>(taskCandidateInvoker.calculateUsersByTask(execution));
+                if (CollUtil.isEmpty(assigneeUserIds)) {
+                    // 特殊：如果没有处理人的情况下，至少有一个 null 空元素，避免自动通过！
+                    // 这样，保证在 BpmUserTaskActivityBehavior 至少创建出一个 Task 任务
+                    // 用途：1）审批人为空时；2）审批类型为自动通过、自动拒绝时
+                    assigneeUserIds = SetUtils.asSet((Long) null);
+                }
+                execution.setVariableLocal(super.collectionVariable, assigneeUserIds);
+            }
+            return assigneeUserIds.size();
+        }
+
+        // 情况二：CallActivity 节点
+        if (execution.getCurrentFlowElement() instanceof CallActivity) {
+            FlowElement flowElement = execution.getCurrentFlowElement();
+            Integer sourceType = BpmnModelUtils.parseMultiInstanceSourceType(flowElement);
+            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.NUMBER_FORM.getType())) {
+                return execution.getVariable(super.collectionExpression.getExpressionText(), Integer.class);
+            }
+            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTIPLE_FORM.getType())) {
+                return execution.getVariable(super.collectionExpression.getExpressionText(), List.class).size();
+            }
+        }
+
+        return super.resolveNrOfInstances(execution);
+    }
+
+    @Override
+    protected void executeOriginalBehavior(DelegateExecution execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
+        // 参见 https://t.zsxq.com/53Meo 情况
+        if (execution.getCurrentFlowElement() instanceof CallActivity
+            || execution.getCurrentFlowElement() instanceof SubProcess) {
+            super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
+            return;
+        }
+        super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
+    }
+
+    // ========== 屏蔽解析器覆写 ==========
+
+    @Override
+    public void setCollectionExpression(Expression collectionExpression) {
+        // 保持自定义变量名，忽略解析器写入的 collection 表达式
+    }
+
+    @Override
+    public void setCollectionVariable(String collectionVariable) {
+        // 保持自定义变量名，忽略解析器写入的 collection 变量名
+    }
+
+    @Override
+    public void setCollectionElementVariable(String collectionElementVariable) {
+        // 保持自定义变量名，忽略解析器写入的单元素变量名
+    }
+
+}

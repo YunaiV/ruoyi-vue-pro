@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.enums.order;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderStatusEnum implements IntArrayValuable {
+public enum TradeOrderStatusEnum implements ArrayValuable<Integer> {
 
     UNPAID(0, "待支付"),
     UNDELIVERED(10, "待发货"),
@@ -23,7 +23,7 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
     COMPLETED(30, "已完成"),
     CANCELED(40, "已取消");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(TradeOrderStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态值
@@ -35,7 +35,7 @@ public enum TradeOrderStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

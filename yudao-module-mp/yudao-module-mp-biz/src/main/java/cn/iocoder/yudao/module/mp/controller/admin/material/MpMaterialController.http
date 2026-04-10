@@ -1,5 +1,0 @@
-### 请求 /mp/material/page 接口 => 成功
-GET {{baseUrl}}/mp/material/page?permanent=true&pageNo=1&pageSize=10
-Content-Type: application/json
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}

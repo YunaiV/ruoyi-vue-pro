@@ -1,4 +1,0 @@
-### 请求 /system/operate-log/page 接口 => 成功
-GET {{baseUrl}}/system/operate-log/page
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}

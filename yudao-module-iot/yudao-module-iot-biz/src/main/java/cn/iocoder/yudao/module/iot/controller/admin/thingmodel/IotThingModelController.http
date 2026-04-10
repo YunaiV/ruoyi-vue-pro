@@ -1,0 +1,180 @@
+### 请求 /iot/product-thing-model/create 接口 => 成功
+POST {{baseUrl}}/iot/product-thing-model/create
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "productId": 12,
+  "productKey": "CJVS54fObwZJ9Qe5CJVS54fObwZJ9Qe5",
+  "identifier": "Temperature",
+  "name": "温度",
+  "description": "当前温度值",
+  "type": 1,
+  "property": {
+    "identifier": "Temperature",
+    "name": "温度",
+    "accessMode": "r",
+    "required": true,
+    "dataType": "int",
+    "dataSpecs": {
+      "dataType": "int",
+      "max": "200",
+      "min": "0",
+      "step": "10",
+      "defaultValue": "30",
+      "unit": "%",
+      "unitName": "百分比"
+    }
+  }
+}
+
+### 请求 /iot/product-thing-model/create 接口 => 成功
+POST {{baseUrl}}/iot/product-thing-model/create
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "productId": 12,
+  "productKey": "CJVS54fObwZJ9Qe5CJVS54fObwZJ9Qe5",
+  "identifier": "switch",
+  "name": "开关",
+  "description": "温度计开关",
+  "type": 1,
+  "property": {
+    "identifier": "switch",
+    "name": "开关",
+    "accessMode": "rw",
+    "required": true,
+    "dataType": "bool",
+    "dataSpecsList": [
+      {
+        "dataType": "bool",
+        "name": "关",
+        "value": 0
+      },
+      {
+        "dataType": "bool",
+        "name": "开",
+        "value": 1
+      }
+    ]
+  }
+}
+
+### 请求 /iot/product-thing-model/create 接口 => 成功
+POST {{baseUrl}}/iot/product-thing-model/create
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "productId": 12,
+  "productKey": "CJVS54fObwZJ9Qe5CJVS54fObwZJ9Qe5",
+  "identifier": "argb",
+  "name": "温度计 argb 颜色",
+  "description": "温度计 argb 颜色",
+  "type": 1,
+  "property": {
+    "identifier": "argb",
+    "name": "温度计 argb 颜色",
+    "accessMode": "rw",
+    "required": true,
+    "dataType": "array",
+    "dataSpecs": {
+      "dataType": "array",
+      "size": 10,
+      "childDataType": "struct",
+      "dataSpecsList": [
+        {
+          "identifier": "switch",
+          "name": "开关",
+          "accessMode": "rw",
+          "required": true,
+          "dataType": "struct",
+          "childDataType": "bool",
+          "dataSpecsList": [
+            {
+              "dataType": "bool",
+              "name": "关",
+              "value": 0
+            },
+            {
+              "dataType": "bool",
+              "name": "开",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "identifier": "Temperature",
+          "name": "温度",
+          "accessMode": "r",
+          "required": true,
+          "dataType": "struct",
+          "childDataType": "int",
+          "dataSpecs": {
+            "dataType": "int",
+            "max": "200",
+            "min": "0",
+            "step": "10",
+            "defaultValue": "30",
+            "unit": "%",
+            "unitName": "百分比"
+          }
+        }
+      ]
+    }
+  }
+}
+
+### 请求 /iot/product-thing-model/update 接口 => 成功
+PUT {{baseUrl}}/iot/product-thing-model/update
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 33,
+  "productId": 12,
+  "productKey": "CJVS54fObwZJ9Qe5CJVS54fObwZJ9Qe5",
+  "identifier": "switch",
+  "name": "开关",
+  "description": "温度计开关",
+  "type": 1,
+  "property": {
+    "identifier": "switch",
+    "name": "开关",
+    "accessMode": "r",
+    "required": true,
+    "dataType": "bool",
+    "dataSpecsList": [
+      {
+        "dataType": "bool",
+        "name": "关",
+        "value": 0
+      },
+      {
+        "dataType": "bool",
+        "name": "开",
+        "value": 1
+      }
+    ]
+  }
+}
+
+### 请求 /iot/product-thing-model/delete 接口 => 成功
+DELETE {{baseUrl}}/iot/product-thing-model/delete?id=36
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+### 请求 /iot/product-thing-model/get 接口 => 成功
+GET {{baseUrl}}/iot/product-thing-model/get?id=67
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+### 请求 /iot/product-thing-model/get-tsl 接口 => 成功
+GET {{baseUrl}}/iot/product-thing-model/get-tsl?productId=1001
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}

@@ -1,0 +1,50 @@
+### 请求 /pay/demo-withdraw/create 接口（支付宝）
+POST {{baseUrl}}/pay/demo-withdraw/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "type": 1,
+  "subject": "测试转账",
+  "price": 10,
+  "userAccount": "oespxk7368@sandbox.com",
+  "userName": "oespxk7368"
+}
+
+### 请求 /pay/demo-withdraw/create 接口（微信余额）
+POST {{baseUrl}}/pay/demo-withdraw/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "type": 2,
+  "subject": "测试转账",
+  "price": 1,
+  "userAccount": "oiSC85elO_OZogXODC5RoGyXamK4",
+  "userName": "芋艿"
+}
+
+### 请求 /pay/demo-withdraw/create 接口（钱包余额）
+POST {{baseUrl}}/pay/demo-withdraw/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "type": 3,
+  "subject": "测试转账",
+  "price": 1,
+  "userAccount": "1"
+}
+
+### 请求 /pay/demo-withdraw/transfer 接口（发起转账）
+POST {{baseUrl}}/pay/demo-withdraw/transfer?id=1
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /pay/demo-withdraw/page 接口（查询分页）
+GET {{baseUrl}}/pay/demo-withdraw/page?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}

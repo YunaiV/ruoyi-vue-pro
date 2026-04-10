@@ -1,9 +1,0 @@
-### /promotion/bargain-record/create 创建砍价助力
-POST {{appApi}}/promotion/bargain-help/create
-Authorization: Bearer test248
-Content-Type: application/json
-tenant-id: {{appTenentId}}
-
-{
-  "recordId": 26
-}

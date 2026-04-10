@@ -7,13 +7,16 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -22,6 +25,42 @@ import java.util.Map;
  * @author 芋道源码
  */
 public class HttpUtils {
+
+    /**
+     * 编码 URL 参数
+     *
+     * @param value 参数
+     * @return 编码后的参数
+     */
+    public static String encodeUtf8(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 解码 URL 参数（query parameter）
+     * 注意：此方法会将 + 解码为空格，适用于 query parameter，不适用于 URL path
+     *
+     * @see #decodeUrlPath(String)
+     * @param value 参数
+     * @return 解码后的参数
+     */
+    public static String decodeUtf8(String value) {
+        return URLDecoder.decode(value, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 解码 URL 路径
+     * 与 {@link #decodeUtf8(String)} 不同，此方法不会将 + 解码为空格，保持 + 为字面字符
+     * 适用于 URL path 部分的解码
+     *
+     * @param path URL 路径
+     * @return 解码后的路径
+     */
+    public static String decodeUrlPath(String path) {
+        // 先将 + 替换为 %2B，避免被 URLDecoder 解码为空格
+        String encoded = path.replace("+", "%2B");
+        return URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+    }
 
     @SuppressWarnings("unchecked")
     public static String replaceUrlQuery(String url, String key, String value) {
@@ -35,8 +74,15 @@ public class HttpUtils {
         return builder.build();
     }
 
-    private String append(String base, Map<String, ?> query, boolean fragment) {
-        return append(base, query, null, fragment);
+    public static String removeUrlQuery(String url) {
+        if (!StrUtil.contains(url, '?')) {
+            return url;
+        }
+        UrlBuilder builder = UrlBuilder.of(url, Charset.defaultCharset());
+        // 移除 query、fragment
+        builder.setQuery(null);
+        builder.setFragment(null);
+        return builder.build();
     }
 
     /**

@@ -9,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,11 +59,19 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
     }
 
     public IdType getIdType(ConfigurableEnvironment environment) {
-        return environment.getProperty(ID_TYPE_KEY, IdType.class);
+        String value = environment.getProperty(ID_TYPE_KEY);
+        try {
+            return StrUtil.isNotBlank(value) ? IdType.valueOf(value) : IdType.NONE;
+        } catch (IllegalArgumentException ex) {
+            log.error("[getIdType][无法解析 id-type 配置值({})]", value, ex);
+            return IdType.NONE;
+        }
     }
 
     public void setIdType(ConfigurableEnvironment environment, IdType idType) {
-        environment.getSystemProperties().put(ID_TYPE_KEY, idType);
+        Map<String, Object> map = new HashMap<>();
+        map.put(ID_TYPE_KEY, idType);
+        environment.getPropertySources().addFirst(new MapPropertySource("mybatisPlusIdType", map));
         log.info("[setIdType][修改 MyBatis Plus 的 idType 为({})]", idType);
     }
 

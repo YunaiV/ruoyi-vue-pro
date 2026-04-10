@@ -74,30 +74,30 @@ public class DateUtils {
      * 创建指定时间
      *
      * @param year  年
-     * @param mouth 月
+     * @param month 月
      * @param day   日
      * @return 指定时间
      */
-    public static Date buildTime(int year, int mouth, int day) {
-        return buildTime(year, mouth, day, 0, 0, 0);
+    public static Date buildTime(int year, int month, int day) {
+        return buildTime(year, month, day, 0, 0, 0);
     }
 
     /**
      * 创建指定时间
      *
      * @param year   年
-     * @param mouth  月
+     * @param month  月
      * @param day    日
      * @param hour   小时
      * @param minute 分钟
      * @param second 秒
      * @return 指定时间
      */
-    public static Date buildTime(int year, int mouth, int day,
+    public static Date buildTime(int year, int month, int day,
                                  int hour, int minute, int second) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, mouth - 1);
+        calendar.set(Calendar.MONTH, month - 1);
         calendar.set(Calendar.DAY_OF_MONTH, day);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);

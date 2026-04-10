@@ -1,0 +1,211 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="${table.classComment}管理"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 搜索组件 -->
+    <SearchForm @search="handleQuery" @reset="handleReset" />
+
+    <!-- ${table.classComment}列表 -->
+    <view class="p-24rpx">
+      <view
+        v-for="item in list"
+        :key="item.${primaryColumn.javaField}"
+        class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
+        @click="handleDetail(item)"
+      >
+        <view class="p-24rpx">
+#set ($titleField = "")
+#set ($statusField = "")
+#set ($statusDictType = "")
+#foreach($column in $columns)
+  #if ($titleField == "" && !$column.primaryKey && $column.listOperationResult)
+    #set ($titleField = $column.javaField)
+    #set ($titleComment = $column.columnComment)
+  #end
+  #if ($statusField == "" && $column.listOperationResult && $column.dictType && "" != $column.dictType)
+    #set ($statusField = $column.javaField)
+    #set ($statusDictType = $column.dictType)
+  #end
+#end
+ #if ($titleField == "")
+   #set ($titleField = $primaryColumn.javaField)
+ #end
+          <view class="mb-16rpx flex items-center justify-between">
+            <view class="text-32rpx text-[#333] font-semibold">
+              {{ item.${titleField} }}
+            </view>
+#if($statusField != "")
+            <dict-tag :type="DICT_TYPE.${statusDictType.toUpperCase()}" :value="item.${statusField}" />
+#end
+          </view>
+#foreach($column in $columns)
+  #if ($column.listOperationResult && !$column.primaryKey && $column.javaField != $titleField && $column.javaField != $statusField)
+    #set ($javaField = $column.javaField)
+    #set ($comment = $column.columnComment)
+    #set ($dictType = $column.dictType)
+    #set ($javaType = $column.javaType)
+    #if ($dictType && "" != $dictType)
+          <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+            <text class="mr-8rpx text-[#999]">${comment}：</text>
+            <dict-tag :type="DICT_TYPE.${dictType.toUpperCase()}" :value="item.${javaField}" />
+          </view>
+    #elseif ($javaType == "LocalDateTime")
+          <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+            <text class="mr-8rpx text-[#999]">${comment}：</text>
+            <text class="line-clamp-1">{{ formatDateTime(item.${javaField}) || '-' }}</text>
+          </view>
+    #else
+          <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+            <text class="mr-8rpx text-[#999]">${comment}：</text>
+            <text class="line-clamp-1">{{ item.${javaField} }}</text>
+          </view>
+    #end
+  #end
+#end
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
+        <wd-status-tip image="content" tip="暂无${table.classComment}数据" />
+      </view>
+      <wd-loadmore
+        v-if="list.length > 0"
+        :state="loadMoreState"
+        @reload="loadMore"
+      />
+    </view>
+
+    <!-- 新增按钮 -->
+    <wd-fab
+      v-if="hasAccessByCodes(['${permissionPrefix}:create'])"
+      position="right-bottom"
+      type="primary"
+      :expandable="false"
+      @click="handleAdd"
+    />
+  </view>
+</template>
+
+<script lang="ts" setup>
+#set ($hasDict = 0)
+#foreach($column in $columns)
+  #if ($hasDict == 0 && $column.listOperationResult && $column.dictType && "" != $column.dictType)
+    #set ($hasDict = 1)
+  #end
+#end
+#set ($hasDateTime = 0)
+#foreach($column in $columns)
+  #if ($column.listOperationResult)
+    #if ($hasDateTime == 0 && $column.javaType == "LocalDateTime")
+      #set ($hasDateTime = 1)
+    #end
+  #end
+#end
+import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import type { LoadMoreState } from '@/http/types'
+import { onReachBottom } from '@dcloudio/uni-app'
+import { onMounted, ref } from 'vue'
+import { get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
+#end
+#if ($hasDateTime == 1)
+import { formatDateTime } from '@/utils/date'
+#end
+import SearchForm from './components/search-form.vue'
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const total = ref(0)
+const list = ref<${simpleClassName}[]>([])
+const loadMoreState = ref<LoadMoreState>('loading')
+const queryParams = ref({
+  pageNo: 1,
+  pageSize: 10,
+})
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus()
+}
+
+/** 查询${table.classComment}列表 */
+async function getList() {
+  loadMoreState.value = 'loading'
+  try {
+    const data = await get${simpleClassName}Page(queryParams.value)
+    list.value = [...list.value, ...data.list]
+    total.value = data.total
+    loadMoreState.value = list.value.length >= total.value ? 'finished' : 'loading'
+  } catch {
+    queryParams.value.pageNo = queryParams.value.pageNo > 1 ? queryParams.value.pageNo - 1 : 1
+    loadMoreState.value = 'error'
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery(data?: Record<string, any>) {
+  queryParams.value = {
+    ...data,
+    pageNo: 1,
+    pageSize: queryParams.value.pageSize,
+  }
+  list.value = []
+  getList()
+}
+
+/** 重置按钮操作 */
+function handleReset() {
+  handleQuery()
+}
+
+/** 加载更多 */
+function loadMore() {
+  if (loadMoreState.value === 'finished') {
+    return
+  }
+  queryParams.value.pageNo++
+  getList()
+}
+
+/** 新增${table.classComment} */
+function handleAdd() {
+  uni.navigateTo({
+    url: '/pages-${table.moduleName}/${table.businessName}/form/index',
+  })
+}
+
+/** 查看详情 */
+function handleDetail(item: ${simpleClassName}) {
+  uni.navigateTo({
+    url: `/pages-${table.moduleName}/${table.businessName}/detail/index?id=#[[${]]#item.${primaryColumn.javaField}#[[}]]#`,
+  })
+}
+
+/** 触底加载更多 */
+onReachBottom(() => {
+  loadMore()
+})
+
+/** 初始化 */
+onMounted(() => {
+  getList()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

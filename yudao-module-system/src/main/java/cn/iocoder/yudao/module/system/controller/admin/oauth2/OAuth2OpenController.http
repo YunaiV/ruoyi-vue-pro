@@ -1,0 +1,62 @@
+### 请求 /system/oauth2/authorize 接口 => 成功
+GET {{baseUrl}}/system/oauth2/authorize?clientId=default
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /system/oauth2/authorize + token 接口 => 成功
+POST {{baseUrl}}/system/oauth2/authorize
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+response_type=token&client_id=default&scope={"user.read": true}&redirect_uri=https://www.iocoder.cn&auto_approve=true
+
+### 请求 /system/oauth2/authorize + code 接口 => 成功
+POST {{baseUrl}}/system/oauth2/authorize
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+response_type=code&client_id=default&scope={"user.read": true}&redirect_uri=https://www.iocoder.cn&auto_approve=false
+
+### 请求 /system/oauth2/token + code 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}
+
+grant_type=authorization_code&redirect_uri=https://www.iocoder.cn&code=189956c07a174588a97157eabef2f93a
+
+### 请求 /system/oauth2/token + password 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}
+
+grant_type=password&username=admin&password=admin123&scope=user.read
+
+### 请求 /system/oauth2/token + client_credentials 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}
+
+grant_type=client_credentials&scope=user.read
+
+### 请求 /system/oauth2/token + refresh_token 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}
+
+grant_type=refresh_token&refresh_token=00895465d6994f72a9d926ceeed0f588
+
+### 请求 /system/oauth2/token + DELETE 接口 => 成功
+DELETE {{baseUrl}}/system/oauth2/token?token=ca8a188f464441d6949c51493a2b7596
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}
+
+### 请求 /system/oauth2/check-token 接口 => 成功
+POST {{baseUrl}}/system/oauth2/check-token?token=620d307c5b4148df8a98dd6c6c547106
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenantId}}

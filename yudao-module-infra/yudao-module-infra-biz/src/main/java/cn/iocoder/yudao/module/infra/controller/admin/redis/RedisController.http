@@ -1,4 +1,0 @@
-### 请求 /infra/redis/get-monitor-info 接口 => 成功
-GET {{baseUrl}}/infra/redis/get-monitor-info
-Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}

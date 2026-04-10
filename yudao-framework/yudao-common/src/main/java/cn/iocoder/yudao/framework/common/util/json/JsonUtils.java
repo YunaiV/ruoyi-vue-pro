@@ -3,18 +3,23 @@ package cn.iocoder.yudao.framework.common.util.json;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeDeserializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +31,18 @@ import java.util.List;
 @Slf4j
 public class JsonUtils {
 
+    @Getter
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     static {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
-        objectMapper.registerModules(new JavaTimeModule()); // 解决 LocalDateTime 的序列化
+        // 解决 LocalDateTime 的序列化
+        SimpleModule simpleModule = new JavaTimeModule()
+                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
+                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
+        objectMapper.registerModules(simpleModule);
     }
 
     /**
@@ -89,6 +99,18 @@ public class JsonUtils {
 
     public static <T> T parseObject(String text, Type type) {
         if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseObject(byte[] text, Type type) {
+        if (ArrayUtil.isEmpty(text)) {
             return null;
         }
         try {
@@ -197,6 +219,63 @@ public class JsonUtils {
 
     public static boolean isJson(String text) {
         return JSONUtil.isTypeJSON(text);
+    }
+
+    /**
+     * 判断字符串是否为 JSON 类型的字符串
+     * @param str 字符串
+     */
+    public static boolean isJsonObject(String str) {
+        return JSONUtil.isTypeJSONObject(str);
+    }
+
+    /**
+     * 将 Object 转换为目标类型
+     * <p>
+     * 避免先转 jsonString 再 parseObject 的性能损耗
+     *
+     * @param obj   源对象（可以是 Map、POJO 等）
+     * @param clazz 目标类型
+     * @return 转换后的对象
+     */
+    public static <T> T convertObject(Object obj, Class<T> clazz) {
+        if (obj == null) {
+            return null;
+        }
+        if (clazz.isInstance(obj)) {
+            return clazz.cast(obj);
+        }
+        return objectMapper.convertValue(obj, clazz);
+    }
+
+    /**
+     * 将 Object 转换为目标类型（支持泛型）
+     *
+     * @param obj           源对象
+     * @param typeReference 目标类型引用
+     * @return 转换后的对象
+     */
+    public static <T> T convertObject(Object obj, TypeReference<T> typeReference) {
+        if (obj == null) {
+            return null;
+        }
+        return objectMapper.convertValue(obj, typeReference);
+    }
+
+    /**
+     * 将 Object 转换为 List 类型
+     * <p>
+     * 避免先转 jsonString 再 parseArray 的性能损耗
+     *
+     * @param obj   源对象（可以是 List、数组等）
+     * @param clazz 目标元素类型
+     * @return 转换后的 List
+     */
+    public static <T> List<T> convertList(Object obj, Class<T> clazz) {
+        if (obj == null) {
+            return new ArrayList<>();
+        }
+        return objectMapper.convertValue(obj, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 
 }

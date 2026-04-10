@@ -1,0 +1,93 @@
+#set ($subTable = $subTables.get($subIndex))##当前表
+#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+<script lang="ts" setup>
+  import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
+
+  import { computed, ref } from 'vue';
+
+  import { useVbenModal } from '@vben/common-ui';
+
+  import { ElMessage } from 'element-plus';
+
+  import { useVbenForm } from '#/adapter/form';
+  import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+  import { $t } from '#/locales';
+
+  import { use${subSimpleClassName}FormSchema } from '../data';
+
+  const emit = defineEmits(['success']);
+  const formData = ref<${apiName}.${subSimpleClassName}>();
+  const getTitle = computed(() => {
+    return formData.value?.id
+        ? $t('ui.actionTitle.edit', ['${subTable.classComment}'])
+        : $t('ui.actionTitle.create', ['${subTable.classComment}']);
+  });
+
+  const [Form, formApi] = useVbenForm({
+    commonConfig: {
+      componentProps: {
+        class: 'w-full',
+      },
+      formItemClass: 'col-span-2',
+      labelWidth: 80,
+    },
+    layout: 'horizontal',
+    schema: use${subSimpleClassName}FormSchema(),
+    showDefaultActions: false
+  });
+
+  const [Modal, modalApi] = useVbenModal({
+    async onConfirm() {
+      const { valid } = await formApi.validate();
+      if (!valid) {
+        return;
+      }
+
+      modalApi.lock();
+      // 提交表单
+      const data = (await formApi.getValues()) as ${apiName}.${subSimpleClassName};
+      data.${subJoinColumn.javaField} = formData.value?.${subJoinColumn.javaField};
+      try {
+        await (formData.value?.id ? update${subSimpleClassName}(data) : create${subSimpleClassName}(data));
+        // 关闭并提示
+        await modalApi.close();
+        emit('success');
+        ElMessage.success($t('ui.actionMessage.operationSuccess'));
+      } finally {
+        modalApi.unlock();
+      }
+    },
+    async onOpenChange(isOpen: boolean) {
+      if (!isOpen) {
+        formData.value = undefined;
+        return;
+      }
+
+      // 加载数据
+      let data = modalApi.getData<${apiName}.${subSimpleClassName}>();
+      if (!data) {
+        return;
+      }
+      if (data.id) {
+        modalApi.lock();
+        try {
+          data = await get${subSimpleClassName}(data.id);
+        } finally {
+          modalApi.unlock();
+        }
+      }
+      // 设置到 values
+      formData.value = data;
+      await formApi.setValues(formData.value);
+    },
+  });
+</script>
+
+<template>
+  <Modal :title="getTitle">
+    <Form class="mx-4" />
+  </Modal>
+</template>

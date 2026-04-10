@@ -1,0 +1,610 @@
+#set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+import type { VbenFormSchema } from '#/adapter/form';
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
+
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+#if(${table.templateType} == 2)## 树表需要导入这些
+import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
+import { handleTree } from '@vben/utils';
+#end
+
+import { getRangePickerDefaultProps } from '#/utils';
+
+/** 新增/修改的表单 */
+export function useFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'id',
+      component: 'Input',
+      dependencies: {
+        triggerFields: [''],
+        show: () => false,
+      },
+    },
+#if(${table.templateType} == 2)## 树表特有字段：上级
+    {
+      fieldName: '${treeParentColumn.javaField}',
+      label: '上级${table.classComment}',
+      component: 'ApiTreeSelect',
+      componentProps: {
+        clearable: true,
+        api: async () => {
+          const data = await get${simpleClassName}List({});
+          data.unshift({
+            id: 0,
+            ${treeNameColumn.javaField}: '顶级${table.classComment}',
+          });
+          return handleTree(data);
+        },
+        labelField: '${treeNameColumn.javaField}',
+        valueField: 'id',
+        childrenField: 'children',
+        placeholder: '请选择上级${table.classComment}',
+        treeDefaultExpandAll: true,
+      },
+      rules: 'selectRequired',
+    },
+#end
+#foreach($column in $columns)
+#if ($column.createOperation || $column.updateOperation)
+#if (!$column.primaryKey && ($table.templateType != 2 || ($table.templateType == 2 && $column.id != $treeParentColumn.id)))## 树表中已经添加了父ID字段，这里排除
+  #set ($dictType = $column.dictType)
+  #set ($javaType = $column.javaType)
+  #set ($javaField = $column.javaField)
+  #set ($comment = $column.columnComment)
+  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #set ($dictMethod = "number")
+  #elseif ($javaType == "String")
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Boolean")
+    #set ($dictMethod = "boolean")
+  #end
+    {
+      fieldName: '${javaField}',
+      label: '${comment}',
+  #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+      rules: 'required',
+  #end
+  #if ($column.htmlType == "input")
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入${comment}',
+      },
+  #elseif($column.htmlType == "imageUpload")## 图片上传
+      component: 'ImageUpload',
+  #elseif($column.htmlType == "fileUpload")## 文件上传
+      component: 'FileUpload',
+  #elseif($column.htmlType == "editor")## 文本编辑器
+      component: 'RichTextarea',
+  #elseif($column.htmlType == "select")## 下拉框
+      component: 'Select',
+      componentProps: {
+        #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else##没数据字典
+        options: [],
+        #end
+        placeholder: '请选择${comment}',
+      },
+  #elseif($column.htmlType == "checkbox")## 多选框
+      component: 'Checkbox',
+      componentProps: {
+        #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else##没数据字典
+        options: [],
+        #end
+      },
+  #elseif($column.htmlType == "radio")## 单选框
+      component: 'RadioGroup',
+      componentProps: {
+        #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else##没数据字典
+        options: [],
+        #end
+        buttonStyle: 'solid',
+        optionType: 'button',
+      },
+  #elseif($column.htmlType == "datetime")## 时间框
+      component: 'DatePicker',
+      componentProps: {
+        showTime: true,
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'x',
+        class: '!w-full',
+      },
+  #elseif($column.htmlType == "textarea")## 文本域
+      component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入${comment}',
+      },
+  #elseif($column.htmlType == "inputNumber")## 数字输入框
+      component: 'InputNumber',
+      componentProps: {
+        min: 0,
+        placeholder: '请输入${comment}',
+        controlsPosition: 'right',
+        class: '!w-full',
+      },
+  #end
+    },
+#end
+#end
+#end
+  ];
+}
+
+/** 列表的搜索表单 */
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+#foreach($column in $columns)
+#if ($column.listOperation)
+  #set ($dictType = $column.dictType)
+  #set ($javaType = $column.javaType)
+  #set ($javaField = $column.javaField)
+  #set ($comment = $column.columnComment)
+  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #set ($dictMethod = "number")
+  #elseif ($javaType == "String")
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Boolean")
+    #set ($dictMethod = "boolean")
+  #end
+    {
+      fieldName: '${javaField}',
+      label: '${comment}',
+  #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
+      component: 'Input',
+      componentProps: {
+        clearable: true,
+        placeholder: '请输入${comment}',
+      },
+  #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+      component: 'Select',
+      componentProps: {
+        clearable: true,
+        #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else## 未设置 dictType 数据字典的情况
+        options: [],
+        #end
+        placeholder: '请选择${comment}',
+      },
+  #elseif($column.htmlType == "datetime")
+      component: 'RangePicker',
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        clearable: true,
+      },
+  #end
+    },
+#end
+#end
+  ];
+}
+
+/** 列表的字段 */
+export function useGridColumns(): VxeTableGridOptions<${apiName}.${simpleClassName}>['columns'] {
+  return [
+#if ($table.templateType != 2 && $deleteBatchEnable)
+  { type: 'checkbox', width: 40 },
+#end
+#if ($table.templateType == 12) ## 内嵌情况
+      { type: 'expand', width: 80, slots: { content: 'expand_content' } },
+#end
+#foreach($column in $columns)
+#if ($column.listOperationResult)
+  #set ($dictType = $column.dictType)
+  #set ($javaField = $column.javaField)
+  #set ($comment = $column.columnComment)
+    {
+      field: '${javaField}',
+      title: '${comment}',
+      minWidth: 120,
+  #if ($column.javaType == "LocalDateTime")## 时间类型
+      formatter: 'formatDateTime',
+  #elseif("" != $dictType)## 数据字典
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+  #end
+  #if (${table.templateType} == 2 && $column.id == $treeNameColumn.id)## 树表特有:标记树节点列
+      treeNode: true,
+  #end
+    },
+#end
+#end
+    {
+      title: '操作',
+      width: 200,
+      fixed: 'right',
+      slots: { default: 'actions' },
+    },
+  ];
+}
+
+## 标准模式和内嵌模式时，主子关系一对一则生成表单schema,一对多则生成列表schema（内嵌模式时表单schema也要生成）。erp 模式时都生成
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+    #set ($index = $foreach.count - 1)
+    #set ($subColumns = $subColumnsList.get($index))##当前字段数组
+    #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+    #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+    #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+// ==================== 子表（$subTable.classComment） ====================
+
+#if ($table.templateType == 11) ## erp 情况
+/** 新增/修改的表单 */
+export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
+    return [
+        {
+            fieldName: 'id',
+            component: 'Input',
+            dependencies: {
+                triggerFields: [''],
+                show: () => false,
+            },
+        },
+        #foreach($column in $subColumns)
+            #if ($column.createOperation || $column.updateOperation)
+                #if (!$column.primaryKey && ($table.templateType != 2 || ($table.templateType == 2 && $column.id != $treeParentColumn.id)))## 树表中已经添加了父ID字段，这里排除
+                    #set ($dictType = $column.dictType)
+                    #set ($javaType = $column.javaType)
+                    #set ($javaField = $column.javaField)
+                    #set ($comment = $column.columnComment)
+                    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                        #set ($dictMethod = "number")
+                    #elseif ($javaType == "String")
+                        #set ($dictMethod = "string")
+                    #elseif ($javaType == "Boolean")
+                        #set ($dictMethod = "boolean")
+                    #end
+                    #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+                    #else
+                        {
+                            fieldName: '${javaField}',
+                            label: '${comment}',
+                            #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+                                rules: 'required',
+                            #end
+                            #if ($column.htmlType == "input")
+                                component: 'Input',
+                                componentProps: {
+                                    placeholder: '请输入${comment}',
+                                },
+                            #elseif($column.htmlType == "imageUpload")## 图片上传
+                                component: 'ImageUpload',
+                            #elseif($column.htmlType == "fileUpload")## 文件上传
+                                component: 'FileUpload',
+                            #elseif($column.htmlType == "editor")## 文本编辑器
+                                component: 'RichTextarea',
+                            #elseif($column.htmlType == "select")## 下拉框
+                                component: 'Select',
+                                componentProps: {
+                                    #if ("" != $dictType)## 有数据字典
+                                        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                    #else##没数据字典
+                                        options: [],
+                                    #end
+                                    placeholder: '请选择${comment}',
+                                },
+                            #elseif($column.htmlType == "checkbox")## 多选框
+                                component: 'Checkbox',
+                                componentProps: {
+                                    #if ("" != $dictType)## 有数据字典
+                                        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                    #else##没数据字典
+                                        options: [],
+                                    #end
+                                },
+                            #elseif($column.htmlType == "radio")## 单选框
+                                component: 'RadioGroup',
+                                componentProps: {
+                                    #if ("" != $dictType)## 有数据字典
+                                        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                    #else##没数据字典
+                                        options: [],
+                                    #end
+                                    buttonStyle: 'solid',
+                                    optionType: 'button',
+                                },
+                            #elseif($column.htmlType == "datetime")## 时间框
+                                component: 'DatePicker',
+                                componentProps: {
+                                    showTime: true,
+                                    format: 'YYYY-MM-DD HH:mm:ss',
+                                    valueFormat: 'x',
+                                    class: '!w-full',
+                                },
+                            #elseif($column.htmlType == "textarea")## 文本域
+                                component: 'Textarea',
+                                componentProps: {
+                                    placeholder: '请输入${comment}',
+                                },
+                            #elseif($column.htmlType == "inputNumber")## 数字输入框
+                                component: 'InputNumber',
+                                componentProps: {
+                                    min: 0,
+                                    placeholder: '请输入${comment}',
+                                    controlsPosition: 'right',
+                                    class: '!w-full',
+                                },
+                            #end
+                        },
+                    #end
+                #end
+            #end
+        #end
+    ];
+}
+
+/** 列表的搜索表单 */
+export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
+    return [
+        #foreach($column in $subColumns)
+            #if ($column.listOperation)
+                #set ($dictType = $column.dictType)
+                #set ($javaType = $column.javaType)
+                #set ($javaField = $column.javaField)
+                #set ($comment = $column.columnComment)
+                #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                    #set ($dictMethod = "number")
+                #elseif ($javaType == "String")
+                    #set ($dictMethod = "string")
+                #elseif ($javaType == "Boolean")
+                    #set ($dictMethod = "boolean")
+                #end
+                {
+                    fieldName: '${javaField}',
+                    label: '${comment}',
+                    #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
+                        component: 'Input',
+                        componentProps: {
+                            clearable: true,
+                            placeholder: '请输入${comment}',
+                        },
+                    #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+                        component: 'Select',
+                        componentProps: {
+                            clearable: true,
+                            #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+                                options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                            #else## 未设置 dictType 数据字典的情况
+                                options: [],
+                            #end
+                            placeholder: '请选择${comment}',
+                        },
+                    #elseif($column.htmlType == "datetime")
+                        component: 'RangePicker',
+                        componentProps: {
+                            ...getRangePickerDefaultProps(),
+                            clearable: true,
+                        },
+                    #end
+                },
+            #end
+        #end
+    ];
+}
+
+/** 列表的字段 */
+export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${apiName}.${subSimpleClassName}>['columns'] {
+    return [
+        #if ($table.templateType != 2 && $deleteBatchEnable)
+            { type: 'checkbox', width: 40 },
+        #end
+        #foreach($column in $subColumns)
+            #if ($column.listOperationResult)
+                #set ($dictType = $column.dictType)
+                #set ($javaField = $column.javaField)
+                #set ($comment = $column.columnComment)
+                {
+                    field: '${javaField}',
+                    title: '${comment}',
+                    minWidth: 120,
+                    #if ($column.javaType == "LocalDateTime")## 时间类型
+                        formatter: 'formatDateTime',
+                    #elseif("" != $dictType)## 数据字典
+                        cellRender: {
+                            name: 'CellDict',
+                            props: { type: DICT_TYPE.$dictType.toUpperCase() },
+                        },
+                    #end
+                },
+            #end
+        #end
+        {
+            title: '操作',
+            width: 200,
+            fixed: 'right',
+            slots: { default: 'actions' },
+        },
+    ];
+}
+
+#else
+    #if ($subTable.subJoinMany) ## 一对多
+    /** 新增/修改列表的字段 */
+    export function use${subSimpleClassName}GridEditColumns(): VxeTableGridOptions<${apiName}.${subSimpleClassName}>['columns'] {
+        return [
+            #foreach($column in $subColumns)
+                #if ($column.createOperation || $column.updateOperation)
+                    #if (!$column.primaryKey && $column.listOperationResult && $column.id != $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+                        #set ($dictType = $column.dictType)
+                        #set ($javaField = $column.javaField)
+                        #set ($comment = $column.columnComment)
+                        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                            #set ($dictMethod = "number")
+                        #elseif ($javaType == "String")
+                            #set ($dictMethod = "string")
+                        #elseif ($javaType == "Boolean")
+                            #set ($dictMethod = "boolean")
+                        #end
+                        {
+                            field: '${javaField}',
+                            title: '${comment}',
+                            minWidth: 120,
+                            slots: { default: '${javaField}' },
+                            #if ($column.htmlType == "select" || $column.htmlType == "checkbox" || $column.htmlType == "radio")
+                                #if ("" != $dictType)## 有数据字典
+                                    params: {
+                                        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                    },
+                                #else
+                                    params: {
+                                        options: [],
+                                    },
+                                #end
+                            #end
+                        },
+                    #end
+                #end
+            #end
+            {
+                title: '操作',
+                width: 200,
+                fixed: 'right',
+                slots: { default: 'actions' },
+            },
+        ];
+    }
+
+    #else
+    /** 新增/修改的表单 */
+    export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
+        return [
+            {
+                fieldName: 'id',
+                component: 'Input',
+                dependencies: {
+                    triggerFields: [''],
+                    show: () => false,
+                },
+            },
+            #foreach($column in $subColumns)
+                #if ($column.createOperation || $column.updateOperation)
+                    #if (!$column.primaryKey && ($table.templateType != 2 || ($table.templateType == 2 && $column.id != $treeParentColumn.id)))## 树表中已经添加了父ID字段，这里排除
+                        #set ($dictType = $column.dictType)
+                        #set ($javaType = $column.javaType)
+                        #set ($javaField = $column.javaField)
+                        #set ($comment = $column.columnComment)
+                        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                            #set ($dictMethod = "number")
+                        #elseif ($javaType == "String")
+                            #set ($dictMethod = "string")
+                        #elseif ($javaType == "Boolean")
+                            #set ($dictMethod = "boolean")
+                        #end
+                        #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+                        #else
+                            {
+                                fieldName: '${javaField}',
+                                label: '${comment}',
+                                #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+                                    rules: 'required',
+                                #end
+                                #if ($column.htmlType == "input")
+                                    component: 'Input',
+                                    componentProps: {
+                                        placeholder: '请输入${comment}',
+                                    },
+                                #elseif($column.htmlType == "imageUpload")## 图片上传
+                                    component: 'ImageUpload',
+                                #elseif($column.htmlType == "fileUpload")## 文件上传
+                                    component: 'FileUpload',
+                                #elseif($column.htmlType == "editor")## 文本编辑器
+                                    component: 'RichTextarea',
+                                #elseif($column.htmlType == "select")## 下拉框
+                                    component: 'Select',
+                                    componentProps: {
+                                        #if ("" != $dictType)## 有数据字典
+                                            options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                        #else##没数据字典
+                                            options: [],
+                                        #end
+                                        placeholder: '请选择${comment}',
+                                    },
+                                #elseif($column.htmlType == "checkbox")## 多选框
+                                    component: 'Checkbox',
+                                    componentProps: {
+                                        #if ("" != $dictType)## 有数据字典
+                                            options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                        #else##没数据字典
+                                            options: [],
+                                        #end
+                                    },
+                                #elseif($column.htmlType == "radio")## 单选框
+                                    component: 'RadioGroup',
+                                    componentProps: {
+                                        #if ("" != $dictType)## 有数据字典
+                                            options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                        #else##没数据字典
+                                            options: [],
+                                        #end
+                                        buttonStyle: 'solid',
+                                        optionType: 'button',
+                                    },
+                                #elseif($column.htmlType == "datetime")## 时间框
+                                    component: 'DatePicker',
+                                    componentProps: {
+                                        showTime: true,
+                                        format: 'YYYY-MM-DD HH:mm:ss',
+                                        valueFormat: 'x',
+                                        class: '!w-full',
+                                    },
+                                #elseif($column.htmlType == "textarea")## 文本域
+                                    component: 'Textarea',
+                                    componentProps: {
+                                        placeholder: '请输入${comment}',
+                                    },
+                                #elseif($column.htmlType == "inputNumber")## 数字输入框
+                                    component: 'InputNumber',
+                                    componentProps: {
+                                        min: 0,
+                                        placeholder: '请输入${comment}',
+                                        controlsPosition: 'right',
+                                        class: '!w-full',
+                                    },
+                                #end
+                            },
+                        #end
+                    #end
+                #end
+            #end
+        ];
+    }
+
+    #end
+    #if ($table.templateType == 12) ## 内嵌情况
+    /** 列表的字段 */
+    export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
+        return [
+            #foreach($column in $subColumns)
+                #if ($column.listOperationResult)
+                    #set ($dictType = $column.dictType)
+                    #set ($javaField = $column.javaField)
+                    #set ($comment = $column.columnComment)
+                    {
+                        field: '${javaField}',
+                        title: '${comment}',
+                        minWidth: 120,
+                        #if ($column.javaType == "LocalDateTime")## 时间类型
+                            formatter: 'formatDateTime',
+                        #elseif("" != $dictType)## 数据字典
+                            cellRender: {
+                                name: 'CellDict',
+                                props: { type: DICT_TYPE.$dictType.toUpperCase() },
+                            },
+                        #end
+                    },
+                #end
+            #end
+        ];
+    }
+    #end
+#end
+#end

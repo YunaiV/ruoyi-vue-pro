@@ -84,7 +84,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
      */
     private Field getField(JsonGenerator generator) {
         String currentName = generator.getOutputContext().getCurrentName();
-        Object currentValue = generator.getCurrentValue();
+        Object currentValue = generator.currentValue();
         Class<?> currentValueClass = currentValue.getClass();
         return ReflectUtil.getField(currentValueClass, currentName);
     }

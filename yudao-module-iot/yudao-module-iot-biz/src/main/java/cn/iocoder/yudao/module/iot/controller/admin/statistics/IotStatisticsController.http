@@ -1,0 +1,11 @@
+### 请求 /iot/statistics/get-device-message-summary-by-date 接口（小时）
+GET {{baseUrl}}/iot/statistics/get-device-message-summary-by-date?interval=0&times[0]=2025-06-13 00:00:00&times[1]=2025-06-14 23:59:59
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+### 请求 /iot/statistics/get-device-message-summary-by-date 接口（天）
+GET {{baseUrl}}/iot/statistics/get-device-message-summary-by-date?interval=1&times[0]=2025-06-13 00:00:00&times[1]=2025-06-14 23:59:59
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}

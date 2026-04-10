@@ -60,4 +60,13 @@ public class ObjectUtils {
         return Arrays.asList(array).contains(obj);
     }
 
+    @SafeVarargs
+    public static <T> boolean notEqualsAny(T obj, T... array) {
+        return !Arrays.asList(array).contains(obj);
+    }
+
+    public static boolean isNotAllEmpty(Object... objs) {
+        return !ObjectUtil.isAllEmpty(objs);
+    }
+
 }

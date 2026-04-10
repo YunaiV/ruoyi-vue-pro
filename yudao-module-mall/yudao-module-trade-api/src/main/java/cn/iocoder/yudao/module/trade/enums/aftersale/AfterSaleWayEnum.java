@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.aftersale;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,12 +13,12 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum AfterSaleWayEnum implements IntArrayValuable {
+public enum AfterSaleWayEnum implements ArrayValuable<Integer> {
 
     REFUND(10, "仅退款"),
     RETURN_AND_REFUND(20, "退货退款");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(AfterSaleWayEnum::getWay).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(AfterSaleWayEnum::getWay).toArray(Integer[]::new);
 
     /**
      * 方式
@@ -30,7 +30,7 @@ public enum AfterSaleWayEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

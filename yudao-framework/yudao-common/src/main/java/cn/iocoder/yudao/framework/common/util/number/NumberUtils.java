@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.number;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 数字的工具类，补全 {@link cn.hutool.core.util.NumberUtil} 的功能
@@ -18,6 +20,18 @@ public class NumberUtils {
 
     public static Integer parseInt(String str) {
         return StrUtil.isNotEmpty(str) ? Integer.valueOf(str) : null;
+    }
+
+    public static boolean isAllNumber(List<String> values) {
+        if (CollUtil.isEmpty(values)) {
+            return false;
+        }
+        for (String value : values) {
+            if (!NumberUtil.isNumber(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

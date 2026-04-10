@@ -1,0 +1,66 @@
+### 发送消息（段式）
+POST {{baseUrl}}/ai/chat/message/send
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581724",
+  "content": "你是 OpenAI 么？"
+}
+
+### 发送消息（流式）
+POST {{baseUrl}}/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581724",
+  "content": "1+1=?"
+}
+
+### 发送消息（流式）【带文件】
+POST {{baseUrl}}/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581797",
+  "content": "图片里有什么？",
+  "attachmentUrls": ["http://test.yudao.iocoder.cn/1755531278.jpeg"]
+}
+
+### 发送消息（流式）【追问带文件】
+POST {{baseUrl}}/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581799",
+  "content": "说下图片里，有哪些字？",
+  "useContext": true
+}
+
+### 发送消息（流式）【联网搜索】
+POST {{baseUrl}}/ai/chat/message/send-stream
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "conversationId": "1781604279872581799",
+  "content": "今天是周几？",
+  "useSearch": true
+}
+
+### 获得指定对话的消息列表
+GET {{baseUrl}}/ai/chat/message/list-by-conversation-id?conversationId=1781604279872581799
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 删除消息
+DELETE {{baseUrl}}/ai/chat/message/delete?id=50
+Authorization: {{token}}

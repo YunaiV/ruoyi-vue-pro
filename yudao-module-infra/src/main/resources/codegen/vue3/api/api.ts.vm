@@ -1,0 +1,166 @@
+import request from '@/config/axios'
+import type { Dayjs } from 'dayjs';
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
+
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+  #set ($subColumns = $subColumnsList.get($index))##当前字段数组
+/** ${subTable.classComment}信息 */
+export interface ${subSimpleClassName} {
+  #foreach ($column in $subColumns)
+    #if ($column.createOperation || $column.updateOperation)
+      #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
+      #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
+      #else
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
+      #end
+    #end
+  #end
+}
+
+#end
+/** ${table.classComment}信息 */
+export interface ${simpleClassName} {
+  #foreach ($column in $columns)
+    #if ($column.createOperation || $column.updateOperation)
+      #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
+      #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
+      #else
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
+      #end
+    #end
+  #end
+  #if ( $table.templateType == 2 )
+    children?: ${simpleClassName}[];
+  #end
+  ## 特殊：主子表专属逻辑
+  #if ( $table.templateType == 10 || $table.templateType == 12 )
+    #foreach ($subTable in $subTables)
+      #set ($index = $foreach.count - 1)
+      #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+      #if ( $subTable.subJoinMany )
+          ${subSimpleClassName.toLowerCase()}s?: ${subSimpleClassName}[]
+      #else
+          ${subSimpleClassName.toLowerCase()}?: ${subSimpleClassName}
+      #end
+    #end
+  #end
+}
+
+// ${table.classComment} API
+export const ${simpleClassName}Api = {
+#if ( $table.templateType != 2 )
+  // 查询${table.classComment}分页
+  get${simpleClassName}Page: async (params: any) => {
+    return await request.get({ url: `${baseURL}/page`, params })
+  },
+#else
+  // 查询${table.classComment}列表
+  get${simpleClassName}List: async (params) => {
+    return await request.get({ url: `${baseURL}/list`, params })
+  },
+#end
+
+  // 查询${table.classComment}详情
+  get${simpleClassName}: async (id: number) => {
+    return await request.get({ url: `${baseURL}/get?id=` + id })
+  },
+
+  // 新增${table.classComment}
+  create${simpleClassName}: async (data: ${simpleClassName}) => {
+    return await request.post({ url: `${baseURL}/create`, data })
+  },
+
+  // 修改${table.classComment}
+  update${simpleClassName}: async (data: ${simpleClassName}) => {
+    return await request.put({ url: `${baseURL}/update`, data })
+  },
+
+  // 删除${table.classComment}
+  delete${simpleClassName}: async (id: number) => {
+    return await request.delete({ url: `${baseURL}/delete?id=` + id })
+  },
+
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+  /** 批量删除${table.classComment} */
+  delete${simpleClassName}List: async (ids: number[]) => {
+    return await request.delete({ url: `${baseURL}/delete-list?ids=${ids.join(',')}` })
+  },
+#end
+
+  // 导出${table.classComment} Excel
+  export${simpleClassName}: async (params) => {
+    return await request.download({ url: `${baseURL}/export-excel`, params })
+  },
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))##当前 primary 字段
+#set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+#set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+
+// ==================== 子表（$subTable.classComment） ====================
+## 情况一：MASTER_ERP 时，需要分查询页子表
+#if ( $table.templateType == 11 )
+
+  // 获得${subTable.classComment}分页
+  get${subSimpleClassName}Page: async (params) => {
+    return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/page`, params })
+  },
+## 情况二：非 MASTER_ERP 时，需要列表查询子表
+#else
+  #if ( $subTable.subJoinMany )
+
+  // 获得${subTable.classComment}列表
+  get${subSimpleClassName}ListBy${SubJoinColumnName}: async (${subJoinColumn.javaField}) => {
+    return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField} })
+  },
+  #else
+
+  // 获得${subTable.classComment}
+  get${subSimpleClassName}By${SubJoinColumnName}: async (${subJoinColumn.javaField}) => {
+    return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=` + ${subJoinColumn.javaField} })
+  },
+  #end
+#end
+## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
+#if ( $table.templateType == 11 )
+  // 新增${subTable.classComment}
+  create${subSimpleClassName}: async (data: ${subSimpleClassName}) => {
+    return await request.post({ url: `${baseURL}/${subSimpleClassName_strikeCase}/create`, data })
+  },
+
+  // 修改${subTable.classComment}
+  update${subSimpleClassName}: async (data: ${subSimpleClassName}) => {
+    return await request.put({ url: `${baseURL}/${subSimpleClassName_strikeCase}/update`, data })
+  },
+
+  // 删除${subTable.classComment}
+  delete${subSimpleClassName}: async (id: number) => {
+    return await request.delete({ url: `${baseURL}/${subSimpleClassName_strikeCase}/delete?id=` + id })
+  },
+
+  #if ($deleteBatchEnable)
+  /** 批量删除${subTable.classComment} */
+  delete${subSimpleClassName}List: async (ids: number[]) => {
+    return await request.delete({ url: `${baseURL}/${subSimpleClassName_strikeCase}/delete-list?ids=${ids.join(',')}` })
+  },
+  #end
+
+  // 获得${subTable.classComment}
+  get${subSimpleClassName}: async (id: number) => {
+    return await request.get({ url: `${baseURL}/${subSimpleClassName_strikeCase}/get?id=` + id })
+  },
+#end
+#end
+}

@@ -1,0 +1,53 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
+## 处理 BigDecimal 字段的引入
+#foreach ($column in $columns)
+#if (${column.javaType} == "BigDecimal")
+import java.math.BigDecimal;
+#break
+#end
+#end
+## 处理 LocalDateTime 字段的引入
+#foreach ($column in $columns)
+#if (${column.listOperationResult} && ${column.javaType} == "LocalDateTime")
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
+#break
+#end
+#end
+## 处理 Excel 导出
+import cn.idev.excel.annotation.*;
+#foreach ($column in $columns)
+#if ("$!column.dictType" != "")## 有设置数据字典
+import ${DictFormatClassName};
+import ${DictConvertClassName};
+#break
+#end
+#end
+
+@Schema(description = "${sceneEnum.name} - ${table.classComment} Response VO")
+@Data
+@ExcelIgnoreUnannotated
+public class ${sceneEnum.prefixClass}${table.className}RespVO {
+
+## 逐个处理字段
+#foreach ($column in $columns)
+#if (${column.listOperationResult})
+## 1. 处理 Swagger 注解
+    @Schema(description = "${column.columnComment}"#if (!${column.nullable}), requiredMode = Schema.RequiredMode.REQUIRED#end#if ("$!column.example" != ""), example = "${column.example}"#end)
+## 2. 处理 Excel 导出
+#if ("$!column.dictType" != "")##处理枚举值
+    @ExcelProperty(value = "${column.columnComment}", converter = DictConvert.class)
+    @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+#else
+    @ExcelProperty("${column.columnComment}")
+#end
+## 3. 处理字段定义
+    private ${column.javaType} ${column.javaField};
+
+#end
+#end
+}

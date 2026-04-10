@@ -1,9 +1,0 @@
-### /promotion/bargain-record/create 创建砍价记录
-POST {{appApi}}/promotion/bargain-record/create
-Authorization: Bearer {{appToken}}
-Content-Type: application/json
-tenant-id: {{appTenentId}}
-
-{
-  "activityId": 1
-}

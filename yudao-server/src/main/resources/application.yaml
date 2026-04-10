@@ -96,7 +96,7 @@ spring:
 
 # VO 转换（数据翻译）相关
 easy-trans:
-  is-enable-global: true # 启用全局翻译（拦截所有 SpringMVC ResponseBody 进行自动翻译 )。如果对于性能要求很高可关闭此配置，或通过 @IgnoreTrans 忽略某个接口
+  is-enable-global: false # 【默认禁用，对性能确认压力大】启用全局翻译（拦截所有 SpringMVC ResponseBody 进行自动翻译 )。如果对于性能要求很高可关闭此配置，或通过 @IgnoreTrans 忽略某个接口
 
 --- #################### 验证码相关配置 ####################
 
@@ -107,7 +107,7 @@ aj:
     cache-type: redis # 缓存 local/redis...
     cache-number: 1000 # local 缓存的阈值,达到这个值，清除缓存
     timing-clear: 180 # local定时清除过期缓存(单位秒),设置为0代表不执行
-    type: blockPuzzle # 验证码类型 default两种都实例化。 blockPuzzle 滑块拼图 clickWord 文字点选
+    type: blockPuzzle # 验证码类型 default 三种都实例化。blockPuzzle 滑块拼图、clickWord 文字点选、pictureWord 文本输入
     water-mark: 芋道源码 # 右下角水印文字(我的水印)，可使用 https://tool.chinaz.com/tools/unicode.aspx 中文转 Unicode，Linux 可能需要转 unicode
     interference-options: 0 # 滑动干扰项(0/1/2)
     req-frequency-limit-enable: false # 接口请求次数一分钟限制是否开启 true|false
@@ -149,50 +149,98 @@ spring:
   ai:
     vectorstore: # 向量存储
       redis:
-        index: default-index
-        prefix: "default:"
-    embedding:
-      transformer:
-        onnx:
-          model-uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/model.onnx
-        tokenizer:
-          uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/tokenizer.json
+        initialize-schema: true
+        index-name: knowledge_index # Redis 中向量索引的名称：用于存储和检索向量数据的索引标识符，所有相关的向量搜索操作都会基于这个索引进行
+        prefix: "knowledge_segment:" # Redis 中存储向量数据的键名前缀：这个前缀会添加到每个存储在 Redis 中的向量数据键名前，每个 document 都是一个 hash 结构
+      qdrant:
+        initialize-schema: true
+        collection-name: knowledge_segment # Qdrant 中向量集合的名称：用于存储向量数据的集合标识符，所有相关的向量操作都会在这个集合中进行
+        host: 127.0.0.1
+        port: 6334
+      milvus:
+        initialize-schema: true
+        database-name: default # Milvus 中数据库的名称
+        collection-name: knowledge_segment # Milvus 中集合的名称：用于存储向量数据的集合标识符，所有相关的向量操作都会在这个集合中进行
+        client:
+          host: 127.0.0.1
+          port: 19530
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
     zhipuai: # 智谱 AI
       api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
     openai: # OpenAI 官方
-      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+      api-key: sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17
       base-url: https://api.gptsapi.net
     azure: # OpenAI 微软
       openai:
         endpoint: https://eastusprejade.openai.azure.com
-        api-key: xxx
+    anthropic: # Anthropic Claude
+      api-key: sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
         model: llama3
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
-  cloud:
-    ai:
-      tongyi: # 通义千问
-        tongyi:
-          api-key: sk-Zsd81gZYg7
+    dashscope: # 通义千问
+      api-key: sk-47aa124781be4bfb95244cc62f6xxxx
+    minimax: # Minimax：https://www.minimaxi.com/
+      api-key: xxxx
+    moonshot: # 月之暗面（KIMI）
+      api-key: sk-abc
+    deepseek: # DeepSeek
+      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
+      chat:
+        options:
+          model: deepseek-chat
+    model:
+      rerank: false # 是否开启“通义千问”的 Rerank 模型，填写 dashscope 开启
+    mcp:
+      server:
+        enabled: false
+        name: yudao-mcp-server
+        version: 1.0.0
+        instructions: 一个 MCP 示例服务
+        sse-endpoint: /sse
+      client:
+        enabled: false
+        name: mcp
+        sse:
+          connections:
+            filesystem:
+              url: http://127.0.0.1:8089
+              sse-endpoint: /sse
+        annotation-scanner:
+          enabled: false # TODO @芋艿：有 bug https://github.com/spring-projects/spring-ai/issues/4917 需要官方修复
 
 yudao:
   ai:
-    deep-seek: # DeepSeek
+    gemini: # 谷歌 Gemini
       enable: true
-      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
-      model: deepseek-chat
+      api-key: AIzaSyAVoBxgoFvvte820vEQMma2LKBnC98bqMQ
+      model: gemini-2.5-flash
+    doubao: # 字节豆包
+      enable: true
+      api-key: 5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272
+      model: doubao-1-5-lite-32k-250115
+    hunyuan: # 腾讯混元
+      enable: true
+      api-key: sk-abc
+      model: hunyuan-turbo
+    siliconflow: # 硅基流动
+      enable: true
+      api-key: sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz
+      model: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
     xinghuo: # 讯飞星火
       enable: true
-      appId: 13c8cca6
-      appKey: cb6415c19d6162cda07b47316fcb0416
-      secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
-      model: generalv3.5
+      appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
+      secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
+      model: x1
+    baichuan: # 百川智能
+      enable: true
+      api-key: sk-abc
+      model: Baichuan4-Turbo
     midjourney:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj
@@ -203,6 +251,9 @@ yudao:
       enable: true
   #    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
       base-url: http://127.0.0.1:3001
+    web-search:
+      enable: true
+      api-key: sk-40500e52840f4d24b956d0b1d80d9abe
 
 --- #################### 芋道相关配置 ####################
 
@@ -221,6 +272,13 @@ yudao:
   security:
     permit-all_urls:
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
+  api-encrypt:
+    enable: true # 是否开启 API 加密
+    algorithm: AES # 加密算法，支持 AES、RSA 等
+    request-key: 52549111389893486934626385991395 # 【AES 案例】请求加密的秘钥，，必须 16、24、32 位
+    response-key: 96103715984234343991809655248883 # 【AES 案例】响应加密的秘钥，AES 案例，必须 16、24、32 位
+#    request-key: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKWzasimcZ1icsWDPVdTXcZs1DkOWjI+m9bTQU8aOqflnomkr6QO1WWeSHBHzuJGsTlV/ZY2pFfq/NstKC94hBjx7yioYJvzb2bKN/Uy4j5nM3iCF//u0RiFkkY8j0Bt/EWoFTOb6RHf8cHIAjbYYtP3pYzbpCIwryfe0g//KIuzAgMBAAECgYADDjZrYcpZjR2xr7RbXmGtzYbyUGXwZEAqa3XaWBD51J2iSyOkAlQEDjGmxGQ3vvb4qDHHadWI+3/TKNeDXJUO+xTVJrnismK5BsHyC6dfxlIK/5BAuknryTca/3UoA1yomS9ZlF3Q0wcecaDoEnSmZEaTrp9T3itPAz4KnGjv5QJBAN5mNcfu6iJ5ktNvEdzqcxkKwbXb9Nq1SLnmTvt+d5TPX7eQ9fCwtOfVu5iBLhhZzb5PJ7pSN3Zt6rl5/jPOGv0CQQC+vETX9oe1wbxZSv6/RBGy0Xow6GndbJwvd89PcAJ2h+OJXWtg/rRHB3t9EQm7iis0XbZTapj19E4U6l8EibhvAkEA1CvYpRwmHKu1SqdM+GBnW/2qHlBwwXJvpoK02TOm674HR/4w0+YRQJfkd7LOAgcyxJuJgDTNmtt0MmzS+iNoFQJAMVSUIZ77XoDq69U/qcw7H5qaFcgmiUQr6QL9tTftCyb+LGri+MUnby96OtCLSdvkbLjIDS8GvKYhA7vSM2RDNQJBAKGyVVnFFIrbK3yuwW71yvxQEGoGxlgvZSezZ4vGgqTxrr9HvAtvWLwR6rpe6ybR/x8uUtoW7NRBWgpiIFwjvY4= # 【RSA 案例】请求解密的私钥
+#    response-key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDh/CHyBcS/zEfVyINVA7+c9Xxl0CPdxPMK1OIjxaLy/7BLfbkoEpI8onQtjuzfpuxCraDem9bu3BMF0pMH95HytI3Vi0kGjaV+WLIalwgc2w37oA2sbsmKzQOP7SDLO5s2QJNAD7kVwd+Q5rqaLu2MO0xVv+0IUJhn83hClC0L5wIDAQAB # 【RSA 案例】响应加密的公钥
   websocket:
     enable: true # websocket的开关
     path: /infra/ws # 路径
@@ -246,61 +304,17 @@ yudao:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
     front-type: 20 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
+    vo-type: 10 # VO 的类型，参见 CodegenVOTypeEnum 枚举类
+    delete-batch-enable: true # 是否生成批量删除接口
     unit-test-enable: false # 是否生成单元测试
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
-      - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
-      - /admin-api/system/tenant/get-by-website # 基于域名获取租户，不许带租户编号
-      - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
-      - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
-      - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
-      - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
-      - /admin-api/pay/notify/** # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
-      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
+    ignore-visit-urls:
+      - /admin-api/system/user/profile/**
+      - /admin-api/system/auth/**
     ignore-tables:
-      - system_tenant
-      - system_tenant_package
-      - system_dict_data
-      - system_dict_type
-      - system_error_code
-      - system_menu
-      - system_sms_channel
-      - system_sms_template
-      - system_sms_log
-      - system_sensitive_word
-      - system_oauth2_client
-      - system_mail_account
-      - system_mail_template
-      - system_mail_log
-      - system_notify_template
-      - infra_codegen_column
-      - infra_codegen_table
-      - infra_config
-      - infra_file_config
-      - infra_file
-      - infra_file_content
-      - infra_job
-      - infra_job_log
-      - infra_job_log
-      - infra_data_source_config
-      - jimu_dict
-      - jimu_dict_item
-      - jimu_report
-      - jimu_report_data_source
-      - jimu_report_db
-      - jimu_report_db_field
-      - jimu_report_db_param
-      - jimu_report_link
-      - jimu_report_map
-      - jimu_report_share
-      - rep_demo_dxtj
-      - rep_demo_employee
-      - rep_demo_gongsi
-      - rep_demo_jianpiao
-      - tmp_report_data_1
-      - tmp_report_data_income
     ignore-caches:
       - user_role_ids
       - permission_menu_ids
@@ -309,6 +323,8 @@ yudao:
       - mail_account
       - mail_template
       - sms_template
+      - iot:device
+      - iot:thing_model_list
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
@@ -320,13 +336,18 @@ yudao:
       pay-expire-time: 2h # 支付的过期时间
       receive-expire-time: 14d # 收货的过期时间
       comment-expire-time: 7d # 评论的过期时间
+      status-sync-to-wxa-enable: true # 是否同步订单状态到微信小程序
     express:
-      client: kd_niao
+      client: kd_100
       kd-niao:
         api-key: cb022f1e-48f1-4c4a-a723-9001ac9676b8
         business-id: 1809751
+        request-type: 1002 # 免费版 1002；付费版 8001
       kd100:
         key: pLXUGAwK5305
         customer: E77DF18BE109F454A5CD319E44BF5177
+  iot:
+    message-bus:
+      type: redis # 消息总线的类型
 
 debug: false

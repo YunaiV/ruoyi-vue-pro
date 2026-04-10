@@ -64,8 +64,10 @@ public abstract class AbstractWebSocketMessageSender implements WebSocketMessage
             sessions = (List<WebSocketSession>) sessionManager.getSessionList(userType);
         }
         if (CollUtil.isEmpty(sessions)) {
-            log.info("[send][sessionId({}) userType({}) userId({}) messageType({}) messageContent({}) 未匹配到会话]",
-                    sessionId, userType, userId, messageType, messageContent);
+            if (log.isDebugEnabled()) {
+                log.debug("[send][sessionId({}) userType({}) userId({}) messageType({}) messageContent({}) 未匹配到会话]",
+                        sessionId, userType, userId, messageType, messageContent);
+            }
         }
         // 2. 执行发送
         doSend(sessions, messageType, messageContent);

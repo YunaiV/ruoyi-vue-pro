@@ -1,4 +1,0 @@
-### 请求 /member/user/profile/get 接口 => 没有权限
-GET {{appApi}}/member/user/get
-Authorization: Bearer test245
-tenant-id: {{appTenentId}}
