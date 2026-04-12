@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 群聊消息 Response VO
@@ -36,11 +37,11 @@ public class ImGroupMessageRespVO {
     @Schema(description = "发送时间")
     private LocalDateTime sendTime;
 
-    @Schema(description = "@目标用户编号列表", example = "1,2,3")
-    private String atUserIds;
+    @Schema(description = "@目标用户编号列表", example = "[1,2,3]")
+    private List<Long> atUserIds;
 
-    @Schema(description = "定向接收用户编号列表", example = "1,2")
-    private String receiverUserIds;
+    @Schema(description = "定向接收用户编号列表", example = "[1,2]")
+    private List<Long> receiverUserIds;
 
     @Schema(description = "回执状态", example = "0")
     private Integer receiptStatus;
