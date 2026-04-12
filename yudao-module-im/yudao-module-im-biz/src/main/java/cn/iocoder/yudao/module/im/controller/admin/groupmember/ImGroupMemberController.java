@@ -1,27 +1,21 @@
 package cn.iocoder.yudao.module.im.controller.admin.groupmember;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.ImGroupMemberSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
-import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
+import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -74,18 +68,6 @@ public class ImGroupMemberController {
     public CommonResult<PageResult<ImGroupMemberRespVO>> getGroupMemberPage(@Valid ImGroupMemberPageReqVO pageReqVO) {
         PageResult<ImGroupMemberDO> pageResult = imGroupMemberService.getGroupMemberPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ImGroupMemberRespVO.class));
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出群成员 Excel")
-    @PreAuthorize("@ss.hasPermission('im:group-member:export')")
-    public void exportGroupMemberExcel(@Valid ImGroupMemberPageReqVO pageReqVO,
-                                       HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ImGroupMemberDO> list = imGroupMemberService.getGroupMemberPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "群成员.xls", "数据", ImGroupMemberRespVO.class,
-                BeanUtils.toBean(list, ImGroupMemberRespVO.class));
     }
 
 }

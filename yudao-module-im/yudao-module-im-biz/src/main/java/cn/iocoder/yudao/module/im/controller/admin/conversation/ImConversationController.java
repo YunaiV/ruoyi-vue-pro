@@ -8,9 +8,6 @@ import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversatio
 import cn.iocoder.yudao.module.im.controller.admin.conversation.vo.ImConversationUpdatePinnedReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationDO;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationService;
-import cn.iocoder.yudao.module.im.service.message.ImMessageService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -32,28 +29,12 @@ public class ImConversationController {
     @Resource
     private ImConversationService imConversationService;
 
-    @Resource
-    private ImMessageService imMessageService;
-
-    @Resource
-    AdminUserApi adminUserApi;
-
+    // TODO @芋艿：头像和昵称的聚合应交给前端完成
     @GetMapping("/list")
     @Operation(summary = "获得用户的会话列表")
     public CommonResult<List<ImConversationRespVO>> getConversationList() {
         List<ImConversationDO> conversationList = imConversationService.getConversationList(getLoginUserId());
         List<ImConversationRespVO> imConversationRespVOList = BeanUtils.toBean(conversationList, ImConversationRespVO.class);
-        // TODO @dylan：这块，交给前端聚合哈。im 这块，我们重前端，后端更多解决消息的通信和存储。
-        imConversationRespVOList.forEach(item -> {
-            // 处理个人图像和昵称
-            Long receiverId = item.getTargetId();
-            AdminUserRespDTO receiverUser = adminUserApi.getUser(receiverId);
-            if (receiverUser != null) {
-                item.setAvatar(receiverUser.getAvatar());
-                item.setNickname(receiverUser.getNickname());
-            }
-
-        });
         return success(imConversationRespVOList);
     }
 
