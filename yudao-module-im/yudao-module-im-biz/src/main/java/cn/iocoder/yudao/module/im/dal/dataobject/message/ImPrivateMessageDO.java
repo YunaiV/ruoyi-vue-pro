@@ -1,0 +1,73 @@
+package cn.iocoder.yudao.module.im.dal.dataobject.message;
+
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+/**
+ * IM 私聊消息 DO
+ *
+ * @author 芋道源码
+ */
+@TableName("im_private_message")
+@KeySequence("im_private_message_seq")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ImPrivateMessageDO extends BaseDO {
+
+    /**
+     * 编号
+     */
+    @TableId
+    private Long id;
+    /**
+     * 客户端消息编号，用于发送幂等
+     */
+    private String clientMessageId;
+    /**
+     * 发送人编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long senderId;
+    /**
+     * 接收人编号
+     *
+     * 关联 AdminUserDO 的 id 字段
+     */
+    private Long receiverId;
+    /**
+     * 消息类型
+     * <p>
+     * 枚举 {@link ImMessageTypeEnum}
+     */
+    private Integer type;
+    /**
+     * 消息内容，JSON 格式
+     *
+     * TODO @AI：/Users/yunai/Java/yudao-all-in-im/ruoyi-vue-pro/yudao-module-im/yudao-module-im-biz/src/main/java/cn/iocoder/yudao/module/im/dal/dataobject/message/content
+     */
+    private String content;
+    /**
+     * 消息状态
+     * <p>
+     * 枚举 {@link ImMessageStatusEnum}
+     * 私聊状态：UNREAD(0) / READ(1) / RECALL(2)
+     */
+    private Integer status;
+    /**
+     * 发送时间
+     */
+    private LocalDateTime sendTime;
+
+}

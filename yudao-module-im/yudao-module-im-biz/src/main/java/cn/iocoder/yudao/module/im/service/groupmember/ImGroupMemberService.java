@@ -60,4 +60,21 @@ public interface ImGroupMemberService {
      * @return 群成员列表
      */
     List<ImGroupMemberDO> selectByGroupId(Long groupId);
+
+    /**
+     * 根据群编号和用户编号查询群成员
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     * @return 群成员
+     */
+    ImGroupMemberDO getGroupMember(Long groupId, Long userId);
+
+    /**
+     * 查询用户所在的所有群的成员记录
+     *
+     * @param userId 用户编号
+     * @return 群成员记录列表
+     */
+    List<ImGroupMemberDO> getGroupMembersByUserId(Long userId);
 }

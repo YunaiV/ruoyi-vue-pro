@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+// TODO @AI：去掉部分不需要的 save 字段；
 @Schema(description = "管理后台 - 群成员新增/修改 Request VO")
 @Data
 public class ImGroupMemberSaveReqVO {
@@ -11,23 +12,23 @@ public class ImGroupMemberSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17071")
     private Long id;
 
-    @Schema(description = "群 id", example = "13279")
+    @Schema(description = "群编号", example = "13279")
     private Long groupId;
 
-    @Schema(description = "用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "21730")
-    @NotNull(message = "用户id不能为空")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21730")
+    @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "昵称", example = "芋艿")
-    private String nickname;
+    @Schema(description = "组内显示名", example = "芋艿")
+    private String displayUserName;
 
-    @Schema(description = "头像")
-    private String avatar;
+    @Schema(description = "群显示备注", example = "核心群")
+    private String displayGroupName;
 
-    @Schema(description = "组内显示名称", example = "芋艿")
-    private String aliasName;
+    @Schema(description = "是否免打扰")
+    private Boolean muted;
 
-    @Schema(description = "备注", example = "你说的对")
-    private String remark;
+    @Schema(description = "成员状态", example = "0")
+    private Integer status;
 
 }

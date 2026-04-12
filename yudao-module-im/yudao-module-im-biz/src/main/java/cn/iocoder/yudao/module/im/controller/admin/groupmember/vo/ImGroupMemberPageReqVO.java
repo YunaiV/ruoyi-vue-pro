@@ -17,23 +17,14 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ImGroupMemberPageReqVO extends PageParam {
 
-    @Schema(description = "群 id", example = "13279")
+    @Schema(description = "群编号", example = "13279")
     private Long groupId;
 
-    @Schema(description = "用户id", example = "21730")
+    @Schema(description = "用户编号", example = "21730")
     private Long userId;
 
-    @Schema(description = "昵称", example = "芋艿")
-    private String nickname;
-
-    @Schema(description = "头像")
-    private String avatar;
-
-    @Schema(description = "组内显示名称", example = "芋艿")
-    private String aliasName;
-
-    @Schema(description = "备注", example = "你说的对")
-    private String remark;
+    @Schema(description = "成员状态", example = "0")
+    private Integer status;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

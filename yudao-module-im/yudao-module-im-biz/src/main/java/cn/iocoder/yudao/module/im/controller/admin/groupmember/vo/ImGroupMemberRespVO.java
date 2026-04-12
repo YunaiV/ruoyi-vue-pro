@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+// TODO @AI：去掉部分导出字段
 @Schema(description = "管理后台 - 群成员 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -16,29 +17,37 @@ public class ImGroupMemberRespVO {
     @ExcelProperty("编号")
     private Long id;
 
-    @Schema(description = "群 id", example = "13279")
-    @ExcelProperty("群 id")
+    @Schema(description = "群编号", example = "13279")
+    @ExcelProperty("群编号")
     private Long groupId;
 
-    @Schema(description = "用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "21730")
-    @ExcelProperty("用户id")
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21730")
+    @ExcelProperty("用户编号")
     private Long userId;
 
-    @Schema(description = "昵称", example = "芋艿")
-    @ExcelProperty("昵称")
-    private String nickname;
+    @Schema(description = "组内显示名", example = "芋艿")
+    @ExcelProperty("组内显示名")
+    private String displayUserName;
 
-    @Schema(description = "头像")
-    @ExcelProperty("头像")
-    private String avatar;
+    @Schema(description = "群显示备注", example = "核心群")
+    @ExcelProperty("群显示备注")
+    private String displayGroupName;
 
-    @Schema(description = "组内显示名称", example = "芋艿")
-    @ExcelProperty("组内显示名称")
-    private String aliasName;
+    @Schema(description = "是否免打扰")
+    @ExcelProperty("是否免打扰")
+    private Boolean muted;
 
-    @Schema(description = "备注", example = "你说的对")
-    @ExcelProperty("备注")
-    private String remark;
+    @Schema(description = "成员状态", example = "0")
+    @ExcelProperty("成员状态")
+    private Integer status;
+
+    @Schema(description = "入群时间")
+    @ExcelProperty("入群时间")
+    private LocalDateTime joinTime;
+
+    @Schema(description = "退群时间")
+    @ExcelProperty("退群时间")
+    private LocalDateTime quitTime;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

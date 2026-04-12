@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
- * 群成员 Mapper
+ * IM 群成员 Mapper
  *
  * @author 芋道源码
  */
@@ -21,15 +21,22 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eqIfPresent(ImGroupMemberDO::getGroupId, reqVO.getGroupId())
                 .eqIfPresent(ImGroupMemberDO::getUserId, reqVO.getUserId())
-                .likeIfPresent(ImGroupMemberDO::getNickname, reqVO.getNickname())
-                .eqIfPresent(ImGroupMemberDO::getAvatar, reqVO.getAvatar())
-                .likeIfPresent(ImGroupMemberDO::getAliasName, reqVO.getAliasName())
-                .eqIfPresent(ImGroupMemberDO::getRemark, reqVO.getRemark())
+                .eqIfPresent(ImGroupMemberDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ImGroupMemberDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ImGroupMemberDO::getId));
     }
 
     default List<ImGroupMemberDO> selectListByGroupId(Long groupId) {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>().eq(ImGroupMemberDO::getGroupId, groupId));
+    }
+
+    default ImGroupMemberDO selectByGroupIdAndUserId(Long groupId, Long userId) {
+        return selectOne(new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .eq(ImGroupMemberDO::getUserId, userId));
+    }
+
+    default List<ImGroupMemberDO> selectListByUserId(Long userId) {
+        return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>().eq(ImGroupMemberDO::getUserId, userId));
     }
 }

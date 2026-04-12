@@ -19,7 +19,7 @@ public interface ImInboxService {
     void saveInboxAndSendMessage(ImMessageDO imMessageDO);
 
     /**
-     * 获得大于 sequence 的消息ids
+     * 获得大于 sequence 的消息 ids
      *
      * @param userId   用户编号
      * @param sequence 序列号

@@ -52,10 +52,19 @@ public class ImGroupServiceImpl implements ImGroupService {
         imGroupMapper.deleteById(id);
     }
 
-    private void validateGroupExists(Long id) {
-        if (imGroupMapper.selectById(id) == null) {
+    @Override
+    public ImGroupDO validateGroupExists(Long id) {
+        ImGroupDO group = imGroupMapper.selectById(id);
+        if (group == null) {
             throw exception(GROUP_NOT_EXISTS);
         }
+        if (Boolean.TRUE.equals(group.getBanned())) {
+            throw exception(GROUP_BANNED);
+        }
+        if (Boolean.TRUE.equals(group.getDissolved())) {
+            throw exception(GROUP_DISSOLVED);
+        }
+        return group;
     }
 
     @Override

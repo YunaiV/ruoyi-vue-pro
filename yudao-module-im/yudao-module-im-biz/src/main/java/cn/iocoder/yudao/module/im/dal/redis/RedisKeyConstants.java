@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.im.dal.redis;
 
 
 /**
- * im Redis Key 枚举类
+ * IM Redis Key 枚举类
  *
  * @author 芋道源码
  */
@@ -21,4 +21,12 @@ public interface RedisKeyConstants {
      * VALUE 数据类型： String
      */
     String INBOX_LOCK = "im_inbox_lock:%s";
+
+    /**
+     * 群已读位置
+     * KEY 格式：  im:group:read:{groupId}
+     * VALUE 数据类型： Hash (field: userId, value: maxReadMessageId)
+     */
+    String GROUP_READ_POSITION = "im:group:read:%s";
+
 }

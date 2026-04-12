@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.im.enums.message;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @AI：还需要这个枚举么？
 /**
  * IM 消息的类型枚举
  * <p>
@@ -15,7 +16,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum ImMessageContentTypeEnum implements IntArrayValuable {
+public enum ImMessageContentTypeEnum implements ArrayValuable<Integer> {
 
     TEXT(101, "文本消息"),
     PICTURE(102, "图片消息"),
@@ -60,7 +61,7 @@ public enum ImMessageContentTypeEnum implements IntArrayValuable {
     BURN_CHANGE(1701, "阅后即焚开启或关闭通知"),
     REVOKE(2101, "撤回消息通知");;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ImMessageContentTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageContentTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -73,7 +74,7 @@ public enum ImMessageContentTypeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

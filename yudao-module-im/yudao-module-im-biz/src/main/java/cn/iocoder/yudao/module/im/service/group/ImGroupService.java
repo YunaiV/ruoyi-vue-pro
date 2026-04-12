@@ -50,4 +50,12 @@ public interface ImGroupService {
      */
     PageResult<ImGroupDO> getGroupPage(ImGroupPageReqVO pageReqVO);
 
+    /**
+     * 校验群存在且未封禁、未解散
+     *
+     * @param groupId 群编号
+     * @return 群信息
+     */
+    ImGroupDO validateGroupExists(Long groupId);
+
 }

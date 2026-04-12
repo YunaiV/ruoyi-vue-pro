@@ -1,9 +1,15 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.group;
 
-import lombok.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberStatusEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+// TODO @AI：好友关系是逻辑删除，群成员是 status 标识，感觉是不是要统一下？
 /**
  * IM 群成员 DO
  *
@@ -24,31 +30,43 @@ public class ImGroupMemberDO extends BaseDO {
      */
     @TableId
     private Long id;
-    // TODO @hao：groupId 和 userId 都写下关联字段哈
     /**
      * 群编号
+     * <p>
+     * 关联 {@link ImGroupDO#getId()}
      */
     private Long groupId;
     /**
      * 用户编号
+     * <p>
+     * 关联 AdminUserDO 的 id 字段
      */
     private Long userId;
-    // TODO @hao：nickname 和 avatar 是不是不用存储哈；
     /**
-     * 昵称
+     * 组内显示名
      */
-    private String nickname;
+    private String displayUserName;
     /**
-     * 头像
+     * 群显示备注
      */
-    private String avatar;
+    private String displayGroupName;
     /**
-     * 组内显示名称
+     * 是否免打扰
      */
-    private String aliasName;
+    private Boolean muted;
     /**
-     * 备注
+     * 成员状态
+     * <p>
+     * 枚举 {@link ImGroupMemberStatusEnum}
      */
-    private String remark;
+    private Integer status;
+    /**
+     * 入群时间
+     */
+    private LocalDateTime joinTime;
+    /**
+     * 退群时间
+     */
+    private LocalDateTime quitTime;
 
 }

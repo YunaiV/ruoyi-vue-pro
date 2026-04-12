@@ -26,32 +26,37 @@ public class ImGroupDO extends BaseDO {
      */
     @TableId
     private Long id;
-    // TODO @hao：name，如果这个表已经是 group 了，不用在带额外的
     /**
-     * 群名字
+     * 群名称
      */
-    private String groupName;
-    // TODO @hao：关联字段；
+    private String name;
     /**
-     * 群主编号
+     * 群主用户编号
+     * <p>
+     * 关联 AdminUserDO 的 id 字段
      */
-    private Long ownerId;
-    // TODO @hao：头像使用 avatar 好了，整个项目统一；然后 Thumb 是不是不用存，这个更多是文件服务做裁剪
+    private Long ownerUserId;
     /**
      * 群头像
      */
-    private String headImage;
-    /**
-     * 群头像缩略图
-     */
-    private String headImageThumb;
+    private String avatar;
     /**
      * 群公告
      */
     private String notice;
     /**
-     * 群备注
+     * 是否封禁
      */
-    private String remark;
+    private Boolean banned;
+    /**
+     * 封禁原因
+     */
+    private String bannedReason;
+    // TODO @AI：封禁时间；
+    /**
+     * 是否解散
+     */
+    private Boolean dissolved;
+    // TODO @AI：解散时间
 
 }
