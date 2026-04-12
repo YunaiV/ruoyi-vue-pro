@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 @Data
 public class ImPrivateMessageRespVO {
 
-    // TODO @AI：类型不对；
     @Schema(description = "消息编号", example = "1")
-    private String id;
+    private Long id;
 
     @Schema(description = "客户端消息编号", example = "uuid-xxx")
     private String clientMessageId;

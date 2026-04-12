@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * IM 群信息 DO
  *
@@ -52,11 +54,17 @@ public class ImGroupDO extends BaseDO {
      * 封禁原因
      */
     private String bannedReason;
-    // TODO @AI：封禁时间；
+    /**
+     * 封禁时间
+     */
+    private LocalDateTime bannedTime;
     /**
      * 是否解散
      */
     private Boolean dissolved;
-    // TODO @AI：解散时间
+    /**
+     * 解散时间
+     */
+    private LocalDateTime dissolvedTime;
 
 }

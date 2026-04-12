@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.im.controller.admin.groupmember.vo;
+package cn.iocoder.yudao.module.im.controller.admin.group.vo.member;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// TODO @AI：去掉部分不需要的 save 字段；
-@Schema(description = "管理后台 - 群成员新增/修改 Request VO")
+import java.time.LocalDateTime;
+
+@Schema(description = "管理后台 - 群成员 Response VO")
 @Data
-public class ImGroupMemberSaveReqVO {
+public class ImGroupMemberRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17071")
     private Long id;
@@ -16,7 +16,6 @@ public class ImGroupMemberSaveReqVO {
     private Long groupId;
 
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21730")
-    @NotNull(message = "用户编号不能为空")
     private Long userId;
 
     @Schema(description = "组内显示名", example = "芋艿")
@@ -30,5 +29,14 @@ public class ImGroupMemberSaveReqVO {
 
     @Schema(description = "成员状态", example = "0")
     private Integer status;
+
+    @Schema(description = "入群时间")
+    private LocalDateTime joinTime;
+
+    @Schema(description = "退群时间")
+    private LocalDateTime quitTime;
+
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
 
 }

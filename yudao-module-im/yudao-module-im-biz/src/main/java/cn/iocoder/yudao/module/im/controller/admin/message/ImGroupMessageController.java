@@ -40,7 +40,7 @@ public class ImGroupMessageController {
         return success(toRespVO(message));
     }
 
-    // TODO @AI：需要在评估下，是否需要 nextMinId
+    // DONE @AI：需要在评估下，是否需要 nextMinId。结论：需要，前端用 nextMinId 做增量拉取游标
     @GetMapping("/pull")
     @Operation(summary = "拉取群聊消息（增量）")
     @Parameter(name = "minId", description = "最小消息 id", required = true, example = "0")
@@ -56,7 +56,7 @@ public class ImGroupMessageController {
         return success(resp);
     }
 
-    // TODO @AI：它是不是不用 VO
+    // DONE @AI：它是不是不用 VO。结论：需要 ReqVO，承载 groupId 字段并做参数校验
     @PutMapping("/read")
     @Operation(summary = "标记群聊消息已读")
     public CommonResult<Boolean> readMessages(@Valid @RequestBody ImGroupMessageReadReqVO reqVO) {
@@ -64,16 +64,15 @@ public class ImGroupMessageController {
         return success(true);
     }
 
-    // TODO @AI：不使用 path variable
-    @DeleteMapping("/recall/{id}")
+    @DeleteMapping("/recall")
     @Operation(summary = "撤回群聊消息")
     @Parameter(name = "id", description = "消息编号", required = true, example = "1")
-    public CommonResult<Boolean> recallMessage(@PathVariable("id") Long id) {
+    public CommonResult<Boolean> recallMessage(@RequestParam("id") Long id) {
         imGroupMessageService.recallMessage(getLoginUserId(), id);
         return success(true);
     }
 
-    // TODO @AI：这个接口，确认下是否需要！
+    // DONE @AI：这个接口，确认需要！用于群回执人数展示
     @GetMapping("/read-users")
     @Operation(summary = "获取群消息已读用户列表")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1")
@@ -89,7 +88,7 @@ public class ImGroupMessageController {
     /**
      * DO 转换为 RespVO（Long id 统一转 String）
      */
-    // TODO @AI：BeanUtils？
+    // DONE @AI：BeanUtils？结论：因 id/senderId/groupId 需 Long→String 手动转换，不适合 BeanUtils
     private ImGroupMessageRespVO toRespVO(ImGroupMessageDO message) {
         ImGroupMessageRespVO vo = new ImGroupMessageRespVO();
         vo.setId(message.getId().toString());

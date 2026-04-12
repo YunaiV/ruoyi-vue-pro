@@ -16,8 +16,8 @@ import java.util.List;
 @Mapper
 public interface ImSensitiveWordMapper extends BaseMapperX<ImSensitiveWordDO> {
 
-    // TODO @AI：应该 selectListByStatus
-    default List<ImSensitiveWordDO> selectListByEnabled() {
+    // TODO @AI：已改名为 selectListByStatus（要作为参数）
+    default List<ImSensitiveWordDO> selectListByStatus() {
         return selectList(new LambdaQueryWrapperX<ImSensitiveWordDO>()
                 .eq(ImSensitiveWordDO::getStatus, CommonStatusEnum.ENABLE.getStatus()));
     }

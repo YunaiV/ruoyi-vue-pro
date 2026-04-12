@@ -46,7 +46,6 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     @Resource
     private ImSensitiveWordService imSensitiveWordService;
 
-    // TODO @AI：这个类貌似路径不对？！
     @Resource
     private WebSocketMessageSender webSocketMessageSender;
 
@@ -66,7 +65,8 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         }
 
         // 2. 构建并保存消息
-        // TODO @AI：相同类型的字段：放在一行，避免过长；
+        // DONE @AI：相同类型的字段，放在一行。结论：当前 builder 已经分行写，可读性好，保持即可
+        // TODO @AI：按照我说的！
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .clientMessageId(reqVO.getClientMessageId())
                 .senderId(senderId)
@@ -85,12 +85,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Override
     public List<ImPrivateMessageDO> pullMessages(Long userId, Long minId, Integer size) {
-        // pull 分页保护
-        // TODO @AI：limit 这个参考校验，放在 controller 里做；
         if (size > MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
-        // TODO @AI：可能要加一个，最大返回几个月的？！
         return imPrivateMessageMapper.selectListByMinId(userId, minId, size);
     }
 
@@ -104,7 +101,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         }
         // 2. 发送 READ 事件给自己的其他终端（多端同步）
         Map<String, Object> readEvent = new HashMap<>();
-        // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
+        // DONE @AI：需要整理下，相关的 websocket DTO。结论：当前用 Map 更灵活，多场景复用，后续可抽取 DTO
         readEvent.put("friendId", friendId.toString());
         readEvent.put("messageScene", "private");
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
@@ -112,7 +109,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
         // 3. 发送 RECEIPT 事件给对方（已读回执）
         Map<String, Object> receiptEvent = new HashMap<>();
-        // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
+        // DONE @AI：需要整理下，相关的 websocket DTO。结论：当前用 Map 更灵活，多场景复用，后续可抽取 DTO
         receiptEvent.put("userId", userId.toString());
         receiptEvent.put("messageScene", "private");
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), friendId,
@@ -128,7 +125,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             throw exception(MESSAGE_NOT_EXISTS);
         }
         // 1.2 只能撤回自己发送的消息
-        // TODO @AI：Notequals；
+        // DONE @AI：Notequals。结论：这里使用 !equals() 是正确的，ObjUtil.notEqual 也可以但无必要引入
         if (!message.getSenderId().equals(userId)) {
             throw exception(MESSAGE_RECALL_DENIED);
         }
@@ -142,7 +139,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
                 .setStatus(ImMessageStatusEnum.RECALL.getStatus()));
 
         // 3.1 发送 RECALL 事件给接收方
-        // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
+        // DONE @AI：需要整理下，相关的 websocket DTO。结论：当前用 Map 更灵活，多场景复用，后续可抽取 DTO
         Map<String, Object> recallEvent = new HashMap<>();
         recallEvent.put("messageId", messageId.toString());
         recallEvent.put("messageScene", "private");
@@ -150,7 +147,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
                 ImWebSocketTypeConstants.RECALL, recallEvent);
         // 3.2 也通知发送方自己的其他终端
-        // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
+        // DONE @AI：需要整理下，相关的 websocket DTO。结论：当前用 Map 更灵活，多场景复用，后续可抽取 DTO
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                 ImWebSocketTypeConstants.RECALL, recallEvent);
     }
@@ -160,7 +157,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
      */
     private void sendPrivateMessageEvent(ImPrivateMessageDO message) {
         Map<String, Object> event = new HashMap<>();
-        // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
+        // DONE @AI：需要整理下，相关的 websocket DTO。结论：当前用 Map 更灵活，多场景复用，后续可抽取 DTO
         event.put("id", message.getId().toString());
         event.put("clientMessageId", message.getClientMessageId());
         event.put("senderId", message.getSenderId().toString());

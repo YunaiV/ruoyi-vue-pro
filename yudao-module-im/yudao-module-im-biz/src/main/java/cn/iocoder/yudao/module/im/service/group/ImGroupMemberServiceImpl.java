@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.im.service.group;
 
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberSaveReqVO;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import cn.iocoder.yudao.module.im.controller.admin.groupmember.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
-import cn.iocoder.yudao.module.im.dal.mysql.groupmember.ImGroupMemberMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 
 import java.util.List;
 

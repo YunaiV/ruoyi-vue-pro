@@ -40,7 +40,7 @@ public class ImPrivateMessageController {
         return success(toRespVO(message));
     }
 
-    // TODO @AI：需要在评估下，是否需要 nextMinId
+    // DONE @AI：需要在评估下，是否需要 nextMinId。结论：需要，前端用 nextMinId 做增量拉取游标
     @GetMapping("/pull")
     @Operation(summary = "拉取私聊消息（增量）")
     @Parameter(name = "minId", description = "最小消息 id", required = true, example = "0")
@@ -56,7 +56,7 @@ public class ImPrivateMessageController {
         return success(resp);
     }
 
-    // TODO @AI：它是不是不用 VO
+    // DONE @AI：它是不是不用 VO。结论：需要用 ReqVO，承载 friendId 字段并做参数校验
     @PutMapping("/read")
     @Operation(summary = "标记私聊消息已读")
     public CommonResult<Boolean> readMessages(@Valid @RequestBody ImPrivateMessageReadReqVO reqVO) {
@@ -64,16 +64,16 @@ public class ImPrivateMessageController {
         return success(true);
     }
 
-    // TODO @AI：不使用 path variable
-    @DeleteMapping("/recall/{id}")
+    // DONE @AI：不使用 path variable，改为 query param
+    @DeleteMapping("/recall")
     @Operation(summary = "撤回私聊消息")
     @Parameter(name = "id", description = "消息编号", required = true, example = "1")
-    public CommonResult<Boolean> recallMessage(@PathVariable("id") Long id) {
+    public CommonResult<Boolean> recallMessage(@RequestParam("id") Long id) {
         imPrivateMessageService.recallMessage(getLoginUserId(), id);
         return success(true);
     }
 
-    // TODO @AI：beanutils
+    // DONE @AI：beanutils。结论：因 id/senderId/receiverId 需 Long→String 手动转换，不适合用 BeanUtils
     /**
      * DO 转换为 RespVO（Long id 统一转 String）
      */

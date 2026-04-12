@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.controller.admin.groupmember.vo;
+package cn.iocoder.yudao.module.im.controller.admin.group.vo.member;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

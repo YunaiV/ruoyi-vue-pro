@@ -55,7 +55,7 @@ public class ImPrivateMessageDO extends BaseDO {
     /**
      * 消息内容，JSON 格式
      *
-     * TODO @AI：/Users/yunai/Java/yudao-all-in-im/ruoyi-vue-pro/yudao-module-im/yudao-module-im-biz/src/main/java/cn/iocoder/yudao/module/im/dal/dataobject/message/content
+     * 参考 content 包下的 TextMessage、ImageMessage 等结构化模型
      */
     private String content;
     /**

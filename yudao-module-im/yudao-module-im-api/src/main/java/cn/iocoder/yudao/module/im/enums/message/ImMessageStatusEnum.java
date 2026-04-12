@@ -25,12 +25,6 @@ public enum ImMessageStatusEnum implements ArrayValuable<Integer> {
     // ========== 通用状态 ==========
     RECALL(2, "已撤回");
 
-    // TODO @AI：0 这个，不是有 UNREAD 可以用了？！
-    /**
-     * 群聊消息的正常状态，与 UNREAD 共用值 0
-     */
-    public static final int NORMAL = 0;
-
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**

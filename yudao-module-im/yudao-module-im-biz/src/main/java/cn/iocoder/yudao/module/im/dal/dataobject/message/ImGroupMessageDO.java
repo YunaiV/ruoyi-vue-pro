@@ -57,7 +57,7 @@ public class ImGroupMessageDO extends BaseDO {
     /**
      * 消息内容，JSON 格式
      *
-     * TODO @AI：/Users/yunai/Java/yudao-all-in-im/ruoyi-vue-pro/yudao-module-im/yudao-module-im-biz/src/main/java/cn/iocoder/yudao/module/im/dal/dataobject/message/content
+     * 参考 content 包下的 TextMessage、ImageMessage 等结构化模型
      */
     private String content;
     /**
@@ -65,8 +65,9 @@ public class ImGroupMessageDO extends BaseDO {
      * <p>
      * 枚举 {@link ImMessageStatusEnum}
      * 群聊状态：NORMAL(0) / RECALL(2)
+     *
+     * 为什么没有 READ 状态？与单聊的差异：单聊用 UNREAD/READ 跟踪每条消息状态，群聊用 Redis 存储每个成员的已读位置（游标模型）
      */
-    // TODO @AI：会不会存在 READ 的情况？如果不存在，最好说明下，和单聊的差异；
     private Integer status;
     /**
      * 发送时间
@@ -79,14 +80,14 @@ public class ImGroupMessageDO extends BaseDO {
      *
      * 关联 AdminUserDO 的 id 字段
      */
-    // TODO @AI：使用 List<Long> 存储，避免逗号分隔的字符串解析问题
+    // TODO @AI：后续优化为 List<Long> 存储（使用 MyBatis-Plus TypeHandler），避免逗号分隔解析问题
     private String receiverUserIds;
     /**
      * @ 目标用户编号列表，逗号分隔
      *
      * 关联 AdminUserDO 的 id 字段
      */
-    // TODO @AI：使用 List<Long> 存储，避免逗号分隔的字符串解析问题
+    // TODO @AI：后续优化为 List<Long> 存储（使用 MyBatis-Plus TypeHandler），避免逗号分隔解析问题
     private String atUserIds;
     /**
      * 回执状态

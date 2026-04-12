@@ -11,7 +11,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_SENSITIVE_WORD_BLOCKED;
 
-// TODO @AI：需要内存化；晚点处理；
+// TODO @AI：需要内存化（加载到内存缓存，避免每次查库）；优先级低，后续优化
 /**
  * IM 敏感词 Service 实现类
  *
@@ -30,7 +30,7 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
             return;
         }
         // 查询所有启用状态的敏感词
-        List<ImSensitiveWordDO> enabledWords = imSensitiveWordMapper.selectListByEnabled();
+        List<ImSensitiveWordDO> enabledWords = imSensitiveWordMapper.selectListByStatus();
         // 逐词匹配
         for (ImSensitiveWordDO wordDO : enabledWords) {
             if (text.contains(wordDO.getWord())) {

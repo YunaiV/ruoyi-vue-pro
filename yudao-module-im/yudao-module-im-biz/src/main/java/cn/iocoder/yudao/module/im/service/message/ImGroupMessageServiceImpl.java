@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.redis.group.GroupReadPositionRedisDAO;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -70,7 +70,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
         // 3. 校验发送人在群中
         ImGroupMemberDO member = imGroupMemberService.getGroupMember(reqVO.getGroupId(), senderId);
-        if (member == null || ImGroupMemberStatusEnum.QUIT.getStatus().equals(member.getStatus())) {
+        if (member == null || CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
 
@@ -86,7 +86,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .groupId(reqVO.getGroupId())
                 .type(reqVO.getType())
                 .content(reqVO.getContent())
-                .status(ImMessageStatusEnum.NORMAL) // 群聊正常状态 = 0
+                .status(ImMessageStatusEnum.UNREAD.getStatus()) // 群聊正常状态 = 0
                 .sendTime(LocalDateTime.now())
                 .atUserIds(CollUtil.isNotEmpty(reqVO.getAtUserIds())
                         ? StrUtil.join(",", reqVO.getAtUserIds()) : null)
@@ -134,7 +134,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 return false;
             }
             // 退群后消息边界
-            if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(m.getStatus())
+            if (CommonStatusEnum.DISABLE.getStatus().equals(m.getStatus())
                     && m.getQuitTime() != null && msg.getSendTime().isAfter(m.getQuitTime())) {
                 return false;
             }
@@ -153,7 +153,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     public void readMessages(Long userId, Long groupId) {
         // 1. 校验用户在群中（权限校验）
         ImGroupMemberDO member = imGroupMemberService.getGroupMember(groupId, userId);
-        if (member == null || ImGroupMemberStatusEnum.QUIT.getStatus().equals(member.getStatus())) {
+        if (member == null || CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
 
@@ -206,7 +206,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         recallEvent.put("messageScene", "group");
         recallEvent.put("senderId", userId.toString());
         for (ImGroupMemberDO m : members) {
-            if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(m.getStatus())) {
+            if (CommonStatusEnum.DISABLE.getStatus().equals(m.getStatus())) {
                 continue;
             }
             webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
@@ -218,7 +218,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     public List<Long> getReadUsers(Long userId, Long groupId, Long messageId) {
         // 1. 校验用户在群中（权限校验）
         ImGroupMemberDO currentMember = imGroupMemberService.getGroupMember(groupId, userId);
-        if (currentMember == null || ImGroupMemberStatusEnum.QUIT.getStatus().equals(currentMember.getStatus())) {
+        if (currentMember == null || CommonStatusEnum.DISABLE.getStatus().equals(currentMember.getStatus())) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
 
@@ -299,7 +299,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                     : ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
 
             for (ImGroupMemberDO m : allMembers) {
-                if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(m.getStatus())) {
+                if (CommonStatusEnum.DISABLE.getStatus().equals(m.getStatus())) {
                     continue;
                 }
                 webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
@@ -330,7 +330,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 continue;
             }
             // 已退群且退群时间在消息发送之前 → 不可见
-            if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(m.getStatus())
+            if (CommonStatusEnum.DISABLE.getStatus().equals(m.getStatus())
                     && m.getQuitTime() != null && msg.getSendTime().isAfter(m.getQuitTime())) {
                 continue;
             }
@@ -374,7 +374,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         }
 
         for (ImGroupMemberDO member : members) {
-            if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(member.getStatus())) {
+            if (CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
                 continue;
             }
             // 定向接收过滤

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.redis.group.GroupReadPositionRedisDAO;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
@@ -78,15 +78,15 @@ public class ImGroupMessageServiceImplTest {
         ImGroupMemberDO member = new ImGroupMemberDO();
         member.setGroupId(10L);
         member.setUserId(1L);
-        member.setStatus(ImGroupMemberStatusEnum.NORMAL.getStatus());
+        member.setStatus(CommonStatusEnum.ENABLE.getStatus());
         when(imGroupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
 
         List<ImGroupMemberDO> allMembers = List.of(
                 member,
                 ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus()).build(),
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(10L).userId(3L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus()).build()
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()
         );
         when(imGroupMemberService.selectByGroupId(10L)).thenReturn(allMembers);
         when(imGroupMessageMapper.insert(any(ImGroupMessageDO.class))).thenAnswer(invocation -> {
@@ -102,7 +102,7 @@ public class ImGroupMessageServiceImplTest {
         assertNotNull(result);
         assertEquals(1L, result.getSenderId());
         assertEquals(10L, result.getGroupId());
-        assertEquals(ImMessageStatusEnum.NORMAL, result.getStatus());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
         assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus());
 
         // 验证推送给 3 个群成员
@@ -153,7 +153,7 @@ public class ImGroupMessageServiceImplTest {
         LocalDateTime joinTime = LocalDateTime.of(2026, 4, 12, 10, 0, 0);
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(joinTime).build();
         when(imGroupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
 
@@ -182,7 +182,7 @@ public class ImGroupMessageServiceImplTest {
         LocalDateTime quitTime = LocalDateTime.of(2026, 4, 12, 10, 0, 0);
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(ImGroupMemberStatusEnum.QUIT.getStatus())
+                .status(CommonStatusEnum.DISABLE.getStatus())
                 .joinTime(joinTime).quitTime(quitTime).build();
         when(imGroupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
 
@@ -209,7 +209,7 @@ public class ImGroupMessageServiceImplTest {
         // 准备
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
         when(imGroupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
 
@@ -238,7 +238,7 @@ public class ImGroupMessageServiceImplTest {
         // 准备
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
         when(imGroupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
 
@@ -264,17 +264,17 @@ public class ImGroupMessageServiceImplTest {
         // 准备
         ImGroupMessageDO message = ImGroupMessageDO.builder()
                 .id(50L).senderId(1L).groupId(10L)
-                .status(ImMessageStatusEnum.NORMAL).build();
+                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
         when(imGroupMessageMapper.selectById(50L)).thenReturn(message);
         when(imGroupMessageMapper.updateById(any(ImGroupMessageDO.class))).thenReturn(1);
 
         List<ImGroupMemberDO> members = List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus()).build(),
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus()).build(),
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(10L).userId(3L)
-                        .status(ImGroupMemberStatusEnum.QUIT.getStatus()).build()
+                        .status(CommonStatusEnum.DISABLE.getStatus()).build()
         );
         when(imGroupMemberService.selectByGroupId(10L)).thenReturn(members);
 
@@ -303,7 +303,7 @@ public class ImGroupMessageServiceImplTest {
         // 准备：用户 1 是群成员
         ImGroupMemberDO currentMember = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
         when(imGroupMemberService.getGroupMember(10L, 1L)).thenReturn(currentMember);
 
@@ -321,13 +321,13 @@ public class ImGroupMessageServiceImplTest {
         List<ImGroupMemberDO> allMembers = List.of(
                 currentMember,
                 ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                        .status(CommonStatusEnum.ENABLE.getStatus())
                         .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build(),
                 ImGroupMemberDO.builder().groupId(10L).userId(3L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                        .status(CommonStatusEnum.ENABLE.getStatus())
                         .joinTime(LocalDateTime.of(2026, 4, 13, 0, 0, 0)).build(), // 消息之后才入群
                 ImGroupMemberDO.builder().groupId(10L).userId(5L)
-                        .status(ImGroupMemberStatusEnum.NORMAL.getStatus())
+                        .status(CommonStatusEnum.ENABLE.getStatus())
                         .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build()  // 发送者
         );
         when(imGroupMemberService.selectByGroupId(10L)).thenReturn(allMembers);

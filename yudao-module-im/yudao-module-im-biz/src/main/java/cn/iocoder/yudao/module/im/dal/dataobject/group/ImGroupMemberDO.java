@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.group;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -9,7 +9,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO @AI：好友关系是逻辑删除，群成员是 status 标识，感觉是不是要统一下？
 /**
  * IM 群成员 DO
  *
@@ -57,7 +56,8 @@ public class ImGroupMemberDO extends BaseDO {
     /**
      * 成员状态
      * <p>
-     * 枚举 {@link ImGroupMemberStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
+     * ENABLE(0) = 正常，DISABLE(1) = 已退出
      */
     private Integer status;
     /**
