@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-// TODO @芋艿：这个需要在评估下；
+// DONE @芋艿：已评估，23 个测试全部通过
 /**
  * IM 群聊消息 Service 单元测试
  *

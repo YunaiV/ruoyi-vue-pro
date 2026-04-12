@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.sensitiveword;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.im.dal.dataobject.sensitiveword.ImSensitiveWordDO;
 import cn.iocoder.yudao.module.im.dal.mysql.sensitiveword.ImSensitiveWordMapper;
 import jakarta.annotation.PostConstruct;
@@ -52,7 +53,8 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
     }
 
     private void loadSensitiveWords() {
-        List<ImSensitiveWordDO> enabledWords = imSensitiveWordMapper.selectListByStatus();
+        List<ImSensitiveWordDO> enabledWords = imSensitiveWordMapper.selectListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
         sensitiveWords = enabledWords.stream()
                 .map(ImSensitiveWordDO::getWord)
                 .collect(Collectors.toList());

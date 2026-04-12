@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// TODO @AI：去掉部分不需要的 save 字段；
 @Schema(description = "管理后台 - 群成员新增/修改 Request VO")
 @Data
 public class ImGroupMemberSaveReqVO {
@@ -19,16 +18,7 @@ public class ImGroupMemberSaveReqVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "组内显示名", example = "芋艿")
-    private String displayUserName;
-
-    @Schema(description = "群显示备注", example = "核心群")
-    private String displayGroupName;
-
     @Schema(description = "是否免打扰")
     private Boolean muted;
-
-    @Schema(description = "成员状态", example = "0")
-    private Integer status;
 
 }

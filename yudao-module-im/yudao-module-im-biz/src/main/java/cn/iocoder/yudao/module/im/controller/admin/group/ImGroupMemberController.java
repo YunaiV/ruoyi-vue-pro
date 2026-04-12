@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @芋艿：得看看 create、update、delete、get、page 这几个接口，要保留哪些
+// DONE @芋艿：create/update/delete/get/page 全部保留，管理后台群成员管理需要
 @Tag(name = "管理后台 - 群成员")
 @RestController
 @RequestMapping("/im/group-member")
