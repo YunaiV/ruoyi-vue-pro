@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,7 +40,7 @@ public class ImPrivateMessageServiceImplTest {
     @Mock
     private ImSensitiveWordService imSensitiveWordService;
     @Mock
-    private WebSocketSenderApi webSocketSenderApi;
+    private WebSocketMessageSender webSocketMessageSender;
 
     private ImPrivateMessageSendReqVO buildSendReqVO() {
         ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
@@ -59,7 +59,11 @@ public class ImPrivateMessageServiceImplTest {
         ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
         when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(null);
-        when(imPrivateMessageMapper.insert(any())).thenReturn(1);
+        when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
+            ImPrivateMessageDO msg = invocation.getArgument(0);
+            msg.setId(99L);
+            return 1;
+        });
 
         // 调用
         ImPrivateMessageDO result = privateMessageService.sendMessage(1L, reqVO);
@@ -75,8 +79,8 @@ public class ImPrivateMessageServiceImplTest {
         // 验证调用
         verify(imFriendService).validateIsFriend(1L, 2L);
         verify(imSensitiveWordService).validateText(reqVO.getContent());
-        verify(imPrivateMessageMapper).insert(any());
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+        verify(imPrivateMessageMapper).insert(any(ImPrivateMessageDO.class));
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
     }
 
     @Test
@@ -96,7 +100,7 @@ public class ImPrivateMessageServiceImplTest {
         // 断言：返回已存在的消息
         assertEquals(100L, result.getId());
         // 验证不会重复插入
-        verify(imPrivateMessageMapper, never()).insert(any());
+        verify(imPrivateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
     }
 
     @Test
@@ -151,7 +155,7 @@ public class ImPrivateMessageServiceImplTest {
         privateMessageService.readMessages(1L, 2L);
 
         // 断言：发送了 READ 和 RECEIPT 事件
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
     }
 
     // ========== 撤回测试 ==========
@@ -163,15 +167,15 @@ public class ImPrivateMessageServiceImplTest {
                 .id(10L).senderId(1L).receiverId(2L)
                 .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
         when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
-        when(imPrivateMessageMapper.updateById(any())).thenReturn(1);
+        when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
 
         // 调用
         privateMessageService.recallMessage(1L, 10L);
 
         // 断言
-        verify(imPrivateMessageMapper).updateById(any());
+        verify(imPrivateMessageMapper).updateById(any(ImPrivateMessageDO.class));
         // 验证推送了 RECALL 事件（给接收方和发送方）
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
     }
 
     @Test

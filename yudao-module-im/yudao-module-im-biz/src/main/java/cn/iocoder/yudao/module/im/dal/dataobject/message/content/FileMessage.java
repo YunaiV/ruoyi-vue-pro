@@ -1,27 +1,28 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message.content;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * 文件消息的 {@link ImMessageDO 字段 content} 的内容
- *
- * @author 芋道源码
+ * 文件消息内容
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class FileMessage {
 
+    /**
+     * 文件 URL
+     */
+    private String url;
     /**
      * 文件名
      */
     private String name;
     /**
-     * 文件 URL
+     * 文件大小（字节）
      */
-    private String url;
+    private Long size;
+    /**
+     * 文件类型（扩展名）
+     */
+    private String type;
 
 }

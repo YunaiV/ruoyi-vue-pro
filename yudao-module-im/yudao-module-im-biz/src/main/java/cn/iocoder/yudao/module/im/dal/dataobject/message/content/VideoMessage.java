@@ -1,19 +1,36 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message.content;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
 import lombok.Data;
 
 /**
- * 视频消息的 {@link ImMessageDO 字段 content} 的内容
- *
- * @author 芋道源码
+ * 视频消息内容
  */
 @Data
 public class VideoMessage {
 
     /**
-     * 视频地址
+     * 视频文件 URL
      */
     private String url;
+    /**
+     * 视频封面 URL
+     */
+    private String coverUrl;
+    /**
+     * 视频时长（秒）
+     */
+    private Integer duration;
+    /**
+     * 视频宽度
+     */
+    private Integer width;
+    /**
+     * 视频高度
+     */
+    private Integer height;
+    /**
+     * 文件大小（字节）
+     */
+    private Long size;
 
 }

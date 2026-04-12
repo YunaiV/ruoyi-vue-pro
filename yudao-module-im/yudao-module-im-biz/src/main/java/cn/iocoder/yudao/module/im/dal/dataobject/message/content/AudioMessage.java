@@ -1,50 +1,24 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message.content;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.ImMessageDO;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-// TODO @anhaohao：要有 IM；
-// TODO @芋艿：后续要挪到 api 包下，主要是给外部接口使用
 /**
- * 语音消息的 {@link ImMessageDO 字段 content} 的内容
- *
- * @author 芋道源码
+ * 语音消息内容
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class AudioMessage {
 
     /**
-     * 语音文件唯一 ID
+     * 语音文件 URL
      */
-    private String uuid;
-
+    private String url;
     /**
-     * 语音文件的本地路径
+     * 语音时长（秒）
      */
-    private String soundPath;
-
+    private Integer duration;
     /**
-     * 语音文件下载地址
+     * 文件大小（字节）
      */
-    private String sourceUrl;
-
-    /**
-     * 语音文件大小
-     */
-    private int dataSize;
-
-    /**
-     * 语音时长
-     */
-    private int duration;
-
-    /**
-     * 语音文件类型
-     */
-    private String soundType;
+    private Long size;
 
 }

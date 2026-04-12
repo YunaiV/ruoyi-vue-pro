@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.ImGroupMessageSendReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
@@ -11,9 +11,9 @@ import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
-import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
+import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,7 +51,7 @@ public class ImGroupMessageServiceImplTest {
     @Mock
     private GroupReadPositionRedisDAO groupReadPositionRedisDAO;
     @Mock
-    private WebSocketSenderApi webSocketSenderApi;
+    private WebSocketMessageSender webSocketMessageSender;
 
     private ImGroupMessageSendReqVO buildSendReqVO() {
         ImGroupMessageSendReqVO reqVO = new ImGroupMessageSendReqVO();
@@ -89,7 +89,11 @@ public class ImGroupMessageServiceImplTest {
                         .status(ImGroupMemberStatusEnum.NORMAL.getStatus()).build()
         );
         when(imGroupMemberService.selectByGroupId(10L)).thenReturn(allMembers);
-        when(imGroupMessageMapper.insert(any())).thenReturn(1);
+        when(imGroupMessageMapper.insert(any(ImGroupMessageDO.class))).thenAnswer(invocation -> {
+            ImGroupMessageDO msg = invocation.getArgument(0);
+            msg.setId(99L);
+            return 1;
+        });
 
         // 调用
         ImGroupMessageDO result = groupMessageService.sendMessage(1L, reqVO);
@@ -102,7 +106,7 @@ public class ImGroupMessageServiceImplTest {
         assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus());
 
         // 验证推送给 3 个群成员
-        verify(webSocketSenderApi, times(3)).sendObject(anyInt(), anyLong(), anyString(), any());
+        verify(webSocketMessageSender, times(3)).sendObject(anyInt(), anyLong(), anyString(), any());
     }
 
     @Test
@@ -121,7 +125,7 @@ public class ImGroupMessageServiceImplTest {
 
         // 断言
         assertEquals(100L, result.getId());
-        verify(imGroupMessageMapper, never()).insert(any());
+        verify(imGroupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
     }
 
     @Test
@@ -262,7 +266,7 @@ public class ImGroupMessageServiceImplTest {
                 .id(50L).senderId(1L).groupId(10L)
                 .status(ImMessageStatusEnum.NORMAL).build();
         when(imGroupMessageMapper.selectById(50L)).thenReturn(message);
-        when(imGroupMessageMapper.updateById(any())).thenReturn(1);
+        when(imGroupMessageMapper.updateById(any(ImGroupMessageDO.class))).thenReturn(1);
 
         List<ImGroupMemberDO> members = List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
@@ -278,7 +282,7 @@ public class ImGroupMessageServiceImplTest {
         groupMessageService.recallMessage(1L, 50L);
 
         // 断言：只给 2 个活跃成员发送 RECALL 事件（userId=3 已退群）
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
     }
 
     // ========== 群已读测试 ==========

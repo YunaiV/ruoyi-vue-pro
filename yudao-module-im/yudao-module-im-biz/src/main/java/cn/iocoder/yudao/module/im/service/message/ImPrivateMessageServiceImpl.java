@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImWebSocketTypeConstants;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     // TODO @AI：这个类貌似路径不对？！
     @Resource
-    private WebSocketSenderApi webSocketSenderApi;
+    private WebSocketMessageSender webSocketMessageSender;
 
     @Override
     public ImPrivateMessageDO sendMessage(Long senderId, ImPrivateMessageSendReqVO reqVO) {
@@ -107,7 +107,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
         readEvent.put("friendId", friendId.toString());
         readEvent.put("messageScene", "private");
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                 ImWebSocketTypeConstants.READ, readEvent);
 
         // 3. 发送 RECEIPT 事件给对方（已读回执）
@@ -115,7 +115,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
         receiptEvent.put("userId", userId.toString());
         receiptEvent.put("messageScene", "private");
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), friendId,
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), friendId,
                 ImWebSocketTypeConstants.RECEIPT, receiptEvent);
     }
 
@@ -147,11 +147,11 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         recallEvent.put("messageId", messageId.toString());
         recallEvent.put("messageScene", "private");
         recallEvent.put("senderId", userId.toString());
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
                 ImWebSocketTypeConstants.RECALL, recallEvent);
         // 3.2 也通知发送方自己的其他终端
         // TODO @AI：需要整理下，相关的 websocket DTO；可维护性变强！
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                 ImWebSocketTypeConstants.RECALL, recallEvent);
     }
 
@@ -171,10 +171,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         event.put("sendTime", message.getSendTime().toString());
         event.put("messageScene", "private");
         // 推送给接收方
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
                 ImWebSocketTypeConstants.PRIVATE_MESSAGE, event);
         // 推送给发送方自己的其他终端（多端同步）
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
                 ImWebSocketTypeConstants.PRIVATE_MESSAGE, event);
     }
 

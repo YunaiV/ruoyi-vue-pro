@@ -15,9 +15,9 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImWebSocketTypeConstants;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
-import cn.iocoder.yudao.module.im.service.groupmember.ImGroupMemberService;
+import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     @Resource
     private GroupReadPositionRedisDAO groupReadPositionRedisDAO;
     @Resource
-    private WebSocketSenderApi webSocketSenderApi;
+    private WebSocketMessageSender webSocketMessageSender;
 
     @Override
     public ImGroupMessageDO sendMessage(Long senderId, ImGroupMessageSendReqVO reqVO) {
@@ -170,7 +170,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         Map<String, Object> readEvent = new HashMap<>();
         readEvent.put("groupId", groupId.toString());
         readEvent.put("messageScene", "group");
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                 ImWebSocketTypeConstants.READ, readEvent);
 
         // 5. 刷新群回执
@@ -209,7 +209,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(m.getStatus())) {
                 continue;
             }
-            webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
+            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
                     ImWebSocketTypeConstants.RECALL, recallEvent);
         }
     }
@@ -302,7 +302,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 if (ImGroupMemberStatusEnum.QUIT.getStatus().equals(m.getStatus())) {
                     continue;
                 }
-                webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
+                webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
                         ImWebSocketTypeConstants.RECEIPT, receiptEvent);
             }
         }
@@ -382,7 +382,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                     && !member.getUserId().equals(message.getSenderId())) {
                 continue;
             }
-            webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), member.getUserId(),
+            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), member.getUserId(),
                     ImWebSocketTypeConstants.GROUP_MESSAGE, event);
         }
     }

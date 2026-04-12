@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImWebSocketTypeConstants;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -40,7 +40,7 @@ public class ImWebSocketEventTest {
     @Mock
     private ImSensitiveWordService imSensitiveWordService;
     @Mock
-    private WebSocketSenderApi webSocketSenderApi;
+    private WebSocketMessageSender webSocketMessageSender;
 
     @Test
     public void testSendMessage_websocketEvent() {
@@ -52,7 +52,12 @@ public class ImWebSocketEventTest {
         reqVO.setContent("{\"content\":\"事件测试\"}");
 
         when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "evt-uuid")).thenReturn(null);
-        when(imPrivateMessageMapper.insert(any())).thenReturn(1);
+        // mock insert：通过 doAnswer 模拟 MyBatis-Plus 设置 ID
+        when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
+            ImPrivateMessageDO msg = invocation.getArgument(0);
+            msg.setId(99L);
+            return 1;
+        });
 
         // 调用
         privateMessageService.sendMessage(1L, reqVO);
@@ -60,7 +65,7 @@ public class ImWebSocketEventTest {
         // 捕获 WebSocket 调用
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object> contentCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), anyLong(),
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(),
                 typeCaptor.capture(), contentCaptor.capture());
 
         // 验证消息事件类型
@@ -87,7 +92,7 @@ public class ImWebSocketEventTest {
         // 捕获
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Long> userCaptor = ArgumentCaptor.forClass(Long.class);
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), userCaptor.capture(),
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), userCaptor.capture(),
                 typeCaptor.capture(), any());
 
         // 第一次：发给自己的 READ 事件
@@ -104,7 +109,7 @@ public class ImWebSocketEventTest {
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(1L).receiverId(2L).status(0).build();
         when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
-        when(imPrivateMessageMapper.updateById(any())).thenReturn(1);
+        when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
 
         // 调用
         privateMessageService.recallMessage(1L, 10L);
@@ -112,7 +117,7 @@ public class ImWebSocketEventTest {
         // 捕获
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object> contentCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(webSocketSenderApi, times(2)).sendObject(anyInt(), anyLong(),
+        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(),
                 typeCaptor.capture(), contentCaptor.capture());
 
         // 验证 RECALL 事件类型
