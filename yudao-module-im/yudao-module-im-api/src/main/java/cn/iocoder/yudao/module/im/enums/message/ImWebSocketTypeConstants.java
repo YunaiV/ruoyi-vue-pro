@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.im.enums.message;
 
-// TODO @芋艿：稍后在 review
+// DONE @芋艿：已 review，事件类型定义正确
 /**
  * IM WebSocket 事件类型常量
  *

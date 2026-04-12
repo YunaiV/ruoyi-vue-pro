@@ -1,17 +1,16 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.friend;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @AI：好友关系是逻辑删除，群成员是 status 标识，感觉是不是要统一下？感觉都改成 status 会不会好点？这样增加一个添加时间、和删除时间；都使用 statusenum 标识；
+import java.time.LocalDateTime;
+
 /**
  * IM 好友关系 DO
- * <p>
- * 删除好友采用逻辑删除，沿用 BaseDO 的 deleted。
- * 重新添加好友时优先恢复原关系记录，不新插重复行。
  *
  * @author 芋道源码
  */
@@ -43,8 +42,22 @@ public class ImFriendDO extends BaseDO {
      */
     private Long friendUserId;
     /**
+     * 好友状态
+     * <p>
+     * 枚举 {@link CommonStatusEnum}
+     */
+    private Integer status;
+    /**
      * 是否免打扰
      */
     private Boolean muted;
+    /**
+     * 添加好友时间
+     */
+    private LocalDateTime addTime;
+    /**
+     * 删除好友时间
+     */
+    private LocalDateTime deleteTime;
 
 }

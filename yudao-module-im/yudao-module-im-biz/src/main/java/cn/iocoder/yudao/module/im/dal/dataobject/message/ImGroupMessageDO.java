@@ -6,18 +6,21 @@ import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * IM 群聊消息 DO
  *
  * @author 芋道源码
  */
-@TableName("im_group_message")
+@TableName(value = "im_group_message", autoResultMap = true)
 @KeySequence("im_group_message_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -74,21 +77,21 @@ public class ImGroupMessageDO extends BaseDO {
      */
     private LocalDateTime sendTime;
     /**
-     * 定向接收用户编号列表，逗号分隔
+     * 定向接收用户编号列表
      * <p>
      * 为空表示全员可见
      *
      * 关联 AdminUserDO 的 id 字段
      */
-    // TODO @AI：后续优化为 List<Long> 存储（使用 MyBatis-Plus TypeHandler），避免逗号分隔解析问题
-    private String receiverUserIds;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> receiverUserIds;
     /**
-     * @ 目标用户编号列表，逗号分隔
+     * @ 目标用户编号列表
      *
      * 关联 AdminUserDO 的 id 字段
      */
-    // TODO @AI：后续优化为 List<Long> 存储（使用 MyBatis-Plus TypeHandler），避免逗号分隔解析问题
-    private String atUserIds;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> atUserIds;
     /**
      * 回执状态
      * <p>

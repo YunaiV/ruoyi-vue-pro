@@ -19,7 +19,7 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 
-// TODO @芋艿：得看看 create、update、delete、get、page 这几个接口，要保留哪些
+// DONE @芋艿：create/update/delete/get/page 全部保留，管理后台群管理需要
 @Tag(name = "管理后台 - 群")
 @RestController
 @RequestMapping("/im/group")

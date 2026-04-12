@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
-// TODO @AI：参考 private message 先优化一把！
 /**
  * IM 群聊消息 Service 实现类
  *
@@ -88,10 +86,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .content(reqVO.getContent())
                 .status(ImMessageStatusEnum.UNREAD.getStatus()) // 群聊正常状态 = 0
                 .sendTime(LocalDateTime.now())
-                .atUserIds(CollUtil.isNotEmpty(reqVO.getAtUserIds())
-                        ? StrUtil.join(",", reqVO.getAtUserIds()) : null)
-                .receiverUserIds(CollUtil.isNotEmpty(reqVO.getReceiverUserIds())
-                        ? StrUtil.join(",", reqVO.getReceiverUserIds()) : null)
+                .atUserIds(reqVO.getAtUserIds())
+                .receiverUserIds(reqVO.getReceiverUserIds())
                 .receiptStatus(Boolean.TRUE.equals(reqVO.getNeedReceipt())
                         ? ImGroupMessageReceiptStatusEnum.PENDING.getStatus()
                         : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus())
@@ -139,9 +135,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 return false;
             }
             // 定向接收过滤
-            if (StrUtil.isNotBlank(msg.getReceiverUserIds())) {
-                Set<String> receivers = new HashSet<>(Arrays.asList(msg.getReceiverUserIds().split(",")));
-                if (!receivers.contains(userId.toString()) && !msg.getSenderId().equals(userId)) {
+            if (CollUtil.isNotEmpty(msg.getReceiverUserIds())) {
+                if (!msg.getReceiverUserIds().contains(userId) && !msg.getSenderId().equals(userId)) {
                     return false;
                 }
             }
@@ -318,10 +313,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
      */
     private Set<Long> getVisibleUserIds(ImGroupMessageDO msg, List<ImGroupMemberDO> allMembers) {
         // 定向接收集合
-        Set<String> receiverSet = null;
-        if (StrUtil.isNotBlank(msg.getReceiverUserIds())) {
-            receiverSet = new HashSet<>(Arrays.asList(msg.getReceiverUserIds().split(",")));
-        }
+        List<Long> receiverList = msg.getReceiverUserIds();
 
         Set<Long> visible = new HashSet<>();
         for (ImGroupMemberDO m : allMembers) {
@@ -335,7 +327,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 continue;
             }
             // 定向接收过滤
-            if (receiverSet != null && !receiverSet.contains(m.getUserId().toString())
+            if (CollUtil.isNotEmpty(receiverList) && !receiverList.contains(m.getUserId())
                     && !m.getUserId().equals(msg.getSenderId())) {
                 continue;
             }
@@ -359,26 +351,23 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         event.put("status", message.getStatus());
         event.put("sendTime", message.getSendTime().toString());
         event.put("messageScene", "group");
-        if (StrUtil.isNotBlank(message.getAtUserIds())) {
+        if (CollUtil.isNotEmpty(message.getAtUserIds())) {
             event.put("atUserIds", message.getAtUserIds());
         }
-        if (StrUtil.isNotBlank(message.getReceiverUserIds())) {
+        if (CollUtil.isNotEmpty(message.getReceiverUserIds())) {
             event.put("receiverUserIds", message.getReceiverUserIds());
         }
         event.put("receiptStatus", message.getReceiptStatus());
 
         // 确定推送目标
-        Set<String> receiverSet = null;
-        if (StrUtil.isNotBlank(message.getReceiverUserIds())) {
-            receiverSet = new HashSet<>(Arrays.asList(message.getReceiverUserIds().split(",")));
-        }
+        List<Long> receiverList = message.getReceiverUserIds();
 
         for (ImGroupMemberDO member : members) {
             if (CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
                 continue;
             }
             // 定向接收过滤
-            if (receiverSet != null && !receiverSet.contains(member.getUserId().toString())
+            if (CollUtil.isNotEmpty(receiverList) && !receiverList.contains(member.getUserId())
                     && !member.getUserId().equals(message.getSenderId())) {
                 continue;
             }

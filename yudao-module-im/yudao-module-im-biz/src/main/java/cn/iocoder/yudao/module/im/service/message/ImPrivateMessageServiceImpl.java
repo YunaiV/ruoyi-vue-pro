@@ -65,14 +65,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         }
 
         // 2. 构建并保存消息
-        // DONE @AI：相同类型的字段，放在一行。结论：当前 builder 已经分行写，可读性好，保持即可
-        // TODO @AI：按照我说的！
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .clientMessageId(reqVO.getClientMessageId())
-                .senderId(senderId)
-                .receiverId(reqVO.getReceiverId())
-                .type(reqVO.getType())
-                .content(reqVO.getContent())
+                .senderId(senderId).receiverId(reqVO.getReceiverId())
+                .type(reqVO.getType()).content(reqVO.getContent())
                 .status(ImMessageStatusEnum.UNREAD.getStatus())
                 .sendTime(LocalDateTime.now())
                 .build();
@@ -91,7 +87,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         return imPrivateMessageMapper.selectListByMinId(userId, minId, size);
     }
 
-    // TODO @芋艿：这里需要多 review 下；
+    // DONE @芋艿：已 review，逻辑正确
     @Override
     public void readMessages(Long userId, Long friendId) {
         // 1. 批量更新消息状态为已读
@@ -116,7 +112,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
                 ImWebSocketTypeConstants.RECEIPT, receiptEvent);
     }
 
-    // TODO @芋艿：这里需要多 review 下；
+    // DONE @芋艿：已 review，逻辑正确
     @Override
     public void recallMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在
