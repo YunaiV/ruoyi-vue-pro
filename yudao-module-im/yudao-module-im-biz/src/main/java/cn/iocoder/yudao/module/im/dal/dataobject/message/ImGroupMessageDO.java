@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
@@ -9,7 +10,6 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -77,20 +77,20 @@ public class ImGroupMessageDO extends BaseDO {
      */
     private LocalDateTime sendTime;
     /**
-     * 定向接收用户编号列表
+     * 定向接收用户编号列表，以逗号分隔
      * <p>
      * 为空表示全员可见
      *
      * 关联 AdminUserDO 的 id 字段
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> receiverUserIds;
     /**
-     * @ 目标用户编号列表
+     * @ 目标用户编号列表，以逗号分隔
      *
      * 关联 AdminUserDO 的 id 字段
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> atUserIds;
     /**
      * 回执状态

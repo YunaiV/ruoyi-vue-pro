@@ -19,7 +19,7 @@ public interface ImPrivateMessageService {
      * @param reqVO    发送请求
      * @return 消息
      */
-    ImPrivateMessageDO sendMessage(Long senderId, ImPrivateMessageSendReqVO reqVO);
+    ImPrivateMessageDO sendPrivateMessage(Long senderId, ImPrivateMessageSendReqVO reqVO);
 
     /**
      * 拉取私聊消息（增量）
@@ -29,7 +29,7 @@ public interface ImPrivateMessageService {
      * @param size   拉取数量
      * @return 消息列表
      */
-    List<ImPrivateMessageDO> pullMessages(Long userId, Long minId, Integer size);
+    List<ImPrivateMessageDO> pullPrivateMessages(Long userId, Long minId, Integer size);
 
     /**
      * 标记私聊消息已读
@@ -37,7 +37,7 @@ public interface ImPrivateMessageService {
      * @param userId   当前用户编号
      * @param friendId 好友用户编号
      */
-    void readMessages(Long userId, Long friendId);
+    void readPrivateMessages(Long userId, Long friendId);
 
     /**
      * 撤回私聊消息
@@ -45,6 +45,6 @@ public interface ImPrivateMessageService {
      * @param userId    当前用户编号
      * @param messageId 消息编号
      */
-    void recallMessage(Long userId, Long messageId);
+    void recallPrivateMessage(Long userId, Long messageId);
 
 }

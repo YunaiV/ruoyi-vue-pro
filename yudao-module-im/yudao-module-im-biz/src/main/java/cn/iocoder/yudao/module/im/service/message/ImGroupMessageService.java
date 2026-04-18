@@ -19,7 +19,7 @@ public interface ImGroupMessageService {
      * @param reqVO    发送请求
      * @return 消息
      */
-    ImGroupMessageDO sendMessage(Long senderId, ImGroupMessageSendReqVO reqVO);
+    ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO);
 
     /**
      * 拉取群聊消息（增量）
@@ -29,7 +29,7 @@ public interface ImGroupMessageService {
      * @param size   拉取数量
      * @return 消息列表
      */
-    List<ImGroupMessageDO> pullMessages(Long userId, Long minId, Integer size);
+    List<ImGroupMessageDO> pullGroupMessages(Long userId, Long minId, Integer size);
 
     /**
      * 标记群聊消息已读
@@ -37,7 +37,7 @@ public interface ImGroupMessageService {
      * @param userId  当前用户编号
      * @param groupId 群编号
      */
-    void readMessages(Long userId, Long groupId);
+    void readGroupMessages(Long userId, Long groupId);
 
     /**
      * 撤回群聊消息
@@ -45,7 +45,7 @@ public interface ImGroupMessageService {
      * @param userId    当前用户编号
      * @param messageId 消息编号
      */
-    void recallMessage(Long userId, Long messageId);
+    void recallGroupMessage(Long userId, Long messageId);
 
     /**
      * 获取群消息的已读用户列表
@@ -55,6 +55,6 @@ public interface ImGroupMessageService {
      * @param messageId 消息编号
      * @return 已读用户编号列表
      */
-    List<Long> getReadUsers(Long userId, Long groupId, Long messageId);
+    List<Long> getGroupReadUsers(Long userId, Long groupId, Long messageId);
 
 }

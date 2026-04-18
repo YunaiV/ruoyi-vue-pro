@@ -50,7 +50,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     private WebSocketMessageSender webSocketMessageSender;
 
     @Override
-    public ImPrivateMessageDO sendMessage(Long senderId, ImPrivateMessageSendReqVO reqVO) {
+    public ImPrivateMessageDO sendPrivateMessage(Long senderId, ImPrivateMessageSendReqVO reqVO) {
         // 1.1 幂等校验：根据 senderId + clientMessageId 查重
         ImPrivateMessageDO existing = imPrivateMessageMapper.selectBySenderIdAndClientMessageId(
                 senderId, reqVO.getClientMessageId());
@@ -80,7 +80,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     }
 
     @Override
-    public List<ImPrivateMessageDO> pullMessages(Long userId, Long minId, Integer size) {
+    public List<ImPrivateMessageDO> pullPrivateMessages(Long userId, Long minId, Integer size) {
         if (size > MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
@@ -89,7 +89,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     // DONE @芋艿：已 review，逻辑正确
     @Override
-    public void readMessages(Long userId, Long friendId) {
+    public void readPrivateMessages(Long userId, Long friendId) {
         // 1. 批量更新消息状态为已读
         int updated = imPrivateMessageMapper.updateStatusToRead(userId, friendId);
         if (updated == 0) {
@@ -114,7 +114,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     // DONE @芋艿：已 review，逻辑正确
     @Override
-    public void recallMessage(Long userId, Long messageId) {
+    public void recallPrivateMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在
         ImPrivateMessageDO message = imPrivateMessageMapper.selectById(messageId);
         if (message == null) {

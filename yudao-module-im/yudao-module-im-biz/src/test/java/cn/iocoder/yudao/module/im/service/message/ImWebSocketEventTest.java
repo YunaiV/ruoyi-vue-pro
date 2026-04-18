@@ -60,7 +60,7 @@ public class ImWebSocketEventTest {
         });
 
         // 调用
-        privateMessageService.sendMessage(1L, reqVO);
+        privateMessageService.sendPrivateMessage(1L, reqVO);
 
         // 捕获 WebSocket 调用
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
@@ -87,7 +87,7 @@ public class ImWebSocketEventTest {
         when(imPrivateMessageMapper.updateStatusToRead(1L, 2L)).thenReturn(1);
 
         // 调用
-        privateMessageService.readMessages(1L, 2L);
+        privateMessageService.readPrivateMessages(1L, 2L);
 
         // 捕获
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
@@ -112,7 +112,7 @@ public class ImWebSocketEventTest {
         when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
 
         // 调用
-        privateMessageService.recallMessage(1L, 10L);
+        privateMessageService.recallPrivateMessage(1L, 10L);
 
         // 捕获
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);

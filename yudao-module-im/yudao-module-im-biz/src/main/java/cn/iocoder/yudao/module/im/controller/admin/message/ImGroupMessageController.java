@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.im.controller.admin.message;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.*;
-import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageReadReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
@@ -35,40 +33,35 @@ public class ImGroupMessageController {
 
     @PostMapping("/send")
     @Operation(summary = "发送群聊消息")
-    public CommonResult<ImGroupMessageRespVO> sendMessage(@Valid @RequestBody ImGroupMessageSendReqVO reqVO) {
-        ImGroupMessageDO message = imGroupMessageService.sendMessage(getLoginUserId(), reqVO);
+    public CommonResult<ImGroupMessageRespVO> sendGroupMessage(@Valid @RequestBody ImGroupMessageSendReqVO reqVO) {
+        ImGroupMessageDO message = imGroupMessageService.sendGroupMessage(getLoginUserId(), reqVO);
         return success(toRespVO(message));
     }
 
-    // DONE @AI：需要在评估下，是否需要 nextMinId。结论：需要，前端用 nextMinId 做增量拉取游标
     @GetMapping("/pull")
     @Operation(summary = "拉取群聊消息（增量）")
     @Parameter(name = "minId", description = "最小消息 id", required = true, example = "0")
     @Parameter(name = "size", description = "拉取数量", required = true, example = "100")
-    public CommonResult<ImMessagePullRespVO<ImGroupMessageRespVO>> pullMessages(
+    public CommonResult<List<ImGroupMessageRespVO>> pullGroupMessages(
             @RequestParam("minId") Long minId,
             @RequestParam("size") Integer size) {
-        List<ImGroupMessageDO> messages = imGroupMessageService.pullMessages(getLoginUserId(), minId, size);
-        ImMessagePullRespVO<ImGroupMessageRespVO> resp = new ImMessagePullRespVO<>();
-        resp.setList(messages.stream().map(this::toRespVO).collect(Collectors.toList()));
-        resp.setNextMinId(messages.isEmpty() ? minId
-                : messages.get(messages.size() - 1).getId());
-        return success(resp);
+        List<ImGroupMessageDO> messages = imGroupMessageService.pullGroupMessages(getLoginUserId(), minId, size);
+        return success(messages.stream().map(this::toRespVO).collect(Collectors.toList()));
     }
 
-    // DONE @AI：它是不是不用 VO。结论：需要 ReqVO，承载 groupId 字段并做参数校验
     @PutMapping("/read")
     @Operation(summary = "标记群聊消息已读")
-    public CommonResult<Boolean> readMessages(@Valid @RequestBody ImGroupMessageReadReqVO reqVO) {
-        imGroupMessageService.readMessages(getLoginUserId(), reqVO.getGroupId());
+    @Parameter(name = "groupId", description = "群编号", required = true, example = "1")
+    public CommonResult<Boolean> readGroupMessages(@RequestParam("groupId") Long groupId) {
+        imGroupMessageService.readGroupMessages(getLoginUserId(), groupId);
         return success(true);
     }
 
     @DeleteMapping("/recall")
     @Operation(summary = "撤回群聊消息")
     @Parameter(name = "id", description = "消息编号", required = true, example = "1")
-    public CommonResult<Boolean> recallMessage(@RequestParam("id") Long id) {
-        imGroupMessageService.recallMessage(getLoginUserId(), id);
+    public CommonResult<Boolean> recallGroupMessage(@RequestParam("id") Long id) {
+        imGroupMessageService.recallGroupMessage(getLoginUserId(), id);
         return success(true);
     }
 
@@ -77,10 +70,10 @@ public class ImGroupMessageController {
     @Operation(summary = "获取群消息已读用户列表")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1")
     @Parameter(name = "messageId", description = "消息编号", required = true, example = "1")
-    public CommonResult<List<String>> getReadUsers(
+    public CommonResult<List<String>> getGroupReadUsers(
             @RequestParam("groupId") Long groupId,
             @RequestParam("messageId") Long messageId) {
-        List<Long> readUserIds = imGroupMessageService.getReadUsers(getLoginUserId(), groupId, messageId);
+        List<Long> readUserIds = imGroupMessageService.getGroupReadUsers(getLoginUserId(), groupId, messageId);
         // Long -> String 转换
         return success(readUserIds.stream().map(String::valueOf).collect(Collectors.toList()));
     }

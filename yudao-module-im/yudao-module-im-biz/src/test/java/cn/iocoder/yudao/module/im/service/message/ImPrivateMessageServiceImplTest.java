@@ -66,7 +66,7 @@ public class ImPrivateMessageServiceImplTest {
         });
 
         // 调用
-        ImPrivateMessageDO result = privateMessageService.sendMessage(1L, reqVO);
+        ImPrivateMessageDO result = privateMessageService.sendPrivateMessage(1L, reqVO);
 
         // 断言
         assertNotNull(result);
@@ -95,7 +95,7 @@ public class ImPrivateMessageServiceImplTest {
                 .thenReturn(existingMessage);
 
         // 调用
-        ImPrivateMessageDO result = privateMessageService.sendMessage(1L, reqVO);
+        ImPrivateMessageDO result = privateMessageService.sendPrivateMessage(1L, reqVO);
 
         // 断言：返回已存在的消息
         assertEquals(100L, result.getId());
@@ -114,7 +114,7 @@ public class ImPrivateMessageServiceImplTest {
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> privateMessageService.sendMessage(1L, reqVO));
+                () -> privateMessageService.sendPrivateMessage(1L, reqVO));
         assertEquals(FRIEND_NOT_FRIEND.getCode(), exception.getCode());
     }
 
@@ -130,7 +130,7 @@ public class ImPrivateMessageServiceImplTest {
         when(imPrivateMessageMapper.selectListByMinId(1L, 0L, 100)).thenReturn(mockMessages);
 
         // 调用
-        List<ImPrivateMessageDO> result = privateMessageService.pullMessages(1L, 0L, 100);
+        List<ImPrivateMessageDO> result = privateMessageService.pullPrivateMessages(1L, 0L, 100);
 
         // 断言
         assertEquals(2, result.size());
@@ -140,7 +140,7 @@ public class ImPrivateMessageServiceImplTest {
     public void testPullMessages_sizeExceeded() {
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> privateMessageService.pullMessages(1L, 0L, 1001));
+                () -> privateMessageService.pullPrivateMessages(1L, 0L, 1001));
         assertEquals(MESSAGE_PULL_SIZE_EXCEEDED.getCode(), exception.getCode());
     }
 
@@ -152,7 +152,7 @@ public class ImPrivateMessageServiceImplTest {
         when(imPrivateMessageMapper.updateStatusToRead(1L, 2L)).thenReturn(3);
 
         // 调用
-        privateMessageService.readMessages(1L, 2L);
+        privateMessageService.readPrivateMessages(1L, 2L);
 
         // 断言：发送了 READ 和 RECEIPT 事件
         verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
@@ -170,7 +170,7 @@ public class ImPrivateMessageServiceImplTest {
         when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
 
         // 调用
-        privateMessageService.recallMessage(1L, 10L);
+        privateMessageService.recallPrivateMessage(1L, 10L);
 
         // 断言
         verify(imPrivateMessageMapper).updateById(any(ImPrivateMessageDO.class));
@@ -188,7 +188,7 @@ public class ImPrivateMessageServiceImplTest {
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> privateMessageService.recallMessage(1L, 10L));
+                () -> privateMessageService.recallPrivateMessage(1L, 10L));
         assertEquals(MESSAGE_RECALL_DENIED.getCode(), exception.getCode());
     }
 
@@ -202,7 +202,7 @@ public class ImPrivateMessageServiceImplTest {
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> privateMessageService.recallMessage(1L, 10L));
+                () -> privateMessageService.recallPrivateMessage(1L, 10L));
         assertEquals(MESSAGE_ALREADY_RECALLED.getCode(), exception.getCode());
     }
 

@@ -55,7 +55,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     private WebSocketMessageSender webSocketMessageSender;
 
     @Override
-    public ImGroupMessageDO sendMessage(Long senderId, ImGroupMessageSendReqVO reqVO) {
+    public ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO) {
         // 1. 幂等校验
         ImGroupMessageDO existing = imGroupMessageMapper.selectBySenderIdAndClientMessageId(
                 senderId, reqVO.getClientMessageId());
@@ -100,7 +100,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    public List<ImGroupMessageDO> pullMessages(Long userId, Long minId, Integer size) {
+    public List<ImGroupMessageDO> pullGroupMessages(Long userId, Long minId, Integer size) {
         if (size > MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
@@ -145,7 +145,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    public void readMessages(Long userId, Long groupId) {
+    public void readGroupMessages(Long userId, Long groupId) {
         // 1. 校验用户在群中（权限校验）
         ImGroupMemberDO member = imGroupMemberService.getGroupMember(groupId, userId);
         if (member == null || CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
@@ -173,7 +173,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    public void recallMessage(Long userId, Long messageId) {
+    public void recallGroupMessage(Long userId, Long messageId) {
         // 1. 校验消息存在
         ImGroupMessageDO message = imGroupMessageMapper.selectById(messageId);
         if (message == null) {
@@ -210,7 +210,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    public List<Long> getReadUsers(Long userId, Long groupId, Long messageId) {
+    public List<Long> getGroupReadUsers(Long userId, Long groupId, Long messageId) {
         // 1. 校验用户在群中（权限校验）
         ImGroupMemberDO currentMember = imGroupMemberService.getGroupMember(groupId, userId);
         if (currentMember == null || CommonStatusEnum.DISABLE.getStatus().equals(currentMember.getStatus())) {

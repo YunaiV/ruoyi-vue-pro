@@ -96,7 +96,7 @@ public class ImGroupMessageServiceImplTest {
         });
 
         // 调用
-        ImGroupMessageDO result = groupMessageService.sendMessage(1L, reqVO);
+        ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
 
         // 断言
         assertNotNull(result);
@@ -121,7 +121,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(existing);
 
         // 调用
-        ImGroupMessageDO result = groupMessageService.sendMessage(1L, reqVO);
+        ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
 
         // 断言
         assertEquals(100L, result.getId());
@@ -141,7 +141,7 @@ public class ImGroupMessageServiceImplTest {
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> groupMessageService.sendMessage(1L, reqVO));
+                () -> groupMessageService.sendGroupMessage(1L, reqVO));
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
     }
 
@@ -168,7 +168,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(beforeJoin, afterJoin));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
 
         // 断言：入群前消息不可见
         assertEquals(1, result.size());
@@ -197,7 +197,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(beforeQuit, afterQuit));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
 
         // 断言：退群后消息不可见
         assertEquals(1, result.size());
@@ -216,7 +216,7 @@ public class ImGroupMessageServiceImplTest {
         // 定向接收消息：只给用户 2 和 3
         ImGroupMessageDO directedMsg = ImGroupMessageDO.builder()
                 .id(1L).groupId(10L).senderId(5L)
-                .receiverUserIds("2,3")
+                .receiverUserIds(List.of(2L, 3L))
                 .sendTime(LocalDateTime.of(2026, 4, 12, 10, 0, 0)).build();
         // 全员消息
         ImGroupMessageDO allMsg = ImGroupMessageDO.builder()
@@ -226,7 +226,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(directedMsg, allMsg));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
 
         // 断言：定向接收的消息用户 1 看不到，只能看到全员消息
         assertEquals(1, result.size());
@@ -244,17 +244,17 @@ public class ImGroupMessageServiceImplTest {
 
         ImGroupMessageDO atMsg = ImGroupMessageDO.builder()
                 .id(1L).groupId(10L).senderId(2L)
-                .atUserIds("1,3")
+                .atUserIds(List.of(1L, 3L))
                 .sendTime(LocalDateTime.of(2026, 4, 12, 10, 0, 0)).build();
         when(imGroupMessageMapper.selectListByMinId(List.of(10L), 0L, 100))
                 .thenReturn(List.of(atMsg));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
 
         // 断言：@ 字段正确返回
         assertEquals(1, result.size());
-        assertEquals("1,3", result.get(0).getAtUserIds());
+        assertEquals(List.of(1L, 3L), result.get(0).getAtUserIds());
     }
 
     // ========== 撤回测试 ==========
@@ -279,7 +279,7 @@ public class ImGroupMessageServiceImplTest {
         when(imGroupMemberService.selectByGroupId(10L)).thenReturn(members);
 
         // 调用
-        groupMessageService.recallMessage(1L, 50L);
+        groupMessageService.recallGroupMessage(1L, 50L);
 
         // 断言：只给 2 个活跃成员发送 RECALL 事件（userId=3 已退群）
         verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
@@ -294,7 +294,7 @@ public class ImGroupMessageServiceImplTest {
 
         // 调用并断言：越权校验
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> groupMessageService.readMessages(1L, 10L));
+                () -> groupMessageService.readGroupMessages(1L, 10L));
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
     }
 
@@ -340,7 +340,7 @@ public class ImGroupMessageServiceImplTest {
         when(groupReadPositionRedisDAO.getAllReadPositions(10L)).thenReturn(positions);
 
         // 调用：查询 messageId=80 的已读用户
-        List<Long> readUsers = groupMessageService.getReadUsers(1L, 10L, 80L);
+        List<Long> readUsers = groupMessageService.getGroupReadUsers(1L, 10L, 80L);
 
         // 断言：
         // 用户 1: 可见 + readMaxId=100>=80 → 已读 ✓（但排除发送者？不是发送者，所以算入）
@@ -361,7 +361,7 @@ public class ImGroupMessageServiceImplTest {
 
         // 调用并断言：越权校验
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> groupMessageService.getReadUsers(99L, 10L, 80L));
+                () -> groupMessageService.getGroupReadUsers(99L, 10L, 80L));
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
     }
 
