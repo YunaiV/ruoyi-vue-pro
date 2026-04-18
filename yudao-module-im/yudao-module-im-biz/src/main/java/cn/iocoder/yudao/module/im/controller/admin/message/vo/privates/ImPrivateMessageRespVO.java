@@ -19,10 +19,10 @@ public class ImPrivateMessageRespVO {
     private String clientMessageId;
 
     @Schema(description = "发送人编号", example = "1")
-    private String senderId;
+    private Long senderId;
 
     @Schema(description = "接收人编号", example = "2")
-    private String receiverId;
+    private Long receiverId;
 
     @Schema(description = "消息类型", example = "0")
     private Integer type;

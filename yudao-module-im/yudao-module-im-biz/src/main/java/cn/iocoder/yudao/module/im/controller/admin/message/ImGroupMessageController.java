@@ -51,8 +51,8 @@ public class ImGroupMessageController {
         List<ImGroupMessageDO> messages = imGroupMessageService.pullMessages(getLoginUserId(), minId, size);
         ImMessagePullRespVO<ImGroupMessageRespVO> resp = new ImMessagePullRespVO<>();
         resp.setList(messages.stream().map(this::toRespVO).collect(Collectors.toList()));
-        resp.setNextMinId(messages.isEmpty() ? minId.toString()
-                : messages.get(messages.size() - 1).getId().toString());
+        resp.setNextMinId(messages.isEmpty() ? minId
+                : messages.get(messages.size() - 1).getId());
         return success(resp);
     }
 

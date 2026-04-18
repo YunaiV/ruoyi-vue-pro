@@ -16,6 +16,6 @@ public class ImMessagePullRespVO<T> {
     private List<T> list;
 
     @Schema(description = "下次拉取的最小 id", example = "100")
-    private String nextMinId;
+    private Long nextMinId;
 
 }
