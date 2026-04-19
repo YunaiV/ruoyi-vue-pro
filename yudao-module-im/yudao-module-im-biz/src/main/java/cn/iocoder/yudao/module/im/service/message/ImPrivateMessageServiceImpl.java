@@ -81,29 +81,36 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     }
 
     @Override
-    public List<ImPrivateMessageDO> pullPrivateMessages(Long userId, Long minId, Integer size) {
+    public List<ImPrivateMessageDO> pullPrivateMessageList(Long userId, Long minId, Integer size) {
         if (size > MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
-        return privateMessageMapper.selectListByMinId(userId, minId, size);
+        List<ImPrivateMessageDO> messages = privateMessageMapper.selectListByMinId(userId, minId, size);
+        log.info("[pullPrivateMessageList][userId({}) minId({}) size({}) result({})]",
+                userId, minId, size, messages.size());
+        return messages;
     }
 
-    // DONE @芋艿：已 review，逻辑正确
+    // TODO @AI：应该是将 friendId 改成 receiverId，毕竟消息是发给对方的
     @Override
     public void readPrivateMessages(Long userId, Long friendId) {
         // 1. 批量更新消息状态为已读
+        // TODO @AI：先查询；然后在 update；避免锁的问题；
+        // TODO @AI：注意，update 的时候，也要 id in、status =，最后 updateObj 传入；避免并发问题；
         int updated = privateMessageMapper.updateStatusToRead(userId, friendId);
         if (updated == 0) {
             return; // 没有需要更新的消息
         }
-        // 2. 发送 READ 事件给自己的其他终端（多端同步）
+
+        // TODO @AI：继续 async ！
+        // 2.1 发送 READ 事件给自己的其他终端（多端同步）
         ImMessageReadMessage readMessage = new ImMessageReadMessage()
                 .setFriendId(friendId.toString())
                 .setMessageScene("private");
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                 ImMessageReadMessage.TYPE, readMessage);
 
-        // 3. 发送 RECEIPT 事件给对方（已读回执）
+        // 2.2 发送 RECEIPT 事件给对方（已读回执）
         ImMessageReceiptMessage receiptMessage = new ImMessageReceiptMessage()
                 .setUserId(userId.toString())
                 .setMessageScene("private");

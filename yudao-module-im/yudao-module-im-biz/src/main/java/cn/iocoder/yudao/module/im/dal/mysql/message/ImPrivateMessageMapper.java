@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.dal.mysql.message;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,18 +25,15 @@ public interface ImPrivateMessageMapper extends BaseMapperX<ImPrivateMessageDO> 
      * @return 消息列表
      */
     default List<ImPrivateMessageDO> selectListByMinId(Long userId, Long minId, Integer size) {
-        return selectList(new LambdaQueryWrapperX<ImPrivateMessageDO>()
-                .and(w -> w.eq(ImPrivateMessageDO::getSenderId, userId)
-                        .or()
-                        .eq(ImPrivateMessageDO::getReceiverId, userId))
-                .gt(ImPrivateMessageDO::getId, minId)
-                .orderByAsc(ImPrivateMessageDO::getId)
-                .last("LIMIT " + size));
+        QueryWrapperX<ImPrivateMessageDO> wrapper = new QueryWrapperX<>();
+        wrapper.and(w -> w.eq("sender_id", userId)
+                        .or().eq("receiver_id", userId))
+                .gt("id", minId)
+                .orderByAsc("id");
+        wrapper.limitN(size);
+        return selectList(wrapper);
     }
 
-    /**
-     * 根据 senderId 和 clientMessageId 查询（幂等校验）
-     */
     default ImPrivateMessageDO selectBySenderIdAndClientMessageId(Long senderId, String clientMessageId) {
         return selectOne(new LambdaQueryWrapperX<ImPrivateMessageDO>()
                 .eq(ImPrivateMessageDO::getSenderId, senderId)

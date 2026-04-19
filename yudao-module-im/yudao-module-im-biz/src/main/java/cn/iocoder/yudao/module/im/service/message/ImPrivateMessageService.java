@@ -29,7 +29,7 @@ public interface ImPrivateMessageService {
      * @param size   拉取数量
      * @return 消息列表
      */
-    List<ImPrivateMessageDO> pullPrivateMessages(Long userId, Long minId, Integer size);
+    List<ImPrivateMessageDO> pullPrivateMessageList(Long userId, Long minId, Integer size);
 
     /**
      * 标记私聊消息已读

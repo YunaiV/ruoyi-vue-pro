@@ -43,9 +43,9 @@ public class ImPrivateMessageController {
     @Operation(summary = "拉取私聊消息（增量）")
     @Parameter(name = "minId", description = "最小消息 id", required = true, example = "0")
     @Parameter(name = "size", description = "拉取数量", required = true, example = "100")
-    public CommonResult<List<ImPrivateMessageRespVO>> pullPrivateMessages(@RequestParam("minId") Long minId,
-                                                                   @RequestParam("size") Integer size) {
-        List<ImPrivateMessageDO> messages = privateMessageService.pullPrivateMessages(getLoginUserId(), minId, size);
+    public CommonResult<List<ImPrivateMessageRespVO>> pullPrivateMessageList(@RequestParam("minId") Long minId,
+                                                                             @RequestParam("size") Integer size) {
+        List<ImPrivateMessageDO> messages = privateMessageService.pullPrivateMessageList(getLoginUserId(), minId, size);
         return success(BeanUtils.toBean(messages, ImPrivateMessageRespVO.class));
     }
 
