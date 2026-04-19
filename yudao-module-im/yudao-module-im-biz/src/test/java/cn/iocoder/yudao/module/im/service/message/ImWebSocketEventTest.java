@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.im.service.message;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
-import cn.iocoder.yudao.module.im.enums.message.ImWebSocketTypeConstants;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageRecallMessage;
+import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageSendMessage;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
@@ -13,8 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -69,16 +70,14 @@ public class ImWebSocketEventTest {
                 typeCaptor.capture(), contentCaptor.capture());
 
         // 验证消息事件类型
-        assertEquals(ImWebSocketTypeConstants.PRIVATE_MESSAGE, typeCaptor.getAllValues().get(0));
-        assertEquals(ImWebSocketTypeConstants.PRIVATE_MESSAGE, typeCaptor.getAllValues().get(1));
+        assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(0));
+        assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(1));
 
-        // 验证 payload 中 id 字段按 String 返回
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) contentCaptor.getAllValues().get(0);
-        assertTrue(payload.get("id") instanceof String, "id 应为 String 类型");
-        assertTrue(payload.get("senderId") instanceof String, "senderId 应为 String 类型");
-        assertTrue(payload.get("receiverId") instanceof String, "receiverId 应为 String 类型");
-        assertEquals("private", payload.get("messageScene"));
+        // 验证 payload 是 DTO 类型
+        ImPrivateMessageSendMessage payload = (ImPrivateMessageSendMessage) contentCaptor.getAllValues().get(0);
+        assertNotNull(payload.getId(), "id 不应为空");
+        assertEquals("1", payload.getSenderId());
+        assertEquals("2", payload.getReceiverId());
     }
 
     @Test
@@ -96,10 +95,10 @@ public class ImWebSocketEventTest {
                 typeCaptor.capture(), any());
 
         // 第一次：发给自己的 READ 事件
-        assertEquals(ImWebSocketTypeConstants.READ, typeCaptor.getAllValues().get(0));
+        assertEquals(ImMessageReadMessage.TYPE, typeCaptor.getAllValues().get(0));
         assertEquals(1L, userCaptor.getAllValues().get(0));
         // 第二次：发给对方的 RECEIPT 事件
-        assertEquals(ImWebSocketTypeConstants.RECEIPT, typeCaptor.getAllValues().get(1));
+        assertEquals(ImMessageReceiptMessage.TYPE, typeCaptor.getAllValues().get(1));
         assertEquals(2L, userCaptor.getAllValues().get(1));
     }
 
@@ -121,13 +120,12 @@ public class ImWebSocketEventTest {
                 typeCaptor.capture(), contentCaptor.capture());
 
         // 验证 RECALL 事件类型
-        assertEquals(ImWebSocketTypeConstants.RECALL, typeCaptor.getAllValues().get(0));
+        assertEquals(ImMessageRecallMessage.TYPE, typeCaptor.getAllValues().get(0));
 
         // 验证 payload
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) contentCaptor.getAllValues().get(0);
-        assertEquals("10", payload.get("messageId"));
-        assertEquals("private", payload.get("messageScene"));
+        ImMessageRecallMessage payload = (ImMessageRecallMessage) contentCaptor.getAllValues().get(0);
+        assertEquals("10", payload.getMessageId());
+        assertEquals("private", payload.getMessageScene());
     }
 
 }

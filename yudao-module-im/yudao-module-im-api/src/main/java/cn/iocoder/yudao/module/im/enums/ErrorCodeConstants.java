@@ -37,6 +37,8 @@ public interface ErrorCodeConstants {
     // ========== 好友 (1-040-600-000) ==========
     ErrorCode FRIEND_NOT_EXISTS = new ErrorCode(1_040_600_000, "好友关系不存在");
     ErrorCode FRIEND_NOT_FRIEND = new ErrorCode(1_040_600_001, "对方不是您的好友");
+    ErrorCode FRIEND_ADD_SELF = new ErrorCode(1_040_600_002, "不允许添加自己为好友");
+    ErrorCode FRIEND_ALREADY = new ErrorCode(1_040_600_003, "你们已经是好友了");
 
     // ========== 敏感词 (1-040-700-000) ==========
     ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_040_700_000, "敏感词不存在");

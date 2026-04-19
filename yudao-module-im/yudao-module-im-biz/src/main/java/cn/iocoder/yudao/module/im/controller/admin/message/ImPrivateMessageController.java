@@ -29,12 +29,13 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class ImPrivateMessageController {
 
     @Resource
-    private ImPrivateMessageService imPrivateMessageService;
+    private ImPrivateMessageService privateMessageService;
 
     @PostMapping("/send")
     @Operation(summary = "发送私聊消息")
-    public CommonResult<ImPrivateMessageRespVO> sendPrivateMessage(@Valid @RequestBody ImPrivateMessageSendReqVO reqVO) {
-        ImPrivateMessageDO message = imPrivateMessageService.sendPrivateMessage(getLoginUserId(), reqVO);
+    public CommonResult<ImPrivateMessageRespVO> sendPrivateMessage(
+            @Valid @RequestBody ImPrivateMessageSendReqVO reqVO) {
+        ImPrivateMessageDO message = privateMessageService.sendPrivateMessage(getLoginUserId(), reqVO);
         return success(BeanUtils.toBean(message, ImPrivateMessageRespVO.class));
     }
 
@@ -44,7 +45,7 @@ public class ImPrivateMessageController {
     @Parameter(name = "size", description = "拉取数量", required = true, example = "100")
     public CommonResult<List<ImPrivateMessageRespVO>> pullPrivateMessages(@RequestParam("minId") Long minId,
                                                                    @RequestParam("size") Integer size) {
-        List<ImPrivateMessageDO> messages = imPrivateMessageService.pullPrivateMessages(getLoginUserId(), minId, size);
+        List<ImPrivateMessageDO> messages = privateMessageService.pullPrivateMessages(getLoginUserId(), minId, size);
         return success(BeanUtils.toBean(messages, ImPrivateMessageRespVO.class));
     }
 
@@ -52,7 +53,7 @@ public class ImPrivateMessageController {
     @Operation(summary = "标记私聊消息已读")
     @Parameter(name = "friendId", description = "好友用户编号", required = true, example = "2")
     public CommonResult<Boolean> readPrivateMessages(@RequestParam("friendId") Long friendId) {
-        imPrivateMessageService.readPrivateMessages(getLoginUserId(), friendId);
+        privateMessageService.readPrivateMessages(getLoginUserId(), friendId);
         return success(true);
     }
 
@@ -60,7 +61,7 @@ public class ImPrivateMessageController {
     @Operation(summary = "撤回私聊消息")
     @Parameter(name = "id", description = "消息编号", required = true, example = "1")
     public CommonResult<Boolean> recallPrivateMessage(@RequestParam("id") Long id) {
-        imPrivateMessageService.recallPrivateMessage(getLoginUserId(), id);
+        privateMessageService.recallPrivateMessage(getLoginUserId(), id);
         return success(true);
     }
 

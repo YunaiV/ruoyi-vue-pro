@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IM 好友关系 Mapper
  *
@@ -13,17 +15,16 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ImFriendMapper extends BaseMapperX<ImFriendDO> {
 
-    /**
-     * 查询好友关系
-     *
-     * @param userId       用户编号
-     * @param friendUserId 好友用户编号
-     * @return 好友关系
-     */
     default ImFriendDO selectByUserIdAndFriendUserId(Long userId, Long friendUserId) {
         return selectOne(new LambdaQueryWrapperX<ImFriendDO>()
                 .eq(ImFriendDO::getUserId, userId)
                 .eq(ImFriendDO::getFriendUserId, friendUserId));
+    }
+
+    default List<ImFriendDO> selectListByUserId(Long userId) {
+        return selectList(new LambdaQueryWrapperX<ImFriendDO>()
+                .eq(ImFriendDO::getUserId, userId)
+                .orderByDesc(ImFriendDO::getId));
     }
 
 }

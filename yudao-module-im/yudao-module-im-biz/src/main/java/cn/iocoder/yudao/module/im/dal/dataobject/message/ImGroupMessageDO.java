@@ -67,7 +67,6 @@ public class ImGroupMessageDO extends BaseDO {
      * 消息状态
      * <p>
      * 枚举 {@link ImMessageStatusEnum}
-     * 群聊状态：NORMAL(0) / RECALL(2)
      *
      * 为什么没有 READ 状态？与单聊的差异：单聊用 UNREAD/READ 跟踪每条消息状态，群聊用 Redis 存储每个成员的已读位置（游标模型）
      */

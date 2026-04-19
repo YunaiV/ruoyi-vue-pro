@@ -62,7 +62,6 @@ public class ImPrivateMessageDO extends BaseDO {
      * 消息状态
      * <p>
      * 枚举 {@link ImMessageStatusEnum}
-     * 私聊状态：UNREAD(0) / READ(1) / RECALL(2)
      */
     private Integer status;
     /**
