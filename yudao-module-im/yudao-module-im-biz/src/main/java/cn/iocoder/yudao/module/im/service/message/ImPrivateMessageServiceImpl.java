@@ -13,14 +13,11 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivate
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
-import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
-import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageSendMessage;
+import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -183,7 +180,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         ImMessageReceiptMessage receiptMessage = new ImMessageReceiptMessage()
                 .setReceiverId(userId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), receiverId,
-                ImMessageReceiptMessage.TYPE, receiptMessage);
+                ImPrivateMessageDTO.TYPE, receiptDto);
     }
 
     @Override
