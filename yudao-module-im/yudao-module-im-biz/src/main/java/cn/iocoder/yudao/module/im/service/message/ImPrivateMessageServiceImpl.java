@@ -1,20 +1,23 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
-import cn.iocoder.yudao.module.im.websocket.ImMessageRecallMessage;
 import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
 import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageSendMessage;
 import jakarta.annotation.Resource;
@@ -29,6 +32,8 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_MAX_PULL_SIZE;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_RECALL_TIMEOUT_MINUTES;
 
 /**
  * IM 私聊消息 Service 实现类
@@ -39,11 +44,6 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 @Validated
 @Slf4j
 public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
-
-    /**
-     * pull 最大拉取数量
-     */
-    private static final int MAX_PULL_SIZE = 1000;
 
     @Resource
     private ImPrivateMessageMapper privateMessageMapper;
@@ -85,7 +85,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Override
     public List<ImPrivateMessageDO> pullPrivateMessageList(Long userId, Long minId, Integer size) {
-        if (size > MAX_PULL_SIZE) {
+        if (size > MESSAGE_MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
         List<ImPrivateMessageDO> messages = privateMessageMapper.selectListByMinId(userId, minId, size);
@@ -111,37 +111,42 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         getSelf().readPrivateMessageEvent(userId, receiverId);
     }
 
-    // DONE @芋艿：已 review，逻辑正确
     @Override
-    public void recallPrivateMessage(Long userId, Long messageId) {
+    public ImPrivateMessageDO recallPrivateMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在
         ImPrivateMessageDO message = privateMessageMapper.selectById(messageId);
         if (message == null) {
             throw exception(MESSAGE_NOT_EXISTS);
         }
         // 1.2 只能撤回自己发送的消息
-        // DONE @AI：Notequals。结论：这里使用 !equals() 是正确的，ObjUtil.notEqual 也可以但无必要引入
-        if (!message.getSenderId().equals(userId)) {
+        if (ObjUtil.notEqual(message.getSenderId(), userId)) {
             throw exception(MESSAGE_RECALL_DENIED);
         }
         // 1.3 不能重复撤回
         if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
             throw exception(MESSAGE_ALREADY_RECALLED);
         }
+        // 1.4 只允许撤回限定时间内的消息
+        if (message.getSendTime().plusMinutes(MESSAGE_RECALL_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
+            throw exception(MESSAGE_RECALL_TIMEOUT, MESSAGE_RECALL_TIMEOUT_MINUTES);
+        }
 
-        // 2. 更新消息状态为撤回
+        // 2. 更新原消息状态为撤回
         privateMessageMapper.updateById(new ImPrivateMessageDO().setId(messageId)
                 .setStatus(ImMessageStatusEnum.RECALL.getStatus()));
 
-        // 3. 发送 RECALL 事件
-        ImMessageRecallMessage recallMessage = new ImMessageRecallMessage()
-                .setMessageId(messageId).setSenderId(userId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
-        // 3.1 通知接收方
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
-                ImMessageRecallMessage.TYPE, recallMessage);
-        // 3.2 通知发送方自己的其他终端
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImMessageRecallMessage.TYPE, recallMessage);
+        // 3. 插入一条 TIP_TEXT 消息作为撤回提示
+        RecallMessage recallContent = new RecallMessage()
+                .setMessageId(messageId);
+        ImPrivateMessageDO tipMessage = new ImPrivateMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
+                .setSenderId(userId).setReceiverId(message.getReceiverId())
+                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(JsonUtils.toJsonString(recallContent))
+                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now());
+        privateMessageMapper.insert(tipMessage);
+
+        // 4. 异步推送撤回提示消息（前端据此更新原消息状态 + 插入撤回提示）
+        getSelf().sendPrivateMessageEvent(tipMessage);
+        return tipMessage;
     }
 
     /**

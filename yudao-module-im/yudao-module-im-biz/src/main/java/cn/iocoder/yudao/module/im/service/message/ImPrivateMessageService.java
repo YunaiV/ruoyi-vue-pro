@@ -44,7 +44,8 @@ public interface ImPrivateMessageService {
      *
      * @param userId    当前用户编号
      * @param messageId 消息编号
+     * @return 撤回后的消息
      */
-    void recallPrivateMessage(Long userId, Long messageId);
+    ImPrivateMessageDO recallPrivateMessage(Long userId, Long messageId);
 
 }

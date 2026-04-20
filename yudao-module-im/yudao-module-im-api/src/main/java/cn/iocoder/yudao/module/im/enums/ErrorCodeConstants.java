@@ -20,6 +20,7 @@ public interface ErrorCodeConstants {
     ErrorCode MESSAGE_RECEIVER_NOT_EXISTS = new ErrorCode(1_040_300_001, "接收人不存在");
     ErrorCode MESSAGE_RECALL_DENIED = new ErrorCode(1_040_300_002, "只能撤回自己发送的消息");
     ErrorCode MESSAGE_ALREADY_RECALLED = new ErrorCode(1_040_300_003, "消息已撤回");
+    ErrorCode MESSAGE_RECALL_TIMEOUT = new ErrorCode(1_040_300_007, "超过 {} 分钟的消息无法撤回");
     ErrorCode MESSAGE_SENSITIVE_WORD_BLOCKED = new ErrorCode(1_040_300_004, "消息包含敏感词，无法发送");
     ErrorCode MESSAGE_PULL_SIZE_EXCEEDED = new ErrorCode(1_040_300_005, "单次拉取消息数量超出限制");
     ErrorCode MESSAGE_CLIENT_ID_DUPLICATE = new ErrorCode(1_040_300_006, "消息已发送，请勿重复提交");
