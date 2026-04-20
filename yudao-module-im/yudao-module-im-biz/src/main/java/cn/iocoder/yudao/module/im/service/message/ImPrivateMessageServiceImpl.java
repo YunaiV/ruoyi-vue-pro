@@ -105,8 +105,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         privateMessageMapper.updateByIdsAndStatus(messageIds, ImMessageStatusEnum.UNREAD.getStatus(),
                 new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
 
-        // 2. 异步发送 READ + RECEIPT 事件
-        getSelf().readPrivateMessageEvent(userId, receiverId);
+        // 2. 异步发送 READ + RECEIPT 事件（携带已读位置）
+        Long maxReadId = CollUtil.max(messageIds);
+        getSelf().readPrivateMessageEvent(userId, receiverId, maxReadId);
     }
 
     @Override
@@ -134,8 +135,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
                 .setStatus(ImMessageStatusEnum.RECALL.getStatus()));
 
         // 3. 插入一条 TIP_TEXT 消息作为撤回提示
-        RecallMessage recallContent = new RecallMessage()
-                .setMessageId(messageId);
+        RecallMessage recallContent = new RecallMessage().setMessageId(messageId);
         ImPrivateMessageDO tipMessage = new ImPrivateMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
                 .setSenderId(userId).setReceiverId(message.getReceiverId())
                 .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(JsonUtils.toJsonString(recallContent))
@@ -152,14 +152,14 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
      */
     @Async
     public void sendPrivateMessageEvent(ImPrivateMessageDO message) {
-        ImPrivateMessageSendMessage websocketMessage = BeanUtils.toBean(message, ImPrivateMessageSendMessage.class);
+        ImPrivateMessageDTO dto = ImPrivateMessageDTO.ofSend(message);
         // 推送给接收方
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
-                ImPrivateMessageSendMessage.TYPE, websocketMessage);
+                ImPrivateMessageDTO.TYPE, dto);
 
         // 推送给发送方自己的其他终端（多端同步）
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
-                ImPrivateMessageSendMessage.TYPE, websocketMessage);
+                ImPrivateMessageDTO.TYPE, dto);
     }
 
     /**
@@ -167,18 +167,17 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
      *
      * @param userId     当前用户编号
      * @param receiverId 对方用户编号
+     * @param maxReadId  已读位置（最大已读消息编号）
      */
     @Async
-    public void readPrivateMessageEvent(Long userId, Long receiverId) {
+    public void readPrivateMessageEvent(Long userId, Long receiverId, Long maxReadId) {
         // 1. 发送 READ 事件给自己的其他终端（多端同步）
-        ImMessageReadMessage readMessage = new ImMessageReadMessage()
-                .setReceiverId(receiverId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
+        ImPrivateMessageDTO readDto = ImPrivateMessageDTO.ofRead(userId, receiverId, maxReadId);
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImMessageReadMessage.TYPE, readMessage);
+                ImPrivateMessageDTO.TYPE, readDto);
 
         // 2. 发送 RECEIPT 事件给对方（已读回执）
-        ImMessageReceiptMessage receiptMessage = new ImMessageReceiptMessage()
-                .setReceiverId(userId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
+        ImPrivateMessageDTO receiptDto = ImPrivateMessageDTO.ofReceipt(userId, receiverId, maxReadId);
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), receiverId,
                 ImPrivateMessageDTO.TYPE, receiptDto);
     }
