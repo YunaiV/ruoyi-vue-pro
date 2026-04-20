@@ -22,6 +22,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
@@ -92,6 +93,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         return messages;
     }
 
+    // TODO @AI：考虑到更稳妥，是不是前端传递 messageId？不然恰好发过来，然后读取了。【后续在优化】
     @Override
     public void readPrivateMessages(Long userId, Long receiverId) {
         // 1.1 查询未读消息列表
@@ -111,6 +113,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ImPrivateMessageDO recallPrivateMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在
         ImPrivateMessageDO message = privateMessageMapper.selectById(messageId);

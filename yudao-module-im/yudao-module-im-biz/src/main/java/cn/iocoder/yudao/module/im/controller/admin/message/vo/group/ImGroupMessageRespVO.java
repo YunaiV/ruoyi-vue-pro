@@ -14,16 +14,16 @@ import java.util.List;
 public class ImGroupMessageRespVO {
 
     @Schema(description = "消息编号", example = "1")
-    private String id;
+    private Long id;
 
     @Schema(description = "客户端消息编号", example = "uuid-xxx")
     private String clientMessageId;
 
     @Schema(description = "发送人编号", example = "1")
-    private String senderId;
+    private Long senderId;
 
     @Schema(description = "群编号", example = "1")
-    private String groupId;
+    private Long groupId;
 
     @Schema(description = "消息类型", example = "0")
     private Integer type;
@@ -45,8 +45,5 @@ public class ImGroupMessageRespVO {
 
     @Schema(description = "回执状态", example = "0")
     private Integer receiptStatus;
-
-    @Schema(description = "已读人数（群回执使用）", example = "5")
-    private Integer readCount;
 
 }

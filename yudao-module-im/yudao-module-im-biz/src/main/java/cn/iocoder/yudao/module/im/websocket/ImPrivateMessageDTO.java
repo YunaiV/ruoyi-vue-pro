@@ -45,8 +45,6 @@ public class ImPrivateMessageDTO {
     private Long receiverId;
     /**
      * 消息类型
-     * <p>
-     * TEXT / IMAGE / FILE / VOICE / VIDEO / READ / RECEIPT / RECALL / TIP_TEXT
      */
     private Integer type;
     /**
