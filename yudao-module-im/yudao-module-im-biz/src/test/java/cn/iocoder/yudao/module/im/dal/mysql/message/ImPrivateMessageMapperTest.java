@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author 芋道源码
  */
-@Import(ImPrivateMessageMapper.class)
 public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
 
     @Resource

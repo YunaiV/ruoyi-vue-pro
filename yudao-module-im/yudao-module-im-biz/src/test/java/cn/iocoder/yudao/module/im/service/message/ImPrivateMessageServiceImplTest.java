@@ -2,19 +2,18 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,8 +28,7 @@ import static org.mockito.Mockito.*;
  *
  * @author 芋道源码
  */
-@ExtendWith(MockitoExtension.class)
-public class ImPrivateMessageServiceImplTest {
+public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
     private ImPrivateMessageServiceImpl privateMessageService;
@@ -155,22 +153,28 @@ public class ImPrivateMessageServiceImplTest {
 
     @Test
     public void testReadMessages_success() {
-        // 准备：mock 未读消息列表
-        List<ImPrivateMessageDO> unreadMessages = List.of(
-                ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
-                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build(),
-                ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L)
-                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
-        );
-        when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
-                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
+                    .thenReturn(privateMessageService);
 
-        // 调用
-        privateMessageService.readPrivateMessages(1L, 2L);
+            // 准备：mock 未读消息列表
+            List<ImPrivateMessageDO> unreadMessages = List.of(
+                    ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
+                            .status(ImMessageStatusEnum.UNREAD.getStatus()).build(),
+                    ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L)
+                            .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
+            );
+            when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
+                    ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
 
-        // 断言：更新了消息状态 + 发送了 READ 和 RECEIPT 事件
-        verify(imPrivateMessageMapper).update(any(ImPrivateMessageDO.class), any());
-        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+            // 调用
+            privateMessageService.readPrivateMessages(1L, 2L);
+
+            // 断言：更新了消息状态 + 发送了 READ 和 RECEIPT 事件
+            verify(imPrivateMessageMapper).updateByIdsAndStatus(eq(List.of(1L, 2L)),
+                    eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class));
+            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+        }
     }
 
     // ========== 撤回测试 ==========
@@ -208,7 +212,8 @@ public class ImPrivateMessageServiceImplTest {
         // 准备
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(2L).receiverId(1L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
+                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .sendTime(LocalDateTime.now()).build();
         when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
 
         // 调用并断言
@@ -222,7 +227,8 @@ public class ImPrivateMessageServiceImplTest {
         // 准备
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(1L).receiverId(2L)
-                .status(ImMessageStatusEnum.RECALL.getStatus()).build();
+                .status(ImMessageStatusEnum.RECALL.getStatus())
+                .sendTime(LocalDateTime.now()).build();
         when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
 
         // 调用并断言

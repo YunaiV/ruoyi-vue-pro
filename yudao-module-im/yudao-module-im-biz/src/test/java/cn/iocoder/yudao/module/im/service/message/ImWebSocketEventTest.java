@@ -1,26 +1,25 @@
 package cn.iocoder.yudao.module.im.service.message;
 
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
-import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
-import cn.iocoder.yudao.module.im.websocket.ImMessageRecallMessage;
-import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageSendMessage;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
+import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageSendMessage;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -31,8 +30,7 @@ import static org.mockito.Mockito.*;
  *
  * @author 芋道源码
  */
-@ExtendWith(MockitoExtension.class)
-public class ImWebSocketEventTest {
+public class ImWebSocketEventTest extends BaseMockitoUnitTest {
 
     @InjectMocks
     private ImPrivateMessageServiceImpl privateMessageService;
@@ -48,92 +46,104 @@ public class ImWebSocketEventTest {
 
     @Test
     public void testSendMessage_websocketEvent() {
-        // 准备
-        ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
-        reqVO.setClientMessageId("evt-uuid");
-        reqVO.setReceiverId(2L);
-        reqVO.setType(0);
-        reqVO.setContent("{\"content\":\"事件测试\"}");
+        try (var springUtilMockedStatic = mockStatic(cn.hutool.extra.spring.SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> cn.hutool.extra.spring.SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
+                    .thenReturn(privateMessageService);
 
-        when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "evt-uuid")).thenReturn(null);
-        // mock insert：通过 doAnswer 模拟 MyBatis-Plus 设置 ID
-        when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
-            ImPrivateMessageDO msg = invocation.getArgument(0);
-            msg.setId(99L);
-            return 1;
-        });
+            // 准备
+            ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
+            reqVO.setClientMessageId("evt-uuid");
+            reqVO.setReceiverId(2L);
+            reqVO.setType(0);
+            reqVO.setContent("{\"content\":\"事件测试\"}");
 
-        // 调用
-        privateMessageService.sendPrivateMessage(1L, reqVO);
+            when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "evt-uuid")).thenReturn(null);
+            when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
+                ImPrivateMessageDO msg = invocation.getArgument(0);
+                msg.setId(99L);
+                return 1;
+            });
 
-        // 捕获 WebSocket 调用
-        ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object> contentCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(),
-                typeCaptor.capture(), contentCaptor.capture());
+            // 调用
+            privateMessageService.sendPrivateMessage(1L, reqVO);
 
-        // 验证消息事件类型
-        assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(0));
-        assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(1));
+            // 捕获 WebSocket 调用
+            ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Object> contentCaptor = ArgumentCaptor.forClass(Object.class);
+            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(),
+                    typeCaptor.capture(), contentCaptor.capture());
 
-        // 验证 payload 是 DTO 类型
-        ImPrivateMessageSendMessage payload = (ImPrivateMessageSendMessage) contentCaptor.getAllValues().get(0);
-        assertNotNull(payload.getId(), "id 不应为空");
-        assertEquals("1", payload.getSenderId());
-        assertEquals("2", payload.getReceiverId());
+            // 验证消息事件类型
+            assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(0));
+            assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(1));
+
+            // 验证 payload 是 DTO 类型
+            ImPrivateMessageSendMessage payload = (ImPrivateMessageSendMessage) contentCaptor.getAllValues().get(0);
+            assertNotNull(payload.getId(), "id 不应为空");
+            assertEquals(1L, payload.getSenderId());
+            assertEquals(2L, payload.getReceiverId());
+        }
     }
 
     @Test
     public void testReadMessage_readAndReceiptEvents() {
-        // 准备：mock 未读消息
-        List<ImPrivateMessageDO> unreadMessages = List.of(
-                ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
-                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
-        );
-        when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
-                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
+        try (var springUtilMockedStatic = mockStatic(cn.hutool.extra.spring.SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> cn.hutool.extra.spring.SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
+                    .thenReturn(privateMessageService);
 
-        // 调用
-        privateMessageService.readPrivateMessages(1L, 2L);
+            // 准备：mock 未读消息
+            List<ImPrivateMessageDO> unreadMessages = List.of(
+                    ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
+                            .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
+            );
+            when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
+                    ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
 
-        // 捕获
-        ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Long> userCaptor = ArgumentCaptor.forClass(Long.class);
-        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), userCaptor.capture(),
-                typeCaptor.capture(), any());
+            // 调用
+            privateMessageService.readPrivateMessages(1L, 2L);
 
-        // 第一次：发给自己的 READ 事件
-        assertEquals(ImMessageReadMessage.TYPE, typeCaptor.getAllValues().get(0));
-        assertEquals(1L, userCaptor.getAllValues().get(0));
-        // 第二次：发给对方的 RECEIPT 事件
-        assertEquals(ImMessageReceiptMessage.TYPE, typeCaptor.getAllValues().get(1));
-        assertEquals(2L, userCaptor.getAllValues().get(1));
+            // 捕获
+            ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Long> userCaptor = ArgumentCaptor.forClass(Long.class);
+            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), userCaptor.capture(),
+                    typeCaptor.capture(), any());
+
+            // 第一次：发给自己的 READ 事件
+            assertEquals(ImMessageReadMessage.TYPE, typeCaptor.getAllValues().get(0));
+            assertEquals(1L, userCaptor.getAllValues().get(0));
+            // 第二次：发给对方的 RECEIPT 事件
+            assertEquals(ImMessageReceiptMessage.TYPE, typeCaptor.getAllValues().get(1));
+            assertEquals(2L, userCaptor.getAllValues().get(1));
+        }
     }
 
     @Test
-    public void testRecallMessage_recallEvent() {
-        // 准备
-        ImPrivateMessageDO message = ImPrivateMessageDO.builder()
-                .id(10L).senderId(1L).receiverId(2L).status(0).build();
-        when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
-        when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
+    public void testRecallMessage_tipTextEvent() {
+        try (var springUtilMockedStatic = mockStatic(cn.hutool.extra.spring.SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> cn.hutool.extra.spring.SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
+                    .thenReturn(privateMessageService);
 
-        // 调用
-        privateMessageService.recallPrivateMessage(1L, 10L);
+            // 准备
+            ImPrivateMessageDO message = ImPrivateMessageDO.builder()
+                    .id(10L).senderId(1L).receiverId(2L).status(0)
+                    .sendTime(java.time.LocalDateTime.now()).build();
+            when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
+            when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
+            when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenReturn(1);
 
-        // 捕获
-        ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object> contentCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(),
-                typeCaptor.capture(), contentCaptor.capture());
+            // 调用
+            privateMessageService.recallPrivateMessage(1L, 10L);
 
-        // 验证 RECALL 事件类型
-        assertEquals(ImMessageRecallMessage.TYPE, typeCaptor.getAllValues().get(0));
+            // 捕获
+            ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Object> contentCaptor = ArgumentCaptor.forClass(Object.class);
+            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(),
+                    typeCaptor.capture(), contentCaptor.capture());
 
-        // 验证 payload
-        ImMessageRecallMessage payload = (ImMessageRecallMessage) contentCaptor.getAllValues().get(0);
-        assertEquals("10", payload.getMessageId());
-        assertEquals("private", payload.getMessageScene());
+            // 验证：推送的是 TIP_TEXT 消息（通过 sendPrivateMessageEvent）
+            assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(0));
+            assertEquals(ImPrivateMessageSendMessage.TYPE, typeCaptor.getAllValues().get(1));
+        }
     }
 
 }
