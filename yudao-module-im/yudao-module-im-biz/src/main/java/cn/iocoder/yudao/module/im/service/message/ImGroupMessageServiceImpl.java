@@ -11,8 +11,12 @@ import cn.iocoder.yudao.module.im.dal.redis.group.GroupReadPositionRedisDAO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImWebSocketTypeConstants;
+import cn.iocoder.yudao.module.im.websocket.ImGroupMessageSendMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageRecallMessage;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
@@ -28,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
  * IM 群聊消息 Service 实现类
@@ -38,8 +43,6 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 @Validated
 @Slf4j
 public class ImGroupMessageServiceImpl implements ImGroupMessageService {
-
-    private static final int MAX_PULL_SIZE = 1000;
 
     @Resource
     private ImGroupMessageMapper imGroupMessageMapper;
@@ -100,8 +103,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    public List<ImGroupMessageDO> pullGroupMessages(Long userId, Long minId, Integer size) {
-        if (size > MAX_PULL_SIZE) {
+    public List<ImGroupMessageDO> pullGroupMessageList(Long userId, Long minId, Integer size) {
+        if (size > MESSAGE_MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
         // 获取用户所在的所有群
@@ -162,11 +165,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         groupReadPositionRedisDAO.updateReadPosition(groupId, userId, maxMessageId);
 
         // 4. 发送 READ 事件给自己的其他终端
-        Map<String, Object> readEvent = new HashMap<>();
-        readEvent.put("groupId", groupId.toString());
-        readEvent.put("messageScene", "group");
+        ImMessageReadMessage readMessage = new ImMessageReadMessage()
+                .setGroupId(groupId)
+                .setScene(ImMessageSceneEnum.GROUP.getScene());
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImWebSocketTypeConstants.READ, readEvent);
+                ImMessageReadMessage.TYPE, readMessage);
 
         // 5. 刷新群回执
         refreshGroupReceipts(groupId);
@@ -195,17 +198,17 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
         // 5. 发送 RECALL 事件给所有群成员
         List<ImGroupMemberDO> members = imGroupMemberService.selectByGroupId(message.getGroupId());
-        Map<String, Object> recallEvent = new HashMap<>();
-        recallEvent.put("messageId", messageId.toString());
-        recallEvent.put("groupId", message.getGroupId().toString());
-        recallEvent.put("messageScene", "group");
-        recallEvent.put("senderId", userId.toString());
+        ImMessageRecallMessage recallMessage = new ImMessageRecallMessage()
+                .setMessageId(messageId)
+                .setGroupId(message.getGroupId())
+                .setSenderId(userId)
+                .setScene(ImMessageSceneEnum.GROUP.getScene());
         for (ImGroupMemberDO m : members) {
             if (CommonStatusEnum.DISABLE.getStatus().equals(m.getStatus())) {
                 continue;
             }
             webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
-                    ImWebSocketTypeConstants.RECALL, recallEvent);
+                    ImMessageRecallMessage.TYPE, recallMessage);
         }
     }
 
@@ -285,20 +288,21 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             }
 
             // 6. 广播 RECEIPT 事件给活跃成员
-            Map<String, Object> receiptEvent = new HashMap<>();
-            receiptEvent.put("messageId", msg.getId().toString());
-            receiptEvent.put("groupId", groupId.toString());
-            receiptEvent.put("readCount", readCount);
-            receiptEvent.put("receiptStatus", allRead
-                    ? ImGroupMessageReceiptStatusEnum.DONE.getStatus()
-                    : ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
+            ImMessageReceiptMessage receiptMessage = new ImMessageReceiptMessage()
+                    .setMessageId(msg.getId())
+                    .setGroupId(groupId)
+                    .setReadCount(readCount)
+                    .setReceiptStatus(allRead
+                            ? ImGroupMessageReceiptStatusEnum.DONE.getStatus()
+                            : ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
+                    .setScene(ImMessageSceneEnum.GROUP.getScene());
 
             for (ImGroupMemberDO m : allMembers) {
                 if (CommonStatusEnum.DISABLE.getStatus().equals(m.getStatus())) {
                     continue;
                 }
                 webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), m.getUserId(),
-                        ImWebSocketTypeConstants.RECEIPT, receiptEvent);
+                        ImMessageReceiptMessage.TYPE, receiptMessage);
             }
         }
     }
@@ -341,23 +345,18 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
      */
     private void sendGroupMessageEvent(ImGroupMessageDO message, Long groupId) {
         List<ImGroupMemberDO> members = imGroupMemberService.selectByGroupId(groupId);
-        Map<String, Object> event = new HashMap<>();
-        event.put("id", message.getId().toString());
-        event.put("clientMessageId", message.getClientMessageId());
-        event.put("senderId", message.getSenderId().toString());
-        event.put("groupId", message.getGroupId().toString());
-        event.put("type", message.getType());
-        event.put("content", message.getContent());
-        event.put("status", message.getStatus());
-        event.put("sendTime", message.getSendTime().toString());
-        event.put("messageScene", "group");
-        if (CollUtil.isNotEmpty(message.getAtUserIds())) {
-            event.put("atUserIds", message.getAtUserIds());
-        }
-        if (CollUtil.isNotEmpty(message.getReceiverUserIds())) {
-            event.put("receiverUserIds", message.getReceiverUserIds());
-        }
-        event.put("receiptStatus", message.getReceiptStatus());
+        ImGroupMessageSendMessage sendMessage = new ImGroupMessageSendMessage()
+                .setId(message.getId())
+                .setClientMessageId(message.getClientMessageId())
+                .setSenderId(message.getSenderId())
+                .setGroupId(message.getGroupId())
+                .setType(message.getType())
+                .setContent(message.getContent())
+                .setStatus(message.getStatus())
+                .setSendTime(message.getSendTime())
+                .setAtUserIds(message.getAtUserIds())
+                .setReceiverUserIds(message.getReceiverUserIds())
+                .setReceiptStatus(message.getReceiptStatus());
 
         // 确定推送目标
         List<Long> receiverList = message.getReceiverUserIds();
@@ -372,7 +371,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 continue;
             }
             webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), member.getUserId(),
-                    ImWebSocketTypeConstants.GROUP_MESSAGE, event);
+                    ImGroupMessageSendMessage.TYPE, sendMessage);
         }
     }
 

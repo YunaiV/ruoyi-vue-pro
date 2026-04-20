@@ -42,10 +42,10 @@ public class ImGroupMessageController {
     @Operation(summary = "拉取群聊消息（增量）")
     @Parameter(name = "minId", description = "最小消息 id", required = true, example = "0")
     @Parameter(name = "size", description = "拉取数量", required = true, example = "100")
-    public CommonResult<List<ImGroupMessageRespVO>> pullGroupMessages(
+    public CommonResult<List<ImGroupMessageRespVO>> pullGroupMessageList(
             @RequestParam("minId") Long minId,
             @RequestParam("size") Integer size) {
-        List<ImGroupMessageDO> messages = imGroupMessageService.pullGroupMessages(getLoginUserId(), minId, size);
+        List<ImGroupMessageDO> messages = imGroupMessageService.pullGroupMessageList(getLoginUserId(), minId, size);
         return success(messages.stream().map(this::toRespVO).collect(Collectors.toList()));
     }
 

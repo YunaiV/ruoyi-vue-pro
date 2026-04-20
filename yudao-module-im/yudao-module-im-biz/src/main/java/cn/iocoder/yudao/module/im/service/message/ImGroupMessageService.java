@@ -29,7 +29,7 @@ public interface ImGroupMessageService {
      * @param size   拉取数量
      * @return 消息列表
      */
-    List<ImGroupMessageDO> pullGroupMessages(Long userId, Long minId, Integer size);
+    List<ImGroupMessageDO> pullGroupMessageList(Long userId, Long minId, Integer size);
 
     /**
      * 标记群聊消息已读

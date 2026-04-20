@@ -186,13 +186,13 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
                 ImMessageReceiptMessage.TYPE, receiptMessage);
     }
 
-    private ImPrivateMessageServiceImpl getSelf() {
-        return SpringUtil.getBean(getClass());
-    }
-
     @Override
     public List<ImPrivateMessageDO> getPrivateMessageList(Long userId, ImPrivateMessageListReqVO reqVO) {
         return privateMessageMapper.selectHistoryList(userId, reqVO.getReceiverId(), reqVO.getMaxId(), reqVO.getLimit());
+    }
+
+    private ImPrivateMessageServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }
