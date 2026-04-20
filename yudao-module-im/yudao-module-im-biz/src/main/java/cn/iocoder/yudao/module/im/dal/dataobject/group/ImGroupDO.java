@@ -58,6 +58,7 @@ public class ImGroupDO extends BaseDO {
      * 封禁时间
      */
     private LocalDateTime bannedTime;
+    // TODO @AI：status 字段，枚举 CommonStatusEnum，表示正常 / 解散；如果是解散状态，则不允许任何操作了。
     /**
      * 是否解散
      */

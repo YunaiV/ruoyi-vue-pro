@@ -57,7 +57,6 @@ public class ImGroupMemberDO extends BaseDO {
      * 成员状态
      * <p>
      * 枚举 {@link CommonStatusEnum}
-     * ENABLE(0) = 正常，DISABLE(1) = 已退出
      */
     private Integer status;
     /**

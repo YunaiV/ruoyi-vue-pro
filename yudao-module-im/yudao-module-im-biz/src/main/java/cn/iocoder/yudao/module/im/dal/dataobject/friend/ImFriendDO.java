@@ -48,6 +48,9 @@ public class ImFriendDO extends BaseDO {
      */
     private Boolean muted;
 
+    // TODO @AI：status 字段，枚举 CommonStatusEnum，表示正常 / 解散；如果是解散状态，则不允许任何操作了。
+    // TODO @AI：addTime、deleteTime 字段，分别表示添加好友的时间和删除好友的时间；如果 deleteTime 不为 null，则表示已删除。不使用 deleted；
+
     // 说明：
     // - 删除状态用 BaseDO 的 deleted 字段表达（0=正常，1=已删除）
     // - 添加时间用 BaseDO 的 createTime；删除时间对应 updateTime
