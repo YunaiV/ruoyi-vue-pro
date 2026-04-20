@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.message;
 
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 
@@ -47,5 +48,14 @@ public interface ImPrivateMessageService {
      * @return 撤回后的消息
      */
     ImPrivateMessageDO recallPrivateMessage(Long userId, Long messageId);
+
+    /**
+     * 查询私聊历史消息（游标拉取）
+     *
+     * @param userId 当前用户编号
+     * @param reqVO  拉取请求
+     * @return 消息列表（按 id 倒序）
+     */
+    List<ImPrivateMessageDO> getPrivateMessageList(Long userId, ImPrivateMessageListReqVO reqVO);
 
 }

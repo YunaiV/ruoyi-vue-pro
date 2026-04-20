@@ -177,20 +177,30 @@ public class ImPrivateMessageServiceImplTest {
 
     @Test
     public void testRecallMessage_success() {
-        // 准备
-        ImPrivateMessageDO message = ImPrivateMessageDO.builder()
-                .id(10L).senderId(1L).receiverId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
-        when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
-        when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
+                    .thenReturn(privateMessageService);
 
-        // 调用
-        privateMessageService.recallPrivateMessage(1L, 10L);
+            // 准备
+            ImPrivateMessageDO message = ImPrivateMessageDO.builder()
+                    .id(10L).senderId(1L).receiverId(2L)
+                    .status(ImMessageStatusEnum.UNREAD.getStatus())
+                    .sendTime(LocalDateTime.now()).build(); // 刚发送，5 分钟内
+            when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
+            when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
+            when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenReturn(1);
 
-        // 断言
-        verify(imPrivateMessageMapper).updateById(any(ImPrivateMessageDO.class));
-        // 验证推送了 RECALL 事件（给接收方和发送方）
-        verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+            // 调用
+            ImPrivateMessageDO result = privateMessageService.recallPrivateMessage(1L, 10L);
+
+            // 断言：返回 TIP_TEXT 消息
+            assertNotNull(result);
+            // 验证：更新原消息状态 + 插入 tipMessage
+            verify(imPrivateMessageMapper).updateById(any(ImPrivateMessageDO.class));
+            verify(imPrivateMessageMapper).insert(any(ImPrivateMessageDO.class));
+            // 验证推送了消息（给接收方和发送方）
+            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+        }
     }
 
     @Test

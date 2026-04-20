@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.controller.admin.message;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
@@ -60,9 +61,16 @@ public class ImPrivateMessageController {
     @DeleteMapping("/recall")
     @Operation(summary = "撤回私聊消息")
     @Parameter(name = "id", description = "消息编号", required = true, example = "1")
-    public CommonResult<Boolean> recallPrivateMessage(@RequestParam("id") Long id) {
-        privateMessageService.recallPrivateMessage(getLoginUserId(), id);
-        return success(true);
+    public CommonResult<ImPrivateMessageRespVO> recallPrivateMessage(@RequestParam("id") Long id) {
+        ImPrivateMessageDO message = privateMessageService.recallPrivateMessage(getLoginUserId(), id);
+        return success(BeanUtils.toBean(message, ImPrivateMessageRespVO.class));
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "查询私聊历史消息")
+    public CommonResult<List<ImPrivateMessageRespVO>> getPrivateMessageList(@Valid ImPrivateMessageListReqVO reqVO) {
+        List<ImPrivateMessageDO> messages = privateMessageService.getPrivateMessageList(getLoginUserId(), reqVO);
+        return success(BeanUtils.toBean(messages, ImPrivateMessageRespVO.class));
     }
 
 }
