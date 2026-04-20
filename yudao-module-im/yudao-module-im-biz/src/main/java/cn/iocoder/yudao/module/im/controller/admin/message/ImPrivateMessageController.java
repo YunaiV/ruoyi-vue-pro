@@ -51,9 +51,9 @@ public class ImPrivateMessageController {
 
     @PutMapping("/read")
     @Operation(summary = "标记私聊消息已读")
-    @Parameter(name = "friendId", description = "好友用户编号", required = true, example = "2")
-    public CommonResult<Boolean> readPrivateMessages(@RequestParam("friendId") Long friendId) {
-        privateMessageService.readPrivateMessages(getLoginUserId(), friendId);
+    @Parameter(name = "receiverId", description = "接收方用户编号（对方）", required = true, example = "2")
+    public CommonResult<Boolean> readPrivateMessages(@RequestParam("receiverId") Long receiverId) {
+        privateMessageService.readPrivateMessages(getLoginUserId(), receiverId);
         return success(true);
     }
 

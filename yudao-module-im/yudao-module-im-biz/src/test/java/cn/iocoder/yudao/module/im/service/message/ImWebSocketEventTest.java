@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.service.message;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
 import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
 import cn.iocoder.yudao.module.im.websocket.ImMessageRecallMessage;
@@ -16,6 +17,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -82,8 +85,13 @@ public class ImWebSocketEventTest {
 
     @Test
     public void testReadMessage_readAndReceiptEvents() {
-        // 准备
-        when(imPrivateMessageMapper.updateStatusToRead(1L, 2L)).thenReturn(1);
+        // 准备：mock 未读消息
+        List<ImPrivateMessageDO> unreadMessages = List.of(
+                ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
+                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
+        );
+        when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
+                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
 
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L);

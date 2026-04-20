@@ -1,20 +1,22 @@
 package cn.iocoder.yudao.module.im.service.message;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.websocket.ImMessageReadMessage;
-import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
 import cn.iocoder.yudao.module.im.websocket.ImMessageRecallMessage;
+import cn.iocoder.yudao.module.im.websocket.ImMessageReceiptMessage;
 import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageSendMessage;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
 /**
@@ -91,31 +94,21 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         return messages;
     }
 
-    // TODO @AI：应该是将 friendId 改成 receiverId，毕竟消息是发给对方的
     @Override
-    public void readPrivateMessages(Long userId, Long friendId) {
-        // 1. 批量更新消息状态为已读
-        // TODO @AI：先查询；然后在 update；避免锁的问题；
-        // TODO @AI：注意，update 的时候，也要 id in、status =，最后 updateObj 传入；避免并发问题；
-        int updated = privateMessageMapper.updateStatusToRead(userId, friendId);
-        if (updated == 0) {
-            return; // 没有需要更新的消息
+    public void readPrivateMessages(Long userId, Long receiverId) {
+        // 1.1 查询未读消息列表
+        List<ImPrivateMessageDO> unreadMessages = privateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(
+                receiverId, userId, ImMessageStatusEnum.UNREAD.getStatus());
+        if (CollUtil.isEmpty(unreadMessages)) {
+            return;
         }
+        // 1.2 根据 id in + status 条件更新，避免并发问题
+        List<Long> messageIds = convertList(unreadMessages, ImPrivateMessageDO::getId);
+        privateMessageMapper.updateByIdsAndStatus(messageIds, ImMessageStatusEnum.UNREAD.getStatus(),
+                new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
 
-        // TODO @AI：继续 async ！
-        // 2.1 发送 READ 事件给自己的其他终端（多端同步）
-        ImMessageReadMessage readMessage = new ImMessageReadMessage()
-                .setFriendId(friendId.toString())
-                .setMessageScene("private");
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImMessageReadMessage.TYPE, readMessage);
-
-        // 2.2 发送 RECEIPT 事件给对方（已读回执）
-        ImMessageReceiptMessage receiptMessage = new ImMessageReceiptMessage()
-                .setUserId(userId.toString())
-                .setMessageScene("private");
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), friendId,
-                ImMessageReceiptMessage.TYPE, receiptMessage);
+        // 2. 异步发送 READ + RECEIPT 事件
+        getSelf().readPrivateMessageEvent(userId, receiverId);
     }
 
     // DONE @芋艿：已 review，逻辑正确
@@ -142,9 +135,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
         // 3. 发送 RECALL 事件
         ImMessageRecallMessage recallMessage = new ImMessageRecallMessage()
-                .setMessageId(messageId.toString())
-                .setSenderId(userId.toString())
-                .setMessageScene("private");
+                .setMessageId(messageId).setSenderId(userId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
         // 3.1 通知接收方
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
                 ImMessageRecallMessage.TYPE, recallMessage);
@@ -162,9 +153,31 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         // 推送给接收方
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
                 ImPrivateMessageSendMessage.TYPE, websocketMessage);
+
         // 推送给发送方自己的其他终端（多端同步）
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
                 ImPrivateMessageSendMessage.TYPE, websocketMessage);
+    }
+
+    /**
+     * 发送已读 + 已读回执 WebSocket 事件
+     *
+     * @param userId     当前用户编号
+     * @param receiverId 对方用户编号
+     */
+    @Async
+    public void readPrivateMessageEvent(Long userId, Long receiverId) {
+        // 1. 发送 READ 事件给自己的其他终端（多端同步）
+        ImMessageReadMessage readMessage = new ImMessageReadMessage()
+                .setReceiverId(receiverId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+                ImMessageReadMessage.TYPE, readMessage);
+
+        // 2. 发送 RECEIPT 事件给对方（已读回执）
+        ImMessageReceiptMessage receiptMessage = new ImMessageReceiptMessage()
+                .setReceiverId(userId).setScene(ImMessageSceneEnum.PRIVATE.getScene());
+        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), receiverId,
+                ImMessageReceiptMessage.TYPE, receiptMessage);
     }
 
     private ImPrivateMessageServiceImpl getSelf() {

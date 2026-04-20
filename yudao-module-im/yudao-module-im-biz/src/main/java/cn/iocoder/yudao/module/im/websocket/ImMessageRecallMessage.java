@@ -17,18 +17,20 @@ public class ImMessageRecallMessage {
     /**
      * 消息编号
      */
-    private String messageId;
+    private Long messageId;
     /**
      * 发送人编号
      */
-    private String senderId;
+    private Long senderId;
     /**
      * 群聊场景：群编号
      */
-    private String groupId;
+    private Long groupId;
     /**
-     * 消息场景：private / group
+     * 消息场景
+     *
+     * 关联 {@link cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum}
      */
-    private String messageScene;
+    private Integer scene;
 
 }

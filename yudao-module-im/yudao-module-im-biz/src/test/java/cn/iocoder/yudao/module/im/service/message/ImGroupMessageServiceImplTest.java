@@ -168,7 +168,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(beforeJoin, afterJoin));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
         // 断言：入群前消息不可见
         assertEquals(1, result.size());
@@ -197,7 +197,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(beforeQuit, afterQuit));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
         // 断言：退群后消息不可见
         assertEquals(1, result.size());
@@ -226,7 +226,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(directedMsg, allMsg));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
         // 断言：定向接收的消息用户 1 看不到，只能看到全员消息
         assertEquals(1, result.size());
@@ -250,7 +250,7 @@ public class ImGroupMessageServiceImplTest {
                 .thenReturn(List.of(atMsg));
 
         // 调用
-        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessages(1L, 0L, 100);
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
         // 断言：@ 字段正确返回
         assertEquals(1, result.size());

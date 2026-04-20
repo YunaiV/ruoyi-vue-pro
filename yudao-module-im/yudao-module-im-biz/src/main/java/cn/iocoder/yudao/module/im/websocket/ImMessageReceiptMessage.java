@@ -17,23 +17,30 @@ public class ImMessageReceiptMessage {
 
     public static final String TYPE = "im-message-receipt";
 
+    /**
+     * 消息场景
+     *
+     * 关联 {@link cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum}
+     */
+    private Integer scene;
+
     // ========== 私聊场景 ==========
 
     /**
      * 私聊场景：已读方的用户编号
      */
-    private String userId;
+    private Long receiverId;
 
     // ========== 群聊场景 ==========
 
     /**
      * 群聊场景：消息编号
      */
-    private String messageId;
+    private Long messageId;
     /**
      * 群聊场景：群编号
      */
-    private String groupId;
+    private Long groupId;
     /**
      * 群聊场景：已读人数
      */
@@ -42,12 +49,5 @@ public class ImMessageReceiptMessage {
      * 群聊场景：回执状态
      */
     private Integer receiptStatus;
-
-    // ========== 通用 ==========
-
-    /**
-     * 消息场景：private / group
-     */
-    private String messageScene;
 
 }

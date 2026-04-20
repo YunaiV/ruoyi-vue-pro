@@ -34,10 +34,10 @@ public interface ImPrivateMessageService {
     /**
      * 标记私聊消息已读
      *
-     * @param userId   当前用户编号
-     * @param friendId 好友用户编号
+     * @param userId     当前用户编号
+     * @param receiverId 接收方用户编号（对方）
      */
-    void readPrivateMessages(Long userId, Long friendId);
+    void readPrivateMessages(Long userId, Long receiverId);
 
     /**
      * 撤回私聊消息

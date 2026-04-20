@@ -17,16 +17,18 @@ public class ImMessageReadMessage {
     public static final String TYPE = "im-message-read";
 
     /**
-     * 私聊场景：好友编号
+     * 私聊场景：接收方编号
      */
-    private String friendId;
+    private Long receiverId;
     /**
      * 群聊场景：群编号
      */
-    private String groupId;
+    private Long groupId;
     /**
-     * 消息场景：private / group
+     * 消息场景
+     *
+     * 关联 {@link cn.iocoder.yudao.module.im.enums.message.ImMessageSceneEnum}
      */
-    private String messageScene;
+    private Integer scene;
 
 }

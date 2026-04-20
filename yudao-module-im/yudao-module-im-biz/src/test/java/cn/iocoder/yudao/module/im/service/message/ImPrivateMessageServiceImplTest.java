@@ -137,7 +137,7 @@ public class ImPrivateMessageServiceImplTest {
         when(imPrivateMessageMapper.selectListByMinId(1L, 0L, 100)).thenReturn(mockMessages);
 
         // 调用
-        List<ImPrivateMessageDO> result = privateMessageService.pullPrivateMessages(1L, 0L, 100);
+        List<ImPrivateMessageDO> result = privateMessageService.pullPrivateMessageList(1L, 0L, 100);
 
         // 断言
         assertEquals(2, result.size());
@@ -147,7 +147,7 @@ public class ImPrivateMessageServiceImplTest {
     public void testPullMessages_sizeExceeded() {
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> privateMessageService.pullPrivateMessages(1L, 0L, 1001));
+                () -> privateMessageService.pullPrivateMessageList(1L, 0L, 1001));
         assertEquals(MESSAGE_PULL_SIZE_EXCEEDED.getCode(), exception.getCode());
     }
 
@@ -155,13 +155,21 @@ public class ImPrivateMessageServiceImplTest {
 
     @Test
     public void testReadMessages_success() {
-        // 准备
-        when(imPrivateMessageMapper.updateStatusToRead(1L, 2L)).thenReturn(3);
+        // 准备：mock 未读消息列表
+        List<ImPrivateMessageDO> unreadMessages = List.of(
+                ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
+                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build(),
+                ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L)
+                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
+        );
+        when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
+                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
 
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L);
 
-        // 断言：发送了 READ 和 RECEIPT 事件
+        // 断言：更新了消息状态 + 发送了 READ 和 RECEIPT 事件
+        verify(imPrivateMessageMapper).update(any(ImPrivateMessageDO.class), any());
         verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
     }
 
