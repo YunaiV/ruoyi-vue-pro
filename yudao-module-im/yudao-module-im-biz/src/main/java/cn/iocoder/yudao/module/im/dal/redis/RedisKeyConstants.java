@@ -8,12 +8,11 @@ package cn.iocoder.yudao.module.im.dal.redis;
  */
 public interface RedisKeyConstants {
 
-    // TODO @AI：这个 key 可能要改下；
     /**
-     * 群已读位置
-     * KEY 格式：  im:group:read:{groupId}
+     * 群消息已读位置
+     * KEY 格式：  im:group:message:read:{groupId}
      * VALUE 数据类型： Hash (field: userId, value: maxReadMessageId)
      */
-    String GROUP_READ_POSITION = "im:group:read:%s";
+    String GROUP_MESSAGE_READ = "im:group:message:read:%s";
 
 }

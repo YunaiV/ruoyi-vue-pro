@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
-import cn.iocoder.yudao.module.im.dal.redis.message.GroupReadPositionRedisDAO;
+import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
@@ -50,7 +50,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImSensitiveWordService sensitiveWordService;
     @Mock
-    private GroupReadPositionRedisDAO groupReadPositionRedisDAO;
+    private GroupMessageReadRedisDAO groupMessageReadRedisDAO;
     @Mock
     private WebSocketMessageSender webSocketMessageSender;
 
@@ -82,7 +82,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberDO member = ImGroupMemberDO.builder()
                     .groupId(10L).userId(1L).status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
 
             List<ImGroupMemberDO> allMembers = List.of(
                     member,
@@ -141,7 +141,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ImGroupDO group = new ImGroupDO();
         group.setId(10L);
         when(groupService.validateGroupExists(10L)).thenReturn(group);
-        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(null);
+        when(groupMemberService.validateMemberInGroup(10L, 1L))
+                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -278,7 +279,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 撤回前需要校验用户仍在群中
             ImGroupMemberDO selfMember = ImGroupMemberDO.builder()
                     .groupId(10L).userId(1L).status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(selfMember);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(selfMember);
             when(groupMessageMapper.updateById(any(ImGroupMessageDO.class))).thenReturn(1);
             when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenReturn(1);
 
@@ -354,11 +355,12 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testReadMessages_notInGroup() {
         // 准备：当前用户不在群中
-        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(null);
+        when(groupMemberService.validateMemberInGroup(10L, 1L))
+                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
 
         // 调用并断言：越权校验
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> groupMessageService.readGroupMessages(1L, 10L));
+                () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
     }
 
@@ -369,7 +371,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
-        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(currentMember);
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(currentMember);
 
         // 准备：消息由用户 5 发，发送时间在 2026-04-12 10:00
         ImGroupMessageDO message = ImGroupMessageDO.builder()
@@ -397,11 +399,11 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberService.selectByGroupId(10L)).thenReturn(allMembers);
 
         // 准备：Redis 已读位置 — 用户 1 读到 100, 用户 2 读到 50, 用户 3 读到 200
-        Map<Object, Object> positions = new HashMap<>();
-        positions.put("1", "100");
-        positions.put("2", "50");
-        positions.put("3", "200");
-        when(groupReadPositionRedisDAO.getAllReadPositions(10L)).thenReturn(positions);
+        Map<Long, Long> positions = new HashMap<>();
+        positions.put(1L, 100L);
+        positions.put(2L, 50L);
+        positions.put(3L, 200L);
+        when(groupMessageReadRedisDAO.getReadMaxMessageIdMap(10L)).thenReturn(positions);
 
         // 调用：查询 messageId=80 的已读用户
         List<Long> readUsers = groupMessageService.getGroupReadUsers(1L, 10L, 80L);
@@ -421,7 +423,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetReadUsers_notInGroup() {
         // 准备：当前用户不在群中
-        when(groupMemberService.getGroupMember(10L, 99L)).thenReturn(null);
+        when(groupMemberService.validateMemberInGroup(10L, 99L))
+                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
 
         // 调用并断言：越权校验
         ServiceException exception = assertThrows(ServiceException.class,

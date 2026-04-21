@@ -175,14 +175,14 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     @Async
     public void readPrivateMessageEvent(Long userId, Long receiverId, Long maxReadId) {
         // 1. 发送 READ 事件给自己的其他终端（多端同步）
-        ImPrivateMessageDTO readDto = ImPrivateMessageDTO.ofRead(userId, receiverId, maxReadId);
+        ImPrivateMessageDTO readDTO = ImPrivateMessageDTO.ofRead(userId, receiverId, maxReadId);
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImPrivateMessageDTO.TYPE, readDto);
+                ImPrivateMessageDTO.TYPE, readDTO);
 
         // 2. 发送 RECEIPT 事件给对方（已读回执）
-        ImPrivateMessageDTO receiptDto = ImPrivateMessageDTO.ofReceipt(userId, receiverId, maxReadId);
+        ImPrivateMessageDTO receiptDTO = ImPrivateMessageDTO.ofReceipt(userId, receiverId, maxReadId);
         webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), receiverId,
-                ImPrivateMessageDTO.TYPE, receiptDto);
+                ImPrivateMessageDTO.TYPE, receiptDTO);
     }
 
     @Override

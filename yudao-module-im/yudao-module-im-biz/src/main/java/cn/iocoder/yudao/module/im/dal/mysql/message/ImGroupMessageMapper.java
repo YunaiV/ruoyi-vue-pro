@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
         QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
         wrapper.in("group_id", groupIds)
                 .gt("id", minId)
+                .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .orderByAsc("id");
         wrapper.limitN(size);
         return selectList(wrapper);
@@ -38,16 +40,18 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
     /**
      * 查询群聊历史消息（游标拉取）
      *
-     * @param groupId 群编号
-     * @param maxId   起始消息 id（不含），为空则从最新开始
-     * @param limit   拉取数量
+     * @param groupId  群编号
+     * @param maxId    起始消息 id（不含），为空则从最新开始
+     * @param limit    拉取数量
+     * @param joinTime 入群时间，仅返回入群之后的消息
      * @return 消息列表（按 id 倒序）
      */
-    default List<ImGroupMessageDO> selectHistoryList(Long groupId, Long maxId, Integer limit) {
+    default List<ImGroupMessageDO> selectHistoryList(Long groupId, Long maxId, Integer limit, LocalDateTime joinTime) {
         QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
         wrapper.eq("group_id", groupId)
                 .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .lt(maxId != null, "id", maxId)
+                .ge(joinTime != null, "send_time", joinTime)
                 .orderByDesc("id");
         wrapper.limitN(limit);
         return selectList(wrapper);
@@ -57,22 +61,6 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
         return selectOne(new LambdaQueryWrapperX<ImGroupMessageDO>()
                 .eq(ImGroupMessageDO::getSenderId, senderId)
                 .eq(ImGroupMessageDO::getClientMessageId, clientMessageId));
-    }
-
-    /**
-     * 获取群内最新消息 id
-     *
-     * @param groupId 群编号
-     * @return 最新消息 id，无消息时返回 null
-     */
-    default Long selectMaxIdByGroupId(Long groupId) {
-        QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
-        wrapper.eq("group_id", groupId)
-                .orderByDesc("id")
-                .select("id");
-        wrapper.limitN(1);
-        ImGroupMessageDO msg = selectOne(wrapper);
-        return msg == null ? null : msg.getId();
     }
 
     /**
@@ -86,11 +74,11 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
      * @param maxId   结束消息 id（含，本次已读位置）
      * @return 待回执消息列表
      */
-    default List<ImGroupMessageDO> selectPendingReceiptMessagesInRange(Long groupId, Long minId, Long maxId) {
+    default List<ImGroupMessageDO> selectListByGroupIdAndPendingReceipt(Long groupId, Long minId, Long maxId) {
         return selectList(new LambdaQueryWrapperX<ImGroupMessageDO>()
                 .eq(ImGroupMessageDO::getGroupId, groupId)
                 .eq(ImGroupMessageDO::getReceiptStatus, ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
-                .gt(ImGroupMessageDO::getId, minId)
+                .gt(minId != null, ImGroupMessageDO::getId, minId)
                 .le(ImGroupMessageDO::getId, maxId)
                 .ne(ImGroupMessageDO::getStatus, ImMessageStatusEnum.RECALL.getStatus()));
     }
