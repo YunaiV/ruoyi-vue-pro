@@ -35,13 +35,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_GROUP_PULL_MAX_DAYS;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_MAX_PULL_SIZE;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_RECALL_TIMEOUT_MINUTES;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
  * IM 群聊消息 Service 实现类
@@ -145,8 +141,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .sorted(Comparator.comparing(ImGroupMessageDO::getId))
                 .limit(size)
                 .toList();
-        // 3.2 按当前用户补齐离线拉取结果：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
-        enrichPullResultForViewer(userId, result);
+        // 3.2 按当前用户补齐：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
+        appendMessageStatusAndReceipt(userId, result);
 
         log.info("[pullGroupMessageList][userId({}) minId({}) size({}) result({})]",
                 userId, minId, size, result.size());
@@ -154,26 +150,29 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     /**
-     * 离线拉取结果按当前用户补齐：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
+     * 补全消息已读态和回执已读人数
+     *
+     * 1. 消息已读态（status）：根据 Redis 已读游标判断 READ / UNREAD
+     * 2. 回执已读人数（readCount）：仅对本人发送的回执消息，计算可见成员中的已读人数
      */
-    @SuppressWarnings("StatementWithEmptyBody")
-    private void enrichPullResultForViewer(Long userId, List<ImGroupMessageDO> messages) {
+    @SuppressWarnings({"StatementWithEmptyBody", "DataFlowIssue"})
+    private void appendMessageStatusAndReceipt(Long userId, List<ImGroupMessageDO> messages) {
         if (CollUtil.isEmpty(messages)) {
             return;
         }
-        Map<Long, Long> viewerReadCursorByGroup = new HashMap<>(); // 群 → 已读位置
+        Map<Long, Long> readMaxMessageIdsByGroup = new HashMap<>(); // 群 → 已读位置
         Map<Long, Map<Long, Long>> readPositionsByGroup = new HashMap<>(); // 群 → (用户 → 已读位置)
         Map<Long, List<ImGroupMemberDO>> membersByGroup = new HashMap<>(); // 群 → 全部成员列表
         for (ImGroupMessageDO message : messages) {
             // 消息已读态（status）：撤回 > 已读 > 未读
             Long groupId = message.getGroupId();
-            long readCursor = viewerReadCursorByGroup.computeIfAbsent(groupId, gid -> {
-                Long readMax = groupMessageReadRedisDAO.getReadMaxMessageId(gid, userId);
-                return readMax != null ? readMax : -1L;
+            long readMaxMessageId = readMaxMessageIdsByGroup.computeIfAbsent(groupId, gid -> {
+                Long readMaxMsgId = groupMessageReadRedisDAO.getReadMaxMessageId(gid, userId);
+                return readMaxMsgId != null ? readMaxMsgId : -1L;
             });
             if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
                 // 保持撤回态
-            } else if (readCursor >= message.getId()) {
+            } else if (readMaxMessageId >= message.getId()) {
                 message.setStatus(ImMessageStatusEnum.READ.getStatus());
             } else {
                 message.setStatus(ImMessageStatusEnum.UNREAD.getStatus());
@@ -190,15 +189,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                     groupMemberService::getGroupMemberListByGroupId);
             Set<Long> visibleUserIds = getVisibleUserIds(message, allMembers);
             visibleUserIds.remove(message.getSenderId());
-            int readCount = 0;
-            if (CollUtil.isNotEmpty(visibleUserIds)) {
-                for (Long uid : visibleUserIds) {
-                    Long pos = positions.get(uid);
-                    if (pos != null && pos >= message.getId()) {
-                        readCount++;
-                    }
-                }
-            }
+            int readCount = getSumValue(visibleUserIds,
+                    uid -> positions.getOrDefault(uid, -1L) >= message.getId() ? 1 : null,
+                    Integer::sum, 0);
             message.setReadCount(readCount);
         }
     }
@@ -394,29 +387,29 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     /**
      * 判断一条群消息对某个群成员是否可见
-     * <p>
-     * 规则：
-     * 1. 入群时间晚于消息发送时间 → 不可见
-     * 2. 已退群且退群时间早于消息发送时间 → 不可见
-     * 3. 存在定向接收列表且当前用户既不在列表中也不是发送者 → 不可见
+     *
+     * @param msg 消息
+     * @param member 群成员
+     * @param userId 当前用户编号（用于定向消息过滤）
+     * @return 是否可见
      */
     private boolean isMessageVisible(ImGroupMessageDO msg, ImGroupMemberDO member, Long userId) {
         if (member == null) {
             return false;
         }
+        // 1. 入群时间晚于消息发送时间 → 不可见
         if (member.getJoinTime() != null && msg.getSendTime().isBefore(member.getJoinTime())) {
             return false;
         }
+        // 2. 已退群且退群时间早于消息发送时间 → 不可见
         if (CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())
                 && member.getQuitTime() != null && msg.getSendTime().isAfter(member.getQuitTime())) {
             return false;
         }
-        if (CollUtil.isNotEmpty(msg.getReceiverUserIds())
-                && !msg.getReceiverUserIds().contains(userId)
-                && ObjUtil.notEqual(msg.getSenderId(), userId)) {
-            return false;
-        }
-        return true;
+        // 3. 存在定向接收列表且当前用户既不在列表中也不是发送者 → 不可见
+        return !CollUtil.isNotEmpty(msg.getReceiverUserIds())
+                || msg.getReceiverUserIds().contains(userId)
+                || !ObjUtil.notEqual(msg.getSenderId(), userId);
     }
 
     /**
