@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.deepay.agent;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -27,5 +28,17 @@ public class Context {
 
     /** ImaAgent 创建的 ima 知识库 ID（同步失败时为 null） */
     public String imaKbId;
+
+    /** SalesAgent 生成的商品标题 */
+    public String title;
+
+    /** SalesAgent 生成的商品描述 */
+    public String description;
+
+    /** SalesAgent 设定的商品价格 */
+    public BigDecimal price;
+
+    /** SalesAgent 生成的商品链接 */
+    public String link;
 
 }

@@ -51,6 +51,8 @@ public class ChainOrchestrator {
         ctx = imaAgent.run(ctx);
         // 5. 生成收款 IBAN（mock）
         ctx = new FinanceAgent().run(ctx);
+        // 6. 生成商品销售信息（标题、描述、价格、链接）
+        ctx = new SalesAgent().run(ctx);
 
         return ctx;
     }
