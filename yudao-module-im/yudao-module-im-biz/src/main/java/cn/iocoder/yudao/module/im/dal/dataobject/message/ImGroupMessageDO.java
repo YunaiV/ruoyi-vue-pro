@@ -98,4 +98,12 @@ public class ImGroupMessageDO extends BaseDO {
      */
     private Integer receiptStatus;
 
+    // ========== 非表字段 ==========
+
+    /**
+     * 离线拉取等场景下回算的已读人数
+     */
+    @TableField(exist = false)
+    private Integer readCount;
+
 }
