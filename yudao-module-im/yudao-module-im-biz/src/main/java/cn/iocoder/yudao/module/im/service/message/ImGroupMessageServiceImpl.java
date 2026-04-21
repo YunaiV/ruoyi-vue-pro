@@ -134,7 +134,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     /**
-     * 拉取当前仍在群主路径的消息。
+     * 拉取当前仍在群的主路径消息。
      *
      * 仅当首批消息过滤后仍无可见消息时，才按消息最大 id 继续向后探测，
      * 直到命中可见消息或确认该来源已耗尽。
@@ -410,24 +410,18 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             if (CollUtil.isEmpty(visibleUserIds)) {
                 continue;
             }
-            int readCount = 0;
-            for (Long uid : visibleUserIds) {
-                Long readMaxMessageId = allPositions.get(uid);
-                if (readMaxMessageId != null && readMaxMessageId >= message.getId()) {
-                    readCount++;
-                }
-            }
+            int readCount = getSumValue(visibleUserIds,
+                    uid -> allPositions.getOrDefault(uid, -1L) >= message.getId() ? 1 : null,
+                    Integer::sum, 0);
             // 2.1.2 全部已读 → 标记回执完成
-            boolean allRead = readCount >= visibleUserIds.size();
-            Integer newReceiptStatus = allRead
-                    ? ImGroupMessageReceiptStatusEnum.DONE.getStatus()
-                    : ImGroupMessageReceiptStatusEnum.PENDING.getStatus();
-            if (allRead) {
+            Integer newReceiptStatus = ImGroupMessageReceiptStatusEnum.PENDING.getStatus();
+            if (readCount >= visibleUserIds.size()) {
+                newReceiptStatus = ImGroupMessageReceiptStatusEnum.DONE.getStatus();
                 groupMessageMapper.updateById(new ImGroupMessageDO().setId(message.getId())
                         .setReceiptStatus(newReceiptStatus));
             }
 
-            // 224 发送 RECEIPT 事件给消息发送方（只有 ta 关心已读进度）
+            // 2.2 发送 RECEIPT 事件给消息发送方（只有 ta 关心已读进度）
             ImGroupMessageDTO receiptDTO = ImGroupMessageDTO.ofReceipt(
                     message.getId(), groupId, readCount, newReceiptStatus);
             webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
@@ -472,10 +466,13 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 && member.getQuitTime() != null && msg.getSendTime().isAfter(member.getQuitTime())) {
             return false;
         }
-        // 3. 存在定向接收列表且当前用户既不在列表中也不是发送者 → 不可见
-        return !CollUtil.isNotEmpty(msg.getReceiverUserIds())
-                || msg.getReceiverUserIds().contains(userId)
-                || !ObjUtil.notEqual(msg.getSenderId(), userId);
+        // 3.1 无定向接收列表 → 全员可见
+        if (CollUtil.isEmpty(msg.getReceiverUserIds())) {
+            return true;
+        }
+        // 3.2 当前用户在定向列表中，或本人即发送者 → 可见
+        return msg.getReceiverUserIds().contains(userId)
+                || ObjUtil.equal(msg.getSenderId(), userId);
     }
 
     /**

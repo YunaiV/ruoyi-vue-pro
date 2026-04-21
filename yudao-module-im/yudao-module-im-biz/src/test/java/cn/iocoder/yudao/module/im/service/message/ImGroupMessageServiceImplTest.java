@@ -186,6 +186,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testPullMessages_activeQueryRetriesWhenFirstBatchInvisible() {
+        // 准备：首批 2 条（入群前 + 定向给别人）全部不可见，第二批命中可见消息
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime joinTime = now.minusHours(1);
         ImGroupMemberDO member = ImGroupMemberDO.builder()
@@ -213,8 +214,10 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
                 .thenReturn(List.of());
 
+        // 调用
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 2);
 
+        // 断言：仅返回第二批的可见消息；两批 selectListByMinId 各被调用一次
         assertEquals(1, result.size());
         assertEquals(3L, result.get(0).getId());
         verify(groupMessageMapper).selectListByMinId(eq(List.of(10L)), eq(0L),
@@ -289,6 +292,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testPullMessages_quitQueryKeepsOriginalMinIdWhenActiveQueryRetries() {
+        // 准备：主查询首批不可见触发重试（游标从 8→101），退群补齐仍使用原始 minId=8
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime joinTime = now.minusHours(1);
         ImGroupMemberDO activeMember = ImGroupMemberDO.builder()
@@ -335,8 +339,10 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 any(LocalDateTime.class), eq(quitTime), eq(2)))
                 .thenReturn(List.of(quitGroupMsg));
 
+        // 调用
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 8L, 2);
 
+        // 断言：退群补齐使用原始 minId=8 而非主查询重试后的 101
         assertEquals(2, result.size());
         assertEquals(50L, result.get(0).getId());
         assertEquals(102L, result.get(1).getId());
