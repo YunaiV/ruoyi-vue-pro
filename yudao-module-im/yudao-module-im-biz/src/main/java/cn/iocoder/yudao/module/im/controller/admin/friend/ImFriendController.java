@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.im.controller.admin.friend;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendRespVO;
+import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - IM 好友")
 @RestController
@@ -28,16 +30,14 @@ public class ImFriendController {
     @GetMapping("/list")
     @Operation(summary = "获得当前登录用户的好友列表")
     public CommonResult<List<ImFriendRespVO>> getMyFriendList() {
-        Long userId = SecurityFrameworkUtils.getLoginUserId();
-        return success(friendService.getMyFriendList(userId));
+        return success(friendService.getMyFriendList(getLoginUserId()));
     }
 
     @GetMapping("/get")
     @Operation(summary = "获得好友详情")
     @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
     public CommonResult<ImFriendRespVO> getFriend(@RequestParam("friendUserId") Long friendUserId) {
-        Long userId = SecurityFrameworkUtils.getLoginUserId();
-        return success(friendService.getFriend(userId, friendUserId));
+        return success(friendService.getFriend(getLoginUserId(), friendUserId));
     }
 
     @PostMapping("/add")
@@ -45,8 +45,7 @@ public class ImFriendController {
     @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
     public CommonResult<Boolean> addFriend(
             @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
-        Long userId = SecurityFrameworkUtils.getLoginUserId();
-        friendService.addFriend(userId, friendUserId);
+        friendService.addFriend(getLoginUserId(), friendUserId);
         return success(true);
     }
 
@@ -55,11 +54,15 @@ public class ImFriendController {
     @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
     public CommonResult<Boolean> deleteFriend(
             @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
-        Long userId = SecurityFrameworkUtils.getLoginUserId();
-        friendService.deleteFriend(userId, friendUserId);
+        friendService.deleteFriend(getLoginUserId(), friendUserId);
         return success(true);
     }
 
-    // TODO @AI：增加一个 updateFriend 接口，目前暂时就 dnd（免打扰）功能，后续可以增加备注等功能
+    @PutMapping("/update")
+    @Operation(summary = "更新好友信息（当前仅免打扰）")
+    public CommonResult<Boolean> updateFriend(@Valid @RequestBody ImFriendUpdateReqVO reqVO) {
+        friendService.updateFriend(getLoginUserId(), reqVO);
+        return success(true);
+    }
 
 }
