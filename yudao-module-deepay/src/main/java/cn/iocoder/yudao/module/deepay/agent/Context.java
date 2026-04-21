@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.deepay.agent;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -21,6 +22,15 @@ public class Context {
 
     /** ChainAgent 生成并落库的 6 位链码，商品唯一标识 */
     public String chainCode;
+
+    /** ProductInfoAgent 提取的商品标题 */
+    public String title;
+
+    /** ProductInfoAgent 提取的商品描述 */
+    public String description;
+
+    /** ProductInfoAgent 设置的商品价格（单位：欧元） */
+    public BigDecimal price;
 
     /** FinanceAgent 生成的收款 IBAN（MVP 为 mock 字符串） */
     public String iban;

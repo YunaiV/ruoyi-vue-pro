@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -26,6 +27,15 @@ public class DeepayStyleChainDO {
 
     /** 最终选中的设计图片 URL */
     private String imageUrl;
+
+    /** 商品标题（从用户 prompt 提取） */
+    private String title;
+
+    /** 商品描述 */
+    private String description;
+
+    /** 商品价格（单位：欧元） */
+    private BigDecimal price;
 
     /**
      * 记录状态。

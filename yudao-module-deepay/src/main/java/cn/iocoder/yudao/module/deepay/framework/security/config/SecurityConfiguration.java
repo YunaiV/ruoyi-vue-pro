@@ -23,6 +23,8 @@ public class SecurityConfiguration {
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
                 // 商品生成接口无需登录
                 registry.requestMatchers("/api/create-product").permitAll();
+                // 商品 JSON 查询接口无需登录
+                registry.requestMatchers("/api/product/**").permitAll();
                 // 商品展示页无需登录
                 registry.requestMatchers("/product/**").permitAll();
             }

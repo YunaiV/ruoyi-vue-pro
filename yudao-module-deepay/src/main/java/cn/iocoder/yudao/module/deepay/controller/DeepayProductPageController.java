@@ -1,68 +1,87 @@
 package cn.iocoder.yudao.module.deepay.controller;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayStyleChainDO;
-import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayStyleChainMapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.iocoder.yudao.module.deepay.service.product.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
- * Deepay 商品展示页。
+ * Deepay 商品展示接口。
  *
- * <p>GET /product/{chainCode} —— 根据链码查询数据库，直接返回基础 HTML 商品页，无需前端框架。</p>
+ * <p>
+ * <ul>
+ *   <li>GET /product/{chainCode}      —— Thymeleaf 渲染页面，供用户在浏览器直接访问</li>
+ *   <li>GET /api/product/{chainCode}  —— JSON 数据接口，供未来前端/小程序调用</li>
+ * </ul>
+ * </p>
  */
-@RestController
-@RequestMapping("/product")
+@Tag(name = "Deepay - 商品展示")
+@Controller
 public class DeepayProductPageController {
 
     @Resource
-    private DeepayStyleChainMapper deepayStyleChainMapper;
+    private ProductService productService;
 
-    @GetMapping(value = "/{chainCode}", produces = "text/html;charset=UTF-8")
-    public String productPage(@PathVariable String chainCode) {
-        DeepayStyleChainDO chain = deepayStyleChainMapper.selectOne(
-                new LambdaQueryWrapper<DeepayStyleChainDO>()
-                        .eq(DeepayStyleChainDO::getChainCode, chainCode));
+    // ----------------------------------------------------------------
+    // 1. 页面接口：GET /product/{chainCode}  →  Thymeleaf HTML
+    // ----------------------------------------------------------------
 
-        if (chain == null) {
-            return "<html><body><h2>商品不存在（" + escapeHtml(chainCode) + "）</h2></body></html>";
+    @GetMapping("/product/{chainCode}")
+    public String productPage(@PathVariable String chainCode, Model model) {
+        DeepayStyleChainDO product = productService.getByChainCode(chainCode);
+
+        if (product == null) {
+            model.addAttribute("title", "商品不存在");
+            model.addAttribute("chainCode", chainCode);
+            model.addAttribute("image", null);
+            model.addAttribute("description", "该链码对应的商品不存在，请确认链接是否正确。");
+            model.addAttribute("price", null);
+            return "product";
         }
 
-        String imageUrl = chain.getImageUrl() != null ? chain.getImageUrl() : "";
-        String imgTag = imageUrl.isEmpty() ? "" :
-                "<img src=\"" + escapeHtml(imageUrl) + "\" width=\"300\" style=\"border-radius:8px;\"/><br/><br/>";
-
-        return "<!DOCTYPE html>\n"
-                + "<html lang=\"zh\">\n"
-                + "<head>\n"
-                + "  <meta charset=\"UTF-8\"/>\n"
-                + "  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n"
-                + "  <title>意式极简羊绒大衣</title>\n"
-                + "</head>\n"
-                + "<body style=\"font-family:sans-serif;max-width:400px;margin:40px auto;text-align:center;\">\n"
-                + "  <h1>意式极简羊绒大衣</h1>\n"
-                + "  " + imgTag + "\n"
-                + "  <p>高端双面羊绒面料，极简设计</p>\n"
-                + "  <h2>€299</h2>\n"
-                + "  <p style=\"color:#888;font-size:12px;\">商品编号：" + escapeHtml(chainCode) + "</p>\n"
-                + "</body>\n"
-                + "</html>";
+        model.addAttribute("chainCode", product.getChainCode());
+        model.addAttribute("title", product.getTitle());
+        model.addAttribute("image", product.getImageUrl());
+        model.addAttribute("description", product.getDescription());
+        model.addAttribute("price", product.getPrice());
+        return "product";
     }
 
-    /** 对用户输入/数据库内容做最基本的 HTML 转义，防止 XSS。 */
-    private static String escapeHtml(String text) {
-        if (text == null) {
-            return "";
+    // ----------------------------------------------------------------
+    // 2. JSON 接口：GET /api/product/{chainCode}  →  JSON
+    // ----------------------------------------------------------------
+
+    @GetMapping("/api/product/{chainCode}")
+    @ResponseBody
+    @Operation(summary = "根据链码获取商品 JSON 信息")
+    public CommonResult<Map<String, Object>> productJson(@PathVariable String chainCode) {
+        DeepayStyleChainDO product = productService.getByChainCode(chainCode);
+
+        if (product == null) {
+            return CommonResult.error(404, "商品不存在：" + chainCode);
         }
-        return text.replace("&", "&amp;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;")
-                   .replace("\"", "&quot;")
-                   .replace("'", "&#x27;");
+
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("chainCode", product.getChainCode());
+        resp.put("image", product.getImageUrl());
+        resp.put("title", product.getTitle());
+        resp.put("description", product.getDescription());
+        resp.put("price", product.getPrice());
+        resp.put("link", "https://deepay.link/" + product.getChainCode());
+        return success(resp);
     }
 
 }
+

@@ -40,6 +40,9 @@ public class ChainAgent implements Agent {
         DeepayStyleChainDO record = new DeepayStyleChainDO();
         record.setChainCode(code);
         record.setImageUrl(ctx.selectedImage);
+        record.setTitle(ctx.title);
+        record.setDescription(ctx.description);
+        record.setPrice(ctx.price);
         record.setStatus("CREATED");
         record.setCreatedAt(LocalDateTime.now());
         deepayStyleChainMapper.insert(record);
