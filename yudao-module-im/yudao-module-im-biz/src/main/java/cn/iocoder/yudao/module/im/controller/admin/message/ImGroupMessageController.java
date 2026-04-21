@@ -20,9 +20,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-/**
- * 管理后台 - IM 群聊消息
- */
 @Tag(name = "管理后台 - IM 群聊消息")
 @RestController
 @RequestMapping("/im/message/group")
