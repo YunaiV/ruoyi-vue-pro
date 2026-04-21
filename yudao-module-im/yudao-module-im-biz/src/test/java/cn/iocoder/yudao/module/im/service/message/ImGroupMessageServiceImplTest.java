@@ -311,6 +311,123 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(List.of(1L, 3L), result.get(0).getAtUserIds());
     }
 
+    @Test
+    public void testPullMessages_pageTrimmedToSize() {
+        LocalDateTime now = LocalDateTime.now();
+        ImGroupMemberDO activeMember = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(activeMember));
+
+        ImGroupMessageDO activeMsg1 = ImGroupMessageDO.builder()
+                .id(1000L).groupId(10L).senderId(2L).sendTime(now.minusHours(2)).build();
+        ImGroupMessageDO activeMsg2 = ImGroupMessageDO.builder()
+                .id(2000L).groupId(10L).senderId(2L).sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(2)))
+                .thenReturn(List.of(activeMsg1, activeMsg2));
+
+        LocalDateTime quitTime = now.minusDays(1);
+        ImGroupMemberDO quitMember = ImGroupMemberDO.builder()
+                .groupId(20L).userId(1L)
+                .status(CommonStatusEnum.DISABLE.getStatus())
+                .joinTime(now.minusDays(20))
+                .quitTime(quitTime).build();
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of(quitMember));
+
+        ImGroupMessageDO quit1 = ImGroupMessageDO.builder()
+                .id(150L).groupId(20L).senderId(99L).sendTime(now.minusDays(5)).build();
+        ImGroupMessageDO quit2 = ImGroupMessageDO.builder()
+                .id(160L).groupId(20L).senderId(99L).sendTime(now.minusDays(4)).build();
+        when(groupMessageMapper.selectListByGroupIdAndMinIdAndQuitTimeBefore(eq(20L), eq(0L),
+                any(LocalDateTime.class), eq(quitTime), eq(2)))
+                .thenReturn(List.of(quit1, quit2));
+
+        when(groupMessageReadRedisDAO.getReadMaxMessageId(anyLong(), eq(1L))).thenReturn(null);
+
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 2);
+
+        assertEquals(2, result.size());
+        assertEquals(150L, result.get(0).getId());
+        assertEquals(160L, result.get(1).getId());
+    }
+
+    @Test
+    public void testPullMessages_pullSetsReadFromRedisCursor() {
+        LocalDateTime now = LocalDateTime.now();
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
+
+        ImGroupMessageDO low = ImGroupMessageDO.builder()
+                .id(5L).groupId(10L).senderId(2L).status(ImMessageStatusEnum.UNREAD.getStatus())
+                .sendTime(now.minusHours(2)).build();
+        ImGroupMessageDO high = ImGroupMessageDO.builder()
+                .id(10L).groupId(10L).senderId(2L).status(ImMessageStatusEnum.UNREAD.getStatus())
+                .sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(100)))
+                .thenReturn(List.of(low, high));
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of());
+
+        when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(7L);
+
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
+
+        assertEquals(2, result.size());
+        assertEquals(ImMessageStatusEnum.READ.getStatus(), result.get(0).getStatus());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.get(1).getStatus());
+    }
+
+    @Test
+    public void testPullMessages_receiptReadCountForSender() {
+        LocalDateTime now = LocalDateTime.now();
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
+
+        ImGroupMessageDO receiptMsg = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(1L)
+                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .receiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
+                .sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(100)))
+                .thenReturn(List.of(receiptMsg));
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of());
+
+        when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(100L);
+        Map<Long, Long> positions = new HashMap<>();
+        positions.put(1L, 100L);
+        positions.put(2L, 100L);
+        positions.put(3L, 50L);
+        when(groupMessageReadRedisDAO.getReadMaxMessageIdMap(10L)).thenReturn(positions);
+
+        List<ImGroupMemberDO> allMembers = List.of(
+                member,
+                ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(now.minusDays(20)).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(3L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(now.minusDays(20)).build()
+        );
+        when(groupMemberService.getGroupMemberListByGroupId(10L)).thenReturn(allMembers);
+
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
+
+        assertEquals(1, result.size());
+        assertEquals(1, result.get(0).getReadCount());
+    }
+
     // ========== 撤回测试 ==========
 
     @Test

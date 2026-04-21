@@ -138,14 +138,69 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             }
         }
 
-        // 3. 按可见性过滤（入群前不可见、定向消息排除），并按 id 升序重排
+        // 3.1 按可见性过滤（入群前不可见、定向消息排除），按 id 升序后仅取本页 size 条，
+        //     避免「在群 + 退群前」多路合并时一次响应跨度过大、游标直接跳到全局最大 id 而漏拉中间消息
         List<ImGroupMessageDO> result = messages.stream()
                 .filter(msg -> isMessageVisible(msg, memberMap.get(msg.getGroupId()), userId))
                 .sorted(Comparator.comparing(ImGroupMessageDO::getId))
+                .limit(size)
                 .toList();
+        // 3.2 按当前用户补齐离线拉取结果：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
+        enrichPullResultForViewer(userId, result);
+
         log.info("[pullGroupMessageList][userId({}) minId({}) size({}) result({})]",
                 userId, minId, size, result.size());
         return result;
+    }
+
+    /**
+     * 离线拉取结果按当前用户补齐：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
+     */
+    @SuppressWarnings("StatementWithEmptyBody")
+    private void enrichPullResultForViewer(Long userId, List<ImGroupMessageDO> messages) {
+        if (CollUtil.isEmpty(messages)) {
+            return;
+        }
+        Map<Long, Long> viewerReadCursorByGroup = new HashMap<>(); // 群 → 已读位置
+        Map<Long, Map<Long, Long>> readPositionsByGroup = new HashMap<>(); // 群 → (用户 → 已读位置)
+        Map<Long, List<ImGroupMemberDO>> membersByGroup = new HashMap<>(); // 群 → 全部成员列表
+        for (ImGroupMessageDO message : messages) {
+            // 消息已读态（status）：撤回 > 已读 > 未读
+            Long groupId = message.getGroupId();
+            long readCursor = viewerReadCursorByGroup.computeIfAbsent(groupId, gid -> {
+                Long readMax = groupMessageReadRedisDAO.getReadMaxMessageId(gid, userId);
+                return readMax != null ? readMax : -1L;
+            });
+            if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
+                // 保持撤回态
+            } else if (readCursor >= message.getId()) {
+                message.setStatus(ImMessageStatusEnum.READ.getStatus());
+            } else {
+                message.setStatus(ImMessageStatusEnum.UNREAD.getStatus());
+            }
+
+            // 回执消息的已读人数（readCount）：仅补齐本人发送的，其他消息不处理（回执消息才关心已读人数，且只对发送者可见）
+            if (ObjUtil.notEqual(message.getSenderId(), userId)
+                || ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus().equals(message.getReceiptStatus())) {
+                continue;
+            }
+            Map<Long, Long> positions = readPositionsByGroup.computeIfAbsent(groupId,
+                    gid -> groupMessageReadRedisDAO.getReadMaxMessageIdMap(gid));
+            List<ImGroupMemberDO> allMembers = membersByGroup.computeIfAbsent(groupId,
+                    groupMemberService::getGroupMemberListByGroupId);
+            Set<Long> visibleUserIds = getVisibleUserIds(message, allMembers);
+            visibleUserIds.remove(message.getSenderId());
+            int readCount = 0;
+            if (CollUtil.isNotEmpty(visibleUserIds)) {
+                for (Long uid : visibleUserIds) {
+                    Long pos = positions.get(uid);
+                    if (pos != null && pos >= message.getId()) {
+                        readCount++;
+                    }
+                }
+            }
+            message.setReadCount(readCount);
+        }
     }
 
     @Override
