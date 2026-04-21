@@ -35,10 +35,11 @@ public interface ImGroupMessageService {
     /**
      * 标记群聊消息已读
      *
-     * @param userId  当前用户编号
-     * @param groupId 群编号
+     * @param userId    当前用户编号
+     * @param groupId   群编号
+     * @param messageId 已读到的消息编号
      */
-    void readGroupMessages(Long userId, Long groupId);
+    void readGroupMessages(Long userId, Long groupId, Long messageId);
 
     /**
      * 撤回群聊消息

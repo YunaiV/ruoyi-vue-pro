@@ -21,6 +21,11 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Resource
     private ImPrivateMessageMapper mapper;
 
+    /**
+     * 一个足够早的时间作为 minSendTime，避免把测试数据过滤掉
+     */
+    private static final LocalDateTime FAR_PAST = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
+
     // ========== selectListByMinId ==========
 
     @Test
@@ -36,7 +41,7 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
         mapper.insert(msg3);
 
         // 调用：用户 1 从 id=0 拉取
-        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, 0L, 100);
+        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, 0L, FAR_PAST, 100);
 
         // 断言：只包含与用户 1 相关的 2 条
         assertEquals(2, result.size());
@@ -53,7 +58,7 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
         mapper.insert(msg2);
 
         // 调用：从 msg1.id 之后拉取
-        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, msg1.getId(), 100);
+        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, msg1.getId(), FAR_PAST, 100);
 
         // 断言：只有 msg2
         assertEquals(1, result.size());
@@ -68,10 +73,29 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
         mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD));
 
         // 调用：limit 2
-        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, 0L, 2);
+        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, 0L, FAR_PAST, 2);
 
         // 断言
         assertEquals(2, result.size());
+    }
+
+    @Test
+    public void testSelectListByMinId_sendTimeFilter() {
+        // 准备：一条落在窗口内，一条落在窗口外
+        ImPrivateMessageDO newMsg = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        newMsg.setSendTime(LocalDateTime.now().minusDays(1));
+        mapper.insert(newMsg);
+        ImPrivateMessageDO oldMsg = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        oldMsg.setSendTime(LocalDateTime.now().minusDays(40));
+        mapper.insert(oldMsg);
+
+        // 调用：窗口起点 = 30 天前
+        List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, 0L,
+                LocalDateTime.now().minusDays(30), 100);
+
+        // 断言：只返回窗口内的消息
+        assertEquals(1, result.size());
+        assertEquals(newMsg.getId(), result.get(0).getId());
     }
 
     // ========== selectHistoryList ==========

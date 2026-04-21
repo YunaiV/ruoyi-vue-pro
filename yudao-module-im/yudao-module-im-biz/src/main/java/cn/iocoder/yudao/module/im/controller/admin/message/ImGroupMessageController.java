@@ -52,8 +52,10 @@ public class ImGroupMessageController {
     @PutMapping("/read")
     @Operation(summary = "标记群聊消息已读")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1")
-    public CommonResult<Boolean> readGroupMessages(@RequestParam("groupId") Long groupId) {
-        groupMessageService.readGroupMessages(getLoginUserId(), groupId);
+    @Parameter(name = "messageId", description = "已读到的消息编号", required = true, example = "100")
+    public CommonResult<Boolean> readGroupMessages(@RequestParam("groupId") Long groupId,
+                                                   @RequestParam("messageId") Long messageId) {
+        groupMessageService.readGroupMessages(getLoginUserId(), groupId, messageId);
         return success(true);
     }
 

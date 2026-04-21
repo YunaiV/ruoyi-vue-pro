@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -35,8 +36,10 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_GROUP_PULL_MAX_DAYS;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_MAX_PULL_SIZE;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_RECALL_TIMEOUT_MINUTES;
 
@@ -101,21 +104,44 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         if (size > MESSAGE_MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
-        // 1. 获取用户所在的所有群
-        List<ImGroupMemberDO> members = groupMemberService.getGroupMembersByUserId(userId);
-        if (CollUtil.isEmpty(members)) {
-            return Collections.emptyList();
+        // 0. 拉取时间窗：超过窗口的老消息不再通过离线通道推送
+        LocalDateTime minSendTime = LocalDateTime.now().minusDays(MESSAGE_GROUP_PULL_MAX_DAYS);
+
+        // 1. 主查询：仅用"当前仍在群"的成员记录驱动（已退群的群由步骤 2 补齐）
+        List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);
+        Map<Long, ImGroupMemberDO> memberMap = convertMap(activeMembers, ImGroupMemberDO::getGroupId);
+        List<ImGroupMessageDO> messages = new ArrayList<>();
+        if (CollUtil.isNotEmpty(activeMembers)) {
+            List<Long> groupIds = convertList(activeMembers, ImGroupMemberDO::getGroupId);
+            messages.addAll(groupMessageMapper.selectListByMinId(groupIds, minId, minSendTime, size));
         }
-        List<Long> groupIds = convertList(members, ImGroupMemberDO::getGroupId);
 
-        // 2. 拉取消息
-        List<ImGroupMessageDO> messages = groupMessageMapper.selectListByMinId(groupIds, minId, size);
+        // 2. 补齐"退群前"的消息：
+        //    - 退群时间早于窗口起点的群直接忽略（消息已不在拉取范围）；
+        //    - 若 minId > 0 且能查到对应消息，则进一步把下限抬到该消息的 sendTime，
+        //      避免把客户端已拥有的老消息再次推送。
+        LocalDateTime minQuitTime = minSendTime;
+        if (minId != null && minId > 0) {
+            ImGroupMessageDO minMessage = groupMessageMapper.selectById(minId);
+            if (minMessage != null && minMessage.getSendTime() != null
+                    && minMessage.getSendTime().isAfter(minSendTime)) {
+                minQuitTime = minMessage.getSendTime();
+            }
+        }
+        List<ImGroupMemberDO> quitMembers = groupMemberService.getQuitGroupMemberListByUserId(userId, minQuitTime);
+        for (ImGroupMemberDO quitMember : quitMembers) {
+            List<ImGroupMessageDO> quitGroupMessages = groupMessageMapper.selectListByGroupIdAndMinIdAndQuitTimeBefore(
+                    quitMember.getGroupId(), minId, minSendTime, quitMember.getQuitTime(), size);
+            if (CollUtil.isNotEmpty(quitGroupMessages)) {
+                messages.addAll(quitGroupMessages);
+                memberMap.put(quitMember.getGroupId(), quitMember);
+            }
+        }
 
-        // 3. 过滤：入群前不可见、退群后不可见、定向接收过滤
-        // TODO @AI：Java 层过滤在 SQL limit 之后，可能导致返回数量不足 size（跨群场景 joinTime 各异，无法下沉 SQL）【后续优化】
-        Map<Long, ImGroupMemberDO> memberMap = CollUtil.toMap(members, new HashMap<>(), ImGroupMemberDO::getGroupId);
+        // 3. 按可见性过滤（入群前不可见、定向消息排除），并按 id 升序重排
         List<ImGroupMessageDO> result = messages.stream()
                 .filter(msg -> isMessageVisible(msg, memberMap.get(msg.getGroupId()), userId))
+                .sorted(Comparator.comparing(ImGroupMessageDO::getId))
                 .toList();
         log.info("[pullGroupMessageList][userId({}) minId({}) size({}) result({})]",
                 userId, minId, size, result.size());
@@ -178,6 +204,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         return recallMessage;
     }
 
+    // TODO @芋艿：这个方法在优化下；
     @Override
     public List<Long> getGroupReadUsers(Long userId, Long groupId, Long messageId) {
         // 1.1 校验用户在群中（权限校验）
@@ -189,7 +216,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         }
 
         // 2. 获取所有成员和已读位置
-        List<ImGroupMemberDO> allMembers = groupMemberService.selectByGroupId(groupId);
+        List<ImGroupMemberDO> allMembers = groupMemberService.getGroupMemberListByGroupId(groupId);
         Map<Long, Long> allPositions = groupMessageReadRedisDAO.getReadMaxMessageIdMap(groupId);
 
         // 3. 计算该消息的可见成员集合（排除发送者自己）
@@ -225,14 +252,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     @Async
     public void sendGroupMessageEvent(ImGroupMessageDO message) {
         ImGroupMessageDTO dto = ImGroupMessageDTO.ofSend(message);
-        // 广播给群内可见成员（含发送方自己，支持多端同步）
-        List<ImGroupMemberDO> members = groupMemberService.selectByGroupId(message.getGroupId());
+        // 广播给群内有效成员（含发送方自己，支持多端同步）
+        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(message.getGroupId());
+        // 定向消息仍需过滤，非目标用户不应收到推送
         List<Long> receiverList = message.getReceiverUserIds();
         for (ImGroupMemberDO member : members) {
-            if (CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
-                continue;
-            }
-            // 特殊：仅在存在定向接收列表时，才进行过滤；如果没有定向列表，则默认所有成员可见
             if (CollUtil.isNotEmpty(receiverList) && !receiverList.contains(member.getUserId())
                     && ObjUtil.notEqual(member.getUserId(), message.getSenderId())) {
                 continue;
@@ -263,8 +287,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         if (CollUtil.isEmpty(pendingMessages)) {
             return;
         }
-        // DONE @AI：收敛到 groupMemberService 方法里，会不会更通用；——已收敛为 getActiveMemberListByGroupId
-        List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveMemberListByGroupId(groupId);
+        List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
         Map<Long, Long> allPositions = groupMessageReadRedisDAO.getReadMaxMessageIdMap(groupId);
         for (ImGroupMessageDO message : pendingMessages) {
             // 2.1.1 统计可见成员中的已读人数

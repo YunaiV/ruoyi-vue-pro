@@ -32,6 +32,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_MAX_PULL_SIZE;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_PRIVATE_PULL_MAX_DAYS;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_RECALL_TIMEOUT_MINUTES;
 
 /**
@@ -87,7 +88,11 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         if (size > MESSAGE_MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
-        List<ImPrivateMessageDO> messages = privateMessageMapper.selectListByMinId(userId, minId, size);
+        // 0. 拉取时间窗：超过窗口的老消息不再通过离线通道推送
+        LocalDateTime minSendTime = LocalDateTime.now().minusDays(MESSAGE_PRIVATE_PULL_MAX_DAYS);
+
+        // 根据 minId 和 minSendTime 拉取消息，避免 minId 恰好被发出后才拉取，导致漏消息
+        List<ImPrivateMessageDO> messages = privateMessageMapper.selectListByMinId(userId, minId, minSendTime, size);
         log.info("[pullPrivateMessageList][userId({}) minId({}) size({}) result({})]",
                 userId, minId, size, messages.size());
         return messages;

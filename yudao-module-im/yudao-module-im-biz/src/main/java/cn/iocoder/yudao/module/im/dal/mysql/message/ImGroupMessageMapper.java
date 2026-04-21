@@ -20,17 +20,48 @@ import java.util.List;
 public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
 
     /**
-     * 根据 minId 增量拉取群聊消息
+     * 根据 minId + 时间窗口增量拉取群聊消息（在群成员使用）
      *
-     * @param groupIds 用户所在群编号列表
-     * @param minId    最小消息 id（不含）
-     * @param size     拉取数量
-     * @return 消息列表
+     * @param groupIds    用户当前仍在群内的群编号列表
+     * @param minId       最小消息 id（不含）
+     * @param minSendTime 最早发送时间（不含），限制离线消息时间窗口
+     * @param size        拉取数量
+     * @return 消息列表（按 id 升序）
      */
-    default List<ImGroupMessageDO> selectListByMinId(List<Long> groupIds, Long minId, Integer size) {
+    default List<ImGroupMessageDO> selectListByMinId(List<Long> groupIds, Long minId,
+                                                     LocalDateTime minSendTime, Integer size) {
         QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
         wrapper.in("group_id", groupIds)
                 .gt("id", minId)
+                .gt("send_time", minSendTime)
+                .ne("status", ImMessageStatusEnum.RECALL.getStatus())
+                .orderByAsc("id");
+        wrapper.limitN(size);
+        return selectList(wrapper);
+    }
+
+    /**
+     * 查询"退群前"的离线消息（退群成员使用）
+     * <p>
+     * 语义：用户已退出某群，但仍需把 {@code minId} 之后、{@code minSendTime} 之后、
+     * 不晚于退群时间的消息补齐到本地，便于前端看到完整上下文。
+     *
+     * @param groupId     群编号
+     * @param minId       最小消息 id（不含）
+     * @param minSendTime 最早发送时间（不含）
+     * @param quitTime    退群时间（含），仅返回退群当时已存在的消息
+     * @param size        拉取数量
+     * @return 消息列表（按 id 升序）
+     */
+    default List<ImGroupMessageDO> selectListByGroupIdAndMinIdAndQuitTimeBefore(Long groupId, Long minId,
+                                                                                LocalDateTime minSendTime,
+                                                                                LocalDateTime quitTime,
+                                                                                Integer size) {
+        QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
+        wrapper.eq("group_id", groupId)
+                .gt("id", minId)
+                .gt("send_time", minSendTime)
+                .le("send_time", quitTime)
                 .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .orderByAsc("id");
         wrapper.limitN(size);

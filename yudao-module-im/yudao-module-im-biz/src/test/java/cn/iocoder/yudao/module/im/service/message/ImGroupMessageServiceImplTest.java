@@ -91,7 +91,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(3L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()
             );
-            when(groupMemberService.selectByGroupId(10L)).thenReturn(allMembers);
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(allMembers);
             when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenAnswer(invocation -> {
                 ImGroupMessageDO msg = invocation.getArgument(0);
                 msg.setId(99L);
@@ -154,23 +154,27 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testPullMessages_joinTimeFilter() {
-        // 准备
-        LocalDateTime joinTime = LocalDateTime.of(2026, 4, 12, 10, 0, 0);
+        // 准备：消息时间用"最近 1 天内"避免被 30 天窗口过滤
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime joinTime = now.minusHours(2);
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(joinTime).build();
-        when(groupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
 
-        // 模拟一条入群前的消息和一条入群后的消息
+        // 入群前 1 条 + 入群后 1 条
         ImGroupMessageDO beforeJoin = ImGroupMessageDO.builder()
                 .id(1L).groupId(10L).senderId(2L)
-                .sendTime(LocalDateTime.of(2026, 4, 12, 9, 0, 0)).build();
+                .sendTime(now.minusHours(3)).build();
         ImGroupMessageDO afterJoin = ImGroupMessageDO.builder()
                 .id(2L).groupId(10L).senderId(2L)
-                .sendTime(LocalDateTime.of(2026, 4, 12, 11, 0, 0)).build();
-        when(groupMessageMapper.selectListByMinId(List.of(10L), 0L, 100))
+                .sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(100)))
                 .thenReturn(List.of(beforeJoin, afterJoin));
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of());
 
         // 调用
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
@@ -181,54 +185,95 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testPullMessages_quitTimeFilter() {
-        // 准备
-        LocalDateTime joinTime = LocalDateTime.of(2026, 4, 10, 10, 0, 0);
-        LocalDateTime quitTime = LocalDateTime.of(2026, 4, 12, 10, 0, 0);
-        ImGroupMemberDO member = ImGroupMemberDO.builder()
+    public void testPullMessages_quitMemberLoadsPreQuitMessages() {
+        // 准备：当前群（在群）+ 一个最近退群
+        LocalDateTime now = LocalDateTime.now();
+        ImGroupMemberDO activeMember = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(CommonStatusEnum.DISABLE.getStatus())
-                .joinTime(joinTime).quitTime(quitTime).build();
-        when(groupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(activeMember));
 
-        // 退群前后各一条消息
-        ImGroupMessageDO beforeQuit = ImGroupMessageDO.builder()
-                .id(1L).groupId(10L).senderId(2L)
-                .sendTime(LocalDateTime.of(2026, 4, 11, 10, 0, 0)).build();
-        ImGroupMessageDO afterQuit = ImGroupMessageDO.builder()
-                .id(2L).groupId(10L).senderId(2L)
-                .sendTime(LocalDateTime.of(2026, 4, 13, 10, 0, 0)).build();
-        when(groupMessageMapper.selectListByMinId(List.of(10L), 0L, 100))
-                .thenReturn(List.of(beforeQuit, afterQuit));
+        ImGroupMessageDO activeMsg = ImGroupMessageDO.builder()
+                .id(5L).groupId(10L).senderId(2L)
+                .sendTime(now.minusHours(2)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(100)))
+                .thenReturn(List.of(activeMsg));
+
+        // 已退群：退群时间在窗口内（minId=0，minQuitTime 直接用 minSendTime）
+        LocalDateTime quitTime = now.minusDays(3);
+        ImGroupMemberDO quitMember = ImGroupMemberDO.builder()
+                .groupId(20L).userId(1L)
+                .status(CommonStatusEnum.DISABLE.getStatus())
+                .joinTime(now.minusDays(20))
+                .quitTime(quitTime).build();
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of(quitMember));
+
+        ImGroupMessageDO quitGroupMsg = ImGroupMessageDO.builder()
+                .id(3L).groupId(20L).senderId(99L)
+                .sendTime(now.minusDays(5)).build();
+        when(groupMessageMapper.selectListByGroupIdAndMinIdAndQuitTimeBefore(eq(20L), eq(0L),
+                any(LocalDateTime.class), eq(quitTime), eq(100)))
+                .thenReturn(List.of(quitGroupMsg));
 
         // 调用
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
-        // 断言：退群后消息不可见
-        assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).getId());
+        // 断言：两条消息均返回，并按 id 升序
+        assertEquals(2, result.size());
+        assertEquals(3L, result.get(0).getId());
+        assertEquals(5L, result.get(1).getId());
+    }
+
+    @Test
+    public void testPullMessages_quitMemberFilteredByBoundarySendTime() {
+        // 准备：minId > 0，边界消息 sendTime 晚于窗口起点，应当被用作 minQuitTime
+        LocalDateTime now = LocalDateTime.now();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of());
+        when(groupMessageMapper.selectListByMinId(anyList(), anyLong(), any(LocalDateTime.class), anyInt()))
+                .thenReturn(List.of());
+
+        LocalDateTime boundarySendTime = now.minusDays(2);
+        ImGroupMessageDO boundary = ImGroupMessageDO.builder()
+                .id(8L).groupId(10L).senderId(2L).sendTime(boundarySendTime).build();
+        when(groupMessageMapper.selectById(8L)).thenReturn(boundary);
+        when(groupMemberService.getQuitGroupMemberListByUserId(1L, boundarySendTime))
+                .thenReturn(List.of());
+
+        // 调用
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 8L, 100);
+
+        // 断言：使用边界消息 sendTime 抬升 minQuitTime
+        assertEquals(0, result.size());
+        verify(groupMemberService).getQuitGroupMemberListByUserId(1L, boundarySendTime);
     }
 
     @Test
     public void testPullMessages_receiverUserIdsFilter() {
         // 准备
+        LocalDateTime now = LocalDateTime.now();
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
-                .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
-        when(groupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
 
         // 定向接收消息：只给用户 2 和 3
         ImGroupMessageDO directedMsg = ImGroupMessageDO.builder()
                 .id(1L).groupId(10L).senderId(5L)
                 .receiverUserIds(List.of(2L, 3L))
-                .sendTime(LocalDateTime.of(2026, 4, 12, 10, 0, 0)).build();
+                .sendTime(now.minusHours(2)).build();
         // 全员消息
         ImGroupMessageDO allMsg = ImGroupMessageDO.builder()
                 .id(2L).groupId(10L).senderId(5L)
-                .sendTime(LocalDateTime.of(2026, 4, 12, 10, 0, 0)).build();
-        when(groupMessageMapper.selectListByMinId(List.of(10L), 0L, 100))
+                .sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(100)))
                 .thenReturn(List.of(directedMsg, allMsg));
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of());
 
         // 调用
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
@@ -241,18 +286,22 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testPullMessages_atFieldCorrectReturn() {
         // 准备
+        LocalDateTime now = LocalDateTime.now();
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
-                .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
-        when(groupMemberService.getGroupMembersByUserId(1L)).thenReturn(List.of(member));
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
 
         ImGroupMessageDO atMsg = ImGroupMessageDO.builder()
                 .id(1L).groupId(10L).senderId(2L)
                 .atUserIds(List.of(1L, 3L))
-                .sendTime(LocalDateTime.of(2026, 4, 12, 10, 0, 0)).build();
-        when(groupMessageMapper.selectListByMinId(List.of(10L), 0L, 100))
+                .sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(List.of(10L)), eq(0L),
+                any(LocalDateTime.class), eq(100)))
                 .thenReturn(List.of(atMsg));
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of());
 
         // 调用
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
@@ -290,7 +339,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(3L)
                             .status(CommonStatusEnum.DISABLE.getStatus()).build()
             );
-            when(groupMemberService.selectByGroupId(10L)).thenReturn(members);
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(members);
 
             // 调用
             ImGroupMessageDO result = groupMessageService.recallGroupMessage(1L, 50L);
@@ -396,7 +445,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                         .status(CommonStatusEnum.ENABLE.getStatus())
                         .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build()  // 发送者
         );
-        when(groupMemberService.selectByGroupId(10L)).thenReturn(allMembers);
+        when(groupMemberService.getGroupMemberListByGroupId(10L)).thenReturn(allMembers);
 
         // 准备：Redis 已读位置 — 用户 1 读到 100, 用户 2 读到 50, 用户 3 读到 200
         Map<Long, Long> positions = new HashMap<>();

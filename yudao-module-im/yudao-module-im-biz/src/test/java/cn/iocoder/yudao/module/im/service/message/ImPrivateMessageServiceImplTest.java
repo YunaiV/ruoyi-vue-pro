@@ -132,7 +132,8 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 ImPrivateMessageDO.builder().id(1L).senderId(1L).receiverId(2L).build(),
                 ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L).build()
         );
-        when(imPrivateMessageMapper.selectListByMinId(1L, 0L, 100)).thenReturn(mockMessages);
+        when(imPrivateMessageMapper.selectListByMinId(eq(1L), eq(0L), any(LocalDateTime.class), eq(100)))
+                .thenReturn(mockMessages);
 
         // 调用
         List<ImPrivateMessageDO> result = privateMessageService.pullPrivateMessageList(1L, 0L, 100);

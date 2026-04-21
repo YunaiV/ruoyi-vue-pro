@@ -33,10 +33,7 @@ public class ImGroupMessageSendReqVO {
     @Schema(description = "@目标用户编号列表", example = "[1,2,3]")
     private List<Long> atUserIds;
 
-    @Schema(description = "定向接收用户编号列表", example = "[1,2]")
-    private List<Long> receiverUserIds;
-
     @Schema(description = "是否需要回执", example = "false")
-    private Boolean needReceipt;
+    private Boolean receipt;
 
 }
