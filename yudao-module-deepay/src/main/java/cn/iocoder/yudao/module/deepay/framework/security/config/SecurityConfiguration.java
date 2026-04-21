@@ -23,6 +23,11 @@ public class SecurityConfiguration {
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
                 // 商品生成接口无需登录
                 registry.requestMatchers("/api/create-product").permitAll();
+                // 支付相关接口无需登录（Webhook 由支付网关回调，详情页为公开页面）
+                registry.requestMatchers("/api/order/create").permitAll();
+                registry.requestMatchers("/api/payment/callback").permitAll();
+                registry.requestMatchers("/api/payment/simulate").permitAll();
+                registry.requestMatchers("/product/**").permitAll();
             }
 
         };
