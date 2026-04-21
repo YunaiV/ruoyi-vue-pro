@@ -47,6 +47,7 @@ public class DeepayProductPageController {
             model.addAttribute("chainCode", chainCode);
             model.addAttribute("image", null);
             model.addAttribute("description", "该链码对应的商品不存在，请确认链接是否正确。");
+            // price 设为 null，模板中通过 th:if 判断不渲染价格区域
             model.addAttribute("price", null);
             return "product";
         }

@@ -53,7 +53,7 @@
 
     <p class="description" th:text="${description}">商品描述</p>
 
-    <div class="price">€<span th:text="${price}">0.00</span></div>
+    <div class="price" th:if="${price != null}">€<span th:text="${price}">0.00</span></div>
 
     <p class="chain-code" th:text="'商品编号：' + ${chainCode}"></p>
 
