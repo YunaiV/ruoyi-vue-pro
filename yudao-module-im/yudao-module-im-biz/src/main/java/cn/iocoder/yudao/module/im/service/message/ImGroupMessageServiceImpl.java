@@ -49,6 +49,13 @@ import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 @Slf4j
 public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
+    /**
+     * 仅用于规避群消息 pull 的"假空页"：
+     * 首批 raw 消息可能因入群时间或定向接收过滤后变成空列表，但后续更大的 id 仍然存在可见消息。
+     * 因此仅在过滤结果为空时，按本轮 raw 最大 id 向后再试几次。
+     */
+    private static final int PULL_GROUP_MESSAGE_EMPTY_RETRY_TIMES = 3;
+
     @Resource
     private ImGroupMessageMapper groupMessageMapper;
     @Resource
@@ -100,12 +107,50 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         if (size > MESSAGE_MAX_PULL_SIZE) {
             throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
         }
+
         // 0. 拉取时间窗：超过窗口的老消息不再通过离线通道推送
         LocalDateTime minSendTime = LocalDateTime.now().minusDays(MESSAGE_GROUP_PULL_MAX_DAYS);
 
+        // 1. 拉取一批原始消息（包含当前在群、退群前补齐两部分），并过滤得到当前用户可见的结果
+        List<ImGroupMessageDO> result = Collections.emptyList();
+        Long currentMinId = minId; // 当前轮次的下限消息编号；初始为用户传入的 minId，后续会根据拉取结果更新
+        for (int retryCount = 0; retryCount <= PULL_GROUP_MESSAGE_EMPTY_RETRY_TIMES; retryCount++) {
+            // 1.1 查询一批原始消息（包含当前在群、退群前补齐两部分）
+            Map<Long, ImGroupMemberDO> memberMap = new HashMap<>(); // 群编号 → 群成员记录（包含当前在群、退群前补齐两部分）
+            List<ImGroupMessageDO> messages = getGroupMessageList(userId, currentMinId, size, minSendTime, memberMap);
+            if (CollUtil.isEmpty(messages)) {
+                break;
+            }
+            // 1.2 过滤得到当前用户可见的结果（按 id 升序）
+            result = filterGroupMessageList(messages, memberMap, userId, size);
+            // 已拿到可见消息，或原始消息已不足一页（说明没有继续重试的必要）
+            if (CollUtil.isNotEmpty(result) || messages.size() < size) {
+                break;
+            }
+
+            // 1.3 更新 currentMinId，进行下一轮查询；如果本轮查询的最大消息编号没有前进，则说明后续没有更多消息了，直接 break
+            Long maxMessageId = getMaxValue(messages, ImGroupMessageDO::getId);
+            if (maxMessageId == null || maxMessageId <= currentMinId) {
+                break;
+            }
+            currentMinId = maxMessageId;
+        }
+
+        // 2. 按当前用户补齐：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
+        appendMessageStatusAndReceipt(userId, result);
+        log.info("[pullGroupMessageList][userId({}) minId({}) size({}) result({})]", userId, minId, size, result.size());
+        return result;
+    }
+
+    /**
+     * 查询一批原始群消息（包含当前在群、退群前补齐两部分）
+     */
+    private List<ImGroupMessageDO> getGroupMessageList(Long userId, Long minId, Integer size,
+                                                       LocalDateTime minSendTime,
+                                                       Map<Long, ImGroupMemberDO> memberMap) {
         // 1. 主查询：仅用"当前仍在群"的成员记录驱动（已退群的群由步骤 2 补齐）
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);
-        Map<Long, ImGroupMemberDO> memberMap = convertMap(activeMembers, ImGroupMemberDO::getGroupId);
+        memberMap.putAll(convertMap(activeMembers, ImGroupMemberDO::getGroupId));
         List<ImGroupMessageDO> messages = new ArrayList<>();
         if (CollUtil.isNotEmpty(activeMembers)) {
             List<Long> groupIds = convertList(activeMembers, ImGroupMemberDO::getGroupId);
@@ -128,25 +173,28 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         for (ImGroupMemberDO quitMember : quitMembers) {
             List<ImGroupMessageDO> quitGroupMessages = groupMessageMapper.selectListByGroupIdAndMinIdAndQuitTimeBefore(
                     quitMember.getGroupId(), minId, minSendTime, quitMember.getQuitTime(), size);
-            if (CollUtil.isNotEmpty(quitGroupMessages)) {
-                messages.addAll(quitGroupMessages);
-                memberMap.put(quitMember.getGroupId(), quitMember);
+            if (CollUtil.isEmpty(quitGroupMessages)) {
+                continue;
             }
+            messages.addAll(quitGroupMessages);
+            memberMap.put(quitMember.getGroupId(), quitMember);
         }
+        return messages;
+    }
 
-        // 3.1 按可见性过滤（入群前不可见、定向消息排除），按 id 升序后仅取本页 size 条，
-        //     避免「在群 + 退群前」多路合并时一次响应跨度过大、游标直接跳到全局最大 id 而漏拉中间消息
-        List<ImGroupMessageDO> result = messages.stream()
+    /**
+     * 过滤一批原始群消息，得到当前用户可见的返回结果
+     */
+    private List<ImGroupMessageDO> filterGroupMessageList(List<ImGroupMessageDO> messages,
+                                                          Map<Long, ImGroupMemberDO> memberMap,
+                                                          Long userId, Integer size) {
+        // 按可见性过滤（入群前不可见、定向消息排除），按 id 升序后仅取本页 size 条，
+        // 避免「在群 + 退群前」多路合并时一次响应跨度过大、游标直接跳到全局最大 id 而漏拉中间消息
+        return messages.stream()
                 .filter(msg -> isMessageVisible(msg, memberMap.get(msg.getGroupId()), userId))
                 .sorted(Comparator.comparing(ImGroupMessageDO::getId))
                 .limit(size)
                 .toList();
-        // 3.2 按当前用户补齐：消息已读态（相对 Redis 已读游标）、本人发送的回执消息的已读人数
-        appendMessageStatusAndReceipt(userId, result);
-
-        log.info("[pullGroupMessageList][userId({}) minId({}) size({}) result({})]",
-                userId, minId, size, result.size());
-        return result;
     }
 
     /**
