@@ -1,22 +1,21 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
 /**
  * 群成员 Service 实现类
@@ -51,7 +50,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         imGroupMemberMapper.updateById(updateObj);
     }
 
-    // TODO @AI：是不是不存在删除一说？
     @Override
     public void removeGroupMember(Long id) {
         // TODO @AI：需要群主校验下；
@@ -76,16 +74,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     @Override
     public List<ImGroupMemberDO> getGroupMemberListByGroupId(Long groupId) {
         return imGroupMemberMapper.selectListByGroupId(groupId);
-    }
-
-    @Override
-    public ImGroupMemberDO getGroupMember(Long groupId, Long userId) {
-        return imGroupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
-    }
-
-    @Override
-    public List<ImGroupMemberDO> getGroupMemberListByUserId(Long userId) {
-        return imGroupMemberMapper.selectListByUserId(userId);
     }
 
     @Override
@@ -132,6 +120,13 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 .setDisplayUserName(displayUserName).setDisplayGroupName(displayGroupName));
 
         // TODO @AI：需要分析下，是否需要
+    }
+
+    @Override
+    public void removeGroupMembersByGroupId(Long groupId) {
+        imGroupMemberMapper.updateByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus(),
+                new ImGroupMemberDO().setStatus(CommonStatusEnum.DISABLE.getStatus())
+                        .setQuitTime(LocalDateTime.now()));
     }
 
 }

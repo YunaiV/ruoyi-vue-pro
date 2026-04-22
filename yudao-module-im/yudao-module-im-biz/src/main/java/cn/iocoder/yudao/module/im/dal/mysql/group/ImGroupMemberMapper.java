@@ -27,10 +27,6 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .eq(ImGroupMemberDO::getUserId, userId));
     }
 
-    default List<ImGroupMemberDO> selectListByUserId(Long userId) {
-        return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>().eq(ImGroupMemberDO::getUserId, userId));
-    }
-
     default List<ImGroupMemberDO> selectListByGroupIdAndStatus(Long groupId, Integer status) {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eq(ImGroupMemberDO::getGroupId, groupId)
@@ -57,6 +53,13 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .eq(ImGroupMemberDO::getUserId, userId)
                 .eq(ImGroupMemberDO::getStatus, CommonStatusEnum.DISABLE.getStatus())
                 .geIfPresent(ImGroupMemberDO::getQuitTime, minQuitTime));
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    default int updateByGroupIdAndStatus(Long groupId, Integer oldStatus, ImGroupMemberDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .eq(ImGroupMemberDO::getStatus, oldStatus));
     }
 
 }

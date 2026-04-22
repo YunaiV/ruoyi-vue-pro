@@ -45,7 +45,6 @@ public interface ImGroupMemberService {
      */
     ImGroupMemberDO getGroupMember(Long id);
 
-
     /**
      * 根据群组 id 查询群成员（包含所有状态）
      *
@@ -53,23 +52,6 @@ public interface ImGroupMemberService {
      * @return 群成员列表
      */
     List<ImGroupMemberDO> getGroupMemberListByGroupId(Long groupId);
-
-    /**
-     * 根据群编号和用户编号查询群成员
-     *
-     * @param groupId 群编号
-     * @param userId  用户编号
-     * @return 群成员
-     */
-    ImGroupMemberDO getGroupMember(Long groupId, Long userId);
-
-    /**
-     * 查询用户所在的所有群的成员记录
-     *
-     * @param userId 用户编号
-     * @return 群成员记录列表
-     */
-    List<ImGroupMemberDO> getGroupMemberListByUserId(Long userId);
 
     /**
      * 根据群编号查询有效成员列表（仅 ENABLE 状态）
@@ -106,6 +88,7 @@ public interface ImGroupMemberService {
      * @param userId  用户编号
      * @return 群成员记录
      */
+    @SuppressWarnings("UnusedReturnValue")
     ImGroupMemberDO addGroupMember(Long groupId, Long userId);
 
     /**
@@ -129,5 +112,14 @@ public interface ImGroupMemberService {
      */
     void updateGroupMember(Long groupId, Long userId,
                            String displayUserName, String displayGroupName);
+
+    /**
+     * 移除群的全部成员（设置为 DISABLE 状态）
+     * <p>
+     * 用于群解散场景
+     *
+     * @param groupId 群编号
+     */
+    void removeGroupMembersByGroupId(Long groupId);
 
 }
