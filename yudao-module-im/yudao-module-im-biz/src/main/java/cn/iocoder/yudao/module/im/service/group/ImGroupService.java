@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import java.util.List;
+
 /**
  * 群 Service 接口
  *
@@ -57,5 +59,15 @@ public interface ImGroupService {
      * @return 群信息
      */
     ImGroupDO validateGroupExists(Long groupId);
+
+    /**
+     * 获取指定用户加入的所有"有效"群（未退群且未封禁/解散）
+     * <p>
+     * 返回当前登录用户在群内身份仍有效的所有群。
+     *
+     * @param userId 用户编号
+     * @return 群列表
+     */
+    List<ImGroupDO> getMyGroupList(Long userId);
 
 }

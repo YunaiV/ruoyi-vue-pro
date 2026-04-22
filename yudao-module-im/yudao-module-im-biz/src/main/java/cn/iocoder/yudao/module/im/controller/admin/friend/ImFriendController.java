@@ -84,7 +84,7 @@ public class ImFriendController {
     // ========== 私有方法：VO 组装 ==========
 
     private List<ImFriendRespVO> buildFriendRespVOList(Collection<ImFriendDO> friends) {
-        if (CollUtil.isNotEmpty(friends)) {
+        if (CollUtil.isEmpty(friends)) {
             return Collections.emptyList();
         }
         // 批量聚合 AdminUser 信息（昵称 / 头像），避免 N+1

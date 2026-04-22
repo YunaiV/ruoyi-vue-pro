@@ -27,8 +27,14 @@ public class ImGroupRespVO {
     @Schema(description = "是否封禁")
     private Boolean banned;
 
+    @Schema(description = "封禁时间")
+    private LocalDateTime bannedTime;
+
     @Schema(description = "是否解散")
     private Boolean dissolved;
+
+    @Schema(description = "解散时间")
+    private LocalDateTime dissolvedTime;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

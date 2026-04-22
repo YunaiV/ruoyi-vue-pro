@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMember
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -54,12 +55,12 @@ public interface ImGroupMemberService {
     PageResult<ImGroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO);
 
     /**
-     * 根据群组id查询群成员
+     * 根据群组 id 查询群成员（包含所有状态）
      *
      * @param groupId 群组id
      * @return 群成员列表
      */
-    List<ImGroupMemberDO> selectByGroupId(Long groupId);
+    List<ImGroupMemberDO> getGroupMemberListByGroupId(Long groupId);
 
     /**
      * 根据群编号和用户编号查询群成员
@@ -76,5 +77,39 @@ public interface ImGroupMemberService {
      * @param userId 用户编号
      * @return 群成员记录列表
      */
-    List<ImGroupMemberDO> getGroupMembersByUserId(Long userId);
+    List<ImGroupMemberDO> getGroupMemberListByUserId(Long userId);
+
+    /**
+     * 根据群编号查询有效成员列表（仅 ENABLE 状态）
+     *
+     * @param groupId 群编号
+     * @return 有效群成员列表
+     */
+    List<ImGroupMemberDO> getActiveGroupMemberListByGroupId(Long groupId);
+
+    /**
+     * 查询用户所在的所有群的有效成员记录（仅 ENABLE 状态）
+     *
+     * @param userId 用户编号
+     * @return 有效群成员记录列表
+     */
+    List<ImGroupMemberDO> getActiveGroupMemberListByUserId(Long userId);
+
+    /**
+     * 查询用户已退群的群成员记录（DISABLE 状态）
+     *
+     * @param userId      用户编号，必传
+     * @param minQuitTime 最早退群时间（含），可空
+     * @return 已退群成员记录列表
+     */
+    List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime);
+
+    /**
+     * 校验用户是否为群的有效成员
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     * @return 群成员记录
+     */
+    ImGroupMemberDO validateMemberInGroup(Long groupId, Long userId);
 }

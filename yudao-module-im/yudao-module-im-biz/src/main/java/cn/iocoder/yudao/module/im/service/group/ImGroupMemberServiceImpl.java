@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.group;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberSaveReqVO;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -72,7 +74,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
-    public List<ImGroupMemberDO> selectByGroupId(Long groupId) {
+    public List<ImGroupMemberDO> getGroupMemberListByGroupId(Long groupId) {
         return imGroupMemberMapper.selectListByGroupId(groupId);
     }
 
@@ -82,8 +84,32 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
-    public List<ImGroupMemberDO> getGroupMembersByUserId(Long userId) {
+    public List<ImGroupMemberDO> getGroupMemberListByUserId(Long userId) {
         return imGroupMemberMapper.selectListByUserId(userId);
+    }
+
+    @Override
+    public List<ImGroupMemberDO> getActiveGroupMemberListByGroupId(Long groupId) {
+        return imGroupMemberMapper.selectEnabledListByGroupId(groupId);
+    }
+
+    @Override
+    public List<ImGroupMemberDO> getActiveGroupMemberListByUserId(Long userId) {
+        return imGroupMemberMapper.selectEnabledListByUserId(userId);
+    }
+
+    @Override
+    public List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime) {
+        return imGroupMemberMapper.selectQuitListByUserId(userId, minQuitTime);
+    }
+
+    @Override
+    public ImGroupMemberDO validateMemberInGroup(Long groupId, Long userId) {
+        ImGroupMemberDO member = imGroupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
+        if (member == null || CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
+            throw exception(GROUP_MEMBER_NOT_IN_GROUP);
+        }
+        return member;
     }
 
 }
