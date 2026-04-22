@@ -13,6 +13,11 @@ public interface ImCommonConstants {
     int MESSAGE_MAX_PULL_SIZE = 1000;
 
     /**
+     * 群最大成员人数
+     */
+    int MAX_GROUP_MEMBER = 500;
+
+    /**
      * 消息撤回时间限制（分钟）
      */
     int MESSAGE_RECALL_TIMEOUT_MINUTES = 5;
@@ -50,14 +55,18 @@ public interface ImCommonConstants {
     /**
      * 群解散系统提示
      */
-    String GROUP_DISSOLVE_TIP_MESSAGE = "'{}'解散了群聊";
+    String GROUP_DISSOLVE_TIP_MESSAGE = "\"{}\"解散了群聊";
     /**
      * 退群系统提示
      */
-    String GROUP_QUIT_TIP_MESSAGE = "您已退出群聊";
+    String GROUP_QUIT_TIP_MESSAGE = "你已退出群聊";
     /**
      * 踢出群系统提示
      */
-    String GROUP_REMOVE_TIP_MESSAGE = "您已被移出群聊";
+    String GROUP_REMOVE_TIP_MESSAGE = "你已被移出群聊";
+    /**
+     * 邀请入群系统提示
+     */
+    String GROUP_INVITE_TIP_MESSAGE = "\"{}\"邀请\"{}\"加入了群聊";
 
 }

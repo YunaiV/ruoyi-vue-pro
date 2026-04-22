@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,6 +64,12 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Override
     public List<ImFriendDO> getFriendList(Long userId) {
         return imFriendMapper.selectListByUserId(userId);
+    }
+
+    @Override
+    public List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds) {
+        return imFriendMapper.selectListByUserIdAndFriendUserIdsAndStatus(userId, friendUserIds,
+                CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override

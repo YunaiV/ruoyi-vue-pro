@@ -37,6 +37,8 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_MEMBER_ALREADY_QUIT = new ErrorCode(1_040_500_002, "您已退出该群");
     ErrorCode GROUP_OWNER_CANNOT_QUIT = new ErrorCode(1_040_500_003, "您是群主，不可退出群聊");
     ErrorCode GROUP_CANNOT_REMOVE_SELF = new ErrorCode(1_040_500_004, "不能移除自己");
+    ErrorCode GROUP_MEMBER_EXCEED = new ErrorCode(1_040_500_005, "群聊人数不能超过{}人");
+    ErrorCode GROUP_INVITE_NOT_FRIEND = new ErrorCode(1_040_500_006, "'{}' 不是您的好友，邀请失败");
 
     // ========== 好友 (1-040-600-000) ==========
     ErrorCode FRIEND_NOT_EXISTS = new ErrorCode(1_040_600_000, "好友关系不存在");

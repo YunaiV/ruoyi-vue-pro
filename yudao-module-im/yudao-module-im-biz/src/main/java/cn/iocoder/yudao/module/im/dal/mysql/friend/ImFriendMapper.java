@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,6 +26,21 @@ public interface ImFriendMapper extends BaseMapperX<ImFriendDO> {
         return selectList(new LambdaQueryWrapperX<ImFriendDO>()
                 .eq(ImFriendDO::getUserId, userId)
                 .orderByDesc(ImFriendDO::getId));
+    }
+    default List<ImFriendDO> selectListByUserIdAndStatus(Long userId, Integer status) {
+        return selectList(new LambdaQueryWrapperX<ImFriendDO>()
+                .eq(ImFriendDO::getUserId, userId)
+                .eq(ImFriendDO::getStatus, status)
+                .orderByDesc(ImFriendDO::getId));
+    }
+
+    default List<ImFriendDO> selectListByUserIdAndFriendUserIdsAndStatus(Long userId,
+                                                                        Collection<Long> friendUserIds,
+                                                                        Integer status) {
+        return selectList(new LambdaQueryWrapperX<ImFriendDO>()
+                .eq(ImFriendDO::getUserId, userId)
+                .in(ImFriendDO::getFriendUserId, friendUserIds)
+                .eq(ImFriendDO::getStatus, status));
     }
 
 }

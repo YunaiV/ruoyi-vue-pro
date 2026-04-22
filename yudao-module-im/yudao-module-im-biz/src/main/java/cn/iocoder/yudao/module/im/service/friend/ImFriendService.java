@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.service.friend;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,6 +32,15 @@ public interface ImFriendService {
      * @return 好友关系列表（含已删除的记录）
      */
     List<ImFriendDO> getFriendList(Long userId);
+
+    /**
+     * 获得当前用户与指定用户之间的有效好友列表（仅 ENABLE 状态）
+     *
+     * @param userId        用户编号
+     * @param friendUserIds 需要校验的好友用户编号集合
+     * @return 有效好友关系列表
+     */
+    List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds);
 
     /**
      * 查询一个好友关系记录（仅限本人视角）

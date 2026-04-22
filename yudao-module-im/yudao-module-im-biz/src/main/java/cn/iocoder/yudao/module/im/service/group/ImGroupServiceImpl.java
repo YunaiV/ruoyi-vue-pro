@@ -13,14 +13,16 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,11 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -64,6 +62,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     private ImGroupMessageService groupMessageService;
     @Resource
     private ImWebSocketService webSocketService;
+
+    @Resource
+    private ImFriendService friendService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -164,8 +165,15 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (CollUtil.isEmpty(inviteReqVO.getMemberUserIds())) {
             return;
         }
-        // 1.3 校验群人数上限
+        // 1.3 校验被邀请人都是当前用户的好友
         List<Long> memberUserIds = inviteReqVO.getMemberUserIds();
+        List<ImFriendDO> friends = friendService.getActiveFriendList(userId, memberUserIds);
+        Set<Long> friendUserIds = convertSet(friends, ImFriendDO::getFriendUserId);
+        Collection<Long> notFriendUserIds = CollUtil.subtract(memberUserIds, friendUserIds);
+        if (CollUtil.isNotEmpty(notFriendUserIds)) {
+            throw exception(GROUP_INVITE_NOT_FRIEND, getUserNicknames(notFriendUserIds));
+        }
+        // 1.4 校验群人数上限
         if (activeMembers.size() + memberUserIds.size() > MAX_GROUP_MEMBER) {
             throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
         }
@@ -177,12 +185,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         webSocketService.sendGroupMessageAsync(new HashSet<>(memberUserIds),
                 ImGroupMessageDTO.ofGroupCreate(userId, groupId));
         // 3.2 发送邀请提示消息给所有群成员
-        AdminUserRespDTO inviter = adminUserApi.getUser(userId);
-        Map<Long, AdminUserRespDTO> invitedUserMap = adminUserApi.getUserMap(memberUserIds);
-        String invitedNames = memberUserIds.stream()
-                .map(id -> invitedUserMap.containsKey(id) ? invitedUserMap.get(id).getNickname() : String.valueOf(id))
-                .collect(Collectors.joining(","));
-        String tipContent = StrUtil.format(GROUP_INVITE_TIP_MESSAGE, inviter.getNickname(), invitedNames);
+        String tipContent = StrUtil.format(GROUP_INVITE_TIP_MESSAGE,
+                getUserNicknames(List.of(userId)), getUserNicknames(memberUserIds));
         List<ImGroupMemberDO> allMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
         Set<Long> allMemberUserIds = convertSet(allMembers, ImGroupMemberDO::getUserId);
         groupMessageService.sendTipGroupMessage(userId, groupId, allMemberUserIds, tipContent);
@@ -282,6 +286,19 @@ public class ImGroupServiceImpl implements ImGroupService {
 
     private ImGroupServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
+    }
+
+    /**
+     * 根据用户编号集合，拼接用户昵称字符串（逗号分隔）
+     *
+     * @param userIds 用户编号集合
+     * @return 昵称字符串，如 "张三,李四"
+     */
+    private String getUserNicknames(Collection<Long> userIds) {
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        return userIds.stream()
+                .map(id -> userMap.containsKey(id) ? userMap.get(id).getNickname() : String.valueOf(id))
+                .collect(Collectors.joining(","));
     }
 
 }
