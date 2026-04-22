@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.hutool.extra.spring.SpringUtil;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -77,26 +78,20 @@ public class ImFriendServiceImpl implements ImFriendService {
         // 1.2 校验对方存在（禁用/不存在的账号不允许添加）
         adminUserApi.validateUser(friendUserId);
 
-        // 双向绑定
-        // DONE @AI：改成 createOrUpdateFriend 之类的接口，内部自动处理"已删除的好友再加回来"的情况；或者直接在数据库层面通过唯一索引 + 物理更新来解决。
-        // 说明：bindFriend 内部已处理 DISABLE → ENABLE 的恢复逻辑
-        bindFriend(userId, friendUserId);
-        bindFriend(friendUserId, userId);
+        // 2. 双向绑定
+        getSelf().addFriend0(userId, friendUserId);
+        getSelf().addFriend0(friendUserId, userId);
 
-        // TODO @AI：推送异步化：1）好友的打招呼；2）通知好友发生变化的消息；
-
-        // TODO @AI：实现如下：
-        // TODO @芋艿：【对齐】这里缺少了好友添加成功的系统提示消息，
-        //  需要通过 `ImPrivateMessageService` 插入一条 TIP_TEXT 类型的消息并走 WebSocket 推送给双方。
-        //  涉及 WebSocket 推送器的事件类型扩展（当前 `ImWsEventType` 无 FRIEND_NEW），待统一后补上。
+        // TODO @芋艿：好友添加成功后：1）插入 TIP_TEXT 系统提示消息并推送双方；2）通知双方好友列表变更。
+        //  依赖 WebSocket 事件类型扩展（当前无 FRIEND_NEW），待统一后补上。
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteFriend(Long userId, Long friendUserId) {
         // 双向标记为 DISABLE + 记录 deleteTime
-        unbindFriend(userId, friendUserId);
-        unbindFriend(friendUserId, userId);
+        getSelf().deleteFriend0(userId, friendUserId);
+        getSelf().deleteFriend0(friendUserId, userId);
 
         // TODO @芋艿：【对齐】这里缺少了好友删除的系统提示 + FRIEND_DEL WebSocket 推送，
         //  待 WS 事件类型扩展后补上。
@@ -109,29 +104,20 @@ public class ImFriendServiceImpl implements ImFriendService {
      * - 已存在但 DISABLE：恢复关系（status=ENABLE，刷新 addTime，清空 deleteTime）
      */
     @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
-    public void bindFriend(Long userId, Long friendUserId) {
+    public void addFriend0(Long userId, Long friendUserId) {
         ImFriendDO exists = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        // 情况一：恢复已删除的好友关系
         if (exists != null) {
             if (CommonStatusEnum.isEnable(exists.getStatus())) {
-                return; // 已是好友，跳过
+                return;
             }
-            // 恢复已删除的好友关系
-            ImFriendDO updateObj = new ImFriendDO();
-            updateObj.setId(exists.getId());
-            updateObj.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            updateObj.setAddTime(LocalDateTime.now());
-            updateObj.setDeleteTime(null);
-            imFriendMapper.updateById(updateObj);
+            imFriendMapper.updateById(new ImFriendDO().setId(exists.getId())
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()).setAddTime(LocalDateTime.now()));
             return;
         }
-        // 新增
-        ImFriendDO friend = ImFriendDO.builder()
-                .userId(userId)
-                .friendUserId(friendUserId)
-                .muted(false)
-                .status(CommonStatusEnum.ENABLE.getStatus())
-                .addTime(LocalDateTime.now())
-                .build();
+        // 情况二：新增好有关系
+        ImFriendDO friend = ImFriendDO.builder().userId(userId).friendUserId(friendUserId)
+                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).addTime(LocalDateTime.now()).build();
         imFriendMapper.insert(friend);
     }
 
@@ -139,16 +125,17 @@ public class ImFriendServiceImpl implements ImFriendService {
      * 单向解除好友关系（status 设为 DISABLE，记录 deleteTime）
      */
     @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
-    public void unbindFriend(Long userId, Long friendUserId) {
+    public void deleteFriend0(Long userId, Long friendUserId) {
         ImFriendDO exists = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (exists == null || CommonStatusEnum.isDisable(exists.getStatus())) {
             return;
         }
-        ImFriendDO updateObj = new ImFriendDO();
-        updateObj.setId(exists.getId());
-        updateObj.setStatus(CommonStatusEnum.DISABLE.getStatus());
-        updateObj.setDeleteTime(LocalDateTime.now());
-        imFriendMapper.updateById(updateObj);
+        imFriendMapper.updateById(new ImFriendDO().setId(exists.getId())
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDeleteTime(LocalDateTime.now()));
+    }
+
+    private ImFriendServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }
