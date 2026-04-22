@@ -33,7 +33,8 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     FRIEND_UPDATE(102, "好友更新"), // 对应 FriendUpdateMessage 类
 
     GROUP_CREATE(200, "群创建"), // 暂无
-    GROUP_UPDATE(201, "群信息变更"); // 暂无
+    GROUP_UPDATE(201, "群信息变更"), // 暂无
+    GROUP_DISSOLVE(202, "群解散"); // 暂无
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

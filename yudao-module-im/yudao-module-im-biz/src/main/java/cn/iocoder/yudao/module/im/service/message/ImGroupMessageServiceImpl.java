@@ -481,6 +481,22 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         groupMessageReadRedisDAO.deleteReadMaxMessageIdMap(groupId);
     }
 
+    @Override
+    public void sendTipGroupMessage(Long senderId, Long groupId, Set<Long> memberUserIds, String content) {
+        // 1. 插入 TIP_TEXT 消息
+        ImGroupMessageDO tipMessage = new ImGroupMessageDO()
+                .setClientMessageId(IdUtil.fastSimpleUUID())
+                .setSenderId(senderId).setGroupId(groupId)
+                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content)
+                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
+                .setReceiptStatus(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus());
+        groupMessageMapper.insert(tipMessage);
+
+        // 2. 推送给指定用户
+        imWebSocketService.sendGroupMessageAsync(memberUserIds,
+                ImGroupMessageDTO.ofSend(tipMessage));
+    }
+
     private ImGroupMessageServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }

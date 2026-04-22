@@ -45,4 +45,11 @@ public interface ImCommonConstants {
      */
     String FRIEND_DELETE_TIP_MESSAGE = "你们的好友关系已被解除";
 
+    // ==================== 群相关提示消息 ====================
+
+    /**
+     * 群解散系统提示
+     */
+    String GROUP_DISSOLVE_TIP_MESSAGE = "'{}'解散了群聊";
+
 }

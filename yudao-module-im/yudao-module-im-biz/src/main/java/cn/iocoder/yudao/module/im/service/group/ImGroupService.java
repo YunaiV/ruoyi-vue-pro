@@ -61,6 +61,16 @@ public interface ImGroupService {
     ImGroupDO validateGroupExists(Long groupId);
 
     /**
+     * 校验当前用户是否为群主
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     * @return 群信息
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    ImGroupDO validateGroupOwner(Long groupId, Long userId);
+
+    /**
      * 获取指定用户加入的所有"有效"群（未退群且未封禁/解散）
      * <p>
      * 返回当前登录用户在群内身份仍有效的所有群。

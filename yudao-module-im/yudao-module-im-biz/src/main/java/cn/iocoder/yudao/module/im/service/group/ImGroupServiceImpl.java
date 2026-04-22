@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -13,6 +14,8 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import jakarta.annotation.Resource;
@@ -32,6 +35,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.GROUP_DISSOLVE_TIP_MESSAGE;
 
 // TODO @芋艿：群主的调整，暂时不考虑。后续在弄；
 /**
@@ -54,6 +58,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     private ImGroupMessageService groupMessageService;
     @Resource
     private ImWebSocketService webSocketService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -112,29 +119,29 @@ public class ImGroupServiceImpl implements ImGroupService {
     @CacheEvict(cacheNames = GROUP, key = "#id")
     @Transactional(rollbackFor = Exception.class)
     public void dissolveGroup(Long id, Long userId) {
-        // 1.1 校验群存在
-        ImGroupDO group = validateGroupExists(id);
-        // 1.2 校验当前用户是群主
-        if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
-            throw exception(GROUP_NOT_OWNER);
-        }
-        // TODO @AI：增加一个是否为群主的 public 方法；因为别的模块也需要使用；
+        // 1. 校验群存在 + 当前用户是群主
+        validateGroupOwner(id, userId);
 
-        // 3. 更新群状态为已解散
-        // TODO @AI：链式调用；
-        ImGroupDO updateObj = new ImGroupDO();
-        updateObj.setId(id);
-        updateObj.setStatus(CommonStatusEnum.DISABLE.getStatus());
-        updateObj.setDissolvedTime(LocalDateTime.now());
-        groupMapper.updateById(updateObj);
-
-        // 4. 清理已读缓存
+        // 2.1 获取群成员列表（在移除之前，后续推送需要）
+        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(id);
+        Set<Long> memberUserIds = convertSet(members, ImGroupMemberDO::getUserId);
+        // 2.2 更新群状态为已解散
+        groupMapper.updateById(new ImGroupDO().setId(id)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDissolvedTime(LocalDateTime.now()));
+        // 2.3 移除全部群成员
+        groupMemberService.removeGroupMembersByGroupId(id);
+        // 2.4 清理已读缓存
         groupMessageService.deleteReadMaxMessageIdMap(id);
-        // TODO @AI：推送群解散的提示；
-        // TODO @AI：推送群信息变化；
+
+        // 3.1 发送解散提示消息（TIP_TEXT）并推送
+        AdminUserRespDTO user = adminUserApi.getUser(userId);
+        String tipContent = StrUtil.format(GROUP_DISSOLVE_TIP_MESSAGE, user.getNickname());
+        groupMessageService.sendTipGroupMessage(userId, id, memberUserIds, tipContent);
+        // 3.2 推送群解散事件给所有原群成员
+        webSocketService.sendGroupMessageAsync(memberUserIds,
+                ImGroupMessageDTO.ofGroupDissolve(userId, id));
     }
 
-    // TODO @AI：缓存还是加在这个方法上；不加在 getGroup 上；
     @Override
     public ImGroupDO validateGroupExists(Long id) {
         ImGroupDO group = getSelf().getGroup(id);
@@ -146,6 +153,15 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
         if (CommonStatusEnum.DISABLE.getStatus().equals(group.getStatus())) {
             throw exception(GROUP_DISSOLVED);
+        }
+        return group;
+    }
+
+    @Override
+    public ImGroupDO validateGroupOwner(Long groupId, Long userId) {
+        ImGroupDO group = validateGroupExists(groupId);
+        if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
+            throw exception(GROUP_NOT_OWNER);
         }
         return group;
     }
