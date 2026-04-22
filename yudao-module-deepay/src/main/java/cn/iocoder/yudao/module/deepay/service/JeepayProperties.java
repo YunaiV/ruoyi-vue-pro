@@ -35,8 +35,14 @@ public class JeepayProperties {
     /** 签名密钥 */
     private String apiKey = "PLACEHOLDER_API_KEY";
 
-    /** 默认支付方式代码（WX_JSAPI / ALI_PC / ALI_WAP 等） */
-    private String wayCode = "WX_JSAPI";
+    /** 默认支付方式代码（AUTO=自动 / WX_JSAPI / ALI_PC / ALI_WAP 等） */
+    private String wayCode = "AUTO";
+
+    /**
+     * 货币代码（ISO 4217）。全系统统一 EUR（欧元）。
+     * Jeepay 支持多币种，此处默认欧元。
+     */
+    private String currency = "EUR";
 
     /** 支付成功异步回调地址 */
     private String notifyUrl = "https://your-domain.com/deepay/callback/payment";
@@ -57,6 +63,9 @@ public class JeepayProperties {
 
     public String getWayCode()    { return wayCode; }
     public void setWayCode(String v)    { this.wayCode = v; }
+
+    public String getCurrency()   { return currency; }
+    public void setCurrency(String v)   { this.currency = v; }
 
     public String getNotifyUrl()  { return notifyUrl; }
     public void setNotifyUrl(String v)  { this.notifyUrl = v; }

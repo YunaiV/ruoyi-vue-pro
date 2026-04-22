@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.deepay.agent;
 import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayOrderDO;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayOrderMapper;
 import cn.iocoder.yudao.module.deepay.service.JeepayProperties;
-import cn.iocoder.yudao.module.deepay.service.PaymentService;
+import cn.iocoder.yudao.module.deepay.service.PaymentServiceV2;
+import cn.iocoder.yudao.module.deepay.service.payment.PaymentResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,16 +19,10 @@ import java.time.LocalDateTime;
  *
  * <h3>与 FinanceAgent 的区别</h3>
  * <ul>
- *   <li>通过 {@link PaymentService} 接口创建支付单，解耦具体支付渠道</li>
+ *   <li>通过 {@link PaymentServiceV2} → {@link cn.iocoder.yudao.module.deepay.service.payment.PaymentPluginManager}
+ *       创建支付单，完全解耦 Jeepay</li>
  *   <li>防重复下单：同一 chainCode + userId 已有 PENDING 订单时直接复用</li>
- *   <li>支持 Jeepay / Mock / Stripe（切换 {@code deepay.payment.provider} 即可）</li>
- * </ul>
- *
- * <h3>输出</h3>
- * <ul>
- *   <li>ctx.orderId    = deepay_order.id</li>
- *   <li>ctx.paymentId  = 支付渠道返回的 paymentId</li>
- *   <li>ctx.paid       = false（等待回调）</li>
+ *   <li>切换 Jeepay → Stripe：只改 {@code deepay.payment.provider}，此类无需改动</li>
  * </ul>
  */
 @Component
@@ -35,9 +30,9 @@ public class OrderFlowAgent implements Agent {
 
     private static final Logger log = LoggerFactory.getLogger(OrderFlowAgent.class);
 
-    @Resource private DeepayOrderMapper deepayOrderMapper;
-    @Resource private PaymentService    paymentService;
-    @Resource private JeepayProperties  jeepayProperties;
+    @Resource private DeepayOrderMapper  deepayOrderMapper;
+    @Resource private PaymentServiceV2   paymentService;
+    @Resource private JeepayProperties   jeepayProperties;
 
     @Override
     public Context run(Context ctx) {
@@ -46,10 +41,10 @@ public class OrderFlowAgent implements Agent {
             return ctx;
         }
 
-        String code   = ctx.chainCode != null ? ctx.chainCode : "UNKNOWN";
-        BigDecimal amount = ctx.price != null ? ctx.price : BigDecimal.ZERO;
+        String     code   = ctx.chainCode != null ? ctx.chainCode : "UNKNOWN";
+        BigDecimal amount = ctx.price     != null ? ctx.price     : BigDecimal.ZERO;
 
-        // ── 防重复下单（同 chainCode + userId）────────────────────
+        // ── 防重复下单（同 chainCode + userId）──────────────────────
         if (ctx.userId != null) {
             DeepayOrderDO existing = deepayOrderMapper.selectByChainCodeAndUserId(code, ctx.userId);
             if (existing != null && "PENDING".equals(existing.getStatus())) {
@@ -62,15 +57,17 @@ public class OrderFlowAgent implements Agent {
             }
         }
 
-        // ── 通过支付中台创建支付单 ────────────────────────────────
-        String outTradeNo = code + "-" + System.currentTimeMillis();
-        String subject    = StringUtils.hasText(ctx.title) ? ctx.title : ("Deepay-" + code);
-        String paymentId  = paymentService.createPayment(
+        // ── 通过支付中台创建支付单（不知道 Jeepay 存在）────────────
+        String subject   = StringUtils.hasText(ctx.title) ? ctx.title : ("Deepay-" + code);
+        // outTradeNo = 我方唯一标识（= paymentId，映射到 Jeepay outTradeNo）
+        String outTradeNo = "PAY-" + code + "-" + System.currentTimeMillis();
+
+        PaymentResp resp = paymentService.create(
                 outTradeNo, amount, subject, jeepayProperties.getNotifyUrl());
 
-        // ── 落库订单 ─────────────────────────────────────────────
+        // ── 落库订单 ─────────────────────────────────────────────────
         DeepayOrderDO order = new DeepayOrderDO();
-        order.setPaymentId(paymentId);
+        order.setPaymentId(outTradeNo);          // 我方ID = outTradeNo
         order.setChainCode(code);
         order.setUserId(ctx.userId);
         order.setAmount(amount);
@@ -79,12 +76,18 @@ public class OrderFlowAgent implements Agent {
         deepayOrderMapper.insert(order);
 
         ctx.orderId   = String.valueOf(order.getId());
-        ctx.paymentId = paymentId;
+        ctx.paymentId = outTradeNo;
         ctx.paid      = false;
-        ctx.iban      = "DEEPAY-" + code;   // 向后兼容
+        ctx.iban      = "DEEPAY-" + code;        // 向后兼容
+        // 支付跳转链接（前端展示给用户）
+        if (resp.isSuccess() && StringUtils.hasText(resp.getPayUrl())) {
+            log.info("[OrderFlowAgent] 支付链接={}", resp.getPayUrl());
+        }
 
-        log.info("[OrderFlowAgent] 订单已创建 orderId={} paymentId={} amount={} outTradeNo={}",
-                ctx.orderId, paymentId, amount, outTradeNo);
+        log.info("[OrderFlowAgent] 订单已创建 orderId={} paymentId={} amount={} payUrl={}",
+                ctx.orderId, outTradeNo, amount,
+                resp.isSuccess() ? resp.getPayUrl() : "FAILED:" + resp.getErrorMsg());
         return ctx;
     }
 }
+

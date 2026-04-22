@@ -27,8 +27,14 @@ public class DeepayProductDO {
     /** 商品描述 */
     private String description;
 
-    /** 售价 */
+    /** 售价（使用 BigDecimal，禁止 double/float，货币单位 EUR） */
     private BigDecimal price;
+
+    /**
+     * 货币代码（ISO 4217），全系统统一 EUR（欧元）。
+     * 前端展示、Jeepay 创建支付均使用此字段。
+     */
+    private String currency = "EUR";
 
     /** 状态：SELLING / STOPPED / REDESIGNING */
     private String status;
@@ -51,6 +57,12 @@ public class DeepayProductDO {
      * TrendAgent 用 WHERE category=? 做精准过滤。
      */
     private String category;
+
+    /**
+     * 发布渠道（逗号分隔，e.g. "H5" / "H5,1688" / "H5,Shopify"）。
+     * PublishChannelAgent 落库时写入。
+     */
+    private String channel;
 
     /**
      * 主图（便捷字段，等价于 cdnImageUrl）。

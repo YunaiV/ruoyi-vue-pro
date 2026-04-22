@@ -81,6 +81,19 @@ public interface DeepayProductMapper extends BaseMapperX<DeepayProductDO> {
                 .eq(DeepayProductDO::getId, id));
     }
 
+    default void updateChannel(Long id, String channel) {
+        update(null, new LambdaUpdateWrapper<DeepayProductDO>()
+                .set(DeepayProductDO::getChannel, channel)
+                .eq(DeepayProductDO::getId, id));
+    }
+
+    default void updateTitleAndDescription(Long id, String title, String description) {
+        update(null, new LambdaUpdateWrapper<DeepayProductDO>()
+                .set(DeepayProductDO::getTitle, title)
+                .set(DeepayProductDO::getDescription, description)
+                .eq(DeepayProductDO::getId, id));
+    }
+
     /**
      * 查询指定品类的热销商品（TrendAgent 使用）。
      *

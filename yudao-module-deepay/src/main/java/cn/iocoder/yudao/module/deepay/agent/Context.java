@@ -220,6 +220,24 @@ public class Context {
     /** CostEstimateAgent 输出：true 表示成本过高，流程在 Phase 9 终止。 */
     public Boolean costTooHigh;
 
+    // ===== Phase 10 商品化 + 多渠道 + 支付中台 =====
+    /** StyleConsistencyAgent 锁定后的最终风格（输出给后续所有 Agent）。 */
+    public String  finalStyle;
+    /** DesignSplitAgent 输出：设计拆解要素（领型/版型/面料/图案）。 */
+    public java.util.List<String> designParts;
+    /** ProductFinalizeAgent 输出：人工味商品标题（供落库 + 渠道展示）。 */
+    public String  productTitle;
+    /** ProductFinalizeAgent 输出：卖点描述（面料+版型+人群）。 */
+    public String  productDescription;
+    /** PricingStrategyAgent 输出：趋势溢价（元），= 同品类均价 × 0.1。 */
+    public BigDecimal trendBoost;
+    /** PricingStrategyAgent 输出：市场调整溢价（EU/ME +20元，CN 0）。 */
+    public BigDecimal marketAdjust;
+    /** PublishChannelAgent 输出：已发布渠道列表（["H5","1688","Shopify"]）。 */
+    public java.util.List<String> channels;
+    /** PublishChannelAgent 输出：主发布渠道（首个）。 */
+    public String  productChannel;
+
 }
 
 

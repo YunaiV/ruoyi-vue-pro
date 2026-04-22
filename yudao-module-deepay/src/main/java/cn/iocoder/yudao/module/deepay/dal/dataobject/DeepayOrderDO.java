@@ -30,8 +30,14 @@ public class DeepayOrderDO {
     /** 订单状态：PENDING / PAID / CANCELLED */
     private String status;
 
-    /** 实收金额 */
+    /** 实收金额（使用 BigDecimal，禁止 double/float） */
     private BigDecimal amount;
+
+    /**
+     * 货币代码（ISO 4217），全系统统一 EUR（欧元）。
+     * Jeepay 创建支付单时传入此字段。
+     */
+    private String currency = "EUR";
 
     private LocalDateTime createdAt;
 

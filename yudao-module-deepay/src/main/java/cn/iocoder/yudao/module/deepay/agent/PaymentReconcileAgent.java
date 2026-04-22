@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayOrderDO;
 import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayPaymentLogDO;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayOrderMapper;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayPaymentLogMapper;
-import cn.iocoder.yudao.module.deepay.service.PaymentService;
+import cn.iocoder.yudao.module.deepay.service.PaymentServiceV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ public class PaymentReconcileAgent {
     /** 允许的金额误差（分），Jeepay 可能有1分精度差 */
     private static final BigDecimal AMOUNT_TOLERANCE = new BigDecimal("0.01");
 
-    @Resource private PaymentService       paymentService;
+    @Resource private PaymentServiceV2    paymentService;
     @Resource private DeepayOrderMapper    orderMapper;
     @Resource private DeepayPaymentLogMapper paymentLogMapper;
 
