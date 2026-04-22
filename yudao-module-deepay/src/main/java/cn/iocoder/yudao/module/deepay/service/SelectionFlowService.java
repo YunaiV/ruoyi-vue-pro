@@ -52,6 +52,7 @@ public class SelectionFlowService {
     @Resource private TrendAgent           trendAgent;
     @Resource private StyleEngine          styleEngine;
     @Resource private SelectionFeedAgent   selectionFeedAgent;
+    @Resource private BrandFilterAgent     brandFilterAgent;
     @Resource private FeedbackAgent        feedbackAgent;
 
     // ====================================================================

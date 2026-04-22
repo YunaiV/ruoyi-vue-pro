@@ -6,168 +6,155 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * RiskControlAgent — 层2 风险拦截（Phase 8）。
+ * RiskControlAgent — Phase 8 风险拦截（logo + complexity + cost/margin）。
  *
- * <h3>功能</h3>
- * <p>在进入生产链（PatternAgent 之前）做最后一道风险拦截，
- * 防止"不该生产的款"进入打版 → 生产 → 上架流程，造成资金损耗。</p>
- *
- * <h3>风险规则（三类）</h3>
+ * <h3>三类拦截规则</h3>
  * <ol>
- *   <li><b>价格风险</b>：建议售价 &lt; 成本价 × 1.2（毛利不足 20%）→ 拦截</li>
- *   <li><b>合规风险</b>：品类 + 市场组合黑名单（如某品类不允许在某市场销售）→ 拦截</li>
- *   <li><b>库存风险</b>：同品类当前 SELLING 商品超过上限（防止 SKU 爆炸）→ 告警</li>
+ *   <li><b>品牌Logo检测</b>：selectedImage/designImages URL含知名品牌关键词 → 拒绝</li>
+ *   <li><b>结构复杂度</b>：ctx.complexity &gt; 80 → 拒绝（无法量产）</li>
+ *   <li><b>成本/利润</b>：毛利率 &lt; 20% 或绝对利润 &lt; 10元 → 拒绝</li>
  * </ol>
  *
- * <h3>输出</h3>
- * <ul>
- *   <li>{@link Context#shouldProduce} — false 时 Orchestrator 终止流程</li>
- *   <li>{@link Context#riskLevel}     — NONE / LOW / MEDIUM / HIGH</li>
- *   <li>{@link Context#decisionReason} — 拦截原因文字</li>
- * </ul>
- *
- * <h3>验收</h3>
- * <ul>
- *   <li>✔ 成本 100、建议售价 110 → 拦截（毛利仅 10%）</li>
- *   <li>✔ 成本 100、建议售价 150 → 通过</li>
- *   <li>✔ 无成本数据 → 默认通过（不因数据缺失误杀）</li>
- * </ul>
+ * <h3>品类×市场合规</h3>
+ * <p>内裤/内衣 在 中东（ME）市场 → 合规拦截。</p>
  */
 @Component
 public class RiskControlAgent implements Agent {
 
     private static final Logger log = LoggerFactory.getLogger(RiskControlAgent.class);
 
-    /** 最低毛利率阈值（20%） */
     private static final BigDecimal MIN_MARGIN = new BigDecimal("0.20");
-    /** 最低绝对利润（元），防止超低价商品 */
     private static final BigDecimal MIN_PROFIT = new BigDecimal("10.00");
+
+    /** 禁止出现在图片URL中的品牌关键词（大小写不敏感） */
+    private static final List<String> LOGO_BRANDS = Arrays.asList(
+            "gucci","prada","balenciaga","chanel","hermes","louis vuitton","lv",
+            "nike","adidas","supreme","off-white","offwhite","dior","versace",
+            "burberry","fendi","givenchy","valentino","moncler","armani"
+    );
 
     @Override
     public Context run(Context ctx) {
-        // 默认通过
         ctx.riskLevel = "NONE";
 
-        // 1️⃣ 价格风险校验
-        RiskResult priceRisk = checkPriceRisk(ctx);
-        if (priceRisk.blocked) {
-            ctx.shouldProduce  = false;
-            ctx.riskLevel      = "HIGH";
-            ctx.decisionReason = priceRisk.reason;
-            log.warn("[RiskControl] ❌ 价格风险拦截 chainCode={} reason={}", ctx.chainCode, priceRisk.reason);
-            return ctx;
+        // ── 1. Logo 检测 ──────────────────────────────────────────
+        if (detectLogo(ctx)) {
+            ctx.logoDetected = true;
+            return block(ctx, "HIGH", "[RiskControl] 检测到品牌Logo，拒绝生产");
         }
-        if ("MEDIUM".equals(priceRisk.level)) {
-            ctx.riskLevel = "MEDIUM";
+        ctx.logoDetected = false;
+
+        // ── 2. 复杂度门控 ─────────────────────────────────────────
+        if (ctx.complexity != null && ctx.complexity > 80) {
+            return block(ctx, "HIGH",
+                    "[RiskControl] 结构复杂度=" + ctx.complexity + ">80，无法量产");
         }
 
-        // 2️⃣ 合规风险校验
-        RiskResult complianceRisk = checkComplianceRisk(ctx);
-        if (complianceRisk.blocked) {
-            ctx.shouldProduce  = false;
-            ctx.riskLevel      = "HIGH";
-            ctx.decisionReason = complianceRisk.reason;
-            log.warn("[RiskControl] ❌ 合规风险拦截 chainCode={} reason={}", ctx.chainCode, complianceRisk.reason);
-            return ctx;
-        }
-
-        // 3️⃣ 图片完整性校验（无设计图不应进入生产）
+        // ── 3. 无设计图 ───────────────────────────────────────────
         if (ctx.designImages == null || ctx.designImages.isEmpty()) {
-            ctx.shouldProduce  = false;
-            ctx.riskLevel      = "HIGH";
-            ctx.decisionReason = "[RiskControl] 无设计图，拒绝进入生产";
-            log.warn("[RiskControl] ❌ 无设计图 chainCode={}", ctx.chainCode);
-            return ctx;
+            return block(ctx, "HIGH", "[RiskControl] 无设计图，拒绝进入生产");
         }
 
-        // 通过所有校验
-        if (ctx.shouldProduce == null) {
-            ctx.shouldProduce = true;
+        // ── 4. 合规校验 ───────────────────────────────────────────
+        RiskResult compliance = checkCompliance(ctx);
+        if (compliance.blocked) return block(ctx, "HIGH", compliance.reason);
+
+        // ── 5. 成本/利润校验 ─────────────────────────────────────
+        RiskResult price = checkPriceRisk(ctx);
+        if (price.blocked) return block(ctx, "HIGH", price.reason);
+        if ("MEDIUM".equals(price.level)) {
+            ctx.riskLevel      = "MEDIUM";
+            ctx.decisionReason = price.reason;
+            log.warn("[RiskControl] ⚠️ MEDIUM风险 {} chainCode={}", price.reason, ctx.chainCode);
         }
-        log.info("[RiskControl] ✅ 通过 chainCode={} riskLevel={} suggestPrice={} costPrice={}",
-                ctx.chainCode, ctx.riskLevel, ctx.suggestPrice, ctx.costPrice);
+
+        if (ctx.shouldProduce == null) ctx.shouldProduce = true;
+        log.info("[RiskControl] ✅ 通过 complexity={} riskLevel={} chainCode={}",
+                ctx.complexity, ctx.riskLevel, ctx.chainCode);
         return ctx;
     }
 
-    // ====================================================================
-    // 价格风险
-    // ====================================================================
+    // ----------------------------------------------------------------
 
-    private RiskResult checkPriceRisk(Context ctx) {
-        BigDecimal cost  = ctx.costPrice;
-        BigDecimal price = ctx.suggestPrice != null ? ctx.suggestPrice : ctx.price;
+    private boolean detectLogo(Context ctx) {
+        List<String> urls = new java.util.ArrayList<>();
+        if (StringUtils.hasText(ctx.selectedImage)) urls.add(ctx.selectedImage);
+        if (ctx.designImages != null) urls.addAll(ctx.designImages);
+        if (StringUtils.hasText(ctx.designFeatures)) urls.add(ctx.designFeatures);
 
-        if (cost == null || price == null || cost.compareTo(BigDecimal.ZERO) <= 0) {
-            // 无成本数据 → 不拦截（不误杀）
+        for (String url : urls) {
+            if (!StringUtils.hasText(url)) continue;
+            String lower = url.toLowerCase();
+            for (String brand : LOGO_BRANDS) {
+                if (lower.contains(brand)) {
+                    log.warn("[RiskControl] Logo检测命中 brand={} url={}", brand, shorten(url));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private RiskResult checkCompliance(Context ctx) {
+        if (!StringUtils.hasText(ctx.category) || !StringUtils.hasText(ctx.market)) {
             return RiskResult.pass();
         }
+        if (("内裤".equals(ctx.category) || "内衣".equals(ctx.category))
+                && "ME".equalsIgnoreCase(ctx.market)) {
+            return RiskResult.block("[RiskControl] 合规拦截：" + ctx.category + " 不允许在ME市场销售");
+        }
+        return RiskResult.pass();
+    }
 
-        // 绝对利润检查
+    private RiskResult checkPriceRisk(Context ctx) {
+        BigDecimal cost  = ctx.costPrice != null ? ctx.costPrice :
+                           (ctx.totalCost != null ? ctx.totalCost : null);
+        BigDecimal price = ctx.suggestPrice != null ? ctx.suggestPrice : ctx.price;
+        if (cost == null || price == null || cost.compareTo(BigDecimal.ZERO) <= 0) {
+            return RiskResult.pass();
+        }
         BigDecimal profit = price.subtract(cost);
         if (profit.compareTo(MIN_PROFIT) < 0) {
             return RiskResult.block(String.format(
-                    "[RiskControl] 绝对利润 %.2f < 最低要求 %.2f（cost=%.2f price=%.2f）",
+                    "[RiskControl] 绝对利润%.2f<%.2f（cost=%.2f price=%.2f）",
                     profit, MIN_PROFIT, cost, price));
         }
-
-        // 毛利率检查
-        BigDecimal margin = profit.divide(cost, 4, java.math.RoundingMode.HALF_UP);
+        BigDecimal margin = profit.divide(cost, 4, RoundingMode.HALF_UP);
         if (margin.compareTo(MIN_MARGIN) < 0) {
             return RiskResult.block(String.format(
-                    "[RiskControl] 毛利率 %.1f%% < 最低要求 %.0f%%（cost=%.2f price=%.2f）",
-                    margin.multiply(new BigDecimal("100")), MIN_MARGIN.multiply(new BigDecimal("100")),
-                    cost, price));
-        }
-
-        // 低利润告警（20~30% 之间）
-        if (margin.compareTo(new BigDecimal("0.30")) < 0) {
-            return RiskResult.warn(String.format(
-                    "[RiskControl] 毛利率偏低 %.1f%%，建议调价（cost=%.2f price=%.2f）",
+                    "[RiskControl] 毛利率%.1f%%<20%%（cost=%.2f price=%.2f）",
                     margin.multiply(new BigDecimal("100")), cost, price));
         }
-
-        return RiskResult.pass();
-    }
-
-    // ====================================================================
-    // 合规风险（品类 × 市场黑名单）
-    // ====================================================================
-
-    private RiskResult checkComplianceRisk(Context ctx) {
-        String category = ctx.category;
-        String market   = ctx.market;
-        if (!StringUtils.hasText(category) || !StringUtils.hasText(market)) {
-            return RiskResult.pass();
-        }
-        // 示例：内衣品类不允许在中东市场销售
-        if (("内裤".equals(category) || "内衣".equals(category))
-                && "ME".equalsIgnoreCase(market)) {
-            return RiskResult.block(String.format(
-                    "[RiskControl] 合规拦截：%s 不允许在 %s 市场销售", category, market));
+        if (margin.compareTo(new BigDecimal("0.30")) < 0) {
+            return RiskResult.warn(String.format(
+                    "[RiskControl] 毛利率偏低%.1f%%，建议调价", margin.multiply(new BigDecimal("100"))));
         }
         return RiskResult.pass();
     }
 
-    // ====================================================================
-    // 内部结果类
-    // ====================================================================
+    private Context block(Context ctx, String level, String reason) {
+        ctx.shouldProduce  = false;
+        ctx.riskLevel      = level;
+        ctx.decisionReason = reason;
+        log.warn("[RiskControl] ❌ {} chainCode={}", reason, ctx.chainCode);
+        return ctx;
+    }
+
+    private static String shorten(String s) {
+        if (s == null) return "null";
+        return s.length() > 80 ? s.substring(0, 80) + "…" : s;
+    }
 
     private static class RiskResult {
-        final boolean blocked;
-        final String  level;
-        final String  reason;
-
-        private RiskResult(boolean blocked, String level, String reason) {
-            this.blocked = blocked;
-            this.level   = level;
-            this.reason  = reason;
-        }
-
-        static RiskResult pass()               { return new RiskResult(false, "NONE",   null); }
-        static RiskResult warn(String reason)  { return new RiskResult(false, "MEDIUM", reason); }
-        static RiskResult block(String reason) { return new RiskResult(true,  "HIGH",   reason); }
+        final boolean blocked; final String level; final String reason;
+        RiskResult(boolean b, String l, String r) { blocked=b; level=l; reason=r; }
+        static RiskResult pass()               { return new RiskResult(false,"NONE",  null); }
+        static RiskResult warn(String r)       { return new RiskResult(false,"MEDIUM",r); }
+        static RiskResult block(String r)      { return new RiskResult(true, "HIGH",  r); }
     }
-
 }

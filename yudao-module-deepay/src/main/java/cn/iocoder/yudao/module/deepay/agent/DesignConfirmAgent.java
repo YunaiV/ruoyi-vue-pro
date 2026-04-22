@@ -6,38 +6,29 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 /**
- * DesignConfirmAgent — 层2 设计图最终确认门控（Phase 8）。
+ * DesignConfirmAgent — Phase 8 设计图最终确认 + 评分门控。
  *
- * <h3>功能</h3>
- * <p>在 StyleConsistencyAgent + RiskControlAgent 通过之后、PatternAgent 之前，
- * 做一次最终确认门控：</p>
- * <ul>
- *   <li><b>HUMAN 模式</b>（默认）：设置 pendingQuestion 暂停流程，等待设计师 / 客户
- *       确认 selectedImage，收到确认后继续进入打版</li>
- *   <li><b>AUTO 模式</b>：ctx.selectedImage 已有且 shouldProduce=true → 直接通过，
- *       不打断流程（适合自动化测试 / 全自动流水线）</li>
- * </ul>
- *
- * <h3>模式切换</h3>
+ * <h3>评分公式（DesignConfirm）</h3>
  * <pre>
- *   ctx.designSelectMode = "AI"    → AUTO 模式（不打断）
- *   ctx.designSelectMode = "HUMAN" → HUMAN 模式（暂停等确认）
- *   未设置且 selectedImage 已有    → AUTO 模式
- *   未设置且 selectedImage 为空    → HUMAN 模式
+ * confirmScore = trendScore × 0.4 + brandScore × 0.3 + matchScore × 0.3
+ *
+ * trendScore  — trendImages 匹配度（有趋势图=80；无=50）
+ * brandScore  — 品牌合规度（logoDetected=false→90；true→0）
+ * matchScore  — 来自 StyleConsistencyAgent.styleConsistencyScore（已计算）
  * </pre>
  *
- * <h3>输出</h3>
+ * <h3>绝对过滤（不经过评分直接拒绝）</h3>
  * <ul>
- *   <li>{@link Context#pendingQuestion} — 非 null 时流程暂停</li>
- *   <li>{@link Context#pendingField}    — "confirmDesign"</li>
- *   <li>{@link Context#designConfirmed} — true 表示已确认，可继续</li>
+ *   <li>检测到品牌 Logo（logoDetected=true）</li>
+ *   <li>结构复杂度 &gt; 80</li>
+ *   <li>品类与客户主营不符（由 StyleConsistencyAgent 已设 needRedesign）</li>
+ *   <li>无设计图</li>
  * </ul>
  *
- * <h3>验收</h3>
+ * <h3>模式</h3>
  * <ul>
- *   <li>✔ 自动化流水线（designSelectMode=AI）→ 不打断，直接设 designConfirmed=true</li>
- *   <li>✔ 人工流水线 → pendingQuestion 返回给前端，收到确认后继续</li>
- *   <li>✔ selectedImage 为空且 designImages 非空 → 暂停请求选图</li>
+ *   <li>AUTO（designSelectMode=AI 或 selectedImage 已有）→ 自动选第一张，不打断流程</li>
+ *   <li>HUMAN → 暂停，等设计师 / 客户确认</li>
  * </ul>
  */
 @Component
@@ -45,91 +36,96 @@ public class DesignConfirmAgent implements Agent {
 
     private static final Logger log = LoggerFactory.getLogger(DesignConfirmAgent.class);
 
+    private static final int CONFIRM_PASS_THRESHOLD = 60;
+
     @Override
     public Context run(Context ctx) {
-        // 已确认过（二次进入）→ 直接跳过
+        // 已确认过（重入保护）
         if (Boolean.TRUE.equals(ctx.designConfirmed)) {
             log.debug("[DesignConfirmAgent] 已确认，跳过");
             return ctx;
         }
-
-        // shouldProduce=false → RiskControl 已拦截，不再追问
+        // RiskControl 已拦截
         if (Boolean.FALSE.equals(ctx.shouldProduce)) {
-            log.debug("[DesignConfirmAgent] shouldProduce=false，跳过确认");
+            log.debug("[DesignConfirmAgent] shouldProduce=false，跳过");
             return ctx;
         }
 
-        String mode = resolveMode(ctx);
-        log.info("[DesignConfirmAgent] 模式={} selectedImage={} chainCode={}",
-                mode, StringUtils.hasText(ctx.selectedImage) ? "✓" : "✗", ctx.chainCode);
-
-        if ("AUTO".equals(mode)) {
-            return doAutoConfirm(ctx);
-        } else {
-            return doHumanConfirm(ctx);
+        // ── 绝对过滤 ──────────────────────────────────────────────
+        if (ctx.designImages == null || ctx.designImages.isEmpty()) {
+            return reject(ctx, "[DesignConfirm] 无设计图，拒绝进入生产");
         }
+        if (Boolean.TRUE.equals(ctx.logoDetected)) {
+            return reject(ctx, "[DesignConfirm] 检测到品牌Logo，拒绝生产");
+        }
+        if (ctx.complexity != null && ctx.complexity > 80) {
+            return reject(ctx, "[DesignConfirm] 结构复杂度=" + ctx.complexity + ">80，拒绝量产");
+        }
+
+        // ── 评分模型 ──────────────────────────────────────────────
+        int trendScore = hasTrendImages(ctx) ? 80 : 50;
+        int brandScore = Boolean.TRUE.equals(ctx.logoDetected) ? 0 : 90;
+        int matchScore = ctx.styleConsistencyScore != null ? ctx.styleConsistencyScore : 70;
+
+        int confirmScore = ScoreUtil.computeConfirmScore(trendScore, brandScore, matchScore);
+        ctx.designScore  = confirmScore;
+
+        log.info("[DesignConfirmAgent] score={} (trend={} brand={} match={}) chainCode={}",
+                confirmScore, trendScore, brandScore, matchScore, ctx.chainCode);
+
+        if (confirmScore < CONFIRM_PASS_THRESHOLD) {
+            ctx.needRedesign   = true;
+            ctx.decisionReason = "[DesignConfirm] score=" + confirmScore + "<" + CONFIRM_PASS_THRESHOLD + "，触发重设计";
+            log.info("[DesignConfirmAgent] ❌ 评分不足，触发重设计 chainCode={}", ctx.chainCode);
+            return ctx;
+        }
+
+        // ── 模式判断 ─────────────────────────────────────────────
+        return "AI".equalsIgnoreCase(ctx.designSelectMode) || StringUtils.hasText(ctx.selectedImage)
+                ? doAutoConfirm(ctx)
+                : doHumanConfirm(ctx);
     }
 
-    // ====================================================================
-    // AUTO 模式
-    // ====================================================================
+    // ----------------------------------------------------------------
 
     private Context doAutoConfirm(Context ctx) {
-        // AUTO 模式：selectedImage 已有 → 直接通过
-        if (StringUtils.hasText(ctx.selectedImage)) {
-            ctx.designConfirmed = true;
-            ctx.shouldProduce   = true;
-            log.info("[DesignConfirmAgent] AUTO 确认 selectedImage={}", shorten(ctx.selectedImage));
-        } else if (ctx.designImages != null && !ctx.designImages.isEmpty()) {
-            // 自动取第一张
-            ctx.selectedImage   = ctx.designImages.get(0);
-            ctx.designConfirmed = true;
-            ctx.shouldProduce   = true;
-            log.info("[DesignConfirmAgent] AUTO 自动选第一张 selectedImage={}", shorten(ctx.selectedImage));
-        } else {
-            // 无图 → RiskControl 应已拦截，这里再兜一次
-            ctx.shouldProduce  = false;
-            ctx.decisionReason = "[DesignConfirm] AUTO模式无可用设计图，终止";
-            log.warn("[DesignConfirmAgent] AUTO 无图，终止 chainCode={}", ctx.chainCode);
+        if (!StringUtils.hasText(ctx.selectedImage) && ctx.designImages != null && !ctx.designImages.isEmpty()) {
+            ctx.selectedImage = ctx.designImages.get(0);
         }
+        ctx.designConfirmed = true;
+        ctx.shouldProduce   = true;
+        log.info("[DesignConfirmAgent] ✅ AUTO确认 score={} image={}", ctx.designScore, shorten(ctx.selectedImage));
         return ctx;
     }
-
-    // ====================================================================
-    // HUMAN 模式
-    // ====================================================================
 
     private Context doHumanConfirm(Context ctx) {
         if (StringUtils.hasText(ctx.selectedImage)) {
-            // 已有 selectedImage（从上游填入）→ 确认通过
             ctx.designConfirmed = true;
             ctx.shouldProduce   = true;
-            log.info("[DesignConfirmAgent] HUMAN 已有 selectedImage，确认通过");
+            log.info("[DesignConfirmAgent] ✅ HUMAN已有selectedImage，确认通过 score={}", ctx.designScore);
         } else {
-            // 暂停流程，等待设计师确认
-            ctx.pendingQuestion = "请确认您满意的设计图（回传 selectedImage URL 即可继续生产）";
+            ctx.pendingQuestion = "请确认满意的设计图（回传 selectedImage URL 继续生产）";
             ctx.pendingField    = "confirmDesign";
-            log.info("[DesignConfirmAgent] ⏸ 等待人工确认 chainCode={} designImages={}",
-                    ctx.chainCode, ctx.designImages != null ? ctx.designImages.size() : 0);
+            log.info("[DesignConfirmAgent] ⏸ 等待人工确认 designImages={} chainCode={}",
+                    ctx.designImages != null ? ctx.designImages.size() : 0, ctx.chainCode);
         }
         return ctx;
     }
 
-    // ====================================================================
-    // 工具
-    // ====================================================================
+    private Context reject(Context ctx, String reason) {
+        ctx.shouldProduce  = false;
+        ctx.riskLevel      = "HIGH";
+        ctx.decisionReason = reason;
+        log.warn("[DesignConfirmAgent] ❌ {} chainCode={}", reason, ctx.chainCode);
+        return ctx;
+    }
 
-    private String resolveMode(Context ctx) {
-        if (StringUtils.hasText(ctx.designSelectMode)) {
-            return "AI".equalsIgnoreCase(ctx.designSelectMode) ? "AUTO" : "HUMAN";
-        }
-        // 有 selectedImage → AUTO；否则 → HUMAN
-        return StringUtils.hasText(ctx.selectedImage) ? "AUTO" : "HUMAN";
+    private boolean hasTrendImages(Context ctx) {
+        return ctx.trendImages != null && !ctx.trendImages.isEmpty();
     }
 
     private static String shorten(String s) {
         if (s == null) return "null";
-        return s.length() > 60 ? s.substring(0, 60) + "..." : s;
+        return s.length() > 60 ? s.substring(0, 60) + "…" : s;
     }
-
 }
