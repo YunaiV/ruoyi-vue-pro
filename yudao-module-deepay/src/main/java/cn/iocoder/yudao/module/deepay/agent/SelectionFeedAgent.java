@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
  *
  * <h3>功能</h3>
  * <p>根据客户画像（category + style + crowd）从 deepay_trend_pool 中精准过滤，
- * 返回给设计师 / 客户查看的参考图列表。</p>
+ * 返回给设计师 / 客户查看的参考图列表，同时输出富类型 {@link SelectionFeedItem} 列表
+ * （含 brand + score + reason），让设计师直观了解"今天做什么款 + 为什么推"。</p>
  *
  * <h3>重要：这是参考款，不是商品</h3>
  * <ul>
@@ -36,11 +37,18 @@ import java.util.stream.Collectors;
  * 3️⃣ 只按 category 匹配（最宽松，保证有图可看）
  * </pre>
  *
+ * <h3>输出</h3>
+ * <ul>
+ *   <li>{@link Context#selectionImages} — 兼容旧接口（URL 列表）</li>
+ *   <li>{@link Context#selectionFeed}   — 富类型列表（image + brand + score + reason）</li>
+ * </ul>
+ *
  * <h3>验收</h3>
  * <ul>
  *   <li>✔ 内裤客户 → 永远只看到内裤图，不出外套</li>
  *   <li>✔ 外套 + 男装 + 工装 → 优先出男装工装款</li>
  *   <li>✔ 无数据 → 品类保底图兜底，不抛异常</li>
+ *   <li>✔ selectionFeed 每条包含 brand + score + reason</li>
  * </ul>
  */
 @Component
@@ -49,7 +57,7 @@ public class SelectionFeedAgent implements Agent {
     private static final Logger log = LoggerFactory.getLogger(SelectionFeedAgent.class);
 
     private static final int QUERY_LIMIT  = 20;
-    private static final int MIN_RESULTS  = 5;   // 低于此数量时放宽过滤条件
+    private static final int MIN_RESULTS  = 5;
 
     @Resource
     private DeepayTrendPoolMapper trendPoolMapper;
@@ -65,18 +73,34 @@ public class SelectionFeedAgent implements Agent {
 
         List<DeepayTrendPoolDO> result = fetchWithFallback(ctx);
 
+        // ---- 兼容旧接口：URL 列表 ----
         ctx.selectionImages = result.stream()
                 .map(DeepayTrendPoolDO::getImageUrl)
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toList());
 
+        // ---- 新接口：富类型 SelectionFeedItem 列表 ----
+        ctx.selectionFeed = result.stream()
+                .filter(d -> StringUtils.hasText(d.getImageUrl()))
+                .map(d -> new SelectionFeedItem(
+                        d.getImageUrl(),
+                        resolveBrand(d),
+                        resolveScore(d),
+                        buildReason(d, ctx)))
+                .collect(Collectors.toList());
+
         // 最终兜底：品类保底图（永不返回空列表）
         if (ctx.selectionImages.isEmpty()) {
             log.info("[SelectionFeedAgent] 所有查询无结果，使用品类保底图 category={}", ctx.category);
-            ctx.selectionImages = fallbackImages(ctx.category);
+            List<String> fallback = fallbackImages(ctx.category);
+            ctx.selectionImages = fallback;
+            ctx.selectionFeed   = fallback.stream()
+                    .map(url -> new SelectionFeedItem(url, "系统推荐", 70, "品类保底图"))
+                    .collect(Collectors.toList());
         }
 
-        log.info("[SelectionFeedAgent] DONE selectionImages={}", ctx.selectionImages.size());
+        log.info("[SelectionFeedAgent] DONE selectionImages={} selectionFeed={}",
+                ctx.selectionImages.size(), ctx.selectionFeed.size());
         return ctx;
     }
 
@@ -124,6 +148,84 @@ public class SelectionFeedAgent implements Agent {
         } catch (Exception e) {
             log.warn("[SelectionFeedAgent] 查询 trend_pool 异常 category={}", category, e);
             return Collections.emptyList();
+        }
+    }
+
+    // ====================================================================
+    // 富类型字段解析
+    // ====================================================================
+
+    /** 解析品牌（brand 字段 → source 映射 → 默认） */
+    private String resolveBrand(DeepayTrendPoolDO d) {
+        if (StringUtils.hasText(d.getBrand())) {
+            return d.getBrand();
+        }
+        // source 映射到可读品牌名
+        if (!StringUtils.hasText(d.getSource())) return "趋势精选";
+        switch (d.getSource().toLowerCase()) {
+            case "zara":        return "ZARA";
+            case "h&m":         return "H&M";
+            case "nike":        return "Nike";
+            case "adidas":      return "Adidas";
+            case "balenciaga":  return "Balenciaga";
+            case "gucci":       return "Gucci";
+            case "prada":       return "Prada";
+            case "shein":       return "SHEIN";
+            case "tiktok":      return "TikTok";
+            case "1688":        return "1688";
+            case "runway":      return "秀场";
+            case "brand":       return "品牌参考";
+            default:            return d.getSource();
+        }
+    }
+
+    /** 将 DECIMAL score 转 int（兼容旧 Integer 字段和 null） */
+    private int resolveScore(DeepayTrendPoolDO d) {
+        return d.getScore() != null ? d.getScore() : 70;
+    }
+
+    /**
+     * 构建推荐理由（供设计师理解为何推这张）。
+     * 格式：{source}爆款 + {market}市场 + {style}风格
+     */
+    private String buildReason(DeepayTrendPoolDO d, Context ctx) {
+        StringBuilder sb = new StringBuilder();
+        // 来源标签
+        String src = d.getSource();
+        if ("tiktok".equalsIgnoreCase(src)) {
+            sb.append("TikTok爆款");
+        } else if ("shein".equalsIgnoreCase(src)) {
+            sb.append("SHEIN热销");
+        } else if ("1688".equalsIgnoreCase(src)) {
+            sb.append("1688畅销");
+        } else if ("runway".equalsIgnoreCase(src)) {
+            sb.append("秀场灵感");
+        } else if ("brand".equalsIgnoreCase(src)) {
+            sb.append("品牌参考");
+        } else {
+            sb.append("趋势精选");
+        }
+        // 市场
+        if (StringUtils.hasText(ctx.market)) {
+            sb.append("+").append(marketLabel(ctx.market)).append("市场");
+        }
+        // 风格
+        if (StringUtils.hasText(d.getStyle())) {
+            sb.append("+").append(d.getStyle()).append("风格");
+        }
+        // 热度分
+        if (d.getScore() != null && d.getScore() >= 90) {
+            sb.append("（TOP款）");
+        }
+        return sb.toString();
+    }
+
+    private String marketLabel(String market) {
+        switch (market.toUpperCase()) {
+            case "EU": return "欧美";
+            case "US": return "北美";
+            case "ME": return "中东";
+            default:   return "国内";
         }
     }
 

@@ -117,6 +117,7 @@ public class DeepaySelectionController {
         private String style;
         private String market;
         private String priceLevel;
+        private String purpose;
         private String gender;
         private String targetAge;
 
@@ -132,6 +133,8 @@ public class DeepaySelectionController {
         public void   setMarket(String v)     { this.market = v; }
         public String getPriceLevel()  { return priceLevel; }
         public void   setPriceLevel(String v) { this.priceLevel = v; }
+        public String getPurpose()     { return purpose; }
+        public void   setPurpose(String v)    { this.purpose = v; }
         public String getGender()      { return gender; }
         public void   setGender(String v)     { this.gender = v; }
         public String getTargetAge()   { return targetAge; }
@@ -178,6 +181,7 @@ public class DeepaySelectionController {
         ctx.style      = req.getStyle();
         ctx.market     = req.getMarket();
         ctx.priceLevel = req.getPriceLevel();
+        ctx.purpose    = req.getPurpose();
         ctx.gender     = req.getGender();
         ctx.targetAge  = req.getTargetAge();
         return ctx;
@@ -190,6 +194,7 @@ public class DeepaySelectionController {
         resp.put("pendingField",    ctx.pendingField);
         // 出图（问答完成后）
         resp.put("selectionImages", ctx.selectionImages);
+        resp.put("selectionFeed",   ctx.selectionFeed);
         resp.put("styleCombos",     ctx.styleCombos);
         // 当前画像摘要
         resp.put("category",   ctx.category);
@@ -197,6 +202,7 @@ public class DeepaySelectionController {
         resp.put("style",      ctx.style);
         resp.put("market",     ctx.market);
         resp.put("priceLevel", ctx.priceLevel);
+        resp.put("purpose",    ctx.purpose);
         resp.put("confidence", ctx.confidenceScore);
         return resp;
     }

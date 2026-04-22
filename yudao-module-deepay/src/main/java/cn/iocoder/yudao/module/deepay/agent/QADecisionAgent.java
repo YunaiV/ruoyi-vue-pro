@@ -54,6 +54,7 @@ public class QADecisionAgent implements Agent {
     private static final List<String> VALID_PRICE_LEVELS = Arrays.asList("LOW", "MID", "HIGH");
     private static final List<String> VALID_CROWDS       =
             Arrays.asList("男装", "少女", "中老年", "运动");
+    private static final List<String> VALID_PURPOSES     = Arrays.asList("WHOLESALE", "RETAIL");
 
     // ====================================================================
     // Agent.run
@@ -102,15 +103,23 @@ public class QADecisionAgent implements Agent {
         }
         ctx.priceLevel = ctx.priceLevel.toUpperCase();
 
-        // ---- 五问全部填齐 ----
+        // ---- Q6: 用途？（批发 vs 零售）----
+        if (!StringUtils.hasText(ctx.purpose)
+                || !VALID_PURPOSES.contains(ctx.purpose.toUpperCase())) {
+            return pause(ctx, "purpose",
+                    "你的用途是？（WHOLESALE=批发 / RETAIL=零售）");
+        }
+        ctx.purpose = ctx.purpose.toUpperCase();
+
+        // ---- 六问全部填齐 ----
         ctx.pendingQuestion = null;
         ctx.pendingField    = null;
         if (ctx.confidenceScore == null || ctx.confidenceScore.compareTo(CONFIDENCE_THRESHOLD) < 0) {
             ctx.confidenceScore = CONFIDENCE_THRESHOLD;
         }
 
-        log.info("[QADecisionAgent] ✅ 五问完成 category={} crowd={} style={} market={} priceLevel={}",
-                ctx.category, ctx.crowd, ctx.style, ctx.market, ctx.priceLevel);
+        log.info("[QADecisionAgent] ✅ 六问完成 category={} crowd={} style={} market={} priceLevel={} purpose={}",
+                ctx.category, ctx.crowd, ctx.style, ctx.market, ctx.priceLevel, ctx.purpose);
         return ctx;
     }
 
@@ -129,7 +138,8 @@ public class QADecisionAgent implements Agent {
                 || !StringUtils.hasText(ctx.crowd)
                 || !StringUtils.hasText(ctx.style)
                 || !StringUtils.hasText(ctx.market)
-                || !StringUtils.hasText(ctx.priceLevel);
+                || !StringUtils.hasText(ctx.priceLevel)
+                || !StringUtils.hasText(ctx.purpose);
     }
 
     // ====================================================================

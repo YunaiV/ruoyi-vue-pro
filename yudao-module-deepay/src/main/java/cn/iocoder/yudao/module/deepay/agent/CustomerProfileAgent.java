@@ -79,6 +79,7 @@ public class CustomerProfileAgent implements Agent {
         if (!StringUtils.hasText(ctx.priceLevel))  ctx.priceLevel = profile.getPriceLevel();
         if (!StringUtils.hasText(ctx.targetAge))   ctx.targetAge  = profile.getTargetAge();
         if (!StringUtils.hasText(ctx.gender))      ctx.gender     = profile.getGender();
+        if (!StringUtils.hasText(ctx.purpose))     ctx.purpose    = profile.getPurpose();
         if (ctx.confidenceScore == null)            ctx.confidenceScore = profile.getConfidenceScore();
 
         // keyword 兜底：画像品类 → 更精准的 DesignAgent prompt
@@ -125,12 +126,14 @@ public class CustomerProfileAgent implements Agent {
         if (StringUtils.hasText(ctx.priceLevel))  profile.setPriceLevel(ctx.priceLevel);
         if (StringUtils.hasText(ctx.targetAge))   profile.setTargetAge(ctx.targetAge);
         if (StringUtils.hasText(ctx.gender))      profile.setGender(ctx.gender);
+        if (StringUtils.hasText(ctx.purpose))     profile.setPurpose(ctx.purpose);
 
         // SmartQuestion 完整回答后设置初始置信度 0.6（如尚未达到）
         boolean hasFullAnswers = StringUtils.hasText(ctx.category)
                 && StringUtils.hasText(ctx.market)
                 && StringUtils.hasText(ctx.style)
-                && StringUtils.hasText(ctx.priceLevel);
+                && StringUtils.hasText(ctx.priceLevel)
+                && StringUtils.hasText(ctx.purpose);
         if (hasFullAnswers && (profile.getConfidenceScore() == null
                 || profile.getConfidenceScore().compareTo(new BigDecimal("0.6")) < 0)) {
             profile.setConfidenceScore(new BigDecimal("0.6"));

@@ -192,47 +192,52 @@ public class TrendAgent implements Agent {
         List<DeepayTrendPoolDO> list = new ArrayList<>();
 
         // ----外套----
-        list.add(build("shein",   "外套", "工装", "男装",   "img/trend/coat_workwear_male_1.jpg",   80 + 10));
-        list.add(build("tiktok",  "外套", "工装", "男装",   "img/trend/coat_workwear_male_2.jpg",   80 + 8));
-        list.add(build("brand",   "外套", "极简", "男装",   "img/trend/coat_minimal_male_1.jpg",    80 + 12));
-        list.add(build("runway",  "外套", "轻奢", "男装",   "img/trend/coat_luxury_male_1.jpg",     80 + 15));
-        list.add(build("1688",    "外套", "休闲", "男装",   "img/trend/coat_casual_male_1.jpg",     80 + 6));
-        list.add(build("shein",   "外套", "街头", "少女",   "img/trend/coat_street_girl_1.jpg",     80 + 10));
-        list.add(build("tiktok",  "外套", "性感", "少女",   "img/trend/coat_sexy_girl_1.jpg",       78 + 8));
-        list.add(build("brand",   "外套", "极简", "少女",   "img/trend/coat_minimal_girl_1.jpg",    75 + 12));
+        list.add(build("shein",   "外套", "工装", "男装",   "img/trend/coat_workwear_male_1.jpg",   80 + 10, "SHEIN"));
+        list.add(build("tiktok",  "外套", "工装", "男装",   "img/trend/coat_workwear_male_2.jpg",   80 + 8,  "TikTok"));
+        list.add(build("brand",   "外套", "极简", "男装",   "img/trend/coat_minimal_male_1.jpg",    80 + 12, "ZARA"));
+        list.add(build("runway",  "外套", "轻奢", "男装",   "img/trend/coat_luxury_male_1.jpg",     80 + 15, "Balenciaga"));
+        list.add(build("1688",    "外套", "休闲", "男装",   "img/trend/coat_casual_male_1.jpg",     80 + 6,  "1688"));
+        list.add(build("shein",   "外套", "街头", "少女",   "img/trend/coat_street_girl_1.jpg",     80 + 10, "SHEIN"));
+        list.add(build("tiktok",  "外套", "性感", "少女",   "img/trend/coat_sexy_girl_1.jpg",       78 + 8,  "TikTok"));
+        list.add(build("brand",   "外套", "极简", "少女",   "img/trend/coat_minimal_girl_1.jpg",    75 + 12, "H&M"));
 
         // ----内裤 / 内衣----
-        list.add(build("shein",   "内裤", "性感", "少女",   "img/trend/underwear_sexy_1.jpg",       85 + 10));
-        list.add(build("tiktok",  "内裤", "性感", "少女",   "img/trend/underwear_sexy_2.jpg",       85 + 8));
-        list.add(build("1688",    "内裤", "极简", "少女",   "img/trend/underwear_minimal_1.jpg",    80 + 6));
-        list.add(build("brand",   "内衣", "轻奢", "少女",   "img/trend/lingerie_luxury_1.jpg",      78 + 12));
-        list.add(build("runway",  "内衣", "性感", "少女",   "img/trend/lingerie_sexy_1.jpg",        78 + 15));
+        list.add(build("shein",   "内裤", "性感", "少女",   "img/trend/underwear_sexy_1.jpg",       85 + 10, "SHEIN"));
+        list.add(build("tiktok",  "内裤", "性感", "少女",   "img/trend/underwear_sexy_2.jpg",       85 + 8,  "TikTok"));
+        list.add(build("1688",    "内裤", "极简", "少女",   "img/trend/underwear_minimal_1.jpg",    80 + 6,  "1688"));
+        list.add(build("brand",   "内衣", "轻奢", "少女",   "img/trend/lingerie_luxury_1.jpg",      78 + 12, "Prada"));
+        list.add(build("runway",  "内衣", "性感", "少女",   "img/trend/lingerie_sexy_1.jpg",        78 + 15, "Gucci"));
 
         // ----连衣裙----
-        list.add(build("tiktok",  "连衣裙", "性感", "少女",  "img/trend/dress_sexy_1.jpg",           90 + 8));
-        list.add(build("shein",   "连衣裙", "休闲", "少女",  "img/trend/dress_casual_1.jpg",         88 + 10));
-        list.add(build("brand",   "连衣裙", "极简", "少女",  "img/trend/dress_minimal_1.jpg",        85 + 12));
-        list.add(build("runway",  "连衣裙", "轻奢", "中老年","img/trend/dress_luxury_elder_1.jpg",   75 + 15));
-        list.add(build("1688",    "连衣裙", "休闲", "中老年","img/trend/dress_casual_elder_1.jpg",   72 + 6));
+        list.add(build("tiktok",  "连衣裙", "性感", "少女",  "img/trend/dress_sexy_1.jpg",           90 + 8,  "TikTok"));
+        list.add(build("shein",   "连衣裙", "休闲", "少女",  "img/trend/dress_casual_1.jpg",         88 + 10, "SHEIN"));
+        list.add(build("brand",   "连衣裙", "极简", "少女",  "img/trend/dress_minimal_1.jpg",        85 + 12, "ZARA"));
+        list.add(build("runway",  "连衣裙", "轻奢", "中老年","img/trend/dress_luxury_elder_1.jpg",   75 + 15, "Gucci"));
+        list.add(build("1688",    "连衣裙", "休闲", "中老年","img/trend/dress_casual_elder_1.jpg",   72 + 6,  "1688"));
 
         // ----裤子----
-        list.add(build("1688",    "裤子", "工装", "男装",   "img/trend/pants_workwear_male_1.jpg",  82 + 6));
-        list.add(build("shein",   "裤子", "工装", "男装",   "img/trend/pants_workwear_male_2.jpg",  82 + 10));
-        list.add(build("brand",   "裤子", "极简", "男装",   "img/trend/pants_minimal_male_1.jpg",   80 + 12));
-        list.add(build("tiktok",  "裤子", "休闲", "少女",   "img/trend/pants_casual_girl_1.jpg",    80 + 8));
-        list.add(build("shein",   "裤子", "街头", "运动",   "img/trend/pants_street_sport_1.jpg",   78 + 10));
+        list.add(build("1688",    "裤子", "工装", "男装",   "img/trend/pants_workwear_male_1.jpg",  82 + 6,  "1688"));
+        list.add(build("shein",   "裤子", "工装", "男装",   "img/trend/pants_workwear_male_2.jpg",  82 + 10, "SHEIN"));
+        list.add(build("brand",   "裤子", "极简", "男装",   "img/trend/pants_minimal_male_1.jpg",   80 + 12, "Adidas"));
+        list.add(build("tiktok",  "裤子", "休闲", "少女",   "img/trend/pants_casual_girl_1.jpg",    80 + 8,  "TikTok"));
+        list.add(build("shein",   "裤子", "街头", "运动",   "img/trend/pants_street_sport_1.jpg",   78 + 10, "Nike"));
 
         // ----上衣 / T恤----
-        list.add(build("tiktok",  "上衣", "街头", "运动",   "img/trend/top_street_sport_1.jpg",     84 + 8));
-        list.add(build("1688",    "上衣", "休闲", "少女",   "img/trend/top_casual_girl_1.jpg",      82 + 6));
-        list.add(build("brand",   "T恤",  "极简", "男装",   "img/trend/tshirt_minimal_male_1.jpg",  80 + 12));
-        list.add(build("shein",   "T恤",  "街头", "运动",   "img/trend/tshirt_street_sport_1.jpg",  78 + 10));
+        list.add(build("tiktok",  "上衣", "街头", "运动",   "img/trend/top_street_sport_1.jpg",     84 + 8,  "Nike"));
+        list.add(build("1688",    "上衣", "休闲", "少女",   "img/trend/top_casual_girl_1.jpg",      82 + 6,  "1688"));
+        list.add(build("brand",   "T恤",  "极简", "男装",   "img/trend/tshirt_minimal_male_1.jpg",  80 + 12, "H&M"));
+        list.add(build("shein",   "T恤",  "街头", "运动",   "img/trend/tshirt_street_sport_1.jpg",  78 + 10, "Adidas"));
 
         return list;
     }
 
     private DeepayTrendPoolDO build(String source, String category, String style,
                                     String crowd, String imageUrl, int score) {
+        return build(source, category, style, crowd, imageUrl, score, null);
+    }
+
+    private DeepayTrendPoolDO build(String source, String category, String style,
+                                    String crowd, String imageUrl, int score, String brand) {
         DeepayTrendPoolDO d = new DeepayTrendPoolDO();
         d.setSource(source);
         d.setCategory(category);
@@ -240,8 +245,22 @@ public class TrendAgent implements Agent {
         d.setCrowd(crowd);
         d.setImageUrl(imageUrl);
         d.setScore(score);
+        d.setBrand(brand != null ? brand : sourceToBrand(source));
         d.setCreatedAt(LocalDateTime.now());
         return d;
+    }
+
+    /** source → 可读品牌名（未单独设置 brand 时的默认映射） */
+    private String sourceToBrand(String source) {
+        if (source == null) return null;
+        switch (source.toLowerCase()) {
+            case "shein":   return "SHEIN";
+            case "tiktok":  return "TikTok";
+            case "1688":    return "1688";
+            case "brand":   return "品牌参考";
+            case "runway":  return "秀场";
+            default:        return source;
+        }
     }
 
     // ====================================================================

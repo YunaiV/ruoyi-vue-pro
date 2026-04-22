@@ -50,6 +50,12 @@ public class DeepayTrendPoolDO {
     private String imageUrl;
 
     /**
+     * 来源品牌（ZARA / H&M / Nike / Adidas / Gucci / Prada / Balenciaga / SHEIN / TikTok…）。
+     * 用于 SelectionFeedAgent 的 brand 字段输出，帮助设计师了解款式方向来源。
+     */
+    private String brand;
+
+    /**
      * 综合评分（0~100+）：由来源加权 + 用户反馈动态更新
      * <ul>
      *   <li>runway  +15</li>

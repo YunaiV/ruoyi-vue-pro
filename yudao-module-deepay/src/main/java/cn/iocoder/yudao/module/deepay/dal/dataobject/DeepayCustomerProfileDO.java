@@ -83,6 +83,12 @@ public class DeepayCustomerProfileDO {
     private String gender;
 
     /**
+     * 用途：WHOLESALE（批发）/ RETAIL（零售）。
+     * QADecisionAgent 六问中第 6 问填充；影响定价倍率与起订量。
+     */
+    private String purpose;
+
+    /**
      * 画像置信度（0.00~1.00）：
      * <ul>
      *   <li>0.00~0.59 — 数据不足，需触发 SmartQuestionAgent 补充</li>

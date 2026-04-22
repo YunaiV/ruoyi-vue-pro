@@ -161,6 +161,12 @@ public class Context {
      * ❗ 这是参考款图片，不是商品。设计师从这里选方向。
      */
     public java.util.List<String> selectionImages;
+
+    /**
+     * SelectionFeedAgent 输出：富类型推荐列表（含 brand + score + reason），
+     * 供前端直接渲染"今天做什么款 + 为什么推"。
+     */
+    public java.util.List<SelectionFeedItem> selectionFeed;
     /**
      * StyleEngine.buildCombinations() 输出：10~20 个风格组合方向。
      * 每个 StyleCombo 包含主风格、副风格、参考品牌和完整 Prompt。
@@ -254,6 +260,12 @@ public class Context {
      * UserCurrencyService 从 IP 识别后注入 ctx；默认 EUR。
      */
     public String  userCurrency;
+
+    /**
+     * 用途：WHOLESALE（批发）/ RETAIL（零售）。
+     * QADecisionAgent Q6 填充；影响定价倍率与起订量逻辑。
+     */
+    public String  purpose;
 
 }
 
