@@ -90,12 +90,12 @@ public interface DeepayTrendPoolMapper extends BaseMapperX<DeepayTrendPoolDO> {
 
     /**
      * 根据用户反馈更新评分（delta 为正数表示选中，负数表示跳过）。
-     * 使用 SQL 表达式保证原子性；同时兜底 score >= 0，不出负分。
+     * 使用参数化 SQL 保证安全性；score 下限 0，不出负分。
      */
     default void updateScore(Long id, int delta) {
         update(null, new LambdaUpdateWrapper<DeepayTrendPoolDO>()
                 .eq(DeepayTrendPoolDO::getId, id)
-                .setSql("score = GREATEST(0, score + " + delta + ")"));
+                .setSql("score = GREATEST(0, score + {0})", delta));
     }
 
 }
