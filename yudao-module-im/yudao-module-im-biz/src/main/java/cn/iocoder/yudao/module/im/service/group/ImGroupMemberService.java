@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -69,6 +70,14 @@ public interface ImGroupMemberService {
     ImGroupMemberDO addGroupMember(Long groupId, Long userId);
 
     /**
+     * 批量添加群成员（入群）
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合
+     */
+    void addGroupMembers(Long groupId, Collection<Long> userIds);
+
+    /**
      * 校验用户是否为群的有效成员
      *
      * @param groupId 群编号
@@ -96,6 +105,16 @@ public interface ImGroupMemberService {
      * @param userId  用户编号
      */
     void removeGroupMember(Long groupId, Long userId);
+
+    /**
+     * 批量移除指定群成员（设置为 DISABLE 状态）
+     * <p>
+     * 用于批量踢出场景
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合
+     */
+    void removeGroupMembers(Long groupId, Collection<Long> userIds);
 
     /**
      * 移除群的全部成员（设置为 DISABLE 状态）

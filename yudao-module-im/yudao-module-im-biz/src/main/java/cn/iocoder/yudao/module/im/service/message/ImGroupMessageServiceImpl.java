@@ -477,6 +477,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
+    public void deleteReadMaxMessageIds(Long groupId, Collection<Long> userIds) {
+        groupMessageReadRedisDAO.deleteReadMaxMessageIds(groupId, userIds);
+    }
+
+    @Override
     public void deleteReadMaxMessageIdMap(Long groupId) {
         groupMessageReadRedisDAO.deleteReadMaxMessageIdMap(groupId);
     }

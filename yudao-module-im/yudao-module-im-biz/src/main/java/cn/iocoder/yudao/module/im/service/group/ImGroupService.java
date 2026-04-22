@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.service.group;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import jakarta.validation.Valid;
 
@@ -92,13 +93,13 @@ public interface ImGroupService {
     /**
      * 邀请用户加入群
      * <p>
-     * 仅群主可执行
+     * 群成员即可执行，支持批量。
+     * 校验群人数上限，邀请后推送提示消息和群创建事件给被邀请人。
      *
-     * @param userId      当前登录用户编号（群主）
+     * @param userId      当前登录用户编号
      * @param inviteReqVO 邀请信息
-     * @return 群成员编号
      */
-    Long inviteGroupMember(Long userId, @Valid ImGroupMemberInviteReqVO inviteReqVO);
+    void inviteGroupMember(Long userId, @Valid ImGroupMemberInviteReqVO inviteReqVO);
 
     /**
      * 退群
@@ -113,12 +114,11 @@ public interface ImGroupService {
     /**
      * 移除群成员（踢人）
      * <p>
-     * 仅群主可执行，且不能移除自己
+     * 仅群主可执行，且不能移除自己，支持批量
      *
-     * @param groupId      群编号
-     * @param memberUserId 被移除的用户编号
-     * @param userId       当前登录用户编号（群主）
+     * @param userId      当前登录用户编号（群主）
+     * @param removeReqVO 移除信息
      */
-    void removeGroupMember(Long groupId, Long memberUserId, Long userId);
+    void removeGroupMember(Long userId, @Valid ImGroupMemberRemoveReqVO removeReqVO);
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.group;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
@@ -10,9 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
 /**
@@ -25,31 +30,31 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_N
 public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource
-    private ImGroupMemberMapper imGroupMemberMapper;
+    private ImGroupMemberMapper groupMemberMapper;
 
     @Override
     public ImGroupMemberDO getGroupMember(Long id) {
-        return imGroupMemberMapper.selectById(id);
+        return groupMemberMapper.selectById(id);
     }
 
     @Override
     public List<ImGroupMemberDO> getGroupMemberListByGroupId(Long groupId) {
-        return imGroupMemberMapper.selectListByGroupId(groupId);
+        return groupMemberMapper.selectListByGroupId(groupId);
     }
 
     @Override
     public List<ImGroupMemberDO> getActiveGroupMemberListByGroupId(Long groupId) {
-        return imGroupMemberMapper.selectListByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus());
+        return groupMemberMapper.selectListByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override
     public List<ImGroupMemberDO> getActiveGroupMemberListByUserId(Long userId) {
-        return imGroupMemberMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
+        return groupMemberMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override
     public List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime) {
-        return imGroupMemberMapper.selectQuitListByUserId(userId, minQuitTime);
+        return groupMemberMapper.selectQuitListByUserId(userId, minQuitTime);
     }
 
     @Override
@@ -57,13 +62,42 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         ImGroupMemberDO member = new ImGroupMemberDO()
                 .setGroupId(groupId).setUserId(userId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(LocalDateTime.now());
-        imGroupMemberMapper.insert(member);
+        groupMemberMapper.insert(member);
         return member;
     }
 
     @Override
+    public void addGroupMembers(Long groupId, Collection<Long> userIds) {
+        LocalDateTime now = LocalDateTime.now();
+        // 1.1 查询已有记录（含已退群的 DISABLE 记录）
+        List<ImGroupMemberDO> existMembers = groupMemberMapper.selectListByGroupIdAndUserIds(groupId, userIds);
+        Map<Long, ImGroupMemberDO> existMap = convertMap(existMembers, ImGroupMemberDO::getUserId);
+        // 1.2 分类：已有记录 → UPDATE，新成员 → INSERT
+        List<ImGroupMemberDO> inserts = new ArrayList<>();
+        List<ImGroupMemberDO> updates = new ArrayList<>();
+        for (Long userId : userIds) {
+            ImGroupMemberDO exist = existMap.get(userId);
+            if (exist == null) {
+                inserts.add(new ImGroupMemberDO().setGroupId(groupId).setUserId(userId)
+                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now));
+            } else if (CommonStatusEnum.DISABLE.getStatus().equals(exist.getStatus())) {
+                updates.add(new ImGroupMemberDO().setId(exist.getId())
+                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now));
+            }
+        }
+
+        // 2. 执行
+        if (CollUtil.isNotEmpty(inserts)) {
+            groupMemberMapper.insertBatch(inserts);
+        }
+        if (CollUtil.isNotEmpty(updates)) {
+            groupMemberMapper.updateBatch(updates);
+        }
+    }
+
+    @Override
     public ImGroupMemberDO validateMemberInGroup(Long groupId, Long userId) {
-        ImGroupMemberDO member = imGroupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
+        ImGroupMemberDO member = groupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
         if (member == null || CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
@@ -77,7 +111,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         // 2. 更新群成员信息
         ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class)
                 .setId(member.getId());
-        imGroupMemberMapper.updateById(updateObj);
+        groupMemberMapper.updateById(updateObj);
     }
 
     @Override
@@ -85,14 +119,22 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         // 1. 校验是群的有效成员
         ImGroupMemberDO member = validateMemberInGroup(groupId, userId);
         // 2. 更新为退群状态
-        imGroupMemberMapper.updateById(new ImGroupMemberDO().setId(member.getId())
+        groupMemberMapper.updateById(new ImGroupMemberDO().setId(member.getId())
                 .setStatus(CommonStatusEnum.DISABLE.getStatus())
                 .setQuitTime(LocalDateTime.now()));
     }
 
     @Override
+    public void removeGroupMembers(Long groupId, Collection<Long> userIds) {
+        groupMemberMapper.updateByGroupIdAndUserIdsAndStatus(groupId, userIds,
+                CommonStatusEnum.ENABLE.getStatus(),
+                new ImGroupMemberDO().setStatus(CommonStatusEnum.DISABLE.getStatus())
+                        .setQuitTime(LocalDateTime.now()));
+    }
+
+    @Override
     public void removeGroupMembersByGroupId(Long groupId) {
-        imGroupMemberMapper.updateByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus(),
+        groupMemberMapper.updateByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus(),
                 new ImGroupMemberDO().setStatus(CommonStatusEnum.DISABLE.getStatus())
                         .setQuitTime(LocalDateTime.now()));
     }

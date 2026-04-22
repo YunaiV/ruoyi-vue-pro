@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessa
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -79,6 +80,16 @@ public interface ImGroupMessageService {
      * @param userId  用户编号
      */
     void deleteReadMaxMessageId(Long groupId, Long userId);
+
+    /**
+     * 批量清理用户在某群的已读位置缓存
+     * <p>
+     * 用于批量踢出场景
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合
+     */
+    void deleteReadMaxMessageIds(Long groupId, Collection<Long> userIds);
 
     /**
      * 清理某群所有用户的已读位置缓存

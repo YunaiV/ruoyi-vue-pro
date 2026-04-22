@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,6 +26,12 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
         return selectOne(new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eq(ImGroupMemberDO::getGroupId, groupId)
                 .eq(ImGroupMemberDO::getUserId, userId));
+    }
+
+    default List<ImGroupMemberDO> selectListByGroupIdAndUserIds(Long groupId, Collection<Long> userIds) {
+        return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .in(ImGroupMemberDO::getUserId, userIds));
     }
 
     default List<ImGroupMemberDO> selectListByGroupIdAndStatus(Long groupId, Integer status) {
@@ -59,6 +66,15 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
     default int updateByGroupIdAndStatus(Long groupId, Integer oldStatus, ImGroupMemberDO updateObj) {
         return update(updateObj, new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eq(ImGroupMemberDO::getGroupId, groupId)
+                .eq(ImGroupMemberDO::getStatus, oldStatus));
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    default int updateByGroupIdAndUserIdsAndStatus(Long groupId, Collection<Long> userIds,
+                                                   Integer oldStatus, ImGroupMemberDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .in(ImGroupMemberDO::getUserId, userIds)
                 .eq(ImGroupMemberDO::getStatus, oldStatus));
     }
 

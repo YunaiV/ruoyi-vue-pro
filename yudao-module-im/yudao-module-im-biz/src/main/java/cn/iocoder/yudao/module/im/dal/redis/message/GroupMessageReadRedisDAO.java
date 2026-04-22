@@ -5,6 +5,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +71,18 @@ public class GroupMessageReadRedisDAO {
     public void deleteReadMaxMessageId(Long groupId, Long userId) {
         String key = formatKey(groupId);
         stringRedisTemplate.opsForHash().delete(key, userId.toString());
+    }
+
+    /**
+     * 批量删除用户在某群的已读位置
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合
+     */
+    public void deleteReadMaxMessageIds(Long groupId, Collection<Long> userIds) {
+        String key = formatKey(groupId);
+        Object[] hashKeys = userIds.stream().map(String::valueOf).toArray();
+        stringRedisTemplate.opsForHash().delete(key, hashKeys);
     }
 
     /**

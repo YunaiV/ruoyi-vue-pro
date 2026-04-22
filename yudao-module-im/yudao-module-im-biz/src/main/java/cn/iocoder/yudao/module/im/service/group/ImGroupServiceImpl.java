@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -30,8 +31,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -149,13 +153,39 @@ public class ImGroupServiceImpl implements ImGroupService {
     // ==================== 群成员的写操作 ====================
 
     @Override
-    public Long inviteGroupMember(Long userId, ImGroupMemberInviteReqVO inviteReqVO) {
-        // 1. 校验群存在 + 当前用户是群主
-        validateGroupOwner(inviteReqVO.getGroupId(), userId);
+    public void inviteGroupMember(Long userId, ImGroupMemberInviteReqVO inviteReqVO) {
+        Long groupId = inviteReqVO.getGroupId();
+        // 1.1 校验群存在 + 当前用户是群成员
+        validateGroupExists(groupId);
+        groupMemberService.validateMemberInGroup(groupId, userId);
+        // 1.2 排除已在群中的用户
+        List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
+        activeMembers.forEach(member -> inviteReqVO.getMemberUserIds().remove(member.getUserId()));
+        if (CollUtil.isEmpty(inviteReqVO.getMemberUserIds())) {
+            return;
+        }
+        // 1.3 校验群人数上限
+        List<Long> memberUserIds = inviteReqVO.getMemberUserIds();
+        if (activeMembers.size() + memberUserIds.size() > MAX_GROUP_MEMBER) {
+            throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
+        }
 
-        // 2. 添加群成员
-        ImGroupMemberDO member = groupMemberService.addGroupMember(inviteReqVO.getGroupId(), inviteReqVO.getUserId());
-        return member.getId();
+        // 2. 批量添加群成员
+        groupMemberService.addGroupMembers(groupId, memberUserIds);
+
+        // 3.1 推送群创建事件给被邀请人（让客户端新增群会话）
+        webSocketService.sendGroupMessageAsync(new HashSet<>(memberUserIds),
+                ImGroupMessageDTO.ofGroupCreate(userId, groupId));
+        // 3.2 发送邀请提示消息给所有群成员
+        AdminUserRespDTO inviter = adminUserApi.getUser(userId);
+        Map<Long, AdminUserRespDTO> invitedUserMap = adminUserApi.getUserMap(memberUserIds);
+        String invitedNames = memberUserIds.stream()
+                .map(id -> invitedUserMap.containsKey(id) ? invitedUserMap.get(id).getNickname() : String.valueOf(id))
+                .collect(Collectors.joining(","));
+        String tipContent = StrUtil.format(GROUP_INVITE_TIP_MESSAGE, inviter.getNickname(), invitedNames);
+        List<ImGroupMemberDO> allMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
+        Set<Long> allMemberUserIds = convertSet(allMembers, ImGroupMemberDO::getUserId);
+        groupMessageService.sendTipGroupMessage(userId, groupId, allMemberUserIds, tipContent);
     }
 
     @Override
@@ -180,23 +210,25 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
-    public void removeGroupMember(Long groupId, Long memberUserId, Long userId) {
+    public void removeGroupMember(Long userId, ImGroupMemberRemoveReqVO removeReqVO) {
+        Long groupId = removeReqVO.getGroupId();
         // 1. 校验群存在 + 当前用户是群主
         validateGroupOwner(groupId, userId);
         // 2. 不能移除自己
-        if (ObjUtil.equal(memberUserId, userId)) {
+        if (removeReqVO.getMemberUserIds().contains(userId)) {
             throw exception(GROUP_CANNOT_REMOVE_SELF);
         }
 
-        // 3.1 移除群成员
-        groupMemberService.removeGroupMember(groupId, memberUserId);
-        // 3.2 清理已读缓存
-        groupMessageService.deleteReadMaxMessageId(groupId, memberUserId);
+        // 3.1 批量移除群成员
+        Set<Long> memberUserIds = new HashSet<>(removeReqVO.getMemberUserIds());
+        groupMemberService.removeGroupMembers(groupId, memberUserIds);
+        // 3.2 批量清理已读缓存
+        groupMessageService.deleteReadMaxMessageIds(groupId, memberUserIds);
 
         // 4.1 发送踢出提示消息（TIP_TEXT）
-        groupMessageService.sendTipGroupMessage(userId, groupId, Set.of(memberUserId), GROUP_REMOVE_TIP_MESSAGE);
+        groupMessageService.sendTipGroupMessage(userId, groupId, memberUserIds, GROUP_REMOVE_TIP_MESSAGE);
         // 4.2 推送群删除事件
-        webSocketService.sendGroupMessageAsync(Set.of(memberUserId),
+        webSocketService.sendGroupMessageAsync(memberUserIds,
                 ImGroupMessageDTO.ofGroupDelete(userId, groupId));
     }
 
