@@ -178,10 +178,47 @@ public class Context {
     @Deprecated public String iban;
 
     // ===== Phase 8 设计落地 =====
-    /**
-     * DesignSelectAgent 模式：HUMAN=人工选图 / AI=自动选图（默认 AI）。
-     */
-    public String designSelectMode;
+    /** DesignSelectAgent 模式：HUMAN=人工选图 / AI=自动选图（默认 AI）。 */
+    public String  designSelectMode;
+    /** DesignConfirmAgent 是否已确认（true = 可进入生产）。 */
+    public Boolean designConfirmed;
+    /** StyleConsistencyAgent 评分（0~100，<60 触发重设计）。 */
+    public Integer styleConsistencyScore;
+    /** RiskControlAgent 风险等级：NONE / LOW / MEDIUM / HIGH。 */
+    public String  riskLevel;
+    /** RiskControlAgent：是否检测到品牌 Logo（true → 拒绝生产）。 */
+    public Boolean logoDetected;
+    /** DesignSplitAgent 输出：结构复杂度评分（0~100，>80 拒绝生产）。 */
+    public Integer complexity;
+    /** DesignSplitAgent 输出：生产要素 JSON
+     *  {"category":"外套","fabric":"棉/牛仔","colors":["黑","灰"],"style":"工装","structure":"宽松","complexity":40} */
+    public String  designFeatures;
+    /** 统一设计评分（ScoreUtil.computeDesignScore），用于 DesignVariantAgent 选最优。 */
+    public Integer designScore;
+
+    // ===== Phase 9 原创生成 =====
+    /** DesignGenAgent 生成设计图时使用的 Prompt（记录备查）。 */
+    public String  designPrompt;
+    /** DesignVariantAgent 输出：3+ 个风格变体。 */
+    public java.util.List<DesignVariant> designVariants;
+    /** DesignVariantAgent 选出的最佳变体图 URL（高分者）。 */
+    public String  finalDesign;
+    /** PatternPrepareAgent 输出：版型类型（基础版型 / 贴体 / 宽松）。 */
+    public String  patternType;
+    /** PatternPrepareAgent 输出：尺码范围。 */
+    public java.util.List<String> sizeRange;
+    /** PatternPrepareAgent 输出：面料建议（如"棉+弹力"）。 */
+    public String  fabricSuggestion;
+    /** PatternPrepareAgent 输出：打版难度（low / medium / high）。 */
+    public String  difficulty;
+    /** CostEstimateAgent 输出：面料成本（元）。 */
+    public BigDecimal fabricCost;
+    /** CostEstimateAgent 输出：人工成本（元）。 */
+    public BigDecimal laborCost;
+    /** CostEstimateAgent 输出：总成本（元）= fabricCost + laborCost。 */
+    public BigDecimal totalCost;
+    /** CostEstimateAgent 输出：true 表示成本过高，流程在 Phase 9 终止。 */
+    public Boolean costTooHigh;
 
 }
 
