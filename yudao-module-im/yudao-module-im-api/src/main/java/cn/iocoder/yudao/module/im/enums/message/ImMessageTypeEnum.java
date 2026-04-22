@@ -34,7 +34,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
 
     GROUP_CREATE(200, "群创建"), // 暂无
     GROUP_UPDATE(201, "群信息变更"), // 暂无
-    GROUP_DISSOLVE(202, "群解散"); // 暂无
+    GROUP_DELETE(202, "群删除"); // 暂无（解散/退群/踢出均用此类型）
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

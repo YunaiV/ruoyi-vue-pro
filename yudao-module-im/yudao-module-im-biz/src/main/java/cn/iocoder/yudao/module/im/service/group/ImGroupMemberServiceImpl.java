@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.im.service.group;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_EXISTS;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
 /**
@@ -28,43 +26,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource
     private ImGroupMemberMapper imGroupMemberMapper;
-
-    @Override
-    public Long inviteGroupMember(ImGroupMemberInviteReqVO inviteReqVO) {
-        // TODO @AI：需要群主校验下；
-        // 插入
-        ImGroupMemberDO groupMember = BeanUtils.toBean(inviteReqVO, ImGroupMemberDO.class);
-        // TODO @AI：默认字段的设置；
-        imGroupMemberMapper.insert(groupMember);
-        // TODO @AI：或者调用内部的 createGroupMember 方法，设置默认字段的值；
-        // 返回
-        return groupMember.getId();
-    }
-
-    @Override
-    public void updateGroupMember(ImGroupMemberUpdateReqVO updateReqVO) {
-        // 校验存在
-        validateGroupMemberExists(updateReqVO.getId());
-        // 更新
-        ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class);
-        imGroupMemberMapper.updateById(updateObj);
-    }
-
-    @Override
-    public void removeGroupMember(Long id) {
-        // TODO @AI：需要群主校验下；
-        // 校验存在
-        validateGroupMemberExists(id);
-
-        // 删除
-        imGroupMemberMapper.deleteById(id);
-    }
-
-    private void validateGroupMemberExists(Long id) {
-        if (imGroupMemberMapper.selectById(id) == null) {
-            throw exception(GROUP_MEMBER_NOT_EXISTS);
-        }
-    }
 
     @Override
     public ImGroupMemberDO getGroupMember(Long id) {
@@ -96,7 +57,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         ImGroupMemberDO member = new ImGroupMemberDO()
                 .setGroupId(groupId).setUserId(userId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(LocalDateTime.now());
-        // TODO @AI：要不要有个 initXXX 方法，设置默认字段的值；
         imGroupMemberMapper.insert(member);
         return member;
     }
@@ -111,15 +71,23 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
-    public void updateGroupMember(Long groupId, Long userId, String displayUserName, String displayGroupName) {
+    public void updateGroupMember(Long userId, ImGroupMemberUpdateReqVO updateReqVO) {
+        // 1. 校验是群的有效成员
+        ImGroupMemberDO member = validateMemberInGroup(updateReqVO.getGroupId(), userId);
+        // 2. 更新群成员信息
+        ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class)
+                .setId(member.getId());
+        imGroupMemberMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void removeGroupMember(Long groupId, Long userId) {
         // 1. 校验是群的有效成员
         ImGroupMemberDO member = validateMemberInGroup(groupId, userId);
-
-        // 2. 更新展示信息
+        // 2. 更新为退群状态
         imGroupMemberMapper.updateById(new ImGroupMemberDO().setId(member.getId())
-                .setDisplayUserName(displayUserName).setDisplayGroupName(displayGroupName));
-
-        // TODO @AI：需要分析下，是否需要
+                .setStatus(CommonStatusEnum.DISABLE.getStatus())
+                .setQuitTime(LocalDateTime.now()));
     }
 
     @Override

@@ -147,15 +147,17 @@ public class ImGroupMessageDTO {
     }
 
     /**
-     * 构建群解散推送 DTO（通知所有群成员"群已解散"）
+     * 构建群删除推送 DTO（通知群成员"群已移除"）
+     * <p>
+     * 适用于群解散、退群、踢出等场景
      *
-     * @param senderId 操作者（群主）用户编号
+     * @param senderId 操作者用户编号
      * @param groupId  群编号
      * @return 群聊 DTO
      */
-    public static ImGroupMessageDTO ofGroupDissolve(Long senderId, Long groupId) {
+    public static ImGroupMessageDTO ofGroupDelete(Long senderId, Long groupId) {
         return new ImGroupMessageDTO()
-                .setType(ImMessageTypeEnum.GROUP_DISSOLVE.getType())
+                .setType(ImMessageTypeEnum.GROUP_DELETE.getType())
                 .setSenderId(senderId).setGroupId(groupId)
                 .setSendTime(LocalDateTime.now());
     }

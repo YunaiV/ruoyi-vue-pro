@@ -51,5 +51,13 @@ public interface ImCommonConstants {
      * 群解散系统提示
      */
     String GROUP_DISSOLVE_TIP_MESSAGE = "'{}'解散了群聊";
+    /**
+     * 退群系统提示
+     */
+    String GROUP_QUIT_TIP_MESSAGE = "您已退出群聊";
+    /**
+     * 踢出群系统提示
+     */
+    String GROUP_REMOVE_TIP_MESSAGE = "您已被移出群聊";
 
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,8 @@ public class ImGroupController {
 
     @Resource
     private ImGroupService imGroupService;
+
+    // ==================== 群的写操作 ====================
 
     @PostMapping("/create")
     @Operation(summary = "创建群")
@@ -55,6 +58,8 @@ public class ImGroupController {
         return success(true);
     }
 
+    // ==================== 群的读操作 ====================
+
     @GetMapping("/get")
     @Operation(summary = "获得群")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -69,6 +74,33 @@ public class ImGroupController {
     public CommonResult<List<ImGroupRespVO>> getMyGroupList() {
         List<ImGroupDO> groups = imGroupService.getActiveGroupList(getLoginUserId());
         return success(BeanUtils.toBean(groups, ImGroupRespVO.class));
+    }
+
+    // ==================== 群成员的写操作 ====================
+
+    @PostMapping("/invite")
+    @Operation(summary = "邀请用户加入群")
+    @PreAuthorize("@ss.hasPermission('im:group:update')")
+    public CommonResult<Long> inviteGroupMember(@Valid @RequestBody ImGroupMemberInviteReqVO inviteReqVO) {
+        return success(imGroupService.inviteGroupMember(getLoginUserId(), inviteReqVO));
+    }
+
+    @DeleteMapping("/quit")
+    @Operation(summary = "退出群")
+    @Parameter(name = "groupId", description = "群编号", required = true)
+    @PreAuthorize("@ss.hasPermission('im:group:update')")
+    public CommonResult<Boolean> quitGroup(@RequestParam("groupId") Long groupId) {
+        imGroupService.quitGroup(groupId, getLoginUserId());
+        return success(true);
+    }
+
+    @DeleteMapping("/kicking")
+    @Operation(summary = "移除群成员")
+    @PreAuthorize("@ss.hasPermission('im:group:update')")
+    public CommonResult<Boolean> removeGroupMember(@RequestParam("groupId") Long groupId,
+                                                   @RequestParam("memberUserId") Long memberUserId) {
+        imGroupService.removeGroupMember(groupId, memberUserId, getLoginUserId());
+        return success(true);
     }
 
 }

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.im.service.group;
 
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
@@ -14,28 +13,6 @@ import java.util.List;
  * @author 芋道源码
  */
 public interface ImGroupMemberService {
-
-    /**
-     * 邀请用户加入群
-     *
-     * @param inviteReqVO 邀请信息
-     * @return 编号
-     */
-    Long inviteGroupMember(@Valid ImGroupMemberInviteReqVO inviteReqVO);
-
-    /**
-     * 更新群成员信息
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateGroupMember(@Valid ImGroupMemberUpdateReqVO updateReqVO);
-
-    /**
-     * 删除群成员
-     *
-     * @param id 编号
-     */
-    void removeGroupMember(Long id);
 
     /**
      * 获得群成员
@@ -101,17 +78,24 @@ public interface ImGroupMemberService {
     ImGroupMemberDO validateMemberInGroup(Long groupId, Long userId);
 
     /**
-     * 更新群成员的展示信息（群内昵称、群名备注）
+     * 更新群成员信息（群内昵称、群名备注、免打扰等）
      * <p>
      * 内部会校验用户是否为群的有效成员
      *
-     * @param groupId          群编号
-     * @param userId           用户编号
-     * @param displayUserName  群内昵称（null 则不更新）
-     * @param displayGroupName 群名备注（null 则不更新）
+     * @param userId      当前登录用户编号
+     * @param updateReqVO 更新信息
      */
-    void updateGroupMember(Long groupId, Long userId,
-                           String displayUserName, String displayGroupName);
+    void updateGroupMember(Long userId, @Valid ImGroupMemberUpdateReqVO updateReqVO);
+
+    /**
+     * 移除指定群成员（设置为 DISABLE 状态）
+     * <p>
+     * 用于退群、踢出场景
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     */
+    void removeGroupMember(Long groupId, Long userId);
 
     /**
      * 移除群的全部成员（设置为 DISABLE 状态）
