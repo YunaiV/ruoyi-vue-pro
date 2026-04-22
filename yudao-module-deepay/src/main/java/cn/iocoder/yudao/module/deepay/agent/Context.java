@@ -238,6 +238,23 @@ public class Context {
     /** PublishChannelAgent 输出：主发布渠道（首个）。 */
     public String  productChannel;
 
+    // ===== 多货币 =====
+    /**
+     * 基准价（EUR）— AI 定价系统唯一输出。
+     * PricingStrategyAgent 写入，Analytics 用此计算利润，不用 price（展示价）。
+     */
+    public BigDecimal basePrice;
+    /**
+     * 展示价（用户看到的货币金额）。
+     * 由 OrderFlowAgent 在创建订单时通过 FxRateService.convert(basePrice, userCurrency) 计算。
+     */
+    public BigDecimal displayPrice;
+    /**
+     * 用户货币（ISO 4217）。
+     * UserCurrencyService 从 IP 识别后注入 ctx；默认 EUR。
+     */
+    public String  userCurrency;
+
 }
 
 

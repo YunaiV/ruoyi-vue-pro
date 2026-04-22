@@ -19,16 +19,23 @@ import java.util.Map;
  *     provider: jeepay   # 切换为 stripe 或 mock 不影响任何业务代码
  * </pre>
  */
-public interface PaymentService {
+public interface PaymentServiceV2 {
 
     /**
-     * 创建支付单。
+     * 创建支付单（带货币参数，用于多币种路由）。
      *
      * @param outTradeNo 我方唯一订单号（payment_id）
-     * @param amount     支付金额（元）
+     * @param amount     支付金额（展示货币，元）
      * @param subject    商品标题
      * @param notifyUrl  异步回调地址
-     * @return {@link PaymentResp}，含 paymentId（渠道单号）和 payUrl（收银台链接）
+     * @param currency   展示货币（USD / EUR / CNY …）
+     * @return {@link PaymentResp}，含 paymentId 和 payUrl
+     */
+    PaymentResp create(String outTradeNo, BigDecimal amount, String subject,
+                        String notifyUrl, String currency);
+
+    /**
+     * 创建支付单（EUR 默认，向后兼容）。
      */
     PaymentResp create(String outTradeNo, BigDecimal amount, String subject, String notifyUrl);
 
@@ -39,6 +46,13 @@ public interface PaymentService {
      * @return true=合法
      */
     boolean verify(Map<String, String> data);
+
+    /**
+     * 验证支付回调签名（alias，向后兼容 PaymentReconcileAgent）。
+     */
+    default boolean verifyCallback(Map<String, String> data) {
+        return verify(data);
+    }
 
     /**
      * 解析回调支付状态。

@@ -29,15 +29,24 @@ public class PaymentRequest {
     /** 扩展信息（可选，原样透传） */
     private String attach;
 
+    /** 货币代码（订单级别，覆盖全局配置，用于 wayCode 路由） */
+    private String currency = "EUR";
+
     // ---- 构造 / Builder ----
 
     public PaymentRequest() {}
 
     public PaymentRequest(String outTradeNo, BigDecimal amount, String subject, String notifyUrl) {
+        this(outTradeNo, amount, subject, notifyUrl, "EUR");
+    }
+
+    public PaymentRequest(String outTradeNo, BigDecimal amount, String subject,
+                           String notifyUrl, String currency) {
         this.outTradeNo = outTradeNo;
         this.amount     = amount;
         this.subject    = subject;
         this.notifyUrl  = notifyUrl;
+        this.currency   = currency;
     }
 
     public String      getOutTradeNo() { return outTradeNo; }
@@ -48,6 +57,8 @@ public class PaymentRequest {
     public void        setSubject(String v) { this.subject = v; }
     public String      getNotifyUrl()  { return notifyUrl; }
     public void        setNotifyUrl(String v) { this.notifyUrl = v; }
+    public String      getCurrency()   { return currency != null ? currency : "EUR"; }
+    public void        setCurrency(String v) { this.currency = v; }
     public String      getAttach()     { return attach; }
     public void        setAttach(String v) { this.attach = v; }
 }

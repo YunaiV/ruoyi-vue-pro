@@ -32,8 +32,16 @@ public class PaymentServiceImpl implements PaymentServiceV2 {
 
     @Override
     public PaymentResp create(String outTradeNo, BigDecimal amount,
+                               String subject, String notifyUrl, String currency) {
+        PaymentRequest req = new PaymentRequest(outTradeNo, amount, subject, notifyUrl,
+                currency != null ? currency : "EUR");
+        return plugin().createOrder(req);
+    }
+
+    @Override
+    public PaymentResp create(String outTradeNo, BigDecimal amount,
                                String subject, String notifyUrl) {
-        return plugin().createOrder(new PaymentRequest(outTradeNo, amount, subject, notifyUrl));
+        return create(outTradeNo, amount, subject, notifyUrl, "EUR");
     }
 
     @Override

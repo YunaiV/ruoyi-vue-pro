@@ -31,6 +31,15 @@ public class DeepayProductDO {
     private BigDecimal price;
 
     /**
+     * 基准价（EUR）— AI 定价系统唯一输出，永远用 EUR 存储。
+     * 展示时通过 {@link cn.iocoder.yudao.module.deepay.service.FxRateService#convert} 转换。
+     * <pre>
+     * basePrice = totalCost × 2.2 + trendBoost + marketAdjust
+     * </pre>
+     */
+    private BigDecimal basePrice;
+
+    /**
      * 货币代码（ISO 4217），全系统统一 EUR（欧元）。
      * 前端展示、Jeepay 创建支付均使用此字段。
      */

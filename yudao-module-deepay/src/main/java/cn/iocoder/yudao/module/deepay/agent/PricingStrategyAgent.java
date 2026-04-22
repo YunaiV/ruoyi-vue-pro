@@ -76,7 +76,9 @@ public class PricingStrategyAgent implements Agent {
             finalPrice = DEFAULT_PRICE;
         }
 
-        ctx.price = finalPrice;
+        ctx.price    = finalPrice;
+        // basePrice 永远是 EUR（内部基准），analytics/利润统一用此字段
+        ctx.basePrice = finalPrice;
 
         // 落库更新
         if (StringUtils.hasText(ctx.productId)) {

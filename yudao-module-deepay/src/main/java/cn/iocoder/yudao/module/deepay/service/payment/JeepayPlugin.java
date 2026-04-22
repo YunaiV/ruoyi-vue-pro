@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service.payment;
 
 import cn.iocoder.yudao.module.deepay.service.JeepayProperties;
+import cn.iocoder.yudao.module.deepay.service.payment.PaymentRouter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,9 +103,12 @@ public class JeepayPlugin implements PaymentPlugin {
         params.put("mchNo",       props.getMchNo());
         params.put("appId",       props.getAppId());
         params.put("outTradeNo",  req.getOutTradeNo());          // ⭐ 绑定我方ID
-        params.put("wayCode",     props.getWayCode());           // AUTO = 自动选支付方式
+        // wayCode 按订单货币自动路由（STRIPE/ALIPAY_WAP/AUTO）
+        String paymentCurrency = req.getCurrency() != null ? req.getCurrency() : props.getCurrency();
+        String wayCode = PaymentRouter.route(paymentCurrency);
+        params.put("wayCode",     wayCode);
         params.put("amount",      String.valueOf(amountFen));
-        params.put("currency",    props.getCurrency());           // EUR — 欧元，全系统统一
+        params.put("currency",    paymentCurrency);              // 订单展示货币
         params.put("subject",     safe(req.getSubject(), "Deepay商品"));
         params.put("notifyUrl",   safe(req.getNotifyUrl(), props.getNotifyUrl()));
         params.put("reqTime",     String.valueOf(System.currentTimeMillis() / 1000));
