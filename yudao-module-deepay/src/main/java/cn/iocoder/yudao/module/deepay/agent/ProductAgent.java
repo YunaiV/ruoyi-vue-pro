@@ -37,6 +37,14 @@ public class ProductAgent implements Agent {
         product.setChainCode(ctx.chainCode);
         product.setTitle(ctx.title);
         product.setDescription(ctx.description);
+        // 写入封面图（DesignSelectAgent / AIDecisionAgent 选出的图）
+        if (ctx.selectedImage != null) {
+            product.setCdnImageUrl(ctx.selectedImage);
+        }
+        // 品类落库（供 TrendAgent 精准过滤）
+        if (ctx.category != null) {
+            product.setCategory(ctx.category);
+        }
         product.setStatus("DRAFT");
         product.setSoldCount(0);
         product.setStock(0);
