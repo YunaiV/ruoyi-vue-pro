@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.friend.FriendUpdateMessage;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
@@ -89,10 +88,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         imFriendMapper.updateById(new ImFriendDO().setId(friend.getId()).setMuted(reqVO.getMuted()));
 
         // 3. 推送好友更新通知（多端同步）
-        FriendUpdateMessage websocketContent = new FriendUpdateMessage()
-                .setFriendUserId(reqVO.getFriendUserId()).setMuted(reqVO.getMuted());
         imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofFriendUpdate(userId, reqVO.getFriendUserId(), websocketContent));
+                ImPrivateMessageDTO.ofFriendUpdate(userId, reqVO.getFriendUserId()));
     }
 
     @Override

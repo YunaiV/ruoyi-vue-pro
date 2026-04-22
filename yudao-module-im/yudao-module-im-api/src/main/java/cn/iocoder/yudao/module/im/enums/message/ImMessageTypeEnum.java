@@ -30,11 +30,12 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
 
     FRIEND_ADD(100, "好友添加"), // 暂无
     FRIEND_DELETE(101, "好友删除"), // 暂无
-    FRIEND_UPDATE(102, "好友更新"), // 对应 FriendUpdateMessage 类
+    FRIEND_UPDATE(102, "好友更新"), // 暂无（客户端收到后自行拉取）
 
     GROUP_CREATE(200, "群创建"), // 暂无
     GROUP_UPDATE(201, "群信息变更"), // 暂无
-    GROUP_DELETE(202, "群删除"); // 暂无（解散/退群/踢出均用此类型）
+    GROUP_DELETE(202, "群删除"), // 暂无（解散/退群/踢出均用此类型）
+    GROUP_MEMBER_UPDATE(203, "群成员信息变更"); // 暂无（客户端收到后自行拉取）
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

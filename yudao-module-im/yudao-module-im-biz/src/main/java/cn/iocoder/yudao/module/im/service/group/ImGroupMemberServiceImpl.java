@@ -6,6 +6,8 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
+import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -31,6 +33,9 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource
     private ImGroupMemberMapper groupMemberMapper;
+
+    @Resource
+    private ImWebSocketService webSocketService;
 
     @Override
     public ImGroupMemberDO getGroupMember(Long id) {
@@ -108,10 +113,15 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     public void updateGroupMember(Long userId, ImGroupMemberUpdateReqVO updateReqVO) {
         // 1. 校验是群的有效成员
         ImGroupMemberDO member = validateMemberInGroup(updateReqVO.getGroupId(), userId);
+
         // 2. 更新群成员信息
         ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class)
                 .setId(member.getId());
         groupMemberMapper.updateById(updateObj);
+
+        // 3. 推送群成员变更通知（多端同步，仅推给自己）
+        webSocketService.sendGroupMessageAsync(userId,
+                ImGroupMessageDTO.ofGroupMemberUpdate(userId, updateReqVO.getGroupId()));
     }
 
     @Override

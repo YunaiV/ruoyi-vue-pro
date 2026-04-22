@@ -162,4 +162,18 @@ public class ImGroupMessageDTO {
                 .setSendTime(LocalDateTime.now());
     }
 
+    /**
+     * 构建群成员信息变更推送 DTO（多端同步：通知自己"在某群的个人设置变了"）
+     *
+     * @param senderId 当前用户编号
+     * @param groupId  群编号
+     * @return 群聊 DTO
+     */
+    public static ImGroupMessageDTO ofGroupMemberUpdate(Long senderId, Long groupId) {
+        return new ImGroupMessageDTO()
+                .setType(ImMessageTypeEnum.GROUP_MEMBER_UPDATE.getType())
+                .setSenderId(senderId).setGroupId(groupId)
+                .setSendTime(LocalDateTime.now());
+    }
+
 }

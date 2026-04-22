@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.im.service.websocket.dto;
 
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
-import cn.iocoder.yudao.module.im.service.websocket.dto.friend.FriendUpdateMessage;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -137,14 +135,13 @@ public class ImPrivateMessageDTO {
      *
      * @param userId       当前用户编号
      * @param friendUserId 好友的用户编号
-     * @param content      更新后的好友属性
      * @return 私聊 DTO
      */
-    public static ImPrivateMessageDTO ofFriendUpdate(Long userId, Long friendUserId, FriendUpdateMessage content) {
+    public static ImPrivateMessageDTO ofFriendUpdate(Long userId, Long friendUserId) {
         return new ImPrivateMessageDTO()
                 .setType(ImMessageTypeEnum.FRIEND_UPDATE.getType())
                 .setSenderId(userId).setReceiverId(friendUserId)
-                .setContent(JsonUtils.toJsonString(content)).setSendTime(LocalDateTime.now());
+                .setSendTime(LocalDateTime.now());
     }
 
 }
