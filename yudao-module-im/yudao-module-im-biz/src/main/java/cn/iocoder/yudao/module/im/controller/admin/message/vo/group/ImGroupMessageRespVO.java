@@ -46,4 +46,7 @@ public class ImGroupMessageRespVO {
     @Schema(description = "回执状态", example = "0")
     private Integer receiptStatus;
 
+    @Schema(description = "已读人数（回执消息、且发送人为当前用户时有值）", example = "3")
+    private Integer readCount;
+
 }

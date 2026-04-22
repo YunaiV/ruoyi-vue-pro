@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.websocket;
+package cn.iocoder.yudao.module.im.service.websocket.dto;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;

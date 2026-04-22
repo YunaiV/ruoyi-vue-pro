@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.dal.dataobject.message.content;
+package cn.iocoder.yudao.module.im.service.websocket.dto.message;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

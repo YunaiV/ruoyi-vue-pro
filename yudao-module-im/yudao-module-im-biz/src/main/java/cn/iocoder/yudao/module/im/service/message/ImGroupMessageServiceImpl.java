@@ -6,15 +6,13 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
-import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
+import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
@@ -23,7 +21,8 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.im.websocket.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -69,7 +68,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     private ImSensitiveWordService sensitiveWordService;
 
     @Resource
-    private WebSocketMessageSender webSocketMessageSender;
+    private ImWebSocketService imWebSocketService;
 
     @Override
     public ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO) {
@@ -98,7 +97,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         groupMessageMapper.insert(message);
 
         // 3. WebSocket 推送给群成员（异步）
-        getSelf().sendGroupMessageEvent(message);
+        sendGroupMessageEvent(message);
         return message;
     }
 
@@ -161,7 +160,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
             // 4. 按本轮消息最大 id 推进内部游标，跳过这段不可见区间；若游标未前进则直接停止
             Long maxMessageId = getMaxValue(messages, ImGroupMessageDO::getId);
-            if (maxMessageId <= activeMinId) {
+            if (maxMessageId == null || maxMessageId <= activeMinId) {
                 return Collections.emptyList();
             }
             activeMinId = maxMessageId;
@@ -314,7 +313,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         groupMessageMapper.insert(recallMessage);
 
         // 4. 异步推送撤回提示消息（前端据此更新原消息状态 + 插入撤回提示）
-        getSelf().sendGroupMessageEvent(recallMessage);
+        sendGroupMessageEvent(recallMessage);
         return recallMessage;
     }
 
@@ -363,21 +362,12 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     /**
      * 发送群聊消息 WebSocket 事件
      */
-    @Async
     public void sendGroupMessageEvent(ImGroupMessageDO message) {
         ImGroupMessageDTO dto = ImGroupMessageDTO.ofSend(message);
-        // 广播给群内有效成员（含发送方自己，支持多端同步）
+        // 广播给群内有效成员中的可见用户（含发送方自己，支持多端同步；定向消息自动过滤）
         List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(message.getGroupId());
-        // 定向消息仍需过滤，非目标用户不应收到推送
-        List<Long> receiverList = message.getReceiverUserIds();
-        for (ImGroupMemberDO member : members) {
-            if (CollUtil.isNotEmpty(receiverList) && !receiverList.contains(member.getUserId())
-                    && ObjUtil.notEqual(member.getUserId(), message.getSenderId())) {
-                continue;
-            }
-            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), member.getUserId(),
-                    ImGroupMessageDTO.TYPE, dto);
-        }
+        Set<Long> targetUserIds = getVisibleUserIds(message, members);
+        imWebSocketService.sendGroupMessageAsync(targetUserIds, dto);
     }
 
     /**
@@ -389,11 +379,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
      * @param newMaxMessageId   本次已读位置
      */
     @Async
+    @SuppressWarnings("DataFlowIssue")
     public void readGroupMessageEvent(Long userId, Long groupId, Long prevMaxMessageId, Long newMaxMessageId) {
         // 1. 发送 READ 事件给自己的其他终端（多端同步）
-        ImGroupMessageDTO readDTO = ImGroupMessageDTO.ofRead(userId, groupId, newMaxMessageId);
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImGroupMessageDTO.TYPE, readDTO);
+        imWebSocketService.sendGroupMessageAsync(userId,
+                ImGroupMessageDTO.ofRead(userId, groupId, newMaxMessageId));
 
         // 2. 刷新 (prevMaxMessageId, newMaxMessageId] 区间内的待回执消息
         List<ImGroupMessageDO> pendingMessages = groupMessageMapper.selectListByGroupIdAndPendingReceipt(
@@ -422,10 +412,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             }
 
             // 2.2 发送 RECEIPT 事件给消息发送方（只有 ta 关心已读进度）
-            ImGroupMessageDTO receiptDTO = ImGroupMessageDTO.ofReceipt(
-                    message.getId(), groupId, readCount, newReceiptStatus);
-            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
-                    ImGroupMessageDTO.TYPE, receiptDTO);
+            imWebSocketService.sendGroupMessageAsync(message.getSenderId(),
+                    ImGroupMessageDTO.ofReceipt(message.getId(), groupId, readCount, newReceiptStatus));
         }
     }
 
@@ -482,6 +470,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         return convertSet(allMembers, ImGroupMemberDO::getUserId,
                 member -> isMessageVisible(msg, member, member.getUserId()));
     }
+
 
     private ImGroupMessageServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());

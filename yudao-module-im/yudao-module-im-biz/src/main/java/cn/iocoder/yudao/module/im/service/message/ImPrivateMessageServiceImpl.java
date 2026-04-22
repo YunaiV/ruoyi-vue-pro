@@ -3,24 +3,21 @@ package cn.iocoder.yudao.module.im.service.message;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
-import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
-import cn.iocoder.yudao.module.im.websocket.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -31,9 +28,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_MAX_PULL_SIZE;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_PRIVATE_PULL_MAX_DAYS;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.MESSAGE_RECALL_TIMEOUT_MINUTES;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
  * IM 私聊消息 Service 实现类
@@ -54,7 +49,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     private ImSensitiveWordService sensitiveWordService;
 
     @Resource
-    private WebSocketMessageSender webSocketMessageSender;
+    private ImWebSocketService imWebSocketService;
 
     @Override
     public ImPrivateMessageDO sendPrivateMessage(Long senderId, ImPrivateMessageSendReqVO reqVO) {
@@ -80,8 +75,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
                 .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now()));
         privateMessageMapper.insert(message);
 
-        // 3. WebSocket 推送给接收方（异步）
-        getSelf().sendPrivateMessageEvent(message);
+        // 3. WebSocket 异步推送（接收方 + 发送方多端同步）
+        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
+        imWebSocketService.sendPrivateMessageAsync(message.getReceiverId(), websocketMessage);
+        imWebSocketService.sendPrivateMessageAsync(message.getSenderId(), websocketMessage);
         return message;
     }
 
@@ -116,7 +113,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
         // 2. 异步发送 READ + RECEIPT 事件（携带已读位置）
         Long maxReadId = CollUtil.max(messageIds);
-        getSelf().readPrivateMessageEvent(userId, receiverId, maxReadId);
+        imWebSocketService.sendPrivateMessageAsync(userId,
+                ImPrivateMessageDTO.ofRead(userId, receiverId, maxReadId));
+        imWebSocketService.sendPrivateMessageAsync(receiverId,
+                ImPrivateMessageDTO.ofReceipt(userId, receiverId, maxReadId));
     }
 
     @Override
@@ -153,43 +153,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         privateMessageMapper.insert(tipMessage);
 
         // 4. 异步推送撤回提示消息（前端据此更新原消息状态 + 插入撤回提示）
-        getSelf().sendPrivateMessageEvent(tipMessage);
+        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(tipMessage);
+        imWebSocketService.sendPrivateMessageAsync(tipMessage.getReceiverId(), websocketMessage);
+        imWebSocketService.sendPrivateMessageAsync(tipMessage.getSenderId(), websocketMessage);
         return tipMessage;
-    }
-
-    /**
-     * 发送私聊消息 WebSocket 事件
-     */
-    @Async
-    public void sendPrivateMessageEvent(ImPrivateMessageDO message) {
-        ImPrivateMessageDTO dto = ImPrivateMessageDTO.ofSend(message);
-        // 推送给接收方
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getReceiverId(),
-                ImPrivateMessageDTO.TYPE, dto);
-
-        // 推送给发送方自己的其他终端（多端同步）
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), message.getSenderId(),
-                ImPrivateMessageDTO.TYPE, dto);
-    }
-
-    /**
-     * 发送已读 + 已读回执 WebSocket 事件
-     *
-     * @param userId     当前用户编号
-     * @param receiverId 对方用户编号
-     * @param maxReadId  已读位置（最大已读消息编号）
-     */
-    @Async
-    public void readPrivateMessageEvent(Long userId, Long receiverId, Long maxReadId) {
-        // 1. 发送 READ 事件给自己的其他终端（多端同步）
-        ImPrivateMessageDTO readDTO = ImPrivateMessageDTO.ofRead(userId, receiverId, maxReadId);
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                ImPrivateMessageDTO.TYPE, readDTO);
-
-        // 2. 发送 RECEIPT 事件给对方（已读回执）
-        ImPrivateMessageDTO receiptDTO = ImPrivateMessageDTO.ofReceipt(userId, receiverId, maxReadId);
-        webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), receiverId,
-                ImPrivateMessageDTO.TYPE, receiptDTO);
     }
 
     @Override
@@ -197,8 +164,19 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         return privateMessageMapper.selectHistoryList(userId, reqVO.getReceiverId(), reqVO.getMaxId(), reqVO.getLimit());
     }
 
-    private ImPrivateMessageServiceImpl getSelf() {
-        return SpringUtil.getBean(getClass());
+    @Override
+    public void sendTipPrivateMessage(Long senderId, Long receiverId, String content) {
+        // 1. 插入 TIP_TEXT 消息
+        ImPrivateMessageDO tipMessage = new ImPrivateMessageDO()
+                .setClientMessageId(IdUtil.fastSimpleUUID()).setSenderId(senderId).setReceiverId(receiverId)
+                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content)
+                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now());
+        privateMessageMapper.insert(tipMessage);
+
+        // 2. 推送给双方
+        ImPrivateMessageDTO dto = ImPrivateMessageDTO.ofSend(tipMessage);
+        imWebSocketService.sendPrivateMessageAsync(receiverId, dto);
+        imWebSocketService.sendPrivateMessageAsync(senderId, dto);
     }
 
 }

@@ -58,4 +58,15 @@ public interface ImPrivateMessageService {
      */
     List<ImPrivateMessageDO> getPrivateMessageList(Long userId, ImPrivateMessageListReqVO reqVO);
 
+    /**
+     * 发送系统提示消息（TIP_TEXT）
+     * <p>
+     * 跳过好友校验、敏感词过滤，用于系统自动生成的提示消息。
+     *
+     * @param senderId   发送人编号
+     * @param receiverId 接收人编号
+     * @param content    提示文本
+     */
+    void sendTipPrivateMessage(Long senderId, Long receiverId, String content);
+
 }
