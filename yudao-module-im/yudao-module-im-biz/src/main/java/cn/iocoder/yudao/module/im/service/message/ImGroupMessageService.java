@@ -69,4 +69,24 @@ public interface ImGroupMessageService {
      */
     List<ImGroupMessageDO> getGroupMessageList(Long userId, ImGroupMessageListReqVO reqVO);
 
+    /**
+     * 清理用户在某群的已读位置缓存
+     * <p>
+     * 用于成员退群场景
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     */
+    void deleteReadMaxMessageId(Long groupId, Long userId);
+
+    /**
+     * 清理某群所有用户的已读位置缓存
+     * <p>
+     * 用于群解散场景
+     *
+     * @param groupId 群编号
+     */
+    void deleteReadMaxMessageIdMap(Long groupId);
+
 }
+

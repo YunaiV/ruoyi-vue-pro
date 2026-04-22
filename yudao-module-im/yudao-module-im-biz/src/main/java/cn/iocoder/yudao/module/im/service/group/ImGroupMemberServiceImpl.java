@@ -73,7 +73,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return imGroupMemberMapper.selectById(id);
     }
 
-
     @Override
     public List<ImGroupMemberDO> getGroupMemberListByGroupId(Long groupId) {
         return imGroupMemberMapper.selectListByGroupId(groupId);

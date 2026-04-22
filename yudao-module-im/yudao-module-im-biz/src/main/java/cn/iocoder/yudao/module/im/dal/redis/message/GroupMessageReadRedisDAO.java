@@ -61,6 +61,27 @@ public class GroupMessageReadRedisDAO {
         return result;
     }
 
+    /**
+     * 删除用户在某群的已读位置
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     */
+    public void deleteReadMaxMessageId(Long groupId, Long userId) {
+        String key = formatKey(groupId);
+        stringRedisTemplate.opsForHash().delete(key, userId.toString());
+    }
+
+    /**
+     * 删除某群所有用户的已读位置（整个 Hash Key）
+     *
+     * @param groupId 群编号
+     */
+    public void deleteReadMaxMessageIdMap(Long groupId) {
+        String key = formatKey(groupId);
+        stringRedisTemplate.delete(key);
+    }
+
     private static String formatKey(Long groupId) {
         return String.format(GROUP_MESSAGE_READ, groupId);
     }

@@ -471,6 +471,15 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 member -> isMessageVisible(msg, member, member.getUserId()));
     }
 
+    @Override
+    public void deleteReadMaxMessageId(Long groupId, Long userId) {
+        groupMessageReadRedisDAO.deleteReadMaxMessageId(groupId, userId);
+    }
+
+    @Override
+    public void deleteReadMaxMessageIdMap(Long groupId) {
+        groupMessageReadRedisDAO.deleteReadMaxMessageIdMap(groupId);
+    }
 
     private ImGroupMessageServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());

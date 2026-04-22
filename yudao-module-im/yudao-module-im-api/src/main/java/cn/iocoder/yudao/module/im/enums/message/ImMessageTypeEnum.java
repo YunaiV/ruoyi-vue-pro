@@ -26,10 +26,14 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     RECEIPT(12, "回执"), // 暂无
     TIP_TEXT(21, "提示文本"), // 对应 TextMessage 类
 
-    RECALL(10, "撤回"),
-    READ(11, "已读"),
-    RECEIPT(12, "回执"),
-    TIP_TEXT(21, "提示文本");
+    // ==================== 非单聊、群聊存储的类型，100 开始 ====================
+
+    FRIEND_ADD(100, "好友添加"), // 暂无
+    FRIEND_DELETE(101, "好友删除"), // 暂无
+    FRIEND_UPDATE(102, "好友更新"), // 对应 FriendUpdateMessage 类
+
+    GROUP_CREATE(200, "群创建"), // 暂无
+    GROUP_UPDATE(201, "群信息变更"); // 暂无
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

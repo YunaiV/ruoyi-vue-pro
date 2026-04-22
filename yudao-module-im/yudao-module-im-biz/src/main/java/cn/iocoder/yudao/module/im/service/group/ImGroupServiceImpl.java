@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import jakarta.annotation.Resource;
@@ -33,7 +34,6 @@ import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
 // TODO @芋艿：群主的调整，暂时不考虑。后续在弄；
-// DONE @AI：groupdo 增加一个缓存；spring cache 实现；
 /**
  * 群 Service 实现类
  *
@@ -49,6 +49,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Resource
     @Lazy // 避免循环依赖
     private ImGroupMemberService groupMemberService;
+    @Resource
+    @Lazy // 避免循环依赖
+    private ImGroupMessageService groupMessageService;
     @Resource
     private ImWebSocketService webSocketService;
 
@@ -125,7 +128,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         updateObj.setDissolvedTime(LocalDateTime.now());
         groupMapper.updateById(updateObj);
 
-        // TODO @AI：清理已读缓存；
+        // 4. 清理已读缓存
+        groupMessageService.deleteReadMaxMessageIdMap(id);
         // TODO @AI：推送群解散的提示；
         // TODO @AI：推送群信息变化；
     }
