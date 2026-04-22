@@ -44,27 +44,46 @@ public class DeepayProductController {
     // ----------------------------------------------------------------
 
     @PostMapping("/deepay/run")
-    @Operation(summary = "完整流水线（keyword → image + price + chainCode）")
-    public CommonResult<Map<String, Object>> run(@Valid @RequestBody KeywordReqVO req) {
+    @Operation(summary = "完整流水线（Phase 8：支持 keyword 或 category/style/crowd 画像参数）")
+    public CommonResult<Map<String, Object>> run(@Valid @RequestBody RunReqVO req) {
         Context ctx = new Context();
-        ctx.keyword = req.getKeyword();
+        ctx.keyword    = req.getKeyword();
+        ctx.customerId = req.getCustomerId();
+        ctx.category   = req.getCategory();
+        ctx.style      = req.getStyle();
+        ctx.crowd      = req.getCrowd();
+        ctx.market     = req.getMarket();
+        ctx.priceLevel = req.getPriceLevel();
+        // 默认 AI 自动选图（无人工干预）
+        ctx.designSelectMode = req.getDesignSelectMode() != null ? req.getDesignSelectMode() : "AI";
+
+        // keyword 与 category 互补
+        if (ctx.keyword == null && ctx.category != null) {
+            ctx.keyword = ctx.category;
+        }
+
         productionOrchestrator.run(ctx);
 
         Map<String, Object> resp = new LinkedHashMap<>();
-        resp.put("chainCode",   ctx.chainCode);
-        resp.put("image",       ctx.selectedImage);
-        resp.put("price",       ctx.price);
-        resp.put("title",       ctx.title);
-        resp.put("stock",       ctx.stock);
-        resp.put("published",   ctx.published);
-        resp.put("productId",   ctx.productId);
-        resp.put("productUrl",  ctx.productUrl);
-        resp.put("paymentId",   ctx.paymentId);
-        resp.put("orderId",     ctx.orderId);
-        resp.put("patternFile", ctx.patternFile);
-        resp.put("techPackUrl", ctx.techPackUrl);
-        resp.put("action",      ctx.action);
-        resp.put("report",      ctx.analyticsReport);
+        resp.put("chainCode",    ctx.chainCode);
+        resp.put("image",        ctx.selectedImage);
+        resp.put("price",        ctx.price);
+        resp.put("title",        ctx.title);
+        resp.put("stock",        ctx.stock);
+        resp.put("published",    ctx.published);
+        resp.put("productId",    ctx.productId);
+        resp.put("productUrl",   ctx.productUrl);
+        resp.put("paymentId",    ctx.paymentId);
+        resp.put("orderId",      ctx.orderId);
+        resp.put("patternFile",  ctx.patternFile);
+        resp.put("techPackUrl",  ctx.techPackUrl);
+        resp.put("action",       ctx.action);
+        resp.put("report",       ctx.analyticsReport);
+        // Phase 6-7
+        resp.put("pendingQuestion",  ctx.pendingQuestion);
+        resp.put("pendingField",     ctx.pendingField);
+        resp.put("selectionImages",  ctx.selectionImages);
+        resp.put("styleCombos",      ctx.styleCombos);
         return success(resp);
     }
 
@@ -73,14 +92,20 @@ public class DeepayProductController {
     // ----------------------------------------------------------------
 
     @PostMapping("/deepay/trend")
-    @Operation(summary = "TrendAgent：根据关键词返回爆款参考图列表")
-    public CommonResult<Map<String, Object>> trend(@Valid @RequestBody KeywordReqVO req) {
+    @Operation(summary = "TrendAgent：根据关键词 / 画像返回爆款参考图列表")
+    public CommonResult<Map<String, Object>> trend(@Valid @RequestBody RunReqVO req) {
         Context ctx = new Context();
-        ctx.keyword = req.getKeyword();
+        ctx.keyword  = req.getKeyword();
+        ctx.category = req.getCategory();
+        ctx.style    = req.getStyle();
+        ctx.crowd    = req.getCrowd();
+        if (ctx.keyword == null && ctx.category != null) ctx.keyword = ctx.category;
         trendAgent.run(ctx);
 
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("keyword",         ctx.keyword);
+        resp.put("category",        ctx.category);
+        resp.put("trendImages",     ctx.trendImages);
         resp.put("referenceImages", ctx.referenceImages);
         return success(resp);
     }
@@ -105,6 +130,35 @@ public class DeepayProductController {
     // ----------------------------------------------------------------
     // Request VOs
     // ----------------------------------------------------------------
+
+    /** Phase 8 完整流水线请求（keyword 或 category/style/crowd 任填其一） */
+    public static class RunReqVO {
+        private String keyword;          // 关键词（可选，与 category 二选一）
+        private Long   customerId;       // 客户 ID（有则加载画像）
+        private String category;         // 品类（可选）
+        private String style;            // 风格（可选）
+        private String crowd;            // 客群（可选）
+        private String market;           // 市场（可选）
+        private String priceLevel;       // 价位（可选）
+        private String designSelectMode; // HUMAN/AI（默认 AI）
+
+        public String getKeyword()           { return keyword; }
+        public void   setKeyword(String v)           { this.keyword = v; }
+        public Long   getCustomerId()        { return customerId; }
+        public void   setCustomerId(Long v)          { this.customerId = v; }
+        public String getCategory()          { return category; }
+        public void   setCategory(String v)          { this.category = v; }
+        public String getStyle()             { return style; }
+        public void   setStyle(String v)             { this.style = v; }
+        public String getCrowd()             { return crowd; }
+        public void   setCrowd(String v)             { this.crowd = v; }
+        public String getMarket()            { return market; }
+        public void   setMarket(String v)            { this.market = v; }
+        public String getPriceLevel()        { return priceLevel; }
+        public void   setPriceLevel(String v)        { this.priceLevel = v; }
+        public String getDesignSelectMode()  { return designSelectMode; }
+        public void   setDesignSelectMode(String v)  { this.designSelectMode = v; }
+    }
 
     public static class KeywordReqVO {
         @NotBlank(message = "keyword 不能为空")

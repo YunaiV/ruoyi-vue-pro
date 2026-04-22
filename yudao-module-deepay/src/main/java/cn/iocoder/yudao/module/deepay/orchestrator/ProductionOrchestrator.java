@@ -63,12 +63,18 @@ public class ProductionOrchestrator {
     // ---- Phase 6 — 记忆 + 问答 + 选择 ----
     /** 用户画像加载（对应 spec 的 customerProfileAgent） */
     @Resource private MemoryAgent             customerProfileAgent;
-    /** 问答决策树（对应 spec 的 questionAgent） */
+    /** 旧版问答决策树（向后兼容） */
     @Resource private SmartQuestionAgent      questionAgent;
+    /** Phase 6-7 五问引导（新版，category + crowd + style + market + priceLevel） */
+    @Resource private QADecisionAgent         qaDecisionAgent;
     /** 用户选图记录（越用越准） */
     @Resource private SelectionAgent          selectionAgent;
     /** 二次品类防错过滤 */
     @Resource private CategoryFilterAgent     categoryFilterAgent;
+    /** Phase 8：AI 生成图质量过滤（清晰度 + 品类一致性） */
+    @Resource private DesignFilterAgent       designFilterAgent;
+    /** Phase 8：设计图选择（HUMAN=人工 / AI=自动）*/
+    @Resource private DesignSelectAgent       designSelectAgent;
 
     // ---- 核心 Agent ----
     @Resource private ChainAgent              chainAgent;
@@ -111,15 +117,24 @@ public class ProductionOrchestrator {
         ctx = customerProfileAgent.run(ctx);
 
         // ---- 3. 问答决策树（缺字段 → 中断，等待用户回答）⏸ ----
-        if (SmartQuestionAgent.needsQuestionnaire(ctx)) {
-            ctx = questionAgent.run(ctx);
+        boolean useNewQA = ctx.customerId != null && QADecisionAgent.needsQA(ctx);
+        if (useNewQA) {
+            // Phase 6-7：五问引导（customerId 存在时优先）
+            ctx = qaDecisionAgent.run(ctx);
             if (StringUtils.hasText(ctx.pendingQuestion)) {
-                log.info("[Orchestrator] ⏸ 等待用户回答 pendingQuestion={}", ctx.pendingQuestion);
-                // 保存已填充的部分答案，下次跳过已回答字段
+                log.info("[Orchestrator] ⏸ 等待用户回答(QA) pendingQuestion={}", ctx.pendingQuestion);
                 customerProfileAgent.save(ctx);
                 return ctx;
             }
-            // 全部字段填齐，回写画像
+            customerProfileAgent.save(ctx);
+        } else if (SmartQuestionAgent.needsQuestionnaire(ctx)) {
+            // 向后兼容旧版问卷（无 customerId 时）
+            ctx = questionAgent.run(ctx);
+            if (StringUtils.hasText(ctx.pendingQuestion)) {
+                log.info("[Orchestrator] ⏸ 等待用户回答 pendingQuestion={}", ctx.pendingQuestion);
+                customerProfileAgent.save(ctx);
+                return ctx;
+            }
             customerProfileAgent.save(ctx);
         }
 
@@ -209,9 +224,16 @@ public class ProductionOrchestrator {
 
     private Context executeDesignIteration(Context ctx) {
         try {
-            ctx = designAgent.run(ctx);
+            ctx = designAgent.run(ctx);                // Phase 8 Step 1：生成 3~6 张图
             ctx = syncDesignImagesToCdn(ctx);
-            ctx = categoryFilterAgent.run(ctx);   // 二次品类防错
+            ctx = designFilterAgent.run(ctx);          // Phase 8 Step 2：过滤垃圾图
+            ctx = categoryFilterAgent.run(ctx);        // 二次品类防错
+            ctx = designSelectAgent.run(ctx);          // Phase 8 Step 3：选图（AI 默认/HUMAN 可选）
+            // 若人工选图模式，pendingQuestion 已设置，外层感知后返回
+            if (StringUtils.hasText(ctx.pendingQuestion)
+                    && "selectedImage".equals(ctx.pendingField)) {
+                return ctx;
+            }
         } catch (Exception e) {
             log.error("[Orchestrator] DesignAgent 失败，登记重试 chainCode={}", ctx.chainCode, e);
             retryScheduler.register(ctx.chainCode, "AI_DESIGN", e.getMessage());

@@ -74,6 +74,7 @@ public class CustomerProfileAgent implements Agent {
         // 只在 ctx 字段为空时填充（保留调用方显式传入的值）
         if (!StringUtils.hasText(ctx.category))   ctx.category   = profile.getCategoryLevel1();
         if (!StringUtils.hasText(ctx.style))       ctx.style      = extractPrimaryStyle(profile.getStyleWeights());
+        if (!StringUtils.hasText(ctx.crowd))       ctx.crowd      = profile.getCrowd();
         if (!StringUtils.hasText(ctx.market))      ctx.market     = profile.getMarket();
         if (!StringUtils.hasText(ctx.priceLevel))  ctx.priceLevel = profile.getPriceLevel();
         if (!StringUtils.hasText(ctx.targetAge))   ctx.targetAge  = profile.getTargetAge();
@@ -85,8 +86,8 @@ public class CustomerProfileAgent implements Agent {
             ctx.keyword = profile.getCategoryLevel1();
         }
 
-        log.info("[CustomerProfileAgent] 画像加载完成 customerId={} category={} style={} confidence={}",
-                customerId, ctx.category, ctx.style, ctx.confidenceScore);
+        log.info("[CustomerProfileAgent] 画像加载完成 customerId={} category={} crowd={} style={} confidence={}",
+                customerId, ctx.category, ctx.crowd, ctx.style, ctx.confidenceScore);
         return ctx;
     }
 
@@ -119,6 +120,7 @@ public class CustomerProfileAgent implements Agent {
         if (StringUtils.hasText(ctx.style)) {
             profile.setStyleWeights(mergeStyleWeight(profile.getStyleWeights(), ctx.style, 0.1));
         }
+        if (StringUtils.hasText(ctx.crowd))       profile.setCrowd(ctx.crowd);
         if (StringUtils.hasText(ctx.market))      profile.setMarket(ctx.market);
         if (StringUtils.hasText(ctx.priceLevel))  profile.setPriceLevel(ctx.priceLevel);
         if (StringUtils.hasText(ctx.targetAge))   profile.setTargetAge(ctx.targetAge);

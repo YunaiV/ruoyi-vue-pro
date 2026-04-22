@@ -116,6 +116,11 @@ public class Context {
     public String category;
     /** 主风格标签（SEXY / CASUAL / SPORT / MINIMAL / LUXURY / minimalist 等） */
     public String style;
+    /**
+     * 目标客群：男装 / 少女 / 中老年 / 运动。
+     * QADecisionAgent 填充，CustomerProfileAgent 持久化。
+     */
+    public String crowd;
     /** 风格权重 Map（key=风格名, value=0~1 权重），由 MemoryAgent / PreferenceLearningAgent 维护 */
     public java.util.Map<String, Double> styleWeights;
     /**
@@ -134,17 +139,33 @@ public class Context {
     /** 客户画像置信度（0~1），低于 0.6 时触发 SmartQuestionAgent */
     public java.math.BigDecimal confidenceScore;
     /**
-     * 当前待回答问题（SmartQuestionAgent 决策树输出）。
+     * 当前待回答问题（SmartQuestionAgent / QADecisionAgent 决策树输出）。
      * 非 null 表示流程"暂停等待用户输入"，Orchestrator 收到后立即返回，不继续执行后续 Agent。
      * 调用方在下次请求中把答案填入对应字段，再次调用 Orchestrator 即可继续。
      */
     public String pendingQuestion;
+    /**
+     * 当前待填写的字段名（对应 pendingQuestion 的字段）。
+     * 例如 "category"、"crowd"、"style"、"market"、"priceLevel"。
+     * 前端/客户端据此知道把用户答案填入哪个字段。
+     */
+    public String pendingField;
     /** TrendAgent 输出：结构化趋势商品列表（含 imageUrl / category / style / soldCount） */
     public java.util.List<TrendItem> trendItems;
-    /** TrendSourceAgent 输出：趋势图 URL 列表（来自内部近7天热销） */
+    /** TrendAgent 输出：趋势图 URL 列表（来自 deepay_trend_pool 或内部近7天热销） */
     public java.util.List<String> trendImages;
     /** TrendSourceAgent 输出：趋势关键词 */
     public java.util.List<String> trendKeywords;
+    /**
+     * SelectionFeedAgent 输出：推给设计师的参考图列表（按品类 + 风格 + 客群过滤排序）。
+     * ❗ 这是参考款图片，不是商品。设计师从这里选方向。
+     */
+    public java.util.List<String> selectionImages;
+    /**
+     * StyleEngine.buildCombinations() 输出：10~20 个风格组合方向。
+     * 每个 StyleCombo 包含主风格、副风格、参考品牌和完整 Prompt。
+     */
+    public java.util.List<StyleCombo> styleCombos;
 
     // ===== 向后兼容（ChainOrchestrator）=====
     /** @deprecated 使用 keyword */
@@ -155,6 +176,12 @@ public class Context {
     @Deprecated public String imaKbId;
     /** @deprecated */
     @Deprecated public String iban;
+
+    // ===== Phase 8 设计落地 =====
+    /**
+     * DesignSelectAgent 模式：HUMAN=人工选图 / AI=自动选图（默认 AI）。
+     */
+    public String designSelectMode;
 
 }
 
