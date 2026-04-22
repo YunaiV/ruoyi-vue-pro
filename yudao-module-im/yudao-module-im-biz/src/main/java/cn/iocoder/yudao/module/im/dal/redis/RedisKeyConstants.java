@@ -15,4 +15,12 @@ public interface RedisKeyConstants {
      */
     String GROUP_MESSAGE_READ = "im:group:message:read:%s";
 
+    /**
+     * 好友关系是否存在的缓存
+     * <p>
+     * KEY 格式：friend:{userId}_{friendUserId}
+     * VALUE 数据类型：Boolean
+     */
+    String FRIEND = "friend";
+
 }

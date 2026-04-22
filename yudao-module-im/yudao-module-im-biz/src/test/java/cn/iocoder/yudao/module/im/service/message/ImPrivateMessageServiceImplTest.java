@@ -81,7 +81,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
             assertNotNull(result.getSendTime());
 
             // 验证调用
-            verify(imFriendService).validateFriendExists(1L, 2L);
+            verify(imFriendService).isFriend(1L, 2L);
             verify(imSensitiveWordService).validateText(reqVO.getContent());
             verify(imPrivateMessageMapper).insert(any(ImPrivateMessageDO.class));
             verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
@@ -114,8 +114,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
         when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(null);
-        doThrow(new ServiceException(FRIEND_NOT_FRIEND))
-                .when(imFriendService).validateFriendExists(1L, 2L);
+        when(imFriendService.isFriend(1L, 2L)).thenReturn(false);
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,

@@ -1,27 +1,24 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_ADD_SELF;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
+import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
 /**
  * IM 好友关系 Service 实现类
@@ -39,40 +36,19 @@ public class ImFriendServiceImpl implements ImFriendService {
     private AdminUserApi adminUserApi;
 
     @Override
-    public void validateFriendExists(Long userId, Long friendUserId) {
+    @Cacheable(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId", unless = "#result == null")
+    public boolean isFriend(Long userId, Long friendUserId) {
         ImFriendDO friend = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
-        if (friend == null || CommonStatusEnum.isDisable(friend.getStatus())) {
-            throw exception(FRIEND_NOT_FRIEND);
-        }
-    }
-
-    // TODO @AI：这里只负责返回 List<ImFriendDO>；VO 组装在 controller 搞；
-    // TODO @AI：方法改成 getEnabledFriendList 之类的，明确只返回未删除的好友；如果需要展示已删除的好友，提供一个 getAllFriendList 之类的方法。
-    @Override
-    public List<ImFriendRespVO> getMyFriendList(Long userId) {
-        List<ImFriendDO> friends = imFriendMapper.selectListByUserId(userId);
-        if (friends.isEmpty()) {
-            return Collections.emptyList();
-        }
-        // 批量聚合 AdminUser 信息（昵称 / 头像），避免 N+1
-        List<Long> friendUserIds = CollectionUtils.convertList(friends, ImFriendDO::getFriendUserId);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(friendUserIds);
-        return CollectionUtils.convertList(friends, f -> buildRespVO(f, userMap.get(f.getFriendUserId())));
-    }
-
-    // TODO @AI：这里只负责返回 ImFriendDO；
-    @Override
-    public ImFriendRespVO getFriend(Long userId, Long friendUserId) {
-        ImFriendDO friend = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
-        if (friend == null) {
-            throw exception(FRIEND_NOT_FRIEND);
-        }
-        AdminUserRespDTO user = adminUserApi.getUser(friendUserId);
-        return buildRespVO(friend, user);
+        return friend != null && CommonStatusEnum.isEnable(friend.getStatus());
     }
 
     @Override
-    public ImFriendDO getFriendDO(Long userId, Long friendUserId) {
+    public List<ImFriendDO> getFriendList(Long userId) {
+        return imFriendMapper.selectListByUserId(userId);
+    }
+
+    @Override
+    public ImFriendDO getFriend(Long userId, Long friendUserId) {
         return imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
     }
 
@@ -83,6 +59,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         if (friend == null) {
             throw exception(FRIEND_NOT_FRIEND);
         }
+
         // 2. 更新好友属性（目前仅免打扰）
         ImFriendDO updateObj = new ImFriendDO();
         updateObj.setId(friend.getId());
@@ -131,8 +108,8 @@ public class ImFriendServiceImpl implements ImFriendService {
      * - 已存在且 ENABLE：无需重复操作
      * - 已存在但 DISABLE：恢复关系（status=ENABLE，刷新 addTime，清空 deleteTime）
      */
-    // TODO @AI：spring cache；参考别的模块的写法；
-    private void bindFriend(Long userId, Long friendUserId) {
+    @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
+    public void bindFriend(Long userId, Long friendUserId) {
         ImFriendDO exists = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (exists != null) {
             if (CommonStatusEnum.isEnable(exists.getStatus())) {
@@ -161,7 +138,8 @@ public class ImFriendServiceImpl implements ImFriendService {
     /**
      * 单向解除好友关系（status 设为 DISABLE，记录 deleteTime）
      */
-    private void unbindFriend(Long userId, Long friendUserId) {
+    @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
+    public void unbindFriend(Long userId, Long friendUserId) {
         ImFriendDO exists = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (exists == null || CommonStatusEnum.isDisable(exists.getStatus())) {
             return;
@@ -171,24 +149,6 @@ public class ImFriendServiceImpl implements ImFriendService {
         updateObj.setStatus(CommonStatusEnum.DISABLE.getStatus());
         updateObj.setDeleteTime(LocalDateTime.now());
         imFriendMapper.updateById(updateObj);
-    }
-
-    /**
-     * 聚合 ImFriendDO + AdminUser 构造响应 VO
-     */
-    private ImFriendRespVO buildRespVO(ImFriendDO friend, AdminUserRespDTO user) {
-        ImFriendRespVO vo = new ImFriendRespVO();
-        vo.setId(friend.getId());
-        vo.setFriendUserId(friend.getFriendUserId());
-        vo.setMuted(friend.getMuted());
-        vo.setStatus(friend.getStatus());
-        vo.setAddTime(friend.getAddTime());
-        vo.setDeleteTime(friend.getDeleteTime());
-        if (user != null) {
-            vo.setNickname(user.getNickname());
-            vo.setAvatar(user.getAvatar());
-        }
-        return vo;
     }
 
 }

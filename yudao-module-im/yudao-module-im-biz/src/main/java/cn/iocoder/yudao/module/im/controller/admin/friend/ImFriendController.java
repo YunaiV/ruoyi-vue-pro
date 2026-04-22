@@ -1,9 +1,15 @@
 package cn.iocoder.yudao.module.im.controller.admin.friend;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,9 +19,14 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.singleton;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - IM 好友")
@@ -27,17 +38,22 @@ public class ImFriendController {
     @Resource
     private ImFriendService friendService;
 
+    @Resource
+    private AdminUserApi adminUserApi;
+
     @GetMapping("/list")
     @Operation(summary = "获得当前登录用户的好友列表")
     public CommonResult<List<ImFriendRespVO>> getMyFriendList() {
-        return success(friendService.getMyFriendList(getLoginUserId()));
+        List<ImFriendDO> friends = friendService.getFriendList(getLoginUserId());
+        return success(buildFriendRespVOList(friends));
     }
 
     @GetMapping("/get")
     @Operation(summary = "获得好友详情")
     @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
     public CommonResult<ImFriendRespVO> getFriend(@RequestParam("friendUserId") Long friendUserId) {
-        return success(friendService.getFriend(getLoginUserId(), friendUserId));
+        ImFriendDO friend = friendService.getFriend(getLoginUserId(), friendUserId);
+        return success(buildFriendRespVO(friend));
     }
 
     @PostMapping("/add")
@@ -63,6 +79,30 @@ public class ImFriendController {
     public CommonResult<Boolean> updateFriend(@Valid @RequestBody ImFriendUpdateReqVO reqVO) {
         friendService.updateFriend(getLoginUserId(), reqVO);
         return success(true);
+    }
+
+    // ========== 私有方法：VO 组装 ==========
+
+    private List<ImFriendRespVO> buildFriendRespVOList(Collection<ImFriendDO> friends) {
+        if (CollUtil.isNotEmpty(friends)) {
+            return Collections.emptyList();
+        }
+        // 批量聚合 AdminUser 信息（昵称 / 头像），避免 N+1
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertList(friends, ImFriendDO::getFriendUserId));
+        return convertList(friends, f -> {
+            ImFriendRespVO vo = BeanUtils.toBean(f, ImFriendRespVO.class);
+            MapUtils.findAndThen(userMap, f.getFriendUserId(), user ->
+                    vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
+            return vo;
+        });
+    }
+
+    private ImFriendRespVO buildFriendRespVO(ImFriendDO friend) {
+        if (friend == null) {
+            return null;
+        }
+        return CollUtil.getFirst(buildFriendRespVOList(singleton(friend)));
     }
 
 }

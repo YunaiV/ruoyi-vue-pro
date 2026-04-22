@@ -67,7 +67,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             return existing;
         }
         // 1.2 好友校验
-        friendService.validateFriendExists(senderId, reqVO.getReceiverId());
+        if (!friendService.isFriend(senderId, reqVO.getReceiverId())) {
+            throw exception(FRIEND_NOT_FRIEND);
+        }
         // 1.3 文本消息敏感词过滤
         if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
