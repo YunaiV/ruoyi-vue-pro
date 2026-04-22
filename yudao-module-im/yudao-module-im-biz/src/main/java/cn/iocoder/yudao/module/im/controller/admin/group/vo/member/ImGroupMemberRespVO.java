@@ -39,15 +39,12 @@ public class ImGroupMemberRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
-    // ========== 聚合字段：用户侧接口按需填充（admin CRUD 查询不填） ==========
+    // ========== 关联 AdminUser 的字段 ==========
 
-    @Schema(description = "用户昵称（聚合自 AdminUser，用户侧接口返回）", example = "芋道")
+    @Schema(description = "用户昵称", example = "芋道")
     private String nickname;
 
-    @Schema(description = "用户头像（聚合自 AdminUser，用户侧接口返回）")
+    @Schema(description = "用户头像")
     private String avatar;
-
-    @Schema(description = "展示昵称：优先 displayUserName，回落 nickname", example = "芋道")
-    private String showNickname;
 
 }

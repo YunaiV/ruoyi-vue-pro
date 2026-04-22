@@ -23,4 +23,12 @@ public interface RedisKeyConstants {
      */
     String FRIEND = "friend";
 
+    /**
+     * 群信息缓存
+     * <p>
+     * KEY 格式：group:{groupId}
+     * VALUE 数据类型：ImGroupDO
+     */
+    String GROUP = "group";
+
 }

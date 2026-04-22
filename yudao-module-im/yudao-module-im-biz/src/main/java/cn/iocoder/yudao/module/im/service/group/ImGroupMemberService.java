@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.im.service.group;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
 
@@ -17,26 +16,26 @@ import java.util.List;
 public interface ImGroupMemberService {
 
     /**
-     * 创建群成员
+     * 邀请用户加入群
      *
-     * @param createReqVO 创建信息
+     * @param inviteReqVO 邀请信息
      * @return 编号
      */
-    Long createGroupMember(@Valid ImGroupMemberSaveReqVO createReqVO);
+    Long inviteGroupMember(@Valid ImGroupMemberInviteReqVO inviteReqVO);
 
     /**
-     * 更新群成员
+     * 更新群成员信息
      *
      * @param updateReqVO 更新信息
      */
-    void updateGroupMember(@Valid ImGroupMemberSaveReqVO updateReqVO);
+    void updateGroupMember(@Valid ImGroupMemberUpdateReqVO updateReqVO);
 
     /**
      * 删除群成员
      *
      * @param id 编号
      */
-    void deleteGroupMember(Long id);
+    void removeGroupMember(Long id);
 
     /**
      * 获得群成员
@@ -46,13 +45,6 @@ public interface ImGroupMemberService {
      */
     ImGroupMemberDO getGroupMember(Long id);
 
-    /**
-     * 获得群成员分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 群成员分页
-     */
-    PageResult<ImGroupMemberDO> getGroupMemberPage(ImGroupMemberPageReqVO pageReqVO);
 
     /**
      * 根据群组 id 查询群成员（包含所有状态）
@@ -105,6 +97,18 @@ public interface ImGroupMemberService {
     List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime);
 
     /**
+     * 添加群成员（入群）
+     * <p>
+     * 插入一条 ENABLE 状态的群成员记录，并设置 joinTime。
+     * 可用于创建群时添加群主、邀请入群等场景。
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     * @return 群成员记录
+     */
+    ImGroupMemberDO addGroupMember(Long groupId, Long userId);
+
+    /**
      * 校验用户是否为群的有效成员
      *
      * @param groupId 群编号
@@ -112,4 +116,18 @@ public interface ImGroupMemberService {
      * @return 群成员记录
      */
     ImGroupMemberDO validateMemberInGroup(Long groupId, Long userId);
+
+    /**
+     * 更新群成员的展示信息（群内昵称、群名备注）
+     * <p>
+     * 内部会校验用户是否为群的有效成员
+     *
+     * @param groupId          群编号
+     * @param userId           用户编号
+     * @param displayUserName  群内昵称（null 则不更新）
+     * @param displayGroupName 群名备注（null 则不更新）
+     */
+    void updateGroupMember(Long groupId, Long userId,
+                           String displayUserName, String displayGroupName);
+
 }

@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.im.controller.admin.group;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -20,11 +19,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - 群成员")
 @RestController
@@ -38,32 +37,27 @@ public class ImGroupMemberController {
     @Resource
     private AdminUserApi adminUserApi;
 
-    // TODO @AI：add 加人；
-    @PostMapping("/create")
-    @Operation(summary = "创建群成员")
+    @PostMapping("/invite")
+    @Operation(summary = "邀请用户加入群")
     @PreAuthorize("@ss.hasPermission('im:group-member:create')")
-    public CommonResult<Long> createGroupMember(@Valid @RequestBody ImGroupMemberSaveReqVO createReqVO) {
-        return success(imGroupMemberService.createGroupMember(createReqVO));
+    public CommonResult<Long> inviteGroupMember(@Valid @RequestBody ImGroupMemberInviteReqVO inviteReqVO) {
+        return success(imGroupMemberService.inviteGroupMember(inviteReqVO));
     }
-
-    // TODO @AI：踢人；
-
-    // TODO @AI：退群；放在这里；避免 group 里面逻辑太多；
 
     @PutMapping("/update")
     @Operation(summary = "更新群成员")
     @PreAuthorize("@ss.hasPermission('im:group-member:update')")
-    public CommonResult<Boolean> updateGroupMember(@Valid @RequestBody ImGroupMemberSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updateGroupMember(@Valid @RequestBody ImGroupMemberUpdateReqVO updateReqVO) {
         imGroupMemberService.updateGroupMember(updateReqVO);
         return success(true);
     }
 
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除群成员")
-    @Parameter(name = "id", description = "编号", required = true)
+    @DeleteMapping("/remove")
+    @Operation(summary = "移除群成员（踢人）")
+    @Parameter(name = "id", description = "群成员编号", required = true)
     @PreAuthorize("@ss.hasPermission('im:group-member:delete')")
-    public CommonResult<Boolean> deleteGroupMember(@RequestParam("id") Long id) {
-        imGroupMemberService.deleteGroupMember(id);
+    public CommonResult<Boolean> removeGroupMember(@RequestParam("id") Long id) {
+        imGroupMemberService.removeGroupMember(id);
         return success(true);
     }
 
@@ -76,45 +70,20 @@ public class ImGroupMemberController {
         return success(BeanUtils.toBean(groupMember, ImGroupMemberRespVO.class));
     }
 
-    @GetMapping("/page")
-    @Operation(summary = "获得群成员分页")
-    @PreAuthorize("@ss.hasPermission('im:group-member:query')")
-    public CommonResult<PageResult<ImGroupMemberRespVO>> getGroupMemberPage(@Valid ImGroupMemberPageReqVO pageReqVO) {
-        PageResult<ImGroupMemberDO> pageResult = imGroupMemberService.getGroupMemberPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, ImGroupMemberRespVO.class));
-    }
-
-    // ========== 用户侧接口（登录用户自己看群成员，无需后台权限） ==========
-
     @GetMapping("/list")
     @Operation(summary = "获得指定群的成员列表")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1024")
     public CommonResult<List<ImGroupMemberRespVO>> getGroupMemberList(@RequestParam("groupId") Long groupId) {
         List<ImGroupMemberDO> members = imGroupMemberService.getGroupMemberListByGroupId(groupId);
-        if (members.isEmpty()) {
-            return success(Collections.emptyList());
-        }
-        // 聚合 AdminUser 的昵称 + 头像
-        List<Long> userIds = CollectionUtils.convertList(members, ImGroupMemberDO::getUserId);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        return success(CollectionUtils.convertList(members, m -> {
+        // 批量聚合 AdminUser 信息（昵称 / 头像）
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertList(members, ImGroupMemberDO::getUserId));
+        return success(convertList(members, m -> {
             ImGroupMemberRespVO vo = BeanUtils.toBean(m, ImGroupMemberRespVO.class);
-            AdminUserRespDTO user = userMap.get(m.getUserId());
-            if (user != null) {
-                vo.setNickname(user.getNickname());
-                vo.setAvatar(user.getAvatar());
-            }
-            // showNickname 回落：优先群内备注 displayUserName，否则用用户昵称
-            if (m.getDisplayUserName() != null && !m.getDisplayUserName().isEmpty()) {
-                vo.setShowNickname(m.getDisplayUserName());
-            } else if (user != null) {
-                vo.setShowNickname(user.getNickname());
-            }
+            MapUtils.findAndThen(userMap, m.getUserId(), user ->
+                    vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
             return vo;
         }));
     }
-
-    // TODO @芋艿：【对齐】/group/members/remove 批量踢人接口第一期未实现。
-    //  需要：校验群主权限、批量更新 im_group_member 为 DISABLE + 设置 quitTime、通过 WebSocket 推送给被踢成员。
 
 }

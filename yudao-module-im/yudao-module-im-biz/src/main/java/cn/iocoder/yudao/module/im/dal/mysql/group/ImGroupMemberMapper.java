@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.im.dal.mysql.group;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,15 +16,6 @@ import java.util.List;
  */
 @Mapper
 public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
-
-    default PageResult<ImGroupMemberDO> selectPage(ImGroupMemberPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<ImGroupMemberDO>()
-                .eqIfPresent(ImGroupMemberDO::getGroupId, reqVO.getGroupId())
-                .eqIfPresent(ImGroupMemberDO::getUserId, reqVO.getUserId())
-                .eqIfPresent(ImGroupMemberDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(ImGroupMemberDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(ImGroupMemberDO::getId));
-    }
 
     default List<ImGroupMemberDO> selectListByGroupId(Long groupId) {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>().eq(ImGroupMemberDO::getGroupId, groupId));
@@ -42,18 +31,16 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>().eq(ImGroupMemberDO::getUserId, userId));
     }
 
-    // TODO @AI：selectListByXXX；enabled 传入进来
-    default List<ImGroupMemberDO> selectEnabledListByGroupId(Long groupId) {
+    default List<ImGroupMemberDO> selectListByGroupIdAndStatus(Long groupId, Integer status) {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eq(ImGroupMemberDO::getGroupId, groupId)
-                .eq(ImGroupMemberDO::getStatus, CommonStatusEnum.ENABLE.getStatus()));
+                .eq(ImGroupMemberDO::getStatus, status));
     }
 
-    // TODO @AI：selectListByXXX；enabled 传入进来
-    default List<ImGroupMemberDO> selectEnabledListByUserId(Long userId) {
+    default List<ImGroupMemberDO> selectListByUserIdAndStatus(Long userId, Integer status) {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eq(ImGroupMemberDO::getUserId, userId)
-                .eq(ImGroupMemberDO::getStatus, CommonStatusEnum.ENABLE.getStatus()));
+                .eq(ImGroupMemberDO::getStatus, status));
     }
 
     /**

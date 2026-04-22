@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.im.service.group;
 
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -16,25 +16,33 @@ public interface ImGroupService {
 
     /**
      * 创建群
+     * <p>
+     * 同时将当前登录用户设置为群主，并插入群主的群成员记录
      *
      * @param createReqVO 创建信息
-     * @return 编号
+     * @param userId      当前登录用户编号（群主）
+     * @return 创建后的群信息
      */
-    Long createGroup(@Valid ImGroupSaveReqVO createReqVO);
+    ImGroupDO createGroup(@Valid ImGroupCreateReqVO createReqVO, Long userId);
 
     /**
-     * 更新群
+     * 更新群信息
      *
      * @param updateReqVO 更新信息
+     * @param userId      当前登录用户编号
+     * @return 更新后的群信息
      */
-    void updateGroup(@Valid ImGroupSaveReqVO updateReqVO);
+    ImGroupDO updateGroup(@Valid ImGroupUpdateReqVO updateReqVO, Long userId);
 
     /**
-     * 删除群
+     * 解散群
+     * <p>
+     * 仅群主可执行
      *
-     * @param id 编号
+     * @param id     群编号
+     * @param userId 当前登录用户编号
      */
-    void deleteGroup(Long id);
+    void dissolveGroup(Long id, Long userId);
 
     /**
      * 获得群
@@ -43,14 +51,6 @@ public interface ImGroupService {
      * @return 群
      */
     ImGroupDO getGroup(Long id);
-
-    /**
-     * 获得群分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 群分页
-     */
-    PageResult<ImGroupDO> getGroupPage(ImGroupPageReqVO pageReqVO);
 
     /**
      * 校验群存在且未封禁、未解散
@@ -68,6 +68,6 @@ public interface ImGroupService {
      * @param userId 用户编号
      * @return 群列表
      */
-    List<ImGroupDO> getMyGroupList(Long userId);
+    List<ImGroupDO> getActiveGroupList(Long userId);
 
 }

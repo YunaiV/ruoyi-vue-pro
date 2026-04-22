@@ -1,0 +1,15 @@
+package cn.iocoder.yudao.module.im.controller.admin.group.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Schema(description = "管理后台 - 群创建 Request VO")
+@Data
+public class ImGroupCreateReqVO {
+
+    @Schema(description = "群名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道技术交流群")
+    @NotBlank(message = "群名称不能为空")
+    private String name;
+
+}

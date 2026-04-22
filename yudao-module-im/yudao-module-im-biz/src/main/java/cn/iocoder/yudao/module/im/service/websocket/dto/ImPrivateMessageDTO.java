@@ -102,6 +102,8 @@ public class ImPrivateMessageDTO {
                 .setSenderId(senderId).setReceiverId(receiverId);
     }
 
+    // ==================== 好友变更相关 ====================
+
     /**
      * 构建好友添加推送 DTO（通知对方"你有一位新好友"）
      *
@@ -129,6 +131,7 @@ public class ImPrivateMessageDTO {
                 .setSenderId(userId).setReceiverId(friendUserId)
                 .setSendTime(LocalDateTime.now());
     }
+
     /**
      * 构建好友更新推送 DTO（通知自己多端同步好友属性变更）
      *

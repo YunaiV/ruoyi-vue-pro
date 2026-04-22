@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.group;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -58,11 +59,13 @@ public class ImGroupDO extends BaseDO {
      * 封禁时间
      */
     private LocalDateTime bannedTime;
-    // TODO @AI：status 字段，枚举 CommonStatusEnum，表示正常 / 解散；如果是解散状态，则不允许任何操作了。
     /**
-     * 是否解散
+     * 群状态
+     * <p>
+     * 枚举 {@link CommonStatusEnum}
+     * ENABLE = 正常，DISABLE = 已解散
      */
-    private Boolean dissolved;
+    private Integer status;
     /**
      * 解散时间
      */

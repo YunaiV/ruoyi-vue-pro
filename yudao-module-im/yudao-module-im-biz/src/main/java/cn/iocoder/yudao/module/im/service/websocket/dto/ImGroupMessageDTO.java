@@ -116,4 +116,34 @@ public class ImGroupMessageDTO {
                 .setGroupId(groupId).setReadCount(readCount).setReceiptStatus(receiptStatus);
     }
 
+    // ==================== 群变更相关 ====================
+
+    /**
+     * 构建群创建推送 DTO（通知群成员"有一个新群"）
+     *
+     * @param senderId 创建者（群主）用户编号
+     * @param groupId  群编号
+     * @return 群聊 DTO
+     */
+    public static ImGroupMessageDTO ofGroupCreate(Long senderId, Long groupId) {
+        return new ImGroupMessageDTO()
+                .setType(ImMessageTypeEnum.GROUP_CREATE.getType())
+                .setSenderId(senderId).setGroupId(groupId)
+                .setSendTime(LocalDateTime.now());
+    }
+
+    /**
+     * 构建群信息变更推送 DTO（通知所有群成员"群信息变了"）
+     *
+     * @param senderId 操作者用户编号
+     * @param groupId  群编号
+     * @return 群聊 DTO
+     */
+    public static ImGroupMessageDTO ofGroupUpdate(Long senderId, Long groupId) {
+        return new ImGroupMessageDTO()
+                .setType(ImMessageTypeEnum.GROUP_UPDATE.getType())
+                .setSenderId(senderId).setGroupId(groupId)
+                .setSendTime(LocalDateTime.now());
+    }
+
 }

@@ -29,6 +29,7 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");
     ErrorCode GROUP_BANNED = new ErrorCode(1_040_400_001, "群已被封禁");
     ErrorCode GROUP_DISSOLVED = new ErrorCode(1_040_400_002, "群已解散");
+    ErrorCode GROUP_NOT_OWNER = new ErrorCode(1_040_400_003, "仅群主可执行该操作");
 
     // ========== 群成员 (1-040-500-000) ==========
     ErrorCode GROUP_MEMBER_NOT_EXISTS = new ErrorCode(1_040_500_000, "群成员不存在");

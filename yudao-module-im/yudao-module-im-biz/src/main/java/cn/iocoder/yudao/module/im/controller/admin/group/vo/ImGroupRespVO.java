@@ -30,8 +30,8 @@ public class ImGroupRespVO {
     @Schema(description = "封禁时间")
     private LocalDateTime bannedTime;
 
-    @Schema(description = "是否解散")
-    private Boolean dissolved;
+    @Schema(description = "群状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer status;
 
     @Schema(description = "解散时间")
     private LocalDateTime dissolvedTime;
