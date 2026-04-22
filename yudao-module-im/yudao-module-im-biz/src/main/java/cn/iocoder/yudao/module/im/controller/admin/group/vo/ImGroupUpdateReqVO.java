@@ -21,12 +21,4 @@ public class ImGroupUpdateReqVO {
     @Schema(description = "群公告")
     private String notice;
 
-    // ========== 以下字段来自 im_group_member 表（当前用户在该群的个人设置） ==========
-
-    @Schema(description = "我在本群的昵称")
-    private String displayUserName;
-
-    @Schema(description = "群名备注")
-    private String displayGroupName;
-
 }

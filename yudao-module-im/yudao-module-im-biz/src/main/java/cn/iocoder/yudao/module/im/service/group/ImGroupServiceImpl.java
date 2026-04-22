@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -92,35 +91,23 @@ public class ImGroupServiceImpl implements ImGroupService {
     @CacheEvict(cacheNames = GROUP, key = "#updateReqVO.id")
     @Transactional(rollbackFor = Exception.class)
     public ImGroupDO updateGroup(ImGroupUpdateReqVO updateReqVO, Long userId) {
-        // 1. 校验群存在
+        // 1.1 校验群存在
         ImGroupDO group = validateGroupExists(updateReqVO.getId());
-
-        // 2. 更新群信息（name、avatar、notice → im_group 表）
-        boolean hasGroupInfoChange = !ObjUtil.isAllEmpty(
-                updateReqVO.getName(), updateReqVO.getAvatar(), updateReqVO.getNotice());
-        if (hasGroupInfoChange) {
-            if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
-                throw exception(GROUP_NOT_OWNER);
-            }
-            // 2.1 更新数据库
-            ImGroupDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
-            groupMapper.updateById(updateObj);
-            // 同步到内存中的 group 对象，避免再次查询
-            BeanUtil.copyProperties(updateReqVO, group, CopyOptions.create().ignoreNullValue());
-
-            // 2.2 群信息的变更，推送给所有群成员
-            List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(group.getId());
-            Set<Long> memberUserIds = convertSet(members, ImGroupMemberDO::getUserId);
-            webSocketService.sendGroupMessageAsync(memberUserIds,
-                    ImGroupMessageDTO.ofGroupUpdate(userId, group.getId()));
+        // 1.2 校验操作人是群主
+        if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
+            throw exception(GROUP_NOT_OWNER);
         }
 
-        // 3. 更新当前用户的群成员信息（displayUserName、displayGroupName → im_group_member 表）
-        if (!ObjUtil.isAllEmpty(updateReqVO.getDisplayUserName(), updateReqVO.getDisplayGroupName())) {
-            groupMemberService.updateGroupMember(userId, new ImGroupMemberUpdateReqVO()
-                    .setGroupId(updateReqVO.getId()).setDisplayUserName(updateReqVO.getDisplayUserName())
-                    .setDisplayGroupName(updateReqVO.getDisplayGroupName()));
-        }
+        // 2. 更新数据库
+        ImGroupDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
+        groupMapper.updateById(updateObj);
+        BeanUtil.copyProperties(updateReqVO, group, CopyOptions.create().ignoreNullValue());
+
+        // 3. 群信息的变更，推送给所有群成员
+        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(group.getId());
+        Set<Long> memberUserIds = convertSet(members, ImGroupMemberDO::getUserId);
+        webSocketService.sendGroupMessageAsync(memberUserIds,
+                ImGroupMessageDTO.ofGroupUpdate(userId, group.getId()));
         return group;
     }
 
