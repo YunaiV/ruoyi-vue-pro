@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,6 +29,7 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_N
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 @Validated
 public class ImGroupMemberServiceImpl implements ImGroupMemberService {
@@ -62,13 +65,34 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return groupMemberMapper.selectQuitListByUserId(userId, minQuitTime);
     }
 
+    /**
+     * 并发安全：依靠 im_group_member 表的唯一索引 uk_group_user(group_id, user_id) 保证幂等，
+     * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
+     */
     @Override
     public ImGroupMemberDO addGroupMember(Long groupId, Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        // 情况一：已存在记录 → 复活或跳过
+        ImGroupMemberDO exists = groupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
+        if (exists != null) {
+            if (CommonStatusEnum.isDisable(exists.getStatus())) {
+                groupMemberMapper.updateById(new ImGroupMemberDO().setId(exists.getId())
+                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now));
+            }
+            return groupMemberMapper.selectById(exists.getId());
+        }
+        // 情况二：新增成员
         ImGroupMemberDO member = new ImGroupMemberDO()
                 .setGroupId(groupId).setUserId(userId)
-                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(LocalDateTime.now());
-        groupMemberMapper.insert(member);
-        return member;
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now);
+        try {
+            groupMemberMapper.insert(member);
+            return member;
+        } catch (DuplicateKeyException e) {
+            // 并发场景：另一个请求已先一步插入，且其插入的必然是 ENABLE 状态（DISABLE 场景在上方分支已处理），查询返回
+            log.warn("[addGroupMember][groupId({}) userId({}) 并发插入冲突，查询返回]", groupId, userId);
+            return groupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
+        }
     }
 
     @Override
@@ -91,12 +115,21 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             }
         }
 
-        // 2. 执行
-        if (CollUtil.isNotEmpty(inserts)) {
-            groupMemberMapper.insertBatch(inserts);
-        }
+        // 2.1 先做 update，update 没有并发冲突风险
         if (CollUtil.isNotEmpty(updates)) {
             groupMemberMapper.updateBatch(updates);
+        }
+        // 2.2 批量 insert。并发场景下若其它请求已先一步插入同一 (groupId, userId)，
+        //     会触发唯一索引冲突，此时降级为逐个 addGroupMember（利用其兜底逻辑幂等处理）。
+        if (CollUtil.isNotEmpty(inserts)) {
+            try {
+                groupMemberMapper.insertBatch(inserts);
+            } catch (DuplicateKeyException e) {
+                log.warn("[addGroupMembers][groupId({}) userIds({}) 批量插入冲突，降级为逐个处理]", groupId, userIds);
+                for (ImGroupMemberDO insert : inserts) {
+                    addGroupMember(groupId, insert.getUserId());
+                }
+            }
         }
     }
 

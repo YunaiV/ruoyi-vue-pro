@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 
@@ -24,6 +25,7 @@ import java.util.Collection;
  * @author 芋道源码
  */
 @Service
+@Validated
 @Slf4j
 public class ImWebSocketServiceImpl implements ImWebSocketService {
 

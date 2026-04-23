@@ -158,9 +158,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         try {
             imFriendMapper.insert(friend);
         } catch (DuplicateKeyException e) {
-            // 并发场景：另一个请求已先一步插入，降级走已存在逻辑
-            log.warn("[addFriend0][userId({}) friendUserId({}) 并发插入冲突，降级处理]", userId, friendUserId);
-            addFriend0(userId, friendUserId);
+            // 并发场景：另一个请求已先一步插入，且其插入的必然是 ENABLE 状态（DISABLE 场景在上方分支已处理），直接忽略
+            log.warn("[addFriend0][userId({}) friendUserId({}) 并发插入冲突，忽略]", userId, friendUserId);
         }
     }
 
