@@ -316,16 +316,7 @@ public class Context {
      */
     public String  purpose;
 
-    /** SalesAgent 生成的商品标题 */
-    public String title;
-
-    /** SalesAgent 生成的商品描述 */
-    public String description;
-
-    /** SalesAgent 设定的商品价格 */
-    public BigDecimal price;
-
-    /** SalesAgent 生成的商品链接 */
+    /** SalesAgent 生成的商品链接，格式：https://deepay.link/{chainCode} */
     public String link;
 
 }
