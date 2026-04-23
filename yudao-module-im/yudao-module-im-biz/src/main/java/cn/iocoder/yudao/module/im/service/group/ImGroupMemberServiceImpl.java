@@ -66,7 +66,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     /**
-     * 并发安全：依靠 im_group_member 表的唯一索引 uk_group_user(group_id, user_id) 保证幂等，
+     * 并发安全：依靠 im_group_member 表的唯一索引 uk_im_group_member_group_user(group_id, user_id) 保证幂等，
      * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
      */
     @Override

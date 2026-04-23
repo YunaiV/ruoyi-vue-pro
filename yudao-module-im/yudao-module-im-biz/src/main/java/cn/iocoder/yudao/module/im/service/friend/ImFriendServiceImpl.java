@@ -137,7 +137,7 @@ public class ImFriendServiceImpl implements ImFriendService {
      * - 已存在且 ENABLE：无需重复操作
      * - 已存在但 DISABLE：恢复关系（status=ENABLE，刷新 addTime，清空 deleteTime）
      * <p>
-     * 并发安全：依靠 im_friend 表的唯一索引 uk_user_friend(user_id, friend_user_id) 保证幂等，
+     * 并发安全：依靠 im_friend 表的唯一索引 uk_im_friend_user_friend(user_id, friend_user_id) 保证幂等，
      * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
      */
     @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
