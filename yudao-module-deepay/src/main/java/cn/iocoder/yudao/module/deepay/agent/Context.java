@@ -200,8 +200,11 @@ public class Context {
     /** ImageScoringAgent 输出：综合分 Top 2 图片 */
     public List<DesignImage> topImages;
 
-    // ===== Phase 8 设计拆分 =====
-    /** 版型（oversize / fitted / straight），由 DesignSplitAgent 填充 */
+    // ===== Phase 8 / 9 版型 =====
+    /**
+     * 版型类型，由 DesignSplitAgent（oversize/fitted/straight）
+     * 和 PatternPrepareAgent（基础版型/贴体版型/宽松版型）共用此字段。
+     */
     public String patternType;
     /** 面料（cotton / denim / knit / wool），由 DesignSplitAgent 填充 */
     public String fabric;
@@ -258,8 +261,6 @@ public class Context {
     public java.util.List<DesignVariant> designVariants;
     /** DesignVariantAgent 选出的最佳变体图 URL（高分者）。 */
     public String  finalDesign;
-    /** PatternPrepareAgent 输出：版型类型（基础版型 / 贴体 / 宽松）。 */
-    public String  patternType;
     /** PatternPrepareAgent 输出：尺码范围。 */
     public java.util.List<String> sizeRange;
     /** PatternPrepareAgent 输出：面料建议（如"棉+弹力"）。 */

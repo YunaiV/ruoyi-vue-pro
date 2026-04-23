@@ -35,6 +35,12 @@ public class DeepayOrderDO {
     private BigDecimal amount;
 
     /**
+     * 支付单号（由 OrderFlowAgent 生成，格式 PAY-{chainCode}-{ts}）。
+     * 对应支付网关的 outTradeNo，PaymentCallbackService 通过此字段定位订单。
+     */
+    private String paymentId;
+
+    /**
      * 基准金额（EUR）— 真实结算金额，等于 product.basePrice。
      * 分析、利润计算统一用此字段，不用 displayAmount。
      */

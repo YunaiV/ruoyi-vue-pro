@@ -88,6 +88,12 @@ public class DeepayProductDO {
     private String channel;
 
     /**
+     * 设计图 ID（关联 deepay_design_image 或 FLUX 生成记录）。
+     * PublishAgent / ProductAgent 落库时写入，用于设计追溯和展示。
+     */
+    private String designId;
+
+    /**
      * 主图（便捷字段，等价于 cdnImageUrl）。
      * TrendAgent 通过 {@link #getMainImage()} 读取，避免字段名不一致问题。
      */
