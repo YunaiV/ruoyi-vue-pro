@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Scrollbar hide utility ─────────────────────────────── */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
+
+/* ── Base reset ─────────────────────────────────────────── */
+@layer base {
+  html {
+    background: #0B0B0B;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  body {
+    @apply bg-bg text-white font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+  }
+  * { touch-action: manipulation; }
+  ::-webkit-scrollbar { width: 3px; height: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 3px; }
+}
+
+/* ── Component library ──────────────────────────────────── */
+@layer components {
+
+  /* ── LAYOUT TOKENS ─── */
+  .container {
+    @apply max-w-[480px] mx-auto px-4;
+  }
+  .section {
+    @apply py-[72px];
+  }
+  .title {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .sub {
+    @apply text-[#9CA3AF] text-sm;
+  }
+
+  /* ── PRIMARY BUTTON (pill + neon glow) ─── */
+  .btn-primary {
+    @apply bg-accent text-black font-medium rounded-full
+           h-12 w-full flex items-center justify-center gap-2
+           transition-all duration-200
+           active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 22px rgba(0, 255, 136, 0.45);
+  }
+
+  /* ── GHOST BUTTON ─── */
+  .btn-ghost {
+    @apply bg-surface2 text-white font-medium rounded-full
+           h-12 w-full flex items-center justify-center gap-2
+           border border-border
+           transition-all duration-200
+           active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* ── CARD (dark + depth) ─── */
+  .card {
+    @apply bg-surface rounded-2xl overflow-hidden;
+    border: 1px solid #1A1A1A;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ── CHIP SELECTOR ─── */
+  .chip {
+    @apply px-4 py-1.5 rounded-full text-sm font-medium
+           bg-surface2 text-muted border border-border
+           whitespace-nowrap cursor-pointer
+           transition-colors duration-150;
+  }
+  .chip-active {
+    @apply bg-accent text-black border-accent;
+  }
+
+  /* ── IMAGE CARD (depth shadow added) ─── */
+  .img-card {
+    @apply relative rounded-2xl overflow-hidden cursor-pointer
+           aspect-[3/4] border-2 border-border
+           transition-all duration-200 active:scale-[.97];
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.35);
+  }
+  .img-card-selected {
+    @apply border-accent;
+    box-shadow: 0 0 0 1px #00FF88;
+  }
+
+  /* ── SHIMMER SKELETON ─── */
+  .skeleton {
+    @apply rounded-2xl;
+    background: linear-gradient(90deg, #111 25%, #1a1a1a 50%, #111 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  /* ── QUOTA BADGES ─── */
+  .badge-ok    { @apply bg-accent/15 text-accent; }
+  .badge-low   { @apply bg-yellow-400/15 text-yellow-300; }
+  .badge-empty { @apply bg-danger/15 text-danger; }
+}
+
+/* ── Motion system ──────────────────────────────────────── */
+
+/* Page / section entrance */
+.fade-up {
+  animation: fadeUp 0.8s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Image card entrance (scale + fade) */
+.img-in {
+  opacity: 0;
+  animation: imgIn 0.6s ease both;
+}
+@keyframes imgIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+/* Shimmer */
+@keyframes shimmer { to { background-position: -200% 0; } }

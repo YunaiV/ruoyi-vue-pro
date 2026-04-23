@@ -1,0 +1,102 @@
+{
+  "name": "strip-comments",
+  "description": "Strip line and/or block comments from a string. Blazing fast, and works with JavaScript, Sass, CSS, Less.js, and a number of other languages.",
+  "version": "2.0.1",
+  "homepage": "https://github.com/jonschlinkert/strip-comments",
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "repository": "jonschlinkert/strip-comments",
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/strip-comments/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "lib"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "test": "mocha",
+    "cover": "nyc --reporter=text --reporter=html mocha"
+  },
+  "devDependencies": {
+    "gulp-format-md": "^2.0.0",
+    "mocha": "^6.2.2",
+    "nyc": "^14.1.1"
+  },
+  "keywords": [
+    "ada comments",
+    "apl comments",
+    "applescript comments",
+    "block comment",
+    "block",
+    "block-comment",
+    "c comments",
+    "code comment",
+    "comment",
+    "comments",
+    "csharp comments",
+    "css comments",
+    "css",
+    "hashbang comments",
+    "haskell comments",
+    "html comments",
+    "java comments",
+    "javascript comments",
+    "javascript",
+    "js",
+    "less comments",
+    "less css",
+    "less",
+    "less.js",
+    "lessjs",
+    "line comment",
+    "line comments",
+    "line",
+    "line-comment",
+    "line-comments",
+    "lua comments",
+    "matlab comments",
+    "ocaml comments",
+    "pascal comments",
+    "perl comments",
+    "php comments",
+    "python comments",
+    "remove",
+    "ruby comments",
+    "sass comments",
+    "sass",
+    "shebang comments",
+    "sql comments",
+    "strip",
+    "swift comments",
+    "typscript comments",
+    "xml comments"
+  ],
+  "verb": {
+    "toc": true,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
+    "helpers": [
+      "./examples/support/helpers.js"
+    ],
+    "related": {
+      "list": [
+        "code-context",
+        "extract-comments",
+        "parse-code-context",
+        "parse-comments"
+      ]
+    },
+    "lint": {
+      "reflinks": true
+    }
+  }
+}

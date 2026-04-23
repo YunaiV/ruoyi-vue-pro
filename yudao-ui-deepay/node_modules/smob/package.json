@@ -1,0 +1,72 @@
+{
+    "name": "smob",
+    "version": "1.6.1",
+    "description": "Zero dependency library to safe merge objects.",
+    "main": "dist/index.cjs",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "scripts": {
+        "build:types": "tsc --emitDeclarationOnly",
+        "build:js": "rollup -c",
+        "build": "rimraf dist && npm run build:types && npm run build:js",
+        "commit": "npx git-cz",
+        "lint": "eslint --ext .js,.ts ./src",
+        "lint:fix": "npm run lint -- --fix",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
+        "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage",
+        "prepare": "npx husky install",
+        "prepublishOnly": "npm run build"
+    },
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://github.com/tada5hi"
+    },
+    "license": "MIT",
+    "keywords": [
+        "object",
+        "object-merge",
+        "merge",
+        "safe",
+        "deep-merge",
+        "merge-deep"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tada5hi/smob.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Tada5hi/smob/issues"
+    },
+    "homepage": "https://github.com/Tada5hi/smob#readme",
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^16.0.3",
+        "@swc/core": "^1.15.11",
+        "@tada5hi/commitlint-config": "^1.2.7",
+        "@tada5hi/eslint-config-typescript": "^1.2.18",
+        "@tada5hi/tsconfig": "^0.7.0",
+        "@types/node": "^25.2.3",
+        "@vitest/coverage-v8": "^4.0.18",
+        "cross-env": "^10.1.0",
+        "eslint": "^8.57.1",
+        "husky": "^9.1.7",
+        "rollup": "^4.57.1",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18",
+        "workspaces-publish": "^1.6.0"
+    }
+}

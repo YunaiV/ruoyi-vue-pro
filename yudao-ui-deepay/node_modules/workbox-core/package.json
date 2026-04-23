@@ -1,0 +1,27 @@
+{
+  "name": "workbox-core",
+  "version": "7.4.0",
+  "license": "MIT",
+  "author": "Google's Web DevRel Team and Google's Aurora Team",
+  "description": "This module is used by a number of the other Workbox modules to share common code.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googlechrome/workbox.git"
+  },
+  "bugs": "https://github.com/googlechrome/workbox/issues",
+  "homepage": "https://github.com/GoogleChrome/workbox",
+  "keywords": [
+    "workbox",
+    "workboxjs",
+    "service worker",
+    "sw"
+  ],
+  "workbox": {
+    "browserNamespace": "workbox.core",
+    "packageType": "sw"
+  },
+  "main": "index.js",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "gitHead": "fa702feeddd417fcdfa495cd9428fb4a28632e92"
+}

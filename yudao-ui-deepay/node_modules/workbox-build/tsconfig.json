@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "composite": true,
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "outDir": "./build",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "target": "ES2018",
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
+  },
+  "files": ["src/cdn-details.json"],
+  "include": ["src/**/*.ts", "src/schema/*.json"],
+  "references": [
+    {"path": "../workbox-background-sync/"},
+    {"path": "../workbox-broadcast-update/"},
+    {"path": "../workbox-cacheable-response/"},
+    {"path": "../workbox-core/"},
+    {"path": "../workbox-expiration/"},
+    {"path": "../workbox-google-analytics/"}
+  ]
+}

@@ -21,12 +21,20 @@ public class SecurityConfiguration {
 
             @Override
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
-                // 商品生成接口无需登录
-                registry.requestMatchers("/api/create-product").permitAll();
-                // 商品 JSON 查询接口无需登录
-                registry.requestMatchers("/api/product/**").permitAll();
-                // 商品展示页无需登录
-                registry.requestMatchers("/product/**").permitAll();
+                registry.requestMatchers(
+                        "/api/create-product",       // 轻量版（向后兼容）
+                        "/deepay/run",               // 完整生产流水线
+                        "/deepay/trend",             // 趋势查询
+                        "/deepay/callback/payment",  // 支付回调（Webhook，无 Token）
+                        "/deepay/callback/refund",   // 退款回调
+                        "/api/order/create",         // 创建订单（PR#6）
+                        "/api/payment/callback",     // Jeepay Webhook（PR#6）
+                        "/api/payment/simulate",     // 模拟支付（PR#6）
+                        "/product/**",               // 商品展示页（PR#5）
+                        "/api/product/**",           // 商品 JSON API（PR#5）
+                        "/deepay/inventory/**",      // 库存管理（MVP 阶段）
+                        "/deepay/order/**"           // 订单模拟（MVP 阶段）
+                ).permitAll();
             }
 
         };
