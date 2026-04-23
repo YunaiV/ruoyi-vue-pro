@@ -9,51 +9,35 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 指标表 deepay_metrics
+ * Deepay 复盘指标表。
+ *
+ * <p>对应数据库表 {@code deepay_metrics}。
+ * 每笔成交后写入一条记录，用于后续数据复盘分析。</p>
  */
 @TableName("deepay_metrics")
 @Data
 public class DeepayMetricsDO {
 
+    /** 自增主键 */
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /** 关联链码 */
+    /** 关联商品链码 */
     private String chainCode;
 
-    /** 销量快照 */
-    private Integer soldCount;
-
-    /** 上架价格快照 */
+    /** 成交价格（元） */
     private BigDecimal price;
 
-    /** 分类（来自 keyword） */
-    private String category;
-
-    /** 商品详情页浏览次数 */
-    private Integer viewCount;
-
-    /** 成功支付次数（与 soldCount 对比可得转化率） */
-    private Integer payCount;
-
-    /** 转化率（pay_count / view_count），取值 0.00~1.00 */
-    private BigDecimal conversionRate;
-
-    /** 生产成本快照 */
-    private BigDecimal costPrice;
-
-    /** 单笔利润（price - cost_price） */
-    private BigDecimal profit;
-
-    /** 投资回报率（profit / cost_price） */
-    private BigDecimal roi;
-
     /**
-     * 风格标签（SEXY / CASUAL / SPORT / MINIMAL / LUXURY）。
-     * 由 AnalyticsAgent 在落库时从 Context.style 写入，供 TrendAgent 风格加权排序使用。
+     * 是否已售。
+     * <ul>
+     *   <li>{@code 0} —— 未售（订单创建时写入）</li>
+     *   <li>{@code 1} —— 已售（支付回调后更新）</li>
+     * </ul>
      */
-    private String style;
+    private Integer sold;
 
+    /** 记录时间 */
     private LocalDateTime createdAt;
 
 }
