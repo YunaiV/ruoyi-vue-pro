@@ -1,89 +1,148 @@
 package cn.iocoder.yudao.module.deepay.agent;
 
+import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayCustomerProfileDO;
+import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayCustomerProfileMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
+import java.util.*;
+
 /**
- * StyleConsistencyAgent — 锁定风格 Prompt，防止后续 Agent 风格漂移（Phase 8）。
+ * StyleConsistencyAgent — 风格一致性校验（Phase 8）。
  *
- * <p>在 AIDecisionAgent 之后运行，将品类、风格偏好和市场信息固化为一个一致的
- * 英文 Prompt 字符串，确保后续 DesignGenAgent 使用统一的风格描述。</p>
+ * <h3>校验逻辑</h3>
+ * <ol>
+ *   <li>从 deepay_customer_profile 读取 categoryLevel1（主营品类）</li>
+ *   <li>若 ctx.category ≠ historyMainCategory → penalty -30</li>
+ *   <li>高端市场（EU/ME）出现廉价信号词 → penalty -20</li>
+ *   <li>其余 URL 品类交叉检测（已有实现） → 每张违规 -20</li>
+ * </ol>
+ *
+ * <h3>输出</h3>
+ * <ul>
+ *   <li>ctx.styleConsistencyScore — 0~100，&lt;60 触发 DesignConfirmAgent 重设计</li>
+ *   <li>ctx.needRedesign — true 当 score&lt;60</li>
+ * </ul>
  */
 @Component
 public class StyleConsistencyAgent implements Agent {
 
     private static final Logger log = LoggerFactory.getLogger(StyleConsistencyAgent.class);
 
+    private static final int PASS_THRESHOLD = 60;
+
+    @Resource
+    private DeepayCustomerProfileMapper profileMapper;
+
+    /** 品类关键词（用于跨品类检测） */
+    private static final Map<String, List<String>> CATEGORY_KEYWORDS;
+    /** 高端市场廉价信号词 */
+    private static final List<String> CHEAP_SIGNALS =
+            Arrays.asList("cheap","bargain","shein","taobao","1688","aliexpress","low-cost");
+
+    static {
+        Map<String, List<String>> m = new LinkedHashMap<>();
+        m.put("外套",   Arrays.asList("coat","jacket","outerwear"));
+        m.put("内裤",   Arrays.asList("underwear","briefs","boxer","panty"));
+        m.put("内衣",   Arrays.asList("bra","lingerie","intimate"));
+        m.put("裤子",   Arrays.asList("pants","trousers","jeans"));
+        m.put("连衣裙", Arrays.asList("dress","gown"));
+        m.put("裙子",   Arrays.asList("skirt","dress"));
+        m.put("上衣",   Arrays.asList("tshirt","t-shirt","top","blouse"));
+        m.put("西装",   Arrays.asList("suit","blazer","formal"));
+        CATEGORY_KEYWORDS = Collections.unmodifiableMap(m);
+    }
+
     @Override
     public Context run(Context ctx) {
-        try {
-            String categoryEn = mapCategoryToEn(ctx.category);
-            String styleEn    = mapStyleToEn(ctx.stylePreference != null ? ctx.stylePreference : ctx.style);
-            String marketEn   = mapMarketToEn(ctx.targetMarket != null ? ctx.targetMarket : ctx.market);
+        if (ctx.designImages == null || ctx.designImages.isEmpty()) {
+            ctx.styleConsistencyScore = 80;
+            return ctx;
+        }
 
-            String lockedPrompt = buildLockedPrompt(categoryEn, styleEn, marketEn);
+        int score = 100;
 
-            if (StringUtils.hasText(ctx.finalPrompt)) {
-                ctx.finalPrompt = ctx.finalPrompt + ", consistent style, no logo, no brand";
-            } else {
-                ctx.finalPrompt = lockedPrompt;
+        // ── 1. 主营品类校验（读 customer_profile）─────────────────
+        score += checkCategoryConsistency(ctx);
+
+        // ── 2. 高端市场廉价信号检测 ───────────────────────────────
+        if (isLuxuryMarket(ctx.market)) {
+            for (String url : ctx.designImages) {
+                if (containsCheapSignal(url)) { score -= 20; break; }
             }
+        }
 
-            // 同步更新 stylePrompt
-            ctx.stylePrompt = categoryEn + ", " + styleEn + " style";
+        // ── 3. URL 品类交叉检测 ───────────────────────────────────
+        if (StringUtils.hasText(ctx.category)) {
+            int violations = 0;
+            for (String url : ctx.designImages) {
+                if (hasCategoryConflict(url.toLowerCase(), ctx.category)) violations++;
+            }
+            score -= violations * 20;
+        }
 
-            log.info("[StyleConsistencyAgent] 风格已锁定 finalPrompt={}", ctx.finalPrompt);
-        } catch (Exception e) {
-            log.warn("[StyleConsistencyAgent] 风格锁定异常，跳过", e);
+        score = ScoreUtil.clamp(score);
+        ctx.styleConsistencyScore = score;
+
+        if (score < PASS_THRESHOLD) {
+            ctx.needRedesign   = true;
+            ctx.decisionReason = "[StyleConsistency] score=" + score + "<" + PASS_THRESHOLD + "，风格偏离，触发重设计";
+            log.info("[StyleConsistencyAgent] ❌ score={} category={} → needRedesign", score, ctx.category);
+        } else {
+            log.info("[StyleConsistencyAgent] ✅ score={} category={} style={}", score, ctx.category, ctx.style);
         }
         return ctx;
     }
 
-    private String buildLockedPrompt(String categoryEn, String styleEn, String marketEn) {
-        StringBuilder sb = new StringBuilder();
-        if (StringUtils.hasText(categoryEn)) sb.append(categoryEn);
-        if (StringUtils.hasText(styleEn))    sb.append(", ").append(styleEn);
-        if (StringUtils.hasText(marketEn))   sb.append(", ").append(marketEn).append(" market");
-        sb.append(", consistent style, no logo, no brand");
-        return sb.toString();
-    }
+    // ----------------------------------------------------------------
 
-    private String mapCategoryToEn(String category) {
-        if (!StringUtils.hasText(category)) return "clothing";
-        switch (category) {
-            case "外套":   return "outerwear";
-            case "上衣":   return "top";
-            case "裤子":   return "pants";
-            case "内裤":   return "underwear";
-            case "裙子":   return "skirt";
-            case "连衣裙": return "dress";
-            default:       return category;
+    private int checkCategoryConsistency(Context ctx) {
+        if (ctx.customerId == null || !StringUtils.hasText(ctx.category)) return 0;
+        try {
+            DeepayCustomerProfileDO profile = profileMapper.selectByCustomerId(ctx.customerId);
+            if (profile == null) return 0;
+            String historyMain = profile.getCategoryLevel1();
+            if (!StringUtils.hasText(historyMain)) return 0;
+            if (!historyMain.equals(ctx.category)) {
+                log.info("[StyleConsistencyAgent] 品类偏离 history={} current={} penalty=-30",
+                        historyMain, ctx.category);
+                return -30;
+            }
+        } catch (Exception e) {
+            log.debug("[StyleConsistencyAgent] profile查询失败（不影响评分）", e);
         }
+        return 0;
     }
 
-    private String mapStyleToEn(String style) {
-        if (!StringUtils.hasText(style)) return "casual";
-        switch (style) {
-            case "极简": case "minimalist": return "minimalist";
-            case "工装":                   return "workwear";
-            case "性感":                   return "sexy";
-            case "运动":                   return "sporty";
-            case "奢华": case "luxury":    return "luxury";
-            case "休闲": case "casual":    return "casual";
-            default:                       return style.toLowerCase();
+    private boolean hasCategoryConflict(String urlLower, String targetCat) {
+        List<String> targetKws = CATEGORY_KEYWORDS.get(targetCat);
+        for (Map.Entry<String, List<String>> entry : CATEGORY_KEYWORDS.entrySet()) {
+            if (entry.getKey().equals(targetCat)) continue;
+            for (String kw : entry.getValue()) {
+                if (urlLower.contains(kw)) {
+                    if (targetKws != null) {
+                        for (String tkw : targetKws) {
+                            if (urlLower.contains(tkw)) return false;
+                        }
+                    }
+                    return true;
+                }
+            }
         }
+        return false;
     }
 
-    private String mapMarketToEn(String market) {
-        if (!StringUtils.hasText(market)) return "";
-        switch (market) {
-            case "欧美": case "EU": case "US": return "European/American";
-            case "中东": case "ME":            return "Middle East";
-            case "国内": case "CN":            return "Chinese";
-            default:                           return market;
-        }
+    private boolean containsCheapSignal(String url) {
+        if (!StringUtils.hasText(url)) return false;
+        String lower = url.toLowerCase();
+        for (String s : CHEAP_SIGNALS) { if (lower.contains(s)) return true; }
+        return false;
     }
 
+    private boolean isLuxuryMarket(String market) {
+        return "EU".equalsIgnoreCase(market) || "ME".equalsIgnoreCase(market);
+    }
 }

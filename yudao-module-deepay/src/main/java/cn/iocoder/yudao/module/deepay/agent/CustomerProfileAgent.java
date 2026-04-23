@@ -74,10 +74,12 @@ public class CustomerProfileAgent implements Agent {
         // 只在 ctx 字段为空时填充（保留调用方显式传入的值）
         if (!StringUtils.hasText(ctx.category))   ctx.category   = profile.getCategoryLevel1();
         if (!StringUtils.hasText(ctx.style))       ctx.style      = extractPrimaryStyle(profile.getStyleWeights());
+        if (!StringUtils.hasText(ctx.crowd))       ctx.crowd      = profile.getCrowd();
         if (!StringUtils.hasText(ctx.market))      ctx.market     = profile.getMarket();
         if (!StringUtils.hasText(ctx.priceLevel))  ctx.priceLevel = profile.getPriceLevel();
         if (!StringUtils.hasText(ctx.targetAge))   ctx.targetAge  = profile.getTargetAge();
         if (!StringUtils.hasText(ctx.gender))      ctx.gender     = profile.getGender();
+        if (!StringUtils.hasText(ctx.purpose))     ctx.purpose    = profile.getPurpose();
         if (ctx.confidenceScore == null)            ctx.confidenceScore = profile.getConfidenceScore();
 
         // keyword 兜底：画像品类 → 更精准的 DesignAgent prompt
@@ -85,8 +87,8 @@ public class CustomerProfileAgent implements Agent {
             ctx.keyword = profile.getCategoryLevel1();
         }
 
-        log.info("[CustomerProfileAgent] 画像加载完成 customerId={} category={} style={} confidence={}",
-                customerId, ctx.category, ctx.style, ctx.confidenceScore);
+        log.info("[CustomerProfileAgent] 画像加载完成 customerId={} category={} crowd={} style={} confidence={}",
+                customerId, ctx.category, ctx.crowd, ctx.style, ctx.confidenceScore);
         return ctx;
     }
 
@@ -119,16 +121,19 @@ public class CustomerProfileAgent implements Agent {
         if (StringUtils.hasText(ctx.style)) {
             profile.setStyleWeights(mergeStyleWeight(profile.getStyleWeights(), ctx.style, 0.1));
         }
+        if (StringUtils.hasText(ctx.crowd))       profile.setCrowd(ctx.crowd);
         if (StringUtils.hasText(ctx.market))      profile.setMarket(ctx.market);
         if (StringUtils.hasText(ctx.priceLevel))  profile.setPriceLevel(ctx.priceLevel);
         if (StringUtils.hasText(ctx.targetAge))   profile.setTargetAge(ctx.targetAge);
         if (StringUtils.hasText(ctx.gender))      profile.setGender(ctx.gender);
+        if (StringUtils.hasText(ctx.purpose))     profile.setPurpose(ctx.purpose);
 
         // SmartQuestion 完整回答后设置初始置信度 0.6（如尚未达到）
         boolean hasFullAnswers = StringUtils.hasText(ctx.category)
                 && StringUtils.hasText(ctx.market)
                 && StringUtils.hasText(ctx.style)
-                && StringUtils.hasText(ctx.priceLevel);
+                && StringUtils.hasText(ctx.priceLevel)
+                && StringUtils.hasText(ctx.purpose);
         if (hasFullAnswers && (profile.getConfidenceScore() == null
                 || profile.getConfidenceScore().compareTo(new BigDecimal("0.6")) < 0)) {
             profile.setConfidenceScore(new BigDecimal("0.6"));

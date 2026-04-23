@@ -11,7 +11,7 @@ import java.util.List;
 public interface FluxService {
 
     /**
-     * 根据用户输入生成候选图片 URL 列表（默认 3 张）。
+     * 根据用户输入生成候选图片 URL 列表。
      *
      * <p>实现要求：
      * <ul>
@@ -27,15 +27,27 @@ public interface FluxService {
     List<String> generateImages(String userPrompt);
 
     /**
-     * 根据用户输入生成指定数量的候选图片 URL 列表。
+     * 生成指定数量的候选图片（Phase 8）。
      *
-     * <p>与 {@link #generateImages(String)} 行为一致，额外支持指定生成张数（n）。
-     * n 超出实现支持范围时，实现层应自动裁剪到合理区间（如 1～8 张）。</p>
+     * <p>默认实现：连续调用 {@link #generateImages(String)} 并合并去重结果，
+     * 直至收集到 {@code count} 张或重试 3 次为止。
+     * 有能力返回多张的实现类应覆盖此方法以减少 HTTP 调用次数。</p>
      *
-     * @param userPrompt 用户输入的一句话需求或完整 Prompt
-     * @param n          期望生成的图片张数
-     * @return 图片 URL 列表（至少 1 张）
+     * @param userPrompt 用户输入
+     * @param count      期望生成张数（建议 3~6）
+     * @return 图片 URL 列表（数量 ≤ count，至少 1 张）
      */
-    List<String> generateImages(String userPrompt, int n);
+    default List<String> generateImages(String userPrompt, int count) {
+        java.util.Set<String> urls = new java.util.LinkedHashSet<>();
+        int attempts = 0;
+        while (urls.size() < count && attempts < 3) {
+            List<String> batch = generateImages(userPrompt);
+            if (batch != null) {
+                urls.addAll(batch);
+            }
+            attempts++;
+        }
+        return new java.util.ArrayList<>(urls);
+    }
 
 }

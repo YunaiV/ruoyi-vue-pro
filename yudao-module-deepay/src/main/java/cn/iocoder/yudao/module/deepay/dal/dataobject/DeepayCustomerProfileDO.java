@@ -37,7 +37,7 @@ public class DeepayCustomerProfileDO {
 
     /**
      * 一级品类（如 外套、内裤、连衣裙）。
-     * 由 SmartQuestionAgent 首次填充，用户后续选择时由 PreferenceLearningAgent 更新。
+     * 由 QADecisionAgent 首次填充，用户后续选择时由 FeedbackAgent 更新。
      */
     private String categoryLevel1;
 
@@ -46,6 +46,12 @@ public class DeepayCustomerProfileDO {
      * 细化分类，可留空。
      */
     private String categoryLevel2;
+
+    /**
+     * 目标客群：男装 / 少女 / 中老年 / 运动。
+     * QADecisionAgent 首次填充，FeedbackAgent 据选择记录动态调整。
+     */
+    private String crowd;
 
     /**
      * 风格权重 JSON，例如：
@@ -75,6 +81,12 @@ public class DeepayCustomerProfileDO {
      * 目标性别：MALE / FEMALE / UNISEX。
      */
     private String gender;
+
+    /**
+     * 用途：WHOLESALE（批发）/ RETAIL（零售）。
+     * QADecisionAgent 六问中第 6 问填充；影响定价倍率与起订量。
+     */
+    private String purpose;
 
     /**
      * 画像置信度（0.00~1.00）：
