@@ -33,14 +33,18 @@ public interface DeepayMetricsMapper extends BaseMapperX<DeepayMetricsDO> {
         if (list == null || list.isEmpty()) {
             return null;
         }
-        BigDecimal sum = list.stream()
-                .map(DeepayMetricsDO::getPrice)
-                .filter(p -> p != null && p.compareTo(BigDecimal.ZERO) > 0)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        long cnt = list.stream()
-                .filter(m -> m.getPrice() != null && m.getPrice().compareTo(BigDecimal.ZERO) > 0)
-                .count();
-        return cnt > 0 ? sum.divide(BigDecimal.valueOf(cnt), 2, RoundingMode.HALF_UP) : null;
+        // single-pass: collect valid prices, then compute average
+        List<BigDecimal> prices = new java.util.ArrayList<>();
+        for (DeepayMetricsDO m : list) {
+            if (m.getPrice() != null && m.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+                prices.add(m.getPrice());
+            }
+        }
+        if (prices.isEmpty()) {
+            return null;
+        }
+        BigDecimal sum = prices.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        return sum.divide(BigDecimal.valueOf(prices.size()), 2, RoundingMode.HALF_UP);
     }
 
     /**
@@ -69,10 +73,10 @@ public interface DeepayMetricsMapper extends BaseMapperX<DeepayMetricsDO> {
         if (list == null || list.isEmpty()) {
             return null;
         }
-        return list.stream()
+        java.util.OptionalDouble avg = list.stream()
                 .mapToInt(m -> m.getSoldCount() != null ? m.getSoldCount() : 0)
-                .average()
-                .orElse(0.0);
+                .average();
+        return avg.isPresent() ? avg.getAsDouble() : null;
     }
 
 }

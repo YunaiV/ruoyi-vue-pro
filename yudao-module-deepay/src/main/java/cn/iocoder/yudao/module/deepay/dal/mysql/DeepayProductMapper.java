@@ -32,7 +32,7 @@ public interface DeepayProductMapper extends BaseMapperX<DeepayProductDO> {
      */
     default void addStock(Long id, int delta) {
         update(null, new LambdaUpdateWrapper<DeepayProductDO>()
-                .setSql("stock = stock + " + delta)
+                .setSql("stock = stock + {0}", delta)
                 .eq(DeepayProductDO::getId, id));
     }
 
