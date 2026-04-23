@@ -104,7 +104,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     @Override
     public List<ImGroupMessageDO> pullGroupMessageList(Long userId, Long minId, Integer size) {
         if (size > MESSAGE_MAX_PULL_SIZE) {
-            throw exception(MESSAGE_PULL_SIZE_EXCEEDED);
+            throw exception(MESSAGE_PULL_SIZE_EXCEEDED, MESSAGE_MAX_PULL_SIZE);
         }
 
         // 0. 拉取时间窗：超过窗口的老消息不再通过离线通道推送

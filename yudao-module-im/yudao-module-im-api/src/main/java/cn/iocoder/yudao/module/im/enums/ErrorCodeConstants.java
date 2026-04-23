@@ -9,21 +9,13 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface ErrorCodeConstants {
 
-    // ========== 会话 （1-040-100-000）  ==========
-    ErrorCode CONVERSATION_NOT_EXISTS = new ErrorCode(1_040_100_000, "会话不存在");
-
-    // ========== 收件箱 (1-040-200-000) ==========
-    ErrorCode INBOX_NOT_EXISTS = new ErrorCode(1_040_200_000, "收件箱不存在");
-
     // ========== 消息 (1-040-300-000) ==========
     ErrorCode MESSAGE_NOT_EXISTS = new ErrorCode(1_040_300_000, "消息不存在");
-    ErrorCode MESSAGE_RECEIVER_NOT_EXISTS = new ErrorCode(1_040_300_001, "接收人不存在");
     ErrorCode MESSAGE_RECALL_DENIED = new ErrorCode(1_040_300_002, "只能撤回自己发送的消息");
     ErrorCode MESSAGE_ALREADY_RECALLED = new ErrorCode(1_040_300_003, "消息已撤回");
-    ErrorCode MESSAGE_RECALL_TIMEOUT = new ErrorCode(1_040_300_007, "超过 {} 分钟的消息无法撤回");
     ErrorCode MESSAGE_SENSITIVE_WORD_BLOCKED = new ErrorCode(1_040_300_004, "消息包含敏感词，无法发送");
-    ErrorCode MESSAGE_PULL_SIZE_EXCEEDED = new ErrorCode(1_040_300_005, "单次拉取消息数量超出限制");
-    ErrorCode MESSAGE_CLIENT_ID_DUPLICATE = new ErrorCode(1_040_300_006, "消息已发送，请勿重复提交");
+    ErrorCode MESSAGE_PULL_SIZE_EXCEEDED = new ErrorCode(1_040_300_005, "单次拉取消息数量不能超过 {} 条");
+    ErrorCode MESSAGE_RECALL_TIMEOUT = new ErrorCode(1_040_300_007, "超过 {} 分钟的消息无法撤回");
 
     // ========== 群 (1-040-400-000) ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");
@@ -32,21 +24,14 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_NOT_OWNER = new ErrorCode(1_040_400_003, "仅群主可执行该操作");
 
     // ========== 群成员 (1-040-500-000) ==========
-    ErrorCode GROUP_MEMBER_NOT_EXISTS = new ErrorCode(1_040_500_000, "群成员不存在");
     ErrorCode GROUP_MEMBER_NOT_IN_GROUP = new ErrorCode(1_040_500_001, "您已不在该群中");
-    ErrorCode GROUP_MEMBER_ALREADY_QUIT = new ErrorCode(1_040_500_002, "您已退出该群");
-    ErrorCode GROUP_OWNER_CANNOT_QUIT = new ErrorCode(1_040_500_003, "您是群主，不可退出群聊");
-    ErrorCode GROUP_CANNOT_REMOVE_SELF = new ErrorCode(1_040_500_004, "不能移除自己");
-    ErrorCode GROUP_MEMBER_EXCEED = new ErrorCode(1_040_500_005, "群聊人数不能超过{}人");
+    ErrorCode GROUP_OWNER_CANNOT_QUIT = new ErrorCode(1_040_500_003, "群主不能退出群聊，请先转让群主或解散群聊");
+    ErrorCode GROUP_CANNOT_REMOVE_SELF = new ErrorCode(1_040_500_004, "不能将自己移出群聊");
+    ErrorCode GROUP_MEMBER_EXCEED = new ErrorCode(1_040_500_005, "群聊人数不能超过 {} 人");
     ErrorCode GROUP_INVITE_NOT_FRIEND = new ErrorCode(1_040_500_006, "'{}' 不是您的好友，邀请失败");
 
     // ========== 好友 (1-040-600-000) ==========
-    ErrorCode FRIEND_NOT_EXISTS = new ErrorCode(1_040_600_000, "好友关系不存在");
     ErrorCode FRIEND_NOT_FRIEND = new ErrorCode(1_040_600_001, "对方不是您的好友");
     ErrorCode FRIEND_ADD_SELF = new ErrorCode(1_040_600_002, "不允许添加自己为好友");
-    ErrorCode FRIEND_ALREADY = new ErrorCode(1_040_600_003, "你们已经是好友了");
-
-    // ========== 敏感词 (1-040-700-000) ==========
-    ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_040_700_000, "敏感词不存在");
 
 }
