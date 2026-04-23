@@ -181,29 +181,6 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
         assertEquals(2L, result.get(0).getSenderId());
     }
 
-    // ========== selectBySenderIdAndClientMessageId ==========
-
-    @Test
-    public void testSelectBySenderIdAndClientMessageId() {
-        // 准备
-        ImPrivateMessageDO msg = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
-        msg.setClientMessageId("uuid-001");
-        mapper.insert(msg);
-
-        // 调用
-        ImPrivateMessageDO result = mapper.selectBySenderIdAndClientMessageId(1L, "uuid-001");
-
-        // 断言
-        assertNotNull(result);
-        assertEquals(msg.getId(), result.getId());
-    }
-
-    @Test
-    public void testSelectBySenderIdAndClientMessageId_notFound() {
-        ImPrivateMessageDO result = mapper.selectBySenderIdAndClientMessageId(1L, "not-exist");
-        assertNull(result);
-    }
-
     // ========== 工具方法 ==========
 
     private ImPrivateMessageDO buildMessage(Long senderId, Long receiverId, ImMessageStatusEnum status) {

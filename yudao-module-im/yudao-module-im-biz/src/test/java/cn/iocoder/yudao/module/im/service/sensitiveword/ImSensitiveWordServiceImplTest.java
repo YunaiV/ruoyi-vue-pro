@@ -75,8 +75,8 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testRefresh_reloadsFromMapper() {
-        // 刷新前：第一次调用 mapper
-        verify(imSensitiveWordMapper, times(1)).selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 刷新前：init 调用 mapper 一次
+        verify(imSensitiveWordMapper).selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 准备：新列表不含原词
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))

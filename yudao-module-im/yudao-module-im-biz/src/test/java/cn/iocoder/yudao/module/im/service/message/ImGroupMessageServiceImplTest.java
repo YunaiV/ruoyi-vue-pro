@@ -4,6 +4,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -12,12 +13,14 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -27,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,14 +90,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                     .groupId(10L).userId(1L).status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
 
-            List<ImGroupMemberDO> allMembers = List.of(
-                    member,
-                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
-                    ImGroupMemberDO.builder().groupId(10L).userId(3L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build()
-            );
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(allMembers);
+            when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
+                    .thenReturn(List.of(1L, 2L, 3L));
             when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenAnswer(invocation -> {
                 ImGroupMessageDO msg = invocation.getArgument(0);
                 msg.setId(99L);
@@ -560,12 +558,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             when(groupMessageMapper.updateById(any(ImGroupMessageDO.class))).thenReturn(1);
             when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenReturn(1);
 
-            List<ImGroupMemberDO> members = List.of(
-                    selfMember,
-                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build()
-            );
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(members);
+            when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
+                    .thenReturn(List.of(1L, 2L));
 
             // 调用
             ImGroupMessageDO result = groupMessageService.recallGroupMessage(1L, 50L);
@@ -707,6 +701,363 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> groupMessageService.getGroupReadUsers(99L, 10L, 80L));
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
+    }
+
+    // ========== 发送：补充边界 ==========
+
+    @Test
+    public void testSendMessage_receiptPending() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
+                    .thenReturn(groupMessageService);
+
+            // 准备：reqVO.receipt=true
+            ImGroupMessageSendReqVO reqVO = buildSendReqVO();
+            reqVO.setReceipt(true);
+            when(groupMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-group-001"))
+                    .thenReturn(null);
+            ImGroupDO group = new ImGroupDO();
+            group.setId(10L);
+            when(groupService.validateGroupExists(10L)).thenReturn(group);
+            ImGroupMemberDO member = ImGroupMemberDO.builder()
+                    .groupId(10L).userId(1L).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+            when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L));
+            when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenReturn(1);
+
+            // 调用
+            ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
+
+            // 断言：receipt=true → 回执状态为 PENDING
+            assertEquals(ImGroupMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus());
+        }
+    }
+
+    @Test
+    public void testSendMessage_sensitiveWordBlocked() {
+        // 准备：文本消息命中敏感词
+        ImGroupMessageSendReqVO reqVO = buildSendReqVO();
+        when(groupMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-group-001"))
+                .thenReturn(null);
+        ImGroupDO group = new ImGroupDO();
+        group.setId(10L);
+        when(groupService.validateGroupExists(10L)).thenReturn(group);
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build());
+        doThrow(new ServiceException(MESSAGE_SENSITIVE_WORD_BLOCKED))
+                .when(sensitiveWordService).validateText(reqVO.getContent());
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.sendGroupMessage(1L, reqVO));
+        assertEquals(MESSAGE_SENSITIVE_WORD_BLOCKED.getCode(), exception.getCode());
+        // 断言：不入库、不推送
+        verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
+        verify(imWebSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+    }
+
+    // ========== 撤回：补充边界 ==========
+
+    @Test
+    public void testRecallMessage_notExists() {
+        when(groupMessageMapper.selectById(50L)).thenReturn(null);
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.recallGroupMessage(1L, 50L));
+        assertEquals(MESSAGE_NOT_EXISTS.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testRecallMessage_senderNotInGroup() {
+        // 准备：消息合法、可撤回时间内，但发送人已退群
+        ImGroupMessageDO message = ImGroupMessageDO.builder()
+                .id(50L).senderId(1L).groupId(10L)
+                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .sendTime(LocalDateTime.now()).build();
+        when(groupMessageMapper.selectById(50L)).thenReturn(message);
+        when(groupMemberService.validateMemberInGroup(10L, 1L))
+                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.recallGroupMessage(1L, 50L));
+        assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
+        // 断言：不执行更新、不插 tip
+        verify(groupMessageMapper, never()).updateById(any(ImGroupMessageDO.class));
+        verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
+    }
+
+    // ========== 已读：happy path + 短路 ==========
+
+    @Test
+    public void testReadGroupMessages_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
+                    .thenReturn(groupMessageService);
+
+            // 准备：用户在群；Redis 游标从 5 前进到 100
+            ImGroupMemberDO member = ImGroupMemberDO.builder()
+                    .groupId(10L).userId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+            when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(5L);
+            // readGroupMessageEvent 内部会调 selectListByGroupIdAndPendingReceipt → 返回空简化流程
+            when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 5L, 100L)).thenReturn(List.of());
+
+            // 调用
+            groupMessageService.readGroupMessages(1L, 10L, 100L);
+
+            // 断言：Redis 游标更新 + READ 事件
+            verify(groupMessageReadRedisDAO).updateReadMaxMessageId(10L, 1L, 100L);
+            verify(imWebSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
+        }
+    }
+
+    @Test
+    public void testReadGroupMessages_cursorAlreadyAhead() {
+        // 准备：已读游标已 >= 目标，直接短路返回
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+        when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(200L);
+
+        // 调用
+        groupMessageService.readGroupMessages(1L, 10L, 100L);
+
+        // 断言：不更新、不推送
+        verify(groupMessageReadRedisDAO, never()).updateReadMaxMessageId(anyLong(), anyLong(), anyLong());
+        verify(imWebSocketService, never()).sendGroupMessageAsync(anyLong(), any(ImGroupMessageDTO.class));
+    }
+
+    // ========== 回执：DONE 状态迁移 ==========
+
+    @Test
+    public void testReadGroupMessageEvent_receiptDoneTransition() {
+        // 准备：消息 100 发送者 5，群 10 活跃成员 {5,1,2}，可见用户中除发送者外 {1,2}
+        //       Redis 位置 1→100、2→100 → 全部已读 → 迁移为 DONE
+        ImGroupMessageDO pending = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(5L)
+                .sendTime(LocalDateTime.now().minusMinutes(1))
+                .receiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
+                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
+        when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 0L, 100L))
+                .thenReturn(List.of(pending));
+        List<ImGroupMemberDO> activeMembers = List.of(
+                ImGroupMemberDO.builder().groupId(10L).userId(5L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.now().minusDays(10)).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.now().minusDays(10)).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.now().minusDays(10)).build()
+        );
+        when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(activeMembers);
+        Map<Long, Long> positions = new HashMap<>();
+        positions.put(1L, 100L);
+        positions.put(2L, 100L);
+        when(groupMessageReadRedisDAO.getReadMaxMessageIdMap(10L)).thenReturn(positions);
+
+        // 调用
+        groupMessageService.readGroupMessageEvent(1L, 10L, 0L, 100L);
+
+        // 断言：消息回执状态更新为 DONE
+        ArgumentCaptor<ImGroupMessageDO> captor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
+        verify(groupMessageMapper).updateById(captor.capture());
+        assertEquals(100L, captor.getValue().getId());
+        assertEquals(ImGroupMessageReceiptStatusEnum.DONE.getStatus(), captor.getValue().getReceiptStatus());
+        // 断言：给消息发送方（5）推送 RECEIPT 事件
+        verify(imWebSocketService).sendGroupMessageAsync(eq(5L), any(ImGroupMessageDTO.class));
+    }
+
+    @Test
+    public void testReadGroupMessageEvent_receiptStaysPendingWhenPartialRead() {
+        // 准备：用户 2 还没读到 100 → 仍为 PENDING，不更新 DB
+        ImGroupMessageDO pending = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(5L)
+                .sendTime(LocalDateTime.now().minusMinutes(1))
+                .receiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
+                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
+        when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 0L, 100L))
+                .thenReturn(List.of(pending));
+        List<ImGroupMemberDO> activeMembers = List.of(
+                ImGroupMemberDO.builder().groupId(10L).userId(5L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.now().minusDays(10)).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.now().minusDays(10)).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.now().minusDays(10)).build()
+        );
+        when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(activeMembers);
+        Map<Long, Long> positions = new HashMap<>();
+        positions.put(1L, 100L);
+        positions.put(2L, 50L); // 还没读到 100
+        when(groupMessageReadRedisDAO.getReadMaxMessageIdMap(10L)).thenReturn(positions);
+
+        groupMessageService.readGroupMessageEvent(1L, 10L, 0L, 100L);
+
+        // 断言：回执状态保持 PENDING，不更新 DB
+        verify(groupMessageMapper, never()).updateById(any(ImGroupMessageDO.class));
+        // 仍然推送 RECEIPT 事件给发送方（携带已读人数）
+        verify(imWebSocketService).sendGroupMessageAsync(eq(5L), any(ImGroupMessageDTO.class));
+    }
+
+    // ========== sendGroupMessageEvent：receiverUserIds 定向过滤 ==========
+
+    @Test
+    public void testSendGroupMessageEvent_noReceiverUserIds_broadcastsToAllMembers() {
+        // 准备：无定向 → 应发给所有 ENABLE 成员（含发送者自己，多端同步）
+        ImGroupMessageDO message = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(1L)
+                .sendTime(LocalDateTime.now()).build();
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
+                .thenReturn(List.of(1L, 2L, 3L, 4L));
+
+        groupMessageService.sendGroupMessageEvent(message);
+
+        verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+                        ids.size() == 4 && ids.contains(1L) && ids.contains(2L)
+                                && ids.contains(3L) && ids.contains(4L)),
+                any(ImGroupMessageDTO.class));
+    }
+
+    @Test
+    public void testSendGroupMessageEvent_withReceiverUserIds_onlyTargetedPlusSender() {
+        // 准备：定向给 {2,3}，发送者 1；群成员 {1,2,3,4}
+        // 预期推送目标：{1,2,3}（发送者自己多端同步 + 定向列表）；4 被过滤
+        ImGroupMessageDO message = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(1L)
+                .receiverUserIds(List.of(2L, 3L))
+                .sendTime(LocalDateTime.now()).build();
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
+                .thenReturn(List.of(1L, 2L, 3L, 4L));
+
+        groupMessageService.sendGroupMessageEvent(message);
+
+        verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+                        ids.size() == 3 && ids.contains(1L) && ids.contains(2L)
+                                && ids.contains(3L) && !ids.contains(4L)),
+                any(ImGroupMessageDTO.class));
+    }
+
+    @Test
+    public void testSendGroupMessageEvent_withReceiverUserIds_senderNotInGroup_senderStillExcluded() {
+        // 边界：发送者不在群的 userId 列表里（理论上应先被 validateMemberInGroup 挡住，这里纯防御）
+        // 预期：仅定向用户可见
+        ImGroupMessageDO message = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(99L)
+                .receiverUserIds(List.of(2L, 3L))
+                .sendTime(LocalDateTime.now()).build();
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
+                .thenReturn(List.of(1L, 2L, 3L, 4L));
+
+        groupMessageService.sendGroupMessageEvent(message);
+
+        verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+                        ids.size() == 2 && ids.contains(2L) && ids.contains(3L)),
+                any(ImGroupMessageDTO.class));
+    }
+
+    // ========== sendTipGroupMessage ==========
+
+    @Test
+    public void testSendTipGroupMessage_success() {
+        // 准备
+        Set<Long> targets = Set.of(1L, 2L, 3L);
+
+        // 调用
+        groupMessageService.sendTipGroupMessage(1L, 10L, targets, "张三加入了群聊");
+
+        // 断言：插入一条 TIP_TEXT 提示消息
+        ArgumentCaptor<ImGroupMessageDO> msgCaptor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
+        verify(groupMessageMapper).insert(msgCaptor.capture());
+        ImGroupMessageDO tip = msgCaptor.getValue();
+        assertEquals(1L, tip.getSenderId());
+        assertEquals(10L, tip.getGroupId());
+        assertEquals(ImMessageTypeEnum.TIP_TEXT.getType(), tip.getType());
+        assertEquals("张三加入了群聊", tip.getContent());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), tip.getStatus());
+        assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), tip.getReceiptStatus());
+        assertNotNull(tip.getClientMessageId());
+        assertNotNull(tip.getSendTime());
+        // 断言：推送给指定用户集合
+        verify(imWebSocketService).sendGroupMessageAsync(eq(targets), any(ImGroupMessageDTO.class));
+    }
+
+    // ========== getGroupMessageList ==========
+
+    @Test
+    public void testGetGroupMessageList_delegatesToMapperWithJoinTime() {
+        // 准备
+        LocalDateTime joinTime = LocalDateTime.now().minusDays(5);
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .id(50L).groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(joinTime).build();
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+
+        ImGroupMessageListReqVO reqVO = new ImGroupMessageListReqVO();
+        reqVO.setGroupId(10L);
+        reqVO.setMaxId(100L);
+        reqVO.setLimit(20);
+
+        List<ImGroupMessageDO> mockList = List.of(
+                ImGroupMessageDO.builder().id(99L).groupId(10L).senderId(2L).build()
+        );
+        when(groupMessageMapper.selectHistoryList(10L, 100L, 20, joinTime)).thenReturn(mockList);
+
+        // 调用
+        List<ImGroupMessageDO> result = groupMessageService.getGroupMessageList(1L, reqVO);
+
+        // 断言：使用成员的 joinTime 作为历史消息的下限
+        assertEquals(1, result.size());
+        verify(groupMessageMapper).selectHistoryList(10L, 100L, 20, joinTime);
+    }
+
+    @Test
+    public void testGetGroupMessageList_notInGroup() {
+        // 准备：用户不在群中
+        ImGroupMessageListReqVO reqVO = new ImGroupMessageListReqVO();
+        reqVO.setGroupId(10L);
+        reqVO.setLimit(20);
+        when(groupMemberService.validateMemberInGroup(10L, 1L))
+                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(),
+                        GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
+
+        // 调用并断言：鉴权失败
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.getGroupMessageList(1L, reqVO));
+        assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
+        // 断言：不查询 DB
+        verify(groupMessageMapper, never()).selectHistoryList(anyLong(), anyLong(), anyInt(), any());
+    }
+
+    // ========== delete read cursor 委托 ==========
+
+    @Test
+    public void testDeleteReadMaxMessageId_delegatesToRedis() {
+        groupMessageService.deleteReadMaxMessageId(10L, 1L);
+
+        verify(groupMessageReadRedisDAO).deleteReadMaxMessageId(10L, 1L);
+    }
+
+    @Test
+    public void testDeleteReadMaxMessageIds_delegatesToRedis() {
+        groupMessageService.deleteReadMaxMessageIds(10L, List.of(1L, 2L));
+
+        verify(groupMessageReadRedisDAO).deleteReadMaxMessageIds(10L, List.of(1L, 2L));
+    }
+
+    @Test
+    public void testDeleteReadMaxMessageIdMap_delegatesToRedis() {
+        groupMessageService.deleteReadMaxMessageIdMap(10L);
+
+        verify(groupMessageReadRedisDAO).deleteReadMaxMessageIdMap(10L);
     }
 
 }

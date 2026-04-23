@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
@@ -243,6 +244,113 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> privateMessageService.recallPrivateMessage(1L, 10L));
         assertEquals(MESSAGE_ALREADY_RECALLED.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testRecallMessage_notExists() {
+        // 准备
+        when(privateMessageMapper.selectById(10L)).thenReturn(null);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> privateMessageService.recallPrivateMessage(1L, 10L));
+        assertEquals(MESSAGE_NOT_EXISTS.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testRecallMessage_timeout() {
+        // 准备：消息发送于 10 分钟前（超过 5 分钟窗口）
+        ImPrivateMessageDO message = ImPrivateMessageDO.builder()
+                .id(10L).senderId(1L).receiverId(2L)
+                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .sendTime(LocalDateTime.now().minusMinutes(10)).build();
+        when(privateMessageMapper.selectById(10L)).thenReturn(message);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> privateMessageService.recallPrivateMessage(1L, 10L));
+        assertEquals(MESSAGE_RECALL_TIMEOUT.getCode(), exception.getCode());
+        // 断言：不推送、不插 tipMessage
+        verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
+    }
+
+    @Test
+    public void testSendMessage_sensitiveWordBlocked() {
+        // 准备：文本消息命中敏感词
+        ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
+        when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
+                .thenReturn(null);
+        when(friendService.isFriend(1L, 2L)).thenReturn(true);
+        doThrow(new ServiceException(MESSAGE_SENSITIVE_WORD_BLOCKED))
+                .when(sensitiveWordService).validateText(reqVO.getContent());
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> privateMessageService.sendPrivateMessage(1L, reqVO));
+        assertEquals(MESSAGE_SENSITIVE_WORD_BLOCKED.getCode(), exception.getCode());
+        // 断言：不入库、不推送
+        verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
+        verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+    }
+
+    @Test
+    public void testReadMessages_noUnread() {
+        // 准备：没有未读消息
+        when(privateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
+                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(List.of());
+
+        // 调用
+        privateMessageService.readPrivateMessages(1L, 2L);
+
+        // 断言：不更新、不推送
+        verify(privateMessageMapper, never()).updateByIdsAndStatus(anyList(), anyInt(), any(ImPrivateMessageDO.class));
+        verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+    }
+
+    // ========== sendTipPrivateMessage ==========
+
+    @Test
+    public void testSendTipPrivateMessage_success() {
+        // 调用
+        privateMessageService.sendTipPrivateMessage(1L, 2L, "好友添加成功");
+
+        // 断言：插入一条 TIP_TEXT 提示消息
+        ArgumentCaptor<ImPrivateMessageDO> captor = ArgumentCaptor.forClass(ImPrivateMessageDO.class);
+        verify(privateMessageMapper).insert(captor.capture());
+        ImPrivateMessageDO tip = captor.getValue();
+        assertEquals(1L, tip.getSenderId());
+        assertEquals(2L, tip.getReceiverId());
+        assertEquals(ImMessageTypeEnum.TIP_TEXT.getType(), tip.getType());
+        assertEquals("好友添加成功", tip.getContent());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), tip.getStatus());
+        assertNotNull(tip.getClientMessageId());
+        assertNotNull(tip.getSendTime());
+        // 断言：给双方各推送一次
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+    }
+
+    // ========== getPrivateMessageList ==========
+
+    @Test
+    public void testGetPrivateMessageList_delegatesToMapper() {
+        // 准备
+        ImPrivateMessageListReqVO reqVO = new ImPrivateMessageListReqVO();
+        reqVO.setReceiverId(2L);
+        reqVO.setMaxId(100L);
+        reqVO.setLimit(20);
+        List<ImPrivateMessageDO> mockList = List.of(
+                ImPrivateMessageDO.builder().id(99L).senderId(1L).receiverId(2L).build(),
+                ImPrivateMessageDO.builder().id(98L).senderId(2L).receiverId(1L).build()
+        );
+        when(privateMessageMapper.selectHistoryList(1L, 2L, 100L, 20)).thenReturn(mockList);
+
+        // 调用
+        List<ImPrivateMessageDO> result = privateMessageService.getPrivateMessageList(1L, reqVO);
+
+        // 断言：透传到 mapper，参数一致
+        assertEquals(2, result.size());
+        verify(privateMessageMapper).selectHistoryList(1L, 2L, 100L, 20);
     }
 
 }

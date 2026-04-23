@@ -256,19 +256,19 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
-    public List<ImGroupDO> getActiveGroupList(Long userId) {
-        // 1. 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
+    public List<ImGroupDO> getMyGroupList(Long userId) {
+        // 1.1 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
         List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByUserId(userId);
+        // 1.2 再查最近 MESSAGE_GROUP_PULL_MAX_DAYS 天内退群的成员记录（退群前可能有离线消息需要展示，一并返回作为前端缓存）
+        LocalDateTime minQuitTime = LocalDateTime.now().minusDays(MESSAGE_GROUP_PULL_MAX_DAYS);
+        members.addAll(groupMemberService.getQuitGroupMemberListByUserId(userId, minQuitTime));
         if (CollUtil.isEmpty(members)) {
             return Collections.emptyList();
         }
-        Set<Long> groupIds = convertSet(members, ImGroupMemberDO::getGroupId);
-        if (CollUtil.isEmpty(groupIds)) {
-            return Collections.emptyList();
-        }
 
-        // 2. 批量查询群信息（仅 ENABLE 状态）
-        return groupMapper.selectListByIds(groupIds, CommonStatusEnum.ENABLE.getStatus(), false);
+        // 2. 批量查询群信息（不按 status / banned 过滤，已解散 / 封禁的群也要返回，供前端展示历史消息的群名 / 头像）
+        Set<Long> groupIds = convertSet(members, ImGroupMemberDO::getGroupId);
+        return groupMapper.selectByIds(groupIds);
     }
 
     private ImGroupServiceImpl getSelf() {

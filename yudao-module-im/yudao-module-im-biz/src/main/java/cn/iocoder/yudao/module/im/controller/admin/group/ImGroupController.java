@@ -73,7 +73,7 @@ public class ImGroupController {
     @GetMapping("/list")
     @Operation(summary = "获得当前登录用户的群列表")
     public CommonResult<List<ImGroupRespVO>> getMyGroupList() {
-        List<ImGroupDO> groups = groupService.getActiveGroupList(getLoginUserId());
+        List<ImGroupDO> groups = groupService.getMyGroupList(getLoginUserId());
         return success(BeanUtils.toBean(groups, ImGroupRespVO.class));
     }
 

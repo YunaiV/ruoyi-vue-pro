@@ -31,4 +31,14 @@ public interface RedisKeyConstants {
      */
     String GROUP = "group";
 
+    /**
+     * 群有效成员 userId 列表缓存（仅 ENABLE 状态）
+     * <p>
+     * KEY 格式：group_member_ids:{groupId}
+     * VALUE 数据类型：List<Long>
+     * <p>
+     * 说明：只缓存轻量的 userId 列表，适合"群消息推送目标"这类只关心 userId 的场景。
+     */
+    String GROUP_MEMBER_IDS = "group_member_ids";
+
 }

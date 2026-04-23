@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.im.controller.admin.group;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
 @Tag(name = "管理后台 - 群成员")
 @RestController
@@ -58,8 +62,17 @@ public class ImGroupMemberController {
     @Operation(summary = "获得指定群的成员列表")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1024")
     public CommonResult<List<ImGroupMemberRespVO>> getGroupMemberList(@RequestParam("groupId") Long groupId) {
+        // 1.1 查询群成员列表（包含 DISABLE 已退群的成员，不按时间过滤）
+        // 说明：保留已退群成员，是为了前端展示历史消息时，仍能通过该接口拿到已退群成员的昵称 / 头像信息，避免显示为空
         List<ImGroupMemberDO> members = groupMemberService.getGroupMemberListByGroupId(groupId);
-        // 批量聚合 AdminUser 信息（昵称 / 头像）
+        // 1.2 校验当前登录用户是否为群的有效成员，非成员不可查看
+        Long loginUserId = getLoginUserId();
+        if (CollUtil.findOne(members, m -> loginUserId.equals(m.getUserId())
+                && CommonStatusEnum.ENABLE.getStatus().equals(m.getStatus())) == null) {
+            throw exception(GROUP_MEMBER_NOT_IN_GROUP);
+        }
+
+        // 2.批量聚合 AdminUser 信息（昵称 / 头像）
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertList(members, ImGroupMemberDO::getUserId));
         return success(convertList(members, m -> {

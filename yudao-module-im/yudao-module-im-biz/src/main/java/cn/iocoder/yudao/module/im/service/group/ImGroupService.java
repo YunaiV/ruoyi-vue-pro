@@ -77,14 +77,15 @@ public interface ImGroupService {
     ImGroupDO validateGroupOwner(Long groupId, Long userId);
 
     /**
-     * 获取指定用户加入的所有"有效"群（未退群且未封禁/解散）
+     * 获取指定用户的群列表
      * <p>
-     * 返回当前登录用户在群内身份仍有效的所有群。
+     * 返回用户当前仍有效的群，以及最近 {@link cn.iocoder.yudao.module.im.enums.ImCommonConstants#MESSAGE_GROUP_PULL_MAX_DAYS}
+     * 天内退群的群 —— 退群前可能还有离线消息需要展示，前端需要把这些群信息作为缓存。
      *
      * @param userId 用户编号
      * @return 群列表
      */
-    List<ImGroupDO> getActiveGroupList(Long userId);
+    List<ImGroupDO> getMyGroupList(Long userId);
 
     // ==================== 群成员的写操作 ====================
     // 说明：群成员的写操作统一放在 ImGroupService，而非 ImGroupMemberService，

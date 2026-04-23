@@ -40,6 +40,18 @@ public interface ImGroupMemberService {
     List<ImGroupMemberDO> getActiveGroupMemberListByGroupId(Long groupId);
 
     /**
+     * 根据群编号查询有效成员的 userId 列表（仅 ENABLE 状态）
+     * <p>
+     * 相比 {@link #getActiveGroupMemberListByGroupId(Long)}，只返回 userId，结果体积小，并带有 Redis 缓存。
+     * 适用于"群消息推送目标"等只需要 userId 的场景；
+     * 需要 joinTime/quitTime/status 等字段做历史消息可见性判断时，仍应使用完整列表方法。
+     *
+     * @param groupId 群编号
+     * @return 有效群成员 userId 列表
+     */
+    List<Long> getActiveGroupMemberUserIdsByGroupId(Long groupId);
+
+    /**
      * 查询用户所在的所有群的有效成员记录（仅 ENABLE 状态）
      *
      * @param userId 用户编号

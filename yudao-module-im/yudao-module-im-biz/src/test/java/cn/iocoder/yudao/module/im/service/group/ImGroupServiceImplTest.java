@@ -279,6 +279,43 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testInviteGroupMember_memberExceed() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备：群 10 已有 499 人（逼近 MAX_GROUP_MEMBER=500），再邀请 2 人 → 501 超限
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            List<ImGroupMemberDO> activeMembers = new ArrayList<>();
+            for (long i = 1; i <= 499; i++) {
+                activeMembers.add(ImGroupMemberDO.builder().groupId(10L).userId(i)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build());
+            }
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(activeMembers);
+
+            ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setMemberUserIds(new ArrayList<>(List.of(600L, 601L)));
+            // 被邀请人都是好友
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+                    ImFriendDO.builder().userId(1L).friendUserId(600L)
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                    ImFriendDO.builder().userId(1L).friendUserId(601L)
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()
+            ));
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.inviteGroupMember(1L, reqVO));
+            assertEquals(GROUP_MEMBER_EXCEED.getCode(), exception.getCode());
+            // 断言：不加成员、不推送
+            verify(groupMemberService, never()).addGroupMembers(anyLong(), anyCollection());
+        }
+    }
+
+    @Test
     public void testInviteGroupMember_skipsMembersAlreadyInGroup() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
@@ -439,34 +476,43 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
-    // ========== getActiveGroupList ==========
+    // ========== getMyGroupList ==========
 
     @Test
-    public void testGetActiveGroupList_noMembers() {
-        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of());
+    public void testGetMyGroupList_noMembers() {
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>());
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(new ArrayList<>());
 
-        List<ImGroupDO> result = groupService.getActiveGroupList(1L);
+        List<ImGroupDO> result = groupService.getMyGroupList(1L);
         assertTrue(result.isEmpty());
-        verify(groupMapper, never()).selectListByIds(anyCollection(), any(), any());
+        verify(groupMapper, never()).selectByIds(anyCollection());
     }
 
     @Test
-    public void testGetActiveGroupList_success() {
-        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(
+    public void testGetMyGroupList_success() {
+        // 活跃群成员
+        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(20L).userId(1L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()
-        ));
+        )));
+        // 最近退群成员（最近 30 天内）
+        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(new ArrayList<>(List.of(
+                        ImGroupMemberDO.builder().groupId(30L).userId(1L)
+                                .status(CommonStatusEnum.DISABLE.getStatus()).build()
+                )));
         List<ImGroupDO> groups = List.of(
                 ImGroupDO.builder().id(10L).status(CommonStatusEnum.ENABLE.getStatus()).build(),
-                ImGroupDO.builder().id(20L).status(CommonStatusEnum.ENABLE.getStatus()).build()
+                ImGroupDO.builder().id(20L).status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                ImGroupDO.builder().id(30L).status(CommonStatusEnum.ENABLE.getStatus()).build()
         );
-        when(groupMapper.selectListByIds(anyCollection(), eq(CommonStatusEnum.ENABLE.getStatus()), eq(false)))
-                .thenReturn(groups);
+        when(groupMapper.selectByIds(anyCollection())).thenReturn(groups);
 
-        List<ImGroupDO> result = groupService.getActiveGroupList(1L);
-        assertEquals(2, result.size());
+        List<ImGroupDO> result = groupService.getMyGroupList(1L);
+        assertEquals(3, result.size());
     }
 
 }

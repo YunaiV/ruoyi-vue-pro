@@ -361,12 +361,23 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     /**
      * 发送群聊消息 WebSocket 事件
+     * <p>
+     * 这里仅用于"新消息"（首发 or 撤回提示），{@code message.sendTime = now}：
+     * <ul>
+     *   <li>所有 ENABLE 成员的 {@code joinTime <= now}，{@link #isMessageVisible} 的 joinTime 分支恒为真；</li>
+     *   <li>ENABLE 成员 status 非 DISABLE，quitTime 分支不适用；</li>
+     * </ul>
+     * 因此只剩 {@code receiverUserIds} 定向过滤会真正起效。
+     * 故使用只含 userId 的轻量缓存 {@link ImGroupMemberService#getActiveGroupMemberUserIdsByGroupId(Long)}，
+     * 在本地以 {@link #getVisibleUserIds} 完成定向过滤即可。
+     * <p>
+     * 注意：对历史消息的可见性判断仍需 joinTime/quitTime，见 {@code readGroupMessageEvent} 等处。
      */
     public void sendGroupMessageEvent(ImGroupMessageDO message) {
         ImGroupMessageDTO dto = ImGroupMessageDTO.ofSend(message);
         // 广播给群内有效成员中的可见用户（含发送方自己，支持多端同步；定向消息自动过滤）
-        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(message.getGroupId());
-        Set<Long> targetUserIds = getVisibleUserIds(message, members);
+        List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(message.getGroupId());
+        Set<Long> targetUserIds = getVisibleUserIds(message, memberUserIds);
         imWebSocketService.sendGroupMessageAsync(targetUserIds, dto);
     }
 
@@ -466,9 +477,38 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     /**
      * 计算一条群消息的可见成员集合（含发送者）
      */
-    private Set<Long> getVisibleUserIds(ImGroupMessageDO msg, List<ImGroupMemberDO> allMembers) {
-        return convertSet(allMembers, ImGroupMemberDO::getUserId,
-                member -> isMessageVisible(msg, member, member.getUserId()));
+    private Set<Long> getVisibleUserIds(ImGroupMessageDO message, List<ImGroupMemberDO> members) {
+        return convertSet(members, ImGroupMemberDO::getUserId,
+                member -> isMessageVisible(message, member, member.getUserId()));
+    }
+
+    /**
+     * 基于群成员 userId 列表，过滤出一条消息的可见成员集合（含发送者）。
+     * <p>
+     * 仅适用于"新消息"推送场景（{@code sendTime = now}），不涉及 joinTime/quitTime 判定，
+     * 只应用 {@code receiverUserIds} 定向过滤；语义与
+     * {@link #isMessageVisible(ImGroupMessageDO, ImGroupMemberDO, Long)} 的第 3 步保持一致。
+     */
+    private Set<Long> getVisibleUserIds(ImGroupMessageDO message, Collection<Long> memberUserIds) {
+        if (CollUtil.isEmpty(memberUserIds)) {
+            return new HashSet<>();
+        }
+        // 无定向接收列表 → 全员可见
+        if (CollUtil.isEmpty(message.getReceiverUserIds())) {
+            return new HashSet<>(memberUserIds);
+        }
+        // 有定向接收列表 → 仅定向用户可见；发送者自己也能看到自己的消息（多端同步）
+        Set<Long> allowed = new HashSet<>(message.getReceiverUserIds());
+        if (message.getSenderId() != null) {
+            allowed.add(message.getSenderId());
+        }
+        Set<Long> result = new HashSet<>();
+        for (Long userId : memberUserIds) {
+            if (allowed.contains(userId)) {
+                result.add(userId);
+            }
+        }
+        return result;
     }
 
     @Override

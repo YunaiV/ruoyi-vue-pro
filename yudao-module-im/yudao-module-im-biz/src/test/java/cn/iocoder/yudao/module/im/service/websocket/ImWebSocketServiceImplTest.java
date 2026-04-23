@@ -137,6 +137,24 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testSendPrivateMessageAsync_exceptionSwallowed() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
+                    .thenReturn(imWebSocketService);
+
+            // 准备：sender 抛异常
+            ImPrivateMessageDTO dto = new ImPrivateMessageDTO().setSenderId(1L).setReceiverId(2L);
+            doThrow(new RuntimeException("user offline"))
+                    .when(webSocketMessageSender).sendObject(anyInt(), anyLong(), anyString(), any());
+
+            // 调用：异常应被吞掉，不向上抛
+            imWebSocketService.sendPrivateMessageAsync(2L, dto);
+
+            verify(webSocketMessageSender).sendObject(anyInt(), eq(2L), anyString(), any());
+        }
+    }
+
+    @Test
     public void testSendGroupMessageAsync_singleUserDefaultOverload() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))

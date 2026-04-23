@@ -130,6 +130,52 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testAddGroupMembers_allExisting_onlyUpdates() {
+        // 准备：传入的 3 个用户都已有记录（全部 DISABLE） → 只做 update，不做 insert
+        List<ImGroupMemberDO> existing = List.of(
+                ImGroupMemberDO.builder().id(1L).groupId(10L).userId(2L)
+                        .status(CommonStatusEnum.DISABLE.getStatus()).build(),
+                ImGroupMemberDO.builder().id(2L).groupId(10L).userId(3L)
+                        .status(CommonStatusEnum.DISABLE.getStatus()).build()
+        );
+        when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
+                .thenReturn(existing);
+
+        groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
+
+        verify(groupMemberMapper).updateBatch(anyList());
+        verify(groupMemberMapper, never()).insertBatch(anyList());
+    }
+
+    @Test
+    public void testAddGroupMembers_allNew_onlyInserts() {
+        // 准备：都不存在 → 只做 insert
+        when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
+                .thenReturn(List.of());
+
+        groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
+
+        verify(groupMemberMapper, never()).updateBatch(anyList());
+        verify(groupMemberMapper).insertBatch(anyList());
+    }
+
+    @Test
+    public void testAddGroupMembers_allExistingEnabled_nothingHappens() {
+        // 准备：都已存在且 ENABLE → 既不 update 也不 insert
+        List<ImGroupMemberDO> existing = List.of(
+                ImGroupMemberDO.builder().id(1L).groupId(10L).userId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()
+        );
+        when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
+                .thenReturn(existing);
+
+        groupMemberService.addGroupMembers(10L, List.of(2L));
+
+        verify(groupMemberMapper, never()).updateBatch(anyList());
+        verify(groupMemberMapper, never()).insertBatch(anyList());
+    }
+
+    @Test
     public void testAddGroupMembers_batchInsertDuplicateFallback() {
         // 准备：两个新增成员，批量插入失败时降级为逐个 addGroupMember
         when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
@@ -246,6 +292,39 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
                 eq(CommonStatusEnum.ENABLE.getStatus()), captor.capture());
         assertEquals(CommonStatusEnum.DISABLE.getStatus(), captor.getValue().getStatus());
         assertNotNull(captor.getValue().getQuitTime());
+    }
+
+    // ========== getActiveGroupMemberUserIdsByGroupId ==========
+
+    @Test
+    public void testGetActiveGroupMemberUserIdsByGroupId_extractsUserIds() {
+        // 准备：3 个 ENABLE 成员
+        List<ImGroupMemberDO> members = List.of(
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                ImGroupMemberDO.builder().groupId(10L).userId(3L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()
+        );
+        when(groupMemberMapper.selectListByGroupIdAndStatus(
+                10L, CommonStatusEnum.ENABLE.getStatus())).thenReturn(members);
+
+        // 调用
+        List<Long> userIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L);
+
+        // 断言：只返回 userId、顺序保留
+        assertEquals(List.of(1L, 2L, 3L), userIds);
+    }
+
+    @Test
+    public void testGetActiveGroupMemberUserIdsByGroupId_emptyList() {
+        when(groupMemberMapper.selectListByGroupIdAndStatus(
+                10L, CommonStatusEnum.ENABLE.getStatus())).thenReturn(List.of());
+
+        List<Long> userIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L);
+
+        assertTrue(userIds.isEmpty());
     }
 
 }

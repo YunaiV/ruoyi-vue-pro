@@ -10,6 +10,8 @@ import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP_MEMBER_IDS;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
 /**
@@ -55,6 +59,24 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return groupMemberMapper.selectListByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    /**
+     * 只缓存 userId 列表而非整个 {@link ImGroupMemberDO}，理由：
+     * <ul>
+     *   <li>体积小：500 人群约 4KB，失效/序列化成本低；</li>
+     *   <li>失效面窄：仅 {@link #addGroupMember}/{@link #addGroupMembers}/
+     *       {@link #removeGroupMember}/{@link #removeGroupMembers}/{@link #removeGroupMembersByGroupId}
+     *       这类影响成员集合的写操作需要失效；
+     *       {@link #updateGroupMember}（昵称/备注/免打扰）不修改集合成员，不需要失效。</li>
+     * </ul>
+     */
+    @Override
+    @Cacheable(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
+    public List<Long> getActiveGroupMemberUserIdsByGroupId(Long groupId) {
+        List<ImGroupMemberDO> members = groupMemberMapper.selectListByGroupIdAndStatus(
+                groupId, CommonStatusEnum.ENABLE.getStatus());
+        return convertList(members, ImGroupMemberDO::getUserId);
+    }
+
     @Override
     public List<ImGroupMemberDO> getActiveGroupMemberListByUserId(Long userId) {
         return groupMemberMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
@@ -70,6 +92,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
      * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
      */
     @Override
+    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
     public ImGroupMemberDO addGroupMember(Long groupId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         // 情况一：已存在记录 → 复活或跳过
@@ -96,6 +119,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
+    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
     public void addGroupMembers(Long groupId, Collection<Long> userIds) {
         LocalDateTime now = LocalDateTime.now();
         // 1.1 查询已有记录（含已退群的 DISABLE 记录）
@@ -158,6 +182,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
+    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
     public void removeGroupMember(Long groupId, Long userId) {
         // 1. 校验是群的有效成员
         ImGroupMemberDO member = validateMemberInGroup(groupId, userId);
@@ -168,6 +193,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
+    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
     public void removeGroupMembers(Long groupId, Collection<Long> userIds) {
         groupMemberMapper.updateByGroupIdAndUserIdsAndStatus(groupId, userIds,
                 CommonStatusEnum.ENABLE.getStatus(),
@@ -176,6 +202,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
+    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
     public void removeGroupMembersByGroupId(Long groupId) {
         groupMemberMapper.updateByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus(),
                 new ImGroupMemberDO().setStatus(CommonStatusEnum.DISABLE.getStatus())

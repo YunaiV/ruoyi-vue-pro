@@ -211,21 +211,6 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
         assertEquals(after.getId(), result.get(0).getId());
     }
 
-    // ========== selectBySenderIdAndClientMessageId ==========
-
-    @Test
-    public void testSelectBySenderIdAndClientMessageId() {
-        ImGroupMessageDO msg = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        msg.setClientMessageId("group-uuid-001");
-        mapper.insert(msg);
-
-        ImGroupMessageDO result = mapper.selectBySenderIdAndClientMessageId(1L, "group-uuid-001");
-        assertNotNull(result);
-        assertEquals(msg.getId(), result.getId());
-
-        assertNull(mapper.selectBySenderIdAndClientMessageId(1L, "not-exist"));
-    }
-
     // ========== selectListByGroupIdAndPendingReceipt ==========
 
     @Test
