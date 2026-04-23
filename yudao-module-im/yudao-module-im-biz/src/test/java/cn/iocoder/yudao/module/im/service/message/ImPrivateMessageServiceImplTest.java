@@ -1,19 +1,20 @@
 package cn.iocoder.yudao.module.im.service.message;
 
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
+import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,13 +35,13 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     private ImPrivateMessageServiceImpl privateMessageService;
 
     @Mock
-    private ImPrivateMessageMapper imPrivateMessageMapper;
+    private ImPrivateMessageMapper privateMessageMapper;
     @Mock
-    private ImFriendService imFriendService;
+    private ImFriendService friendService;
     @Mock
-    private ImSensitiveWordService imSensitiveWordService;
+    private ImSensitiveWordService sensitiveWordService;
     @Mock
-    private WebSocketMessageSender webSocketMessageSender;
+    private ImWebSocketService imWebSocketService;
 
     private ImPrivateMessageSendReqVO buildSendReqVO() {
         ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
@@ -55,37 +56,35 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testSendMessage_success() {
-        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
-                    .thenReturn(privateMessageService);
+        // 准备
+        ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
+        when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
+                .thenReturn(null);
+        when(friendService.isFriend(1L, 2L)).thenReturn(true);
+        when(privateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
+            ImPrivateMessageDO msg = invocation.getArgument(0);
+            msg.setId(99L);
+            return 1;
+        });
 
-            // 准备
-            ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
-            when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
-                    .thenReturn(null);
-            when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
-                ImPrivateMessageDO msg = invocation.getArgument(0);
-                msg.setId(99L);
-                return 1;
-            });
+        // 调用
+        ImPrivateMessageDO result = privateMessageService.sendPrivateMessage(1L, reqVO);
 
-            // 调用
-            ImPrivateMessageDO result = privateMessageService.sendPrivateMessage(1L, reqVO);
+        // 断言
+        assertNotNull(result);
+        assertEquals(1L, result.getSenderId());
+        assertEquals(2L, result.getReceiverId());
+        assertEquals(0, result.getType());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
+        assertNotNull(result.getSendTime());
 
-            // 断言
-            assertNotNull(result);
-            assertEquals(1L, result.getSenderId());
-            assertEquals(2L, result.getReceiverId());
-            assertEquals(0, result.getType());
-            assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
-            assertNotNull(result.getSendTime());
-
-            // 验证调用
-            verify(imFriendService).isFriend(1L, 2L);
-            verify(imSensitiveWordService).validateText(reqVO.getContent());
-            verify(imPrivateMessageMapper).insert(any(ImPrivateMessageDO.class));
-            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
-        }
+        // 验证调用
+        verify(friendService).isFriend(1L, 2L);
+        verify(sensitiveWordService).validateText(reqVO.getContent());
+        verify(privateMessageMapper).insert(any(ImPrivateMessageDO.class));
+        // 验证推送给接收方和发送方
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
     }
 
     @Test
@@ -96,7 +95,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 .id(100L).clientMessageId("test-uuid-001").senderId(1L).receiverId(2L)
                 .type(0).content("{\"content\":\"你好\"}").status(0)
                 .sendTime(LocalDateTime.now()).build();
-        when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
+        when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(existingMessage);
 
         // 调用
@@ -105,16 +104,16 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 断言：返回已存在的消息
         assertEquals(100L, result.getId());
         // 验证不会重复插入
-        verify(imPrivateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
+        verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
     }
 
     @Test
     public void testSendMessage_notFriend() {
         // 准备
         ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
-        when(imPrivateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
+        when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(null);
-        when(imFriendService.isFriend(1L, 2L)).thenReturn(false);
+        when(friendService.isFriend(1L, 2L)).thenReturn(false);
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -131,7 +130,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 ImPrivateMessageDO.builder().id(1L).senderId(1L).receiverId(2L).build(),
                 ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L).build()
         );
-        when(imPrivateMessageMapper.selectListByMinId(eq(1L), eq(0L), any(LocalDateTime.class), eq(100)))
+        when(privateMessageMapper.selectListByMinId(eq(1L), eq(0L), any(LocalDateTime.class), eq(100)))
                 .thenReturn(mockMessages);
 
         // 调用
@@ -153,58 +152,67 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadMessages_success() {
-        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
-                    .thenReturn(privateMessageService);
+        // 准备：mock 未读消息（id=1 和 id=5，maxReadId 应为 5）
+        List<ImPrivateMessageDO> unreadMessages = List.of(
+                ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
+                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build(),
+                ImPrivateMessageDO.builder().id(5L).senderId(2L).receiverId(1L)
+                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
+        );
+        when(privateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
+                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
 
-            // 准备：mock 未读消息列表
-            List<ImPrivateMessageDO> unreadMessages = List.of(
-                    ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
-                            .status(ImMessageStatusEnum.UNREAD.getStatus()).build(),
-                    ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L)
-                            .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
-            );
-            when(imPrivateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
-                    ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
+        // 调用
+        privateMessageService.readPrivateMessages(1L, 2L);
 
-            // 调用
-            privateMessageService.readPrivateMessages(1L, 2L);
+        // 断言：更新了消息状态
+        verify(privateMessageMapper).updateByIdsAndStatus(eq(List.of(1L, 5L)),
+                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class));
 
-            // 断言：更新了消息状态 + 发送了 READ 和 RECEIPT 事件
-            verify(imPrivateMessageMapper).updateByIdsAndStatus(eq(List.of(1L, 2L)),
-                    eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class));
-            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
-        }
+        // 断言：发送了 READ + RECEIPT 事件，payload 字段正确
+        ArgumentCaptor<Long> userCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<ImPrivateMessageDTO> contentCaptor = ArgumentCaptor.forClass(ImPrivateMessageDTO.class);
+        verify(imWebSocketService, times(2)).sendPrivateMessageAsync(
+                userCaptor.capture(), contentCaptor.capture());
+
+        // 第一次：发给自己的 READ 事件
+        assertEquals(1L, userCaptor.getAllValues().get(0));
+        ImPrivateMessageDTO readPayload = contentCaptor.getAllValues().get(0);
+        assertEquals(ImMessageTypeEnum.READ.getType(), readPayload.getType());
+        assertEquals(1L, readPayload.getSenderId());
+        assertEquals(2L, readPayload.getReceiverId());
+        assertEquals(5L, readPayload.getId(), "READ id 应为 maxReadId");
+
+        // 第二次：发给对方的 RECEIPT 事件
+        assertEquals(2L, userCaptor.getAllValues().get(1));
+        ImPrivateMessageDTO receiptPayload = contentCaptor.getAllValues().get(1);
+        assertEquals(ImMessageTypeEnum.RECEIPT.getType(), receiptPayload.getType());
+        assertEquals(5L, receiptPayload.getId(), "RECEIPT id 应为 maxReadId");
     }
 
     // ========== 撤回测试 ==========
 
     @Test
     public void testRecallMessage_success() {
-        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImPrivateMessageServiceImpl.class)))
-                    .thenReturn(privateMessageService);
+        // 准备
+        ImPrivateMessageDO message = ImPrivateMessageDO.builder()
+                .id(10L).senderId(1L).receiverId(2L)
+                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .sendTime(LocalDateTime.now()).build(); // 刚发送，5 分钟内
+        when(privateMessageMapper.selectById(10L)).thenReturn(message);
+        when(privateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
+        when(privateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenReturn(1);
 
-            // 准备
-            ImPrivateMessageDO message = ImPrivateMessageDO.builder()
-                    .id(10L).senderId(1L).receiverId(2L)
-                    .status(ImMessageStatusEnum.UNREAD.getStatus())
-                    .sendTime(LocalDateTime.now()).build(); // 刚发送，5 分钟内
-            when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
-            when(imPrivateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
-            when(imPrivateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenReturn(1);
+        // 调用
+        ImPrivateMessageDO result = privateMessageService.recallPrivateMessage(1L, 10L);
 
-            // 调用
-            ImPrivateMessageDO result = privateMessageService.recallPrivateMessage(1L, 10L);
-
-            // 断言：返回 TIP_TEXT 消息
-            assertNotNull(result);
-            // 验证：更新原消息状态 + 插入 tipMessage
-            verify(imPrivateMessageMapper).updateById(any(ImPrivateMessageDO.class));
-            verify(imPrivateMessageMapper).insert(any(ImPrivateMessageDO.class));
-            // 验证推送了消息（给接收方和发送方）
-            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
-        }
+        // 断言：返回 TIP_TEXT 消息
+        assertNotNull(result);
+        // 验证：更新原消息状态 + 插入 tipMessage
+        verify(privateMessageMapper).updateById(any(ImPrivateMessageDO.class));
+        verify(privateMessageMapper).insert(any(ImPrivateMessageDO.class));
+        // 验证推送了消息（给接收方和发送方）
+        verify(imWebSocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }
 
     @Test
@@ -214,7 +222,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 .id(10L).senderId(2L).receiverId(1L)
                 .status(ImMessageStatusEnum.UNREAD.getStatus())
                 .sendTime(LocalDateTime.now()).build();
-        when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
+        when(privateMessageMapper.selectById(10L)).thenReturn(message);
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -229,7 +237,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 .id(10L).senderId(1L).receiverId(2L)
                 .status(ImMessageStatusEnum.RECALL.getStatus())
                 .sendTime(LocalDateTime.now()).build();
-        when(imPrivateMessageMapper.selectById(10L)).thenReturn(message);
+        when(privateMessageMapper.selectById(10L)).thenReturn(message);
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,

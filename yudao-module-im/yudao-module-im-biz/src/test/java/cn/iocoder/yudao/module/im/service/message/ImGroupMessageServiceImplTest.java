@@ -4,7 +4,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -16,12 +15,15 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
+import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private GroupMessageReadRedisDAO groupMessageReadRedisDAO;
     @Mock
-    private WebSocketMessageSender webSocketMessageSender;
+    private ImWebSocketService imWebSocketService;
 
     private ImGroupMessageSendReqVO buildSendReqVO() {
         ImGroupMessageSendReqVO reqVO = new ImGroupMessageSendReqVO();
@@ -109,7 +111,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus());
 
             // 验证推送给 3 个群成员（含发送者自己，用于多端同步）
-            verify(webSocketMessageSender, times(3)).sendObject(anyInt(), anyLong(), anyString(), any());
+            verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+                    ids.size() == 3 && ids.contains(1L) && ids.contains(2L) && ids.contains(3L)),
+                    any(ImGroupMessageDTO.class));
         }
     }
 
@@ -571,8 +575,10 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 验证：更新原消息状态 + 插入 tipMessage
             verify(groupMessageMapper).updateById(any(ImGroupMessageDO.class));
             verify(groupMessageMapper).insert(any(ImGroupMessageDO.class));
-            // 验证：只给 2 个活跃成员推送撤回提示（userId=3 已退群）
-            verify(webSocketMessageSender, times(2)).sendObject(anyInt(), anyLong(), anyString(), any());
+            // 验证：给 2 个活跃成员推送撤回提示
+            verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+                    ids.size() == 2 && ids.contains(1L) && ids.contains(2L)),
+                    any(ImGroupMessageDTO.class));
         }
     }
 
