@@ -23,6 +23,10 @@ public class ChainOrchestrator {
     @Resource
     private DesignAgent designAgent;
 
+    /** ProductInfoAgent 依赖 Spring 管理，提取商品标题/描述/价格 */
+    @Resource
+    private ProductInfoAgent productInfoAgent;
+
     /** ChainAgent 依赖 Mapper，必须由 Spring 管理 */
     @Resource
     private ChainAgent chainAgent;
@@ -50,13 +54,15 @@ public class ChainOrchestrator {
         ctx = designAgent.run(ctx);
         // 2. 选图（取第一张）
         ctx = new DecisionAgent().run(ctx);
-        // 3. 生成链码并落库（必须在库存初始化之前完成）
+        // 3. 提取商品信息（标题、描述、价格）—— 必须在 ChainAgent 之前，以便落库
+        ctx = productInfoAgent.run(ctx);
+        // 4. 生成链码并落库（必须在库存初始化之前完成）
         ctx = chainAgent.run(ctx);
-        // 4. 初始化库存（默认库存 10 件）
+        // 5. 初始化库存（默认库存 10 件）
         ctx = inventoryInitAgent.run(ctx);
-        // 5. ima 同步（副本，失败不影响主流程）
+        // 6. ima 同步（副本，失败不影响主流程）
         ctx = imaAgent.run(ctx);
-        // 6. 生成收款 IBAN（mock）
+        // 7. 生成收款 IBAN（mock）
         ctx = new FinanceAgent().run(ctx);
 
         return ctx;

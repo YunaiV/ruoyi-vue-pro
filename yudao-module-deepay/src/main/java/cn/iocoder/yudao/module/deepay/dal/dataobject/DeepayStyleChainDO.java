@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -38,6 +39,15 @@ public class DeepayStyleChainDO {
     /** 完整 Context 决策快照（JSON），用于 AI 决策回溯审计 */
     private String contextSnapshot;
 
+    /** 商品标题 */
+    private String title;
+
+    /** 商品描述 */
+    private String description;
+
+    /** 商品价格（单位：欧元） */
+    private BigDecimal price;
+
     /** 状态：CREATED / PUBLISHED / STOPPED */
     private String status;
 
@@ -47,5 +57,3 @@ public class DeepayStyleChainDO {
     private String imaKbId;
 
 }
-
-

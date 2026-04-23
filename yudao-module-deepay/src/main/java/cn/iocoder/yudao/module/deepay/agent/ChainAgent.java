@@ -38,10 +38,14 @@ public class ChainAgent implements Agent {
 
         String code = generateUniqueCode();
 
-        // 创建 style_chain 骨架记录（selectedImage / decisionReason 由 AIDecisionAgent 事后回写）
+        // 创建 style_chain 骨架记录
         DeepayStyleChainDO record = new DeepayStyleChainDO();
         record.setChainCode(code);
+        record.setImageUrl(ctx.selectedImage);
         record.setKeyword(ctx.keyword);
+        record.setTitle(ctx.title);
+        record.setDescription(ctx.description);
+        record.setPrice(ctx.price);
         record.setStatus("CREATED");
         record.setCreatedAt(LocalDateTime.now());
         deepayStyleChainMapper.insert(record);
@@ -73,4 +77,3 @@ public class ChainAgent implements Agent {
     }
 
 }
-
