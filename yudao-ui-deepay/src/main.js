@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import './index.css'
@@ -17,4 +18,15 @@ import './index.css'
   } catch (_) {}
 })()
 
-createApp(App).use(router).mount('#app')
+const app   = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+app.use(router)
+
+// ── 启动时加载功能配置（后台改完立刻生效）──────────────────────────
+import { useFeatureStore } from '@/store/modules/feature'
+const featureStore = useFeatureStore()
+featureStore.load()   // 非阻塞：load 失败会用兜底数据，不影响首屏渲染
+
+app.mount('#app')
