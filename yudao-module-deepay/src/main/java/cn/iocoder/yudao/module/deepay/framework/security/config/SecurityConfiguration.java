@@ -33,7 +33,8 @@ public class SecurityConfiguration {
                         "/product/**",               // 商品展示页（PR#5）
                         "/api/product/**",           // 商品 JSON API（PR#5）
                         "/deepay/inventory/**",      // 库存管理（MVP 阶段）
-                        "/deepay/order/**"           // 订单模拟（MVP 阶段）
+                        "/deepay/order/**",          // 订单模拟（MVP 阶段）
+                        "/api/features"              // 功能菜单列表（前端动态菜单，无需登录）
                 ).permitAll();
             }
 
