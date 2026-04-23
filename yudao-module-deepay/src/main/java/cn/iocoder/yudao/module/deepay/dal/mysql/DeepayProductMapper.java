@@ -19,9 +19,27 @@ public interface DeepayProductMapper extends BaseMapperX<DeepayProductDO> {
     }
 
     default void updateStatusByChainCode(String chainCode, String status) {
-        update(new LambdaUpdateWrapper<DeepayProductDO>()
+        update(null, new LambdaUpdateWrapper<DeepayProductDO>()
                 .eq(DeepayProductDO::getChainCode, chainCode)
                 .set(DeepayProductDO::getStatus, status));
+    }
+
+    /**
+     * 原子补货：将指定商品的库存加上 delta。
+     *
+     * @param id    商品主键
+     * @param delta 补货数量（正数）
+     */
+    default void addStock(Long id, int delta) {
+        update(null, new LambdaUpdateWrapper<DeepayProductDO>()
+                .setSql("stock = stock + " + delta)
+                .eq(DeepayProductDO::getId, id));
+    }
+
+    /** 查询所有在售商品（DeepayReviewScheduler 使用）。 */
+    default List<DeepayProductDO> selectBySelling() {
+        return selectList(new LambdaQueryWrapper<DeepayProductDO>()
+                .eq(DeepayProductDO::getStatus, "SELLING"));
     }
 
     /**
