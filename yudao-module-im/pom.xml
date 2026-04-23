@@ -7,24 +7,67 @@
         <artifactId>yudao</artifactId>
         <version>${revision}</version>
     </parent>
-    <modules>
-        <module>yudao-module-im-api</module>
-        <module>yudao-module-im-biz</module>
-    </modules>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-module-im</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
     <description>
-        <!-- TODO 芋艿：这块后面再调整下 -->
-        im 模块，主要提供能力：
-        1. 通讯能力，例如：消息发送、消息接收、消息撤回、消息已读等。
-        2. 通讯会话，例如：单聊、群聊、聊天室等。
-        3. 通讯消息，例如：文本、图片、语音、视频、文件等。
-        4. 通讯消息的存储，例如：消息存储、消息索引、消息搜索等。
-        5. 通讯消息的推送，例如：消息推送、消息通知等。
-        6. 通讯消息的安全，例如：消息加密、消息签名等。
+        im 模块，我们放即时通讯业务。
+        例如说：单聊、群聊、消息收发、消息撤回、消息已读等等
     </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-system</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- DB 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-redis</artifactId>
+        </dependency>
+
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-excel</artifactId>
+        </dependency>
+
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
+        </dependency>
+
+    </dependencies>
 
 </project>
