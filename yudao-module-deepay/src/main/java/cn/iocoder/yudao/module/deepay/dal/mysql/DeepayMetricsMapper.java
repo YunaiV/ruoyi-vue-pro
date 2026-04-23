@@ -8,7 +8,9 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 
 @Mapper
 public interface DeepayMetricsMapper extends BaseMapperX<DeepayMetricsDO> {
@@ -34,7 +36,7 @@ public interface DeepayMetricsMapper extends BaseMapperX<DeepayMetricsDO> {
             return null;
         }
         // single-pass: collect valid prices, then compute average
-        List<BigDecimal> prices = new java.util.ArrayList<>();
+        List<BigDecimal> prices = new ArrayList<>();
         for (DeepayMetricsDO m : list) {
             if (m.getPrice() != null && m.getPrice().compareTo(BigDecimal.ZERO) > 0) {
                 prices.add(m.getPrice());
@@ -73,7 +75,7 @@ public interface DeepayMetricsMapper extends BaseMapperX<DeepayMetricsDO> {
         if (list == null || list.isEmpty()) {
             return null;
         }
-        java.util.OptionalDouble avg = list.stream()
+        OptionalDouble avg = list.stream()
                 .mapToInt(m -> m.getSoldCount() != null ? m.getSoldCount() : 0)
                 .average();
         return avg.isPresent() ? avg.getAsDouble() : null;

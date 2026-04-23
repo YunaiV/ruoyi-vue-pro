@@ -5,7 +5,9 @@ import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayProductDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,15 +28,13 @@ public interface DeepayProductMapper extends BaseMapperX<DeepayProductDO> {
 
     /**
      * 原子补货：将指定商品的库存加上 delta。
+     * 使用 JDBC 命名参数（#{delta}）确保参数化查询，无 SQL 注入风险。
      *
      * @param id    商品主键
      * @param delta 补货数量（正数）
      */
-    default void addStock(Long id, int delta) {
-        update(null, new LambdaUpdateWrapper<DeepayProductDO>()
-                .setSql("stock = stock + {0}", delta)
-                .eq(DeepayProductDO::getId, id));
-    }
+    @Update("UPDATE deepay_product SET stock = stock + #{delta} WHERE id = #{id}")
+    void addStock(@Param("id") Long id, @Param("delta") int delta);
 
     /** 查询所有在售商品（DeepayReviewScheduler 使用）。 */
     default List<DeepayProductDO> selectBySelling() {
