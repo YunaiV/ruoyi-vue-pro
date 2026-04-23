@@ -1,0 +1,37 @@
+{
+  "name": "workbox-google-analytics",
+  "version": "7.4.0",
+  "license": "MIT",
+  "author": "Google's Web DevRel Team and Google's Aurora Team",
+  "description": "Queues failed requests and uses the Background Sync API to replay them when the network is available",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googlechrome/workbox.git"
+  },
+  "bugs": "https://github.com/googlechrome/workbox/issues",
+  "homepage": "https://github.com/GoogleChrome/workbox",
+  "keywords": [
+    "workbox",
+    "workboxjs",
+    "service worker",
+    "sw",
+    "offline",
+    "google",
+    "analytics"
+  ],
+  "workbox": {
+    "browserNamespace": "workbox.googleAnalytics",
+    "outputFilename": "workbox-offline-ga",
+    "packageType": "sw"
+  },
+  "main": "index.js",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "dependencies": {
+    "workbox-background-sync": "7.4.0",
+    "workbox-core": "7.4.0",
+    "workbox-routing": "7.4.0",
+    "workbox-strategies": "7.4.0"
+  },
+  "gitHead": "fa702feeddd417fcdfa495cd9428fb4a28632e92"
+}

@@ -281,4 +281,9 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         return productSpuMapper.selectCount(ProductSpuDO::getCategoryId, categoryId);
     }
 
+    @Override
+    public void addSpuStock(Long id, Integer addCount) {
+        productSpuMapper.addStock(id, addCount);
+    }
+
 }

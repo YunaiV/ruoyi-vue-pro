@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${title}">商品详情</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            max-width: 480px;
+            margin: 48px auto;
+            padding: 0 16px;
+            text-align: center;
+            color: #222;
+            background: #fafafa;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .product-image {
+            width: 100%;
+            max-width: 360px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        .description {
+            margin: 20px 0;
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        .price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 12px 0 4px;
+        }
+        .chain-code {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 th:text="${title}">商品标题</h1>
+
+    <img th:src="${image}" class="product-image" alt="商品图片"
+         th:if="${image != null and !#strings.isEmpty(image)}"/>
+
+    <p class="description" th:text="${description}">商品描述</p>
+
+    <div class="price" th:if="${price != null}">€<span th:text="${price}">0.00</span></div>
+
+    <p class="chain-code" th:text="'商品编号：' + ${chainCode}"></p>
+
+</body>
+</html>

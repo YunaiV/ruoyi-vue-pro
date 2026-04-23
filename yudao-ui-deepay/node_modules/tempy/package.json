@@ -1,0 +1,53 @@
+{
+	"name": "tempy",
+	"version": "0.6.0",
+	"description": "Get a random temporary file or directory path",
+	"license": "MIT",
+	"repository": "sindresorhus/tempy",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "https://sindresorhus.com"
+	},
+	"engines": {
+		"node": ">=10"
+	},
+	"scripts": {
+		"test": "xo && ava && tsd"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywords": [
+		"temp",
+		"temporary",
+		"path",
+		"file",
+		"directory",
+		"folder",
+		"tempfile",
+		"tempdir",
+		"tmpdir",
+		"tmpfile",
+		"random",
+		"unique"
+	],
+	"dependencies": {
+		"is-stream": "^2.0.0",
+		"temp-dir": "^2.0.0",
+		"type-fest": "^0.16.0",
+		"unique-string": "^2.0.0"
+	},
+	"devDependencies": {
+		"ava": "^2.4.0",
+		"tsd": "^0.13.1",
+		"xo": "^0.32.1"
+	},
+	"xo": {
+		"rules": {
+			"node/no-unsupported-features/node-builtins": "off"
+		}
+	}
+}

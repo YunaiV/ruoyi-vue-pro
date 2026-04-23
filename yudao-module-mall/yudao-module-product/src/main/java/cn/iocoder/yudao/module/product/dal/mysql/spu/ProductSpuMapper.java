@@ -159,4 +159,20 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
         update(null, updateWrapper);
     }
 
+    /**
+     * 直接增加商品 SPU 库存（不影响销量）
+     *
+     * @param id       商品 SPU 编号
+     * @param addCount 增加的库存数量（必须大于 0）
+     */
+    default void addStock(Long id, Integer addCount) {
+        if (addCount == null || addCount <= 0) {
+            return;
+        }
+        LambdaUpdateWrapper<ProductSpuDO> updateWrapper = new LambdaUpdateWrapper<ProductSpuDO>()
+                .setSql("stock = stock + " + addCount)
+                .eq(ProductSpuDO::getId, id);
+        update(null, updateWrapper);
+    }
+
 }

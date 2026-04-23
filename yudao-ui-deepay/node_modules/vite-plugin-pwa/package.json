@@ -1,0 +1,161 @@
+{
+  "name": "vite-plugin-pwa",
+  "type": "module",
+  "version": "0.21.2",
+  "packageManager": "pnpm@10.6.5",
+  "description": "Zero-config PWA for Vite",
+  "author": "antfu <anthonyfu117@hotmail.com>",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/antfu",
+  "homepage": "https://github.com/vite-pwa/vite-plugin-pwa#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vite-pwa/vite-plugin-pwa.git"
+  },
+  "bugs": "https://github.com/vite-pwa/vite-plugin-pwa/issues",
+  "keywords": [
+    "react",
+    "pwa",
+    "vue",
+    "vitepress",
+    "preact",
+    "svelte",
+    "sveltekit",
+    "workbox",
+    "solidjs",
+    "vite",
+    "vite-plugin"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./types": {
+      "types": "./types/index.d.ts"
+    },
+    "./preact": {
+      "types": "./preact.d.ts"
+    },
+    "./react": {
+      "types": "./react.d.ts"
+    },
+    "./solid": {
+      "types": "./solid.d.ts"
+    },
+    "./svelte": {
+      "types": "./svelte.d.ts"
+    },
+    "./vanillajs": {
+      "types": "./vanillajs.d.ts"
+    },
+    "./vue": {
+      "types": "./vue.d.ts"
+    },
+    "./client": {
+      "types": "./client.d.ts"
+    },
+    "./info": {
+      "types": "./info.d.ts"
+    },
+    "./pwa-assets": {
+      "types": "./pwa-assets.d.ts"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "*.d.ts",
+    "dist",
+    "types"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "docs": "pnpm -C docs run dev",
+    "docs:build": "pnpm -C docs run build",
+    "docs:serve": "pnpm -C docs run serve",
+    "docs:preview": "pnpm -C docs run preview",
+    "lint": "eslint .",
+    "lint:fix": "nr lint --fix",
+    "dev": "esno scripts/dev.ts",
+    "build": "rimraf dist && esno scripts/build.ts",
+    "build-js-example-on-root": "vite build --outDir=../../dist-examples-root -c ./examples/vanilla-js-custom-sw/vite.config.js ./examples/vanilla-js-custom-sw",
+    "build-vue-example-on-root": "DEBUG=vite-plugin-pwa BASE_URL=/ SOURCE_MAP=true CLAIMS=true vite build --outDir=../../dist-examples-root -c ./examples/vue-router/vite.config.ts ./examples/vue-router",
+    "prepublishOnly": "npm run build",
+    "release": "bumpp && npm publish",
+    "examples": "esno scripts/run-examples.ts",
+    "example:vue:dev:cdn": "pnpm -C examples/vue-basic-cdn run dev",
+    "example:vue:build:cdn": "pnpm -C examples/vue-basic-cdn run build",
+    "example:vue:start:cdn": "pnpm -C examples/vue-basic-cdn run start",
+    "deploy": "nr build && nr docs:build",
+    "test-vue": "pnpm -C examples/vue-router run test",
+    "test-react": "pnpm -C examples/react-router run test",
+    "test-preact": "pnpm -C examples/preact-router run test",
+    "test-solid": "pnpm -C examples/solid-router run test",
+    "test-svelte": "pnpm -C examples/svelte-routify run test",
+    "test-typescript": "pnpm -C examples/vanilla-ts-no-ip run test",
+    "test": "nr test-vue && nr test-react && nr test-preact && nr test-solid && nr test-svelte && nr test-typescript",
+    "test:vite-ecosystem-ci": "nr test-typescript"
+  },
+  "peerDependencies": {
+    "@vite-pwa/assets-generator": "^0.2.6",
+    "vite": "^3.1.0 || ^4.0.0 || ^5.0.0 || ^6.0.0",
+    "workbox-build": "^7.3.0",
+    "workbox-window": "^7.3.0"
+  },
+  "peerDependenciesMeta": {
+    "@vite-pwa/assets-generator": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "debug": "^4.3.6",
+    "pretty-bytes": "^6.1.1",
+    "tinyglobby": "^0.2.10",
+    "workbox-build": "^7.3.0",
+    "workbox-window": "^7.3.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.10.2",
+    "@antfu/ni": "^0.21.9",
+    "@playwright/test": "^1.40.0",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^18.17.14",
+    "@types/prompts": "^2.4.8",
+    "@types/react": "^18.2.21",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@vite-pwa/assets-generator": "^0.2.6",
+    "bumpp": "^9.2.0",
+    "eslint": "^9.23.0",
+    "esno": "0.17.0",
+    "kolorist": "^1.8.0",
+    "preact": "^10.19.2",
+    "prompts": "^2.4.2",
+    "publint": "^0.2.5",
+    "react": "^18.2.0",
+    "solid-js": "^1.8.5",
+    "svelte": "^4.2.5",
+    "tsup": "^7.3.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vitest": "1.0.0-beta.4",
+    "vue": "^3.3.8"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "^4.22.4"
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+    "additionalProperties": false,
+    "type": "object",
+    "properties": {
+        "additionalManifestEntries": {
+            "description": "A list of entries to be precached, in addition to any entries that are\ngenerated as part of the build configuration.",
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    {
+                        "$ref": "#/definitions/ManifestEntry"
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "dontCacheBustURLsMatching": {
+            "description": "Assets that match this will be assumed to be uniquely versioned via their\nURL, and exempted from the normal HTTP cache-busting that's done when\npopulating the precache. While not required, it's recommended that if your\nexisting build process already inserts a `[hash]` value into each filename,\nyou provide a RegExp that will detect that, as it will reduce the bandwidth\nconsumed when precaching.",
+            "$ref": "#/definitions/RegExp"
+        },
+        "manifestTransforms": {
+            "description": "One or more functions which will be applied sequentially against the\ngenerated manifest. If `modifyURLPrefix` or `dontCacheBustURLsMatching` are\nalso specified, their corresponding transformations will be applied first.",
+            "type": "array",
+            "items": {}
+        },
+        "maximumFileSizeToCacheInBytes": {
+            "description": "This value can be used to determine the maximum size of files that will be\nprecached. This prevents you from inadvertently precaching very large files\nthat might have accidentally matched one of your patterns.",
+            "default": 2097152,
+            "type": "number"
+        },
+        "modifyURLPrefix": {
+            "description": "An object mapping string prefixes to replacement string values. This can be\nused to, e.g., remove or add a path prefix from a manifest entry if your\nweb hosting setup doesn't match your local filesystem setup. As an\nalternative with more flexibility, you can use the `manifestTransforms`\noption and provide a function that modifies the entries in the manifest\nusing whatever logic you provide.\n\nExample usage:\n\n```\n// Replace a '/dist/' prefix with '/', and also prepend\n// '/static' to every URL.\nmodifyURLPrefix: {\n  '/dist/': '/',\n  '': '/static',\n}\n```",
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "globFollow": {
+            "description": "Determines whether or not symlinks are followed when generating the\nprecache manifest. For more information, see the definition of `follow` in\nthe `glob` [documentation](https://github.com/isaacs/node-glob#options).",
+            "default": true,
+            "type": "boolean"
+        },
+        "globIgnores": {
+            "description": "A set of patterns matching files to always exclude when generating the\nprecache manifest. For more information, see the definition of `ignore` in\nthe `glob` [documentation](https://github.com/isaacs/node-glob#options).",
+            "default": [
+                "**/node_modules/**/*"
+            ],
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "globPatterns": {
+            "description": "Files matching any of these patterns will be included in the precache\nmanifest. For more information, see the\n[`glob` primer](https://github.com/isaacs/node-glob#glob-primer).",
+            "default": [
+                "**/*.{js,wasm,css,html}"
+            ],
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "templatedURLs": {
+            "description": "If a URL is rendered based on some server-side logic, its contents may\ndepend on multiple files or on some other unique string value. The keys in\nthis object are server-rendered URLs. If the values are an array of\nstrings, they will be interpreted as `glob` patterns, and the contents of\nany files matching the patterns will be used to uniquely version the URL.\nIf used with a single string, it will be interpreted as unique versioning\ninformation that you've generated for a given URL.",
+            "type": "object",
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "globDirectory": {
+            "description": "The local directory you wish to match `globPatterns` against. The path is\nrelative to the current directory.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "globDirectory"
+    ],
+    "definitions": {
+        "ManifestEntry": {
+            "type": "object",
+            "properties": {
+                "integrity": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "revision",
+                "url"
+            ]
+        },
+        "RegExp": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "type": "string"
+                },
+                "global": {
+                    "type": "boolean"
+                },
+                "ignoreCase": {
+                    "type": "boolean"
+                },
+                "multiline": {
+                    "type": "boolean"
+                },
+                "lastIndex": {
+                    "type": "number"
+                },
+                "flags": {
+                    "type": "string"
+                },
+                "sticky": {
+                    "type": "boolean"
+                },
+                "unicode": {
+                    "type": "boolean"
+                },
+                "dotAll": {
+                    "type": "boolean"
+                },
+                "hasIndices": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "dotAll",
+                "flags",
+                "global",
+                "hasIndices",
+                "ignoreCase",
+                "lastIndex",
+                "multiline",
+                "source",
+                "sticky",
+                "unicode"
+            ]
+        }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#"
+}

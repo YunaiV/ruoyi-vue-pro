@@ -1,0 +1,34 @@
+{
+  "name": "workbox-window",
+  "version": "7.4.0",
+  "license": "MIT",
+  "author": "Google's Web DevRel Team and Google's Aurora Team",
+  "description": "Simplifies communications with Workbox packages running in the service worker",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googlechrome/workbox.git"
+  },
+  "bugs": "https://github.com/googlechrome/workbox/issues",
+  "homepage": "https://github.com/GoogleChrome/workbox",
+  "keywords": [
+    "workbox",
+    "workboxjs",
+    "service worker",
+    "sw",
+    "window",
+    "message",
+    "postMessage"
+  ],
+  "workbox": {
+    "packageType": "window",
+    "primaryBuild": "build/workbox-window.prod.mjs"
+  },
+  "main": "build/workbox-window.prod.umd.js",
+  "module": "build/workbox-window.prod.es5.mjs",
+  "types": "index.d.ts",
+  "dependencies": {
+    "@types/trusted-types": "^2.0.2",
+    "workbox-core": "7.4.0"
+  },
+  "gitHead": "fa702feeddd417fcdfa495cd9428fb4a28632e92"
+}

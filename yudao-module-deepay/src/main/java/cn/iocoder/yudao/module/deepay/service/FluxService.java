@@ -11,7 +11,7 @@ import java.util.List;
 public interface FluxService {
 
     /**
-     * 根据用户输入生成候选图片 URL 列表。
+     * 根据用户输入生成候选图片 URL 列表（默认 3 张）。
      *
      * <p>实现要求：
      * <ul>
@@ -25,5 +25,17 @@ public interface FluxService {
      * @return 图片 URL 列表（至少 1 张，正常情况 2～3 张）
      */
     List<String> generateImages(String userPrompt);
+
+    /**
+     * 根据用户输入生成指定数量的候选图片 URL 列表。
+     *
+     * <p>与 {@link #generateImages(String)} 行为一致，额外支持指定生成张数（n）。
+     * n 超出实现支持范围时，实现层应自动裁剪到合理区间（如 1～8 张）。</p>
+     *
+     * @param userPrompt 用户输入的一句话需求或完整 Prompt
+     * @param n          期望生成的图片张数
+     * @return 图片 URL 列表（至少 1 张）
+     */
+    List<String> generateImages(String userPrompt, int n);
 
 }
