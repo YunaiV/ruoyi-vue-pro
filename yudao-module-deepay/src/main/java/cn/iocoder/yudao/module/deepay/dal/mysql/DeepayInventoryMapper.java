@@ -6,12 +6,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface DeepayInventoryMapper extends BaseMapperX<DeepayInventoryDO> {
 
     default DeepayInventoryDO selectByChainCode(String chainCode) {
         return selectOne(new LambdaQueryWrapper<DeepayInventoryDO>()
                 .eq(DeepayInventoryDO::getChainCode, chainCode));
+    }
+
+    default List<DeepayInventoryDO> selectAll() {
+        return selectList(new LambdaQueryWrapper<>());
     }
 
     /**

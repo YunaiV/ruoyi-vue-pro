@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.deepay.service;
 
+import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayMetricsMapper;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayStyleChainMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,6 +59,9 @@ public class TrendServiceImpl implements TrendService {
     @Resource
     private DeepayStyleChainMapper deepayStyleChainMapper;
 
+    @Resource
+    private DeepayMetricsMapper deepayMetricsMapper;
+
     public TrendServiceImpl(RestTemplateBuilder builder) {
         this.restTemplate = builder
                 .setConnectTimeout(Duration.ofSeconds(10))
@@ -94,6 +98,20 @@ public class TrendServiceImpl implements TrendService {
         // 优先级 3：内置 fallback
         log.info("[TrendService] 无历史热销数据，使用内置 fallback 图片。keyword={}", keyword);
         return FALLBACK_IMAGES;
+    }
+
+    @Override
+    public double getTrendScore(String category, String style) {
+        try {
+            Double avg = deepayMetricsMapper.selectAvgSoldCountByCategory(category);
+            if (avg == null) {
+                return 50.0;
+            }
+            return Math.min(100.0, avg / 10.0);
+        } catch (Exception e) {
+            log.warn("[TrendService] getTrendScore 查询失败，返回中性分 50 category={} style={}", category, style, e);
+            return 50.0;
+        }
     }
 
     /**

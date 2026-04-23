@@ -72,6 +72,36 @@ public class FluxServiceImpl implements FluxService {
     }
 
     @Override
+    public List<String> generateImages(String userPrompt, int n) {
+        int clamped = Math.max(1, Math.min(8, n));
+        String fullPrompt = buildPrompt(userPrompt);
+
+        if (!StringUtils.hasText(apiUrl)) {
+            log.info("[FluxService] API URL 未配置，使用默认保底图片（n={}）。prompt={}", clamped, fullPrompt);
+            return buildFallbackList(clamped);
+        }
+
+        final int finalClamped = clamped;
+        return circuitBreakerService.execute(
+                "FluxService",
+                () -> callFluxApiN(fullPrompt, finalClamped),
+                () -> {
+                    log.warn("[FluxService] 熔断器已断开，降级为保底图片 n={} prompt={}", finalClamped, fullPrompt);
+                    return buildFallbackList(finalClamped);
+                }
+        );
+    }
+
+    /** 构建 n 个保底图片 URL 列表（循环取 DEFAULT_IMAGES）。 */
+    private List<String> buildFallbackList(int count) {
+        List<String> result = new java.util.ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            result.add(DEFAULT_IMAGES.get(i % DEFAULT_IMAGES.size()));
+        }
+        return result;
+    }
+
+    @Override
     public List<String> generateImages(String userPrompt) {
         String fullPrompt = buildPrompt(userPrompt);
 
@@ -125,10 +155,9 @@ public class FluxServiceImpl implements FluxService {
             headers.setBearerAuth(apiKey);
         }
 
-        Map<String, Object> body = Map.of(
-                "prompt", prompt,
-                "num_images", 3
-        );
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("prompt", prompt);
+        body.put("num_images", 3);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         Map<String, Object> response = restTemplate.postForObject(apiUrl, request, Map.class);
@@ -159,6 +188,46 @@ public class FluxServiceImpl implements FluxService {
         if (images.isEmpty()) {
             log.warn("[FluxService] API 返回图片列表中无有效 URL，降级为保底图片。");
             return DEFAULT_IMAGES;
+        }
+
+        return images;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private List<String> callFluxApiN(String prompt, int n) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (StringUtils.hasText(apiKey)) {
+            headers.setBearerAuth(apiKey);
+        }
+
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("prompt", prompt);
+        body.put("num_images", n);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        Map<String, Object> response = restTemplate.postForObject(apiUrl, request, Map.class);
+
+        if (response == null || !response.containsKey("images")) {
+            log.warn("[FluxService] API 响应格式异常，缺少 'images' 字段，降级为保底图片。n={}", n);
+            return buildFallbackList(n);
+        }
+
+        Object raw = response.get("images");
+        if (!(raw instanceof List)) {
+            log.warn("[FluxService] API 响应中 'images' 字段类型异常（期望 List），降级为保底图片。n={}", n);
+            return buildFallbackList(n);
+        }
+
+        List<?> rawList = (List<?>) raw;
+        List<String> images = rawList.stream()
+                .filter(item -> item instanceof String)
+                .map(item -> (String) item)
+                .collect(java.util.stream.Collectors.toList());
+
+        if (images.isEmpty()) {
+            log.warn("[FluxService] API 返回图片列表中无有效 URL，降级为保底图片。n={}", n);
+            return buildFallbackList(n);
         }
 
         return images;

@@ -26,6 +26,12 @@ public class TrendItem {
     /** 关联链码（来自 deepay_metrics.chain_code） */
     private String chainCode;
 
+    /** 数据来源（1688 / TikTok / Shein / internal 等） */
+    private String source;
+
+    /** 综合评分（TrendAgent 多源评分，越高越优先展示） */
+    private double score;
+
     // ---- constructors ----
 
     public TrendItem() {}
@@ -54,5 +60,11 @@ public class TrendItem {
 
     public String getChainCode() { return chainCode; }
     public void   setChainCode(String chainCode) { this.chainCode = chainCode; }
+
+    public String getSource() { return source; }
+    public void   setSource(String source) { this.source = source; }
+
+    public double getScore() { return score; }
+    public void   setScore(double score) { this.score = score; }
 
 }

@@ -23,4 +23,13 @@ public interface TrendService {
      */
     List<String> getReferenceImages(String keyword);
 
+    /**
+     * 获取指定品类+风格的趋势热度分（0~100）。无数据时返回 50（中性分）。
+     *
+     * @param category 品类（如 外套 / 连衣裙）
+     * @param style    风格标签（如 极简 / 工装）
+     * @return 趋势热度分 0~100
+     */
+    double getTrendScore(String category, String style);
+
 }

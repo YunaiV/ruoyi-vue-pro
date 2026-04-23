@@ -26,6 +26,18 @@ public class DeepayInventoryDO {
     /** 锁定库存（下单未支付） */
     private Integer lockedStock;
 
+    /**
+     * 库存状态。
+     * <ul>
+     *   <li>{@code NORMAL} —— 库存充足（stock &gt; 2）</li>
+     *   <li>{@code LOW}    —— 库存不足（0 &lt; stock &le; 2）</li>
+     *   <li>{@code OUT}    —— 库存耗尽（stock == 0）</li>
+     * </ul>
+     */
+    private String status;
+
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
 }

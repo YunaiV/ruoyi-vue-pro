@@ -173,6 +173,55 @@ public class Context {
      */
     public java.util.List<StyleCombo> styleCombos;
 
+    // ===== Phase 9 StyleEngineAgent 输出 =====
+    /**
+     * 客户风格偏好（中文标签，如 工装 / 极简 / 性感 / 运动）。
+     * 由 SmartQuestionAgent / StyleEngineAgent 填充。
+     * 与 {@link #style}（英文枚举）并存，StyleEngineAgent 优先读此字段。
+     */
+    public String stylePreference;
+
+    /**
+     * 目标市场（中文标签，如 欧美 / 中东 / 国内）。
+     * StyleEngineAgent 读取后映射为英文 Prompt 描述。
+     * 与 {@link #market}（英文枚举 CN/EU/US/ME）并存。
+     */
+    public String targetMarket;
+
+    /**
+     * StyleEngineAgent 输出：可直接发给 FLUX API 的完整英文 Prompt。
+     * DesignGenAgent 读取此字段生成图片。
+     */
+    public String finalPrompt;
+
+    // ===== Phase 8 图片评分 =====
+    /** ImageScoringAgent 输出：带评分的设计图列表 */
+    public List<DesignImage> scoredImages;
+    /** ImageScoringAgent 输出：综合分 Top 2 图片 */
+    public List<DesignImage> topImages;
+
+    // ===== Phase 8 设计拆分 =====
+    /** 版型（oversize / fitted / straight），由 DesignSplitAgent 填充 */
+    public String patternType;
+    /** 面料（cotton / denim / knit / wool），由 DesignSplitAgent 填充 */
+    public String fabric;
+    /** 设计细节（多口袋 / 刺绣 / 拉链等），由 DesignSplitAgent 填充 */
+    public String designDetails;
+
+    // ===== Phase 8 风险 =====
+    /** 版权风险评分（0~100），>80 视为高风险，由 RiskControlAgent 填充 */
+    public Integer riskScore;
+
+    // ===== Phase 8 成本 =====
+    /** 估算生产成本，由 CostEstimateAgent 填充 */
+    public java.math.BigDecimal cost;
+
+    // ===== Phase 9 变体与安全图 =====
+    /** DesignVariantAgent 输出：所有变体图片 URL 列表（5种颜色×面料，共10张） */
+    public List<String> variantImages;
+    /** RiskControlAgent 输出：过滤高风险图后的安全图片列表 */
+    public List<String> safeImages;
+
     // ===== 向后兼容（ChainOrchestrator）=====
     /** @deprecated 使用 keyword */
     @Deprecated public String prompt;
@@ -268,5 +317,3 @@ public class Context {
     public String  purpose;
 
 }
-
-

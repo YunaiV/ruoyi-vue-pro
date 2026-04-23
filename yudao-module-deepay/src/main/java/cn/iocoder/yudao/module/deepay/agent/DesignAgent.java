@@ -49,7 +49,7 @@ public class DesignAgent implements Agent {
     private String resolvePrompt(Context ctx) {
         // 优先使用已组装好的 stylePrompt（由 Orchestrator 调用 StyleEngine 预先填充）
         if (StringUtils.hasText(ctx.stylePrompt)) {
-            return ctx.stylePrompt;
+            return appendTrendHint(ctx.stylePrompt, ctx);
         }
 
         // 有画像字段 → 实时组装完整 prompt
@@ -66,14 +66,28 @@ public class DesignAgent implements Agent {
             }
             String full = styleEngine.buildFullPrompt(ctx);
             if (StringUtils.hasText(full)) {
-                return full;
+                return appendTrendHint(full, ctx);
             }
         }
 
         // 最终兜底：只用 keyword（与原版行为一致）
         String kw = StringUtils.hasText(ctx.keyword) ? ctx.keyword : "";
         log.debug("[DesignAgent] 无画像，退化为 keyword={}", kw);
-        return kw;
+        return appendTrendHint(kw, ctx);
+    }
+
+    // STEP 12: append trend reference hint if trendItems available
+    private String appendTrendHint(String prompt, Context ctx) {
+        if (ctx.trendItems == null || ctx.trendItems.isEmpty()) return prompt;
+        String topTrendUrls = ctx.trendItems.stream()
+                .limit(3)
+                .map(TrendItem::getImageUrl)
+                .filter(StringUtils::hasText)
+                .collect(java.util.stream.Collectors.joining(", "));
+        if (StringUtils.hasText(topTrendUrls)) {
+            return prompt + ", trend reference: " + topTrendUrls;
+        }
+        return prompt;
     }
 
 }

@@ -13,20 +13,15 @@ import java.util.List;
 @Mapper
 public interface DeepayProductMapper extends BaseMapperX<DeepayProductDO> {
 
-    default List<DeepayProductDO> selectBySelling() {
-        return selectList(new LambdaQueryWrapper<DeepayProductDO>()
-                .eq(DeepayProductDO::getStatus, "SELLING"));
-    }
-
     default DeepayProductDO selectByChainCode(String chainCode) {
         return selectOne(new LambdaQueryWrapper<DeepayProductDO>()
                 .eq(DeepayProductDO::getChainCode, chainCode));
     }
 
-    default void addStock(Long id, int delta) {
-        update(null, new LambdaUpdateWrapper<DeepayProductDO>()
-                .setSql("stock = stock + " + delta)
-                .eq(DeepayProductDO::getId, id));
+    default void updateStatusByChainCode(String chainCode, String status) {
+        update(new LambdaUpdateWrapper<DeepayProductDO>()
+                .eq(DeepayProductDO::getChainCode, chainCode)
+                .set(DeepayProductDO::getStatus, status));
     }
 
     /**

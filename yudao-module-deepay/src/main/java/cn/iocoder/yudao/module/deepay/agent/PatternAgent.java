@@ -60,5 +60,3 @@ public class PatternAgent implements Agent {
     }
 
 }
-
-

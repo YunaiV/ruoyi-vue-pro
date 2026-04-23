@@ -31,7 +31,9 @@ public class SecurityConfiguration {
                         "/api/payment/callback",     // Jeepay Webhook（PR#6）
                         "/api/payment/simulate",     // 模拟支付（PR#6）
                         "/product/**",               // 商品展示页（PR#5）
-                        "/api/product/**"            // 商品 JSON API（PR#5）
+                        "/api/product/**",           // 商品 JSON API（PR#5）
+                        "/deepay/inventory/**",      // 库存管理（MVP 阶段）
+                        "/deepay/order/**"           // 订单模拟（MVP 阶段）
                 ).permitAll();
             }
 

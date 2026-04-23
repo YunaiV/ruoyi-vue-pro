@@ -9,19 +9,20 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 订单表 deepay_order
+ * Deepay 订单表。
+ *
+ * <p>对应数据库表 {@code deepay_order}。
+ * 状态流转：INIT → PAID。</p>
  */
 @TableName("deepay_order")
 @Data
 public class DeepayOrderDO {
 
+    /** 自增主键 */
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /** 全局唯一支付 ID */
-    private String paymentId;
-
-    /** 关联链码 */
+    /** 关联商品链码 */
     private String chainCode;
 
     /** 下单用户 ID（与 chain_code 联合唯一，防止同一用户重复下单） */
@@ -51,9 +52,9 @@ public class DeepayOrderDO {
      * Jeepay 创建支付单时传入此字段。
      */
     private String currency = "EUR";
-
     private LocalDateTime createdAt;
 
-    private LocalDateTime paidAt;
+    /** 记录更新时间 */
+    private LocalDateTime updatedAt;
 
 }
