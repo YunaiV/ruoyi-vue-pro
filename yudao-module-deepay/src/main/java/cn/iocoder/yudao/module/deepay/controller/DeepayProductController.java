@@ -195,15 +195,17 @@ public class DeepayProductController {
     // ----------------------------------------------------------------
 
     @PostMapping("/api/create-product")
-    @Operation(summary = "轻量版：生成链码 + IBAN（向后兼容）")
-    public CommonResult<Map<String, String>> createProduct(@Valid @RequestBody PromptReqVO req) {
+    @Operation(summary = "一句话生成完整商品信息（chainCode + image + title + description + price + link）")
+    public CommonResult<Map<String, Object>> createProduct(@Valid @RequestBody PromptReqVO req) {
         Context ctx = chainOrchestrator.run(req.getPrompt());
 
-        Map<String, String> resp = new LinkedHashMap<>();
-        resp.put("chainCode", ctx.chainCode);
-        resp.put("image",     ctx.selectedImage);
-        resp.put("iban",      ctx.iban);
-        resp.put("link",      "https://deepay.link/" + ctx.chainCode);
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("chainCode",    ctx.chainCode);
+        resp.put("image",        ctx.selectedImage);
+        resp.put("title",        ctx.title);
+        resp.put("description",  ctx.description);
+        resp.put("price",        ctx.price);
+        resp.put("link",         ctx.link);
         return success(resp);
     }
 

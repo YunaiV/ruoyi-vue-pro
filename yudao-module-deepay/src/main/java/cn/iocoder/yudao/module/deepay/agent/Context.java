@@ -316,4 +316,7 @@ public class Context {
      */
     public String  purpose;
 
+    /** SalesAgent 生成的商品链接，格式：https://deepay.link/{chainCode} */
+    public String link;
+
 }
