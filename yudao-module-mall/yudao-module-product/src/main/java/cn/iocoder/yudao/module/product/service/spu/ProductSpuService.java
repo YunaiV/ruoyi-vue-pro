@@ -132,6 +132,14 @@ public interface ProductSpuService {
      */
     Long getSpuCountByCategoryId(Long categoryId);
 
+    /**
+     * 直接增加商品 SPU 库存（不影响销量）
+     *
+     * @param id       商品 SPU 编号
+     * @param addCount 增加的库存数量
+     */
+    void addSpuStock(Long id, Integer addCount);
+
 
     /**
      * 校验商品是否有效。如下情况，视为无效：
