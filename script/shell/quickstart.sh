@@ -51,9 +51,9 @@ FRONTEND_OUT="${FRONTEND_OUT:-$PROJECT}"
 DOMAIN="${DOMAIN:-deepay.srl}"
 NGINX_CONF="${NGINX_CONF:-/www/server/panel/vhost/nginx/deepay.conf}"
 
-DB="${DB:-sdsdsdas}"
-DB_USER="${DB_USER:-sdsdsdas}"
-DB_PASS="${DB_PASS:-sdsdsdas}"
+DB="${DB:-deepay}"
+DB_USER="${DB_USER:-deepay}"
+DB_PASS="${DB_PASS:-SRx3ETXjNWRKofo51jvc}"
 
 NONINTERACTIVE="${NONINTERACTIVE:-0}"
 
@@ -149,17 +149,73 @@ _setup_java() {
 _setup_java
 
 # ══════════════════════════════════════════════════════════
-# 步骤 1 — 检查依赖
+# 步骤 1 — 自动安装缺失依赖
 # ══════════════════════════════════════════════════════════
-title "步骤 1  检查环境"
-need_cmd() { command -v "$1" &>/dev/null || error "未找到 $1，请在宝塔软件商店安装后重试"; }
-need_cmd mvn; need_cmd node; need_cmd npm; need_cmd mysql; need_cmd nginx
+title "步骤 1  检查并安装依赖"
 
-ok "Java  : $(java  -version 2>&1 | head -1)"
-ok "Maven : $(mvn   -version 2>&1 | head -1)"
-ok "Node  : $(node  -v)"
-ok "npm   : $(npm   -v)"
+# 检测包管理器
+if command -v apt-get &>/dev/null; then
+  PKG_MGR="apt"
+  export DEBIAN_FRONTEND=noninteractive
+elif command -v yum &>/dev/null; then
+  PKG_MGR="yum"
+elif command -v dnf &>/dev/null; then
+  PKG_MGR="dnf"
+else
+  PKG_MGR="unknown"
+fi
 
+_pkg_install() {
+  local pkg="$1"
+  info "正在安装 ${pkg} ..."
+  case "$PKG_MGR" in
+    apt) apt-get install -y -q "$pkg" 2>&1 | tail -2 ;;
+    yum) yum install -y "$pkg" 2>&1 | tail -2 ;;
+    dnf) dnf install -y "$pkg" 2>&1 | tail -2 ;;
+    *)   warn "无法自动安装 ${pkg}，请手动安装后重试"; return 1 ;;
+  esac
+}
+
+# 确保 Nginx 已安装并运行
+if ! command -v nginx &>/dev/null; then
+  _pkg_install nginx
+fi
+systemctl enable nginx 2>/dev/null || true
+systemctl start  nginx 2>/dev/null || service nginx start 2>/dev/null || true
+ok "Nginx : $(nginx -v 2>&1)"
+
+# 确保 MySQL 已安装并运行
+if ! command -v mysql &>/dev/null; then
+  if [ "$PKG_MGR" = "apt" ]; then
+    _pkg_install mysql-server
+  else
+    _pkg_install mysql-community-server || _pkg_install mariadb-server
+  fi
+fi
+systemctl enable mysql  2>/dev/null || systemctl enable mysqld  2>/dev/null || true
+systemctl start  mysql  2>/dev/null || systemctl start  mysqld  2>/dev/null \
+  || service mysql start 2>/dev/null || true
+ok "MySQL : $(mysql --version 2>&1 | head -1)"
+
+# 确保 Maven 已安装
+if ! command -v mvn &>/dev/null; then
+  _pkg_install maven
+fi
+ok "Maven : $(mvn -version 2>&1 | head -1)"
+
+# 确保 Node / npm 已安装（需要 16+）
+if ! command -v node &>/dev/null; then
+  if [ "$PKG_MGR" = "apt" ]; then
+    # NodeSource LTS 20
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - 2>&1 | tail -3
+    _pkg_install nodejs
+  else
+    _pkg_install nodejs npm || true
+  fi
+fi
+ok "Node  : $(node -v)  npm: $(npm -v)"
+
+# Redis 检查（不强制安装，宝塔一般已装）
 if command -v redis-cli &>/dev/null; then
   redis-cli ping &>/dev/null && ok "Redis : 运行中" || warn "Redis 未响应，请检查宝塔 Redis 服务"
 else
@@ -203,23 +259,69 @@ fi
 # ══════════════════════════════════════════════════════════
 title "步骤 3  创建数据库 & 导入全部 SQL"
 
-# 从宝塔读取 MySQL root 密码
+# ── 自动获取 MySQL root 访问权限（支持全新安装） ──────────
 BT_MYSQL_PWD=""
 BT_CFG=/www/server/panel/config/config.json
+
+# 方式 1：宝塔 config.json
 if [ -f "$BT_CFG" ]; then
-  BT_MYSQL_PWD=$(python3 -c "import json,sys; d=json.load(open('$BT_CFG')); print(d.get('mysql_root',''))" 2>/dev/null || true)
+  BT_MYSQL_PWD=$(python3 -c \
+    "import json; d=json.load(open('$BT_CFG')); print(d.get('mysql_root',''))" \
+    2>/dev/null || true)
+  [ -n "$BT_MYSQL_PWD" ] && ok "从宝塔配置读取 MySQL root 密码"
 fi
 
+# 方式 2：脚本上次运行保存的密码文件
+if [ -z "$BT_MYSQL_PWD" ] && [ -f /root/.deepay_mysql_root ]; then
+  BT_MYSQL_PWD=$(cat /root/.deepay_mysql_root)
+  [ -n "$BT_MYSQL_PWD" ] && ok "从 /root/.deepay_mysql_root 读取 root 密码"
+fi
+
+# 方式 3：全新安装 — 尝试空密码连接
+if [ -z "$BT_MYSQL_PWD" ]; then
+  if mysql -u root --connect-timeout=5 -e "SELECT 1;" &>/dev/null 2>&1; then
+    ok "全新 MySQL 安装，root 当前无密码"
+    # 生成随机 root 密码并切换认证插件（兼容 Ubuntu socket auth）
+    _ROOT_PWD=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9' | head -c 20)
+    mysql -u root -e \
+      "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${_ROOT_PWD}'; FLUSH PRIVILEGES;" \
+      2>/dev/null \
+      || mysql -u root -e \
+      "UPDATE mysql.user SET authentication_string=PASSWORD('${_ROOT_PWD}'), plugin='mysql_native_password' WHERE User='root'; FLUSH PRIVILEGES;" \
+      2>/dev/null || true
+    BT_MYSQL_PWD="$_ROOT_PWD"
+    echo "$BT_MYSQL_PWD" > /root/.deepay_mysql_root
+    chmod 600 /root/.deepay_mysql_root
+    ok "已自动设置 MySQL root 密码并保存至 /root/.deepay_mysql_root"
+  fi
+fi
+
+# 方式 4：Ubuntu socket auth — 用 sudo mysql 初始化
+if [ -z "$BT_MYSQL_PWD" ]; then
+  if sudo mysql -u root --connect-timeout=5 -e "SELECT 1;" &>/dev/null 2>&1; then
+    ok "检测到 Ubuntu socket 认证模式，正在切换为密码认证..."
+    _ROOT_PWD=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9' | head -c 20)
+    sudo mysql -u root -e \
+      "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${_ROOT_PWD}'; FLUSH PRIVILEGES;" \
+      2>/dev/null || true
+    BT_MYSQL_PWD="$_ROOT_PWD"
+    echo "$BT_MYSQL_PWD" > /root/.deepay_mysql_root
+    chmod 600 /root/.deepay_mysql_root
+    ok "已切换为密码认证，root 密码保存至 /root/.deepay_mysql_root"
+  fi
+fi
+
+# 方式 5：交互式输入（最后兜底）
 if [ -z "$BT_MYSQL_PWD" ]; then
   if [ "${NONINTERACTIVE}" = "1" ]; then
-    error "MySQL root 密码未找到（/www/server/panel/config/config.json），请设置 NONINTERACTIVE=0 或手动传入密码"
+    error "无法自动获取 MySQL root 密码，请设置环境变量 NONINTERACTIVE=0 后重试"
   fi
-  echo -n "  请输入 MySQL root 密码（宝塔面板 → 数据库 → root密码）: "
+  echo -n "  请输入 MySQL root 密码: "
   read -rs BT_MYSQL_PWD; echo ""
 fi
 
 MYSQL_CMD="mysql -u root -p${BT_MYSQL_PWD} --connect-timeout=5"
-$MYSQL_CMD -e "SELECT 1;" &>/dev/null || error "MySQL root 密码不对或 MySQL 未运行"
+$MYSQL_CMD -e "SELECT 1;" &>/dev/null || error "MySQL root 密码不正确或 MySQL 未运行"
 
 # 创建数据库和账号（幂等）
 $MYSQL_CMD <<SQL 2>/dev/null || true
@@ -530,6 +632,7 @@ UNIT
 
 systemctl daemon-reload
 systemctl enable deepay 2>/dev/null && ok "deepay.service 已设为开机自启" || warn "systemd enable 失败，可忽略"
+systemctl restart deepay 2>/dev/null && ok "deepay.service 已启动" || warn "systemd start 失败，请查看: journalctl -u deepay -n 30"
 
 # ══════════════════════════════════════════════════════════
 # 完成汇总
@@ -537,20 +640,18 @@ systemctl enable deepay 2>/dev/null && ok "deepay.service 已设为开机自启"
 echo ""
 echo -e "${G}${B}"
 echo "  ╔══════════════════════════════════════════════════════════╗"
-echo "  ║           🎉  一键完全配置完成！                        ║"
+echo "  ║           🎉  全自动部署完成！                          ║"
 echo "  ╠══════════════════════════════════════════════════════════╣"
-echo "  ║  主域名  http://deepay.srl    → 自动跳到 admin         ║"
-echo "  ║  管理台  http://admin.deepay.srl  （前端 Vue）          ║"
-echo "  ║  API     http://api.deepay.srl    （后端 48080）        ║"
-echo "  ║  Swagger http://api.deepay.srl/swagger-ui               ║"
+echo "  ║  站点    http://${DOMAIN}"
+echo "  ║  API     http://${DOMAIN}/api/"
+echo "  ║  Swagger http://${DOMAIN}/swagger-ui"
 echo "  ╠══════════════════════════════════════════════════════════╣"
+echo "  ║  数据库  ${DB}  用户: ${DB_USER}"
 echo "  ║  后端日志  tail -f ${LOG}"
-echo "  ║  重新部署  bash ${PROJECT}/script/shell/deepay-deploy.sh"
+echo "  ║  重新部署  bash ${PROJECT}/script/shell/quickstart.sh"
 echo "  ╠══════════════════════════════════════════════════════════╣"
-echo "  ║  💡 开启 HTTPS（每个域名都要单独申请）：                ║"
-echo "  ║     宝塔面板 → 网站 → 添加站点（三个域名各一个）        ║"
-echo "  ║     → SSL → Let's Encrypt → 申请免费证书                ║"
-echo "  ║     → 证书申请后取消 Nginx 配置里的 # return 301 https  ║"
+echo "  ║  💡 开启 HTTPS：                                        ║"
+echo "  ║     宝塔面板 → 网站 → ${DOMAIN} → SSL → Let's Encrypt  ║"
 echo "  ╚══════════════════════════════════════════════════════════╝"
 echo -e "${N}"
 
