@@ -23,12 +23,21 @@
       已选 {{ selectedList.length }} 张
       <button @click="goRedesign">用这些改款 →</button>
     </div>
+
+    <!-- AI 助手：可用自然语言直接选款 -->
+    <AiChatDrawer
+      module="selection"
+      greeting="你好！我是灵感库 AI 助手。直接告诉我你想做什么款，比如：「我要做欧美极简外套」"
+      @done="handleAiDone"
+      @imageClick="handleAiImageClick"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import AiChatDrawer from '@/components/AiChat/AiChatDrawer.vue'
 
 const router = useRouter()
 
@@ -49,6 +58,25 @@ const selectedList = computed(() => list.value.filter(i => i.selected))
 const goRedesign = () => {
   const urls = selectedList.value.map(i => i.url).join(',')
   router.push(`/ai/redesign?refs=${urls}`)
+}
+
+// AI 选款完成后，将推荐图加入灵感库
+const handleAiDone = (sessionId) => {
+  console.log('AI 选款完成 sessionId=', sessionId)
+}
+
+// AI 推荐图片被点击 → 直接加入已选
+const handleAiImageClick = (url) => {
+  const exists = list.value.find(i => i.url === url)
+  if (!exists) {
+    list.value.push({
+      id: Date.now(),
+      url,
+      title: 'AI 推荐款',
+      score: 90,
+      selected: true
+    })
+  }
 }
 </script>
 
