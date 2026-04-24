@@ -1,0 +1,25 @@
+server:
+  port: 48080
+
+spring:
+  datasource:
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: sdsdsdas
+          password: sdsdsdas
+        slave:
+          lazy: true   # 懒加载，避免从库未配置时启动报错
+          url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: sdsdsdas
+          password: sdsdsdas
+
+  # ⚠️ 本项目使用 Spring Boot 2.7.x，Redis 连接配置前缀是 spring.redis（非 spring.data.redis）
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 5000ms
+    # password:   # 宝塔 Redis 未设 requirepass，留空即可；若设了密码则取消注释并填入

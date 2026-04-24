@@ -53,3 +53,10 @@ application-my.yaml
 /yudao-ui-app/unpackage/
 **/.DS_Store
 node_modules/
+
+# Runtime dirs (logs/backups stay local, only config is committed)
+run/backend/logs/
+run/backend/backup/
+run/backend/heapDump/
+run/backend/app.jar
+run/backend/deepay.pid
