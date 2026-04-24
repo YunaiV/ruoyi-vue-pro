@@ -19,6 +19,9 @@ jobs:
       matrix:
         java: [ '17' ]
 
+    permissions:
+      contents: write
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK ${{ matrix.java }}
@@ -35,3 +38,22 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B package -pl yudao-server -am -Dmaven.test.skip=true --no-transfer-progress
+
+    - name: Rename JAR for release
+      run: |
+        JAR=$(find yudao-server/target -maxdepth 1 -name "*.jar" \
+          ! -name "*sources*" ! -name "*javadoc*" | head -1)
+        cp "$JAR" yudao-server.jar
+        echo "Built: $JAR → yudao-server.jar"
+
+    # Publish / overwrite the rolling "latest" release so the server can
+    # always download the newest JAR with a stable URL:
+    #   https://github.com/<owner>/<repo>/releases/download/latest/yudao-server.jar
+    - name: Publish JAR as GitHub Release (latest)
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: "Latest Build"
+        body: "Auto-built from commit ${{ github.sha }} on ${{ github.ref_name }}"
+        prerelease: true
+        files: yudao-server.jar
