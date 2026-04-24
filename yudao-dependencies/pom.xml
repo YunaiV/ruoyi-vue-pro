@@ -69,7 +69,7 @@
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.2.9.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
-        <vertx.version>4.5.22</vertx.version>
+        <vertx.version>4.5.24</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
         <californium.version>3.12.0</californium.version>
         <j2mod.version>3.2.1</j2mod.version>
