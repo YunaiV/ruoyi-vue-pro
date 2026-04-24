@@ -333,7 +333,21 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    # 代理到后端 API（前端请求 /admin-api/ 时转发）
+    # ── Deepay 前端 API（/api/**）→ 后端 48080 ──────────────────────────
+    # 前端所有业务接口均以 /api/ 开头（design / quota / pay / shop / user …）
+    # 必须在 location / 之前声明，否则 try_files 会把 API 请求当静态文件处理。
+    location /api/ {
+        proxy_pass http://127.0.0.1:48080/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+
+    # 代理到后端管理 API（/admin-api/）
     location /admin-api/ {
         proxy_pass http://127.0.0.1:48080/admin-api/;
         proxy_set_header Host $host;
