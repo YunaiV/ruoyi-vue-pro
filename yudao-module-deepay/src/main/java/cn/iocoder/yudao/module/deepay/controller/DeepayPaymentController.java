@@ -73,8 +73,8 @@ public class DeepayPaymentController {
     // 商品详情页
     // ----------------------------------------------------------------
 
-    @GetMapping("/product/{chainCode}")
-    @Operation(summary = "商品详情页")
+    @GetMapping("/api/payment/product/{chainCode}")
+    @Operation(summary = "商品详情 JSON")
     public CommonResult<Map<String, Object>> productDetail(@PathVariable("chainCode") String chainCode) {
         DeepayProductDO product = orderService.getProduct(chainCode);
         Map<String, Object> resp = new LinkedHashMap<>();
