@@ -10,7 +10,7 @@ import javax.validation.Valid;
 /**
  * ERP 产品库存明细 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface ErpStockRecordService {
 

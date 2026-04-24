@@ -21,7 +21,7 @@ public class AppArticleRespVO {
     @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")
     private Long categoryId;
 
-    @Schema(description = "图文封面", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "图文封面", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "文章简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是简介")

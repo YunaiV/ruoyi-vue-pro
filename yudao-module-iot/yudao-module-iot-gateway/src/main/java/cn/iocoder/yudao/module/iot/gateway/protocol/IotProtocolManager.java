@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * IoT 协议管理器：负责根据配置创建和管理协议实例
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotProtocolManager implements SmartLifecycle {

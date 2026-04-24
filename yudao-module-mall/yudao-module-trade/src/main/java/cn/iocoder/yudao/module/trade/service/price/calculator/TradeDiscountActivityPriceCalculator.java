@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceC
  *
  * 由于“会员折扣”和“限时折扣”是冲突，需要选择优惠金额多的，所以也放在这里计算
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Order(TradePriceCalculator.ORDER_DISCOUNT_ACTIVITY)

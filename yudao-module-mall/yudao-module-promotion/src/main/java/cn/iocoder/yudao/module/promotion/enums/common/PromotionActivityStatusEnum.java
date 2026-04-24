@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * 促销活动的状态枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AllArgsConstructor
 @Getter

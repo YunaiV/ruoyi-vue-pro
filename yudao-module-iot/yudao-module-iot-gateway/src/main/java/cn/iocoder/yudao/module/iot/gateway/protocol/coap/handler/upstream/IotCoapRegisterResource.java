@@ -9,7 +9,7 @@ import org.eclipse.californium.core.server.resources.CoapExchange;
  * <p>
  * 用于直连设备/网关的一型一密动态注册，不需要认证
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotCoapRegisterResource extends CoapResource {

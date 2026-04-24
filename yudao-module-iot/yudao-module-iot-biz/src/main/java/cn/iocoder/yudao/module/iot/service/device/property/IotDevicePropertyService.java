@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * IoT 设备【属性】数据 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface IotDevicePropertyService {
 

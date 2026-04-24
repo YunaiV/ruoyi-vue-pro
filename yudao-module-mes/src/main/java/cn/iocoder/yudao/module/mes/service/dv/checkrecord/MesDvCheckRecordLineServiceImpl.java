@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.DV_CHECK_RECO
 /**
  * MES 设备点检记录明细 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

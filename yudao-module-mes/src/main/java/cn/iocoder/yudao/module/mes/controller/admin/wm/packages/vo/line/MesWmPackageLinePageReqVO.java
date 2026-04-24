@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 /**
  * MES 装箱明细分页 Request VO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Schema(description = "管理后台 - MES 装箱明细分页 Request VO")
 @Data

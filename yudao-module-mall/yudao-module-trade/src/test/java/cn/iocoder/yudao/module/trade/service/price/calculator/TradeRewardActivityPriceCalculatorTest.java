@@ -9,7 +9,7 @@ import org.mockito.Mock;
 /**
  * {@link TradeRewardActivityPriceCalculator} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest {
 

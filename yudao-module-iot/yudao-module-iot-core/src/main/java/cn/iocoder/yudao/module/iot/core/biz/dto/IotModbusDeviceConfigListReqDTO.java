@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * IoT Modbus 设备配置列表查询 Request DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 @Accessors(chain = true)

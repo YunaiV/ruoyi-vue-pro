@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * {@link MoonshotChatModel} 的集成测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class MoonshotChatModelTests {
 

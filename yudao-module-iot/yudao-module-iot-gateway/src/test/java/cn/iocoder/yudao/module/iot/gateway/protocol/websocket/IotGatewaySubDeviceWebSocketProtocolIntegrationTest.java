@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * <p>注意：WebSocket 协议是有状态的长连接，认证成功后同一连接上的后续请求无需再携带认证信息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @Disabled

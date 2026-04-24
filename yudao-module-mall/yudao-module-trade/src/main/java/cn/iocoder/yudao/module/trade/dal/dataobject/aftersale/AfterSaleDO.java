@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 售后订单，用于处理 {@link TradeOrderDO} 交易订单的退款退货流程
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "trade_after_sale", autoResultMap = true)
 @KeySequence("trade_after_sale_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

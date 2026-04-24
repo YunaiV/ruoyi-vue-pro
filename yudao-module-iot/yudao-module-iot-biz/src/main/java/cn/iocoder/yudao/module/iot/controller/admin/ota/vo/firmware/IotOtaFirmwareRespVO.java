@@ -28,7 +28,7 @@ public class IotOtaFirmwareRespVO implements VO {
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "智能设备")
     private String productName;
 
-    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/firmware.bin")
+    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/firmware.bin")
     private String fileUrl;
 
     @Schema(description = "固件文件大小", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

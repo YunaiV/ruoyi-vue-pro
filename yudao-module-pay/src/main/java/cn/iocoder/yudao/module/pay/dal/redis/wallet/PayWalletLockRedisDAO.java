@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.module.pay.dal.redis.RedisKeyConstants.PAY_WALLET
 /**
  * 支付钱包的锁 Redis DAO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Repository
 public class PayWalletLockRedisDAO {

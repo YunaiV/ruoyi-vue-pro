@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 质检方案-检测指标项 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesQcTemplateIndicatorMapper extends BaseMapperX<MesQcTemplateIndicatorDO> {

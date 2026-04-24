@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * {@link SeckillConfigServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(SeckillConfigServiceImpl.class)
 @Disabled // TODO 芋艿：未来开启；后续要 review 下

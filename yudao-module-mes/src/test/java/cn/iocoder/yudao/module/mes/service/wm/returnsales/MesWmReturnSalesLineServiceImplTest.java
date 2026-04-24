@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * {@link MesWmReturnSalesLineServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(MesWmReturnSalesLineServiceImpl.class)
 public class MesWmReturnSalesLineServiceImplTest extends BaseDbUnitTest {

@@ -31,7 +31,7 @@ public class AiChatRoleRespVO implements VO {
     @Schema(description = "角色名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     private String name;
 
-    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     private String avatar;
 
     @Schema(description = "角色类别", requiredMode = Schema.RequiredMode.REQUIRED, example = "创作")

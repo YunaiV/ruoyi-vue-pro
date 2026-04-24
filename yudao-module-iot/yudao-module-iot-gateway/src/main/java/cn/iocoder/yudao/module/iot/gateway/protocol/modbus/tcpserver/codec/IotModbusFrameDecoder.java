@@ -23,7 +23,7 @@ import java.util.function.BiConsumer;
  *      - MODBUS_TCP：两阶段 RecordParser（MBAP length 字段驱动）
  *      - MODBUS_RTU：功能码驱动的状态机
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j

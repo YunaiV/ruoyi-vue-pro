@@ -10,7 +10,7 @@ import lombok.*;
 /**
  * MES 点检保养方案设备 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_dv_check_plan_machinery")
 @KeySequence("mes_dv_check_plan_machinery_seq")

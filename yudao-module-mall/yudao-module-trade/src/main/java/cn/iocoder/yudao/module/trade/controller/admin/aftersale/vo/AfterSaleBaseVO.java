@@ -44,7 +44,7 @@ public class AfterSaleBaseVO {
     @Schema(description = "补充描述", example = "你说的对")
     private String applyDescription;
 
-    @Schema(description = "补充凭证图片", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "补充凭证图片", example = "https://www.deepay.srl/1.png")
     private List<String> applyPicUrls;
 
     @Schema(description = "订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18078")
@@ -71,7 +71,7 @@ public class AfterSaleBaseVO {
     @NotNull(message = "商品 SKU 编号不能为空")
     private Long skuId;
 
-    @Schema(description = "商品图片", example = "https://www.iocoder.cn/2.png")
+    @Schema(description = "商品图片", example = "https://www.deepay.srl/2.png")
     private String picUrl;
 
     @Schema(description = "购买数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "20012")

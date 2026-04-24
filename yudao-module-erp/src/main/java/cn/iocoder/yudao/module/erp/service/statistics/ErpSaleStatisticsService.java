@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 /**
  * ERP 销售统计 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface ErpSaleStatisticsService {
 

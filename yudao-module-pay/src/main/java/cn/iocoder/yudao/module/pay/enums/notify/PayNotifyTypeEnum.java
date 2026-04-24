@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 支付通知类型
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

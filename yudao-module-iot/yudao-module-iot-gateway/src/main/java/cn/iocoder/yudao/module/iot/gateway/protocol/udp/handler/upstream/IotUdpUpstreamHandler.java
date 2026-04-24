@@ -45,7 +45,7 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVIC
  * 3. 后续请求：每次请求在 params 中携带 token
  * 4. 服务端验证：每次请求通过 IotDeviceTokenService.verifyToken() 验证
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotUdpUpstreamHandler {

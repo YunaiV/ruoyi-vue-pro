@@ -20,7 +20,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 生产报工 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_pro_feedback")
 @KeySequence("mes_pro_feedback_seq")

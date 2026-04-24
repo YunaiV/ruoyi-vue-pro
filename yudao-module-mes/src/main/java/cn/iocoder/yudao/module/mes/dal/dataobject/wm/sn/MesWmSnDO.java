@@ -11,7 +11,7 @@ import lombok.*;
 /**
  * MES SN 码 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_sn")
 @KeySequence("mes_wm_sn_seq")

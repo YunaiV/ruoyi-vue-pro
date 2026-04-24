@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * <p>注意：MQTT 协议是有状态的长连接，认证在连接时通过 username/password 完成，
  * 认证成功后同一连接上的后续请求无需再携带认证信息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @Disabled

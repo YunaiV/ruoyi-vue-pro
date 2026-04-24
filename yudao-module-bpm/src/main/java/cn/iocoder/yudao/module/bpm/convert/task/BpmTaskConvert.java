@@ -34,7 +34,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAnd
 /**
  * Bpm 任务 Convert
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface BpmTaskConvert {

@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * 交易订单项 - 售后状态
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Getter

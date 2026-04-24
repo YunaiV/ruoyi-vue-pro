@@ -29,7 +29,7 @@ public class AppTradeOrderItemRespVO {
      */
     private List<AppProductPropertyValueDetailRespVO> properties;
 
-    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "购买数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

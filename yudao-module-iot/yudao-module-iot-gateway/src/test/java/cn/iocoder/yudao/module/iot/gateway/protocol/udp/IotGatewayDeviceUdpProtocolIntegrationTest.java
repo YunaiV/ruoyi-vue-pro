@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * <p>注意：UDP 协议是无状态的，每次请求需要在 params 中携带 token（与 HTTP 通过 Header 传递不同）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @Disabled

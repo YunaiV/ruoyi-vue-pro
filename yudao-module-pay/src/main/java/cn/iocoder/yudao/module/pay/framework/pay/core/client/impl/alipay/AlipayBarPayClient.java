@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.
  *
  * 文档：<a href="https://opendocs.alipay.com/open/194/105072">当面付</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class AlipayBarPayClient extends AbstractAlipayPayClient {

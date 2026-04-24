@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 退款单创建 Request DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class PayRefundCreateReqDTO {

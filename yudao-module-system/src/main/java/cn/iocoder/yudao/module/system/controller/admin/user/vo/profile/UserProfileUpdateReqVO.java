@@ -29,7 +29,7 @@ public class UserProfileUpdateReqVO {
     @Schema(description = "用户性别，参见 SexEnum 枚举类", example = "1")
     private Integer sex;
 
-    @Schema(description = "角色头像", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "角色头像", example = "https://www.deepay.srl/1.png")
     @URL(message = "头像地址格式不正确")
     private String avatar;
 

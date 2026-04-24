@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.wm.stocktaking.task.MesWmStock
 /**
  * MES 盘点结果 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesWmStockTakingTaskResultService {
 

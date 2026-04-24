@@ -30,7 +30,7 @@ public class MemberUserBaseVO {
     @NotNull(message = "用户昵称不能为空")
     private String nickname;
 
-    @Schema(description = "头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/x.png")
+    @Schema(description = "头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/x.png")
     @URL(message = "头像必须是 URL 格式")
     private String avatar;
 

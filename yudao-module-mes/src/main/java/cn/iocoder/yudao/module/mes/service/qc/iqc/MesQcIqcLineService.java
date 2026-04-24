@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * MES 来料检验单行 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesQcIqcLineService {
 

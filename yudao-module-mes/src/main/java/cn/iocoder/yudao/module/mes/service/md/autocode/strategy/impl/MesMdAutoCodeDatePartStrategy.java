@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * MES 编码规则 - 当前日期策略
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class MesMdAutoCodeDatePartStrategy implements MesMdAutoCodePartStrategy {

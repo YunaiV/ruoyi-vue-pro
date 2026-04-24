@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link TradeCouponPriceCalculator} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Disabled // TODO 芋艿：后续修复
 public class TradeCouponPriceCalculatorTest extends BaseMockitoUnitTest {

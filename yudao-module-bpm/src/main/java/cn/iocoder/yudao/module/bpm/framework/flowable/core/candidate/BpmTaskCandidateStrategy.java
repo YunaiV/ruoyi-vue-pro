@@ -12,7 +12,7 @@ import java.util.Set;
  * <p>
  * 例如说：分配审批人
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface BpmTaskCandidateStrategy {
 

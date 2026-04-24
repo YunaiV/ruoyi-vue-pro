@@ -39,12 +39,12 @@ public class ProductSpuSaveReqVO {
     @NotNull(message = "商品品牌不能为空")
     private Long brandId;
 
-    @Schema(description = "商品封面图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "商品封面图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     @NotEmpty(message = "商品封面图不能为空")
     private String picUrl;
 
     @Schema(description = "商品轮播图", requiredMode = Schema.RequiredMode.REQUIRED,
-            example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+            example = "[https://www.deepay.srl/xx.png, https://www.deepay.srl/xxx.png]")
     private List<String> sliderPicUrls;
 
     @Schema(description = "排序字段", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

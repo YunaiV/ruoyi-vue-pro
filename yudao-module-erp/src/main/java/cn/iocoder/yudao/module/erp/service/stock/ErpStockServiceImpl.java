@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.STOCK_COUNT_N
 /**
  * ERP 产品库存 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

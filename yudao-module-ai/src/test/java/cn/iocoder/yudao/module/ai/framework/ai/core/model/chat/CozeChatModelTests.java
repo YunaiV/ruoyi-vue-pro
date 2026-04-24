@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 基于 {@link OpenAiChatModel} 集成 Coze 测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class CozeChatModelTests {
 

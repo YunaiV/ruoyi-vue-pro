@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * MES 检测结果枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

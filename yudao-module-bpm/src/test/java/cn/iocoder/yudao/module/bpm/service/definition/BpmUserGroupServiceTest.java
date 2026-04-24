@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.USER_GROUP_NO
 /**
  * {@link BpmUserGroupServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(BpmUserGroupServiceImpl.class)
 public class BpmUserGroupServiceTest extends BaseDbUnitTest {

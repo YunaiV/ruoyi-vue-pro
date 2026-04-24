@@ -37,11 +37,11 @@ public class MemberLevelBaseVO {
     @Range(min = 0, max = 100, message = "享受折扣的范围为 0-100")
     private Integer discountPercent;
 
-    @Schema(description = "等级图标", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "等级图标", example = "https://www.deepay.srl/yudao.jpg")
     @URL(message = "等级图标必须是 URL 格式")
     private String icon;
 
-    @Schema(description = "等级背景图", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "等级背景图", example = "https://www.deepay.srl/yudao.jpg")
     @URL(message = "等级背景图必须是 URL 格式")
     private String backgroundUrl;
 

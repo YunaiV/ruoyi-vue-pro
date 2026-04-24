@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 质检指标 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_qc_indicator")
 @KeySequence("mes_qc_indicator_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

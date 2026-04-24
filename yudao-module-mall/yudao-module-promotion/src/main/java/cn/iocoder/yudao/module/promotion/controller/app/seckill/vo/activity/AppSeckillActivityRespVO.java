@@ -20,7 +20,7 @@ public class AppSeckillActivityRespVO {
     private String spuName; // 从 SPU 的 name 读取
 
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 picUrl 读取
-            example = "https://www.iocoder.cn/xx.png")
+            example = "https://www.deepay.srl/xx.png")
     private String picUrl;
 
     @Schema(description = "商品市场价，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, // 从 SPU 的 marketPrice 读取

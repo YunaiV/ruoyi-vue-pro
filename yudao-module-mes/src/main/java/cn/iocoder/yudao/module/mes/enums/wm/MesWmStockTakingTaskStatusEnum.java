@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * MES 盘点任务状态枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

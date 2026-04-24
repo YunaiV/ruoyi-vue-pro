@@ -12,7 +12,7 @@ import lombok.*;
 /**
  * IoT 设备 Modbus 连接配置 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("iot_device_modbus_config")
 @KeySequence("iot_device_modbus_config_seq")

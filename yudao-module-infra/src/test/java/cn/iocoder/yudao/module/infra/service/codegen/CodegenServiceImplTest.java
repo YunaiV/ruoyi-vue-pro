@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link CodegenServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(CodegenServiceImpl.class)
 public class CodegenServiceImplTest extends BaseDbUnitTest {

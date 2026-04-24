@@ -24,11 +24,11 @@
 
 ## 🐶 新手必读
 
-* 演示地址【Vue3 + element-plus】：<http://dashboard-vue3.yudao.iocoder.cn>
-* 演示地址【Vue3 + vben(ant-design-vue)】：<http://dashboard-vben.yudao.iocoder.cn>
-* 演示地址【Vue2 + element-ui】：<http://dashboard.yudao.iocoder.cn>
-* 启动文档：<https://doc.iocoder.cn/quick-start/>
-* 视频教程：<https://doc.iocoder.cn/video/>
+* 演示地址【Vue3 + element-plus】：<https://admin.deepay.srl>
+* 演示地址【Vue3 + vben(ant-design-vue)】：<https://admin.deepay.srl>
+* 演示地址【Vue2 + element-ui】：<https://admin.deepay.srl>
+* 启动文档：<https://admin.deepay.srl/quick-start/>
+* 视频教程：<https://admin.deepay.srl/video/>
 
 ## 🐰 版本说明
 
@@ -40,11 +40,11 @@
 * 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
 * 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
 
-可参考 [《迁移文档》](https://doc.iocoder.cn/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
+可参考 [《迁移文档》](https://admin.deepay.srl/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
 
 ## 🐯 平台简介
 
-**芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
+**deepay**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
 
 > 有任何问题，或者想要的功能，可以在 _Issues_ 中提给艿艿。
 >
@@ -257,7 +257,7 @@
 
 ### 商城系统
 
-演示地址：<https://doc.iocoder.cn/mall-preview/>
+演示地址：<https://admin.deepay.srl/mall-preview/>
 
 ![功能图](/.image/common/mall-feature.png)
 
@@ -275,19 +275,19 @@
 
 ### ERP 系统
 
-演示地址：<https://doc.iocoder.cn/erp-preview/>
+演示地址：<https://admin.deepay.srl/erp-preview/>
 
 ![功能图](/.image/common/erp-feature.png)
 
 ### CRM 系统
 
-演示地址：<https://doc.iocoder.cn/crm-preview/>
+演示地址：<https://admin.deepay.srl/crm-preview/>
 
 ![功能图](/.image/common/crm-feature.png)
 
 ### MES 系统
 
-演示地址：<https://doc.iocoder.cn/mes-preview/>
+演示地址：<https://admin.deepay.srl/mes-preview/>
 
 ![功能图](/.image/common/mes-feature.png)
 
@@ -295,7 +295,7 @@
 
 ### AI 大模型
 
-演示地址：<https://doc.iocoder.cn/ai-preview/>
+演示地址：<https://admin.deepay.srl/ai-preview/>
 
 ![功能图](/.image/common/ai-feature.png)
 
@@ -303,7 +303,7 @@
 
 ### IoT 物联网
 
-演示地址：<https://doc.iocoder.cn/iot/build>
+演示地址：<https://admin.deepay.srl/iot/build>
 
 ![功能图](/.image/common/iot-feature.png)
 
@@ -338,22 +338,22 @@
 |---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
 | [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.23         | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.7          | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
-| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1          | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.23         | [文档](https://www.deepay.srl/Spring-Boot/datasource-pool/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.7          | [文档](https://www.deepay.srl/Spring-Boot/MyBatis/?yudao)         |
+| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1          | [文档](https://www.deepay.srl/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0 /7.0 |                                                                |
-| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.32.0         | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24         | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.11         | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5          | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
-| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://doc.iocoder.cn/bpm/)                              |
-| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
-| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0          | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
-| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
+| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.32.0         | [文档](https://www.deepay.srl/Spring-Boot/Redis/?yudao)           |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24         | [文档](https://www.deepay.srl/SpringMVC/MVC/?yudao)               |
+| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.11         | [文档](https://www.deepay.srl/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5          | [文档](https://www.deepay.srl/Spring-Boot/Validation/?yudao)      |
+| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://admin.deepay.srl/bpm/)                              |
+| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](https://www.deepay.srl/Spring-Boot/Job/?yudao)             |
+| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0          | [文档](https://www.deepay.srl/Spring-Boot/Swagger/?yudao)         |
+| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](https://www.deepay.srl/Spring-Boot/SkyWalking/?yudao)      |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](https://www.deepay.srl/Spring-Boot/Admin/?yudao)           |
 | [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.13.5         |                                                                |
-| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.3          | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
-| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.34        | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
+| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.3          | [文档](https://www.deepay.srl/Spring-Boot/MapStruct/?yudao)       |
+| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.34        | [文档](https://www.deepay.srl/Spring-Boot/Lombok/?yudao)          |
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2          | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.8.0          | -                                                              |
 

@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 /**
  * MES 销售出库明细 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_product_sales_detail")
 @KeySequence("mes_wm_product_sales_detail_seq")

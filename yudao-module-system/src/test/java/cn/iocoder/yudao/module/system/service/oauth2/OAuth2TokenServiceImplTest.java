@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link OAuth2TokenServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import({OAuth2TokenServiceImpl.class, OAuth2AccessTokenRedisDAO.class})
 public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {

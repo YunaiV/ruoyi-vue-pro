@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * IoT Modbus TCP Client 配置缓存服务
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j

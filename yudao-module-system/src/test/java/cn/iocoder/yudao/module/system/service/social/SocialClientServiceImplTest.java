@@ -45,7 +45,7 @@ import static org.mockito.Mockito.*;
 /**
  * {@link SocialClientServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(SocialClientServiceImpl.class)
 public class SocialClientServiceImplTest extends BaseDbUnitTest {

@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * 支付应用信息 Convert
  *
- * @author 芋艿
+ * @author deepay
  */
 @Mapper
 public interface PayAppConvert {

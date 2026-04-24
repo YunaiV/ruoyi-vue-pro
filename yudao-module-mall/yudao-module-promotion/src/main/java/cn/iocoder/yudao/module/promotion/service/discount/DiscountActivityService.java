@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 限时折扣 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface DiscountActivityService {
 

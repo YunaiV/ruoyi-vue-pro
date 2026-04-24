@@ -38,7 +38,7 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_P
  * 3. BPMN 复杂遍历相关的方法
  * 4. BPMN 流程预测相关的方法
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class BpmnModelUtils {

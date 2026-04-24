@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link DiscountActivityServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author deepay
 */
 @Disabled // TODO 芋艿：后续 fix 补充的单测
 @Import(DiscountActivityServiceImpl.class)

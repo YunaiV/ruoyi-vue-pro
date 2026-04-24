@@ -53,7 +53,7 @@ public class UserRespVO{
     @DictFormat(DictTypeConstants.USER_SEX)
     private Integer sex;
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     private String avatar;
 
     @Schema(description = "状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#OTA_PROGRESS} 上行消息的 params 参数
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="https://help.aliyun.com/zh/iot/user-guide/perform-ota-updates">阿里云 - OTA 升级</a>
  */
 @Data

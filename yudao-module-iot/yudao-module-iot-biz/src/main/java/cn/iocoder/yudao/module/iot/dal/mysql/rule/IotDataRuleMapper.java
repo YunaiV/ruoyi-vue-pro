@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * IoT 数据流转规则 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface IotDataRuleMapper extends BaseMapperX<IotDataRuleDO> {

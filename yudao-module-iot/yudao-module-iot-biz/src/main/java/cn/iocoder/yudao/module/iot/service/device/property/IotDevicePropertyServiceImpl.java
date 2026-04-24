@@ -41,7 +41,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.getBigD
 /**
  * IoT 设备【属性】数据 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Slf4j

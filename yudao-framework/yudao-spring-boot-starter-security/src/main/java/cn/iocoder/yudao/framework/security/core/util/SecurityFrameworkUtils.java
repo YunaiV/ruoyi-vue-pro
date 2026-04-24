@@ -19,7 +19,7 @@ import java.util.Collections;
 /**
  * 安全服务工具类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class SecurityFrameworkUtils {
 

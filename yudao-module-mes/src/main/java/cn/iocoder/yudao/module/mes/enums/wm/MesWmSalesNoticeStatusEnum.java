@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * MES 发货通知单状态枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

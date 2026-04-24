@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * 商品属性项的明细 Response DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class ProductPropertyValueDetailRespDTO {

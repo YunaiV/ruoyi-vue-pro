@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * RocketMQ 广播 WebSocket 的消息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class RocketMQWebSocketMessage {

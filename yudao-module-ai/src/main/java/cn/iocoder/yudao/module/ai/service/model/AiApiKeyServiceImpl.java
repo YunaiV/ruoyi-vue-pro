@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.API_KEY_NOT_EX
 /**
  * AI API 密钥 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

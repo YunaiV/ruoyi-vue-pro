@@ -30,7 +30,7 @@ public class OAuth2UserInfoRespVO {
     @Schema(description = "用户性别，参见 SexEnum 枚举类", example = "1")
     private Integer sex;
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     private String avatar;
 
     /**

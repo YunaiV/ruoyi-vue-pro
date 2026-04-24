@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 各种 {@link SmsClient} 的集成测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class SmsClientTests {
 

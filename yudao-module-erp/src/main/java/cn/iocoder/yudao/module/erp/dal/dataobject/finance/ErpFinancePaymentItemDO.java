@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 /**
  * ERP 付款项 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("erp_finance_payment_item")
 @KeySequence("erp_finance_payment_item_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

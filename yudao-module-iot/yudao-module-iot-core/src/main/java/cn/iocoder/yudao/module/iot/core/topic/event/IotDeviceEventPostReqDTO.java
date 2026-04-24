@@ -8,7 +8,7 @@ import lombok.Data;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#EVENT_POST} 消息的 params 参数
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="http://help.aliyun.com/zh/marketplace/device-reporting-events">阿里云 - 设备上报事件</a>
  */
 @Data

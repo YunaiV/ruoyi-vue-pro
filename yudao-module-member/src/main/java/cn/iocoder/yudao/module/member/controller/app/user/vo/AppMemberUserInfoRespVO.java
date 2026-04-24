@@ -17,7 +17,7 @@ public class AppMemberUserInfoRespVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String nickname;
 
-    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xxx.png")
     private String avatar;
 
     @Schema(description = "用户手机号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601691300")
@@ -51,7 +51,7 @@ public class AppMemberUserInfoRespVO {
         @Schema(description = "等级", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer level;
 
-        @Schema(description = "等级图标", example = "https://www.iocoder.cn/yudao.jpg")
+        @Schema(description = "等级图标", example = "https://www.deepay.srl/yudao.jpg")
         private String icon;
 
     }

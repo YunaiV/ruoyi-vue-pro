@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * Admin 用户 API 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 public class AdminUserApiImpl implements AdminUserApi {

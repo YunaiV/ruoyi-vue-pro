@@ -13,7 +13,7 @@ public class MemberUserRespVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     private String nickname;
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     private String avatar;
 
 }

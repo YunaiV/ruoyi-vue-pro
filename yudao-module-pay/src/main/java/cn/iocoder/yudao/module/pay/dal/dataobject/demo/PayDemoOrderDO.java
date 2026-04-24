@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  *
  * 演示业务系统的订单，如何接入 pay 系统的支付与退款
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("pay_demo_order")
 @KeySequence("pay_demo_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

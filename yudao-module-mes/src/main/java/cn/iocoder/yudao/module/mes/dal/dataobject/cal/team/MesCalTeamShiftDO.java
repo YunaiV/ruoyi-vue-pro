@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * MES 班组排班 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_cal_team_shift")
 @KeySequence("mes_cal_team_shift_seq")

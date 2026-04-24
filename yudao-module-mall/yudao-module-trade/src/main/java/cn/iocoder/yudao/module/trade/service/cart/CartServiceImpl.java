@@ -28,7 +28,7 @@ import static java.util.Collections.emptyList;
  *
  * // TODO 芋艿：未来优化：购物车的价格计算，支持营销信息；目前不支持的原因，前端界面需要前端 pr 支持下；例如说：会员价格；
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

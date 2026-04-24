@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link SocialUserServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(SocialUserServiceImpl.class)
 public class SocialUserServiceImplTest extends BaseDbUnitTest {

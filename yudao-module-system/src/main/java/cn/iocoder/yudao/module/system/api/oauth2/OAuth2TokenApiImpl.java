@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 /**
  * OAuth2.0 Token API 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 public class OAuth2TokenApiImpl implements OAuth2TokenCommonApi {

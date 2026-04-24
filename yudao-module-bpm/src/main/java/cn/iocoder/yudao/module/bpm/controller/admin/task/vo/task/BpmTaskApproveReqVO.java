@@ -18,7 +18,7 @@ public class BpmTaskApproveReqVO {
     @Schema(description = "审批意见", example = "不错不错！")
     private String reason;
 
-    @Schema(description = "签名", example = "https://www.iocoder.cn/sign.png")
+    @Schema(description = "签名", example = "https://www.deepay.srl/sign.png")
     private String signPicUrl;
 
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)

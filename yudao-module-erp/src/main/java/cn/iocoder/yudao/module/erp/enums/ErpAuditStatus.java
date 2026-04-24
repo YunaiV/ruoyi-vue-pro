@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * TODO 芋艿：目前只有待审批、已审批两个状态，未来接入工作流后，会丰富下：待提交（草稿）=》已提交（待审核）=》审核通过、审核不通过；另外，工作流需要支持“反审核”，把工作流退回到原点；
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Getter

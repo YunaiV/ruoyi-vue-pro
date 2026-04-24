@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * MES 编码生成上下文
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class MesMdAutoCodeContext {

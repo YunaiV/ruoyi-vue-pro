@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.USER_NOT_EXIST
 /**
  * 公众号粉丝 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MpUserService {
 

@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 /**
  * 基于 Spring EL 表达式的 {@link RateLimiterKeyResolver} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class ExpressionRateLimiterKeyResolver implements RateLimiterKeyResolver {
 

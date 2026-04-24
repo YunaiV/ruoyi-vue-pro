@@ -12,7 +12,7 @@ import java.util.List;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#TOPO_ADD} 消息的 params 参数
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="http://help.aliyun.com/zh/marketplace/add-topological-relationship">阿里云 - 添加拓扑关系</a>
  */
 @Data

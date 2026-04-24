@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link AfterSaleService} 的单元测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Disabled // TODO 芋艿：后续 fix 补充的单测
 @Import(AfterSaleServiceImpl.class)

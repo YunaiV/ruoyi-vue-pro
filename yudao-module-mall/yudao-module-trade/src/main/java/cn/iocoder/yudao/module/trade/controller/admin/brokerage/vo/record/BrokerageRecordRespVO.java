@@ -22,7 +22,7 @@ public class BrokerageRecordRespVO extends BrokerageRecordBaseVO {
 
     // ========== 用户信息 ==========
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     private String userAvatar;
     @Schema(description = "用户昵称", example = "李四")
     private String userNickname;
@@ -30,7 +30,7 @@ public class BrokerageRecordRespVO extends BrokerageRecordBaseVO {
 
     // ========== 来源用户信息 ==========
 
-    @Schema(description = "来源用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "来源用户头像", example = "https://www.deepay.srl/xxx.png")
     private String sourceUserAvatar;
     @Schema(description = "来源用户昵称", example = "李四")
     private String sourceUserNickname;

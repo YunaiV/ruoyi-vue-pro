@@ -27,7 +27,7 @@ import java.time.Duration;
 /**
  * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 

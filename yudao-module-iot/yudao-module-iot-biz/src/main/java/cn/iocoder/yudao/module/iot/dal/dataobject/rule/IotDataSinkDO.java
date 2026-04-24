@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 /**
  * IoT 数据流转目的 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "iot_data_sink", autoResultMap = true)
 @KeySequence("iot_data_bridge_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

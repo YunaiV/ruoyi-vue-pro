@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.dal.redis;
 /**
  * 支付 Redis Key 枚举类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface RedisKeyConstants {
 

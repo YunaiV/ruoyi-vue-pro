@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * 邮箱发送消息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class MailSendMessage {

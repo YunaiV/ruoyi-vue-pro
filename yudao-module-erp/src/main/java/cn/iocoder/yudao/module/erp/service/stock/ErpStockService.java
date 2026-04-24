@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 /**
  * ERP 产品库存 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface ErpStockService {
 

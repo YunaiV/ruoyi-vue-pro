@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * MES 工装夹具资源 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_md_workstation_tool")
 @KeySequence("mes_md_workstation_tool_seq")

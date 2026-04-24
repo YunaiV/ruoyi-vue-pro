@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.biz.system.permission.dto.DeptDataPermi
 /**
  * 权限 API 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface PermissionCommonApi {
 

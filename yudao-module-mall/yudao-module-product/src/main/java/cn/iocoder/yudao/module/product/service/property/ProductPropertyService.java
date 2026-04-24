@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 商品属性项 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface ProductPropertyService {
 

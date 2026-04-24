@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 /**
  * MES 质检方案-检测指标项 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_qc_template_indicator")
 @KeySequence("mes_qc_template_indicator_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

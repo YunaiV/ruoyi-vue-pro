@@ -8,7 +8,7 @@ import java.time.Duration;
 /**
  * 芋道 IoT 全局配置类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Data

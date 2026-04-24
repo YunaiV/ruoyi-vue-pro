@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceC
 /**
  * 满减送活动的 {@link TradePriceCalculator} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Order(TradePriceCalculator.ORDER_REWARD_ACTIVITY)

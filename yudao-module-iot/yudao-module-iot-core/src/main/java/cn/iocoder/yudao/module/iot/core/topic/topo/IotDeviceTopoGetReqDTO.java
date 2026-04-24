@@ -8,7 +8,7 @@ import lombok.Data;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#TOPO_GET} 请求的 params 参数（目前为空，预留扩展）
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="https://help.aliyun.com/zh/marketplace/obtain-topological-relationship">阿里云 - 获取拓扑关系</a>
  */
 @Data

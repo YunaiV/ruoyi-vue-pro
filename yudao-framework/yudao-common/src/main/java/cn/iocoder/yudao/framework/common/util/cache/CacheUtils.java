@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 /**
  * Cache 工具类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class CacheUtils {
 

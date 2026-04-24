@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * IoT Modbus TCP Server 配置缓存：认证时按需加载，断连时清理，定时刷新已连接设备
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j

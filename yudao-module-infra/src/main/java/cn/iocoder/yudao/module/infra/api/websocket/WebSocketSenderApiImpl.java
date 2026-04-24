@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * WebSocket 发送器的 API 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class WebSocketSenderApiImpl implements WebSocketSenderApi {

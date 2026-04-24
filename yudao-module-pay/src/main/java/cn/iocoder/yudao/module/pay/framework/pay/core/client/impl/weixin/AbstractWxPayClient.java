@@ -42,7 +42,7 @@ import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.
 /**
  * 微信支付抽象类，实现微信统一的接口、以及部分实现（退款）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientConfig> {

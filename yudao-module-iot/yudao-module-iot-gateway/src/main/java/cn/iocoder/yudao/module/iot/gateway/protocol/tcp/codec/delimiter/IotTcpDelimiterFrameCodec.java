@@ -23,7 +23,7 @@ import cn.hutool.core.lang.Assert;
  *   <li>自定义字符串</li>
  * </ul>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotTcpDelimiterFrameCodec implements IotTcpFrameCodec {

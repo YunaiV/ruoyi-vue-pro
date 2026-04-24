@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 /**
  * ERP 产品库存明细 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

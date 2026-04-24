@@ -24,7 +24,7 @@ import java.util.List;
  *
  * 监听 {@link SourceConfig} 数据源，转发到 {@link IotDataSinkDO} 数据目的
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "iot_data_rule", autoResultMap = true)
 @KeySequence("iot_data_rule_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

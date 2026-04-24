@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVIC
 /**
  * IoT 网关 CoAP 协议的【认证】处理器
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotCoapAuthHandler extends IotCoapAbstractHandler {

@@ -16,7 +16,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  *
  * 另外，jobHandlerName 对应到 Spring Bean 的名字，直接调用
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class SchedulerManager {
 

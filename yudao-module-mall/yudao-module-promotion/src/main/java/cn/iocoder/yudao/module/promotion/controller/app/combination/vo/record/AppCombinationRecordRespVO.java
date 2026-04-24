@@ -39,7 +39,7 @@ public class AppCombinationRecordRespVO {
     @Schema(description = "商品名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是大黄豆")
     private String spuName;
 
-    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "购买的商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

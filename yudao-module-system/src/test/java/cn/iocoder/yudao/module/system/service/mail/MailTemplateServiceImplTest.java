@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * {@link MailTemplateServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(MailTemplateServiceImpl.class)
 public class MailTemplateServiceImplTest extends BaseDbUnitTest {

@@ -48,7 +48,7 @@ public class ErpStockCheckRespVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @Schema(description = "附件 URL", example = "https://www.iocoder.cn/1.doc")
+    @Schema(description = "附件 URL", example = "https://www.deepay.srl/1.doc")
     private String fileUrl;
 
     @Schema(description = "创建人", example = "芋道")

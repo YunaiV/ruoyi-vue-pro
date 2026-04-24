@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 /**
  * 砍价活动的 {@link TradePriceCalculator} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Order(TradePriceCalculator.ORDER_BARGAIN_ACTIVITY)

@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * 基于 RocketMQ 的 {@link IotMessageBus} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j

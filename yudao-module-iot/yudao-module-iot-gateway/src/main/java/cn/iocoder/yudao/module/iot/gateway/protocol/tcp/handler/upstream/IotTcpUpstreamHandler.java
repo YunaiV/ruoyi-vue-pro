@@ -33,7 +33,7 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVIC
 /**
  * TCP 上行消息处理器
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotTcpUpstreamHandler implements Handler<NetSocket> {

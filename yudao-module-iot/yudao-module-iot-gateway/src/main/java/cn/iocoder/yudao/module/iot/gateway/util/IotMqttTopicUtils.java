@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
  * <p>
  * 用于统一管理 MQTT 协议中的主题常量，基于 Alink 协议规范
  *
- * @author 芋道源码
+ * @author deepay
  */
 public final class IotMqttTopicUtils {
 

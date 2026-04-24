@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * 管理后台 - MES 销售退货单新增/修改 Request VO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Schema(description = "管理后台 - MES 销售退货单新增/修改 Request VO")
 @Data

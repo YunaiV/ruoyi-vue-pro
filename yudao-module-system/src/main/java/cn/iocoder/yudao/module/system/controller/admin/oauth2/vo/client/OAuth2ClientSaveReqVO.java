@@ -30,7 +30,7 @@ public class OAuth2ClientSaveReqVO {
     @NotNull(message = "应用名不能为空")
     private String name;
 
-    @Schema(description = "应用图标", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "应用图标", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     @NotNull(message = "应用图标不能为空")
     @URL(message = "应用图标的地址不正确")
     private String logo;

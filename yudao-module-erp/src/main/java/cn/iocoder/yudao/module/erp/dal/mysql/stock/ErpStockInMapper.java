@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * ERP 其它入库单 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface ErpStockInMapper extends BaseMapperX<ErpStockInDO> {

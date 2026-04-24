@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * MES 销售出库明细 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesWmProductSalesDetailService {
 

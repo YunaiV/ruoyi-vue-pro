@@ -42,7 +42,7 @@ public class MpMessageRespVO {
 
     @Schema(description = "媒体素材的编号 消息类型为 image、voice、video 时，才有值", example = "1234567890")
     private String mediaId;
-    @Schema(description = "媒体文件的 URL 消息类型为 image、voice、video 时，才有值", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "媒体文件的 URL 消息类型为 image、voice、video 时，才有值", example = "https://www.deepay.srl/xxx.png")
     private String mediaUrl;
 
     @Schema(description = "语音识别后文本 消息类型为 voice 时，才有值", example = "语音识别后文本")
@@ -58,7 +58,7 @@ public class MpMessageRespVO {
 
     @Schema(description = "缩略图的媒体 id 消息类型为 video、music 时，才有值", example = "1234567890")
     private String thumbMediaId;
-    @Schema(description = "缩略图的媒体 URL 消息类型为 video、music 时，才有值", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "缩略图的媒体 URL 消息类型为 video、music 时，才有值", example = "https://www.deepay.srl/xxx.png")
     private String thumbMediaUrl;
 
     @Schema(description = "点击图文消息跳转链接 消息类型为 link 时，才有值", example = "https://www.iocoder.cn")
@@ -83,9 +83,9 @@ public class MpMessageRespVO {
      */
     private List<MpMessageDO.Article> articles;
 
-    @Schema(description = "音乐链接 消息类型为 music 时，才有值", example = "https://www.iocoder.cn/xxx.mp3")
+    @Schema(description = "音乐链接 消息类型为 music 时，才有值", example = "https://www.deepay.srl/xxx.mp3")
     private String musicUrl;
-    @Schema(description = "高质量音乐链接 消息类型为 music 时，才有值", example = "https://www.iocoder.cn/xxx.mp3")
+    @Schema(description = "高质量音乐链接 消息类型为 music 时，才有值", example = "https://www.deepay.srl/xxx.mp3")
     private String hqMusicUrl;
 
     // ========= 事件推送 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html

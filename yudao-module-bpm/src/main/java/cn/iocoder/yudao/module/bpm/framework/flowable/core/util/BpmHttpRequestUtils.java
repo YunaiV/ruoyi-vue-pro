@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTA
 /**
  * 工作流发起 HTTP 请求工具类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class BpmHttpRequestUtils {

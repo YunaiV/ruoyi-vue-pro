@@ -35,7 +35,7 @@ public class AppBargainRecordRespVO {
     private LocalDateTime endTime;
 
     @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED,  // 从 SPU 的 picUrl 读取
-            example = "https://www.iocoder.cn/xx.png")
+            example = "https://www.deepay.srl/xx.png")
     private String picUrl;
 
     // ========== 订单相关 ==========

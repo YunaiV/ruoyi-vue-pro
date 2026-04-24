@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * MES 假期设置 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesCalHolidayService {
 

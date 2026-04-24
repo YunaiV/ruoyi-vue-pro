@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.QC_OQC_LINE_N
 /**
  * MES 出货检验单行 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

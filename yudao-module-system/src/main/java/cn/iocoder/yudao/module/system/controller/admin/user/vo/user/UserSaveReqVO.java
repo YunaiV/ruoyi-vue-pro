@@ -60,7 +60,7 @@ public class UserSaveReqVO {
     @DiffLogField(name = "用户性别", function = SexParseFunction.NAME)
     private Integer sex;
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     @DiffLogField(name = "用户头像")
     private String avatar;
 

@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * 逻辑：粉丝上传地理位置时，也可以触发自动回复
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Slf4j

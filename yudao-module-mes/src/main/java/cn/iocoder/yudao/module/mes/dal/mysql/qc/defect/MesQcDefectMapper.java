@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 缺陷类型 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesQcDefectMapper extends BaseMapperX<MesQcDefectDO> {

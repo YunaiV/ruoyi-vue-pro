@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 销售出库单行 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_product_sales_line")
 @KeySequence("mes_wm_product_sales_line_seq")
