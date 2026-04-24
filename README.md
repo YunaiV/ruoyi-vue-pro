@@ -22,6 +22,47 @@
 
 ---
 
+## 🚀 一键部署（快速上手）
+
+> 适用于宝塔面板 Linux 服务器。确保已在宝塔软件商店安装 **Java 8+、Maven 3.8+、Node 18+、MySQL 8、Redis 7、Nginx**。
+
+### ① 首次全量部署（自动建库 + 打包 + Nginx + 开机自启）
+
+```bash
+# 1. 进入项目根目录（git clone 后的位置）
+cd /www/wwwroot/deepay.srl
+
+# 2. 一键初始化（自动完成：建库导表 → 打包后端 → 构建前端 → 写 Nginx 配置 → 配 systemd）
+bash script/shell/quickstart.sh
+```
+
+### ② 日常更新（拉代码后重新部署）
+
+```bash
+cd /www/wwwroot/deepay.srl
+git pull
+
+# 全量（后端 + 前端）
+bash script/shell/deepay-deploy.sh
+
+# 仅更新后端
+bash script/shell/deepay-deploy.sh backend
+
+# 仅更新前端
+bash script/shell/deepay-deploy.sh frontend
+```
+
+### ③ Docker Compose 部署
+
+```bash
+cd script/docker
+docker compose up -d
+```
+
+> 部署完成后访问：`http://<你的域名>` （前端）、`http://<你的域名>/api/` （后端 API）
+
+---
+
 ## 🐶 新手必读
 
 * 演示地址【Vue3 + element-plus】：<https://admin.deepay.srl>
