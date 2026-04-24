@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.STOCK_COUNT_N
 /**
  * ERP 产品库存 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated
@@ -27,7 +27,7 @@ public class ErpStockServiceImpl implements ErpStockService {
     /**
      * 允许库存为负数
      *
-     * TODO 芋艿：后续做成 db 配置
+     * TODO deepay：后续做成 db 配置
      */
     private static final Boolean NEGATIVE_STOCK_COUNT_ENABLE = false;
 

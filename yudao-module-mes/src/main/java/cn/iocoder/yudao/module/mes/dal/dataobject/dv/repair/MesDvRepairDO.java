@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 维修工单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_dv_repair")
 @KeySequence("mes_dv_repair_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -77,7 +77,7 @@ public class MesDvRepairDO extends BaseDO {
      * 关联 AdminUserDO#getId()
      */
     private Long confirmUserId;
-    // DONE @芋艿：sourceDocType、sourceDocId、sourceDocCode 为预留字段，对齐：暂未使用
+    // DONE @deepay：sourceDocType、sourceDocId、sourceDocCode 为预留字段，对齐：暂未使用
     /**
      * 来源单据类型
      */

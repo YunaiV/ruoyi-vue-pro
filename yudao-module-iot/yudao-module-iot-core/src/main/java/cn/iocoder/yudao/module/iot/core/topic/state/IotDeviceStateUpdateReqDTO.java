@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#STATE_UPDATE} 消息的 params 参数
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 @NoArgsConstructor

@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 /**
  * IoT Modbus 统一帧数据模型（TCP/RTU 公用）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 @Accessors(chain = true)

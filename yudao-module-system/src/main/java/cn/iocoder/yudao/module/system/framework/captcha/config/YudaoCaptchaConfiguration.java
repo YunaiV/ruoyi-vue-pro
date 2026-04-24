@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 /**
  * 验证码的配置类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Configuration(proxyBeanMethods = false)
 @ImportAutoConfiguration(AjCaptchaAutoConfiguration.class) // 目的：解决 aj-captcha 针对 SpringBoot 3.X 自动配置不生效的问题

@@ -21,11 +21,11 @@ import static org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenA
 /**
  * {@link AzureOpenAiChatModel} 集成测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class AzureOpenAIChatModelTests {
 
-    // TODO @芋艿：晚点在调整
+    // TODO @deepay：晚点在调整
     private final OpenAIClientBuilder openAiApi = new OpenAIClientBuilder()
             .endpoint("https://eastusprejade.openai.azure.com")
             .credential(new AzureKeyCredential("xxx"));

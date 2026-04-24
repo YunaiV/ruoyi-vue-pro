@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * IoT 网关 MQTT 上行消息处理器：处理业务消息（属性上报、事件上报等）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {

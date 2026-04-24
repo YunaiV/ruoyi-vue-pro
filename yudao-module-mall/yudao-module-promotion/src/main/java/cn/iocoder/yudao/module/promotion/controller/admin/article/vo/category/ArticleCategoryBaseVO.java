@@ -16,7 +16,7 @@ public class ArticleCategoryBaseVO {
     @NotNull(message = "文章分类名称不能为空")
     private String name;
 
-    @Schema(description = "图标地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "图标地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl")
     private String picUrl;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

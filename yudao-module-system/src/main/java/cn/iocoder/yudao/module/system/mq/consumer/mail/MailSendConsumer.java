@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 /**
  * 针对 {@link MailSendMessage} 的消费者
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Slf4j

@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 /**
  * 商品属性项 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

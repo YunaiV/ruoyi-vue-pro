@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 /**
  * 针对 {@link IotDeviceMessage} 的消费者，处理规则场景
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Slf4j

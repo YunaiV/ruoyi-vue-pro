@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 出货检验单（OQC, Outgoing Quality Control） DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_qc_oqc")
 @KeySequence("mes_qc_oqc_seq")

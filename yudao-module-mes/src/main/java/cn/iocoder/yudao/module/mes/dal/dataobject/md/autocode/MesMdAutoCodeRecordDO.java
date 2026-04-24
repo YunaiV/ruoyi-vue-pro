@@ -10,7 +10,7 @@ import lombok.*;
 /**
  * MES 编码生成记录 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_md_auto_code_record")
 @KeySequence("mes_md_auto_code_record_seq")

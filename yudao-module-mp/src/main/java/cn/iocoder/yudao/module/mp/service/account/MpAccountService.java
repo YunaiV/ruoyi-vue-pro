@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.ACCOUNT_NOT_EX
 /**
  * 公众号账号 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MpAccountService {
 

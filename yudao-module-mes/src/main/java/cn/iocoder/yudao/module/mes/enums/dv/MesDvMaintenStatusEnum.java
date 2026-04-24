@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * MES 设备保养明细结果枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

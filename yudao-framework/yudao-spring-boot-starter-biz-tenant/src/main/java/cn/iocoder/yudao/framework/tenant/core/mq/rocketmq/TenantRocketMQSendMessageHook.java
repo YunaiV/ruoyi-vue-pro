@@ -11,7 +11,7 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  *
  * Producer 发送消息时，将 {@link TenantContextHolder} 租户编号，添加到消息的 Header 中
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TenantRocketMQSendMessageHook implements SendMessageHook {
 

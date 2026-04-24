@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
  *
  * 相比 {@link BaseDbUnitTest} 来说，从内存 DB 改成了内存 Redis
  *
- * @author 芋道源码
+ * @author deepay
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = BaseRedisUnitTest.Application.class)
 @ActiveProfiles("unit-test") // 设置使用 application-unit-test 配置文件

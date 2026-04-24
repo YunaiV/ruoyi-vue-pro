@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link SeckillActivityServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author deepay
 */
 @Import(SeckillActivityServiceImpl.class)
-@Disabled // TODO 芋艿：未来开启
+@Disabled // TODO：未来开启
 public class SeckillActivityServiceImplTest extends BaseDbUnitTest {
 
     @Resource

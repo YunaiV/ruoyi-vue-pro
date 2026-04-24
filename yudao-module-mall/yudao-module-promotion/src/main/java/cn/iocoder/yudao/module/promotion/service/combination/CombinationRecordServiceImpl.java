@@ -77,7 +77,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Resource
     public SocialClientApi socialClientApi;
 
-    // TODO @芋艿：在详细预览下；
+    // TODO @deepay：在详细预览下；
     @Override
     public KeyValue<CombinationActivityDO, CombinationProductDO> validateCombinationRecord(
             Long userId, Long activityId, Long headId, Long skuId, Integer count) {

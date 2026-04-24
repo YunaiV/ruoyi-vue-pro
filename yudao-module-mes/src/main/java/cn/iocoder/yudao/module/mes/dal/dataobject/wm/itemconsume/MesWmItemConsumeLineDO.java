@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 /**
  * MES 物料消耗记录行 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_item_consume_line")
 @KeySequence("mes_wm_item_consume_line_seq")

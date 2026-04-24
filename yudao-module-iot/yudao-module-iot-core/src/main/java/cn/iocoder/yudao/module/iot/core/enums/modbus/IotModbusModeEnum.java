@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * IoT Modbus 工作模式枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @RequiredArgsConstructor

@@ -16,7 +16,7 @@ public class KeFuConversationRespVO {
     private Long userId;
     @Schema(description = "会话所属用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://yudao.com/images/avatar.jpg")
     private String userAvatar;
-    @Schema(description = "会话所属用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "会话所属用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String userNickname;
 
     @Schema(description = "最后聊天时间", requiredMode = Schema.RequiredMode.REQUIRED)

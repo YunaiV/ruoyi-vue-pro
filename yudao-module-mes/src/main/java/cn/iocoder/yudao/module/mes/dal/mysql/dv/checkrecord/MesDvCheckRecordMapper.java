@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 设备点检记录 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesDvCheckRecordMapper extends BaseMapperX<MesDvCheckRecordDO> {

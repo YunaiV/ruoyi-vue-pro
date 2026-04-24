@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * 转账单创建 Response DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class PayTransferCreateRespDTO {

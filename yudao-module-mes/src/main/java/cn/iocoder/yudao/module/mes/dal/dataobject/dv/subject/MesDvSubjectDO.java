@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * MES 点检保养项目 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_dv_subject")
 @KeySequence("mes_dv_subject_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

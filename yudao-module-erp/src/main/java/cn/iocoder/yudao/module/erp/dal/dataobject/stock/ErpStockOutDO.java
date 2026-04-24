@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * ERP 其它出库单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("erp_stock_out")
 @KeySequence("erp_stock_out_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -36,7 +36,7 @@ public class ErpStockOutDO extends BaseDO {
     /**
      * 客户编号
      *
-     * TODO 芋艿：待关联
+     * TODO deepay：待关联
      */
     private Long customerId;
     /**

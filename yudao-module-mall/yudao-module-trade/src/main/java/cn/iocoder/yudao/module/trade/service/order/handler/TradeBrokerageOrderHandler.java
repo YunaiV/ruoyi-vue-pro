@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * 订单分销的 {@link TradeOrderHandler} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class TradeBrokerageOrderHandler implements TradeOrderHandler {

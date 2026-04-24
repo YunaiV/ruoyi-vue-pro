@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 检验结果记录 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesQcIndicatorResultMapper extends BaseMapperX<MesQcIndicatorResultDO> {

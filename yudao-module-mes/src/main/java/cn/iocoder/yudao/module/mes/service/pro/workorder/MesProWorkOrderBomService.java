@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 生产工单 BOM Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesProWorkOrderBomService {
 

@@ -32,7 +32,7 @@ import java.net.Socket;
  *
  * 依赖：j2mod 3.2.1（pom.xml 中已声明）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Deprecated // 仅技术演示，非是必须的
 public class ModbusRtuOverTcpDemo {

@@ -14,7 +14,7 @@ public class MpUserUpdateReqVO {
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(description = "昵称", example = "芋道")
+    @Schema(description = "昵称", example = "deepay")
     private String nickname;
 
     @Schema(description = "备注", example = "你是一个芋头嘛")

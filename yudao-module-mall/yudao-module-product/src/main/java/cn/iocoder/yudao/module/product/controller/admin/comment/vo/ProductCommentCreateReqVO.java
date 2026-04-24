@@ -21,7 +21,7 @@ public class ProductCommentCreateReqVO {
     @NotNull(message = "评价人名称不能为空")
     private String userNickname;
 
-    @Schema(description = "评价人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "评价人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     @NotNull(message = "评价人头像不能为空")
     private String userAvatar;
 
@@ -42,7 +42,7 @@ public class ProductCommentCreateReqVO {
     private String content;
 
     @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED,
-            example = "[https://www.iocoder.cn/xx.png]")
+            example = "[https://www.deepay.srl/xx.png]")
     @Size(max = 9, message = "评论图片地址数组长度不能超过 9 张")
     private List<String> picUrls;
 

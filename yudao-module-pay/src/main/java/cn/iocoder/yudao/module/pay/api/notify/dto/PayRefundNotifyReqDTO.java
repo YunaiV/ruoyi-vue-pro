@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 退款单的通知 Request DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 @Builder

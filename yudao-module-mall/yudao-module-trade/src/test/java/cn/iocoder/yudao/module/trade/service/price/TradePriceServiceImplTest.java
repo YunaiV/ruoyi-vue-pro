@@ -28,9 +28,9 @@ import static org.mockito.Mockito.when;
 /**
  * {@link TradePriceServiceImpl} 的单元测试
  *
- * @author 芋道源码
+ * @author deepay
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks

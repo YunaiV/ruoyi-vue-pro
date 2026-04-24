@@ -25,7 +25,7 @@ public class NotifyMessageRespVO {
     @Schema(description = "模板编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "test_01")
     private String templateCode;
 
-    @Schema(description = "模版发送人名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "模版发送人名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String templateNickname;
 
     @Schema(description = "模版内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "测试内容")

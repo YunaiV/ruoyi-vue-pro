@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
  * {@link IotSceneRuleServiceImpl} 的简化单元测试类
  * 使用 Mockito 进行纯单元测试，不依赖 Spring 容器
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Disabled // TODO @puhui999：单测有报错，先屏蔽
 public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {

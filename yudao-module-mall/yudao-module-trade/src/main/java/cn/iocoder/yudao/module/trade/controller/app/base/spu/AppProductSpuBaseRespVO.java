@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 商品 SPU 基础 Response VO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class AppProductSpuBaseRespVO {
@@ -14,10 +14,10 @@ public class AppProductSpuBaseRespVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "商品 SPU 名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String name;
 
-    @Schema(description = "商品主图地址", example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "商品主图地址", example = "https://www.deepay.srl/xx.png")
     private String picUrl;
 
     @Schema(description = "商品分类编号", example = "1")

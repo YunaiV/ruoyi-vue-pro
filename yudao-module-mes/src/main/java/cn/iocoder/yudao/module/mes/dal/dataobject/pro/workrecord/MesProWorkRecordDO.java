@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * MES 用户工作站绑定关系（当前快照） DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_pro_work_record")
 @KeySequence("mes_pro_work_record_seq")

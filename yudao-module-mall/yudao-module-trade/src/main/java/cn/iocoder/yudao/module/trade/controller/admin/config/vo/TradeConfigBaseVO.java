@@ -64,7 +64,7 @@ public class TradeConfigBaseVO {
     @InEnum(value = BrokerageBindModeEnum.class, message = "分销关系绑定模式必须是 {value}")
     private Integer brokerageBindMode;
 
-    @Schema(description = "分销海报图地址数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/yudao.jpg]")
+    @Schema(description = "分销海报图地址数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.deepay.srl/yudao.jpg]")
     private List<String> brokeragePosterUrls;
 
     @Schema(description = "一级返佣比例", requiredMode = Schema.RequiredMode.REQUIRED, example = "5")

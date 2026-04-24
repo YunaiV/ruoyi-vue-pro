@@ -14,7 +14,7 @@ public class SmsChannelRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "短信签名", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "短信签名", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotNull(message = "短信签名不能为空")
     private String signature;
 
@@ -35,7 +35,7 @@ public class SmsChannelRespVO {
     @Schema(description = "短信 API 的密钥", example = "yuanma")
     private String apiSecret;
 
-    @Schema(description = "短信发送回调 URL", example = "https://www.iocoder.cn")
+    @Schema(description = "短信发送回调 URL", example = "https://www.deepay.srl")
     @URL(message = "回调 URL 格式不正确")
     private String callbackUrl;
 

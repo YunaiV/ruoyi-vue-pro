@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 工具台账 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesTmToolMapper extends BaseMapperX<MesTmToolDO> {

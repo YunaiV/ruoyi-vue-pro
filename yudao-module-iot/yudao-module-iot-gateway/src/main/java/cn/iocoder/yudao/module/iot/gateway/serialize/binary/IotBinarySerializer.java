@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
  * - 请求消息：params 数据(JSON)
  * - 响应消息：code (4字节) + msg 长度(2字节) + msg 字符串 + data 数据(JSON)
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotBinarySerializer implements IotMessageSerializer {

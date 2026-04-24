@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class CrmStatisticsCustomerContractSummaryRespVO {
 
-    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "客户名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String customerName;
 
     @Schema(description = "合同名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "演示合同")
@@ -31,7 +31,7 @@ public class CrmStatisticsCustomerContractSummaryRespVO {
 
     @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long ownerUserId;
-    @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String ownerUserName;
 
     @Schema(description = "创建人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")

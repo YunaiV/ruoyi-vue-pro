@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * 用户任务的审批类型枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

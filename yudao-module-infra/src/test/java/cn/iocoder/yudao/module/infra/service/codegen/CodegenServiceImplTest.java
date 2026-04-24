@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link CodegenServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(CodegenServiceImpl.class)
 public class CodegenServiceImplTest extends BaseDbUnitTest {
@@ -86,7 +86,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         TableInfo tableInfo = mock(TableInfo.class);
         when(databaseTableService.getTable(eq(1L), eq("t_yunai")))
                 .thenReturn(tableInfo);
-        when(tableInfo.getComment()).thenReturn("芋艿");
+        when(tableInfo.getComment()).thenReturn("deepay");
         // mock 方法（TableInfo fields）
         TableField field01 = mock(TableField.class);
         when(field01.getComment()).thenReturn("主键");
@@ -134,7 +134,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> codegenService.validateTableInfo(tableInfo),
                 CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL);
         // 情况三
-        when(tableInfo.getComment()).thenReturn("芋艿");
+        when(tableInfo.getComment()).thenReturn("deepay");
         assertServiceException(() -> codegenService.validateTableInfo(tableInfo),
                 CODEGEN_IMPORT_COLUMNS_NULL);
         // 情况四
@@ -247,7 +247,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         TableInfo tableInfo = mock(TableInfo.class);
         when(databaseTableService.getTable(eq(1L), eq("t_yunai")))
                 .thenReturn(tableInfo);
-        when(tableInfo.getComment()).thenReturn("芋艿");
+        when(tableInfo.getComment()).thenReturn("deepay");
         // mock 方法（TableInfo fields）
         TableField field01 = mock(TableField.class);
         when(field01.getComment()).thenReturn("主键");
@@ -322,7 +322,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         CodegenTableDO tableDO = randomPojo(CodegenTableDO.class, o -> {
             o.setTableName("t_yunai");
-            o.setTableComment("芋艿");
+            o.setTableComment("deepay");
             o.setClassName("SystemYunai");
             o.setCreateTime(buildTime(2021, 3, 10));
         }).setScene(CodegenSceneEnum.ADMIN.getScene());
@@ -539,10 +539,10 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         // mock 方法
         TableInfo tableInfo01 = mock(TableInfo.class);
         when(tableInfo01.getName()).thenReturn("t_yunai");
-        when(tableInfo01.getComment()).thenReturn("芋艿");
+        when(tableInfo01.getComment()).thenReturn("deepay");
         TableInfo tableInfo02 = mock(TableInfo.class);
         when(tableInfo02.getName()).thenReturn("t_yunai_02");
-        when(tableInfo02.getComment()).thenReturn("芋艿_02");
+        when(tableInfo02.getComment()).thenReturn("deepay_02");
         when(databaseTableService.getTableList(eq(dataSourceConfigId), eq(name), eq(comment)))
                 .thenReturn(ListUtil.toList(tableInfo01, tableInfo02));
         // mock 数据
@@ -557,7 +557,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertEquals(1, result.size());
         assertEquals("t_yunai", result.get(0).getName());
-        assertEquals("芋艿", result.get(0).getComment());
+        assertEquals("deepay", result.get(0).getComment());
     }
 
 }

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 设备点检记录明细 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesDvCheckRecordLineMapper extends BaseMapperX<MesDvCheckRecordLineDO> {

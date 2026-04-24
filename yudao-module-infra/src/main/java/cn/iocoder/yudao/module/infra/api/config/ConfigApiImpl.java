@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 /**
  * 参数配置 API 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 
-// TODO @芋艿：数据库
-// TODO @芋艿：mqtt
+// TODO @deepay：数据库
+// TODO @deepay：mqtt
 
 /**
  * 可缓存的 {@link IotDataRuleAction} 抽象实现

@@ -5,11 +5,11 @@ import cn.iocoder.yudao.module.promotion.api.reward.RewardActivityApi;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-// TODO 芋艿：后续在修复
+// TODO：后续在修复
 /**
  * {@link TradeRewardActivityPriceCalculator} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest {
 
@@ -215,7 +215,7 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
 //        assertEquals(promotion01.getTotalPrice(), 350);
 //        assertEquals(promotion01.getDiscountPrice(), 0);
 //        assertFalse(promotion01.getMatch());
-//        assertEquals(promotion01.getDescription(), "TODO"); // TODO 芋艿：后面再想想
+//        assertEquals(promotion01.getDescription(), "TODO"); // TODO：后面再想想
 //        assertEquals(promotion01.getItems().size(), 2);
 //        TradePriceCalculateRespBO.PromotionItem promotionItem011 = promotion01.getItems().get(0);
 //        assertEquals(promotionItem011.getSkuId(), 10L);

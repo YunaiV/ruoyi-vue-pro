@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * 砍价助力 Convert
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface BargainHelpConvert {

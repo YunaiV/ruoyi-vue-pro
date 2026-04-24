@@ -104,7 +104,7 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "审批意见", example = "同意")
         private String reason;
 
-        @Schema(description = "签名", example = "https://www.iocoder.cn/sign.png")
+        @Schema(description = "签名", example = "https://www.deepay.srl/sign.png")
         private String signPicUrl;
 
     }

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * ERP 结算账户 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface ErpAccountMapper extends BaseMapperX<ErpAccountDO> {

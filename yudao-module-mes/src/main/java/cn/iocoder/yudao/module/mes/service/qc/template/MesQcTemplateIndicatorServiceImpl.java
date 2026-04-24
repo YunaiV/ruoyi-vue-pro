@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.QC_TEMPLATE_I
 /**
  * MES 质检方案-检测指标项 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

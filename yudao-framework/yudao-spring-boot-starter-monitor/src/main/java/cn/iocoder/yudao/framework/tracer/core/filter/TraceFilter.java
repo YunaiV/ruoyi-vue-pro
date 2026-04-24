@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Trace 过滤器，打印 traceId 到 header 中返回
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TraceFilter extends OncePerRequestFilter {
 

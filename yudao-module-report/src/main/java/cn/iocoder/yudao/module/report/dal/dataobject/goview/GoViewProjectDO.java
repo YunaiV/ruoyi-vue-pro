@@ -11,7 +11,7 @@ import lombok.*;
  *
  * 每个大屏图标，对应一个项目
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "report_go_view_project", autoResultMap = true) // 由于 SQL Server 的 system_user 是关键字，所以使用 system_users
 @KeySequence("report_go_view_project_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

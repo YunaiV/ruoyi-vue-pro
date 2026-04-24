@@ -15,7 +15,7 @@ public class BrokerageWithdrawRespVO {
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11436")
     private Long userId;
 
-    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String userNickname;
 
     @Schema(description = "提现金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "18781")
@@ -42,7 +42,7 @@ public class BrokerageWithdrawRespVO {
     @Schema(description = "开户地址", example = "海淀支行")
     private String bankAddress;
 
-    @Schema(description = "收款码", example = "https://www.iocoder.cn")
+    @Schema(description = "收款码", example = "https://www.deepay.srl")
     private String qrCodeUrl;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

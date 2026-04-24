@@ -18,7 +18,7 @@ public class AiKnowledgeDocumentRespVO {
     @Schema(description = "文档名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "Java 开发手册")
     private String name;
 
-    @Schema(description = "文档 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://doc.iocoder.cn")
+    @Schema(description = "文档 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://admin.deepay.srl")
     private String url;
 
     @Schema(description = "文档内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "Java 是一门面向对象的语言.....")

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 /**
  * MES 工艺路线产品 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_pro_route_product")
 @KeySequence("mes_pro_route_product_seq")

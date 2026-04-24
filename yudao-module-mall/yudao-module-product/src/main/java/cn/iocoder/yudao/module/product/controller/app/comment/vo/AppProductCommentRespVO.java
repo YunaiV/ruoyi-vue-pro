@@ -21,7 +21,7 @@ public class AppProductCommentRespVO {
     @Schema(description = "评价人名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     private String userNickname;
 
-    @Schema(description = "评价人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "评价人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     private String userAvatar;
 
     @Schema(description = "订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24965")
@@ -51,7 +51,7 @@ public class AppProductCommentRespVO {
     @Schema(description = "追加评价内容", example = "穿了很久都很丝滑诶")
     private String additionalContent;
 
-    @Schema(description = "追评评价图片地址数组，以逗号分隔最多上传 9 张", example = "[https://www.iocoder.cn/xx.png, https://www.iocoder.cn/xxx.png]")
+    @Schema(description = "追评评价图片地址数组，以逗号分隔最多上传 9 张", example = "[https://www.deepay.srl/xx.png, https://www.deepay.srl/xxx.png]")
     private List<String> additionalPicUrls;
 
     @Schema(description = "追加评价时间")
@@ -92,7 +92,7 @@ public class AppProductCommentRespVO {
     private String content;
 
     @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED,
-            example = "[https://www.iocoder.cn/xx.png]")
+            example = "[https://www.deepay.srl/xx.png]")
     @Size(max = 9, message = "评论图片地址数组长度不能超过 9 张")
     private List<String> picUrls;
 

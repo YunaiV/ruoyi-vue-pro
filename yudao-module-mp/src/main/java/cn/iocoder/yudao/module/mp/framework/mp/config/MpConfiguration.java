@@ -21,7 +21,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 /**
  * 微信公众号的配置类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Configuration
 public class MpConfiguration {

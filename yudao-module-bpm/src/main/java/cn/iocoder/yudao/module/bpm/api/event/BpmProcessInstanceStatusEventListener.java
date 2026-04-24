@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationListener;
 /**
  * {@link BpmProcessInstanceStatusEvent} 的监听器
  *
- * @author 芋道源码
+ * @author deepay
  */
 public abstract class BpmProcessInstanceStatusEventListener
         implements ApplicationListener<BpmProcessInstanceStatusEvent> {

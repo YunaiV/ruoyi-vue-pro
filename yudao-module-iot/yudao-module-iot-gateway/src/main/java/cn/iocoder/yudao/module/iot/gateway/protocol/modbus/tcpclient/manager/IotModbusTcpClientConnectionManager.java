@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 2. 分布式锁管理（连接级别），避免多节点重复创建连接
  * 3. 连接重试和故障恢复
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotModbusTcpClientConnectionManager {

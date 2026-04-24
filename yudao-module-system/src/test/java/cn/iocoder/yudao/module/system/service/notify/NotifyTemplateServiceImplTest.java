@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * {@link NotifyTemplateServiceImpl} 的单元测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(NotifyTemplateServiceImpl.class)
 public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {

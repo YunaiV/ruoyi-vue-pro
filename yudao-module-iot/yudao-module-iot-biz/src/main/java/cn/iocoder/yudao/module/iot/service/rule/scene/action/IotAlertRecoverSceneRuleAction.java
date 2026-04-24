@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * IoT 告警恢复的 {@link IotSceneRuleAction} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class IotAlertRecoverSceneRuleAction implements IotSceneRuleAction {

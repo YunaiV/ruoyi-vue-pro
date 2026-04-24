@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 /**
  * IoT 网关 MQTT 协议配置
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class IotMqttConfig {

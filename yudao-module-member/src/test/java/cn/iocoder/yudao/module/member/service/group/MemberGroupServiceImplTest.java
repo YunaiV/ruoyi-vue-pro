@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-// TODO 芋艿：完全 review 完，在去 review 单测
+// TODO：完全 review 完，在去 review 单测
 /**
  * {@link MemberGroupServiceImpl} 的单元测试类
  *

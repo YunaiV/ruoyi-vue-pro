@@ -18,7 +18,7 @@
         从而实现提供 RESTful API 给 yudao-ui-admin、yudao-ui-user 等前端项目。
         本质上来说，它就是个空壳（容器）！
     </description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
     <dependencies>
         <dependency>

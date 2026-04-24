@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * 子类只需实现 {@link #pollPoint(Long, Long)} 定义具体的轮询动作。
  * <p>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public abstract class AbstractIotModbusPollScheduler {

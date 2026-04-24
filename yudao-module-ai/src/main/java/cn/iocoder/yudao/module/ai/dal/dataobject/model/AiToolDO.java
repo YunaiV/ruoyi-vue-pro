@@ -11,7 +11,7 @@ import lombok.*;
 /**
  * AI 工具 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("ai_tool")
 @KeySequence("ai_tool_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

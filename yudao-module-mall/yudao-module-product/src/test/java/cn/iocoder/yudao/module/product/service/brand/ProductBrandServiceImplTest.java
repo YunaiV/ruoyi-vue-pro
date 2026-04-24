@@ -28,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link ProductBrandServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author deepay
 */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import(ProductBrandServiceImpl.class)
 public class ProductBrandServiceImplTest extends BaseDbUnitTest {
 
@@ -107,7 +107,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
     public void testGetBrandPage() {
        // mock 数据
        ProductBrandDO dbBrand = randomPojo(ProductBrandDO.class, o -> { // 等会查询到
-           o.setName("芋道源码");
+           o.setName("deepay");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setCreateTime(buildTime(2022, 2, 1));
        });
@@ -120,7 +120,7 @@ public class ProductBrandServiceImplTest extends BaseDbUnitTest {
        brandMapper.insert(cloneIgnoreId(dbBrand, o -> o.setCreateTime(buildTime(2022, 3, 1))));
        // 准备参数
        ProductBrandPageReqVO reqVO = new ProductBrandPageReqVO();
-       reqVO.setName("芋道");
+       reqVO.setName("deepay");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 1, 1), buildTime(2022, 2, 25)}));
 

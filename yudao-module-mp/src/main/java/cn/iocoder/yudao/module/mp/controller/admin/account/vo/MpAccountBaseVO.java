@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class MpAccountBaseVO {
 
-    @Schema(description = "公众号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "公众号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotEmpty(message = "公众号名称不能为空")
     private String name;
 
@@ -37,7 +37,7 @@ public class MpAccountBaseVO {
     @Schema(description = "加密密钥", example = "gjN+Ksei")
     private String aesKey;
 
-    @Schema(description = "备注", example = "请关注芋道源码，学习技术")
+    @Schema(description = "备注", example = "请关注deepay，学习技术")
     private String remark;
 
 }

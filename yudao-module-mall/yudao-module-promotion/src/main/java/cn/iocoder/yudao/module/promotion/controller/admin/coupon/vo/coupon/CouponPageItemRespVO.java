@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CouponPageItemRespVO extends CouponRespVO {
 
-    @Schema(description = "用户昵称", example = "老芋艿")
+    @Schema(description = "用户昵称", example = "老deepay")
     private String nickname;
 
 }

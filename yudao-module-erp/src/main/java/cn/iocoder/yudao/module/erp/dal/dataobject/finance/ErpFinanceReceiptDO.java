@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * ERP 收款单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("erp_finance_receipt")
 @KeySequence("erp_finance_receipt_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

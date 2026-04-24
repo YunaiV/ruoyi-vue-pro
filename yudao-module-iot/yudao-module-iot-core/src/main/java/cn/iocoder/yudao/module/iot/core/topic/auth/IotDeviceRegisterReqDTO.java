@@ -12,7 +12,7 @@ import javax.validation.constraints.NotEmpty;
  * <p>
  * 直连设备/网关的一型一密动态注册：使用 productSecret 验证，返回 deviceSecret
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
  */
 @Data

@@ -16,7 +16,7 @@
         1. 定时任务，基于 Quartz 拓展
         2. 异步任务，基于 Spring Async 拓展
     </description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
     <dependencies>
         <dependency>

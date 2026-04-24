@@ -10,7 +10,7 @@ import lombok.Data;
  *
  * 每个商品，对应一条记录，通过 {@link #spuId} 和 {@link #skuId} 关联
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("trade_cart")
 @KeySequence("trade_cart_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

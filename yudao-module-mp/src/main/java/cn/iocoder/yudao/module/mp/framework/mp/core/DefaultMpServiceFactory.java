@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * 默认的 {@link MpServiceFactory} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @RequiredArgsConstructor

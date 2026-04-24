@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  *
  * idx_mobile 索引：基于 {@link #mobile} 字段
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("system_sms_code")
 @KeySequence("system_sms_code_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

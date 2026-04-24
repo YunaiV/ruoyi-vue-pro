@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * MES SN 码 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmSnMapper extends BaseMapperX<MesWmSnDO> {

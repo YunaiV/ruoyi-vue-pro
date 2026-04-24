@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 /**
  * MES 退货检验行 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_qc_rqc_line")
 @KeySequence("mes_qc_rqc_line_seq")

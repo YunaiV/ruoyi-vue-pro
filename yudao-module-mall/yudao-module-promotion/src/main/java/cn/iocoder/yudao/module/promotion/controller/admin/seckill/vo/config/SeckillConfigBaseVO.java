@@ -30,7 +30,7 @@ public class SeckillConfigBaseVO {
     @NotNull(message = "结束时间点不能为空")
     private String endTime;
 
-    @Schema(description = "秒杀轮播图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png]")
+    @Schema(description = "秒杀轮播图", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.deepay.srl/xx.png]")
     @NotNull(message = "秒杀轮播图不能为空")
     private List<String> sliderPicUrls;
 

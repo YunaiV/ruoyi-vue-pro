@@ -14,7 +14,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * 设备的最后上报时间的 Redis DAO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Repository
 public class DeviceReportTimeRedisDAO {

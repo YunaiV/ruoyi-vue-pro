@@ -35,7 +35,7 @@ public class ErpSaleOrderSaveReqVO {
     @Schema(description = "定金金额，单位：元", example = "7127")
     private BigDecimal depositPrice;
 
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @Schema(description = "附件地址", example = "https://www.deepay.srl")
     private String fileUrl;
 
     @Schema(description = "备注", example = "你猜")

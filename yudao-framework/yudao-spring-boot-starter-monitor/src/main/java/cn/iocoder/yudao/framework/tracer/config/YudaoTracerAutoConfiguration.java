@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "yudao.tracer", value = "enable", matchIfMissing = true)
 public class YudaoTracerAutoConfiguration {
 
-    // TODO @芋艿：skywalking 不兼容最新的 opentracing 版本。同时，opentracing 也停止了维护，尬住了！后续换 opentelemetry 即可！
+    // TODO @deepay：skywalking 不兼容最新的 opentracing 版本。同时，opentracing 也停止了维护，尬住了！后续换 opentelemetry 即可！
 //    @Bean
 //    public BizTraceAspect bizTracingAop() {
 //        return new BizTraceAspect(tracer());

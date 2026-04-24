@@ -26,7 +26,7 @@ import java.util.Set;
  * 检测逻辑：设备最后一条 {@link IotDeviceMessage} 消息超过一定时间，则认为设备离线
  *
  * @see <a href="https://help.aliyun.com/zh/iot/support/faq-about-device-status#98f7056b2957y">阿里云 IoT —— 设备离线分析</a>
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class IotDeviceOfflineCheckJob implements JobHandler {

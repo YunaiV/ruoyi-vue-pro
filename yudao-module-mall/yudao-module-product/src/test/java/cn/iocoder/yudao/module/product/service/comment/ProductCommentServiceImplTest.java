@@ -31,13 +31,13 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-// TODO 芋艿：单测详细 review 下
+// TODO：单测详细 review 下
 /**
  * {@link ProductCommentServiceImpl} 的单元测试类
  *
  * @author wangzhs
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import(ProductCommentServiceImpl.class)
 public class ProductCommentServiceImplTest extends BaseDbUnitTest {
 

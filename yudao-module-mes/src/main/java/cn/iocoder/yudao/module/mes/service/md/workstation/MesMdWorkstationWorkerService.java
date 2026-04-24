@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * MES 人力资源 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesMdWorkstationWorkerService {
 

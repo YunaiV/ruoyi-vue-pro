@@ -12,7 +12,7 @@ import java.util.Map;
  * <p>
  * 本质是一个 Map，key 为属性标识符，value 为属性值
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="http://help.aliyun.com/zh/marketplace/device-reporting-attributes">阿里云 - 设备上报属性</a>
  */
 public class IotDevicePropertyPostReqDTO extends HashMap<String, Object> {

@@ -9,7 +9,7 @@ import cn.hutool.crypto.digest.HmacAlgorithm;
  * <p>
  * 用于一型一密场景，使用 productSecret 生成签名
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class IotProductAuthUtils {
 

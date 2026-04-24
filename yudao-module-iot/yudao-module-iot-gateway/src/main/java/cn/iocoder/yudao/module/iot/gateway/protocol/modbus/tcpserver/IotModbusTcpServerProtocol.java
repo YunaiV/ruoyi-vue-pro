@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 1. 设备通过自定义功能码（FC 65）发送认证请求
  * 2. 认证成功后，网关主动发送 Modbus 读请求，设备响应（云端轮询模式）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotModbusTcpServerProtocol implements IotProtocol {

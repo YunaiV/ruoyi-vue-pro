@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  *     <li>输入寄存器 (Input Register, 功能码 04): 地址 0-19，初始值 1,11,21,...</li>
  * </ul>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @Disabled

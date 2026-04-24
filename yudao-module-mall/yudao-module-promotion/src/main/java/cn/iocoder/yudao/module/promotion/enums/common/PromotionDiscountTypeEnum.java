@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * 优惠类型枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

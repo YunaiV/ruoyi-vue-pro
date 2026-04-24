@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 安灯呼叫配置 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_pro_andon_config")
 @KeySequence("mes_pro_andon_config_seq")

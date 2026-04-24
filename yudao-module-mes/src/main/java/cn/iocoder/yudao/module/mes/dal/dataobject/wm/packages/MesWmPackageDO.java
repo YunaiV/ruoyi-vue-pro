@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 装箱单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_package")
 @KeySequence("mes_wm_package_seq")

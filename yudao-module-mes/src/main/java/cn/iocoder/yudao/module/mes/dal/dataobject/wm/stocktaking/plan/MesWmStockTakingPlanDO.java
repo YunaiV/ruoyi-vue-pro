@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 盘点方案 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_stock_taking_plan")
 @KeySequence("mes_wm_stock_taking_plan_seq")

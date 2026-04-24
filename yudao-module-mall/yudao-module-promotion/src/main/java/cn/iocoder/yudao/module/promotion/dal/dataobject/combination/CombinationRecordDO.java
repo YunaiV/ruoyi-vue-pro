@@ -9,7 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-// TODO 芋艿：把字段的顺序，和 do 顺序对齐下
+// TODO：把字段的顺序，和 do 顺序对齐下
 /**
  * 拼团记录 DO
  *

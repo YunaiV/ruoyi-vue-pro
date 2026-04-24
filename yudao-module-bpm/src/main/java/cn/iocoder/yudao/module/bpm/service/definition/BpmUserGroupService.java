@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 用户组 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface BpmUserGroupService {
 

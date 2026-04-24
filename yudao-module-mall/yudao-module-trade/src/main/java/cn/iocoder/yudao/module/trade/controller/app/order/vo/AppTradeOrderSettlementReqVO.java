@@ -41,7 +41,7 @@ public class AppTradeOrderSettlementReqVO {
 
     @Schema(description = "自提门店编号", example = "1088")
     private Long pickUpStoreId;
-    @Schema(description = "收件人名称", example = "芋艿") // 选择门店自提时，该字段为联系人名
+    @Schema(description = "收件人名称", example = "deepay") // 选择门店自提时，该字段为联系人名
     private String receiverName;
     @Schema(description = "收件人手机", example = "15601691300") // 选择门店自提时，该字段为联系人手机
     @Mobile(message = "收件人手机格式不正确")

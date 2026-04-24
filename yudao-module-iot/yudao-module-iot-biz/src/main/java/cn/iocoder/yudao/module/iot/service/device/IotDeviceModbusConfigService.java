@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * IoT 设备 Modbus 连接配置 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface IotDeviceModbusConfigService {
 

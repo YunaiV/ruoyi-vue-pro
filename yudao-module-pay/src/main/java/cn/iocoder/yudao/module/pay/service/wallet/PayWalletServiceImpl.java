@@ -63,7 +63,7 @@ public class PayWalletServiceImpl implements PayWalletService {
         PayWalletDO wallet = walletMapper.selectByUserIdAndType(userId, userType);
         if (wallet == null) {
             // 使用双重检查锁，保证钱包创建并发问题
-            // https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1475/files
+            // https://gitee.com/zhijiantianya/sdsdsdas/pulls/1475/files
             wallet = lockRedisDAO.lock(userId, UPDATE_TIMEOUT_MILLIS, () -> {
                 PayWalletDO newWallet = walletMapper.selectByUserIdAndType(userId, userType);
                 if (newWallet == null) {

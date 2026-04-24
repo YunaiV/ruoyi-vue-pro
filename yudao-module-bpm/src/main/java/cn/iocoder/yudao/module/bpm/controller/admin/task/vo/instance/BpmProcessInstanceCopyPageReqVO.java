@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class BpmProcessInstanceCopyPageReqVO extends PageParam {
 
-    @Schema(description = "流程名称", example = "芋道")
+    @Schema(description = "流程名称", example = "deepay")
     private String processInstanceName;
 
     @Schema(description = "创建时间")

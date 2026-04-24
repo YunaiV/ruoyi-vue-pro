@@ -10,7 +10,7 @@ import java.time.Duration;
 /**
  * MES 编码规则的 Redis DAO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Repository
 public class MesMdAutoCodeRedisDAO {

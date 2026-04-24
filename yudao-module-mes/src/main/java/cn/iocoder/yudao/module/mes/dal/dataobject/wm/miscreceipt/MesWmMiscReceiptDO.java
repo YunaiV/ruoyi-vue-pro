@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * MES 杂项入库单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_misc_receipt")
 @KeySequence("mes_wm_misc_receipt_seq")

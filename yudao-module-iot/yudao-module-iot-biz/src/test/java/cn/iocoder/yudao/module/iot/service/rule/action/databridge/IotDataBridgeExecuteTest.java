@@ -39,7 +39,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
 
     @BeforeEach
     public void setUp() {
-        // TODO @芋艿：@puhui999：需要调整下；
+        // TODO @deepay：@puhui999：需要调整下；
         // 创建共享的测试消息
         //message = IotDeviceMessage.builder().messageId("TEST-001").reportTime(LocalDateTime.now())
         //        .productKey("testProduct").deviceName("testDevice")
@@ -126,7 +126,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
 
         // 2. 创建配置
         IotDataSinkHttpConfig config = new IotDataSinkHttpConfig()
-                .setUrl("https://doc.iocoder.cn/").setMethod(HttpMethod.GET.name());
+                .setUrl("https://doc.deepay.srl/").setMethod(HttpMethod.GET.name());
 
         // 3. 执行测试
         log.info("[testHttpDataBridge][执行HTTP数据桥接测试]");

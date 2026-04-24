@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * IoT 设备 Modbus 连接配置 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

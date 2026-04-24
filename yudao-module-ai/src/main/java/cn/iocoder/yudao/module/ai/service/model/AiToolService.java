@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * AI 工具 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface AiToolService {
 

@@ -16,7 +16,7 @@ public class DataSourceConfigSaveReqVO {
     @NotNull(message = "数据源名称不能为空")
     private String name;
 
-    @Schema(description = "数据源连接", requiredMode = Schema.RequiredMode.REQUIRED, example = "jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro")
+    @Schema(description = "数据源连接", requiredMode = Schema.RequiredMode.REQUIRED, example = "jdbc:mysql://127.0.0.1:3306/sdsdsdas")
     @NotNull(message = "数据源连接不能为空")
     private String url;
 

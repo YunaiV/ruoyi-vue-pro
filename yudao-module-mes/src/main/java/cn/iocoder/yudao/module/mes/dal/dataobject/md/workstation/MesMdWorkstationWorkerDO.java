@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * MES 人力资源 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_md_workstation_worker")
 @KeySequence("mes_md_workstation_worker_seq")

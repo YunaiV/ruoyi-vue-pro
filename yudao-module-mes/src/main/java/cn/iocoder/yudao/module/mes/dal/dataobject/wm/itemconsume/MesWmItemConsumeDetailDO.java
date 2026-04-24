@@ -20,7 +20,7 @@ import java.math.BigDecimal;
  * 记录 line 级别的消耗按线边库 FIFO 分配到具体批次的明细。
  * 一条 line 可能拆分为多条 detail（当一个批次库存不够，需要从下一个批次继续分配时）。
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_item_consume_detail")
 @KeySequence("mes_wm_item_consume_detail_seq")

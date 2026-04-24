@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
  * <p>
  * 每个 {@link IotProductDO} 和 {@link IotThingModelDO} 是“一对多”的关系，它的每个属性、事件、服务都对应一条记录
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "iot_thing_model", autoResultMap = true)
 @KeySequence("iot_thing_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

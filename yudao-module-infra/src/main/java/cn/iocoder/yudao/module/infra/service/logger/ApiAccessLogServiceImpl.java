@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.module.infra.dal.dataobject.logger.ApiAccessLogDO
 /**
  * API 访问日志 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @Service

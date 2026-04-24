@@ -12,7 +12,7 @@ public class AiKnowledgeRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24790")
     private Long id;
 
-    @Schema(description = "知识库名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "ruoyi-vue-pro 用户指南")
+    @Schema(description = "知识库名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "sdsdsdas 用户指南")
     private String name;
 
     @Schema(description = "知识库描述", example = "帮助你快速构建系统")

@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * IoT 产品物模型 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface IotThingModelService {
 

@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQConsumerAut
 /**
  * Redis 的 {@link IotMessageBus} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotRedisMessageBus implements IotMessageBus {

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 销售退货单 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmReturnSalesMapper extends BaseMapperX<MesWmReturnSalesDO> {

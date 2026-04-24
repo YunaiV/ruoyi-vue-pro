@@ -11,7 +11,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * 会员用户的 API 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MemberUserApi {
 

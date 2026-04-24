@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 /**
  * 交易订单的自动评论 Job
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class TradeOrderAutoCommentJob implements JobHandler {

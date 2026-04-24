@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * BPM 用户任务的审批人为空时，处理类型枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Getter

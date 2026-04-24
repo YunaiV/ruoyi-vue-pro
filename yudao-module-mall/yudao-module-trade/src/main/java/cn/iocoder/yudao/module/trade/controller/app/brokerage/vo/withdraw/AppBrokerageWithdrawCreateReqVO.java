@@ -36,7 +36,7 @@ public class AppBrokerageWithdrawCreateReqVO {
     @NotBlank(message = "提现姓名不能为空", groups = {Bank.class, WechatApi.class, AlipayApi.class})
     private String userName;
 
-    @Schema(description = "收款码的图片", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "收款码的图片", example = "https://www.deepay.srl/1.png")
     @URL(message = "收款码的图片，必须是一个 URL", groups = {WechatQR.class, AlipayQR.class})
     private String qrCodeUrl;
 

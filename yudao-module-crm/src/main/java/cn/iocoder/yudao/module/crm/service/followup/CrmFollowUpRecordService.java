@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 跟进记录 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface CrmFollowUpRecordService {
 

@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * MES 工装夹具资源 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_md_workstation_tool")
 @KeySequence("mes_md_workstation_tool_seq")
@@ -35,7 +35,7 @@ public class MesMdWorkstationToolDO extends BaseDO {
     /**
      * 工具类型编号
      *
-     * TODO @芋艿：等 tm 模块，关联工具类型表
+     * TODO @deepay：等 tm 模块，关联工具类型表
      */
     private Long toolTypeId;
     /**

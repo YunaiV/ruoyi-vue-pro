@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 支付应用 Service 接口
  *
- * @author 芋艿
+ * @author deepay
  */
 public interface PayAppService {
 

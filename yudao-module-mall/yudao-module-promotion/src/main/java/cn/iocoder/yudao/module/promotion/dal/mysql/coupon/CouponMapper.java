@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * 优惠劵 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface CouponMapper extends BaseMapperX<CouponDO> {

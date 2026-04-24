@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 回调通知 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface PayNotifyService {
 

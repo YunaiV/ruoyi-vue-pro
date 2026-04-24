@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 /**
  * 售后订单 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface AfterSaleService {
 

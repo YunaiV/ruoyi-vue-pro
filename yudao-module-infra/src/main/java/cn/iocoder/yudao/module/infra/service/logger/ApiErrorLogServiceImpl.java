@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.API_ERROR_L
 /**
  * API 错误日志 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

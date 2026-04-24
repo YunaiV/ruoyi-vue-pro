@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 优惠劵模板 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface CouponTemplateService {
 

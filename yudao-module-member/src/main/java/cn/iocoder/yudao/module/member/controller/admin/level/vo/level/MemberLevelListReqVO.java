@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class MemberLevelListReqVO {
 
-    @Schema(description = "等级名称", example = "芋艿")
+    @Schema(description = "等级名称", example = "deepay")
     private String name;
 
     @Schema(description = "状态", example = "1")

@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_DEPLOY_
 /**
  * {@link BpmTaskCandidateStrategy} 的调用者，用于调用对应的策略，实现任务的候选人的计算
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class BpmTaskCandidateInvoker {

@@ -9,7 +9,7 @@ import javax.annotation.Resource;
 /**
  * 设备关联的网关 serverId 的 Redis DAO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Repository
 public class DeviceServerIdRedisDAO {

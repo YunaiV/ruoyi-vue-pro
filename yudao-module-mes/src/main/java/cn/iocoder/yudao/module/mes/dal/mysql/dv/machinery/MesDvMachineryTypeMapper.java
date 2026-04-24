@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * MES 设备类型 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesDvMachineryTypeMapper extends BaseMapperX<MesDvMachineryTypeDO> {

@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * 分配给发起人审批的 Expression 流程表达式
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Deprecated // 仅仅是表达式的示例，建议使用 BpmTaskCandidateStartUserStrategy 替代

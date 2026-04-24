@@ -35,9 +35,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link DiscountActivityServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author deepay
 */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import(DiscountActivityServiceImpl.class)
 public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
 
@@ -183,7 +183,7 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
     public void testGetDiscountActivityPage() {
        // mock 数据
        DiscountActivityDO dbDiscountActivity = randomPojo(DiscountActivityDO.class, o -> { // 等会查询到
-           o.setName("芋艿");
+           o.setName("deepay");
            o.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
            o.setCreateTime(buildTime(2021, 1, 15));
        });
@@ -196,7 +196,7 @@ public class DiscountActivityServiceImplTest extends BaseDbUnitTest {
        discountActivityMapper.insert(cloneIgnoreId(dbDiscountActivity, o -> o.setCreateTime(buildTime(2021, 2, 10))));
        // 准备参数
        DiscountActivityPageReqVO reqVO = new DiscountActivityPageReqVO();
-       reqVO.setName("芋艿");
+       reqVO.setName("deepay");
        reqVO.setStatus(PromotionActivityStatusEnum.WAIT.getStatus());
        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2021, 1, 1), buildTime(2021, 1, 31)}));
 

@@ -22,7 +22,7 @@ import java.util.List;
  *
  * 当用户领取时，会生成 {@link CouponDO} 优惠劵
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "promotion_coupon_template", autoResultMap = true)
 @KeySequence("promotion_coupon_template_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -58,7 +58,7 @@ public class CouponTemplateDO extends BaseDO {
      *
      * 枚举 {@link CommonStatusEnum}
      */
-    // TODO 芋艿：要不要改成 3 个状态？？
+    // TODO：要不要改成 3 个状态？？
     private Integer status;
 
     // ========== 基本信息 END ==========
@@ -174,6 +174,6 @@ public class CouponTemplateDO extends BaseDO {
 
     // ========== 统计信息 END ==========
 
-    // TODO 芋艿：领取开始时间、领取结束时间
+    // TODO：领取开始时间、领取结束时间
 
 }

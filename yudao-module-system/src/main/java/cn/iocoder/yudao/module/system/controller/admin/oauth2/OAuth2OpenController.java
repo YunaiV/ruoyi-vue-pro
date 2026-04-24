@@ -52,7 +52,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  * 考虑到【本系统】暂时不想做的过于复杂，默认只有获取到 access token 之后，可以访问【本系统】管理后台的 /system-api/* 所有接口，除非手动添加 scope 控制。
  * scope 的使用示例，可见 {@link OAuth2UserController} 类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Tag(name = "管理后台 - OAuth2.0 授权")
 @RestController
@@ -87,7 +87,7 @@ public class OAuth2OpenController {
     @Parameters({
             @Parameter(name = "grant_type", required = true, description = "授权类型", example = "code"),
             @Parameter(name = "code", description = "授权范围", example = "userinfo.read"),
-            @Parameter(name = "redirect_uri", description = "重定向 URI", example = "https://www.iocoder.cn"),
+            @Parameter(name = "redirect_uri", description = "重定向 URI", example = "https://www.deepay.srl"),
             @Parameter(name = "state", description = "状态", example = "1"),
             @Parameter(name = "username", example = "tudou"),
             @Parameter(name = "password", example = "cai"), // 多个使用空格分隔
@@ -209,7 +209,7 @@ public class OAuth2OpenController {
             @Parameter(name = "response_type", required = true, description = "响应类型", example = "code"),
             @Parameter(name = "client_id", required = true, description = "客户端编号", example = "tudou"),
             @Parameter(name = "scope", description = "授权范围", example = "userinfo.read"), // 使用 Map<String, Boolean> 格式，Spring MVC 暂时不支持这么接收参数
-            @Parameter(name = "redirect_uri", required = true, description = "重定向 URI", example = "https://www.iocoder.cn"),
+            @Parameter(name = "redirect_uri", required = true, description = "重定向 URI", example = "https://www.deepay.srl"),
             @Parameter(name = "auto_approve", required = true, description = "用户是否接受", example = "true"),
             @Parameter(name = "state", example = "1")
     })

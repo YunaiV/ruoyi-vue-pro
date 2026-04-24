@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * IoT 设备 Modbus 连接配置 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface IotDeviceModbusConfigMapper extends BaseMapperX<IotDeviceModbusConfigDO> {

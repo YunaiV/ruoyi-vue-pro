@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 设备保养记录明细 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesDvMaintenRecordLineMapper extends BaseMapperX<MesDvMaintenRecordLineDO> {

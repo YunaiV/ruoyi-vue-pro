@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.pay.enums.PayChannelEnum.*;
 /**
  * 支付客户端的工厂实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class PayClientFactoryImpl implements PayClientFactory {

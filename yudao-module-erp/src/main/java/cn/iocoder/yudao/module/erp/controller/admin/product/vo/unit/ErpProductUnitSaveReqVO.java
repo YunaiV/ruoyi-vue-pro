@@ -15,7 +15,7 @@ public class ErpProductUnitSaveReqVO {
     @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31254")
     private Long id;
 
-    @Schema(description = "单位名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "单位名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotEmpty(message = "单位名字不能为空")
     private String name;
 

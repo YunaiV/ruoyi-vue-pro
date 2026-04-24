@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * MES 装箱单新增/修改 Request VO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Schema(description = "管理后台 - MES 装箱单新增/修改 Request VO")
 @Data
