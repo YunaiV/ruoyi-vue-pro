@@ -78,10 +78,21 @@ deploy_backend() {
     ok "已同步 application-prod.yml → $BACKEND_CFG/"
   fi
 
-  # ── Maven 打包 ──────────────────────────────────────────
+  # ── Maven 打包（两段式，解决 yudao-dependencies SNAPSHOT 无法远程解析问题）──
   step "A-3  Maven 打包（跳过测试）"
   cd "$PROJECT_ROOT"
   BUILD_LOG=$BACKUP_DIR/build-${DATE}.log
+
+  # 第一段：清除失败缓存，单独安装 yudao-dependencies BOM 到本地 .m2
+  # 原因：yudao-dependencies 从未发布到远程仓库，-pl yudao-server -am 不包含它，
+  #       Maven 在 model-building 阶段就会报 "Non-resolvable import POM"。
+  rm -rf ~/.m2/repository/cn/iocoder/boot/yudao-dependencies/ 2>/dev/null || true
+  mvn install -f "$PROJECT_ROOT/yudao-dependencies/pom.xml" \
+    -DskipTests --no-transfer-progress -q \
+    2>&1 | tee -a "$BUILD_LOG" || error "yudao-dependencies 预安装失败，查看: $BUILD_LOG"
+  ok "yudao-dependencies BOM 已就绪"
+
+  # 第二段：正常构建主项目（BOM 已在本地 .m2，不再远程查找）
   mvn clean package -DskipTests --batch-mode -pl yudao-server -am \
     2>&1 | tee "$BUILD_LOG" | grep -E "BUILD|ERROR|WARNING|INFO.*yudao-server" || true
   JAR_FILE=$(find "$PROJECT_ROOT/yudao-server/target" -maxdepth 1 -name "*.jar" \
@@ -176,7 +187,9 @@ deploy_frontend() {
 
   step "B-2  安装依赖"
   cd "$FRONTEND_SRC"
-  npm install --prefer-offline 2>&1 | tail -3
+  npm install --prefer-offline 2>&1 | tail -3 \
+    || npm install --legacy-peer-deps 2>&1 | tail -3 \
+    || error "npm install 失败"
   ok "依赖安装完毕"
 
   step "B-3  Vite 构建（NODE_ENV=production）"

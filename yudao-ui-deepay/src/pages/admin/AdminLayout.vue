@@ -80,6 +80,11 @@ const allGroups = computed(() => {
 
 function isActive(path) { return route.path === path }
 function navigate(path) { router.push(path) }
+
+// JeePay 总后台地址（优先读环境变量，默认与当前域名同源但端口 9217）
+const JEEPAY_URL = import.meta.env.VITE_JEEPAY_ADMIN_URL
+  || `${location.protocol}//${location.hostname}:9217`
+function openJeePay() { window.open(JEEPAY_URL, '_blank', 'noopener') }
 </script>
 
 <template>
@@ -145,11 +150,20 @@ function navigate(path) { router.push(path) }
         </div>
       </nav>
 
-      <!-- 底部：返回用户端 -->
-      <button class="back-btn" @click="navigate('/')" :title="collapsed ? '返回用户端' : ''">
-        <span class="item-emoji">←</span>
-        <span v-show="!collapsed">返回用户端</span>
-      </button>
+      <!-- 底部操作区 -->
+      <div class="bottom-btns">
+        <!-- JeePay 支付后台 -->
+        <button class="jeepay-btn" @click="openJeePay" :title="collapsed ? 'JeePay 支付后台' : ''">
+          <span class="item-emoji">💳</span>
+          <span v-show="!collapsed">JeePay 支付后台</span>
+          <span v-show="!collapsed" class="ext-icon">↗</span>
+        </button>
+        <!-- 返回用户端 -->
+        <button class="back-btn" @click="navigate('/')" :title="collapsed ? '返回用户端' : ''">
+          <span class="item-emoji">←</span>
+          <span v-show="!collapsed">返回用户端</span>
+        </button>
+      </div>
     </aside>
 
     <!-- ── 主区域 ─────────────────────────────────────── -->
@@ -342,13 +356,52 @@ const ICON_MAP = {
 /* 收起模式：居中显示 emoji */
 .nav-collapsed .nav-item { justify-content: center; padding: 10px 0; }
 .nav-collapsed .group-items { gap: 2px; }
+.sidebar.collapsed .jeepay-btn,
+.sidebar.collapsed .back-btn  { justify-content: center; padding: 10px 0; border-color: transparent; }
+
+/* ── 底部按钮区 ──────────────────────────────── */
+.bottom-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid #1a1a1a;
+}
+
+/* JeePay 按钮 */
+.jeepay-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1px solid #2a1f4a;
+  background: #130e2a;
+  color: #a78bfa;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  text-align: left;
+}
+.jeepay-btn:hover {
+  color: #c4b5fd;
+  border-color: #5b21b6;
+  background: #1e1040;
+}
+.ext-icon {
+  margin-left: auto;
+  font-size: 11px;
+  opacity: 0.6;
+}
 
 /* ── 底部"返回用户端" ─────────────────────────── */
 .back-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 8px;
   padding: 9px 10px;
   border-radius: 9px;
   border: 1px solid #1c1c1c;
@@ -359,6 +412,8 @@ const ICON_MAP = {
   transition: color 0.15s, border-color 0.15s;
   white-space: nowrap;
   overflow: hidden;
+  width: 100%;
+  text-align: left;
 }
 .back-btn:hover { color: #888; border-color: #333; }
 

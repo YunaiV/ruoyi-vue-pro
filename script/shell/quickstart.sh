@@ -406,18 +406,44 @@ YAML
 ok "已写入 $CFG/application-prod.yml"
 
 # ══════════════════════════════════════════════════════════
-# 步骤 5 — Maven 打包后端
+# 步骤 5 — 获取后端 JAR（优先从 GitHub Release 下载，失败则本地 Maven 打包）
 # ══════════════════════════════════════════════════════════
-title "步骤 5  Maven 打包后端（需要几分钟，请耐心等待）"
+title "步骤 5  获取后端 JAR"
 cd "$PROJECT"
 BUILD_LOG=$RUN/backup/build-${DATE}.log
-mvn clean package -DskipTests --batch-mode -pl yudao-server -am \
-  2>&1 | tee "$BUILD_LOG" | grep -E "BUILD|ERROR|yudao-server.*jar" || true
 
-NEW_JAR=$(find "$PROJECT/yudao-server/target" -maxdepth 1 -name "*.jar" \
-          ! -name "*sources*" ! -name "*javadoc*" 2>/dev/null | head -1)
-[ -f "$NEW_JAR" ] || error "打包失败！查看完整日志: $BUILD_LOG"
-ok "打包成功: $NEW_JAR"
+RELEASE_URL="https://github.com/deepveloce-dot/ruoyi-vue-pro/releases/download/latest/yudao-server.jar"
+DOWNLOAD_JAR=$RUN/backup/yudao-server-${DATE}.jar
+
+info "尝试从 GitHub Release 下载预构建 JAR ..."
+if curl -fsSL --retry 3 --connect-timeout 15 -o "$DOWNLOAD_JAR" "$RELEASE_URL" 2>>"$BUILD_LOG"; then
+  NEW_JAR="$DOWNLOAD_JAR"
+  ok "下载成功: $NEW_JAR"
+else
+  warn "下载失败，回退到本地 Maven 打包（需要几分钟，请耐心等待）..."
+
+  # 第一段：清除失败缓存，预安装 yudao-dependencies BOM
+  # yudao-dependencies 从未发布到远程仓库，-pl yudao-server -am 不含它，
+  # Maven model-building 阶段会报 "Non-resolvable import POM"，必须先本地安装。
+  # 显式传 -Drevision 确保安装版本与根 pom 一致（yudao-dependencies/pom.xml 自带 revision 可能与根不同）
+  REVISION=$(grep -oP '(?<=<revision>)[^<]+' "$PROJECT/pom.xml" | head -1)
+  rm -rf ~/.m2/repository/cn/iocoder/boot/yudao-dependencies/ 2>/dev/null || true
+  mvn install -f "$PROJECT/yudao-dependencies/pom.xml" \
+    -Drevision="$REVISION" \
+    -DskipTests --no-transfer-progress -q \
+    2>&1 | tee -a "$BUILD_LOG"
+  [ "${PIPESTATUS[0]}" -eq 0 ] || error "yudao-dependencies 预安装失败！查看: $BUILD_LOG"
+  ok "yudao-dependencies BOM 已就绪"
+
+  # 第二段：构建主项目（BOM 已在本地 .m2）
+  mvn clean package -DskipTests --batch-mode -pl yudao-server -am \
+    2>&1 | tee "$BUILD_LOG" | grep -E "BUILD|ERROR|yudao-server.*jar" || true
+
+  NEW_JAR=$(find "$PROJECT/yudao-server/target" -maxdepth 1 -name "*.jar" \
+            ! -name "*sources*" ! -name "*javadoc*" 2>/dev/null | head -1)
+  [ -f "$NEW_JAR" ] || error "打包失败！查看完整日志: $BUILD_LOG"
+  ok "打包成功: $NEW_JAR"
+fi
 
 # ══════════════════════════════════════════════════════════
 # 步骤 6 — 停止旧后端 & 启动新后端
