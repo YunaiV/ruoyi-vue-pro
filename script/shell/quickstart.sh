@@ -61,21 +61,11 @@ JAVA_OPTS="-server -Xms512m -Xmx512m \
   -XX:+HeapDumpOnOutOfMemoryError \
   -XX:HeapDumpPath=${RUN}/heapDump"
 
-# SQL 文件导入顺序（基础表 → 增量迁移，必须保持此顺序）
+# SQL 文件导入顺序（已合并为 3 个文件，幂等安全，MySQL 5.7 / 8.0 均兼容）
 SQL_FILES=(
-  "ruoyi-vue-pro.sql"
-  "quartz.sql"
-  "deepay.sql"
-  "deepay-phase67.sql"
-  "deepay-phase10.sql"
-  "deepay-feature-config.sql"
-  "deepay-fx.sql"
-  "deepay-selection-v2.sql"
-  "deepay-v2-ima.sql"
-  "deepay-v3-inventory.sql"
-  "deepay-v3-payment.sql"
-  "deepay-v3-product-fields.sql"
-  "deepay-v4-menu.sql"
+  "ruoyi-vue-pro.sql"   # 若依框架系统表
+  "quartz.sql"          # 定时任务表
+  "deepay.sql"          # Deepay 全量业务表（含所有迁移，合并自原 10 个文件）
 )
 # ═══════════════════════════════════════════════════════════
 
