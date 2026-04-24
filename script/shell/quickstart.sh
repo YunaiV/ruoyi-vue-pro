@@ -1,47 +1,61 @@
 #!/bin/bash
 # =============================================================
-#  Deepay 一键完全配置 & 部署脚本
+#  Deepay 全自动一键部署脚本
 #
 #  服务器上执行（只需复制这一行）：
 #    bash /www/wwwroot/deepay.srl/script/shell/quickstart.sh
 #
 #  脚本会自动完成：
-#    ① 检查 Java / Maven / Node / npm / MySQL / Redis / Nginx
-#    ② 配置 Maven 阿里云加速镜像（仅首次）
-#    ③ 创建 MySQL 数据库 + 账号
-#    ④ 按顺序导入全部 SQL 文件（幂等，已存在的表自动跳过）
-#    ⑤ 写入后端生产配置 application-prod.yml
-#    ⑥ Maven 打包后端（-pl yudao-server -am，跳过测试）
-#    ⑦ 停止旧后端进程 → 启动新进程 → 健康检查
-#    ⑧ npm 安装依赖 → Vite 构建前端 → 部署到 Nginx 目录
-#    ⑨ 生成 Nginx 虚拟主机配置 → reload
-#    ⑩ 注册 systemd 服务 → 设为开机自启
+#    ① 自动识别宝塔 JDK17，无需手动配置 JAVA_HOME
+#    ② 检查 Java / Maven / Node / npm / MySQL / Redis / Nginx
+#    ③ 配置 Maven 阿里云加速镜像（仅首次）
+#    ④ 创建 MySQL 数据库 + 账号
+#    ⑤ 按顺序导入全部 SQL 文件（幂等，已存在的表自动跳过）
+#    ⑥ 写入后端生产配置 application-prod.yml
+#    ⑦ Maven 打包后端（-pl yudao-server -am，跳过测试）
+#    ⑧ 停止旧后端进程 → 启动新进程 → 健康检查
+#    ⑨ npm 安装依赖 → Vite 构建前端 → 部署到站点根目录
+#    ⑩ 生成 单站点 Nginx 配置（deepay.srl）→ reload
+#    ⑪ 注册 systemd 服务 → 设为开机自启
+#
+#  环境变量覆盖（全部可选，默认按单站点方案）：
+#    PROJECT         工程根目录（默认 /www/wwwroot/deepay.srl）
+#    FRONTEND_OUT    前端部署目录（默认 $PROJECT）
+#    DOMAIN          站点域名（默认 deepay.srl）
+#    NGINX_CONF      Nginx 配置文件路径
+#    DB / DB_USER / DB_PASS  数据库账号
+#    PORT            后端端口（默认 48080）
+#    PROFILE         Spring profile（默认 prod）
+#    JAVA_HOME       手动指定 JDK 目录（默认自动检测宝塔 JDK17）
+#    NONINTERACTIVE  设为 1 时禁止交互式提示，密码缺失直接报错
 # =============================================================
 set -euo pipefail
 
 # ╔══════════════════════════════════════════════════════════╗
-# ║   全局配置（如需修改只改这里）                           ║
+# ║   全局配置（环境变量优先，其次下方默认值）               ║
 # ╚══════════════════════════════════════════════════════════╝
-PROJECT=/www/wwwroot/deepay.srl
+PROJECT="${PROJECT:-/www/wwwroot/deepay.srl}"
 RUN=$PROJECT/run/backend
 CFG=$RUN/config
 JAR=$RUN/app.jar
 LOG=$RUN/logs/app.log
 PID=$RUN/deepay.pid
-PORT=48080
-PROFILE=prod
+PORT="${PORT:-48080}"
+PROFILE="${PROFILE:-prod}"
 
 FRONTEND_SRC=$PROJECT/yudao-ui-deepay
-FRONTEND_OUT=/www/wwwroot/admin          # 与宝塔站点根目录一致
+# 单站点模式：前端直接输出到站点根目录
+FRONTEND_OUT="${FRONTEND_OUT:-$PROJECT}"
 
-DOMAIN_MAIN=deepay.srl               # 主域名（跳转到 admin）
-DOMAIN_ADMIN=admin.deepay.srl        # 管理后台前端
-DOMAIN_API=api.deepay.srl            # 纯后端 API
-NGINX_CONF=/www/server/panel/vhost/nginx/deepay-all.conf  # 三个域名统一写一个文件
+# 单域名配置（不再生成 admin. / api. 子域名）
+DOMAIN="${DOMAIN:-deepay.srl}"
+NGINX_CONF="${NGINX_CONF:-/www/server/panel/vhost/nginx/deepay.conf}"
 
-DB=sdsdsdas
-DB_USER=sdsdsdas
-DB_PASS=sdsdsdas
+DB="${DB:-sdsdsdas}"
+DB_USER="${DB_USER:-sdsdsdas}"
+DB_PASS="${DB_PASS:-sdsdsdas}"
+
+NONINTERACTIVE="${NONINTERACTIVE:-0}"
 
 JAVA_OPTS="-server -Xms512m -Xmx512m \
   -XX:+HeapDumpOnOutOfMemoryError \
@@ -72,7 +86,6 @@ info()  { echo -e "     $*"; }
 warn()  { echo -e "${Y}  ⚠  $*${N}"; }
 error() { echo -e "${R}  ✗  $*${N}"; exit 1; }
 title() { echo -e "\n${C}${B}══ $* ══${N}"; }
-need()  { command -v "$1" &>/dev/null || error "未找到 $1，请在宝塔软件商店安装后重试"; }
 
 DATE=$(date '+%Y%m%d_%H%M%S')
 mkdir -p "$RUN/logs" "$RUN/backup" "$CFG"
@@ -87,16 +100,60 @@ cat << 'EOF'
   ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ ██╔══██║  ╚██╔╝
   ██████╔╝███████╗███████╗██║     ██║  ██║   ██║
   ╚═════╝ ╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝   ╚═╝
-         一 键 完 全 配 置 脚 本
+         全 自 动 一 键 部 署 脚 本
 EOF
 }
 banner
 
 # ══════════════════════════════════════════════════════════
+# 步骤 0 — 自动检测宝塔 JDK17，修复"未找到 java"
+# ══════════════════════════════════════════════════════════
+title "步骤 0  自动检测 Java（宝塔 JDK17）"
+
+_setup_java() {
+  # 优先：外部传入 JAVA_HOME
+  if [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    export PATH="$JAVA_HOME/bin:$PATH"
+    ok "使用指定 JAVA_HOME: $JAVA_HOME"
+    return 0
+  fi
+
+  # 其次：宝塔安装目录 /www/server/java — 优先选 jdk-17
+  if [ -d /www/server/java ]; then
+    local _jdk=""
+    # 先找 jdk-17 前缀
+    _jdk=$(find /www/server/java -maxdepth 2 -name "java" -path "*/jdk-17*/bin/java" 2>/dev/null \
+           | sort -rV | head -1 || true)
+    # 退而求其次：任意 jdk
+    if [ -z "$_jdk" ]; then
+      _jdk=$(find /www/server/java -maxdepth 2 -name "java" -path "*/bin/java" 2>/dev/null \
+             | sort -rV | head -1 || true)
+    fi
+    if [ -n "$_jdk" ] && [ -x "$_jdk" ]; then
+      export JAVA_HOME
+      JAVA_HOME=$(dirname "$(dirname "$_jdk")")
+      export PATH="$JAVA_HOME/bin:$PATH"
+      ok "自动检测到宝塔 JDK: $JAVA_HOME"
+      return 0
+    fi
+  fi
+
+  # 最后：系统 PATH
+  if command -v java &>/dev/null; then
+    ok "使用系统 PATH 中的 java: $(command -v java)"
+    return 0
+  fi
+
+  error "未找到 Java！请在宝塔软件商店安装 JDK17 后重试，或设置 JAVA_HOME 环境变量"
+}
+_setup_java
+
+# ══════════════════════════════════════════════════════════
 # 步骤 1 — 检查依赖
 # ══════════════════════════════════════════════════════════
 title "步骤 1  检查环境"
-need java; need mvn; need node; need npm; need mysql; need nginx
+need_cmd() { command -v "$1" &>/dev/null || error "未找到 $1，请在宝塔软件商店安装后重试"; }
+need_cmd mvn; need_cmd node; need_cmd npm; need_cmd mysql; need_cmd nginx
 
 ok "Java  : $(java  -version 2>&1 | head -1)"
 ok "Maven : $(mvn   -version 2>&1 | head -1)"
@@ -154,6 +211,9 @@ if [ -f "$BT_CFG" ]; then
 fi
 
 if [ -z "$BT_MYSQL_PWD" ]; then
+  if [ "${NONINTERACTIVE}" = "1" ]; then
+    error "MySQL root 密码未找到（/www/server/panel/config/config.json），请设置 NONINTERACTIVE=0 或手动传入密码"
+  fi
   echo -n "  请输入 MySQL root 密码（宝塔面板 → 数据库 → root密码）: "
   read -rs BT_MYSQL_PWD; echo ""
 fi
@@ -249,7 +309,7 @@ spring:
 yudao:
   web:
     admin-ui:
-      url: https://${DOMAIN_ADMIN}
+      url: https://${DOMAIN}
 YAML
 ok "已写入 $CFG/application-prod.yml"
 
@@ -333,137 +393,107 @@ cp -r "$FRONTEND_SRC/dist"/. "$FRONTEND_OUT/"
 ok "前端已部署 → $FRONTEND_OUT"
 
 # ══════════════════════════════════════════════════════════
-# 步骤 9 — 写 Nginx 配置
+# 步骤 9 — 写 Nginx 配置（单站点：deepay.srl）
 # ══════════════════════════════════════════════════════════
-title "步骤 9  配置 Nginx（三个域名）"
+title "步骤 9  配置 Nginx（单站点 ${DOMAIN}）"
 
 mkdir -p "$(dirname "$NGINX_CONF")"
 
-cat > "$NGINX_CONF" << 'NGINX_EOF'
+# 备份旧配置
+if [ -f "$NGINX_CONF" ]; then
+  cp -f "$NGINX_CONF" "${NGINX_CONF}.bak.${DATE}"
+  ok "旧 Nginx 配置已备份 → ${NGINX_CONF}.bak.${DATE}"
+fi
+
+# 写单站点配置（使用 shell 变量替换 DOMAIN / FRONTEND_OUT / PORT）
+# Nginx 内部变量用 \$ 转义
+cat > "$NGINX_CONF" << NGINX_EOF
 # ============================================================
-#  Deepay — Nginx 虚拟主机配置（三个域名）
+#  Deepay — Nginx 虚拟主机配置（单站点）
 #
-#  deepay.srl          → 301 跳转到 admin.deepay.srl
-#  admin.deepay.srl    → Vue 前端 + /admin-api/ + /api/ 反代
-#  api.deepay.srl      → 纯后端 API 反代（端口 48080）
+#  ${DOMAIN}  → Vue 前端（${FRONTEND_OUT}）
+#               /api/       反代 → 127.0.0.1:${PORT}
+#               /admin-api/ 反代 → 127.0.0.1:${PORT}
+#               /infra/ws   WebSocket
 #
-#  HTTPS：宝塔面板 → 网站 → 对应域名 → SSL → Let's Encrypt
+#  自动生成于 $(date)
+#  HTTPS：宝塔面板 → 网站 → ${DOMAIN} → SSL → Let's Encrypt
 # ============================================================
 
-# ── 1. deepay.srl / www.deepay.srl → 跳转 admin ─────────
 server {
     listen 80;
     listen [::]:80;
-    server_name deepay.srl www.deepay.srl;
-    return 301 http://admin.deepay.srl$request_uri;
-}
+    server_name ${DOMAIN} www.${DOMAIN};
 
-# ── 2. admin.deepay.srl → 前端 + API 反代 ───────────────
-server {
-    listen 80;
-    listen [::]:80;
-    server_name admin.deepay.srl;
-
-    root /www/wwwroot/admin;
+    root ${FRONTEND_OUT};
     index index.html;
+
+    client_max_body_size 32m;
 
     # 前端 SPA（Vue Router history 模式）
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files \$uri \$uri/ /index.html;
     }
 
     # 后端 admin-api
     location /admin-api/ {
-        proxy_pass         http://127.0.0.1:48080/admin-api/;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Real-IP         $remote_addr;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_pass         http://127.0.0.1:${PORT}/admin-api/;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
         proxy_connect_timeout 60s;
         proxy_read_timeout    300s;
         proxy_send_timeout    300s;
-        client_max_body_size  32m;
     }
 
-    # 后端 api（deepay 业务接口）
+    # 后端 api（业务接口）
     location /api/ {
-        proxy_pass         http://127.0.0.1:48080/api/;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Real-IP         $remote_addr;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_pass         http://127.0.0.1:${PORT}/api/;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
         proxy_connect_timeout 60s;
         proxy_read_timeout    300s;
         proxy_send_timeout    300s;
-        client_max_body_size  32m;
     }
 
     # WebSocket（实时推送）
     location /infra/ws {
-        proxy_pass         http://127.0.0.1:48080/infra/ws;
+        proxy_pass         http://127.0.0.1:${PORT}/infra/ws;
         proxy_http_version 1.1;
-        proxy_set_header   Upgrade    $http_upgrade;
+        proxy_set_header   Upgrade    \$http_upgrade;
         proxy_set_header   Connection "upgrade";
-        proxy_set_header   Host       $host;
+        proxy_set_header   Host       \$host;
         proxy_read_timeout 3600s;
     }
 
     # Swagger（调试用）
     location /swagger-ui {
-        proxy_pass http://127.0.0.1:48080/swagger-ui;
-        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:${PORT}/swagger-ui;
+        proxy_set_header Host \$host;
     }
     location /v3/api-docs {
-        proxy_pass http://127.0.0.1:48080/v3/api-docs;
-        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:${PORT}/v3/api-docs;
+        proxy_set_header Host \$host;
     }
 
     # 静态资源缓存
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)$ {
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)\$ {
         expires 30d;
         add_header Cache-Control "public, no-transform";
-    }
-}
-
-# ── 3. api.deepay.srl → 纯后端 API 反代 ─────────────────
-server {
-    listen 80;
-    listen [::]:80;
-    server_name api.deepay.srl;
-
-    client_max_body_size 32m;
-
-    # 全部转发到 Spring Boot
-    location / {
-        proxy_pass         http://127.0.0.1:48080;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Real-IP         $remote_addr;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout    300s;
-        proxy_send_timeout    300s;
-    }
-
-    # WebSocket
-    location /infra/ws {
-        proxy_pass         http://127.0.0.1:48080/infra/ws;
-        proxy_http_version 1.1;
-        proxy_set_header   Upgrade    $http_upgrade;
-        proxy_set_header   Connection "upgrade";
-        proxy_set_header   Host       $host;
-        proxy_read_timeout 3600s;
     }
 }
 NGINX_EOF
 
 ok "Nginx 配置已写入 $NGINX_CONF"
-if nginx -t 2>/dev/null; then
+if nginx -t 2>&1; then
   systemctl reload nginx 2>/dev/null || nginx -s reload 2>/dev/null \
     || warn "Nginx reload 失败，请宝塔面板手动重载"
   ok "Nginx 已重载"
 else
-  warn "Nginx 配置有误，请检查 $NGINX_CONF"
+  warn "Nginx 配置语法有误，请检查 $NGINX_CONF"
 fi
 
 # ══════════════════════════════════════════════════════════
@@ -471,7 +501,8 @@ fi
 # ══════════════════════════════════════════════════════════
 title "步骤 10  配置 systemd 开机自启"
 
-JAVA_BIN=$(command -v java)
+# 使用步骤 0 检测到的 java（JAVA_HOME 已 export）
+JAVA_BIN="${JAVA_HOME:+${JAVA_HOME}/bin/}java"
 
 cat > /etc/systemd/system/deepay.service << UNIT
 [Unit]
