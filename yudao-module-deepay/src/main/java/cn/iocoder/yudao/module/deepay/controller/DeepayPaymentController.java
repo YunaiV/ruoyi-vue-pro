@@ -21,10 +21,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
  * Deepay 支付接口。
  *
  * <ul>
- *   <li>POST /api/payment/order/create —— 创建订单（INIT）</li>
- *   <li>POST /api/payment/callback —— Jeepay Webhook 回调（INIT → PAID）</li>
- *   <li>POST /api/payment/simulate —— 模拟支付成功（测试用）</li>
- *   <li>GET  /product/{chainCode}  —— 商品详情页</li>
+ *   <li>POST /api/payment/order/create             —— 创建订单（INIT）</li>
+ *   <li>POST /api/payment/callback                 —— Jeepay Webhook 回调（INIT → PAID）</li>
+ *   <li>POST /api/payment/simulate                 —— 模拟支付成功（测试用）</li>
+ *   <li>GET  /api/payment/product/{chainCode}      —— 商品详情 JSON</li>
  * </ul>
  */
 @Tag(name = "Deepay - 支付收款")

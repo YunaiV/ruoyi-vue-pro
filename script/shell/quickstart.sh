@@ -34,8 +34,10 @@ PROFILE=prod
 FRONTEND_SRC=$PROJECT/yudao-ui-deepay
 FRONTEND_OUT=/www/wwwroot/admin          # 与宝塔站点根目录一致
 
-DOMAIN_ADMIN=admin.deepay.srl            # 前端 + API 反代域名
-NGINX_CONF=/www/server/panel/vhost/nginx/${DOMAIN_ADMIN}.conf
+DOMAIN_MAIN=deepay.srl               # 主域名（跳转到 admin）
+DOMAIN_ADMIN=admin.deepay.srl        # 管理后台前端
+DOMAIN_API=api.deepay.srl            # 纯后端 API
+NGINX_CONF=/www/server/panel/vhost/nginx/deepay-all.conf  # 三个域名统一写一个文件
 
 DB=sdsdsdas
 DB_USER=sdsdsdas
@@ -209,6 +211,19 @@ server:
   port: ${PORT}
 
 spring:
+  autoconfigure:
+    exclude:
+      # Druid 独立配置，不需要自动装配
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+      # Quartz 表须手动建好，不自动初始化
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+      # AI 向量库按需手动创建
+      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+      # 微信公众号/小程序 appid 仅在 application-local.yaml 配置；
+      # prod 不使用微信功能，禁用避免 appid=null 启动崩溃
+      - com.binarywang.spring.starter.wxjava.mp.config.WxMpServiceAutoConfiguration
+      - com.binarywang.spring.starter.wxjava.miniapp.config.WxMaServiceAutoConfiguration
   datasource:
     dynamic:
       primary: master
@@ -230,6 +245,11 @@ spring:
     database: 0
     timeout: 5000ms
     # password:   # 若宝塔 Redis 设了密码，取消注释并填入
+
+yudao:
+  web:
+    admin-ui:
+      url: https://${DOMAIN_ADMIN}
 YAML
 ok "已写入 $CFG/application-prod.yml"
 
@@ -315,80 +335,127 @@ ok "前端已部署 → $FRONTEND_OUT"
 # ══════════════════════════════════════════════════════════
 # 步骤 9 — 写 Nginx 配置
 # ══════════════════════════════════════════════════════════
-title "步骤 9  配置 Nginx"
+title "步骤 9  配置 Nginx（三个域名）"
 
 mkdir -p "$(dirname "$NGINX_CONF")"
 
-cat > "$NGINX_CONF" << NGINX
+cat > "$NGINX_CONF" << 'NGINX_EOF'
+# ============================================================
+#  Deepay — Nginx 虚拟主机配置（三个域名）
+#
+#  deepay.srl          → 301 跳转到 admin.deepay.srl
+#  admin.deepay.srl    → Vue 前端 + /admin-api/ + /api/ 反代
+#  api.deepay.srl      → 纯后端 API 反代（端口 48080）
+#
+#  HTTPS：宝塔面板 → 网站 → 对应域名 → SSL → Let's Encrypt
+# ============================================================
+
+# ── 1. deepay.srl / www.deepay.srl → 跳转 admin ─────────
 server {
     listen 80;
     listen [::]:80;
-    server_name ${DOMAIN_ADMIN};
+    server_name deepay.srl www.deepay.srl;
+    return 301 http://admin.deepay.srl$request_uri;
+}
 
-    # 申请好 SSL 证书后，取消下一行注释并注释掉下面的 root/location 块
-    # return 301 https://\$host\$request_uri;
+# ── 2. admin.deepay.srl → 前端 + API 反代 ───────────────
+server {
+    listen 80;
+    listen [::]:80;
+    server_name admin.deepay.srl;
 
-    root ${FRONTEND_OUT};
+    root /www/wwwroot/admin;
     index index.html;
 
-    # ── 前端 SPA（Vue Router history 模式）────────────────
+    # 前端 SPA（Vue Router history 模式）
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
-    # ── 后端 API 反代（/api/ 转发给 Spring Boot）────────
-    location /api/ {
-        proxy_pass         http://127.0.0.1:${PORT}/api/;
-        proxy_set_header   Host              \$host;
-        proxy_set_header   X-Real-IP         \$remote_addr;
-        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout    300s;
-        proxy_send_timeout    300s;
-        client_max_body_size  32m;
-    }
-
-    # ── admin-api 反代 ───────────────────────────────────
+    # 后端 admin-api
     location /admin-api/ {
-        proxy_pass         http://127.0.0.1:${PORT}/admin-api/;
-        proxy_set_header   Host              \$host;
-        proxy_set_header   X-Real-IP         \$remote_addr;
-        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_pass         http://127.0.0.1:48080/admin-api/;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
         proxy_connect_timeout 60s;
         proxy_read_timeout    300s;
         proxy_send_timeout    300s;
         client_max_body_size  32m;
     }
 
-    # ── WebSocket（实时推送）──────────────────────────────
+    # 后端 api（deepay 业务接口）
+    location /api/ {
+        proxy_pass         http://127.0.0.1:48080/api/;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+        client_max_body_size  32m;
+    }
+
+    # WebSocket（实时推送）
     location /infra/ws {
-        proxy_pass         http://127.0.0.1:${PORT}/infra/ws;
+        proxy_pass         http://127.0.0.1:48080/infra/ws;
         proxy_http_version 1.1;
-        proxy_set_header   Upgrade    \$http_upgrade;
+        proxy_set_header   Upgrade    $http_upgrade;
         proxy_set_header   Connection "upgrade";
-        proxy_set_header   Host       \$host;
+        proxy_set_header   Host       $host;
         proxy_read_timeout 3600s;
     }
 
-    # ── Swagger（调试用，上线后可删除）──────────────────
+    # Swagger（调试用）
     location /swagger-ui {
-        proxy_pass http://127.0.0.1:${PORT}/swagger-ui;
-        proxy_set_header Host \$host;
+        proxy_pass http://127.0.0.1:48080/swagger-ui;
+        proxy_set_header Host $host;
     }
     location /v3/api-docs {
-        proxy_pass http://127.0.0.1:${PORT}/v3/api-docs;
-        proxy_set_header Host \$host;
+        proxy_pass http://127.0.0.1:48080/v3/api-docs;
+        proxy_set_header Host $host;
     }
 
-    # ── 静态资源缓存 ─────────────────────────────────────
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)\$ {
+    # 静态资源缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)$ {
         expires 30d;
         add_header Cache-Control "public, no-transform";
     }
 }
-NGINX
+
+# ── 3. api.deepay.srl → 纯后端 API 反代 ─────────────────
+server {
+    listen 80;
+    listen [::]:80;
+    server_name api.deepay.srl;
+
+    client_max_body_size 32m;
+
+    # 全部转发到 Spring Boot
+    location / {
+        proxy_pass         http://127.0.0.1:48080;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+    }
+
+    # WebSocket
+    location /infra/ws {
+        proxy_pass         http://127.0.0.1:48080/infra/ws;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    $http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       $host;
+        proxy_read_timeout 3600s;
+    }
+}
+NGINX_EOF
 
 ok "Nginx 配置已写入 $NGINX_CONF"
 if nginx -t 2>/dev/null; then
@@ -438,21 +505,21 @@ systemctl enable deepay 2>/dev/null && ok "deepay.service 已设为开机自启"
 # ══════════════════════════════════════════════════════════
 echo ""
 echo -e "${G}${B}"
-echo "  ╔══════════════════════════════════════════════════════╗"
-echo "  ║           🎉  一键完全配置完成！                    ║"
-echo "  ╠══════════════════════════════════════════════════════╣"
-echo "  ║  前端地址   http://${DOMAIN_ADMIN}          ║"
-echo "  ║  API 地址   http://${DOMAIN_ADMIN}/api/     ║"
-echo "  ║  Swagger    http://${DOMAIN_ADMIN}/swagger-ui║"
-echo "  ╠══════════════════════════════════════════════════════╣"
-echo "  ║  后端日志   tail -f ${LOG}"
-echo "  ║  重新部署   bash ${PROJECT}/script/shell/deepay-deploy.sh"
-echo "  ║  只更新后端 bash ${PROJECT}/script/shell/deepay-deploy.sh backend"
-echo "  ║  只更新前端 bash ${PROJECT}/script/shell/deepay-deploy.sh frontend"
-echo "  ╠══════════════════════════════════════════════════════╣"
-echo "  ║  💡 如要开启 HTTPS：                                ║"
-echo "  ║     宝塔面板 → 网站 → ${DOMAIN_ADMIN}     ║"
-echo "  ║     → SSL → Let's Encrypt → 申请证书               ║"
-echo "  ╚══════════════════════════════════════════════════════╝"
+echo "  ╔══════════════════════════════════════════════════════════╗"
+echo "  ║           🎉  一键完全配置完成！                        ║"
+echo "  ╠══════════════════════════════════════════════════════════╣"
+echo "  ║  主域名  http://deepay.srl    → 自动跳到 admin         ║"
+echo "  ║  管理台  http://admin.deepay.srl  （前端 Vue）          ║"
+echo "  ║  API     http://api.deepay.srl    （后端 48080）        ║"
+echo "  ║  Swagger http://api.deepay.srl/swagger-ui               ║"
+echo "  ╠══════════════════════════════════════════════════════════╣"
+echo "  ║  后端日志  tail -f ${LOG}"
+echo "  ║  重新部署  bash ${PROJECT}/script/shell/deepay-deploy.sh"
+echo "  ╠══════════════════════════════════════════════════════════╣"
+echo "  ║  💡 开启 HTTPS（每个域名都要单独申请）：                ║"
+echo "  ║     宝塔面板 → 网站 → 添加站点（三个域名各一个）        ║"
+echo "  ║     → SSL → Let's Encrypt → 申请免费证书                ║"
+echo "  ║     → 证书申请后取消 Nginx 配置里的 # return 301 https  ║"
+echo "  ╚══════════════════════════════════════════════════════════╝"
 echo -e "${N}"
 

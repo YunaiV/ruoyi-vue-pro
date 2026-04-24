@@ -2,6 +2,20 @@ server:
   port: 48080
 
 spring:
+  autoconfigure:
+    # noinspection SpringBootApplicationYaml
+    exclude:
+      # Druid 独立配置，不需要自动装配
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+      # Quartz 表须手动建好，不自动初始化
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+      # AI 向量库按需手动创建
+      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+      # 微信公众号 / 小程序 appid 只在 application-local.yaml 里配置，
+      # prod 环境不使用微信功能，禁用相关 Bean 避免 appid=null 启动崩溃
+      - com.binarywang.spring.starter.wxjava.mp.config.WxMpServiceAutoConfiguration
+      - com.binarywang.spring.starter.wxjava.miniapp.config.WxMaServiceAutoConfiguration
   datasource:
     dynamic:
       primary: master
