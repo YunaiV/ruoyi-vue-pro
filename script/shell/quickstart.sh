@@ -415,10 +415,14 @@ BUILD_LOG=$RUN/backup/build-${DATE}.log
 # 第一段：清除失败缓存，预安装 yudao-dependencies BOM
 # yudao-dependencies 从未发布到远程仓库，-pl yudao-server -am 不含它，
 # Maven model-building 阶段会报 "Non-resolvable import POM"，必须先本地安装。
+# 显式传 -Drevision 确保安装版本与根 pom 一致（yudao-dependencies/pom.xml 自带 revision 可能与根不同）
+REVISION=$(grep -oP '(?<=<revision>)[^<]+' "$PROJECT/pom.xml" | head -1)
 rm -rf ~/.m2/repository/cn/iocoder/boot/yudao-dependencies/ 2>/dev/null || true
 mvn install -f "$PROJECT/yudao-dependencies/pom.xml" \
+  -Drevision="$REVISION" \
   -DskipTests --no-transfer-progress -q \
-  2>&1 | tee -a "$BUILD_LOG" || error "yudao-dependencies 预安装失败！查看: $BUILD_LOG"
+  2>&1 | tee -a "$BUILD_LOG"
+[ "${PIPESTATUS[0]}" -eq 0 ] || error "yudao-dependencies 预安装失败！查看: $BUILD_LOG"
 ok "yudao-dependencies BOM 已就绪"
 
 # 第二段：构建主项目（BOM 已在本地 .m2）
