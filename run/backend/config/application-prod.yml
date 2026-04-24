@@ -3,7 +3,6 @@ server:
 
 spring:
   autoconfigure:
-    # noinspection SpringBootApplicationYaml
     exclude:
       # Druid 独立配置，不需要自动装配
       - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
@@ -12,11 +11,10 @@ spring:
       # AI 向量库按需手动创建
       - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration
       - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
-      # 注意：WxMpServiceAutoConfiguration / WxMaServiceAutoConfiguration 不是
-      # Spring Boot AutoConfiguration（未注册在 META-INF/spring.factories），
-      # 放入 spring.autoconfigure.exclude 会导致 IllegalStateException 启动崩溃。
-      # wx-java 依赖通过 @Import 方式激活，在 prod 下因 wx.mp.app-id 已有占位值
-      # 不会影响启动，无需在此排除。
+      # !! 不要在此添加 WxMpServiceAutoConfiguration / WxMaServiceAutoConfiguration !!
+      # 这两个类不是 Spring Boot AutoConfiguration（未注册在 META-INF/spring.factories），
+      # 将其加入 spring.autoconfigure.exclude 会抛 IllegalStateException 导致启动崩溃。
+
   datasource:
     dynamic:
       primary: master
@@ -31,10 +29,15 @@ spring:
           username: sdsdsdas
           password: sdsdsdas
 
-  # ⚠️ 本项目使用 Spring Boot 2.7.x，Redis 连接配置前缀是 spring.redis（非 spring.data.redis）
+  # ⚠️ Spring Boot 2.7.x：Redis 前缀是 spring.redis（非 spring.data.redis）
   redis:
     host: 127.0.0.1
     port: 6379
     database: 0
     timeout: 5000ms
-    # password:   # 宝塔 Redis 未设 requirepass，留空即可；若设了密码则取消注释并填入
+    # password:   # 若宝塔 Redis 设了密码，取消注释并填入
+
+yudao:
+  web:
+    admin-ui:
+      url: https://admin.deepay.srl  # CORS 允许来源，与前端域名保持一致
