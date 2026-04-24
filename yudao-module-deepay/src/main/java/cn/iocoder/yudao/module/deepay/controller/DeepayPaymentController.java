@@ -21,10 +21,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
  * Deepay 支付接口。
  *
  * <ul>
- *   <li>POST /api/order/create   —— 创建订单（INIT）</li>
- *   <li>POST /api/payment/callback —— Jeepay Webhook 回调（INIT → PAID）</li>
- *   <li>POST /api/payment/simulate —— 模拟支付成功（测试用）</li>
- *   <li>GET  /product/{chainCode}  —— 商品详情页</li>
+ *   <li>POST /api/payment/order/create —— 创建订单（INIT）</li>
+ *   <li>POST /api/payment/callback     —— Jeepay Webhook 回调（INIT → PAID）</li>
+ *   <li>POST /api/payment/simulate     —— 模拟支付成功（测试用）</li>
+ *   <li>GET  /api/payment/product/{chainCode} —— 商品详情 JSON</li>
  * </ul>
  */
 @Tag(name = "Deepay - 支付收款")
@@ -40,7 +40,7 @@ public class DeepayPaymentController {
     // 创建订单
     // ----------------------------------------------------------------
 
-    @PostMapping("/api/order/create")
+    @PostMapping("/api/payment/order/create")
     @Operation(summary = "创建订单（INIT）")
     public CommonResult<Map<String, Object>> createOrder(@Valid @RequestBody ChainCodeReqVO req) {
         DeepayOrderDO order = orderService.createOrder(req.getChainCode());
@@ -73,8 +73,8 @@ public class DeepayPaymentController {
     // 商品详情页
     // ----------------------------------------------------------------
 
-    @GetMapping("/product/{chainCode}")
-    @Operation(summary = "商品详情页")
+    @GetMapping("/api/payment/product/{chainCode}")
+    @Operation(summary = "商品详情 JSON")
     public CommonResult<Map<String, Object>> productDetail(@PathVariable("chainCode") String chainCode) {
         DeepayProductDO product = orderService.getProduct(chainCode);
         Map<String, Object> resp = new LinkedHashMap<>();
