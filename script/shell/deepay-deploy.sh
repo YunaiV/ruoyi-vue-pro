@@ -68,11 +68,14 @@ deploy_backend() {
   # ── 把仓库内的 prod 配置同步到运行目录 ──
   step "A-2  同步外置配置"
   SRC_CFG=$PROJECT_ROOT/run/backend/config/application-prod.yml
-  if [ -f "$SRC_CFG" ]; then
-    cp -f "$SRC_CFG" "$BACKEND_CFG/application-prod.yml"
-    ok "已同步 application-prod.yml → $BACKEND_CFG/"
-  else
+  DST_CFG=$BACKEND_CFG/application-prod.yml
+  if [ ! -f "$SRC_CFG" ]; then
     warn "未找到 $SRC_CFG，将使用已有配置（若无配置则启动会失败）"
+  elif [ "$SRC_CFG" -ef "$DST_CFG" ]; then
+    ok "配置已在运行目录，无需同步: $DST_CFG"
+  else
+    cp -f "$SRC_CFG" "$DST_CFG"
+    ok "已同步 application-prod.yml → $BACKEND_CFG/"
   fi
 
   # ── Maven 打包 ──────────────────────────────────────────
