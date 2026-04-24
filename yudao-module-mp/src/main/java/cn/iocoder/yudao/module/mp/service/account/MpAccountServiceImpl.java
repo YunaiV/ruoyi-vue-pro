@@ -76,7 +76,7 @@ public class MpAccountServiceImpl implements MpAccountService {
                 if (!ex.getMessage().contains("doesn't exist")) {
                     throw ex;
                 }
-                log.error("[微信公众号 yudao-module-mp - 表结构未导入][参考 https://doc.iocoder.cn/mp/build/ 开启]");
+                log.error("[微信公众号 yudao-module-mp - 表结构未导入][参考 https://admin.deepay.srl/mp/build/ 开启]");
             }
             log.info("[initLocalCacheIfUpdate][缓存公众号账号，数量为:{}]", accounts.size());
 

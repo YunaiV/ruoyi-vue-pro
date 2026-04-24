@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 芋道 AI 配置类
+ * deepay AI 配置类
  *
  * @author fansili
  * @since 1.0

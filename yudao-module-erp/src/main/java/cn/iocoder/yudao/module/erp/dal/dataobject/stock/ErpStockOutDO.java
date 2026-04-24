@@ -36,7 +36,7 @@ public class ErpStockOutDO extends BaseDO {
     /**
      * 客户编号
      *
-     * TODO 芋艿：待关联
+     * TODO deepay：待关联
      */
     private Long customerId;
     /**

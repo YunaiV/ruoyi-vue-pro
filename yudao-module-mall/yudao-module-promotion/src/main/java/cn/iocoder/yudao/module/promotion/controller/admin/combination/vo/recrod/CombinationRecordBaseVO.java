@@ -33,7 +33,7 @@ public class CombinationRecordBaseVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "用户昵称", example = "老芋艿")
+    @Schema(description = "用户昵称", example = "老deepay")
     private String nickname;
 
     @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xxx.jpg")

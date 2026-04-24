@@ -24,7 +24,7 @@ public class SocialUserRespVO {
     @Schema(description = "原始 Token 数据，一般是 JSON 格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
     private String rawTokenInfo;
 
-    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String nickname;
 
     @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")

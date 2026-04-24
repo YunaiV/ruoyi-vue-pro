@@ -18,7 +18,7 @@ public class AppTradeOrderItemRespVO {
 
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long spuId;
-    @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String spuName;
 
     @Schema(description = "商品 SKU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -48,7 +48,7 @@ public class AppTradeOrderItemRespVO {
 
     // ========== 营销基本信息 ==========
 
-    // TODO 芋艿：在捉摸一下
+    // TODO：在捉摸一下
 
     // ========== 售后基本信息 ==========
 

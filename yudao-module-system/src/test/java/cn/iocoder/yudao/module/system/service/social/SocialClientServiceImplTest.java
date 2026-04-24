@@ -82,12 +82,12 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
             when(authRequestFactory.get(eq("WECHAT_MP"))).thenReturn(authRequest);
             // mock 方法
             authStateUtilsMock.when(AuthStateUtils::createState).thenReturn("aoteman");
-            when(authRequest.authorize(eq("aoteman"))).thenReturn("https://www.iocoder.cn?redirect_uri=yyy");
+            when(authRequest.authorize(eq("aoteman"))).thenReturn("https://www.deepay.srl?redirect_uri=yyy");
 
             // 调用
             String url = socialClientService.getAuthorizeUrl(socialType, userType, redirectUri);
             // 断言
-            assertEquals("https://www.iocoder.cn?redirect_uri=sss", url);
+            assertEquals("https://www.deepay.srl?redirect_uri=sss", url);
         }
     }
 

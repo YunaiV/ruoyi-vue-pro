@@ -63,7 +63,7 @@ services:
         NODE_ENV:
           ENV=${NODE_ENV:-production}
           PUBLIC_PATH=${PUBLIC_PATH:-/}
-          VUE_APP_TITLE=${VUE_APP_TITLE:-芋道管理系统}
+          VUE_APP_TITLE=${VUE_APP_TITLE:-deepay}
           VUE_APP_BASE_API=${VUE_APP_BASE_API:-/prod-api}
           VUE_APP_APP_NAME=${VUE_APP_APP_NAME:-/}
           VUE_APP_TENANT_ENABLE=${VUE_APP_TENANT_ENABLE:-true}

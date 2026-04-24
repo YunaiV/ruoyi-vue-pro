@@ -47,7 +47,7 @@ import static org.mockito.Mockito.*;
  *
  * @author deepay
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import({PayJobConfiguration.class, PayNotifyServiceImpl.class, PayNotifyLockRedisDAO.class})
 public class PayNotifyServiceTest extends BaseDbUnitTest {
 

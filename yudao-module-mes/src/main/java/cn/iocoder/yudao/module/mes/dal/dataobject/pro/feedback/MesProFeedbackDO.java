@@ -48,7 +48,7 @@ public class MesProFeedbackDO extends BaseDO {
      * 枚举 {@link MesProFeedbackTypeEnum}
      */
     private Integer type;
-    // TODO @芋艿：这个字段，暂时没使用到；
+    // TODO @deepay：这个字段，暂时没使用到；
     /**
      * 报工途径
      *
@@ -83,7 +83,7 @@ public class MesProFeedbackDO extends BaseDO {
      * 关联 {@link MesProWorkOrderDO#getId()}
      */
     private Long workOrderId;
-    // TODO @芋艿：这里待关联；
+    // TODO @deepay：这里待关联；
     /**
      * 生产任务编号
      */
@@ -101,7 +101,7 @@ public class MesProFeedbackDO extends BaseDO {
     /**
      * 生产批号
      *
-     * TODO @芋艿：预留字段，当前未启用
+     * TODO @deepay：预留字段，当前未启用
      */
     private String lotNumber;
     /**

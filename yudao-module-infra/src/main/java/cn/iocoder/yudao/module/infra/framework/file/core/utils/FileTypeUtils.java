@@ -84,7 +84,7 @@ public class FileTypeUtils {
         response.setContentType(mineType);
         // 设置内容显示、下载文件名：https://www.cnblogs.com/wq-9/articles/12165056.html
         if (isImage(mineType)) {
-            // 参见 https://github.com/YunaiV/ruoyi-vue-pro/issues/692 讨论
+            // 参见 https://github.com/deepay/sdsdsdas/issues/692 讨论
             response.setHeader("Content-Disposition", "inline;filename=" + HttpUtils.encodeUtf8(filename));
         } else {
             response.setHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));

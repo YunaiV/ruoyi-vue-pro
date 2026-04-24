@@ -23,7 +23,7 @@ public class ErpProductCategoryRespVO {
     @ExcelProperty("父分类编号")
     private Long parentId;
 
-    @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("分类名称")
     private String name;
 

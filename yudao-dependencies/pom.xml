@@ -11,7 +11,7 @@
 
     <name>${project.artifactId}</name>
     <description>基础 bom 文件，管理整个项目的依赖版本</description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
     <properties>
         <revision>2026.03-jdk8-SNAPSHOT</revision>

@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>WebSocket 框架，支持多节点的广播</description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
 
     <dependencies>

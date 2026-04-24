@@ -14,7 +14,7 @@ public class AppMemberUserInfoRespVO {
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String nickname;
 
     @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xxx.png")
@@ -45,7 +45,7 @@ public class AppMemberUserInfoRespVO {
         @Schema(description = "等级编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long id;
 
-        @Schema(description = "等级名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+        @Schema(description = "等级名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
         private String name;
 
         @Schema(description = "等级", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

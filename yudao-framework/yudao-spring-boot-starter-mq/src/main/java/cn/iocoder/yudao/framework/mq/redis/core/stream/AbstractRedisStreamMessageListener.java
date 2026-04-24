@@ -69,7 +69,7 @@ public abstract class AbstractRedisStreamMessageListener<T extends AbstractRedis
             this.onMessage(messageObj);
             // ack 消息消费完成
             redisMQTemplate.getRedisTemplate().opsForStream().acknowledge(group, message);
-            // TODO 芋艿：需要额外考虑以下几个点：
+            // TODO：需要额外考虑以下几个点：
             // 1. 处理异常的情况
             // 2. 发送日志；以及事务的结合
             // 3. 消费日志；以及通用的幂等性

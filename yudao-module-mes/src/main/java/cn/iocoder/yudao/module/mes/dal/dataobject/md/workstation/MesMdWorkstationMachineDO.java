@@ -35,7 +35,7 @@ public class MesMdWorkstationMachineDO extends BaseDO {
     /**
      * 设备编号
      *
-     * TODO @芋艿：等 dv 模块，关联设备表
+     * TODO @deepay：等 dv 模块，关联设备表
      */
     private Long machineryId;
     /**

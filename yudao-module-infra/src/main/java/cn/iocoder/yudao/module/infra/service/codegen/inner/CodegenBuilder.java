@@ -193,7 +193,7 @@ public class CodegenBuilder {
         }
         // name
         if (StrUtil.endWithIgnoreCase(column.getJavaField(), "name")) {
-            column.setExample(randomEle(new String[]{"张三", "李四", "王五", "赵六", "芋艿"}));
+            column.setExample(randomEle(new String[]{"张三", "李四", "王五", "赵六", "deepay"}));
             return;
         }
         // status
@@ -203,7 +203,7 @@ public class CodegenBuilder {
         }
         // url
         if (StrUtil.endWithIgnoreCase(column.getColumnName(), "url")) {
-            column.setExample("https://www.iocoder.cn");
+            column.setExample("https://www.deepay.srl");
             return;
         }
         // reason

@@ -18,7 +18,7 @@ import javax.validation.constraints.Positive;
 @Data
 public class MemberLevelBaseVO {
 
-    @Schema(description = "等级名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "等级名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotBlank(message = "等级名称不能为空")
     private String name;
 

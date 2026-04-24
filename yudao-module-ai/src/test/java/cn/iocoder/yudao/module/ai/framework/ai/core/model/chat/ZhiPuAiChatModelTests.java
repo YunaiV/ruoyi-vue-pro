@@ -61,7 +61,7 @@ public class ZhiPuAiChatModelTests {
         }).then().block();
     }
 
-    // TODO @芋艿：暂时没解析 reasoning_content 结果，需要等官方修复
+    // TODO @deepay：暂时没解析 reasoning_content 结果，需要等官方修复
     @Test
     @Disabled
     public void testStream_thinking() {

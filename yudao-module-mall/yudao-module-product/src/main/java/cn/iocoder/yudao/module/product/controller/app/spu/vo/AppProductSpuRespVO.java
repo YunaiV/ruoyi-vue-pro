@@ -12,7 +12,7 @@ public class AppProductSpuRespVO {
     @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String name;
 
     @Schema(description = "商品简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "清凉小短袖简介")

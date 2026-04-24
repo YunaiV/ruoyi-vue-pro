@@ -46,7 +46,7 @@ public class MesWmSnDO extends BaseDO {
      * 批次号
      */
     private String batchCode;
-    // TODO @芋艿：【暂时不处理】看看后续要不要去掉这个字段。
+    // TODO @deepay：【暂时不处理】看看后续要不要去掉这个字段。
     /**
      * 生产工单编号
      *

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-blue.svg" alt="Downloads">
  <img src="https://img.shields.io/badge/Vue-3.2-blue.svg" alt="Downloads">
- <img src="https://img.shields.io/github/license/YunaiV/ruoyi-vue-pro"/>
+ <img src="https://img.shields.io/github/license/deepay/sdsdsdas"/>
 </p>
 
 **严肃声明：现在、未来都不会有商业版本，所有代码全部开源!！**
@@ -34,7 +34,7 @@
 
 | 版本                                                                  | JDK 8 + Spring Boot 2.7                                                   | JDK 17/21 + Spring Boot 3.2                                                           |
 |---------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
+| 【完整版】[sdsdsdas](https://gitee.com/zhijiantianya/sdsdsdas) | [`master`](https://gitee.com/zhijiantianya/sdsdsdas/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/sdsdsdas/tree/master-jdk17/) 分支 |
 | 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   |
 
 * 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
@@ -50,7 +50,7 @@
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
+![架构图](/.image/common/sdsdsdas-architecture.png)
 
 * Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17/21 + Spring Boot 3.2
 * 管理后台的电脑端：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
@@ -78,8 +78,8 @@
 
 | 项目                                                              | Star                                                                                                                                                                                                                                                                                             | 简介                          |
 |-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
-| [ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro)  | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro)       | 基于 Spring Boot 多模块架构        |
-| [yudao-cloud](https://gitee.com/zhijiantianya/yudao-cloud)      | [![Gitee star](https://gitee.com/zhijiantianya/yudao-cloud/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/yudao-cloud.svg?style=social&label=Stars)](https://github.com/YunaiV/yudao-cloud)               | 基于 Spring Cloud 微服务架构       |
+| [sdsdsdas](https://gitee.com/zhijiantianya/sdsdsdas)  | [![Gitee star](https://gitee.com/zhijiantianya/sdsdsdas/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/sdsdsdas) [![GitHub stars](https://img.shields.io/github/stars/deepay/sdsdsdas.svg?style=social&label=Stars)](https://github.com/deepay/sdsdsdas)       | 基于 Spring Boot 多模块架构        |
+| [yudao-cloud](https://gitee.com/zhijiantianya/yudao-cloud)      | [![Gitee star](https://gitee.com/zhijiantianya/yudao-cloud/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/deepay/yudao-cloud.svg?style=social&label=Stars)](https://github.com/deepay/yudao-cloud)               | 基于 Spring Cloud 微服务架构       |
 | [Spring-Boot-Labs](https://gitee.com/yudaocode/SpringBoot-Labs) | [![Gitee star](https://gitee.com/yudaocode/SpringBoot-Labs/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/SpringBoot-Labs.svg?style=social&label=Stars)](https://github.com/yudaocode/SpringBoot-Labs) | 系统学习 Spring Boot & Cloud 专栏 |
 
 ### 前端项目
@@ -97,7 +97,7 @@
 
 **为什么推荐使用本项目？**
 
-① 本项目采用比 Apache 2.0 更宽松的 [MIT License](https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE) 开源协议，个人与企业可 100% 免费使用，不用保留类作者、Copyright 信息。
+① 本项目采用比 Apache 2.0 更宽松的 [MIT License](https://gitee.com/zhijiantianya/sdsdsdas/blob/master/LICENSE) 开源协议，个人与企业可 100% 免费使用，不用保留类作者、Copyright 信息。
 
 ② 代码全部开源，不会像其他项目一样，只开源部分代码，让你无法了解整个项目的架构设计。[国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn)
 
@@ -117,13 +117,13 @@
 
 系统内置多种多种业务功能，可以用于快速你的业务系统：
 
-![功能分层](/.image/common/ruoyi-vue-pro-biz.png)
+![功能分层](/.image/common/sdsdsdas-biz.png)
 
 * 通用模块（必选）：系统功能、基础设施
 * 通用模块（可选）：工作流程、支付系统、数据报表、会员中心
 * 业务系统（按需）：ERP 系统、CRM 系统、MES 系统、商城系统、微信公众号、AI 大模型、IoT 物联网
 
-> 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
+> 友情提示：本项目基于 deepay-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
 > * 额外新增的功能，我们使用 🚀 标记。
 > * 重新实现的功能，我们使用 ⭐️ 标记。
@@ -336,7 +336,7 @@
 
 | 框架                                                                                          | 说明               | 版本             | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/deepay/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.23         | [文档](https://www.deepay.srl/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.7          | [文档](https://www.deepay.srl/Spring-Boot/MyBatis/?yudao)         |

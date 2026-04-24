@@ -17,7 +17,7 @@ public class IotDataRuleSaveReqVO {
     @Schema(description = "数据流转规则编号", example = "8540")
     private Long id;
 
-    @Schema(description = "数据流转规则名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "数据流转规则名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotEmpty(message = "数据流转规则名称不能为空")
     private String name;
 

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 
 /**
- * 芋道 IoT 全局配置类
+ * deepay IoT 全局配置类
  *
  * @author deepay
  */

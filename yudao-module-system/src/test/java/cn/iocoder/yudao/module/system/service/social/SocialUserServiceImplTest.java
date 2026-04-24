@@ -257,7 +257,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         SocialUserDO dbSocialUser = randomPojo(SocialUserDO.class, o -> { // 等会查询到
             o.setType(SocialTypeEnum.GITEE.getType());
-            o.setNickname("芋艿");
+            o.setNickname("deepay");
             o.setOpenid("yudaoyuanma");
             o.setCreateTime(buildTime(2020, 1, 15));
         });

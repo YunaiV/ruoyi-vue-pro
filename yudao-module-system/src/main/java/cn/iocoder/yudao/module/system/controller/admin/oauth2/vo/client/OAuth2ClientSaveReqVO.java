@@ -50,7 +50,7 @@ public class OAuth2ClientSaveReqVO {
     @NotNull(message = "刷新令牌的有效期不能为空")
     private Integer refreshTokenValiditySeconds;
 
-    @Schema(description = "可重定向的 URI 地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "可重定向的 URI 地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl")
     @NotNull(message = "可重定向的 URI 地址不能为空")
     private List<@NotEmpty(message = "重定向的 URI 不能为空") @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
 

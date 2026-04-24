@@ -143,7 +143,7 @@ public class SchedulerManager {
     private void validateScheduler() {
         if (scheduler == null) {
             throw exception0(NOT_IMPLEMENTED.getCode(),
-                    "[定时任务 - 已禁用][参考 https://doc.iocoder.cn/job/ 开启]");
+                    "[定时任务 - 已禁用][参考 https://admin.deepay.srl/job/ 开启]");
         }
     }
 

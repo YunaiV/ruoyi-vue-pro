@@ -82,7 +82,7 @@ public class MesProCardProcessDO extends BaseDO {
     /**
      * 过程检验单编号
      *
-     * TODO @芋艿：关联 mes_qc_ipqc 表，等 IPQC 模块迁移后再对接
+     * TODO @deepay：关联 mes_qc_ipqc 表，等 IPQC 模块迁移后再对接
      */
     private Long ipqcId;
     /**

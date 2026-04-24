@@ -93,7 +93,7 @@ public class BargainHelpServiceImpl implements BargainHelpService {
         return help;
     }
 
-    // TODO 芋艿：优化点：实现一个更随机的逻辑，可以按照你自己的业务；
+    // TODO：优化点：实现一个更随机的逻辑，可以按照你自己的业务；
     private Integer calculateReducePrice(BargainActivityDO activity, BargainRecordDO record) {
         // 1. 随机金额
         Integer reducePrice = MathUtil.randomInt(activity.getBargainMinPrice(),

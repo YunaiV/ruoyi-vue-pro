@@ -17,7 +17,7 @@ public class CrmOperateLogRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long userId;
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String userName;
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

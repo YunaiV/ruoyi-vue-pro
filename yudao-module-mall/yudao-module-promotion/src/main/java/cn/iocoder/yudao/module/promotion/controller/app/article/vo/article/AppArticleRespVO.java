@@ -12,10 +12,10 @@ public class AppArticleRespVO {
     @Schema(description = "文章编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "文章标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码 - 促销模块")
+    @Schema(description = "文章标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay - 促销模块")
     private String title;
 
-    @Schema(description = "文章作者", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "文章作者", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String author;
 
     @Schema(description = "分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2048")

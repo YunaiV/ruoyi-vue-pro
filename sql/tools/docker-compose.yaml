@@ -35,7 +35,7 @@ services:
         environment:
             POSTGRES_USER: root
             POSTGRES_PASSWORD: 123456
-            POSTGRES_DB: ruoyi-vue-pro
+            POSTGRES_DB: sdsdsdas
         ports:
             - "5432:5432"
         volumes:
@@ -104,7 +104,7 @@ services:
             - "5236:5236"
         volumes:
             - dm8:/opt/dmdbms/data
-            - ../dm/ruoyi-vue-pro-dm8.sql:/tmp/schema.sql:ro
+            - ../dm/sdsdsdas-dm8.sql:/tmp/schema.sql:ro
 
     kingbase:
         image: kingbase_v009r001c001b0025_single_x86:v1

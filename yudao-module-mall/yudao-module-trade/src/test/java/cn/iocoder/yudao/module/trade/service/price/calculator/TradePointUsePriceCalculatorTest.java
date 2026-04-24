@@ -22,13 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-// TODO 芋艿：晚点 review
+// TODO：晚点 review
 /**
  * {@link TradePointUsePriceCalculator } 的单元测试类
  *
  * @author owen
  */
-@Disabled // TODO 芋艿：后续修复
+@Disabled // TODO：后续修复
 public class TradePointUsePriceCalculatorTest extends BaseMockitoUnitTest {
 
     @InjectMocks

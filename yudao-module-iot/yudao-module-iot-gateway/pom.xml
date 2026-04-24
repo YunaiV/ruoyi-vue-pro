@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <!-- TODO @芋艿：消息队列，后续可能去掉，默认不使用 rocketmq -->
+            <!-- TODO @deepay：消息队列，后续可能去掉，默认不使用 rocketmq -->
             <optional>true</optional>
         </dependency>
 

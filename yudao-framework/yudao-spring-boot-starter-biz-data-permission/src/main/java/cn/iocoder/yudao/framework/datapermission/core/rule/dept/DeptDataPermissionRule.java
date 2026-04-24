@@ -128,7 +128,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         Expression deptExpression = buildDeptExpression(tableName,tableAlias, deptDataPermission.getDeptIds());
         Expression userExpression = buildUserExpression(tableName, tableAlias, deptDataPermission.getSelf(), loginUser.getId());
         if (deptExpression == null && userExpression == null) {
-            // TODO 芋艿：获得不到条件的时候，暂时不抛出异常，而是不返回数据
+            // TODO：获得不到条件的时候，暂时不抛出异常，而是不返回数据
             log.warn("[getExpression][LoginUser({}) Table({}/{}) DeptDataPermission({}) 构建的条件为空]",
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
 //            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",

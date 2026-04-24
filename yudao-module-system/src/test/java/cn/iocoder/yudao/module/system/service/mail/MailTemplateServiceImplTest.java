@@ -115,7 +115,7 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         });
         mailTemplateMapper.insert(dbMailTemplate);
         // 测试 name 不匹配
-        mailTemplateMapper.insert(cloneIgnoreId(dbMailTemplate, o -> o.setName("芋道")));
+        mailTemplateMapper.insert(cloneIgnoreId(dbMailTemplate, o -> o.setName("deepay")));
         // 测试 code 不匹配
         mailTemplateMapper.insert(cloneIgnoreId(dbMailTemplate, o -> o.setCode("test_02")));
         // 测试 accountId 不匹配

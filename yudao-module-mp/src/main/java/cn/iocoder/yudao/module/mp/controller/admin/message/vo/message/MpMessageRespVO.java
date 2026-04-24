@@ -61,7 +61,7 @@ public class MpMessageRespVO {
     @Schema(description = "缩略图的媒体 URL 消息类型为 video、music 时，才有值", example = "https://www.deepay.srl/xxx.png")
     private String thumbMediaUrl;
 
-    @Schema(description = "点击图文消息跳转链接 消息类型为 link 时，才有值", example = "https://www.iocoder.cn")
+    @Schema(description = "点击图文消息跳转链接 消息类型为 link 时，才有值", example = "https://www.deepay.srl")
     private String url;
 
     @Schema(description = "地理位置维度 消息类型为 location 时，才有值", example = "23.137466")

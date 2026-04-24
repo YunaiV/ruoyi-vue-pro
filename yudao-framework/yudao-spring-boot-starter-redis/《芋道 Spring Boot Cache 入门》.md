@@ -1,1 +1,1 @@
-<http://www.iocoder.cn/Spring-Boot/Cache/?yudao>
+<http://www.deepay.srl/Spring-Boot/Cache/?yudao>

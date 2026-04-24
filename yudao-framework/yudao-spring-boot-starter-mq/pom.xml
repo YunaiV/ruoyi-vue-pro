@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>消息队列，支持 Redis、RocketMQ、RabbitMQ、Kafka 四种</description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
     <dependencies>
         <!-- DB 相关 -->

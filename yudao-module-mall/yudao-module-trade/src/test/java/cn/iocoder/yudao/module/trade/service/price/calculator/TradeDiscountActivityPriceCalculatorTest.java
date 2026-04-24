@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
  *
  * @author deepay
  */
-@Disabled // TODO 芋艿：后续修复
+@Disabled // TODO：后续修复
 public class TradeDiscountActivityPriceCalculatorTest extends BaseMockitoUnitTest {
 
     @InjectMocks

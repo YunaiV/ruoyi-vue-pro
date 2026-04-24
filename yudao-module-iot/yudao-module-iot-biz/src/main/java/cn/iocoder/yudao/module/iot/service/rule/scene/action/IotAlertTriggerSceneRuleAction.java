@@ -54,10 +54,10 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
     }
 
     private void sendAlertMessage(IotAlertConfigDO config, IotDeviceMessage deviceMessage) {
-        // TODO @芋艿：等场景联动开发完，再实现
-        // TODO @芋艿：短信
-        // TODO @芋艿：邮箱
-        // TODO @芋艿：站内信
+        // TODO @deepay：等场景联动开发完，再实现
+        // TODO @deepay：短信
+        // TODO @deepay：邮箱
+        // TODO @deepay：站内信
     }
 
     @Override

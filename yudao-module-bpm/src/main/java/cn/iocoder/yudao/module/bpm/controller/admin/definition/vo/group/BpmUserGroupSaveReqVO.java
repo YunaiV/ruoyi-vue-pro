@@ -13,11 +13,11 @@ public class BpmUserGroupSaveReqVO {
     @Schema(description = "编号", example = "1024")
     private Long id;
 
-    @Schema(description = "组名", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "组名", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotNull(message = "组名不能为空")
     private String name;
 
-    @Schema(description = "描述", example = "芋道源码")
+    @Schema(description = "描述", example = "deepay")
     private String description;
 
     @Schema(description = "成员编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")

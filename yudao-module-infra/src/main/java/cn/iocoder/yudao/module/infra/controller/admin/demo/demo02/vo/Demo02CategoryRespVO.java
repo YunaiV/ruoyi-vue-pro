@@ -16,7 +16,7 @@ public class Demo02CategoryRespVO {
     @ExcelProperty("编号")
     private Long id;
 
-    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("名字")
     private String name;
 

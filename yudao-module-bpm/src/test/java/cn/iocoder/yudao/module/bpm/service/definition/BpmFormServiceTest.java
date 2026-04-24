@@ -117,14 +117,14 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     public void testGetFormPage() {
         // mock 数据
         BpmFormDO dbForm = randomPojo(BpmFormDO.class, o -> { // 等会查询到
-            o.setName("芋道源码");
+            o.setName("deepay");
         });
         formMapper.insert(dbForm);
         // 测试 name 不匹配
         formMapper.insert(cloneIgnoreId(dbForm, o -> o.setName("源码")));
         // 准备参数
         BpmFormPageReqVO reqVO = new BpmFormPageReqVO();
-        reqVO.setName("芋道");
+        reqVO.setName("deepay");
 
         // 调用
         PageResult<BpmFormDO> pageResult = formService.getFormPage(reqVO);

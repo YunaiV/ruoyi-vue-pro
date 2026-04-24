@@ -26,7 +26,7 @@ public class MpUserRespVO  {
     @Schema(description = "取消关注时间")
     private LocalDateTime unsubscribeTime;
 
-    @Schema(description = "昵称", example = "芋道")
+    @Schema(description = "昵称", example = "deepay")
     private String nickname;
     @Schema(description = "头像地址", example = "https://www.deepay.srl/1.png")
     private String headImageUrl;

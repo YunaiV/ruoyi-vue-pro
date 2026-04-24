@@ -18,7 +18,7 @@ public class ErpProductUnitRespVO {
     @ExcelProperty("单位编号")
     private Long id;
 
-    @Schema(description = "单位名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "单位名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("单位名字")
     private String name;
 

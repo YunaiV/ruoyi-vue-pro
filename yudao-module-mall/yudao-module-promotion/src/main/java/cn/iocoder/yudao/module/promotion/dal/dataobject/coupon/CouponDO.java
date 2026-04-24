@@ -52,7 +52,7 @@ public class CouponDO extends BaseDO {
      */
     private Integer status;
 
-    // TODO 芋艿：发放 adminid？
+    // TODO：发放 adminid？
 
     // ========== 基本信息 END ==========
 

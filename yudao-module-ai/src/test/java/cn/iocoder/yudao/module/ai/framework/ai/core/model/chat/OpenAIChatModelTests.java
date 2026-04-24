@@ -67,7 +67,7 @@ public class OpenAIChatModelTests {
         }).then().block();
     }
 
-    // TODO @芋艿：无法触发思考的字段返回，需要 response api：https://github.com/spring-projects/spring-ai/issues/2962
+    // TODO @deepay：无法触发思考的字段返回，需要 response api：https://github.com/spring-projects/spring-ai/issues/2962
     @Test
     @Disabled
     public void testStream_thinking() {

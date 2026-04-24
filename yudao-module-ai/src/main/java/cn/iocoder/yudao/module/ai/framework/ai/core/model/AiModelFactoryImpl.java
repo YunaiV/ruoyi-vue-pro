@@ -519,7 +519,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AzureOpenAiChatAutoConfiguration}
      */
     private static AzureOpenAiChatModel buildAzureOpenAiChatModel(String apiKey, String url) {
-        // TODO @芋艿：使用前，请测试，暂时没密钥！！！
+        // TODO @deepay：使用前，请测试，暂时没密钥！！！
         OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
                 .endpoint(url).credential(new KeyCredential(apiKey));
         return AzureOpenAiChatModel.builder()
@@ -666,7 +666,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AzureOpenAiEmbeddingAutoConfiguration} 的 azureOpenAiEmbeddingModel 方法
      */
     private AzureOpenAiEmbeddingModel buildAzureOpenAiEmbeddingModel(String apiKey, String url, String model) {
-        // TODO @芋艿：手头暂时没密钥，使用建议再测试下
+        // TODO @deepay：手头暂时没密钥，使用建议再测试下
         AzureOpenAiEmbeddingAutoConfiguration azureOpenAiAutoConfiguration = new AzureOpenAiEmbeddingAutoConfiguration();
         // 创建 OpenAIClientBuilder 对象
         OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()

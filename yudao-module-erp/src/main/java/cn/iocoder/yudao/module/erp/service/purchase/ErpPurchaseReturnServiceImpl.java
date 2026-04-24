@@ -36,7 +36,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
-// TODO 芋艿：记录操作日志
+// TODO：记录操作日志
 
 /**
  * ERP 采购退货 Service 实现类

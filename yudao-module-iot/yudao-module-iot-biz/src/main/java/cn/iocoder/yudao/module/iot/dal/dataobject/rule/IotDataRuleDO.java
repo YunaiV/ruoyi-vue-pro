@@ -66,7 +66,7 @@ public class IotDataRuleDO extends BaseDO {
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> sinkIds;
 
-    // TODO @芋艿：未来考虑使用 groovy；支持数据处理；
+    // TODO @deepay：未来考虑使用 groovy；支持数据处理；
 
     /**
      * 数据源配置

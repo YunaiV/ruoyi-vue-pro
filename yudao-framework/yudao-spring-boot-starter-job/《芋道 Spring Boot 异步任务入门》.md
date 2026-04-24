@@ -1,1 +1,1 @@
-<http://www.iocoder.cn/Spring-Boot/Async-Job/?yudao>
+<http://www.deepay.srl/Spring-Boot/Async-Job/?yudao>

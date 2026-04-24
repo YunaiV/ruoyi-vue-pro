@@ -146,7 +146,7 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testGetMenuList() {
         // mock 数据
-        MenuDO menuDO = randomPojo(MenuDO.class, o -> o.setName("芋艿").setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        MenuDO menuDO = randomPojo(MenuDO.class, o -> o.setName("deepay").setStatus(CommonStatusEnum.ENABLE.getStatus()));
         menuMapper.insert(menuDO);
         // 测试 status 不匹配
         menuMapper.insert(cloneIgnoreId(menuDO, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));

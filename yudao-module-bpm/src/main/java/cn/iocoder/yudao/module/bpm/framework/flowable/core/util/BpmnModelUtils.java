@@ -123,7 +123,7 @@ public class BpmnModelUtils {
     public static Integer parseCandidateStrategy(FlowElement userTask) {
         Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
-        // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
+        // TODO @deepay 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
         if (candidateStrategy == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
             candidateStrategy = element != null ? NumberUtils.parseInt(element.getElementText()) : null;

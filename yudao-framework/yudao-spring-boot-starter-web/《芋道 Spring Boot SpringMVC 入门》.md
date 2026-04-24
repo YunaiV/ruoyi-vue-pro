@@ -1,1 +1,1 @@
-<http://www.iocoder.cn/Spring-Boot/SpringMVC/?yudao>
+<http://www.deepay.srl/Spring-Boot/SpringMVC/?yudao>

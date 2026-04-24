@@ -45,7 +45,7 @@ public class DataPermissionRuleFactoryImpl implements DataPermissionRuleFactory 
         if (!dataPermission.enable()) {
             return Collections.emptyList();
         }
-        // 1.4 特殊：数据翻译时，强制忽略数据权限 https://github.com/YunaiV/ruoyi-vue-pro/issues/1007
+        // 1.4 特殊：数据翻译时，强制忽略数据权限 https://github.com/deepay/sdsdsdas/issues/1007
         if (isTranslateCall()) {
             return Collections.emptyList();
         }

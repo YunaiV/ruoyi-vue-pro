@@ -35,7 +35,7 @@ public class CrmPermissionRespVO {
     @NotNull(message = "权限级别不能为空")
     private Integer level;
 
-    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String nickname;
 
     @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "研发部")

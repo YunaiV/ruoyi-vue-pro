@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  *
  * 文档：<a href="https://pay.weixin.qq.com/wiki/doc/apiv3/open/pay/chapter2_5_3.shtml">App 支付</a>
  *
- * // TODO 芋艿：未详细测试，因为手头没 App
+ * // TODO：未详细测试，因为手头没 App
  *
  * @author deepay
  */

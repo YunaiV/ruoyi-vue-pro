@@ -41,6 +41,6 @@
             2. 业务组件：和业务相关的组件的封装，例如说数据字典、操作日志等等。
         如果是业务组件，Maven 名字会包含 biz
     </description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
 </project>

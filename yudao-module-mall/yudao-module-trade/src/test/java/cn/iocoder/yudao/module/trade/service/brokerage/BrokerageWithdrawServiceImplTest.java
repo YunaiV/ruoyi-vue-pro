@@ -21,13 +21,13 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// TODO 芋艿：后续 review
+// TODO：后续 review
 /**
  * {@link BrokerageWithdrawServiceImpl} 的单元测试类
  *
  * @author deepay
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import(BrokerageWithdrawServiceImpl.class)
 public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
 

@@ -14,7 +14,7 @@
     <name>${project.artifactId}</name>
     <description>
         物联网 模块，主要实现 产品管理、设备管理、协议管理等功能。
-                <!-- TODO 芋艿：后续补充下 -->
+                <!-- TODO deepay：后续补充下 -->
     </description>
 
     <dependencies>
@@ -85,7 +85,7 @@
         </dependency>
 
         <!-- 消息队列相关 -->
-        <!-- TODO @芋艿：临时打开 -->
+        <!-- TODO @deepay：临时打开 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>

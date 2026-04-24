@@ -145,7 +145,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         }
 
         // 1. 根据物模型，拼接合法的属性
-        // TODO @芋艿：【待定 004】赋能后，属性到底以 thingModel 为准（ik），还是 db 的表结构为准（tl）？
+        // TODO @deepay：【待定 004】赋能后，属性到底以 thingModel 为准（ik），还是 db 的表结构为准（tl）？
         List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductIdFromCache(device.getProductId());
         Map<String, Object> properties = new HashMap<>();
         params.forEach((key, value) -> {

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  *
  * @author deepay
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import(AfterSaleServiceImpl.class)
 public class AfterSaleServiceTest extends BaseDbUnitTest {
 
@@ -120,7 +120,7 @@ public class AfterSaleServiceTest extends BaseDbUnitTest {
             o.setWay(AfterSaleWayEnum.RETURN_AND_REFUND.getWay());
             o.setType(AfterSaleTypeEnum.IN_SALE.getType());
             o.setOrderNo("202211190847450020500011");
-            o.setSpuName("芋艿");
+            o.setSpuName("deepay");
             o.setCreateTime(buildTime(2022, 1, 15));
         });
         tradeAfterSaleMapper.insert(dbAfterSale);

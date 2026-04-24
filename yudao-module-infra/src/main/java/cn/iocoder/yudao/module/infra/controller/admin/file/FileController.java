@@ -112,8 +112,8 @@ public class FileController {
             throw new IllegalArgumentException("结尾的 path 路径必须传递");
         }
         // 解码，解决中文路径的问题
-        // https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/807/
-        // https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1432/
+        // https://gitee.com/zhijiantianya/sdsdsdas/pulls/807/
+        // https://gitee.com/zhijiantianya/sdsdsdas/pulls/1432/
         path = URLUtil.decode(path, StandardCharsets.UTF_8, false);
 
         // 读取内容
