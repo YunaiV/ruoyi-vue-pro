@@ -19,6 +19,13 @@ import java.util.concurrent.ThreadPoolExecutor;
  *   keepAliveSeconds = 60 — 空闲线程存活时间
  *   rejectedPolicy = CallerRunsPolicy — 队列满时由调用线程执行，降级而非抛错
  * </pre>
+ *
+ * <p>Bean 名称说明：
+ * <ul>
+ *   <li>{@code taskExecutor}       — 原有 AI 生成任务</li>
+ *   <li>{@code deepayAsyncExecutor} — SSE 流式推送任务（别名同一实例）</li>
+ * </ul>
+ * </p>
  */
 @Configuration
 @EnableAsync
@@ -37,6 +44,23 @@ public class DeepayAsyncConfig {
         // 队列满时由调用线程执行（降级），防止请求被直接丢弃
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
+        executor.initialize();
+        return executor;
+    }
+
+    /**
+     * SSE 流式推送线程池（与 taskExecutor 共享配置，独立命名以便监控）。
+     * {@link cn.iocoder.yudao.module.deepay.service.AiChatStreamService} 使用此 executor。
+     */
+    @Bean("deepayAsyncExecutor")
+    public Executor deepayAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(20);
+        executor.setMaxPoolSize(100);
+        executor.setQueueCapacity(200);
+        executor.setKeepAliveSeconds(60);
+        executor.setThreadNamePrefix("deepay-sse-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }
