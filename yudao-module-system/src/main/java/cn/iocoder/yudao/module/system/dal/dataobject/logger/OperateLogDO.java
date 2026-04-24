@@ -10,7 +10,7 @@ import lombok.Data;
 /**
  * 操作日志表
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "system_operate_log", autoResultMap = true)
 @KeySequence("system_operate_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -55,7 +55,7 @@ public class OperateLogDO extends BaseDO {
     /**
      * 日志内容，记录整个操作的明细
      *
-     * 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
+     * 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从deepay改成源码。
      */
     private String action;
     /**

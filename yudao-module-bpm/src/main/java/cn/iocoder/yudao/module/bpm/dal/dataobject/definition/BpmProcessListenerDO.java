@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
  *
  * 目的：本质上它是流程监听器的模版，用于 BPMN 在设计时，直接选择这些模版
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "bpm_process_listener")
 @KeySequence("bpm_process_listener_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

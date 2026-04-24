@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * 基于 RocketMQ 的 {@link IotMessageBus} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -55,7 +55,7 @@ public class IotRocketMQMessageBus implements IotMessageBus {
 
     @Override
     public void post(String topic, Object message) {
-        // TODO @芋艿：需要 orderly！
+        // TODO @deepay：需要 orderly！
         SendResult result = rocketMQTemplate.syncSend(topic, JsonUtils.toJsonString(message));
         log.info("[post][topic({}) 发送消息({}) result({})]", topic, message, result);
     }

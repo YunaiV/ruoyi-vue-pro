@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * JSON 格式的 WebSocket 消息帧
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class JsonWebSocketMessage implements Serializable {

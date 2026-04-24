@@ -22,7 +22,7 @@ import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 
-// TODO @芋艿：单测的 review，等逻辑都达成一致后
+// TODO @deepay：单测的 review，等逻辑都达成一致后
 /**
  * {@link MemberAuthService} 的单元测试类
  *
@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 @Import({MemberAuthServiceImpl.class, YudaoRedisAutoConfiguration.class})
 public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 
-    // TODO @芋艿：登录相关的单测，待补全
+    // TODO @deepay：登录相关的单测，待补全
 
     @Resource
     private MemberAuthServiceImpl authService;
@@ -52,7 +52,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private MemberUserMapper memberUserMapper;
 
-    // TODO 芋艿：后续重构这个单测
+    // TODO：后续重构这个单测
 //    @Test
 //    public void testUpdatePassword_success(){
 //        // 准备参数
@@ -78,7 +78,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 //        assertEquals(memberUserMapper.selectById(userDO.getId()).getPassword(),newPassword);
 //    }
 
-    // TODO 芋艿：后续重构这个单测
+    // TODO：后续重构这个单测
 //    @Test
 //    public void testResetPassword_success(){
 //        // 准备参数

@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * MES 盘点方案 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesWmStockTakingPlanService {
 

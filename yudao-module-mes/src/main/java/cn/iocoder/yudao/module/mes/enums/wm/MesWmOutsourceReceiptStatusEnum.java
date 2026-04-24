@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * 对应字典 mes_wm_outsource_receipt_status
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

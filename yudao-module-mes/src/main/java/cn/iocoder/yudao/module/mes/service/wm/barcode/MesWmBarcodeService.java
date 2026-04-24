@@ -10,7 +10,7 @@ import javax.validation.Valid;
 /**
  * MES 条码清单 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesWmBarcodeService {
 

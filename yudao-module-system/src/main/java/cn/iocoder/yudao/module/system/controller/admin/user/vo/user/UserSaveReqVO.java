@@ -28,7 +28,7 @@ public class UserSaveReqVO {
     @DiffLogField(name = "用户账号")
     private String username;
 
-    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @Size(max = 30, message = "用户昵称长度不能超过30个字符")
     @DiffLogField(name = "用户昵称")
     private String nickname;
@@ -45,7 +45,7 @@ public class UserSaveReqVO {
     @DiffLogField(name = "岗位", function = PostParseFunction.NAME)
     private Set<Long> postIds;
 
-    @Schema(description = "用户邮箱", example = "yudao@iocoder.cn")
+    @Schema(description = "用户邮箱", example = "yudao@deepay.srl")
     @Email(message = "邮箱格式不正确")
     @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
     @DiffLogField(name = "用户邮箱")
@@ -60,7 +60,7 @@ public class UserSaveReqVO {
     @DiffLogField(name = "用户性别", function = SexParseFunction.NAME)
     private Integer sex;
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     @DiffLogField(name = "用户头像")
     private String avatar;
 

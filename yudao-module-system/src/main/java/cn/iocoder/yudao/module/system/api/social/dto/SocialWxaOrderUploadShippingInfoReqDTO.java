@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
  * 小程序订单上传购物详情
  *
  * @see <a href="https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/shopping-order/normal-shopping-detail/uploadShoppingInfo.html">上传购物详情</a>
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class SocialWxaOrderUploadShippingInfoReqDTO {

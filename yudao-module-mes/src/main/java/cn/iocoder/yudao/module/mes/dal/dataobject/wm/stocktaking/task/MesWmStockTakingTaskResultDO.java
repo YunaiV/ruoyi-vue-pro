@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 /**
  * MES 盘点结果 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_stock_taking_task_result")
 @KeySequence("mes_wm_stock_taking_task_result_seq")

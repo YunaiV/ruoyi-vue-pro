@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVIC
 /**
  * IoT 设备消息 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Slf4j

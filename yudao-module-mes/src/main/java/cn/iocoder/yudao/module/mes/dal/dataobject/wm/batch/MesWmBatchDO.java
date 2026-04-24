@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 /**
  * 批次管理 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_batch")
 @KeySequence("mes_wm_batch_seq")

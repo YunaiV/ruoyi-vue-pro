@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseListenerConfig;
 
-// TODO @芋艿：可能会想换个包地址
+// TODO @deepay：可能会想换个包地址
 /**
  * BPM 用户任务通用监听器
  *
@@ -43,7 +43,7 @@ public class BpmUserTaskListener implements TaskListener {
         BpmSimpleModelNodeVO.ListenerHandler listenerHandler = parseListenerConfig(listenerConfig);
 
         // 2. 发起请求
-        // TODO @芋艿：哪些默认参数，后续再调研下；感觉可以搞个 task 字段，把整个 delegateTask 放进去；
+        // TODO @deepay：哪些默认参数，后续再调研下；感觉可以搞个 task 字段，把整个 delegateTask 放进去；
         listenerHandler.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam().setKey("processInstanceId")
                 .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(delegateTask.getProcessInstanceId()));
         listenerHandler.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam().setKey("assignee")
@@ -55,6 +55,6 @@ public class BpmUserTaskListener implements TaskListener {
         BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
                 listenerHandler.getPath(), listenerHandler.getHeader(), listenerHandler.getBody(), false, null);
 
-        // 3. 是否需要后续操作？TODO 芋艿：待定！
+        // 3. 是否需要后续操作？TODO deepay：待定！
     }
 }

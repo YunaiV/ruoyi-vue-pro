@@ -37,7 +37,7 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.USER_UPDATE_TA
 /**
  * 微信公众号粉丝 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

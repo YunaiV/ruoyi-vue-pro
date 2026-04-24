@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * MES 发货通知单状态枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public enum MesWmSalesNoticeStatusEnum implements ArrayValuable<Integer> {
      * 对应 MesWmSalesNoticeService#submitSalesNotice 方法
      */
     APPROVED(MesOrderStatusConstants.APPROVED, "待出库");
-    // TODO @芋艿：【对齐】暂时无后续流程，看看后续要怎么支持下。
+    // TODO @deepay：【对齐】暂时无后续流程，看看后续要怎么支持下。
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(MesWmSalesNoticeStatusEnum::getStatus).toArray(Integer[]::new);
 

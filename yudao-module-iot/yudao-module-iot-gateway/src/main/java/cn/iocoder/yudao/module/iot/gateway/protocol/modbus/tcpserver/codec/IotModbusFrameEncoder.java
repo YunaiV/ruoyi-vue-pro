@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * IoT Modbus 帧编码器：负责将 Modbus 请求/响应编码为字节数组，支持 MODBUS_TCP（MBAP）和 MODBUS_RTU（CRC16）两种帧格式。
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j

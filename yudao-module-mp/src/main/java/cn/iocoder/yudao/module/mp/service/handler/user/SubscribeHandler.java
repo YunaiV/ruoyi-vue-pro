@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 关注的事件处理器
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Slf4j

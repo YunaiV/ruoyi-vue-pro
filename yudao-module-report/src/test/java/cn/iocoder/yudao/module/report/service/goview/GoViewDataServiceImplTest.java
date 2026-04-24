@@ -40,7 +40,7 @@ public class GoViewDataServiceImplTest extends BaseDbUnitTest {
         // mock 数据明细
         when(sqlRowSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         when(sqlRowSet.getObject("id")).thenReturn(1L).thenReturn(2L);
-        when(sqlRowSet.getObject("name")).thenReturn("芋道源码").thenReturn("芋道");
+        when(sqlRowSet.getObject("name")).thenReturn("deepay").thenReturn("deepay");
 
         // 调用
         GoViewDataRespVO dataBySQL = goViewDataService.getDataBySQL(sql);
@@ -49,10 +49,10 @@ public class GoViewDataServiceImplTest extends BaseDbUnitTest {
         assertEquals(2, dataBySQL.getDimensions().size());
         assertEquals(2, dataBySQL.getSource().get(0).size());
         assertEquals(1L, dataBySQL.getSource().get(0).get("id"));
-        assertEquals("芋道源码", dataBySQL.getSource().get(0).get("name"));
+        assertEquals("deepay", dataBySQL.getSource().get(0).get("name"));
         assertEquals(2, dataBySQL.getSource().get(1).size());
         assertEquals(2L, dataBySQL.getSource().get(1).get("id"));
-        assertEquals("芋道", dataBySQL.getSource().get(1).get("name"));
+        assertEquals("deepay", dataBySQL.getSource().get(1).get("name"));
     }
 
 }

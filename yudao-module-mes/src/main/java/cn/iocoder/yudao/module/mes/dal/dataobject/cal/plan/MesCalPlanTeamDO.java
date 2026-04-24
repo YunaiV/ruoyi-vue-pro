@@ -10,7 +10,7 @@ import lombok.*;
 /**
  * MES 计划班组关联 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_cal_plan_team")
 @KeySequence("mes_cal_plan_team_seq")

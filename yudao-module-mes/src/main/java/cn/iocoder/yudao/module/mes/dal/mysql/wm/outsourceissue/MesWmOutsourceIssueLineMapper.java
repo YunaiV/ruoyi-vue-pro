@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 外协发料单行 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmOutsourceIssueLineMapper extends BaseMapperX<MesWmOutsourceIssueLineDO> {

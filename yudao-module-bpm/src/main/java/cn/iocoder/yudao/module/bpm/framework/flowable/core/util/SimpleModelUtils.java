@@ -208,7 +208,7 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeTypeEnum nodeType = BpmSimpleModelNodeTypeEnum.valueOf(node.getType());
         BpmSimpleModelNodeVO childNode = node.getChildNode();
         List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
-        // TODO @芋艿 路由分支没有conditionNodes 这里注释会影响吗？@jason：一起帮忙瞅瞅！
+        // TODO @deepay 路由分支没有conditionNodes 这里注释会影响吗？@jason：一起帮忙瞅瞅！
 //        Assert.notEmpty(conditionNodes, "分支节点的条件节点不能为空");
         // 分支终点节点 ID
         String branchEndNodeId = null;
@@ -277,8 +277,8 @@ public class SimpleModelUtils {
                                                       String conditionExpression) {
         Assert.notEmpty(sourceId, "sourceId 不能为空");
         Assert.notEmpty(targetId, "targetId 不能为空");
-        // TODO @jason：如果 sequenceFlowId 不存在的时候，是不是要生成一个默认的 sequenceFlowId？ @芋艿： 貌似不需要,Flowable 会默认生成；TODO @jason：建议还是搞一个，主要是后续好排查问题。
-        // TODO @jason：如果 name 不存在的时候，是不是要生成一个默认的 name？ @芋艿： 不需要生成默认的吧？ 这个会在流程图展示的， 一般用户填写的。不好生成默认的吧；TODO @jason：建议还是搞一个，主要是后续好排查问题。
+        // TODO @jason：如果 sequenceFlowId 不存在的时候，是不是要生成一个默认的 sequenceFlowId？ @deepay： 貌似不需要,Flowable 会默认生成；TODO @jason：建议还是搞一个，主要是后续好排查问题。
+        // TODO @jason：如果 name 不存在的时候，是不是要生成一个默认的 name？ @deepay： 不需要生成默认的吧？ 这个会在流程图展示的， 一般用户填写的。不好生成默认的吧；TODO @jason：建议还是搞一个，主要是后续好排查问题。
         SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
         if (StrUtil.isNotEmpty(sequenceFlowId)) {
             sequenceFlow.setId(sequenceFlowId);
@@ -341,7 +341,7 @@ public class SimpleModelUtils {
             EndEvent endEvent = new EndEvent();
             endEvent.setId(node.getId());
             endEvent.setName(node.getName());
-            // TODO @芋艿 + jason：要不要加一个终止定义？
+            // TODO @deepay + jason：要不要加一个终止定义？
             return endEvent;
         }
 
@@ -369,7 +369,7 @@ public class SimpleModelUtils {
             // 添加操作按钮配置属性元素
             addButtonsSetting(node.getButtonsSetting(), userTask);
             // 使用自动通过策略
-            // TODO @芋艿 复用了SKIP， 是否需要新加一个策略；TODO @芋艿：【回复】是不是应该类似飞书，搞个草稿状态。待定；还有一种策略，不标记自动通过，而是首次发起后，第一个节点，自动通过；
+            // TODO @deepay 复用了SKIP， 是否需要新加一个策略；TODO @deepay：【回复】是不是应该类似飞书，搞个草稿状态。待定；还有一种策略，不标记自动通过，而是首次发起后，第一个节点，自动通过；
             addAssignStartUserHandlerType(BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType(), userTask);
             return userTask;
         }

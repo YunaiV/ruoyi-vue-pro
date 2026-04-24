@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * IoT Modbus TCP Client 轮询调度器：管理点位的轮询定时器，调度读取任务并上报结果
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollScheduler {

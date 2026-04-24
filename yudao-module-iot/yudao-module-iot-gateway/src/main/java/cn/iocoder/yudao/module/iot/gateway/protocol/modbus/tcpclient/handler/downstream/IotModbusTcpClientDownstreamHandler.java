@@ -21,7 +21,7 @@ import java.util.Map;
  * 1. 处理下行消息（如属性设置 thing.service.property.set）
  * 2. 将属性值转换为 Modbus 写指令，通过 TCP 连接发送给设备
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Slf4j

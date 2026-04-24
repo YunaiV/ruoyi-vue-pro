@@ -26,7 +26,7 @@ public class MailAccountSaveReqVO {
     @NotNull(message = "密码必填")
     private String password;
 
-    @Schema(description = "SMTP 服务器域名", requiredMode = Schema.RequiredMode.REQUIRED, example = "www.iocoder.cn")
+    @Schema(description = "SMTP 服务器域名", requiredMode = Schema.RequiredMode.REQUIRED, example = "www.deepay.srl")
     @NotNull(message = "SMTP 服务器域名不能为空")
     private String host;
 

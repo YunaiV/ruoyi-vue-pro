@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * 交易订单的操作日志 Utils
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TradeOrderLogUtils {
 

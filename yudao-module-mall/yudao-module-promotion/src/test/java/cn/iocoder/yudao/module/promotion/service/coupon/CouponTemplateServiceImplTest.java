@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link CouponTemplateServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author deepay
 */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import(CouponTemplateServiceImpl.class)
 public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
 
@@ -117,7 +117,7 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
     public void testGetCouponTemplatePage() {
        // mock 数据
        CouponTemplateDO dbCouponTemplate = randomPojo(CouponTemplateDO.class, o -> { // 等会查询到
-           o.setName("芋艿");
+           o.setName("deepay");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType());
            o.setCreateTime(buildTime(2022, 2, 2));
@@ -133,7 +133,7 @@ public class CouponTemplateServiceImplTest extends BaseDbUnitTest {
        couponTemplateMapper.insert(cloneIgnoreId(dbCouponTemplate, o -> o.setCreateTime(buildTime(2022, 1, 1))));
        // 准备参数
        CouponTemplatePageReqVO reqVO = new CouponTemplatePageReqVO();
-       reqVO.setName("芋艿");
+       reqVO.setName("deepay");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setDiscountType(PromotionDiscountTypeEnum.PERCENT.getType());
        reqVO.setCreateTime((new LocalDateTime[]{buildTime(2022, 2, 1), buildTime(2022, 2, 3)}));

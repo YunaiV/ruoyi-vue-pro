@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * MES 产品SIP DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_md_product_sip")
 @KeySequence("mes_md_product_sip_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -39,7 +39,7 @@ public class MesMdProductSipDO extends BaseDO {
     /**
      * 工序编号
      */
-    // TODO @芋艿：等 pro 工序模块实现后，补上 {@link} 关联
+    // TODO @deepay：等 pro 工序模块实现后，补上 {@link} 关联
     private Long processId;
     /**
      * 标题

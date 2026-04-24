@@ -50,7 +50,7 @@ public class DeliveryExpressDO extends BaseDO {
      */
     private Integer status;
 
-    // TODO 芋艿：c 和结算相关的字段，后续在看
+    // TODO：c 和结算相关的字段，后续在看
     //    partnerId	是否需要月结账号
     //    partnerKey	是否需要月结密码
     //    net	是否需要取件网店

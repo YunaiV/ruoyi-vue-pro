@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * 渠道支付订单 Response DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class PayOrderRespDTO {

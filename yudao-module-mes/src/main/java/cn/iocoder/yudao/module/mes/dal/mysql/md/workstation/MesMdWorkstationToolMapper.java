@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * MES 工装夹具资源 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesMdWorkstationToolMapper extends BaseMapperX<MesMdWorkstationToolDO> {

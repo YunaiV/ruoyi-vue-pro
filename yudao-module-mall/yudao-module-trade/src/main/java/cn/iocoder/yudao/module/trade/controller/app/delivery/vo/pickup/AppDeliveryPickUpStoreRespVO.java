@@ -17,7 +17,7 @@ public class AppDeliveryPickUpStoreRespVO {
     @Schema(description = "门店名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     private String name;
 
-    @Schema(description = "门店 logo", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "门店 logo", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     private String logo;
 
     @Schema(description = "门店手机", requiredMode = Schema.RequiredMode.REQUIRED, example = "15601892312")

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 /**
  * API 访问日志
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class ApiAccessLogCreateReqDTO {

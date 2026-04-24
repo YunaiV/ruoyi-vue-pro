@@ -89,7 +89,7 @@ public class ApiAccessLogRespVO {
     @ExcelProperty("结果码")
     private Integer resultCode;
 
-    @Schema(description = "结果提示", example = "芋道源码，牛逼！")
+    @Schema(description = "结果提示", example = "deepay，牛逼！")
     @ExcelProperty("结果提示")
     private String resultMsg;
 

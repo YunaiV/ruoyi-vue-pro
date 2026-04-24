@@ -14,7 +14,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 /**
  * 默认的 {@link SecurityFrameworkService} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AllArgsConstructor
 public class SecurityFrameworkServiceImpl implements SecurityFrameworkService {

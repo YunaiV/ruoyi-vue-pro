@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 各种 {@link SmsClient} 的集成测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class SmsClientTests {
 
@@ -62,7 +62,7 @@ public class SmsClientTests {
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey(System.getenv("SMS_TENCENT_ACCESS_KEY") + " " + sdkAppId)
                 .setApiSecret(System.getenv("SMS_TENCENT_SECRET_KEY"))
-                .setSignature("芋道源码");
+                .setSignature("deepay");
         TencentSmsClient client = new TencentSmsClient(properties);
         // 准备参数
         Long sendLogId = System.currentTimeMillis();
@@ -81,7 +81,7 @@ public class SmsClientTests {
         SmsChannelProperties properties = new SmsChannelProperties()
                 .setApiKey(System.getenv("SMS_TENCENT_ACCESS_KEY") + " " + sdkAppId)
                 .setApiSecret(System.getenv("SMS_TENCENT_SECRET_KEY"))
-                .setSignature("芋道源码");
+                .setSignature("deepay");
         TencentSmsClient client = new TencentSmsClient(properties);
         // 准备参数
         String apiTemplateId = "358212";

@@ -9,7 +9,7 @@ import lombok.*;
 /**
  * MES 班组 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_cal_team")
 @KeySequence("mes_cal_team_seq")

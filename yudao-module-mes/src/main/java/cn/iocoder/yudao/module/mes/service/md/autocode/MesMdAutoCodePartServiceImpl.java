@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.AUTO_CODE_PAR
 /**
  * MES 编码规则组成 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

@@ -44,7 +44,7 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
        // mock 数据
        DictTypeDO dbDictType = randomPojo(DictTypeDO.class, o -> { // 等会查询到
            o.setName("yunai");
-           o.setType("芋艿");
+           o.setType("deepay");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setCreateTime(buildTime(2021, 1, 15));
        });

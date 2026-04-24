@@ -49,10 +49,10 @@ public class MpMessageSendReqVO {
     @NotNull(message = "图文消息不能为空", groups = NewsMessageGroup.class)
     private List<MpMessageDO.Article> articles;
 
-    @Schema(description = "音乐链接 消息类型为 MUSIC 时", example = "https://www.iocoder.cn/music.mp3")
+    @Schema(description = "音乐链接 消息类型为 MUSIC 时", example = "https://www.deepay.srl/music.mp3")
     private String musicUrl;
 
-    @Schema(description = "高质量音乐链接 消息类型为 MUSIC 时", example = "https://www.iocoder.cn/music.mp3")
+    @Schema(description = "高质量音乐链接 消息类型为 MUSIC 时", example = "https://www.deepay.srl/music.mp3")
     private String hqMusicUrl;
 
 }

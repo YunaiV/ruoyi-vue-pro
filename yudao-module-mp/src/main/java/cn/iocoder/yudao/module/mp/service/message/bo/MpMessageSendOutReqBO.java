@@ -16,7 +16,7 @@ import java.util.List;
  *
  * 为什么要有该 BO 呢？在自动回复、客服消息、菜单回复消息等场景，都涉及到 MP 给粉丝发送消息，所以使用该 BO 统一承接
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class MpMessageSendOutReqBO {

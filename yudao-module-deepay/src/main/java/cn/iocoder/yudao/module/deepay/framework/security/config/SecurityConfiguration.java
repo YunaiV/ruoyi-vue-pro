@@ -9,8 +9,11 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 /**
  * Deepay 模块 Security 配置。
  *
- * <p>将 {@code /api/create-product} 设为无需认证的公开接口，
- * 方便 MVP 阶段直接通过 curl 或 Postman 测试。</p>
+ * <p>将前端（yudao-ui-deepay）调用的全部 {@code /api/**} 接口设为无需认证，
+ * MVP 阶段采用 X-User-Id 匿名标识而非 JWT，Spring Security 默认会拦截无 Token
+ * 请求，必须在此显式 permitAll，否则返回 401。</p>
+ *
+ * <p>每次新增对外接口时，同步在此声明。</p>
  */
 @Configuration(proxyBeanMethods = false, value = "deepaySecurityConfiguration")
 public class SecurityConfiguration {
@@ -22,19 +25,41 @@ public class SecurityConfiguration {
             @Override
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
                 registry.requestMatchers(
-                        "/api/create-product",       // 轻量版（向后兼容）
-                        "/deepay/run",               // 完整生产流水线
-                        "/deepay/trend",             // 趋势查询
-                        "/deepay/callback/payment",  // 支付回调（Webhook，无 Token）
-                        "/deepay/callback/refund",   // 退款回调
-                        "/api/order/create",         // 创建订单（PR#6）
-                        "/api/payment/callback",     // Jeepay Webhook（PR#6）
-                        "/api/payment/simulate",     // 模拟支付（PR#6）
-                        "/product/**",               // 商品展示页（PR#5）
-                        "/api/product/**",           // 商品 JSON API（PR#5）
-                        "/deepay/inventory/**",      // 库存管理（MVP 阶段）
-                        "/deepay/order/**",          // 订单模拟（MVP 阶段）
-                        "/api/features"              // 功能菜单列表（前端动态菜单，无需登录）
+                        // ── 设计 / AI 生成 ──────────────────────────────────
+                        "/api/design/**",
+
+                        // ── 配额查询 ────────────────────────────────────────
+                        "/api/quota/**",
+
+                        // ── 支付 ────────────────────────────────────────────
+                        "/api/pay/**",         // 创建支付订单 + 支付 Webhook
+                        "/api/payment/**",     // 旧版支付接口（向后兼容）
+
+                        // ── 店铺 / 商品 / 订单 ──────────────────────────────
+                        "/api/shop/**",
+                        "/api/order/**",
+                        "/api/create-product", // 轻量版（向后兼容）
+                        "/api/product/**",     // 商品 JSON API
+                        "/product/**",         // 商品展示页
+
+                        // ── 用户 / 平台统计 ──────────────────────────────────
+                        "/api/user/**",
+                        "/api/platform/**",
+
+                        // ── 提现（MVP 阶段匿名标识，后期可改为 authenticated）─
+                        "/api/withdraw/**",
+
+                        // ── 功能开关菜单（前端动态路由） ─────────────────────
+                        "/api/features",
+
+                        // ── Deepay 内部流水线（无需登录） ────────────────────
+                        "/deepay/run",
+                        "/deepay/trend",
+                        "/deepay/callback/payment",
+                        "/deepay/callback/refund",
+                        "/deepay/inventory/**",
+                        "/deepay/order/**",
+                        "/deepay/selection/**"
                 ).permitAll();
             }
 

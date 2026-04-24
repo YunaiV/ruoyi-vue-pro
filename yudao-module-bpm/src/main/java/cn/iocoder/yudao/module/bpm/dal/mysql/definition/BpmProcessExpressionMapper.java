@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * BPM 流程表达式 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface BpmProcessExpressionMapper extends BaseMapperX<BpmProcessExpressionDO> {

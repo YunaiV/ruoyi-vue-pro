@@ -34,7 +34,7 @@ public class AppAfterSaleCreateReqVO {
     @Schema(description = "补充描述", example = "商品质量不好")
     private String applyDescription;
 
-    @Schema(description = "补充凭证图片", example = "https://www.iocoder.cn/1.png, https://www.iocoder.cn/2.png")
+    @Schema(description = "补充凭证图片", example = "https://www.deepay.srl/1.png, https://www.deepay.srl/2.png")
     private List<String> applyPicUrls;
 
 }

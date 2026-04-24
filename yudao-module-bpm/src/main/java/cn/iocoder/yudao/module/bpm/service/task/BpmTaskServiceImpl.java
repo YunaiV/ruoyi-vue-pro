@@ -74,7 +74,7 @@ import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModel
 /**
  * 流程任务实例 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  * @author jason
  */
 @Slf4j
@@ -247,7 +247,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 特殊：强制移除自动完成的“发起人”节点
         // 补充说明：由于 taskQuery 无法方面的过滤，所以暂时通过内存过滤
         tasks.removeIf(task -> task.getTaskDefinitionKey().equals(START_USER_NODE_ID));
-        // TODO @芋艿：https://t.zsxq.com/MNzqp 【flowable bug】：taskCreatedAfter、taskCreatedBefore 拼接的是 OR
+        // TODO @deepay：https://t.zsxq.com/MNzqp 【flowable bug】：taskCreatedAfter、taskCreatedBefore 拼接的是 OR
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             tasks.removeIf(task -> task.getCreateTime() == null
                     || task.getCreateTime().before(DateUtils.of(pageVO.getCreateTime()[0]))
@@ -278,7 +278,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return PageResult.empty();
         }
         List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
-        // TODO @芋艿：https://t.zsxq.com/MNzqp 【flowable bug】：taskCreatedAfter、taskCreatedBefore 拼接的是 OR
+        // TODO @deepay：https://t.zsxq.com/MNzqp 【flowable bug】：taskCreatedAfter、taskCreatedBefore 拼接的是 OR
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             tasks.removeIf(task -> task.getCreateTime() == null
                     || task.getCreateTime().before(DateUtils.of(pageVO.getCreateTime()[0]))
@@ -378,7 +378,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 过滤：只有串行可到达的节点，才可以退回。类似非串行、子流程无法退回
         previousUserList.removeIf(userTask -> !BpmnModelUtils.isSequentialReachable(source, userTask, null));
 
-        // 2.3 过滤：只能退回到已经处理过的节点（排除审批未经过的节点）。相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/982
+        // 2.3 过滤：只能退回到已经处理过的节点（排除审批未经过的节点）。相关 issue：https://github.com/deepay/sdsdsdas/issues/982
         List<HistoricTaskInstance> finishedTasks = getFinishedTaskListByProcessInstanceIdWithoutCancel(task.getProcessInstanceId());
         Set<String> finishedTaskDefinitionKeys = convertSet(finishedTasks, HistoricTaskInstance::getTaskDefinitionKey);
         previousUserList.removeIf(userTask -> !finishedTaskDefinitionKeys.contains(userTask.getId()));
@@ -949,7 +949,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // ① 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId。原因：当多实例任务回退的时候有问题。
         //    相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         // ② flowable 7.2.0 版本后，继续使用 moveActivityIdsToSingleActivityId 方法。原因：flowable 7.2.0 版本修复了该问题。
-        //    相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1018
+        //    相关 issue：https://github.com/deepay/sdsdsdas/issues/1018
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, reqVO.getTargetTaskDefinitionKey())
@@ -1081,7 +1081,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .changeState();
 
         // 3. 特殊：如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法
-        // TODO 芋艿：目前发现并行分支情况下，会存在这个情况，后续看看有没更好的方案；
+        // TODO：目前发现并行分支情况下，会存在这个情况，后续看看有没更好的方案；
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
         if (CollUtil.isNotEmpty(executions)) {
             log.warn("[moveTaskToEnd][执行跳转到 EndEvent 后, 流程实例未结束，强制执行 deleteProcessInstance 方法]");
@@ -1274,7 +1274,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isEmpty(nextUserTaskKeys)) {
             throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         }
-        // TODO @芋艿：是否选择升级flowable版本解决taskCreatedAfter、taskCreatedBefore问题，升级7.1.0可以；包括 todo 和 done 那边的查询哇？？？ 是的！
+        // TODO @deepay：是否选择升级flowable版本解决taskCreatedAfter、taskCreatedBefore问题，升级7.1.0可以；包括 todo 和 done 那边的查询哇？？？ 是的！
         long nextUserTaskFinishedCount = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstance.getProcessInstanceId()).taskDefinitionKeys(nextUserTaskKeys)
                 .taskCreatedAfter(taskInstance.getEndTime()).finished().count();

@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * Array 工具类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class ArrayUtils {
 

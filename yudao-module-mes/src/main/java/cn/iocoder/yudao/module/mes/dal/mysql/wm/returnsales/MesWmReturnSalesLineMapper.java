@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 销售退货单行 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmReturnSalesLineMapper extends BaseMapperX<MesWmReturnSalesLineDO> {

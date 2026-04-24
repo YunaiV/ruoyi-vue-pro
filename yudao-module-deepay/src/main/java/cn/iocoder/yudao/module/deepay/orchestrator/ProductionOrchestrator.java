@@ -33,7 +33,7 @@ public class ProductionOrchestrator {
     private static final Logger log = LoggerFactory.getLogger(ProductionOrchestrator.class);
 
     // ---- Phase 6 — 记忆 + 问答 + 选择 ----
-    @Resource private MemoryAgent             customerProfileAgent;
+    @Resource private CustomerProfileAgent    customerProfileAgent;
     @Resource private SmartQuestionAgent      questionAgent;
     @Resource private QADecisionAgent         qaDecisionAgent;
     @Resource private SelectionAgent          selectionAgent;
@@ -104,18 +104,18 @@ public class ProductionOrchestrator {
             ctx = qaDecisionAgent.run(ctx);
             if (StringUtils.hasText(ctx.pendingQuestion)) {
                 log.info("[Orchestrator] ⏸ 等待用户回答(QA) q={}", ctx.pendingQuestion);
-                customerProfileAgent.save(ctx);
+                customerProfileAgent.updateProfile(ctx.customerId, ctx);
                 return ctx;
             }
-            customerProfileAgent.save(ctx);
+            customerProfileAgent.updateProfile(ctx.customerId, ctx);
         } else if (SmartQuestionAgent.needsQuestionnaire(ctx)) {
             ctx = questionAgent.run(ctx);
             if (StringUtils.hasText(ctx.pendingQuestion)) {
                 log.info("[Orchestrator] ⏸ 等待用户回答 q={}", ctx.pendingQuestion);
-                customerProfileAgent.save(ctx);
+                customerProfileAgent.updateProfile(ctx.customerId, ctx);
                 return ctx;
             }
-            customerProfileAgent.save(ctx);
+            customerProfileAgent.updateProfile(ctx.customerId, ctx);
         }
 
         // ──────────────────────────────────────────────────────────────

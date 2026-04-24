@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 公众号消息自动回复的类型
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

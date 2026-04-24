@@ -5,7 +5,7 @@ package cn.iocoder.yudao.module.iot.core.messagebus.core;
  *
  * 用于在 IoT 系统中发布和订阅消息，支持多种消息中间件实现
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface IotMessageBus {
 
@@ -30,7 +30,7 @@ public interface IotMessageBus {
      * @param subscriber 订阅者
      */
     default void unregister(IotMessageSubscriber<?> subscriber) {
-        // TODO 芋艿：暂时不实现，需求量不大，但是
+        // TODO：暂时不实现，需求量不大，但是
         // throw new UnsupportedOperationException("取消注册消息订阅者功能，尚未实现");
     }
 

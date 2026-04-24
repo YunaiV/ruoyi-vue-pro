@@ -26,18 +26,18 @@
 <!--        <module>yudao-module-erp</module>-->
 <!--        <module>yudao-module-iot</module>-->
 <!--        <module>yudao-module-mes</module>-->
-<!-- 请参考 https://doc.iocoder.cn/ai/build/ 文档，完成 AI 模块的启动！！！ -->
+<!-- 请参考 https://admin.deepay.srl/ai/build/ 文档，完成 AI 模块的启动！！！ -->
 <!--        <module>yudao-module-ai</module>-->
     </modules>
 
     <name>${project.artifactId}</name>
-    <description>芋道项目基础脚手架</description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <description>deepay项目基础脚手架</description>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
     <properties>
-        <revision>2026.03-jdk8-SNAPSHOT</revision>
+        <revision>2026.03-jdk17-SNAPSHOT</revision>
         <!-- Maven 相关 -->
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>

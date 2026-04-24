@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 盘点方案 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmStockTakingPlanMapper extends BaseMapperX<MesWmStockTakingPlanDO> {

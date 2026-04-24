@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * 支付渠道的编码的枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

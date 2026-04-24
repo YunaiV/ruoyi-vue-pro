@@ -51,7 +51,7 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.coap.handler.upstream
  *     </li>
  * </ol>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @Disabled

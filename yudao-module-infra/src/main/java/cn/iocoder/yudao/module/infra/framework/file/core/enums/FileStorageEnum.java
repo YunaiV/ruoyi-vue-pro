@@ -19,7 +19,7 @@ import lombok.Getter;
 /**
  * 文件存储器枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AllArgsConstructor
 @Getter

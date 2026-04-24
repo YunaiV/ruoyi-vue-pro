@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * IoT 设备信息查询 Request DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class IotDeviceGetReqDTO {

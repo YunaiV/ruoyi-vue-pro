@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 钱包余额增加 Request DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class PayWalletAddBalanceReqDTO {

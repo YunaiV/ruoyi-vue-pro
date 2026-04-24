@@ -10,7 +10,7 @@ import javax.validation.Valid;
 /**
  * MES 设备点检记录 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesDvCheckRecordService {
 

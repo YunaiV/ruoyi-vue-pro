@@ -1,1 +1,1 @@
-<http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao>
+<http://www.deepay.srl/Spring-Boot/MyBatis/?yudao>

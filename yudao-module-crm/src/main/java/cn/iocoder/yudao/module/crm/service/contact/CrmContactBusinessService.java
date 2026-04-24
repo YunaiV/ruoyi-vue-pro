@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * CRM 联系人与商机的关联 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface CrmContactBusinessService {
 

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 安灯呼叫配置 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesProAndonConfigMapper extends BaseMapperX<MesProAndonConfigDO> {

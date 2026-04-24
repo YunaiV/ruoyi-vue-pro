@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class AiKnowledgePageReqVO extends PageParam {
 
-    @Schema(description = "知识库名称", example = "芋艿")
+    @Schema(description = "知识库名称", example = "deepay")
     private String name;
 
     @Schema(description = "是否启用", example = "1")

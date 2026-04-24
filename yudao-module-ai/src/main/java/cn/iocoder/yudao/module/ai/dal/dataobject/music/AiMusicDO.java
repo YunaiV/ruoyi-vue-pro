@@ -84,7 +84,7 @@ public class AiMusicDO extends BaseDO {
      * 枚举 {@link AiPlatformEnum}
      */
     private String platform;
-    // TODO @芋艿：modelId？
+    // TODO @deepay：modelId？
     /**
      * 模型
      */

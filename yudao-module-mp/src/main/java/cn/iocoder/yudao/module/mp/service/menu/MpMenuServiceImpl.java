@@ -33,7 +33,7 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MENU_SAVE_FAIL
 /**
  * 公众号菜单 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
  *
  * 目的：在非 prod 环境时，打印 request 和 response 两条日志到日志文件（控制台）中。
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class ApiAccessLogInterceptor implements HandlerInterceptor {

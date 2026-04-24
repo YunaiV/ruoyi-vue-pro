@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.enums;
 /**
  * IoT 字典类型的枚举类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class DictTypeConstants {
 

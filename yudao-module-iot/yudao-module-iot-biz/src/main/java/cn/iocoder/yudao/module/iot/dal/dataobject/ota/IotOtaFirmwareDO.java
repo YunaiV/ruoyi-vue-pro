@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
  *
  * @see <a href="阿里云 IoT - OTA 升级">https://help.aliyun.com/zh/iot/user-guide/ota-upgrade-overview</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "iot_ota_firmware", autoResultMap = true)
 @KeySequence("iot_ota_firmware_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

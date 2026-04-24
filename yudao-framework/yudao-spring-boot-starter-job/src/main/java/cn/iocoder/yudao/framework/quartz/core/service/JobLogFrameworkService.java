@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 /**
  * Job 日志 Framework Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface JobLogFrameworkService {
 

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 /**
  * IoT TCP 帧编解码器工厂
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class IotTcpFrameCodecFactory {
 

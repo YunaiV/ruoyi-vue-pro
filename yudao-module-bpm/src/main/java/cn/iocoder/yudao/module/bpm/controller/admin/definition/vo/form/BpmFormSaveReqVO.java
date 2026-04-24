@@ -13,7 +13,7 @@ public class BpmFormSaveReqVO {
     @Schema(description = "表单编号", example = "1024")
     private Long id;
 
-    @Schema(description = "表单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "表单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotNull(message = "表单名称不能为空")
     private String name;
 

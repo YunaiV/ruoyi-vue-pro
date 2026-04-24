@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 产品SIP Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesMdProductSipMapper extends BaseMapperX<MesMdProductSipDO> {

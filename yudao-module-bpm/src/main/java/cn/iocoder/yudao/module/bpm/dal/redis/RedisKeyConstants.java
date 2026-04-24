@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.dal.redis;
 /**
  * BPM Redis Key 枚举类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface RedisKeyConstants {
 

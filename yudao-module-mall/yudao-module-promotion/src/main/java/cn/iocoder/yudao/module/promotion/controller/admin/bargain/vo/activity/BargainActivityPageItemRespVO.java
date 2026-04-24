@@ -19,7 +19,7 @@ public class BargainActivityPageItemRespVO extends BargainActivityBaseVO {
 
     @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "618大促")
     private String spuName;
-    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "商品主图", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     private String picUrl;
 
     @Schema(description = "活动状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")

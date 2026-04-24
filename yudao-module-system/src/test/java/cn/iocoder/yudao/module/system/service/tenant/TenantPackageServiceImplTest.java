@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 /**
 * {@link TenantPackageServiceImpl} 的单元测试类
 *
-* @author 芋道源码
+* @author deepay
 */
 @Import(TenantPackageServiceImpl.class)
 public class TenantPackageServiceImplTest extends BaseDbUnitTest {
@@ -141,7 +141,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
     public void testGetTenantPackagePage() {
        // mock 数据
        TenantPackageDO dbTenantPackage = randomPojo(TenantPackageDO.class, o -> { // 等会查询到
-           o.setName("芋道源码");
+           o.setName("deepay");
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
            o.setRemark("源码解析");
            o.setCreateTime(buildTime(2022, 10, 10));
@@ -157,7 +157,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
        tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setCreateTime(buildTime(2022, 11, 11))));
        // 准备参数
        TenantPackagePageReqVO reqVO = new TenantPackagePageReqVO();
-       reqVO.setName("芋道");
+       reqVO.setName("deepay");
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
        reqVO.setRemark("源码");
        reqVO.setCreateTime(buildBetweenTime(2022, 10, 9, 2022, 10, 11));

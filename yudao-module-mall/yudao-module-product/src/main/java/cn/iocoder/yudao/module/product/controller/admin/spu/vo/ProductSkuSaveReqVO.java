@@ -30,7 +30,7 @@ public class ProductSkuSaveReqVO {
     @Schema(description = "条形码", example = "15156165456")
     private String barCode;
 
-    @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
 

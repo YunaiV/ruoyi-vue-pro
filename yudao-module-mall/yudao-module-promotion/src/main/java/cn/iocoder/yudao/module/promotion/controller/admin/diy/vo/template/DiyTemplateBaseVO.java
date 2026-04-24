@@ -20,7 +20,7 @@ public class DiyTemplateBaseVO {
     @Schema(description = "备注", example = "默认主题")
     private String remark;
 
-    @Schema(description = "预览图", example = "[https://www.iocoder.cn/1.jpg]")
+    @Schema(description = "预览图", example = "[https://www.deepay.srl/1.jpg]")
     private List<String> previewPicUrls;
 
 }

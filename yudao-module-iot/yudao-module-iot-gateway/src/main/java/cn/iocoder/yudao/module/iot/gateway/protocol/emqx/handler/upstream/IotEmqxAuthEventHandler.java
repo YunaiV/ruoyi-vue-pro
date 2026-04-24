@@ -31,7 +31,7 @@ import java.util.Locale;
  * 3. 设备 ACL 权限接口 - 对应 EMQX HTTP ACL 插件 {@link #handleAcl(RoutingContext)}
  * 4. 设备注册接口 - 集成一型一密设备注册 {@link #handleDeviceRegister(RoutingContext, String, String)}
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotEmqxAuthEventHandler {

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://img.shields.io/badge/Spring%20Boot-2.7.18-blue.svg" alt="Downloads">
  <img src="https://img.shields.io/badge/Vue-3.2-blue.svg" alt="Downloads">
- <img src="https://img.shields.io/github/license/YunaiV/ruoyi-vue-pro"/>
+ <img src="https://img.shields.io/github/license/deepay/sdsdsdas"/>
 </p>
 
 **严肃声明：现在、未来都不会有商业版本，所有代码全部开源!！**
@@ -22,35 +22,76 @@
 
 ---
 
+## 🚀 一键部署（快速上手）
+
+> 适用于宝塔面板 Linux 服务器。确保已在宝塔软件商店安装 **Java 8+、Maven 3.8+、Node 18+、MySQL 8、Redis 7、Nginx**。
+
+### ① 首次全量部署（自动建库 + 打包 + Nginx + 开机自启）
+
+```bash
+# 1. 进入项目根目录（git clone 后的位置）
+cd /www/wwwroot/deepay.srl
+
+# 2. 一键初始化（自动完成：建库导表 → 打包后端 → 构建前端 → 写 Nginx 配置 → 配 systemd）
+bash script/shell/quickstart.sh
+```
+
+### ② 日常更新（拉代码后重新部署）
+
+```bash
+cd /www/wwwroot/deepay.srl
+git pull
+
+# 全量（后端 + 前端）
+bash script/shell/deepay-deploy.sh
+
+# 仅更新后端
+bash script/shell/deepay-deploy.sh backend
+
+# 仅更新前端
+bash script/shell/deepay-deploy.sh frontend
+```
+
+### ③ Docker Compose 部署
+
+```bash
+cd script/docker
+docker compose up -d
+```
+
+> 部署完成后访问：`http://<你的域名>` （前端）、`http://<你的域名>/api/` （后端 API）
+
+---
+
 ## 🐶 新手必读
 
-* 演示地址【Vue3 + element-plus】：<http://dashboard-vue3.yudao.iocoder.cn>
-* 演示地址【Vue3 + vben(ant-design-vue)】：<http://dashboard-vben.yudao.iocoder.cn>
-* 演示地址【Vue2 + element-ui】：<http://dashboard.yudao.iocoder.cn>
-* 启动文档：<https://doc.iocoder.cn/quick-start/>
-* 视频教程：<https://doc.iocoder.cn/video/>
+* 演示地址【Vue3 + element-plus】：<https://admin.deepay.srl>
+* 演示地址【Vue3 + vben(ant-design-vue)】：<https://admin.deepay.srl>
+* 演示地址【Vue2 + element-ui】：<https://admin.deepay.srl>
+* 启动文档：<https://admin.deepay.srl/quick-start/>
+* 视频教程：<https://admin.deepay.srl/video/>
 
 ## 🐰 版本说明
 
 | 版本                                                                  | JDK 8 + Spring Boot 2.7                                                   | JDK 17/21 + Spring Boot 3.2                                                           |
 |---------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
+| 【完整版】[sdsdsdas](https://gitee.com/zhijiantianya/sdsdsdas) | [`master`](https://gitee.com/zhijiantianya/sdsdsdas/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/sdsdsdas/tree/master-jdk17/) 分支 |
 | 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   |
 
 * 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
 * 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
 
-可参考 [《迁移文档》](https://doc.iocoder.cn/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
+可参考 [《迁移文档》](https://admin.deepay.srl/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
 
 ## 🐯 平台简介
 
-**芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
+**deepay**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
 
 > 有任何问题，或者想要的功能，可以在 _Issues_ 中提给艿艿。
 >
 > 😜 给项目点点 Star 吧，这对我们真的很重要！
 
-![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
+![架构图](/.image/common/sdsdsdas-architecture.png)
 
 * Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17/21 + Spring Boot 3.2
 * 管理后台的电脑端：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
@@ -78,8 +119,8 @@
 
 | 项目                                                              | Star                                                                                                                                                                                                                                                                                             | 简介                          |
 |-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
-| [ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro)  | [![Gitee star](https://gitee.com/zhijiantianya/ruoyi-vue-pro/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/ruoyi-vue-pro) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/ruoyi-vue-pro.svg?style=social&label=Stars)](https://github.com/YunaiV/ruoyi-vue-pro)       | 基于 Spring Boot 多模块架构        |
-| [yudao-cloud](https://gitee.com/zhijiantianya/yudao-cloud)      | [![Gitee star](https://gitee.com/zhijiantianya/yudao-cloud/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/YunaiV/yudao-cloud.svg?style=social&label=Stars)](https://github.com/YunaiV/yudao-cloud)               | 基于 Spring Cloud 微服务架构       |
+| [sdsdsdas](https://gitee.com/zhijiantianya/sdsdsdas)  | [![Gitee star](https://gitee.com/zhijiantianya/sdsdsdas/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/sdsdsdas) [![GitHub stars](https://img.shields.io/github/stars/deepay/sdsdsdas.svg?style=social&label=Stars)](https://github.com/deepay/sdsdsdas)       | 基于 Spring Boot 多模块架构        |
+| [yudao-cloud](https://gitee.com/zhijiantianya/yudao-cloud)      | [![Gitee star](https://gitee.com/zhijiantianya/yudao-cloud/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/deepay/yudao-cloud.svg?style=social&label=Stars)](https://github.com/deepay/yudao-cloud)               | 基于 Spring Cloud 微服务架构       |
 | [Spring-Boot-Labs](https://gitee.com/yudaocode/SpringBoot-Labs) | [![Gitee star](https://gitee.com/yudaocode/SpringBoot-Labs/badge/star.svg?theme=white)](https://gitee.com/zhijiantianya/yudao-cloud) [![GitHub stars](https://img.shields.io/github/stars/yudaocode/SpringBoot-Labs.svg?style=social&label=Stars)](https://github.com/yudaocode/SpringBoot-Labs) | 系统学习 Spring Boot & Cloud 专栏 |
 
 ### 前端项目
@@ -97,7 +138,7 @@
 
 **为什么推荐使用本项目？**
 
-① 本项目采用比 Apache 2.0 更宽松的 [MIT License](https://gitee.com/zhijiantianya/ruoyi-vue-pro/blob/master/LICENSE) 开源协议，个人与企业可 100% 免费使用，不用保留类作者、Copyright 信息。
+① 本项目采用比 Apache 2.0 更宽松的 [MIT License](https://gitee.com/zhijiantianya/sdsdsdas/blob/master/LICENSE) 开源协议，个人与企业可 100% 免费使用，不用保留类作者、Copyright 信息。
 
 ② 代码全部开源，不会像其他项目一样，只开源部分代码，让你无法了解整个项目的架构设计。[国产开源项目对比](https://www.yuque.com/xiatian-bsgny/lm0ec1/wqf8mn)
 
@@ -117,13 +158,13 @@
 
 系统内置多种多种业务功能，可以用于快速你的业务系统：
 
-![功能分层](/.image/common/ruoyi-vue-pro-biz.png)
+![功能分层](/.image/common/sdsdsdas-biz.png)
 
 * 通用模块（必选）：系统功能、基础设施
 * 通用模块（可选）：工作流程、支付系统、数据报表、会员中心
 * 业务系统（按需）：ERP 系统、CRM 系统、MES 系统、商城系统、微信公众号、AI 大模型、IoT 物联网
 
-> 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
+> 友情提示：本项目基于 deepay-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
 > * 额外新增的功能，我们使用 🚀 标记。
 > * 重新实现的功能，我们使用 ⭐️ 标记。
@@ -257,7 +298,7 @@
 
 ### 商城系统
 
-演示地址：<https://doc.iocoder.cn/mall-preview/>
+演示地址：<https://admin.deepay.srl/mall-preview/>
 
 ![功能图](/.image/common/mall-feature.png)
 
@@ -275,19 +316,19 @@
 
 ### ERP 系统
 
-演示地址：<https://doc.iocoder.cn/erp-preview/>
+演示地址：<https://admin.deepay.srl/erp-preview/>
 
 ![功能图](/.image/common/erp-feature.png)
 
 ### CRM 系统
 
-演示地址：<https://doc.iocoder.cn/crm-preview/>
+演示地址：<https://admin.deepay.srl/crm-preview/>
 
 ![功能图](/.image/common/crm-feature.png)
 
 ### MES 系统
 
-演示地址：<https://doc.iocoder.cn/mes-preview/>
+演示地址：<https://admin.deepay.srl/mes-preview/>
 
 ![功能图](/.image/common/mes-feature.png)
 
@@ -295,7 +336,7 @@
 
 ### AI 大模型
 
-演示地址：<https://doc.iocoder.cn/ai-preview/>
+演示地址：<https://admin.deepay.srl/ai-preview/>
 
 ![功能图](/.image/common/ai-feature.png)
 
@@ -303,7 +344,7 @@
 
 ### IoT 物联网
 
-演示地址：<https://doc.iocoder.cn/iot/build>
+演示地址：<https://admin.deepay.srl/iot/build>
 
 ![功能图](/.image/common/iot-feature.png)
 
@@ -336,24 +377,24 @@
 
 | 框架                                                                                          | 说明               | 版本             | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.7.18         | [文档](https://github.com/deepay/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
-| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.23         | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.7          | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
-| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1          | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.23         | [文档](https://www.deepay.srl/Spring-Boot/datasource-pool/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.7          | [文档](https://www.deepay.srl/Spring-Boot/MyBatis/?yudao)         |
+| [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 3.6.1          | [文档](https://www.deepay.srl/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0 /7.0 |                                                                |
-| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.32.0         | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24         | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.11         | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5          | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
-| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://doc.iocoder.cn/bpm/)                              |
-| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
-| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0          | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
-| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
+| [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 3.32.0         | [文档](https://www.deepay.srl/Spring-Boot/Redis/?yudao)           |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24         | [文档](https://www.deepay.srl/SpringMVC/MVC/?yudao)               |
+| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.11         | [文档](https://www.deepay.srl/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5          | [文档](https://www.deepay.srl/Spring-Boot/Validation/?yudao)      |
+| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://admin.deepay.srl/bpm/)                              |
+| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](https://www.deepay.srl/Spring-Boot/Job/?yudao)             |
+| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0          | [文档](https://www.deepay.srl/Spring-Boot/Swagger/?yudao)         |
+| [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](https://www.deepay.srl/Spring-Boot/SkyWalking/?yudao)      |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 2.7.10         | [文档](https://www.deepay.srl/Spring-Boot/Admin/?yudao)           |
 | [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.13.5         |                                                                |
-| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.3          | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
-| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.34        | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
+| [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.3          | [文档](https://www.deepay.srl/Spring-Boot/MapStruct/?yudao)       |
+| [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.34        | [文档](https://www.deepay.srl/Spring-Boot/Lombok/?yudao)          |
 | [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.8.2          | -                                                              |
 | [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 4.8.0          | -                                                              |
 

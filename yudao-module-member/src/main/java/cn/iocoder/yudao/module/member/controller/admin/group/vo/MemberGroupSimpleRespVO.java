@@ -12,7 +12,7 @@ public class MemberGroupSimpleRespVO {
     @Schema(description = "编号", example = "6103")
     private Long id;
 
-    @Schema(description = "等级名称", example = "芋艿")
+    @Schema(description = "等级名称", example = "deepay")
     private String name;
 
 }

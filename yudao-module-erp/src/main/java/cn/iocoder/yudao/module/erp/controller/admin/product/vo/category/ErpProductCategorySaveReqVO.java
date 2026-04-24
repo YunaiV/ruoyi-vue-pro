@@ -17,7 +17,7 @@ public class ErpProductCategorySaveReqVO {
     @NotNull(message = "父分类编号不能为空")
     private Long parentId;
 
-    @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotEmpty(message = "分类名称不能为空")
     private String name;
 

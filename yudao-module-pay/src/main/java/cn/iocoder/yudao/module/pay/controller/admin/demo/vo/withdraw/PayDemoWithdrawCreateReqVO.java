@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 @Data
 public class PayDemoWithdrawCreateReqVO {
 
-    @Schema(description = "提现标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿是一种菜")
+    @Schema(description = "提现标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay是一种菜")
     @NotEmpty(message = "提现标题不能为空")
     private String subject;
 

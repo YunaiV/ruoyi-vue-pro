@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 秒杀时段 Convert
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface SeckillConfigConvert {

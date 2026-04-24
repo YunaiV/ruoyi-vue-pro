@@ -14,7 +14,7 @@ import java.util.Set;
  * 支付宝的 PayClientConfig 实现类
  * 属性主要来自 {@link com.alipay.api.AlipayConfig} 的必要属性
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class AlipayPayClientConfig implements PayClientConfig {

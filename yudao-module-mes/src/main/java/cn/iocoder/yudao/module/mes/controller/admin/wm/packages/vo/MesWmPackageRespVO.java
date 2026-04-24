@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * MES 装箱单 Response VO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Schema(description = "管理后台 - MES 装箱单 Response VO")
 @Data

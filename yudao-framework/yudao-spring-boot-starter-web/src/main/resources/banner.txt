@@ -1,4 +1,4 @@
-芋道源码 http://www.iocoder.cn
+deepay http://www.deepay.srl
 Application Version: ${yudao.info.version}
 Spring Boot Version: ${spring-boot.version}
 

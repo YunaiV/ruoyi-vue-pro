@@ -50,7 +50,7 @@ public class MpAutoReplyBaseVO {
     @NotEmpty(message = "回复的消息 mediaId 不能为空",
             groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String responseMediaId;
-    @Schema(description = "回复的媒体 URL", example = "https://www.iocoder.cn/xxx.jpg")
+    @Schema(description = "回复的媒体 URL", example = "https://www.deepay.srl/xxx.jpg")
     @NotEmpty(message = "回复的消息 mediaId 不能为空",
             groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String responseMediaUrl;
@@ -58,7 +58,7 @@ public class MpAutoReplyBaseVO {
     @Schema(description = "缩略图的媒体 id", example = "123456")
     @NotEmpty(message = "回复的消息 thumbMediaId 不能为空", groups = {MusicMessageGroup.class})
     private String responseThumbMediaId;
-    @Schema(description = "缩略图的媒体 URL",example = "https://www.iocoder.cn/xxx.jpg")
+    @Schema(description = "缩略图的媒体 URL",example = "https://www.deepay.srl/xxx.jpg")
     @NotEmpty(message = "回复的消息 thumbMedia 地址不能为空", groups = {MusicMessageGroup.class})
     private String responseThumbMediaUrl;
 
@@ -78,11 +78,11 @@ public class MpAutoReplyBaseVO {
     @Valid
     private List<MpMessageDO.Article> responseArticles;
 
-    @Schema(description = "回复的音乐链接", example = "https://www.iocoder.cn/xxx.mp3")
+    @Schema(description = "回复的音乐链接", example = "https://www.deepay.srl/xxx.mp3")
     @NotEmpty(message = "回复的音乐链接不能为空", groups = MusicMessageGroup.class)
     @URL(message = "回复的高质量音乐链接格式不正确", groups = MusicMessageGroup.class)
     private String responseMusicUrl;
-    @Schema(description = "高质量音乐链接", example = "https://www.iocoder.cn/xxx.mp3")
+    @Schema(description = "高质量音乐链接", example = "https://www.deepay.srl/xxx.mp3")
     @NotEmpty(message = "回复的高质量音乐链接不能为空", groups = MusicMessageGroup.class)
     @URL(message = "回复的高质量音乐链接格式不正确", groups = MusicMessageGroup.class)
     private String responseHqMusicUrl;

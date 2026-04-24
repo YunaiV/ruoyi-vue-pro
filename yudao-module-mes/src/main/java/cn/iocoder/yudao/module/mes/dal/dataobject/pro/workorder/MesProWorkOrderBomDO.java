@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 /**
  * MES 生产工单 BOM DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_pro_work_order_bom")
 @KeySequence("mes_pro_work_order_bom_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

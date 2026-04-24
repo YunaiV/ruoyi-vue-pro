@@ -6,11 +6,11 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// TODO 芋艿：弱化这个状态
+// TODO：弱化这个状态
 /**
  * 促销活动的状态枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AllArgsConstructor
 @Getter

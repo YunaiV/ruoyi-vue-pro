@@ -16,7 +16,7 @@
 
 ## 二、技术基础
 
-- 项目基础：RuoYi-Vue-Pro（Spring Boot 后端）
+- 项目基础：deepay-Vue-Pro（Spring Boot 后端）
 - 不新建项目，在现有仓库的 `yudao-module-deepay` 模块内开发
 - 所有流程**同步执行**（不引入异步、消息队列等）
 

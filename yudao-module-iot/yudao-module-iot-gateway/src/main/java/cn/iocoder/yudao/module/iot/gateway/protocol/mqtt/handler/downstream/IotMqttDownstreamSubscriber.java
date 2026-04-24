@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * IoT 网关 MQTT 协议：接收下行给设备的消息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotMqttDownstreamSubscriber extends AbstractIotProtocolDownstreamSubscriber {

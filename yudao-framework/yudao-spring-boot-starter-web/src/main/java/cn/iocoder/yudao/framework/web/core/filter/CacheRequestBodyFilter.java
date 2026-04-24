@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Request Body 缓存 Filter，实现它的可重复读取
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class CacheRequestBodyFilter extends OncePerRequestFilter {
 
@@ -21,7 +21,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
      * 需要排除的 URI
      *
      * 1. 排除 Spring Boot Admin 相关请求，避免客户端连接中断导致的异常。
-     *    例如说：<a href="https://github.com/YunaiV/ruoyi-vue-pro/issues/795">795 ISSUE</a>
+     *    例如说：<a href="https://github.com/deepay/sdsdsdas/issues/795">795 ISSUE</a>
      */
     private static final String[] IGNORE_URIS = {"/admin/", "/actuator/"};
 

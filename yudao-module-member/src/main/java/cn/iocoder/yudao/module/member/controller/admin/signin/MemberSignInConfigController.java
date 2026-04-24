@@ -20,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO 芋艿：url
+// TODO：url
 @Tag(name = "管理后台 - 签到规则")
 @RestController
 @RequestMapping("/member/sign-in/config")

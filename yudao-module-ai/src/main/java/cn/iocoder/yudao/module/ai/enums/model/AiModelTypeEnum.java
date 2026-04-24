@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * AI 模型类型的枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @RequiredArgsConstructor

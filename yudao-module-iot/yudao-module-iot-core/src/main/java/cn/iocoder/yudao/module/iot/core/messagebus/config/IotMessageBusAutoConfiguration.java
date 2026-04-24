@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * IoT 消息总线自动配置
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AutoConfiguration
 @EnableConfigurationProperties(IotMessageBusProperties.class)

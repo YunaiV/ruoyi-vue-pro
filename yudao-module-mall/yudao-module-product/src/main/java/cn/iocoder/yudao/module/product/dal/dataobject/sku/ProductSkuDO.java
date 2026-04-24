@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 商品 SKU DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "product_sku", autoResultMap = true)
 @KeySequence("product_sku_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

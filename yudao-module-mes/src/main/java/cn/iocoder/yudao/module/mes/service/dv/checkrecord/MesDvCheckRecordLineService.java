@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * MES 设备点检记录明细 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesDvCheckRecordLineService {
 

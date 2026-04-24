@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * ERP 付款单项 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface ErpFinancePaymentItemMapper extends BaseMapperX<ErpFinancePaymentItemDO> {

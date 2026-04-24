@@ -29,7 +29,7 @@ public class PayTransferRespVO {
     private Long appId;
 
     @ExcelProperty("应用名称")
-    @Schema(description = "应用名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "应用名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String appName;
 
     @Schema(description = "转账渠道编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24833")
@@ -69,7 +69,7 @@ public class PayTransferRespVO {
     @ExcelProperty("收款人账号")
     private String userAccount;
 
-    @Schema(description = "异步通知商户地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "异步通知商户地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl")
     private String notifyUrl;
 
     @ExcelProperty("用户 IP")

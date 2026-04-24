@@ -24,7 +24,7 @@ public class UserRespVO{
     @ExcelProperty("用户名称")
     private String username;
 
-    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("用户昵称")
     private String nickname;
 
@@ -40,7 +40,7 @@ public class UserRespVO{
     @Schema(description = "岗位编号数组", example = "1")
     private Set<Long> postIds;
 
-    @Schema(description = "用户邮箱", example = "yudao@iocoder.cn")
+    @Schema(description = "用户邮箱", example = "yudao@deepay.srl")
     @ExcelProperty("用户邮箱")
     private String email;
 
@@ -53,7 +53,7 @@ public class UserRespVO{
     @DictFormat(DictTypeConstants.USER_SEX)
     private Integer sex;
 
-    @Schema(description = "用户头像", example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", example = "https://www.deepay.srl/xxx.png")
     private String avatar;
 
     @Schema(description = "状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

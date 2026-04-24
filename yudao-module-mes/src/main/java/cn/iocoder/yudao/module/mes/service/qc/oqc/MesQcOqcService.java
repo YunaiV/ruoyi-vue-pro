@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 出货检验单（OQC） Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesQcOqcService {
 

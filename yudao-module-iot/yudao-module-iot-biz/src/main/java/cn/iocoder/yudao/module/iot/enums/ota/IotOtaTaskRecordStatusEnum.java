@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * IoT OTA 升级任务记录的状态枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Getter

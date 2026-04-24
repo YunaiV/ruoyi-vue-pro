@@ -10,7 +10,7 @@ import cn.idev.excel.metadata.property.ExcelContentProperty;
 /**
  * Excel Json 转换器
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class JsonConvert implements Converter<Object> {
 

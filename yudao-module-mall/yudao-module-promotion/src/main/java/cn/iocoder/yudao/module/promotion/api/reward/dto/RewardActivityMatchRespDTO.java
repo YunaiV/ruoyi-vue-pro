@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * 满减送活动的匹配 Response DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class RewardActivityMatchRespDTO {

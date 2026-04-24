@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * IoT Modbus TCP 上行数据处理器：将原始值转换为物模型属性值并上报
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotModbusTcpClientUpstreamHandler {

@@ -15,7 +15,7 @@ public class DataSourceConfigRespVO {
     @Schema(description = "数据源名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "test")
     private String name;
 
-    @Schema(description = "数据源连接", requiredMode = Schema.RequiredMode.REQUIRED, example = "jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro")
+    @Schema(description = "数据源连接", requiredMode = Schema.RequiredMode.REQUIRED, example = "jdbc:mysql://127.0.0.1:3306/sdsdsdas")
     private String url;
 
     @Schema(description = "用户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "root")

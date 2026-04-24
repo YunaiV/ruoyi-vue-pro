@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @see <a href="https://www.cnblogs.com/nanxiang/p/16179519.html">记一次 redis stream 数据类型内存不释放问题</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @AllArgsConstructor

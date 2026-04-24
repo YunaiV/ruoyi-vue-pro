@@ -39,7 +39,7 @@ public class AiImageRespVO {
     @Schema(description = "是否发布", requiredMode = Schema.RequiredMode.REQUIRED, example = "public")
     private Boolean publicStatus;
 
-    @Schema(description = "图片地址", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "图片地址", example = "https://www.deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "绘画错误信息", example = "图片错误信息")

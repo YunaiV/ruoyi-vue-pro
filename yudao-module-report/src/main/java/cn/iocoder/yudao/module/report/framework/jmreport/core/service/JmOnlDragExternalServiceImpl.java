@@ -16,7 +16,7 @@ import java.util.Map;
  * 1. <a href="https://github.com/jeecgboot/jimureport/blob/master/jimureport-example/src/main/java/com/jeecg/modules/jmreport/extend/JimuDragExternalServiceImpl.java">jimureport-example</a>
  * 2. <a href="https://gitee.com/jeecg/JeecgBoot/blob/master/jeecg-boot/jeecg-module-system/jeecg-system-biz/src/main/java/org/jeecg/config/jimureport/JimuDragExternalServiceImpl.java">JeecgBoot 集成</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 public class JmOnlDragExternalServiceImpl implements IOnlDragExternalService {

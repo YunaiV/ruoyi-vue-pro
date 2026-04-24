@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 优惠劵 Response DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class CouponRespDTO {

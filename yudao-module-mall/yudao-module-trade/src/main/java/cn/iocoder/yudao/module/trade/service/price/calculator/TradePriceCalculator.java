@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
  * 优惠计算顺序：
  * 1. <a href="https://help.youzan.com/displaylist/detail_4_4-1-53316">积分抵现、会员价、优惠券、粉丝专享价、满减送哪个优先计算？</>
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface TradePriceCalculator {
 

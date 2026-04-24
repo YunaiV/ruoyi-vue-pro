@@ -12,7 +12,7 @@ import static cn.iocoder.yudao.module.pay.dal.redis.RedisKeyConstants.PAY_NOTIFY
 /**
  * 支付通知的锁 Redis DAO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Repository
 public class PayNotifyLockRedisDAO {

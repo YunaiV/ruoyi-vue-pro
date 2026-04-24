@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 /**
  * {@link MesCalPlanServiceImpl} 的单元测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(MesCalPlanServiceImpl.class)
 public class MesCalPlanServiceImplTest extends BaseDbUnitTest {

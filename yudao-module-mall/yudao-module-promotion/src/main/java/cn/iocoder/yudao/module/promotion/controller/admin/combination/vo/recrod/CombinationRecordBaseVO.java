@@ -33,10 +33,10 @@ public class CombinationRecordBaseVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    @Schema(description = "用户昵称", example = "老芋艿")
+    @Schema(description = "用户昵称", example = "老deepay")
     private String nickname;
 
-    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.jpg")
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xxx.jpg")
     private String avatar;
 
     // ========== 商品相关 ==========
@@ -52,7 +52,7 @@ public class CombinationRecordBaseVO {
     @Schema(description = "商品名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是大黄豆")
     private String spuName;
 
-    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "过期时间", requiredMode = Schema.RequiredMode.REQUIRED)

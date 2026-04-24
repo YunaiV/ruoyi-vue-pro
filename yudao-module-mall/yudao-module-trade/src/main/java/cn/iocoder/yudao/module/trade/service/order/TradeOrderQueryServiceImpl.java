@@ -38,7 +38,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_NOT_F
 /**
  * 交易订单【读】 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {

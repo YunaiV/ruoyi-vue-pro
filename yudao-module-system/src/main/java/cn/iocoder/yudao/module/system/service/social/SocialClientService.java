@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * 社交应用 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface SocialClientService {
 

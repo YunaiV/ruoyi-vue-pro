@@ -20,11 +20,11 @@ public class ErpSupplierRespVO {
     @ExcelProperty("供应商编号")
     private Long id;
 
-    @Schema(description = "供应商名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "供应商名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("供应商名称")
     private String name;
 
-    @Schema(description = "联系人", example = "芋艿")
+    @Schema(description = "联系人", example = "deepay")
     @ExcelProperty("联系人")
     private String contact;
 

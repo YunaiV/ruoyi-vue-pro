@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * MES 库存事务类型枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

@@ -1,1 +1,1 @@
-<http://www.iocoder.cn/Spring-Boot/RocketMQ/?yudao>
+<http://www.deepay.srl/Spring-Boot/RocketMQ/?yudao>

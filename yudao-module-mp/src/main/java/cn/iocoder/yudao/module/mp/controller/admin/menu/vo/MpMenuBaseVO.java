@@ -44,7 +44,7 @@ public class MpMenuBaseVO {
      */
     private String type;
 
-    @Schema(description = "网页链接", example = "https://www.iocoder.cn/")
+    @Schema(description = "网页链接", example = "https://www.deepay.srl/")
     @NotEmpty(message = "网页链接不能为空", groups = {ViewButtonGroup.class, MiniProgramButtonGroup.class})
     @URL(message = "网页链接必须是 URL 格式")
     private String url;
@@ -75,7 +75,7 @@ public class MpMenuBaseVO {
     @NotEmpty(message = "回复的消息 mediaId 不能为空",
             groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String replyMediaId;
-    @Schema(description = "回复的媒体 URL", example = "https://www.iocoder.cn/xxx.jpg")
+    @Schema(description = "回复的媒体 URL", example = "https://www.deepay.srl/xxx.jpg")
     @NotEmpty(message = "回复的消息 mediaId 不能为空",
             groups = {ImageMessageGroup.class, VoiceMessageGroup.class, VideoMessageGroup.class})
     private String replyMediaUrl;
@@ -83,7 +83,7 @@ public class MpMenuBaseVO {
     @Schema(description = "缩略图的媒体 id", example = "123456")
     @NotEmpty(message = "回复的消息 thumbMediaId 不能为空", groups = {MusicMessageGroup.class})
     private String replyThumbMediaId;
-    @Schema(description = "缩略图的媒体 URL",example = "https://www.iocoder.cn/xxx.jpg")
+    @Schema(description = "缩略图的媒体 URL",example = "https://www.deepay.srl/xxx.jpg")
     @NotEmpty(message = "回复的消息 thumbMedia 地址不能为空", groups = {MusicMessageGroup.class})
     private String replyThumbMediaUrl;
 
@@ -103,11 +103,11 @@ public class MpMenuBaseVO {
     @Valid
     private List<MpMessageDO.Article> replyArticles;
 
-    @Schema(description = "回复的音乐链接", example = "https://www.iocoder.cn/xxx.mp3")
+    @Schema(description = "回复的音乐链接", example = "https://www.deepay.srl/xxx.mp3")
     @NotEmpty(message = "回复的音乐链接不能为空", groups = MusicMessageGroup.class)
     @URL(message = "回复的高质量音乐链接格式不正确", groups = MusicMessageGroup.class)
     private String replyMusicUrl;
-    @Schema(description = "高质量音乐链接", example = "https://www.iocoder.cn/xxx.mp3")
+    @Schema(description = "高质量音乐链接", example = "https://www.deepay.srl/xxx.mp3")
     @NotEmpty(message = "回复的高质量音乐链接不能为空", groups = MusicMessageGroup.class)
     @URL(message = "回复的高质量音乐链接格式不正确", groups = MusicMessageGroup.class)
     private String replyHqMusicUrl;

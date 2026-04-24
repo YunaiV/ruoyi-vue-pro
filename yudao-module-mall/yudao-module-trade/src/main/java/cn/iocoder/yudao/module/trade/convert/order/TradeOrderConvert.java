@@ -109,7 +109,7 @@ public interface TradeOrderConvert {
         String subject = orderItems.get(0).getSpuName();
         subject = StrUtils.maxLength(subject, PayOrderCreateReqDTO.SUBJECT_MAX_LENGTH); // 避免超过 32 位
         createReqDTO.setSubject(subject);
-        createReqDTO.setBody(subject); // TODO 芋艿：临时写死
+        createReqDTO.setBody(subject); // TODO：临时写死
         // 订单相关字段
         createReqDTO.setPrice(order.getPayPrice()).setExpireTime(addTime(orderProperties.getPayExpireTime()));
         return createReqDTO;

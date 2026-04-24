@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class Demo03StudentInnerPageReqVO extends PageParam {
 
-    @Schema(description = "名字", example = "芋艿")
+    @Schema(description = "名字", example = "deepay")
     private String name;
 
     @Schema(description = "性别")

@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  * <p>
  * 基于 Vert.x 实现 HTTP 服务器，接收设备上行消息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotHttpProtocol implements IotProtocol {
