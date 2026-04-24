@@ -27,9 +27,8 @@ public class SecurityConfiguration {
                         "/deepay/trend",             // 趋势查询
                         "/deepay/callback/payment",  // 支付回调（Webhook，无 Token）
                         "/deepay/callback/refund",   // 退款回调
-                        "/api/order/create",         // 创建订单（PR#6）
-                        "/api/payment/callback",     // Jeepay Webhook（PR#6）
-                        "/api/payment/simulate",     // 模拟支付（PR#6）
+                        "/api/order/create",         // 创建订单 - DeepayDesignController（设计下单）
+                        "/api/payment/**",           // 支付相关接口（创建订单/回调/模拟/商品详情）
                         "/product/**",               // 商品展示页（PR#5）
                         "/api/product/**",           // 商品 JSON API（PR#5）
                         "/deepay/inventory/**",      // 库存管理（MVP 阶段）
