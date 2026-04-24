@@ -44,8 +44,8 @@ PORT="${PORT:-48080}"
 PROFILE="${PROFILE:-prod}"
 
 FRONTEND_SRC=$PROJECT/yudao-ui-deepay
-# 前端部署到独立目录，Nginx 单独 server block 指向此处
-FRONTEND_OUT="${FRONTEND_OUT:-/www/wwwroot/admin}"
+# 单站点模式：前端直接输出到站点根目录
+FRONTEND_OUT="${FRONTEND_OUT:-$PROJECT}"
 
 # 单域名配置（不再生成 admin. / api. 子域名）
 DOMAIN="${DOMAIN:-deepay.srl}"
@@ -478,18 +478,17 @@ echo $! > "$PID"
 ok "后端已启动  PID=$(cat "$PID")  日志→ $LOG"
 
 info "等待后端就绪（最长 120 秒）..."
-# 注意：本项目未暴露 /actuator/health，使用根路径 / 做存活检测
-HEALTH=http://127.0.0.1:${PORT}/
+HEALTH=http://127.0.0.1:${PORT}/actuator/health
 STATUS=000
 for i in $(seq 1 120); do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH" 2>/dev/null || echo "000")
-  [ "$STATUS" != "000" ] && break
+  [ "$STATUS" = "200" ] && break
   printf "."
   sleep 1
 done
 echo ""
-[ "$STATUS" != "000" ] && ok "后端已就绪 ✓  HTTP $STATUS" \
-  || warn "120s 后仍无响应，可能还在启动中。查看: tail -f $LOG"
+[ "$STATUS" = "200" ] && ok "后端健康检查通过 ✓" \
+  || warn "120s 后仍未就绪（状态 $STATUS），可能还在启动中。查看: tail -f $LOG"
 
 # ══════════════════════════════════════════════════════════
 # 步骤 7 — 构建 & 部署前端

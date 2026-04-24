@@ -126,23 +126,22 @@ deploy_backend() {
   ok "已启动  PID=$(cat "$BACKEND_PID")  日志→ $BACKEND_LOG"
 
   # ── 健康检查 ────────────────────────────────────────────
-  # 注意：本项目未暴露 /actuator/health，使用根路径 / 做存活检测
   step "A-7  健康检查（最长等 120s）"
-  HEALTH=http://127.0.0.1:${BACKEND_PORT}/
+  HEALTH=http://127.0.0.1:${BACKEND_PORT}/actuator/health
   STATUS=000
   for i in $(seq 1 120); do
     STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH" 2>/dev/null || echo "000")
-    [ "$STATUS" != "000" ] && break
+    [ "$STATUS" = "200" ] && break
     printf "."
     sleep 1
   done
   echo ""
-  if [ "$STATUS" != "000" ]; then
-    ok "后端已就绪 ✓  HTTP $STATUS  ($HEALTH)"
+  if [ "$STATUS" = "200" ]; then
+    ok "健康检查通过 ✓  $HEALTH"
   else
-    warn "120s 内无响应。查看日志："
+    warn "120s 内未就绪（最后状态 $STATUS）。查看日志："
     tail -30 "$BACKEND_LOG" || true
-    warn "查看完整日志：tail -f $BACKEND_LOG"
+    warn "后端可能仍在启动中，稍后再检查：curl $HEALTH"
   fi
 }
 
