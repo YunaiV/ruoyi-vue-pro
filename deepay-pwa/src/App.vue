@@ -20,30 +20,31 @@
 
       <!-- Nav Items -->
       <nav class="sb-nav">
+
+        <!-- ① 主页 -->
         <button class="sb-nav-btn" :class="{ active: currentRoute === '/' }" @click="newChat">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          新聊天
+          主页
         </button>
-        <button class="sb-nav-btn" @click="searchFocus">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          搜索对话
-        </button>
-        <button class="sb-nav-btn" :class="{ active: currentRoute === '/template-library' }" @click="navTo('/template-library')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          模板库
-        </button>
+
+        <!-- ② 图库 -->
         <button class="sb-nav-btn" :class="{ active: currentRoute === '/image-library' }" @click="navTo('/image-library')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           图库
         </button>
-        <button class="sb-nav-btn" :class="{ active: currentRoute === '/model-library' }" @click="navTo('/model-library')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          模特库
-        </button>
+
+        <!-- ③ AI 开店 -->
         <button class="sb-nav-btn" :class="{ active: currentRoute === '/ai-sales' }" @click="navTo('/ai-sales')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           AI 开店
         </button>
+
+        <!-- ④ 模板库 -->
+        <button class="sb-nav-btn" :class="{ active: currentRoute === '/template-library' }" @click="navTo('/template-library')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          模板库
+        </button>
+
       </nav>
 
       <div class="sb-divider"></div>
@@ -83,7 +84,7 @@
           <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
           {{ themeStore.isDark ? '深色模式' : '浅色模式' }}
         </button>
-        <div class="sb-user" @click="navTo('/settings')">
+        <div class="sb-user" :class="{ active: currentRoute === '/settings' }" @click="navTo('/settings')">
           <div class="sb-avatar">{{ userStore.avatarLetter }}</div>
           <div class="sb-user-info">
             <span class="sb-user-name">{{ userStore.displayName }}</span>
@@ -437,6 +438,7 @@ onMounted(() => {
   transition: background 0.15s;
 }
 .sb-user:hover { background: var(--gpt-sidebar-hover); }
+.sb-user.active { background: var(--gpt-sidebar-active); }
 
 .sb-avatar {
   width: 32px;
