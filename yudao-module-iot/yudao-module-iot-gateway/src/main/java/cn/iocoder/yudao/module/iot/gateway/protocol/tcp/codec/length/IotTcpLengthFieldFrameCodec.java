@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *   <li>initialBytesToStrip: 解码后跳过的字节数</li>
  * </ul>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotTcpLengthFieldFrameCodec implements IotTcpFrameCodec {

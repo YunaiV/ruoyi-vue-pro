@@ -14,17 +14,46 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Project requires JDK 17 (revision = 2026.03-jdk17-SNAPSHOT)
     strategy:
       matrix:
-        java: [ '8', '11', '17' ]
+        java: [ '17' ]
+
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK ${{ matrix.Java }}
-      uses: actions/setup-java@v2
+    - uses: actions/checkout@v3
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v3
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
         cache: maven
+
+    # yudao-dependencies is a local reactor module, NOT published to any remote repo.
+    # Pre-installing it avoids "Non-resolvable import POM" during root POM model-building.
+    - name: Pre-install yudao-dependencies BOM
+      run: mvn install -f yudao-dependencies/pom.xml -DskipTests -q --no-transfer-progress
+
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+      run: mvn -B package -pl yudao-server -am -Dmaven.test.skip=true --no-transfer-progress
+
+    - name: Rename JAR for release
+      run: |
+        JAR=$(find yudao-server/target -maxdepth 1 -name "*.jar" \
+          ! -name "*sources*" ! -name "*javadoc*" | head -1)
+        cp "$JAR" yudao-server.jar
+        echo "Built: $JAR → yudao-server.jar"
+
+    # Publish / overwrite the rolling "latest" release so the server can
+    # always download the newest JAR with a stable URL:
+    #   https://github.com/<owner>/<repo>/releases/download/latest/yudao-server.jar
+    - name: Publish JAR as GitHub Release (latest)
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: "Latest Build"
+        body: "Auto-built from commit ${{ github.sha }} on ${{ github.ref_name }}"
+        prerelease: true
+        files: yudao-server.jar

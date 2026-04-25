@@ -20,7 +20,7 @@ import java.util.Map;
  * 1. 目前默认使用 jdbcTemplate 查询项目配置的数据源。如果你想查询其它数据源，可以新建对应数据源的 jdbcTemplate 来实现。
  * 2. 默认数据源是 MySQL 关系数据源，可能数据量比较大的情况下，会比较慢，可以考虑后续使用 Click House 等等。
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

@@ -27,7 +27,7 @@ public class ArticleBaseVO {
     @Schema(description = "文章作者", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     private String author;
 
-    @Schema(description = "文章封面图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "文章封面图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl")
     @NotNull(message = "文章封面图片地址不能为空")
     private String picUrl;
 

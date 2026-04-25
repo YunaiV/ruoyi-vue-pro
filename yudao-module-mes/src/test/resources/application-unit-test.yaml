@@ -9,7 +9,7 @@ spring:
 spring:
   # 数据源配置项
   datasource:
-    name: ruoyi-vue-pro
+    name: deepay
     url: jdbc:h2:mem:testdb;MODE=MYSQL;DATABASE_TO_UPPER=false;NON_KEYWORDS=value,day; # MODE 使用 MySQL 模式；DATABASE_TO_UPPER 配置表和字段使用小写
     driver-class-name: org.h2.Driver
     username: sa
@@ -40,9 +40,9 @@ mybatis:
 
 --- #################### 监控相关配置 ####################
 
---- #################### 芋道相关配置 ####################
+--- #################### deepay相关配置 ####################
 
-# 芋道配置项，设置当前项目所有自定义的配置
+# deepay配置项，设置当前项目所有自定义的配置
 yudao:
   info:
     base-package: cn.iocoder.yudao.module

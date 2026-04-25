@@ -11,7 +11,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 /**
  * 公众号的自动回复 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MpAutoReplyService {
 

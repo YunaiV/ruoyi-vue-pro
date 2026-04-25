@@ -56,7 +56,7 @@ import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModel
  * 流程模型实现：主要进行 Flowable {@link Model} 的维护
  *
  * @author yunlongn
- * @author 芋道源码
+ * @author deepay
  * @author jason
  */
 @Service

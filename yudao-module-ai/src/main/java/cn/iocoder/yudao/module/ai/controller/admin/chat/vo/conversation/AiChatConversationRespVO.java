@@ -57,7 +57,7 @@ public class AiChatConversationRespVO implements VO {
 
     // ========== 关联 role 信息 ==========
 
-    @Schema(description = "角色头像", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "角色头像", example = "https://www.deepay.srl/1.png")
     private String roleAvatar;
 
     @Schema(description = "角色名字", example = "小黄")

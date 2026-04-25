@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#CONFIG_PUSH} 下行消息的 params 参数
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="https://help.aliyun.com/zh/iot/user-guide/remote-configuration-1">阿里云 - 远程配置</a>
  */
 @Data

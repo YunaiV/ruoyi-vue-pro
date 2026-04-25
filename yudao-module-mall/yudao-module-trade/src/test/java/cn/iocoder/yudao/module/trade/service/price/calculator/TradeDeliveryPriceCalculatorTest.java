@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  *
  * @author jason
  */
-@Disabled // TODO 芋艿：后续修复
+@Disabled // TODO：后续修复
 public class TradeDeliveryPriceCalculatorTest  extends BaseMockitoUnitTest {
 
     @InjectMocks

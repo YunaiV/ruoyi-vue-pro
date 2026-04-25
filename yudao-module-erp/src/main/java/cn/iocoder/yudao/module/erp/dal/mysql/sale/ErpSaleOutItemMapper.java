@@ -17,7 +17,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * ERP 销售出库项 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface ErpSaleOutItemMapper extends BaseMapperX<ErpSaleOutItemDO> {

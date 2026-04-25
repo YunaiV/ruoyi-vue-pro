@@ -20,7 +20,7 @@ public class CrmContactRespVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "3167")
     private Long id;
 
-    @Schema(description = "联系人姓名", example = "芋艿")
+    @Schema(description = "联系人姓名", example = "deepay")
     @ExcelProperty(value = "联系人姓名", order = 1)
     private String name;
 

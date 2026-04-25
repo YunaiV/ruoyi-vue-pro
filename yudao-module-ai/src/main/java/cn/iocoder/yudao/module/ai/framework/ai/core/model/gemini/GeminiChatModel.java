@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 /**
  * 谷歌 Gemini {@link ChatModel} 实现类，基于 Google AI Studio 提供的 <a href="https://ai.google.dev/gemini-api/docs/openai">OpenAI 兼容方案</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @RequiredArgsConstructor

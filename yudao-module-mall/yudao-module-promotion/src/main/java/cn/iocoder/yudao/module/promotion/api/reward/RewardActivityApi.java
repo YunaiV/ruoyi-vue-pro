@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 满减送活动 API 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface RewardActivityApi {
 

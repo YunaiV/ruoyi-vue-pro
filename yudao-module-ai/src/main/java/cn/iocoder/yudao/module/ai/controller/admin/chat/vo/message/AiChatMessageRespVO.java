@@ -53,7 +53,7 @@ public class AiChatMessageRespVO {
     @Schema(description = "联网搜索的网页内容数组")
     private List<AiWebSearchResponse.WebPage> webSearchPages;
 
-    @Schema(description = "附件 URL 数组", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "附件 URL 数组", example = "https://www.deepay.srl/1.png")
     private List<String> attachmentUrls;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")

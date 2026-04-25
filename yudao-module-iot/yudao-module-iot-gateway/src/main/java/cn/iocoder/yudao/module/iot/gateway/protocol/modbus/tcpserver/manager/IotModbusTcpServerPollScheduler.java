@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * IoT Modbus TCP Server 轮询调度器：编码读请求帧，通过 TCP 连接发送到设备，注册 PendingRequest 等待响应
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotModbusTcpServerPollScheduler extends AbstractIotModbusPollScheduler {

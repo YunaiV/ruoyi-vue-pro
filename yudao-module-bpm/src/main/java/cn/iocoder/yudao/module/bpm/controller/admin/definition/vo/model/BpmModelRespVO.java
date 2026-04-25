@@ -20,10 +20,10 @@ public class BpmModelRespVO extends BpmModelMetaInfoVO {
     @Schema(description = "流程标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "process_yudao")
     private String key;
 
-    @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String name;
 
-    @Schema(description = "流程图标", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "流程图标", example = "https://www.deepay.srl/yudao.jpg")
     private String icon;
 
     @Schema(description = "流程分类编号", example = "1")

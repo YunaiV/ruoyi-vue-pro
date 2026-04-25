@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  *
  * 文档：<a href="https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1">付款码支付</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class WxBarPayClient extends AbstractWxPayClient {

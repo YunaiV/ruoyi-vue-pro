@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 /**
  * IoT 网关 HTTP 协议的处理器抽象基类：提供通用的前置处理（认证）、全局的异常捕获等
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> {

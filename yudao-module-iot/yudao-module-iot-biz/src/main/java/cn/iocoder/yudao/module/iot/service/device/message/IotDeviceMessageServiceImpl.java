@@ -51,7 +51,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DOWNST
 /**
  * IoT 设备消息 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated
@@ -122,7 +122,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // 2.2 情况二：发送下行消息
         // 如果是下行消息，需要校验 serverId 存在
-        // TODO 芋艿：【设计】下行消息需要区分 PUSH 和 PULL 模型
+        // TODO：【设计】下行消息需要区分 PUSH 和 PULL 模型
         // 1. PUSH 模型：适用于 MQTT 等长连接协议。通过 serverId 将消息路由到指定网关，实时推送。
         // 2. PULL 模型：适用于 HTTP 等短连接协议。设备无固定 serverId，无法主动推送。
         // 解决方案：
@@ -189,7 +189,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         }
     }
 
-    // TODO @芋艿：可优化：未来逻辑复杂后，可以独立拆除 Processor 处理器
+    // TODO @deepay：可优化：未来逻辑复杂后，可以独立拆除 Processor 处理器
     private Object handleUpstreamDeviceMessage0(IotDeviceMessage message, IotDeviceDO device) {
         // 设备上下线
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {

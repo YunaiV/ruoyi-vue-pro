@@ -13,11 +13,11 @@ import javax.validation.constraints.Size;
 @Data
 public class UserProfileUpdateReqVO {
 
-    @Schema(description = "用户昵称", example = "芋艿")
+    @Schema(description = "用户昵称", example = "deepay")
     @Size(max = 30, message = "用户昵称长度不能超过 30 个字符")
     private String nickname;
 
-    @Schema(description = "用户邮箱", example = "yudao@iocoder.cn")
+    @Schema(description = "用户邮箱", example = "yudao@deepay.srl")
     @Email(message = "邮箱格式不正确")
     @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
     private String email;
@@ -29,7 +29,7 @@ public class UserProfileUpdateReqVO {
     @Schema(description = "用户性别，参见 SexEnum 枚举类", example = "1")
     private Integer sex;
 
-    @Schema(description = "角色头像", example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "角色头像", example = "https://www.deepay.srl/1.png")
     @URL(message = "头像地址格式不正确")
     private String avatar;
 

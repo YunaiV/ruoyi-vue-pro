@@ -134,7 +134,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 1. 先替换模板变量
         String formattedContent = StrUtil.format(content, params);
 
-        // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1461 讨论
+        // 关联 Pull Request：https://gitee.com/zhijiantianya/sdsdsdas/pulls/1461 讨论
         // 2.1 反转义HTML特殊字符
         formattedContent = unescapeHtml(formattedContent);
         // 2.2 处理代码块（确保<pre><code>标签格式正确）

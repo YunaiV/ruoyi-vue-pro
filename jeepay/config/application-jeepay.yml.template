@@ -1,0 +1,38 @@
+# Jeepay 配置模板 — 复制到 application-local.yml 填入真实值
+
+deepay:
+  payment:
+    # mock = 本地测试（默认）
+    # jeepay = 真实 Jeepay 网关
+    provider: mock
+
+  jeepay:
+    # Jeepay 网关服务地址（启动后修改）
+    api-url: http://localhost:9000
+
+    # 商户号（Jeepay管理台 → 商户管理 → 创建）
+    mch-no: M000001
+
+    # 应用ID（Jeepay管理台 → 应用管理 → 创建）
+    app-id: REPLACE_WITH_YOUR_APP_ID
+
+    # 签名密钥（Jeepay管理台 → 应用管理 → 查看密钥）
+    api-key: REPLACE_WITH_YOUR_API_KEY
+
+    # 支付方式（AUTO=自动选，或指定 WX_JSAPI / ALI_PC / ALI_WAP）
+    way-code: AUTO
+
+    # 货币（EUR=欧元，全系统统一，禁止改为其他货币除非明确要求）
+    currency: EUR
+
+    # 支付成功异步回调地址（必须公网可访问）
+    notify-url: https://your-domain.com/deepay/callback/payment
+
+# ================================================================
+# 切换到 Jeepay 真实环境的步骤：
+# 1. 启动 Jeepay 网关：git clone + mvn spring-boot:run
+# 2. 登录管理台创建商户+应用，拿到 mch-no / app-id / api-key
+# 3. 修改上面 provider: jeepay
+# 4. 填入 mch-no / app-id / api-key
+# 5. 配置 notify-url（内网测试用 ngrok）
+# ================================================================

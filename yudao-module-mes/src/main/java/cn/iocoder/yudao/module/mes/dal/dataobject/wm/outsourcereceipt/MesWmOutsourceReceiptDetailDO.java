@@ -55,7 +55,7 @@ public class MesWmOutsourceReceiptDetailDO extends BaseDO {
     /**
      * 批次编号
      *
-     * DONE @芋艿：保留。待 mes_wm_batch 模块迁移后补充 @link 关联（AI 未修复原因：标注为后续处理，需人工介入）
+     * DONE @deepay：保留。待 mes_wm_batch 模块迁移后补充 @link 关联（AI 未修复原因：标注为后续处理，需人工介入）
      */
     private Long batchId;
     /**

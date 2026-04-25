@@ -11,10 +11,10 @@
 
     <name>${project.artifactId}</name>
     <description>基础 bom 文件，管理整个项目的依赖版本</description>
-    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
+    <url>https://github.com/deepay/sdsdsdas</url>
 
     <properties>
-        <revision>2026.03-jdk8-SNAPSHOT</revision>
+        <revision>2026.03-jdk17-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.framework.version>5.3.39</spring.framework.version>
@@ -64,12 +64,12 @@
         <commons-net.version>3.12.0</commons-net.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <jsch.version>2.27.7</jsch.version>
-        <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
+        <tika-core.version>3.2.2</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.2.9.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
-        <vertx.version>4.5.22</vertx.version>
+        <vertx.version>4.5.24</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
         <californium.version>3.12.0</californium.version>
         <j2mod.version>3.2.1</j2mod.version>

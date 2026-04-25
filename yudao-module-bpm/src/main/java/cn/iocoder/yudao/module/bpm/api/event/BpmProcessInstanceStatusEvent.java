@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 流程实例的状态（结果）发生变化的 Event
  *
- * @author 芋道源码
+ * @author deepay
  */
 @SuppressWarnings("ALL")
 @Data

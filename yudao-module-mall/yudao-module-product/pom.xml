@@ -42,6 +42,12 @@
             <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
         </dependency>
 
+        <!-- Job 定时任务 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-job</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

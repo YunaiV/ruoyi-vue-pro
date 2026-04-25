@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 /**
  * 库存明细的创建 Request BO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 @NoArgsConstructor

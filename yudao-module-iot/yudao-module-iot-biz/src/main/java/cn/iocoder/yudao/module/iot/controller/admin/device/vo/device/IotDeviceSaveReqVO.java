@@ -24,7 +24,7 @@ public class IotDeviceSaveReqVO {
     @Schema(description = "设备序列号", example = "123456")
     private String serialNumber;
 
-    @Schema(description = "设备图片", example = "https://iocoder.cn/1.png")
+    @Schema(description = "设备图片", example = "https://deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "设备分组编号数组", example = "1,2")

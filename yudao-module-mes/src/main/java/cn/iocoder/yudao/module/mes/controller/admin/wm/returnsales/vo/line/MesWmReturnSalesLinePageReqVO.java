@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 管理后台 - MES 销售退货相关
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Schema(description = "管理后台 - MES 销售退货单行分页 Request VO")
 @Data

@@ -29,10 +29,10 @@ public class IotProductSaveReqVO {
     @NotNull(message = "产品分类编号不能为空")
     private Long categoryId;
 
-    @Schema(description = "产品图标", example = "https://iocoder.cn/1.svg")
+    @Schema(description = "产品图标", example = "https://deepay.srl/1.svg")
     private String icon;
 
-    @Schema(description = "产品图片", example = "https://iocoder.cn/1.png")
+    @Schema(description = "产品图片", example = "https://deepay.srl/1.png")
     private String picUrl;
 
     @Schema(description = "产品描述", example = "描述")

@@ -12,7 +12,7 @@ import java.util.List;
  * <p>
  * 额外包含了网关设备的标识信息
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class IotSubDeviceRegisterFullReqDTO {

@@ -10,14 +10,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
- * JustAuth 配置类 TODO 芋艿：等 justauth 1.4.1 版本发布！！！
+ * JustAuth 配置类 TODO deepay：等 justauth 1.4.1 版本发布！！！
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Configuration(proxyBeanMethods = false)
 public class YudaoJustAuthConfiguration {
 
-    @Bean(name = "authRequestFactory2") // TODO @芋艿：等 justauth1.4.1 发布，可以去掉
+    @Bean(name = "authRequestFactory2") // TODO @deepay：等 justauth1.4.1 发布，可以去掉
     @ConditionalOnProperty(
             prefix = "justauth",
             value = {"enabled"},

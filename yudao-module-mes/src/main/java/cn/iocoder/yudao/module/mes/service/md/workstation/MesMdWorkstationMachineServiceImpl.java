@@ -20,7 +20,7 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.MD_WORKSTATIO
 /**
  * MES 设备资源 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated

@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.PRICE_CALCU
 /**
  * 优惠劵的 {@link TradePriceCalculator} 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 @Order(TradePriceCalculator.ORDER_COUPON)

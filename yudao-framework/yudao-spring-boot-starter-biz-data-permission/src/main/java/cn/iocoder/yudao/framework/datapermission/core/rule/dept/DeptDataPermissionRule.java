@@ -45,7 +45,7 @@ import java.util.Set;
  *  3）想要保证原 dept_id 和 user_id 都可以看的到，此时使用 dept_id 和 user_id 一起过滤；
  *      最终过滤条件是 WHERE dept_id = ? OR user_id IN (?, ?, ? ...)
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AllArgsConstructor
 @Slf4j
@@ -128,7 +128,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         Expression deptExpression = buildDeptExpression(tableName,tableAlias, deptDataPermission.getDeptIds());
         Expression userExpression = buildUserExpression(tableName, tableAlias, deptDataPermission.getSelf(), loginUser.getId());
         if (deptExpression == null && userExpression == null) {
-            // TODO 芋艿：获得不到条件的时候，暂时不抛出异常，而是不返回数据
+            // TODO：获得不到条件的时候，暂时不抛出异常，而是不返回数据
             log.warn("[getExpression][LoginUser({}) Table({}/{}) DeptDataPermission({}) 构建的条件为空]",
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
 //            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",

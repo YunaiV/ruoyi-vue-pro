@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 /**
  * ERP 销售统计 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface ErpSaleStatisticsMapper {

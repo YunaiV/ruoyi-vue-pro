@@ -68,7 +68,7 @@ public class MesMdProductSopController {
     @PreAuthorize("@ss.hasPermission('mes:md-item:query')")
     public CommonResult<PageResult<MesMdProductSopRespVO>> getProductSopPage(@Valid MesMdProductSopPageReqVO pageReqVO) {
         PageResult<MesMdProductSopDO> pageResult = productSopService.getProductSopPage(pageReqVO);
-        // TODO @芋艿：工序模块实现后，补充 processCode/processName 的 JOIN 逻辑
+        // TODO @deepay：工序模块实现后，补充 processCode/processName 的 JOIN 逻辑
         return success(BeanUtils.toBean(pageResult, MesMdProductSopRespVO.class));
     }
 
@@ -79,7 +79,7 @@ public class MesMdProductSopController {
     public CommonResult<List<MesMdProductSopRespVO>> getProductSopListByItemId(
             @RequestParam("itemId") Long itemId) {
         List<MesMdProductSopDO> list = productSopService.getProductSopListByItemId(itemId);
-        // TODO @芋艿：工序模块实现后，补充 processCode/processName 的 JOIN 逻辑
+        // TODO @deepay：工序模块实现后，补充 processCode/processName 的 JOIN 逻辑
         return success(BeanUtils.toBean(list, MesMdProductSopRespVO.class));
     }
 

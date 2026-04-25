@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 物料消耗记录 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmItemConsumeMapper extends BaseMapperX<MesWmItemConsumeDO> {

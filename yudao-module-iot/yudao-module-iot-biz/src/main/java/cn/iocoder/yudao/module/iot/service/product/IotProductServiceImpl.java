@@ -150,7 +150,7 @@ public class IotProductServiceImpl implements IotProductService {
         validateProductExists(id);
 
         // 2. 更新为发布状态，需要创建产品超级表数据模型
-        // TODO @芋艿：【待定 001】1）是否需要操作后，在 redis 进行缓存，实现一个“快照”的情况，类似 tl；
+        // TODO @deepay：【待定 001】1）是否需要操作后，在 redis 进行缓存，实现一个“快照”的情况，类似 tl；
         if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
             devicePropertyDataService.defineDevicePropertyData(id);
         }

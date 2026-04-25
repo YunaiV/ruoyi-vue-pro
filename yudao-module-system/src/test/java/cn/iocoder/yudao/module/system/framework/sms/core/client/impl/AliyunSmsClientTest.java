@@ -27,14 +27,14 @@ import static org.mockito.Mockito.mockStatic;
 /**
  * {@link cn.iocoder.yudao.module.system.framework.sms.core.client.impl.AliyunSmsClient} 的单元测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class AliyunSmsClientTest extends BaseMockitoUnitTest {
 
     private final SmsChannelProperties properties = new SmsChannelProperties()
             .setApiKey(randomString()) // 随机一个 apiKey，避免构建报错
             .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
-            .setSignature("芋道源码");
+            .setSignature("deepay");
 
     @InjectMocks
     private final AliyunSmsClient smsClient = new AliyunSmsClient(properties);

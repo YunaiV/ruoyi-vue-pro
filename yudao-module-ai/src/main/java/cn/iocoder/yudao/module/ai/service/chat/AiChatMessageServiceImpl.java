@@ -85,7 +85,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
      */
     private static final Integer WEB_SEARCH_COUNT = 10;
 
-    // TODO @芋艿：后续优化下对话的 Prompt 整体结构
+    // TODO @deepay：后续优化下对话的 Prompt 整体结构
 
     /**
      * 知识库转 {@link UserMessage} 的内容模版
@@ -340,7 +340,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             if (attachmentUserMessage != null) {
                 chatMessages.add(attachmentUserMessage);
             }
-            // TODO @芋艿：历史的知识库；历史的搜索，要不要拼接？
+            // TODO @deepay：历史的知识库；历史的搜索，要不要拼接？
         });
 
         // 1.3 当前 user message 新发送消息

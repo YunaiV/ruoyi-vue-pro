@@ -18,7 +18,7 @@ public class AiChatRoleSaveMyReqVO {
     @NotEmpty(message = "角色名称不能为空")
     private String name;
 
-    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "角色头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     @NotEmpty(message = "角色头像不能为空")
     @URL(message = "角色头像必须是 URL 格式")
     private String avatar;

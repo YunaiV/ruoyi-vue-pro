@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class AppMemberLevelRespVO {
 
-    @Schema(description = "等级名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "等级名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String name;
 
     @Schema(description = "等级", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -19,10 +19,10 @@ public class AppMemberLevelRespVO {
     @Schema(description = "享受折扣", requiredMode = Schema.RequiredMode.REQUIRED, example = "98")
     private Integer discountPercent;
 
-    @Schema(description = "等级图标", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "等级图标", example = "https://www.deepay.srl/yudao.jpg")
     private String icon;
 
-    @Schema(description = "等级背景图", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "等级背景图", example = "https://www.deepay.srl/yudao.jpg")
     private String backgroundUrl;
 
 }

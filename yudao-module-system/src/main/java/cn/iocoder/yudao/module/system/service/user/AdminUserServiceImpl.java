@@ -54,7 +54,7 @@ import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.*;
 /**
  * 后台用户 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service("adminUserService")
 @Slf4j

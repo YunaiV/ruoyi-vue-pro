@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 /**
  * System Redis Key 枚举类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface RedisKeyConstants {
 

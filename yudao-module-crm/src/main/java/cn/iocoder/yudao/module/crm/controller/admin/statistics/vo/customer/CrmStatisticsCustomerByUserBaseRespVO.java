@@ -14,7 +14,7 @@ public class CrmStatisticsCustomerByUserBaseRespVO {
     @Schema(description = "负责人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long ownerUserId;
 
-    @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "负责人", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String ownerUserName;
 
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#DEVICE_REGISTER} 响应的设备信息
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="https://help.aliyun.com/zh/iot/user-guide/unique-certificate-per-product-verification">阿里云 - 一型一密</a>
  */
 @Data

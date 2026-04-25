@@ -20,7 +20,7 @@ public class ProductCommentRespVO {
     @Schema(description = "评价人名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小姑凉")
     private String userNickname;
 
-    @Schema(description = "评价人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+    @Schema(description = "评价人头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
     private String userAvatar;
     @Schema(description = "是否匿名", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean anonymous;
@@ -40,7 +40,7 @@ public class ProductCommentRespVO {
     @Schema(description = "商品 SPU 名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
     private String spuName;
 
-    @Schema(description = "商品 SKU 图片地址", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "商品 SKU 图片地址", example = "https://www.deepay.srl/yudao.jpg")
     private String skuPicUrl;
 
     @Schema(description = "商品 SKU 规格值数组")
@@ -61,7 +61,7 @@ public class ProductCommentRespVO {
     @Schema(description = "评论内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "穿起来非常丝滑凉快")
     private String content;
 
-    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.iocoder.cn/xx.png]")
+    @Schema(description = "评论图片地址数组，以逗号分隔最多上传 9 张", requiredMode = Schema.RequiredMode.REQUIRED, example = "[https://www.deepay.srl/xx.png]")
     private List<String> picUrls;
 
     @Schema(description = "商家是否回复", requiredMode = Schema.RequiredMode.REQUIRED)

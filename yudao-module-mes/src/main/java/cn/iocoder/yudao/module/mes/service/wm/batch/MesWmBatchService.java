@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 批次管理 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesWmBatchService {
 

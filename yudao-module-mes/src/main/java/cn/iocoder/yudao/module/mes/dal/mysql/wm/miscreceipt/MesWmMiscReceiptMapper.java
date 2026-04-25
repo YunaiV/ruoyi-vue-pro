@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * MES 杂项入库单 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesWmMiscReceiptMapper extends BaseMapperX<MesWmMiscReceiptDO> {

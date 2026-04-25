@@ -9,7 +9,7 @@ import io.vertx.core.parsetools.RecordParser;
  * <p>
  * 用于解决 TCP 粘包/拆包问题，提供解码（拆包）和编码（加帧）能力
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface IotTcpFrameCodec {
 

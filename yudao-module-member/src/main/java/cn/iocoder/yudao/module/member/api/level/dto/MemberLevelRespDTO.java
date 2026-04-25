@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 会员等级 Resp DTO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class MemberLevelRespDTO {

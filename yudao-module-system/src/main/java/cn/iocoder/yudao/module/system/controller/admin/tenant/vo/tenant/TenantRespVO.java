@@ -20,11 +20,11 @@ public class TenantRespVO {
     @ExcelProperty("租户编号")
     private Long id;
 
-    @Schema(description = "租户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "租户名", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("租户名")
     private String name;
 
-    @Schema(description = "联系人", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "联系人", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @ExcelProperty("联系人")
     private String contactName;
 
@@ -37,7 +37,7 @@ public class TenantRespVO {
     @DictFormat(DictTypeConstants.COMMON_STATUS)
     private Integer status;
 
-    @Schema(description = "绑定域名数组", example = "https://www.iocoder.cn")
+    @Schema(description = "绑定域名数组", example = "https://www.deepay.srl")
     private List<String> websites;
 
     @Schema(description = "租户套餐编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

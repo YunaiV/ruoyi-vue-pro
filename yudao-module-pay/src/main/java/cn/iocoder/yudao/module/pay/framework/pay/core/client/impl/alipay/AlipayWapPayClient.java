@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * 文档：<a href="https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay">手机网站支付接口</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class AlipayWapPayClient extends AbstractAlipayPayClient {

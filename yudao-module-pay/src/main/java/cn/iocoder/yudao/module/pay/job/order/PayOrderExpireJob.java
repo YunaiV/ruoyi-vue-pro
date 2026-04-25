@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  *
  * 支付超过过期时间时，支付渠道是不会通知进行过期，所以需要定时进行过期关闭。
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class PayOrderExpireJob implements JobHandler {

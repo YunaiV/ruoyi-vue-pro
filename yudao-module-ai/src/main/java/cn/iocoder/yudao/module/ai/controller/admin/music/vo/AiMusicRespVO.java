@@ -22,13 +22,13 @@ public class AiMusicRespVO {
     @Schema(description = "歌词", example = "oh~卖糕的")
     private String lyric;
 
-    @Schema(description = "图片地址", example = "https://www.iocoder.cn")
+    @Schema(description = "图片地址", example = "https://www.deepay.srl")
     private String imageUrl;
 
-    @Schema(description = "音频地址", example = "https://www.iocoder.cn")
+    @Schema(description = "音频地址", example = "https://www.deepay.srl")
     private String audioUrl;
 
-    @Schema(description = "视频地址", example = "https://www.iocoder.cn")
+    @Schema(description = "视频地址", example = "https://www.deepay.srl")
     private String videoUrl;
 
     @Schema(description = "音乐状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")

@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * 优惠劵 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "promotion_coupon", autoResultMap = true)
 @KeySequence("promotion_coupon_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -52,7 +52,7 @@ public class CouponDO extends BaseDO {
      */
     private Integer status;
 
-    // TODO 芋艿：发放 adminid？
+    // TODO：发放 adminid？
 
     // ========== 基本信息 END ==========
 

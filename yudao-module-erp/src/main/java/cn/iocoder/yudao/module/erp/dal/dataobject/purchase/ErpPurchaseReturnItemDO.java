@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 /**
  * ERP 采购退货项 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("erp_purchase_return_items")
 @KeySequence("erp_purchase_return_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

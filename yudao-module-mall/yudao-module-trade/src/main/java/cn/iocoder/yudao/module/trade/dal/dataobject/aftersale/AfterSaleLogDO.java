@@ -11,7 +11,7 @@ import lombok.*;
 /**
  * 交易售后日志 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("trade_after_sale_log")
 @KeySequence("trade_after_sale_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * {@link AnthropicChatModel} 集成测试类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class AnthropicChatModelTest {
 
@@ -62,7 +62,7 @@ public class AnthropicChatModelTest {
         flux.doOnNext(System.out::println).then().block();
     }
 
-    // TODO @芋艿：需要等 spring ai 升级：https://github.com/spring-projects/spring-ai/pull/2800
+    // TODO @deepay：需要等 spring ai 升级：https://github.com/spring-projects/spring-ai/pull/2800
     @Test
     @Disabled
     public void testStream_thinking() {

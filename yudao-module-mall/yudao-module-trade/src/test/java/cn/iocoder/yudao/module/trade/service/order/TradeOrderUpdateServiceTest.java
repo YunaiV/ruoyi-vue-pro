@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @author LeeYan9
  * @since 2022-09-07
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+@Disabled // TODO：后续 fix 补充的单测
 @Import({TradeOrderUpdateServiceImpl.class, TradeOrderConfig.class, CartServiceImpl.class, TradePriceServiceImpl.class,
         DeliveryExpressServiceImpl.class, TradeMessageServiceImpl.class
 })
@@ -114,7 +114,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 ////                .setItems(Arrays.asList(new AppTradeOrderCreateReqVO.Item().setSkuId(1L).setCount(3),
 ////                        new AppTradeOrderCreateReqVO.Item().setSkuId(2L).setCount(4)));
 //        AppTradeOrderCreateReqVO reqVO = null;
-//        // TODO 芋艿：重新高下
+//        // TODO：重新高下
 //        // mock 方法（商品 SKU 检查）
 //        ProductSkuRespDTO sku01 = randomPojo(ProductSkuRespDTO.class, o -> o.setId(1L).setSpuId(11L)
 //                .setPrice(50).setStock(100)
@@ -130,7 +130,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 //                .setStatus(ProductSpuStatusEnum.ENABLE.getStatus()));
 //        when(productSpuApi.getSpuList(eq(asSet(11L, 21L)))).thenReturn(Arrays.asList(spu01, spu02));
 //        // mock 方法（用户收件地址的校验）
-//        MemberAddressRespDTO addressRespDTO = new MemberAddressRespDTO().setId(10L).setUserId(userId).setName("芋艿")
+//        MemberAddressRespDTO addressRespDTO = new MemberAddressRespDTO().setId(10L).setUserId(userId).setName("deepay")
 //                .setMobile("15601691300").setAreaId(3306).setDetailAddress("土豆村");
 //        when(addressApi.getAddress(eq(10L), eq(userId))).thenReturn(addressRespDTO);
 //        // mock 方法（价格计算）
@@ -195,7 +195,7 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
 //        assertNull(tradeOrderDO.getLogisticsId());
 //        assertNull(tradeOrderDO.getDeliveryTime());
 //        assertNull(tradeOrderDO.getReceiveTime());
-//        assertEquals(tradeOrderDO.getReceiverName(), "芋艿");
+//        assertEquals(tradeOrderDO.getReceiverName(), "deepay");
 //        assertEquals(tradeOrderDO.getReceiverMobile(), "15601691300");
 //        assertEquals(tradeOrderDO.getReceiverAreaId(), 3306);
 //        assertEquals(tradeOrderDO.getReceiverDetailAddress(), "土豆村");

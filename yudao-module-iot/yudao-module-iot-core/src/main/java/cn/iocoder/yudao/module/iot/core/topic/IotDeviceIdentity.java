@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
  *
  * 用于标识一个设备的基本信息（productKey + deviceName）
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 @NoArgsConstructor

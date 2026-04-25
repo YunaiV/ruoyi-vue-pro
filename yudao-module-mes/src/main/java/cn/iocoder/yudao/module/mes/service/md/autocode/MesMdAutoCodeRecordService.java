@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.mes.service.md.autocode;
 /**
  * MES 编码生成记录 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesMdAutoCodeRecordService {
 

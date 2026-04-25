@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 /**
  * 交易订单的自动过期 Job
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component
 public class TradeOrderAutoCancelJob implements JobHandler {

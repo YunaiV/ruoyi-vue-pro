@@ -38,7 +38,7 @@ public class DeliveryPickUpStoreBaseVO {
     @NotBlank(message = "门店详细地址不能为空")
     private String detailAddress;
 
-    @Schema(description = "门店 logo", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+    @Schema(description = "门店 logo", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
     @NotBlank(message = "门店 logo 不能为空")
     private String logo;
 

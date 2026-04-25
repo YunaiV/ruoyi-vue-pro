@@ -23,12 +23,12 @@ import java.util.List;
  * {@link cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO}
  * 是一致的
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class BpmModelMetaInfoVO {
 
-    @Schema(description = "流程图标", example = "https://www.iocoder.cn/yudao.jpg")
+    @Schema(description = "流程图标", example = "https://www.deepay.srl/yudao.jpg")
     @URL(message = "流程图标格式不正确")
     private String icon;
 

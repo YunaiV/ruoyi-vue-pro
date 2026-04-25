@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.framework.ai.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.module.ai.framework.ai.core.gateway.ModelGateway;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
@@ -10,6 +11,10 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiImageModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.vllm.VllmChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
@@ -37,6 +42,7 @@ import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClie
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreProperties;
 import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreProperties;
 import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -47,7 +53,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 芋道 AI 自动配置
+ * deepay AI 自动配置
  *
  * @author fansili
  */
@@ -218,7 +224,7 @@ public class AiAutoConfiguration {
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
-                // TODO @芋艿：星火的 function call 有 bug，会报 ToolResponseMessage must have an id 错误！！！
+                // TODO @deepay：星火的 function call 有 bug，会报 ToolResponseMessage must have an id 错误！！！
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new XingHuoChatModel(openAiChatModel);
@@ -284,6 +290,109 @@ public class AiAutoConfiguration {
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new DouBaoChatModel(openAiChatModel);
+    }
+
+    // ========== Runpod ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.runpod.enable", havingValue = "true")
+    public RunpodChatModel runpodChatModel(YudaoAiProperties yudaoAiProperties) {
+        return buildRunpodChatClient(yudaoAiProperties.getRunpod());
+    }
+
+    /**
+     * 构建 RunpodChatModel。
+     *
+     * <p>Runpod 暴露 OpenAI 兼容端点：{@code {baseUrl}/v2/{endpointId}/openai/v1}，
+     * 因此直接复用 OpenAiChatModel 作为底层实现。</p>
+     */
+    public RunpodChatModel buildRunpodChatClient(YudaoAiProperties.Runpod properties) {
+        String baseUrl = StrUtil.blankToDefault(properties.getBaseUrl(), RunpodChatModel.DEFAULT_BASE_URL);
+        String endpointId = StrUtil.blankToDefault(properties.getEndpointId(), RunpodChatModel.DEFAULT_ENDPOINT_ID);
+        String modelName = StrUtil.blankToDefault(properties.getModel(), RunpodChatModel.DEFAULT_MODEL_NAME);
+        // Runpod OpenAI 兼容端点：{baseUrl}/v2/{endpointId}/openai/v1
+        String openAiBaseUrl = baseUrl + "/v2/" + endpointId + RunpodChatModel.OPENAI_COMPAT_PATH;
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(openAiBaseUrl)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(modelName)
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new RunpodChatModel(openAiChatModel);
+    }
+
+    // ========== ModelGateway ==========
+
+    @Bean
+    public ModelGateway modelGateway(@Autowired(required = false) RunpodChatModel runpodChatModel) {
+        return new ModelGateway(runpodChatModel);
+    }
+
+    // ========== vLLM ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.vllm.enable", havingValue = "true")
+    public VllmChatModel vllmChatModel(YudaoAiProperties yudaoAiProperties) {
+        return buildVllmChatClient(yudaoAiProperties.getVllm());
+    }
+
+    /**
+     * 构建 VllmChatModel。
+     *
+     * <p>vLLM 暴露标准 OpenAI 兼容端点 {@code {baseUrl}/v1/chat/completions}，
+     * 因此直接复用 OpenAiChatModel 作为底层实现。</p>
+     *
+     * <p>若 vLLM 服务启动时未指定 {@code --api-key}，则 apiKey 留空字符串即可。</p>
+     */
+    public VllmChatModel buildVllmChatClient(YudaoAiProperties.Vllm properties) {
+        String baseUrl = StrUtil.blankToDefault(properties.getBaseUrl(), VllmChatModel.DEFAULT_BASE_URL);
+        // apiKey 可为空（vLLM 无鉴权时），OpenAiApi 不允许 null，传空字符串
+        String apiKey = StrUtil.blankToDefault(properties.getApiKey(), "EMPTY");
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(baseUrl)
+                        .apiKey(apiKey)
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new VllmChatModel(openAiChatModel);
+    }
+
+    // ========== Stable Diffusion WebUI ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.stable-diffusion-web-ui.enable", havingValue = "true")
+    public StableDiffusionWebUiImageModel stableDiffusionWebUiImageModel(YudaoAiProperties yudaoAiProperties) {
+        return buildStableDiffusionWebUiImageClient(yudaoAiProperties.getStableDiffusionWebUi());
+    }
+
+    /**
+     * 构建 StableDiffusionWebUiImageModel。
+     *
+     * <p>SD WebUI 暴露 AUTOMATIC1111 兼容端点 {@code {baseUrl}/sdapi/v1/txt2img}，
+     * 返回 base64 编码图片列表，无需 API Key（除非启动时指定了 --api-auth）。</p>
+     *
+     * <p>RunPod 上的 TCP 直连地址示例：{@code http://103.196.86.126:15112}</p>
+     */
+    public StableDiffusionWebUiImageModel buildStableDiffusionWebUiImageClient(
+            YudaoAiProperties.StableDiffusionWebUi properties) {
+        String baseUrl = StrUtil.blankToDefault(properties.getBaseUrl(),
+                StableDiffusionWebUiImageModel.DEFAULT_BASE_URL);
+        StableDiffusionWebUiApi api = new StableDiffusionWebUiApi(baseUrl, properties.getApiKey());
+        return new StableDiffusionWebUiImageModel(api);
     }
 
     // ========== RAG 相关 ==========

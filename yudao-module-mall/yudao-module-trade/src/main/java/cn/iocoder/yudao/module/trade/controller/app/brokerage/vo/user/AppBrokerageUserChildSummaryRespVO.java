@@ -15,7 +15,7 @@ public class AppBrokerageUserChildSummaryRespVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "小王")
     private String nickname;
 
-    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.jpg")
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xxx.jpg")
     private String avatar;
 
     @Schema(description = "佣金金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")

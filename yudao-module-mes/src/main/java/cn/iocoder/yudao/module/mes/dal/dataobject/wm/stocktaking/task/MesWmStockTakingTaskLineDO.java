@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 盘点任务行 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_stock_taking_task_line")
 @KeySequence("mes_wm_stock_taking_task_line_seq")

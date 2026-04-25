@@ -98,7 +98,7 @@ docker compose exec opengauss bash -c '/usr/local/opengauss/bin/gsql -U $GS_USER
 
 ```Bash
 docker compose down postgres
-docker volume rm ruoyi-vue-pro_postgres
+docker volume rm sdsdsdas_postgres
 ```
 
 ## 2. MySQL 转换其它数据库
@@ -107,7 +107,7 @@ docker volume rm ruoyi-vue-pro_postgres
 
 ### 2.1 实现原理
 
-通过读取 MySQL 的 `sql/mysql/ruoyi-vue-pro.sql` 数据库文件，转换成对应的数据库脚本。
+通过读取 MySQL 的 `sql/mysql/sdsdsdas.sql` 数据库文件，转换成对应的数据库脚本。
 
 ### 2.2 使用方法
 

@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * 优惠劵 Convert
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface CouponConvert {

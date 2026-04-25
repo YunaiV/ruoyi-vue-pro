@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemconsume.MesWmItemConsum
 /**
  * MES 物料消耗记录 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesWmItemConsumeService {
 

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * MES 安灯呼叫配置 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesProAndonConfigService {
 

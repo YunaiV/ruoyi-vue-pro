@@ -11,7 +11,7 @@ import lombok.Data;
  *
  * 通过充值套餐时，可以赠送一定金额；
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value ="pay_wallet_recharge_package")
 @KeySequence("pay_wallet_recharge_package_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

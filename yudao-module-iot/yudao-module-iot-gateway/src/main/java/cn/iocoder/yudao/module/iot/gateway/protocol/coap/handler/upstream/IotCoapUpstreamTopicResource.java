@@ -12,7 +12,7 @@ import org.eclipse.californium.core.server.resources.Resource;
  * - /topic/sys/{productKey}/{deviceName}/thing/property/post
  * - /topic/sys/{productKey}/{deviceName}/thing/event/{eventId}/post
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotCoapUpstreamTopicResource extends CoapResource {

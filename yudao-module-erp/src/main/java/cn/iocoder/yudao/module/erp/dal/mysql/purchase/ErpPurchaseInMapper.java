@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * ERP 采购入库 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {

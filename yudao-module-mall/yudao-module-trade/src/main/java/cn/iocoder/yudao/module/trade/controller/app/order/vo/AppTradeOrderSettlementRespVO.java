@@ -61,7 +61,7 @@ public class AppTradeOrderSettlementRespVO {
         private Integer skuId;
         @Schema(description = "价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
         private Integer price;
-        @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.png")
+        @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.png")
         private String picUrl;
 
         @Schema(description = "属性数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")

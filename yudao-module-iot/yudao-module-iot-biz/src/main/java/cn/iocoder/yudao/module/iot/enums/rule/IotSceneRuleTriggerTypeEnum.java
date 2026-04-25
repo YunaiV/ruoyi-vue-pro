@@ -13,7 +13,7 @@ import java.util.Arrays;
  * 为什么不直接使用 IotDeviceMessageMethodEnum 呢？
  * 原因是，物模型属性上报，存在批量上报的情况，不只对应一个 method！！！
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Getter

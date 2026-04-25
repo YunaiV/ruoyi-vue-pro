@@ -24,7 +24,7 @@ import static java.util.Collections.singletonList;
  *
  * 主要实现对 {@link TradePriceCalculateRespBO} 计算结果的操作
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TradePriceCalculatorHelper {
 

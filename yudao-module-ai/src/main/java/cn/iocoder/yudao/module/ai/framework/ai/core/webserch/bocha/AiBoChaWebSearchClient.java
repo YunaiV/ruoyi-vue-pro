@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  *
  * @see <a href="https://open.bochaai.com/overview">博查 AI 开放平台</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class AiBoChaWebSearchClient implements AiWebSearchClient {

@@ -34,7 +34,7 @@ import java.util.Properties;
 /**
  * Redis 消息队列 Consumer 配置类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @EnableScheduling // 启用定时任务，用于 RedisPendingMessageResendJob 重发消息

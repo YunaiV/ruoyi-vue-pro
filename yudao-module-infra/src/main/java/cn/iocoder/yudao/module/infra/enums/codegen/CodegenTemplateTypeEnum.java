@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * 代码生成模板类型
  *
- * @author 芋道源码
+ * @author deepay
  */
 @AllArgsConstructor
 @Getter

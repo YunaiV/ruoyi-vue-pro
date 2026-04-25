@@ -11,6 +11,9 @@ public class PayJobConfiguration {
 
     public static final String NOTIFY_THREAD_POOL_TASK_EXECUTOR = "NOTIFY_THREAD_POOL_TASK_EXECUTOR";
 
+    /** 区块链异步存证专用线程池名称 */
+    public static final String BLOCKCHAIN_THREAD_POOL_TASK_EXECUTOR = "blockchainTaskExecutor";
+
     @Bean(NOTIFY_THREAD_POOL_TASK_EXECUTOR)
     public ThreadPoolTaskExecutor notifyThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -21,6 +24,24 @@ public class PayJobConfiguration {
         executor.setThreadNamePrefix("notify-task-"); // 配置线程池的前缀
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         // 进行加载
+        executor.initialize();
+        return executor;
+    }
+
+    /**
+     * 区块链异步存证线程池
+     * 独立于通知线程池，避免互相影响
+     */
+    @Bean(BLOCKCHAIN_THREAD_POOL_TASK_EXECUTOR)
+    public ThreadPoolTaskExecutor blockchainThreadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(8);
+        executor.setKeepAliveSeconds(60);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("blockchain-task-");
+        // 队列满时由调用方线程执行，保证任务不丢失
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }

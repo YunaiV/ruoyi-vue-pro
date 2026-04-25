@@ -10,7 +10,7 @@ import org.springframework.ai.image.ImageResponse;
 
 import static cn.iocoder.yudao.module.ai.framework.ai.core.model.image.StabilityAiImageModelTests.viewImage;
 
-// TODO @芋艿：百度千帆 API 提供了 V2 版本，目前 Spring AI 不兼容，可关键 <https://github.com/spring-projects/spring-ai/issues/2179> 进展
+// TODO @deepay：百度千帆 API 提供了 V2 版本，目前 Spring AI 不兼容，可关键 <https://github.com/spring-projects/spring-ai/issues/2179> 进展
 
 /**
  * {@link QianFanImageModel} 集成测试类

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * 会员标签 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MemberTagMapper extends BaseMapperX<MemberTagDO> {

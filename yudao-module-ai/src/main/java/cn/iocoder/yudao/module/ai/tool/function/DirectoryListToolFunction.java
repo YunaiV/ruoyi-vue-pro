@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * 工具：列出指定目录的文件列表
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Component("directory_list")
 public class DirectoryListToolFunction implements Function<DirectoryListToolFunction.Request, DirectoryListToolFunction.Response> {

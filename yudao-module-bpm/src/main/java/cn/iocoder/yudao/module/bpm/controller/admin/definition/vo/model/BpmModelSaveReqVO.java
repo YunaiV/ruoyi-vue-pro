@@ -18,7 +18,7 @@ public class BpmModelSaveReqVO extends BpmModelMetaInfoVO {
     @NotEmpty(message = "流程标识不能为空")
     private String key;
 
-    @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotEmpty(message = "流程名称不能为空")
     private String name;
 

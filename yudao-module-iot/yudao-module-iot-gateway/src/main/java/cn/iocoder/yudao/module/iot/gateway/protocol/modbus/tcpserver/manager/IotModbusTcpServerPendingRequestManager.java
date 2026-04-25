@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * - TCP 模式：按 transactionId 精确匹配
  * - RTU 模式：按 slaveId + functionCode FIFO 匹配
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class IotModbusTcpServerPendingRequestManager {

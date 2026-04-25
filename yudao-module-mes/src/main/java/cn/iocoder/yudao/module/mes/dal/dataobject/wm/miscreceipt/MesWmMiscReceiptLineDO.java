@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 /**
  * MES 杂项入库单行 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_misc_receipt_line")
 @KeySequence("mes_wm_misc_receipt_line_seq")

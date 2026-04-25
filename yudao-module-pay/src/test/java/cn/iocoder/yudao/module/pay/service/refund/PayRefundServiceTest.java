@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 /**
  * {@link PayRefundServiceImpl} 的单元测试类
  *
- * @author 芋艿
+ * @author deepay
  */
 @Import({PayRefundServiceImpl.class, PayNoRedisDAO.class})
 public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {

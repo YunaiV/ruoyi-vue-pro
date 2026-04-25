@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * CRM 联系人 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface CrmContactService {
 

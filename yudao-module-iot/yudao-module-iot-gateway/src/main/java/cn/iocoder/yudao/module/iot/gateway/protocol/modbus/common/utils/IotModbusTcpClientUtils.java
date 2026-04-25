@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.I
  * 2. 通过 {@link IotModbusTcpClientConnectionManager.ModbusConnection} 执行事务
  * 3. 从响应中提取原始值
  *
- * @author 芋道源码
+ * @author deepay
  */
 @UtilityClass
 @Slf4j

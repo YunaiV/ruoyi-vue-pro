@@ -51,7 +51,7 @@ import static org.mockito.Mockito.*;
 /**
  * {@link MesWmItemConsumeServiceImpl} 的单元测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Import(MesWmItemConsumeServiceImpl.class)
 public class MesWmItemConsumeServiceImplTest extends BaseDbUnitTest {

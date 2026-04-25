@@ -12,7 +12,7 @@ public class DeptRespVO {
     @Schema(description = "部门编号", example = "1024")
     private Long id;
 
-    @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String name;
 
     @Schema(description = "父部门 ID", example = "1024")
@@ -27,7 +27,7 @@ public class DeptRespVO {
     @Schema(description = "联系电话", example = "15601691000")
     private String phone;
 
-    @Schema(description = "邮箱", example = "yudao@iocoder.cn")
+    @Schema(description = "邮箱", example = "yudao@deepay.srl")
     private String email;
 
     @Schema(description = "状态,见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

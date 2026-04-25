@@ -13,7 +13,7 @@ import java.util.List;
  * <p>
  * 用于 {@link IotDeviceMessageMethodEnum#TOPO_CHANGE} 下行消息的 params 参数
  *
- * @author 芋道源码
+ * @author deepay
  * @see <a href="https://help.aliyun.com/zh/marketplace/notify-gateway-topology-changes">阿里云 - 通知网关拓扑关系变化</a>
  */
 @Data

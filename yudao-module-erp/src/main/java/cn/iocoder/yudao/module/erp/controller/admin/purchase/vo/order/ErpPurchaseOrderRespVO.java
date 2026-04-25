@@ -29,7 +29,7 @@ public class ErpPurchaseOrderRespVO {
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     private Long supplierId;
-    @Schema(description = "供应商名称", example = "芋道")
+    @Schema(description = "供应商名称", example = "deepay")
     @ExcelProperty("供应商名称")
     private String supplierName;
 
@@ -63,7 +63,7 @@ public class ErpPurchaseOrderRespVO {
     @Schema(description = "定金金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal depositPrice;
 
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @Schema(description = "附件地址", example = "https://www.deepay.srl")
     @ExcelProperty("附件地址")
     private String fileUrl;
 
@@ -71,9 +71,9 @@ public class ErpPurchaseOrderRespVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @Schema(description = "创建人", example = "芋道")
+    @Schema(description = "创建人", example = "deepay")
     private String creator;
-    @Schema(description = "创建人名称", example = "芋道")
+    @Schema(description = "创建人名称", example = "deepay")
     private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

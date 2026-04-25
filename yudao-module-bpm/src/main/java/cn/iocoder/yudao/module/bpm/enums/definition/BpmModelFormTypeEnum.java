@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * BPM 模型的表单类型的枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

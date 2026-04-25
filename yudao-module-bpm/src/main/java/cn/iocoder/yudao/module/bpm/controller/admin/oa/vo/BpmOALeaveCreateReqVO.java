@@ -29,7 +29,7 @@ public class BpmOALeaveCreateReqVO {
     @Schema(description = "请假类型-参见 bpm_oa_type 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
 
-    @Schema(description = "原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "阅读芋道源码")
+    @Schema(description = "原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "阅读deepay")
     private String reason;
 
     @Schema(description = "发起人自选审批人 Map", example = "{taskKey1: [1, 2]}")

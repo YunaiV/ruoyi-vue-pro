@@ -13,7 +13,7 @@ public class DefaultDatabaseQueryTest {
     public static void main(String[] args) {
 //        DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder("jdbc:oracle:thin:@127.0.0.1:1521:xe",
 //                "root", "123456").build();
-        DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder("jdbc:postgresql://127.0.0.1:5432/ruoyi-vue-pro",
+        DataSourceConfig dataSourceConfig = new DataSourceConfig.Builder("jdbc:postgresql://127.0.0.1:5432/sdsdsdas",
                 "root", "123456").build();
 //        StrategyConfig strategyConfig = new StrategyConfig.Builder().build();
 

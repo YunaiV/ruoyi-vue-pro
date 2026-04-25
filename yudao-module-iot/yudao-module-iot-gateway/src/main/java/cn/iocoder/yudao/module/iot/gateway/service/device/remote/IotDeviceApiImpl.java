@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 /**
  * Iot 设备信息 Service 实现类：调用远程的 device http 接口，进行设备认证、设备获取等
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Slf4j

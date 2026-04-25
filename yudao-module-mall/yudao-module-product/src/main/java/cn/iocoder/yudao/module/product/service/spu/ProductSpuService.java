@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * 商品 SPU Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface ProductSpuService {
 
@@ -131,6 +131,14 @@ public interface ProductSpuService {
      * @return SPU 数量
      */
     Long getSpuCountByCategoryId(Long categoryId);
+
+    /**
+     * 直接增加商品 SPU 库存（不影响销量）
+     *
+     * @param id       商品 SPU 编号
+     * @param addCount 增加的库存数量
+     */
+    void addSpuStock(Long id, Integer addCount);
 
 
     /**

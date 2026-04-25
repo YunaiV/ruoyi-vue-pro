@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 生产流转卡 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_pro_card")
 @KeySequence("mes_pro_card_seq")

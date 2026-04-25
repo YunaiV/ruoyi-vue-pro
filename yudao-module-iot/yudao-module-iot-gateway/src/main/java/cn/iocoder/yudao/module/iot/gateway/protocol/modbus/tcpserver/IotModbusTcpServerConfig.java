@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 /**
  * IoT Modbus TCP Server 协议配置
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Data
 public class IotModbusTcpServerConfig {

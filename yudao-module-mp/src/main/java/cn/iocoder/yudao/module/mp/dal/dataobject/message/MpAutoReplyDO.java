@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * 公众号消息自动回复 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName(value = "mp_auto_reply", autoResultMap = true)
 @KeySequence("mp_auto_reply_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

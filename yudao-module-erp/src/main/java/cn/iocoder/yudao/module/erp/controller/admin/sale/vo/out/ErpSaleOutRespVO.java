@@ -29,7 +29,7 @@ public class ErpSaleOutRespVO {
 
     @Schema(description = "客户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
     private Long customerId;
-    @Schema(description = "客户名称", example = "芋道")
+    @Schema(description = "客户名称", example = "deepay")
     @ExcelProperty("客户名称")
     private String customerName;
 
@@ -73,7 +73,7 @@ public class ErpSaleOutRespVO {
     @Schema(description = "其它金额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "7127")
     private BigDecimal otherPrice;
 
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @Schema(description = "附件地址", example = "https://www.deepay.srl")
     @ExcelProperty("附件地址")
     private String fileUrl;
 
@@ -81,9 +81,9 @@ public class ErpSaleOutRespVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @Schema(description = "创建人", example = "芋道")
+    @Schema(description = "创建人", example = "deepay")
     private String creator;
-    @Schema(description = "创建人名称", example = "芋道")
+    @Schema(description = "创建人名称", example = "deepay")
     private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

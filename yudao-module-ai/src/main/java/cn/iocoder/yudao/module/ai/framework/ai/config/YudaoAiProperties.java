@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 芋道 AI 配置类
+ * deepay AI 配置类
  *
  * @author fansili
  * @since 1.0
@@ -58,6 +58,21 @@ public class YudaoAiProperties {
      * 网络搜索
      */
     private WebSearch webSearch;
+
+    /**
+     * Runpod（海外 fallback）
+     */
+    private Runpod runpod;
+
+    /**
+     * vLLM（自托管 OpenAI 兼容服务）
+     */
+    private Vllm vllm;
+
+    /**
+     * Stable Diffusion WebUI（AUTOMATIC1111 自托管图片生成服务）
+     */
+    private StableDiffusionWebUi stableDiffusionWebUi;
 
     @Data
     public static class Gemini {
@@ -175,10 +190,86 @@ public class YudaoAiProperties {
     }
 
     @Data
+    public static class Runpod {
+
+        private String enable;
+
+        /**
+         * API Key（对应环境变量 RUNPOD_API_KEY）
+         */
+        private String apiKey;
+
+        /**
+         * base URL（对应环境变量 RUNPOD_BASE_URL，默认 https://api.runpod.ai）
+         */
+        private String baseUrl;
+
+        /**
+         * 端点 ID（对应环境变量 RUNPOD_MODEL_ID，默认 qwen3-32b-awq，用于 URL 路径）
+         */
+        private String endpointId;
+
+        /**
+         * 发送给模型的 model 参数（默认 Qwen/Qwen3-32B-AWQ）
+         */
+        private String model;
+
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class Vllm {
+
+        private String enable;
+
+        /**
+         * vLLM HTTP 服务地址（默认 http://localhost:8000）
+         * 典型用法：vllm serve {model} --host 0.0.0.0 --port 8000
+         */
+        private String baseUrl;
+
+        /**
+         * API Key（对应 vllm serve --api-key 参数，无鉴权可留空）
+         */
+        private String apiKey;
+
+        /**
+         * 模型名称（与 vllm serve 指定的模型一致，如 NousResearch/Meta-Llama-3-8B-Instruct）
+         */
+        private String model;
+
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
     public static class WebSearch {
 
         private boolean enable;
 
+        private String apiKey;
+
+    }
+
+    @Data
+    public static class StableDiffusionWebUi {
+
+        private String enable;
+
+        /**
+         * SD WebUI 服务地址（如 http://103.196.86.126:15112）
+         * 本地启动时默认 http://localhost:7860
+         */
+        private String baseUrl;
+
+        /**
+         * API Key（仅在 SD WebUI 启动时指定了 --api-auth 时填写，否则留空）
+         */
         private String apiKey;
 
     }

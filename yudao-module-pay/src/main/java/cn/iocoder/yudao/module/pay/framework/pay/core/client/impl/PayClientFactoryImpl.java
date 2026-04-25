@@ -7,10 +7,12 @@ import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.*;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.mock.MockPayClient;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.wallet.WalletPayClient;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.*;
-import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.mock.MockPayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.*;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.coinbase.CoinbaseCommercePayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.crypto.CryptoUsdcPayClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Type;
@@ -23,7 +25,7 @@ import static cn.iocoder.yudao.module.pay.enums.PayChannelEnum.*;
 /**
  * 支付客户端的工厂实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class PayClientFactoryImpl implements PayClientFactory {
@@ -58,6 +60,10 @@ public class PayClientFactoryImpl implements PayClientFactory {
         clientClass.put(WALLET, WalletPayClient.class);
         // Mock 支付客户端
         clientClass.put(MOCK, MockPayClient.class);
+        // Coinbase Commerce 加密货币支付客户端
+        clientClass.put(COINBASE_COMMERCE, CoinbaseCommercePayClient.class);
+        // 自建 USDC 加密货币支付客户端
+        clientClass.put(CRYPTO_USDC, CryptoUsdcPayClient.class);
     }
 
     @Override

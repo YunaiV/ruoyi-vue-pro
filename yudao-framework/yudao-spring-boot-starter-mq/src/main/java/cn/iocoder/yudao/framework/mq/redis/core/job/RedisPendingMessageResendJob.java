@@ -58,7 +58,7 @@ public class RedisPendingMessageResendJob {
     /**
      * 执行清理逻辑
      *
-     * @see <a href="https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/480/files">讨论</a>
+     * @see <a href="https://gitee.com/zhijiantianya/sdsdsdas/pulls/480/files">讨论</a>
      */
     private void execute() {
         StreamOperations<String, Object, Object> ops = redisTemplate.getRedisTemplate().opsForStream();

@@ -271,7 +271,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
     public void testDoSendMail_success() {
         try (final MockedStatic<MailUtil> mailUtilMock = mockStatic(MailUtil.class)) {
             // 准备参数
-            MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("芋艿"));
+            MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("deepay"));
             // mock 方法（获得邮箱账号）
             MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("7685@qq.com"));
             when(mailAccountService.getMailAccountFromCache(eq(message.getAccountId())))
@@ -281,7 +281,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             String messageId = randomString();
             mailUtilMock.when(() -> MailUtil.send(
                             argThat(mailAccount -> {
-                                assertEquals("芋艿 <7685@qq.com>", mailAccount.getFrom());
+                                assertEquals("deepay <7685@qq.com>", mailAccount.getFrom());
                                 assertTrue(mailAccount.isAuth());
                                 assertEquals(account.getUsername(), mailAccount.getUser());
                                 assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass().toCharArray());
@@ -304,7 +304,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
     public void testDoSendMail_exception() {
         try (MockedStatic<MailUtil> mailUtilMock = mockStatic(MailUtil.class)) {
             // 准备参数
-            MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("芋艿"));
+            MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("deepay"));
             // mock 方法（获得邮箱账号）
             MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("7685@qq.com"));
             when(mailAccountService.getMailAccountFromCache(eq(message.getAccountId())))
@@ -313,7 +313,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             // mock 方法（发送邮件）
             Exception e = new NullPointerException("啦啦啦");
             mailUtilMock.when(() -> MailUtil.send(argThat(mailAccount -> {
-                        assertEquals("芋艿 <7685@qq.com>", mailAccount.getFrom());
+                        assertEquals("deepay <7685@qq.com>", mailAccount.getFrom());
                         assertTrue(mailAccount.isAuth());
                         assertEquals(account.getUsername(), mailAccount.getUser());
                         assertArrayEquals(account.getPassword().toCharArray(), mailAccount.getPass().toCharArray());

@@ -36,7 +36,7 @@ import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 /**
  * 商品 SPU Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 @Validated
@@ -168,7 +168,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
         if (ObjectUtil.notEqual(spuDO.getStatus(), ProductSpuStatusEnum.RECYCLE.getStatus())) {
             throw exception(SPU_NOT_RECYCLE);
         }
-        // TODO 芋艿：【可选】参与活动中的商品，不允许删除？？？
+        // TODO：【可选】参与活动中的商品，不允许删除？？？
 
         // 删除 SPU
         productSpuMapper.deleteById(id);
@@ -248,7 +248,7 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     public void updateSpuStatus(ProductSpuUpdateStatusReqVO updateReqVO) {
         // 校验存在
         validateSpuExists(updateReqVO.getId());
-        // TODO 芋艿：【可选】参与活动中的商品，不允许下架？？？
+        // TODO：【可选】参与活动中的商品，不允许下架？？？
 
         // 更新状态
         ProductSpuDO productSpuDO = productSpuMapper.selectById(updateReqVO.getId()).setStatus(updateReqVO.getStatus());
@@ -279,6 +279,11 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     @Override
     public Long getSpuCountByCategoryId(Long categoryId) {
         return productSpuMapper.selectCount(ProductSpuDO::getCategoryId, categoryId);
+    }
+
+    @Override
+    public void addSpuStock(Long id, Integer addCount) {
+        productSpuMapper.addStock(id, addCount);
     }
 
 }

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * IoT 数据流转规则 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface IotDataRuleService {
 

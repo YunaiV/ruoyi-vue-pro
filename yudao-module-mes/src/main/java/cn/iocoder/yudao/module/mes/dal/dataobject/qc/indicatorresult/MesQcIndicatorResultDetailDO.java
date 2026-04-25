@@ -10,7 +10,7 @@ import lombok.*;
 /**
  * MES 检验结果明细记录 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_qc_indicator_result_detail")
 @KeySequence("mes_qc_indicator_result_detail_seq")

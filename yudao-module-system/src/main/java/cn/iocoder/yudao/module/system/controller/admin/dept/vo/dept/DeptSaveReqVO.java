@@ -17,7 +17,7 @@ public class DeptSaveReqVO {
     @Schema(description = "部门编号", example = "1024")
     private Long id;
 
-    @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "部门名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     @NotBlank(message = "部门名称不能为空")
     @Size(max = 30, message = "部门名称长度不能超过 30 个字符")
     private String name;
@@ -36,7 +36,7 @@ public class DeptSaveReqVO {
     @Size(max = 11, message = "联系电话长度不能超过11个字符")
     private String phone;
 
-    @Schema(description = "邮箱", example = "yudao@iocoder.cn")
+    @Schema(description = "邮箱", example = "yudao@deepay.srl")
     @Email(message = "邮箱格式不正确")
     @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
     private String email;

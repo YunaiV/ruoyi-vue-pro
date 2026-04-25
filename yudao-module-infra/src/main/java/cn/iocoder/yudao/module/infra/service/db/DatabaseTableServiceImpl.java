@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * 数据库表 Service 实现类
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Service
 public class DatabaseTableServiceImpl implements DatabaseTableService {

@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * 用于定义设备消息的序列化格式
  *
- * @author 芋道源码
+ * @author deepay
  */
 @RequiredArgsConstructor
 @Getter

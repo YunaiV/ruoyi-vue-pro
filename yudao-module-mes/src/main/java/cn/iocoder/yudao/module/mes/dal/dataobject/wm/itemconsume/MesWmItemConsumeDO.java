@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 物料消耗记录 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_item_consume")
 @KeySequence("mes_wm_item_consume_seq")

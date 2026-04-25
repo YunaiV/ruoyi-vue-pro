@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * 营销的商品范围枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor

@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 条码清单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_wm_barcode")
 @KeySequence("mes_wm_barcode_seq")

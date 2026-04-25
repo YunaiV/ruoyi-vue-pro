@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link OAuth2OpenController} 的单元测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
 
@@ -251,7 +251,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         String responseType = "token";
         String clientId = randomString();
         String scope = "{\"read\": true, \"write\": false}";
-        String redirectUri = "https://www.iocoder.cn";
+        String redirectUri = "https://www.deepay.srl";
         String state = "test";
         // mock 方法
         OAuth2ClientDO client = randomPojo(OAuth2ClientDO.class);
@@ -263,7 +263,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
                 scope, redirectUri, false, state);
         // 断言
         assertEquals(0, result.getCode());
-        assertEquals("https://www.iocoder.cn#error=access_denied&error_description=User%20denied%20access&state=test", result.getData());
+        assertEquals("https://www.deepay.srl#error=access_denied&error_description=User%20denied%20access&state=test", result.getData());
     }
 
     @Test // autoApprove = true，通过 + token
@@ -272,7 +272,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         String responseType = "token";
         String clientId = randomString();
         String scope = "{\"read\": true, \"write\": false}";
-        String redirectUri = "https://www.iocoder.cn";
+        String redirectUri = "https://www.deepay.srl";
         String state = "test";
         // mock 方法（client)
         OAuth2ClientDO client = randomPojo(OAuth2ClientDO.class).setClientId(clientId).setAdditionalInformation(null);
@@ -293,8 +293,8 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         // 断言
         assertEquals(0, result.getCode());
         assertThat(result.getData(), anyOf( // 29 和 30 都有一定概率，主要是时间计算
-                is("https://www.iocoder.cn#access_token=test_access_token&token_type=bearer&state=test&expires_in=29&scope=read"),
-                is("https://www.iocoder.cn#access_token=test_access_token&token_type=bearer&state=test&expires_in=30&scope=read")
+                is("https://www.deepay.srl#access_token=test_access_token&token_type=bearer&state=test&expires_in=29&scope=read"),
+                is("https://www.deepay.srl#access_token=test_access_token&token_type=bearer&state=test&expires_in=30&scope=read")
         ));
     }
 
@@ -304,7 +304,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         String responseType = "code";
         String clientId = randomString();
         String scope = "{\"read\": true, \"write\": false}";
-        String redirectUri = "https://www.iocoder.cn";
+        String redirectUri = "https://www.deepay.srl";
         String state = "test";
         // mock 方法（client)
         OAuth2ClientDO client = randomPojo(OAuth2ClientDO.class).setClientId(clientId).setAdditionalInformation(null);
@@ -324,7 +324,7 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
                 scope, redirectUri, false, state);
         // 断言
         assertEquals(0, result.getCode());
-        assertEquals("https://www.iocoder.cn?code=test_code&state=test", result.getData());
+        assertEquals("https://www.deepay.srl?code=test_code&state=test", result.getData());
     }
 
     private HttpServletRequest mockRequest(String clientId, String secret) {

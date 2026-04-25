@@ -26,7 +26,7 @@ public class IotOtaFirmwareCreateReqVO {
     @NotNull(message = "产品编号不能为空")
     private Long productId;
 
-    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.zip")
+    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/1.zip")
     @NotEmpty(message = "固件文件 URL 不能为空")
     @URL(message = "固件文件 URL 格式错误")
     private String fileUrl;

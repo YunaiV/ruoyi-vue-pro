@@ -15,7 +15,7 @@ public class AppProductSpuDetailRespVO {
 
     // ========== 基本信息 =========
 
-    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepay")
     private String name;
 
     @Schema(description = "商品简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "我是一个快乐简介")
@@ -80,7 +80,7 @@ public class AppProductSpuDetailRespVO {
         @Schema(description = "VIP 价格，单位使用：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "968") // 通过会员等级，计算出折扣后价格
         private Integer vipPrice;
 
-        @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.png")
+        @Schema(description = "图片地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xx.png")
         private String picUrl;
 
         @Schema(description = "库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

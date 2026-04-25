@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 会员标签 Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MemberTagService {
 

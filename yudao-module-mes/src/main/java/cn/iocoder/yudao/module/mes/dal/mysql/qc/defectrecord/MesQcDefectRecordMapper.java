@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * MES 质检缺陷记录 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface MesQcDefectRecordMapper extends BaseMapperX<MesQcDefectRecordDO> {

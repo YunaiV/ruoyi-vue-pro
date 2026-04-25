@@ -14,7 +14,7 @@ import me.chanjar.weixin.common.api.WxConsts;
  * 1. <a href="https://developers.weixin.qq.com/doc/offiaccount/Asset_Management/New_temporary_materials.html">临时素材</a>
  * 2. <a href="https://developers.weixin.qq.com/doc/offiaccount/Asset_Management/Adding_Permanent_Assets.html">永久素材</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mp_material")
 @KeySequence("mp_material_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

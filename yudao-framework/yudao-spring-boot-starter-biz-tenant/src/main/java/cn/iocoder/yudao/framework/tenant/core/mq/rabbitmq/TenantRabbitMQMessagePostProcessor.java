@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  * 1. Producer 发送消息时，将 {@link TenantContextHolder} 租户编号，添加到消息的 Header 中
  * 2. Consumer 消费消息时，将消息的 Header 的租户编号，添加到 {@link TenantContextHolder} 中，通过 {@link InvocableHandlerMethod} 实现
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class TenantRabbitMQMessagePostProcessor implements MessagePostProcessor {
 

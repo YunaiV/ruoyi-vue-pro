@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 学生班级 Mapper
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Mapper
 public interface Demo03GradeInnerMapper extends BaseMapperX<Demo03GradeDO> {

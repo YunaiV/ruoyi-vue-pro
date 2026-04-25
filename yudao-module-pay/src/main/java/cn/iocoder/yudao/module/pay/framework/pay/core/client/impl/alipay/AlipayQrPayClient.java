@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.
  *
  * 文档：<a href="https://opendocs.alipay.com/apis/02890k">扫码支付</a>
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class AlipayQrPayClient extends AbstractAlipayPayClient {

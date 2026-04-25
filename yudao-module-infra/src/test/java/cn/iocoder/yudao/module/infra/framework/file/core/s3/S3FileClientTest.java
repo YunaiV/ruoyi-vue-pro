@@ -37,7 +37,7 @@ public class S3FileClientTest {
         config.setAccessKey(System.getenv("ALIYUN_ACCESS_KEY"));
         config.setAccessSecret(System.getenv("ALIYUN_SECRET_KEY"));
         config.setBucket("yunai-aoteman");
-        config.setDomain(null); // 如果有自定义域名，则可以设置。http://ali-oss.iocoder.cn
+        config.setDomain(null); // 如果有自定义域名，则可以设置。http://ali-oss.deepay.srl
         // 默认北京的 endpoint
         config.setEndpoint("oss-cn-beijing.aliyuncs.com");
 
@@ -53,7 +53,7 @@ public class S3FileClientTest {
         config.setAccessKey(System.getenv("QCLOUD_ACCESS_KEY"));
         config.setAccessSecret(System.getenv("QCLOUD_SECRET_KEY"));
         config.setBucket("aoteman-1255880240");
-        config.setDomain(null); // 如果有自定义域名，则可以设置。http://tengxun-oss.iocoder.cn
+        config.setDomain(null); // 如果有自定义域名，则可以设置。http://tengxun-oss.deepay.srl
         // 默认上海的 endpoint
         config.setEndpoint("cos.ap-shanghai.myqcloud.com");
 
@@ -70,8 +70,8 @@ public class S3FileClientTest {
 //        config.setAccessSecret(System.getenv("QINIU_SECRET_KEY"));
         config.setAccessKey("b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8");
         config.setAccessSecret("kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP");
-        config.setBucket("ruoyi-vue-pro");
-        config.setDomain("http://test.yudao.iocoder.cn"); // 如果有自定义域名，则可以设置。http://static.yudao.iocoder.cn
+        config.setBucket("sdsdsdas");
+        config.setDomain("http://test.yudao.deepay.srl"); // 如果有自定义域名，则可以设置。http://static.yudao.deepay.srl
         config.setEnablePathStyleAccess(false);
         // 默认上海的 endpoint
         config.setEndpoint("s3-cn-south-1.qiniucs.com");
@@ -89,8 +89,8 @@ public class S3FileClientTest {
 //        config.setAccessSecret(System.getenv("QINIU_SECRET_KEY"));
         config.setAccessKey("b7yvuhBSAGjmtPhMFcn9iMOxUOY_I06cA_p0ZUx8");
         config.setAccessSecret("kXM1l5ia1RvSX3QaOEcwI3RLz3Y2rmNszWonKZtP");
-        config.setBucket("ruoyi-vue-pro-private");
-        config.setDomain("http://t151glocd.hn-bkt.clouddn.com"); // 如果有自定义域名，则可以设置。http://static.yudao.iocoder.cn
+        config.setBucket("sdsdsdas-private");
+        config.setDomain("http://t151glocd.hn-bkt.clouddn.com"); // 如果有自定义域名，则可以设置。http://static.yudao.deepay.srl
         config.setEnablePathStyleAccess(false);
         // 默认上海的 endpoint
         config.setEndpoint("s3-cn-south-1.qiniucs.com");

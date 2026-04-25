@@ -21,7 +21,7 @@ public class BrokerageUserRespVO extends BrokerageUserBaseVO {
 
     // ========== 用户信息 ==========
 
-    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.png")
+    @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/xxx.png")
     private String avatar;
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
     private String nickname;

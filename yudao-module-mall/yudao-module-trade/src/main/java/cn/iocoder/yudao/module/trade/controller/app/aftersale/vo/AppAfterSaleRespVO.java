@@ -66,7 +66,7 @@ public class AppAfterSaleRespVO {
      */
     private List<AppProductPropertyValueDetailRespVO> properties;
 
-    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/01.jpg")
+    @Schema(description = "商品图片", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.deepay.srl/01.jpg")
     private String picUrl;
 
     @Schema(description = "退货商品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

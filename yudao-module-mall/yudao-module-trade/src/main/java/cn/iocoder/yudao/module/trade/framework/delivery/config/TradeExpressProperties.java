@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
-// TODO @芋艿：未来要不要放数据库中？考虑 saas 多租户时，不同租户使用不同的配置？
+// TODO @deepay：未来要不要放数据库中？考虑 saas 多租户时，不同租户使用不同的配置？
 /**
  * 交易运费快递的配置项
  *

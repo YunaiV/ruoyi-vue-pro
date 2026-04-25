@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * 支付渠道的编码的枚举
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Getter
 @AllArgsConstructor
@@ -32,7 +32,11 @@ public enum PayChannelEnum implements ArrayValuable<String> {
 
     MOCK("mock", "模拟支付"),
 
-    WALLET("wallet", "钱包支付");
+    WALLET("wallet", "钱包支付"),
+
+    COINBASE_COMMERCE("coinbase_commerce", "Coinbase Commerce 加密货币支付"),
+
+    CRYPTO_USDC("crypto_usdc", "自建 USDC 加密货币支付");
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(PayChannelEnum::getCode).toArray(String[]::new);
 

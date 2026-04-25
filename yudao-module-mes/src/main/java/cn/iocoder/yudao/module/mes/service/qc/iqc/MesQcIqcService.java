@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * MES 来料检验单（IQC） Service 接口
  *
- * @author 芋道源码
+ * @author deepay
  */
 public interface MesQcIqcService {
 

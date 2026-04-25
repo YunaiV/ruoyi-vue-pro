@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 /**
  * Map 工具类
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class MapUtils {
 

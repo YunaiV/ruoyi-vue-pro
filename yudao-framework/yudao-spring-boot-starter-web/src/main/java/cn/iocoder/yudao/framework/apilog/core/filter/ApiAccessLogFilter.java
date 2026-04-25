@@ -44,7 +44,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  *
  * 目的：记录 API 访问日志到数据库中
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 public class ApiAccessLogFilter extends ApiRequestFilter {

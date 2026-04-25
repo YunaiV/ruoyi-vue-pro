@@ -19,7 +19,7 @@ public class AiKnowledgeDocumentCreateReqVO {
     @NotBlank(message = "文档名称不能为空")
     private String name;
 
-    @Schema(description = "文档 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://doc.iocoder.cn")
+    @Schema(description = "文档 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://admin.deepay.srl")
     @URL(message = "文档 URL 格式不正确")
     private String url;
 

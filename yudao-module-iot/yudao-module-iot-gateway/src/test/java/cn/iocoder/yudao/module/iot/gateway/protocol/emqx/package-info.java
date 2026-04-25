@@ -13,6 +13,6 @@
  * +--------+                 +-------------+                   +---------+
  * </pre>
  *
- * @author 芋道源码
+ * @author deepay
  */
 package cn.iocoder.yudao.module.iot.gateway.protocol.emqx;

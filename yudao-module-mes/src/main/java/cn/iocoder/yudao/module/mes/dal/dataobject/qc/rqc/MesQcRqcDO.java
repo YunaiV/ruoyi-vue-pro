@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 /**
  * MES 退货检验单（RQC, Return Quality Control） DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("mes_qc_rqc")
 @KeySequence("mes_qc_rqc_seq")

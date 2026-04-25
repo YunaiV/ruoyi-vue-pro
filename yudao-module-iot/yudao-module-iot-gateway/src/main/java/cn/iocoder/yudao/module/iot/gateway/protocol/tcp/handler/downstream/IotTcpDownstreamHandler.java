@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * IoT 网关 TCP 下行消息处理器
  *
- * @author 芋道源码
+ * @author deepay
  */
 @Slf4j
 @RequiredArgsConstructor

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * ERP 其它入库单 DO
  *
- * @author 芋道源码
+ * @author deepay
  */
 @TableName("erp_stock_in")
 @KeySequence("erp_stock_in_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * {@link MiniMaxChatModel} 的集成测试
  *
- * @author 芋道源码
+ * @author deepay
  */
 public class MiniMaxChatModelTests {
 
@@ -59,7 +59,7 @@ public class MiniMaxChatModelTests {
         }).then().block();
     }
 
-    // TODO @芋艿：暂时没解析 reasoning_content 结果，需要等官方修复
+    // TODO @deepay：暂时没解析 reasoning_content 结果，需要等官方修复
     @Test
     @Disabled
     public void testStream_thinking() {
