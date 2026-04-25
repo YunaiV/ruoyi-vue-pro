@@ -1,11 +1,6 @@
 <!--
-  Home.vue — App首页（功能入口，不是宣传页）
-
-  功能：
-  ✔ AI输入框（主入口）→ /generate?prompt=...
-  ✔ 双入口 CTA：AI生成 / 模板开店
-  ✔ 模板横滑预览 → /template/:id
-  ✔ 快捷入口：我的店铺 / 全部模板
+  Home.vue — App首页（功能入口）
+  Gemini-style design with hero + chips + templates + AI grid + quick links
 -->
 <script setup>
 import { ref, computed, onMounted } from 'vue'
@@ -39,6 +34,33 @@ function goTemplate(id) {
   router.push(`/template/${id}`)
 }
 
+// Feature chips
+const FEATURE_CHIPS = [
+  { label: '✨ AI出款', path: '/ai/design' },
+  { label: '🎭 灵感库', path: '/inspiration' },
+  { label: '🌿 整季系列', path: '/ai/season' },
+  { label: '🔧 改款工具', path: '/redesign' },
+  { label: '📐 设计稿', path: '/generate' },
+]
+
+// AI tools grid
+const AI_TOOLS = [
+  { icon: '🎯', title: 'AI出款',   sub: '可控出款，系列生成', path: '/ai/design',   accent: false },
+  { icon: '🎭', title: '灵感库',   sub: '精选秀场 + 品牌图',  path: '/inspiration', accent: true  },
+  { icon: '🌿', title: '整季系列', sub: '一键生成 A/B/C',     path: '/ai/season',   accent: false },
+  { icon: '🔧', title: '改款工具', sub: '参考图 → 新款',      path: '/redesign',    accent: false },
+]
+
+// Quick links grid (3 columns)
+const QUICK_LINKS = [
+  { icon: '🏪', title: '我的店铺', sub: () => myShops.value.length > 0 ? `${myShops.value.length} 家` : '暂无', path: '/me' },
+  { icon: '🎨', title: 'AI设计',   sub: () => `每日 ${remainFree.value} 次`,                                     path: '/generate' },
+  { icon: '✏️', title: 'AI改款',   sub: () => '上传参考图',                                                       path: '/redesign' },
+  { icon: '🏆', title: '排行榜',   sub: () => '收益排名',                                                         path: '/leaderboard' },
+  { icon: '🎁', title: '邀请好友', sub: () => '每邀一人得 €2',                                                    path: '/invite' },
+  { icon: '📦', title: '全部模板', sub: () => `${templates.length} 套`,                                           path: '/template' },
+]
+
 // My stores from localStorage
 const myShops = computed(() => {
   const result = []
@@ -53,341 +75,342 @@ const myShops = computed(() => {
   }
   return result.slice(0, 3)
 })
+
+const inputFocused = ref(false)
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg text-white">
+  <div class="home-page">
 
-    <!-- ── 顶部导航 ──────────────────────────────────── -->
-    <header class="sticky top-0 z-10 bg-bg/90 backdrop-blur-md
-                   border-b border-border px-4 py-3
-                   flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="w-7 h-7 rounded-lg bg-accent flex items-center justify-center
-                     text-white font-black text-sm select-none">D</span>
-        <span class="font-semibold text-sm tracking-wide">Deepay</span>
+    <!-- ── Hero Section ──────────────────────────── -->
+    <section class="hero-section">
+      <p class="hero-greeting">设计师，你好 👋</p>
+      <h1 class="hero-title">今天想做什么款式？</h1>
+
+      <!-- Quota badge -->
+      <div class="quota-badge" :class="{ 'quota-low': totalRemain <= 1, 'quota-empty': totalRemain <= 0 }">
+        {{ totalRemain <= 0 ? '次数已用完' : `剩余 ${totalRemain} 次免费生成` }}
       </div>
-      <span
-        :class="[
-          'text-xs font-semibold px-3 py-1.5 rounded-full',
-          totalRemain <= 0 ? 'badge-empty' :
-          totalRemain <= 1 ? 'badge-low'   : 'badge-ok'
-        ]"
-      >
-        {{ totalRemain <= 0 ? '次数已用完' : `剩余 ${totalRemain} 次` }}
-      </span>
-    </header>
+    </section>
 
-    <div class="max-w-[480px] mx-auto px-4 pb-24">
+    <!-- ── Feature Chips ─────────────────────────── -->
+    <section class="chips-section">
+      <div class="chips-scroll">
+        <button
+          v-for="chip in FEATURE_CHIPS"
+          :key="chip.path"
+          class="feature-chip"
+          @click="router.push(chip.path)"
+        >{{ chip.label }}</button>
+      </div>
+    </section>
 
-      <!-- ── Hero：AI输入区 ─────────────────────────── -->
-      <section class="pt-8 pb-6">
-        <h1 class="text-2xl font-bold mb-1">开始设计</h1>
-        <p class="text-muted text-sm mb-5">输入描述 AI 即刻生成，或选模板直接开店</p>
-
-        <!-- 输入框 -->
-        <div class="relative mb-3">
-          <input
-            v-model="prompt"
-            type="text"
-            placeholder="描述你想要的款式，例如：黑色街头卫衣"
-            class="w-full bg-surface border border-border rounded-2xl
-                   px-4 py-3.5 pr-12 text-sm text-white placeholder-muted
-                   focus:outline-none focus:border-accent transition-colors"
-            @keydown.enter="goGenerate"
-          />
-          <!-- 发送图标 -->
-          <button
-            class="absolute right-3 top-1/2 -translate-y-1/2
-                   w-8 h-8 rounded-full bg-accent text-white
-                   flex items-center justify-center active:scale-90
-                   transition-transform duration-100"
-            @click="goGenerate"
-          >
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- 双入口 CTA -->
-        <div class="flex gap-3">
-          <button class="btn-primary flex-1 text-sm font-bold" @click="goGenerate">
-            ✨ AI生成
-          </button>
-          <button
-            class="btn-ghost flex-1 text-sm font-semibold"
-            @click="router.push('/template')"
-          >
-            🏪 模板开店
-          </button>
-        </div>
-      </section>
-
-      <!-- ── 模板横滑预览 ──────────────────────────── -->
-      <section class="mb-8">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="font-semibold text-sm">快速开店模板</h2>
-          <button
-            class="text-accent text-xs font-semibold active:opacity-70"
-            @click="router.push('/template')"
-          >
-            查看全部
-          </button>
-        </div>
-
-        <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
-          <div
-            v-for="tpl in templates"
-            :key="tpl.id"
-            class="card shrink-0 w-[130px] cursor-pointer active:scale-95
-                   transition-transform duration-100"
-            @click="goTemplate(tpl.id)"
-          >
-            <!-- 模板封面 -->
-            <div
-              class="h-24 w-full rounded-t-2xl flex items-end p-2"
-              :style="{ background: tpl.gradient }"
-            >
-              <span class="text-[10px] bg-black/40 backdrop-blur-sm
-                           px-2 py-0.5 rounded-full text-white/80">
-                {{ tpl.tag }}
-              </span>
-            </div>
-            <div class="p-2.5">
-              <p class="text-sm font-semibold">{{ tpl.name }}</p>
-              <p class="text-[11px] text-muted mt-0.5">
-                {{ tpl.products.length }} 款商品
-              </p>
-            </div>
+    <!-- ── Template Horizontal Scroll ─────────────── -->
+    <section class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">快速开店模板</h2>
+        <button class="section-more" @click="router.push('/template')">查看全部</button>
+      </div>
+      <div class="template-scroll">
+        <div
+          v-for="tpl in templates"
+          :key="tpl.id"
+          class="template-card"
+          @click="goTemplate(tpl.id)"
+        >
+          <div class="template-cover" :style="{ background: tpl.gradient }">
+            <span class="template-tag">{{ tpl.tag }}</span>
+          </div>
+          <div class="template-info">
+            <p class="template-name">{{ tpl.name }}</p>
+            <p class="template-count">{{ tpl.products.length }} 款商品</p>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ── AI 设计系统 ───────────────────────────── -->
-      <section class="mb-8">
-        <h2 class="font-semibold text-sm mb-3">AI 设计系统</h2>
-        <div class="grid grid-cols-2 gap-3">
+    <!-- ── AI Tools 2×2 Grid ─────────────────────── -->
+    <section class="section-block">
+      <h2 class="section-title">AI 设计系统</h2>
+      <div class="tools-grid">
+        <button
+          v-for="tool in AI_TOOLS"
+          :key="tool.path"
+          class="tool-card"
+          :class="{ 'tool-accent': tool.accent }"
+          @click="router.push(tool.path)"
+        >
+          <span class="tool-icon">{{ tool.icon }}</span>
+          <p class="tool-title">{{ tool.title }}</p>
+          <p class="tool-sub" :class="{ 'tool-sub-accent': tool.accent }">{{ tool.sub }}</p>
+        </button>
+      </div>
+    </section>
 
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100 hover:border-accent"
-            style="border:1px solid #222"
-            @click="router.push('/ai/design')"
-          >
-            <span class="text-2xl mb-2 block">🎯</span>
-            <p class="font-semibold text-sm">AI出款</p>
-            <p class="text-muted text-xs mt-0.5">可控出款，系列生成</p>
-          </button>
+    <!-- ── Quick Links 3-col Grid ─────────────────── -->
+    <section class="section-block">
+      <h2 class="section-title">快捷入口</h2>
+      <div class="quick-grid">
+        <button
+          v-for="link in QUICK_LINKS"
+          :key="link.path"
+          class="quick-card"
+          @click="router.push(link.path)"
+        >
+          <span class="quick-icon">{{ link.icon }}</span>
+          <p class="quick-title">{{ link.title }}</p>
+          <p class="quick-sub">{{ link.sub() }}</p>
+        </button>
+      </div>
+    </section>
 
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100 hover:border-accent"
-            style="border:1px solid #222"
-            @click="router.push('/inspiration')"
-          >
-            <span class="text-2xl mb-2 block">🎭</span>
-            <p class="font-semibold text-sm">灵感库</p>
-            <p class="text-xs mt-0.5" style="color:#1abc9c">精选秀场 + 品牌图</p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100 hover:border-accent"
-            style="border:1px solid #222"
-            @click="router.push('/ai/season')"
-          >
-            <span class="text-2xl mb-2 block">🌿</span>
-            <p class="font-semibold text-sm">整季系列</p>
-            <p class="text-muted text-xs mt-0.5">一键生成 A/B/C</p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100 hover:border-accent"
-            style="border:1px solid #222"
-            @click="router.push('/redesign')"
-          >
-            <span class="text-2xl mb-2 block">🔧</span>
-            <p class="font-semibold text-sm">改款工具</p>
-            <p class="text-muted text-xs mt-0.5">参考图 → 新款</p>
-          </button>
-
-        </div>
-      </section>
-
-      <!-- ── 快捷入口 ─────────────────────────────── -->
-      <section class="mb-8">
-        <h2 class="font-semibold text-sm mb-3">快捷入口</h2>
-        <div class="grid grid-cols-2 gap-3">
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100"
-            @click="router.push('/me')"
-          >
-            <span class="text-2xl mb-2 block">🏪</span>
-            <p class="font-semibold text-sm">我的店铺</p>
-            <p class="text-muted text-xs mt-0.5">
-              {{ myShops.length > 0 ? `${myShops.length} 家店铺` : '还没有店铺' }}
-            </p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100"
-            @click="router.push('/generate')"
-          >
-            <span class="text-2xl mb-2 block">🎨</span>
-            <p class="font-semibold text-sm">AI设计</p>
-            <p class="text-muted text-xs mt-0.5">每日 {{ remainFree }} 次免费</p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100"
-            @click="router.push('/redesign')"
-          >
-            <span class="text-2xl mb-2 block">✏️</span>
-            <p class="font-semibold text-sm">AI改款</p>
-            <p class="text-muted text-xs mt-0.5">上传参考图改款</p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100"
-            @click="router.push('/inspiration')"
-          >
-            <span class="text-2xl mb-2 block">🎭</span>
-            <p class="font-semibold text-sm">灵感库</p>
-            <p class="text-muted text-xs mt-0.5" style="color:#1abc9c">秀场 + 品牌图</p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100"
-            @click="router.push('/leaderboard')"
-          >
-            <span class="text-2xl mb-2 block">🏆</span>
-            <p class="font-semibold text-sm">收益排行榜</p>
-            <p class="text-muted text-xs mt-0.5">看看你排第几名</p>
-          </button>
-
-          <button
-            class="card p-4 text-left active:scale-95 transition-transform duration-100"
-            @click="router.push('/invite')"
-          >
-            <span class="text-2xl mb-2 block">🎁</span>
-            <p class="font-semibold text-sm">邀请好友</p>
-            <p class="text-xs mt-0.5" style="color:#1abc9c">每邀请一人得 €2</p>
-          </button>
-
-        </div>
-      </section>
-
-      <!-- ── 我的店铺（有数据才显示）──────────────── -->
-      <section v-if="myShops.length">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="font-semibold text-sm">最近店铺</h2>
-          <button
-            class="text-accent text-xs font-semibold active:opacity-70"
-            @click="router.push('/me')"
-          >
-            全部
-          </button>
-        </div>
-
-        <div class="space-y-2">
-          <div
-            v-for="shop in myShops"
-            :key="shop.id"
-            class="card flex items-center gap-3 p-3 cursor-pointer
-                   active:scale-[.98] transition-transform duration-100"
-            @click="router.push(`/shop/${shop.id}`)"
-          >
-            <div
-              class="w-12 h-12 rounded-xl shrink-0"
-              :style="{ background: shop.gradient || '#1A1A1A' }"
-            />
-            <div class="min-w-0 flex-1">
-              <p class="font-semibold text-sm truncate">{{ shop.name || 'AI设计款' }}</p>
-              <p class="text-muted text-xs mt-0.5 truncate">
-                /shop/{{ shop.id }}
-              </p>
-            </div>
-            <svg class="h-4 w-4 text-muted shrink-0" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-            </svg>
+    <!-- ── Recent Shops ───────────────────────────── -->
+    <section v-if="myShops.length" class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">最近店铺</h2>
+        <button class="section-more" @click="router.push('/me')">全部</button>
+      </div>
+      <div class="shops-list">
+        <div
+          v-for="shop in myShops"
+          :key="shop.id"
+          class="shop-row"
+          @click="router.push(`/shop/${shop.id}`)"
+        >
+          <div class="shop-thumb" :style="{ background: shop.gradient || '#1A1A1A' }" />
+          <div class="shop-info">
+            <p class="shop-name">{{ shop.name || 'AI设计款' }}</p>
+            <p class="shop-url">/shop/{{ shop.id }}</p>
           </div>
+          <svg class="shop-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
         </div>
-      </section>
+      </div>
+    </section>
 
-    </div><!-- /max-w -->
+    <!-- bottom padding -->
+    <div style="height:24px" />
 
-    <!-- ── 底部导航栏 ─────────────────────────────── -->
-    <nav class="fixed bottom-0 left-0 right-0 z-20
-                bg-bg/95 backdrop-blur-md border-t border-border
-                flex items-center justify-around
-                px-2 pt-2 pb-[calc(.5rem+env(safe-area-inset-bottom))]">
-      <button
-        class="flex flex-col items-center gap-0.5 px-3 py-1
-               text-accent"
-        @click="router.push('/')"
-      >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
-        </svg>
-        <span class="text-[10px] font-semibold">首页</span>
-      </button>
-
-      <button
-        class="flex flex-col items-center gap-0.5 px-3 py-1 text-muted
-               active:text-white transition-colors"
-        @click="router.push('/generate')"
-      >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 4v16m8-8H4"/>
-        </svg>
-        <span class="text-[10px] font-semibold">AI生成</span>
-      </button>
-
-      <button
-        class="flex flex-col items-center gap-0.5 px-3 py-1 text-muted
-               active:text-white transition-colors"
-        @click="router.push('/template')"
-      >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
-        </svg>
-        <span class="text-[10px] font-semibold">模板</span>
-      </button>
-
-      <button
-        class="flex flex-col items-center gap-0.5 px-3 py-1 text-muted
-               active:text-white transition-colors"
-        @click="router.push('/leaderboard')"
-      >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        <span class="text-[10px] font-semibold">排行</span>
-      </button>
-
-      <button
-        class="flex flex-col items-center gap-0.5 px-3 py-1 text-muted
-               active:text-white transition-colors"
-        @click="router.push('/me')"
-      >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-        </svg>
-        <span class="text-[10px] font-semibold">我的</span>
-      </button>
-    </nav>
+    <!-- ── Fixed Bottom Input Bar (above tabbar) ─── -->
+    <div class="bottom-input-bar" :class="{ focused: inputFocused }">
+      <div class="bottom-input-wrap">
+        <span class="bottom-input-icon">✨</span>
+        <input
+          v-model="prompt"
+          type="text"
+          placeholder="描述你想要的款式，AI 即刻生成…"
+          class="bottom-input"
+          @focus="inputFocused = true"
+          @blur="inputFocused = false"
+          @keydown.enter="goGenerate"
+        />
+        <button class="bottom-input-send" @click="goGenerate">→</button>
+      </div>
+    </div>
 
   </div>
 </template>
+
+<style scoped>
+.home-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 0 100px;
+}
+
+/* ── Hero ── */
+.hero-section {
+  padding: 28px 20px 16px;
+}
+.hero-greeting {
+  font-size: 14px;
+  color: var(--c-text-sub);
+  margin: 0 0 6px;
+}
+.hero-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--c-text-bright);
+  margin: 0 0 14px;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+.quota-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(26,188,156,0.12);
+  color: #1abc9c;
+  border: 1px solid rgba(26,188,156,0.25);
+}
+.quota-low   { background: rgba(245,158,11,0.12); color: #f59e0b; border-color: rgba(245,158,11,0.25); }
+.quota-empty { background: rgba(239,68,68,0.12);  color: #ef4444; border-color: rgba(239,68,68,0.25); }
+
+/* ── Feature Chips ── */
+.chips-section { padding: 8px 0 4px; }
+.chips-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 20px 8px;
+  scrollbar-width: none;
+}
+.chips-scroll::-webkit-scrollbar { display: none; }
+.feature-chip {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--c-card-border);
+  background: var(--c-card);
+  color: var(--c-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.feature-chip:hover {
+  border-color: rgba(26,188,156,0.4);
+  background: rgba(26,188,156,0.06);
+  color: #1abc9c;
+}
+.feature-chip:active { transform: scale(0.94); }
+
+/* ── Section common ── */
+.section-block { padding: 20px 20px 0; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--c-text-bright); margin: 0 0 12px;
+}
+.section-header .section-title { margin: 0; }
+.section-more {
+  font-size: 12px; font-weight: 600;
+  color: #1abc9c; background: transparent; border: none; cursor: pointer;
+  padding: 4px 0;
+}
+
+/* ── Template scroll ── */
+.template-scroll {
+  display: flex; gap: 12px;
+  overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.template-scroll::-webkit-scrollbar { display: none; }
+.template-card {
+  flex-shrink: 0; width: 130px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  border-radius: 16px; overflow: hidden;
+  cursor: pointer; transition: transform 0.15s;
+}
+.template-card:active { transform: scale(0.95); }
+.template-cover {
+  height: 96px; display: flex; align-items: flex-end; padding: 8px;
+}
+.template-tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 20px;
+  background: rgba(0,0,0,0.45); color: rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
+}
+.template-info { padding: 10px; }
+.template-name  { font-size: 13px; font-weight: 600; color: var(--c-text-bright); margin: 0 0 3px; }
+.template-count { font-size: 11px; color: var(--c-text-sub); margin: 0; }
+
+/* ── AI Tools grid ── */
+.tools-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.tool-card {
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  border-radius: 16px; padding: 16px;
+  text-align: left; cursor: pointer;
+  transition: all 0.15s;
+}
+.tool-card:hover { border-color: rgba(26,188,156,0.35); }
+.tool-card:active { transform: scale(0.96); }
+.tool-icon  { font-size: 28px; display: block; margin-bottom: 8px; }
+.tool-title { font-size: 14px; font-weight: 700; color: var(--c-text-bright); margin: 0 0 4px; }
+.tool-sub   { font-size: 12px; color: var(--c-text-sub); margin: 0; }
+.tool-sub-accent { color: #1abc9c !important; }
+
+/* ── Quick links 3-col ── */
+.quick-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.quick-card {
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  border-radius: 14px; padding: 14px 10px;
+  text-align: center; cursor: pointer;
+  transition: all 0.15s;
+}
+.quick-card:hover { border-color: rgba(26,188,156,0.3); }
+.quick-card:active { transform: scale(0.94); }
+.quick-icon  { font-size: 24px; display: block; margin-bottom: 6px; }
+.quick-title { font-size: 13px; font-weight: 700; color: var(--c-text-bright); margin: 0 0 3px; }
+.quick-sub   { font-size: 11px; color: var(--c-text-sub); margin: 0; }
+
+/* ── Recent Shops ── */
+.shops-list  { display: flex; flex-direction: column; gap: 8px; }
+.shop-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  border-radius: 14px; padding: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.shop-row:active { transform: scale(0.98); }
+.shop-thumb { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; }
+.shop-info  { flex: 1; min-width: 0; }
+.shop-name  { font-size: 14px; font-weight: 600; color: var(--c-text-bright); margin: 0 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.shop-url   { font-size: 12px; color: var(--c-text-sub); margin: 0; }
+.shop-arrow { width: 16px; height: 16px; color: var(--c-text-sub); flex-shrink: 0; }
+
+/* ── Bottom Input Bar ── */
+.bottom-input-bar {
+  position: fixed;
+  bottom: calc(56px + env(safe-area-inset-bottom));
+  left: 0; right: 0;
+  padding: 10px 16px;
+  background: var(--c-bg);
+  border-top: 1px solid var(--c-border);
+  transition: border-color 0.2s;
+  z-index: 50;
+}
+.bottom-input-bar.focused { border-color: rgba(26,188,156,0.4); }
+.bottom-input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  border-radius: 24px;
+  padding: 8px 8px 8px 16px;
+  max-width: 600px; margin: 0 auto;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.bottom-input-bar.focused .bottom-input-wrap {
+  border-color: rgba(26,188,156,0.5);
+  box-shadow: 0 0 0 3px rgba(26,188,156,0.08);
+}
+.bottom-input-icon { font-size: 18px; flex-shrink: 0; }
+.bottom-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 14px; color: var(--c-text); min-width: 0;
+}
+.bottom-input::placeholder { color: var(--c-text-muted); }
+.bottom-input-send {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+  border: none; cursor: pointer; color: #fff;
+  font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(26,188,156,0.4);
+  transition: all 0.2s;
+}
+.bottom-input-send:active { transform: scale(0.9); }
+</style>
