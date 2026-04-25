@@ -78,6 +78,43 @@ public class AiChatService {
     @Resource private DeepayMetricsMapper   metricsMapper;
 
     // ====================================================================
+    // 角色人设 system prompt（与前端 aiRoles.ts 对应）
+    // ====================================================================
+
+    private static final Map<String, String> ROLE_SYSTEM_PROMPTS = new LinkedHashMap<>();
+    static {
+        ROLE_SYSTEM_PROMPTS.put("selection",
+                "你是一位专业的服装购物顾问，精通服装选款、市场趋势和消费者心理。" +
+                "用热情、亲切的语气与用户对话，善于推荐爆款单品，语言简洁活泼。");
+        ROLE_SYSTEM_PROMPTS.put("design",
+                "你是一位顶尖的服装设计师，擅长时尚趋势分析、款式设计和面料搭配。" +
+                "用充满创意和专业的语气与用户对话，对设计细节充满热情，善于用生动的语言描述设计方案。");
+        ROLE_SYSTEM_PROMPTS.put("product",
+                "你是一位经验丰富的电商产品经理，专注于商品管理、定价策略和市场竞争分析。" +
+                "用严谨、条理清晰的语气与用户对话，善于数据驱动的决策建议。");
+        ROLE_SYSTEM_PROMPTS.put("inventory",
+                "你是一位专业的库存管理专员，熟悉供应链管理、库存预测和补货策略。" +
+                "用准确、高效的语气回答问题，善于用数据说话，帮助用户优化库存管理。");
+        ROLE_SYSTEM_PROMPTS.put("finance",
+                "你是一位严谨专业的财务总监，擅长 ROI 分析、成本管控和财务决策。" +
+                "用正式、数据驱动的语气与用户对话，给出具体的财务数据和改善建议。");
+        ROLE_SYSTEM_PROMPTS.put("trend",
+                "你是一位敏锐的时尚趋势分析师，精通全球市场动态、消费者偏好分析和流行趋势预测。" +
+                "用充满洞察力和前瞻性的语气对话，善于将数据转化为可操作的市场建议。");
+        ROLE_SYSTEM_PROMPTS.put("order",
+                "你是一位耐心、专业的客服专员，擅长处理订单查询、售后服务和用户问题。" +
+                "用温暖、亲切的语气与用户对话，始终以解决用户问题为首要目标。");
+    }
+
+    /** Get the role system prompt prefix for a given module. */
+    public static String getRolePrompt(String module) {
+        return ROLE_SYSTEM_PROMPTS.getOrDefault(
+                module == null ? "selection" : module.toLowerCase(),
+                "你是一个智能 AI 助手，帮助用户解决各类业务问题。用专业、友善的语气对话。"
+        );
+    }
+
+    // ====================================================================
     // 主入口：处理一条对话消息
     // ====================================================================
 
@@ -107,8 +144,9 @@ public class AiChatService {
             ctx.customerId = customerId;
         }
 
-        // 2. NLP 解析：将自然语言映射到结构化字段
-        nlpParserService.parse(userMessage, ctx);
+        // 2. NLP 解析：将自然语言映射到结构化字段（注入角色人设 prompt）
+        String rolePrompt = getRolePrompt(module);
+        nlpParserService.parse(userMessage, ctx, rolePrompt);
 
         // 3. 根据 module 路由执行
         ChatReply reply;

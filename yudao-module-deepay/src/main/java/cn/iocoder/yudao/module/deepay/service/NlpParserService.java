@@ -87,13 +87,25 @@ public class NlpParserService {
      * @return 填充后的 ctx（同一对象，便于链式调用）
      */
     public Context parse(String userMessage, Context ctx) {
+        return parse(userMessage, ctx, null);
+    }
+
+    /**
+     * 解析用户自然语言，将提取到的字段合并到 ctx。
+     * 支持注入角色人设 prompt（roleSystemPrompt），让 LLM 以对应角色身份解析。
+     *
+     * @param userMessage      用户输入
+     * @param ctx              当前 Context
+     * @param roleSystemPrompt 角色人设前缀（可为 null）
+     */
+    public Context parse(String userMessage, Context ctx, String roleSystemPrompt) {
         if (!StringUtils.hasText(userMessage)) {
             return ctx;
         }
 
         Map<String, String> parsed;
         if (StringUtils.hasText(apiUrl) && StringUtils.hasText(apiKey)) {
-            parsed = callLlm(userMessage);
+            parsed = callLlm(userMessage, roleSystemPrompt);
         } else {
             log.debug("[NlpParser] apiUrl 未配置，使用规则匹配");
             parsed = ruleBased(userMessage);
@@ -126,14 +138,19 @@ public class NlpParserService {
     // LLM 调用
     // ====================================================================
 
-    private Map<String, String> callLlm(String userMessage) {
+    private Map<String, String> callLlm(String userMessage, String roleSystemPrompt) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(apiKey);
 
+            // Build system prompt: role persona prefix + extraction instructions
+            String sysPrompt = StringUtils.hasText(roleSystemPrompt)
+                    ? roleSystemPrompt + "\n\n" + SYSTEM_PROMPT
+                    : SYSTEM_PROMPT;
+
             List<Map<String, String>> messages = new ArrayList<>();
-            messages.add(messageOf("system", SYSTEM_PROMPT));
+            messages.add(messageOf("system", sysPrompt));
             messages.add(messageOf("user", userMessage));
 
             Map<String, Object> body = new LinkedHashMap<>();

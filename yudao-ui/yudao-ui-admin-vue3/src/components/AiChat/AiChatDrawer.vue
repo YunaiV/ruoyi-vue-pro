@@ -30,19 +30,30 @@
       <div v-if="open" class="drawer">
 
         <!-- ── 标题栏 ──────────────────────────────────────── -->
-        <header class="drawer-header" :class="`drawer-header--${state}`">
-          <!-- 状态头像 -->
+        <header class="drawer-header" :class="`drawer-header--${state}`" :style="{ background: headerGradient }">
+          <!-- SVG 角色头像（带状态覆盖层） -->
           <div class="header-avatar" :class="`header-avatar--${state}`">
             <Transition name="av" mode="out-in">
-              <span v-if="state==='thinking'"   key="t" class="av-spin">⚙️</span>
-              <span v-else-if="state==='responding'" key="r" class="av-wave">✨</span>
-              <span v-else-if="tts.speaking.value"   key="s" class="av-speak">🔊</span>
-              <span v-else                       key="i">🤖</span>
+              <!-- Thinking / responding / speaking → overlay indicator -->
+              <div v-if="state==='thinking'"   key="t" class="av-overlay av-overlay--think">
+                <RoleAvatar :module="module" :size="36" :animated="false" />
+                <span class="av-badge av-badge--spin">⚙️</span>
+              </div>
+              <div v-else-if="state==='responding'" key="r" class="av-overlay av-overlay--respond">
+                <RoleAvatar :module="module" :size="36" :animated="false" />
+                <span class="av-badge">✨</span>
+              </div>
+              <div v-else-if="tts.speaking.value" key="s" class="av-overlay">
+                <RoleAvatar :module="module" :size="36" :animated="false" />
+                <span class="av-badge av-badge--tts">🔊</span>
+              </div>
+              <!-- Idle → normal animated avatar -->
+              <RoleAvatar v-else key="i" :module="module" :size="36" :animated="true" />
             </Transition>
           </div>
 
           <div class="header-info">
-            <span class="header-title">AI 助手 · {{ moduleName }}</span>
+            <span class="header-title">{{ role.roleName }}</span>
             <span class="header-status">
               <span class="status-dot" :class="`status-dot--${state}`" />
               {{ statusLabel }}
@@ -247,9 +258,11 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
-import AiChatFab from './AiChatFab.vue'
-import { useAiChat }  from '@/composables/useAiChat'
-import { useAiTts }   from '@/composables/useAiTts'
+import AiChatFab   from './AiChatFab.vue'
+import RoleAvatar  from './RoleAvatar.vue'
+import { useAiChat }       from '@/composables/useAiChat'
+import { useAiTts }        from '@/composables/useAiTts'
+import { getRoleConfig }   from '@/config/aiRoles'
 import type { ChatMessage } from '@/composables/useAiChat'
 
 // ── Props ──────────────────────────────────────────────────────
@@ -261,7 +274,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   module:            'selection',
   customerId:        undefined,
-  greeting:          '你好！我是 AI 助手 🤖\n直接告诉我你想做什么，例如：「我想做一件极简外套」',
+  greeting:          undefined,      // falls back to role.greeting below
   defaultTypewriter: true,
 })
 
@@ -270,22 +283,12 @@ const emit = defineEmits<{
   (e: 'done', sessionId: string): void
 }>()
 
-// ── Module maps ────────────────────────────────────────────────
-const MODULE_NAMES: Record<string,string> = {
-  selection:'选款', design:'设计', product:'商品',
-  inventory:'库存', finance:'财务', trend:'趋势', order:'订单',
-}
-const PLACEHOLDERS: Record<string,string> = {
-  selection:'例如：我想做欧美风极简外套…',
-  design:   '例如：帮我设计一款宽松工装外套…',
-  product:  '例如：外套定什么价合适？',
-  inventory:'例如：外套库存还有多少？',
-  finance:  '例如：这款的 ROI 是多少？',
-  trend:    '例如：最近什么款最火？',
-  order:    '例如：查一下最新订单状态',
-}
-const moduleName  = computed(() => MODULE_NAMES[props.module]  ?? '助手')
-const placeholder = computed(() => PLACEHOLDERS[props.module] ?? '请输入…')
+// ── Role config ────────────────────────────────────────────────
+const role        = computed(() => getRoleConfig(props.module ?? 'selection'))
+const moduleName  = computed(() => role.value.roleName)
+const placeholder = computed(() => role.value.placeholder)
+const headerGradient = computed(() => role.value.gradient)
+const effectiveGreeting = computed(() => props.greeting ?? role.value.greeting)
 
 // ── Reactive state ─────────────────────────────────────────────
 const open         = ref(false)
@@ -307,7 +310,7 @@ const chat = useAiChat({
   customerId: props.customerId,
   get typewriter() { return typewriterOn.value },
   scrollEl:   () => msgsEl.value,
-  greeting:   props.greeting,
+  get greeting() { return effectiveGreeting.value },
   persistKey: `ai_session_${props.module}`,
 })
 const tts = useAiTts({ lang: 'zh-CN', rate: 1.05 })
@@ -521,15 +524,13 @@ onUnmounted(() => { chat.cancel(); tts.stop() })
   padding:12px 14px; flex-shrink:0; color:#fff;
   transition:background 0.5s cubic-bezier(0.4,0,0.2,1);
 }
-.drawer-header--idle       { background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%); }
-.drawer-header--thinking   { background:linear-gradient(135deg,#f59e0b 0%,#ef4444 100%); }
-.drawer-header--responding { background:linear-gradient(135deg,#10b981 0%,#06b6d4 100%); }
+/* Background is now set inline via :style binding (role gradient) */
 
 .header-avatar {
-  width:38px; height:38px; border-radius:50%;
-  background:rgba(255,255,255,0.2); flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; font-size:20px;
-  transition:box-shadow 0.4s;
+  width:40px; height:40px; border-radius:50%;
+  background:rgba(255,255,255,0.18); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; transition:box-shadow 0.4s;
 }
 .header-avatar--thinking   { animation:hdr-ring  0.9s ease-in-out infinite; }
 .header-avatar--responding { animation:hdr-glow  1.2s ease-in-out infinite alternate; }
@@ -541,6 +542,20 @@ onUnmounted(() => { chat.cancel(); tts.stop() })
   from{ box-shadow:0 0 4px  rgba(255,255,255,0.3); }
   to  { box-shadow:0 0 20px rgba(255,255,255,0.7); }
 }
+
+/* Avatar state overlay */
+.av-overlay {
+  position:relative; display:flex; align-items:center; justify-content:center;
+  width:36px; height:36px;
+}
+.av-overlay .av-badge {
+  position:absolute; bottom:-2px; right:-2px;
+  font-size:11px; line-height:1; background:#fff; border-radius:50%;
+  width:16px; height:16px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+.av-badge--spin { animation:icon-spin 1.2s linear infinite; }
+.av-badge--tts  { animation:icon-speak 0.9s ease-in-out infinite; }
 
 .header-info { flex:1; min-width:0; }
 .header-title  { display:block; font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
