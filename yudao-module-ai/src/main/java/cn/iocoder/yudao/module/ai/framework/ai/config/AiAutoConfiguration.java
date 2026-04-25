@@ -12,6 +12,8 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiImageModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.vllm.VllmChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
@@ -367,6 +369,30 @@ public class AiAutoConfiguration {
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new VllmChatModel(openAiChatModel);
+    }
+
+    // ========== Stable Diffusion WebUI ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.stable-diffusion-web-ui.enable", havingValue = "true")
+    public StableDiffusionWebUiImageModel stableDiffusionWebUiImageModel(YudaoAiProperties yudaoAiProperties) {
+        return buildStableDiffusionWebUiImageClient(yudaoAiProperties.getStableDiffusionWebUi());
+    }
+
+    /**
+     * 构建 StableDiffusionWebUiImageModel。
+     *
+     * <p>SD WebUI 暴露 AUTOMATIC1111 兼容端点 {@code {baseUrl}/sdapi/v1/txt2img}，
+     * 返回 base64 编码图片列表，无需 API Key（除非启动时指定了 --api-auth）。</p>
+     *
+     * <p>RunPod 上的 TCP 直连地址示例：{@code http://103.196.86.126:15112}</p>
+     */
+    public StableDiffusionWebUiImageModel buildStableDiffusionWebUiImageClient(
+            YudaoAiProperties.StableDiffusionWebUi properties) {
+        String baseUrl = StrUtil.blankToDefault(properties.getBaseUrl(),
+                StableDiffusionWebUiImageModel.DEFAULT_BASE_URL);
+        StableDiffusionWebUiApi api = new StableDiffusionWebUiApi(baseUrl, properties.getApiKey());
+        return new StableDiffusionWebUiImageModel(api);
     }
 
     // ========== RAG 相关 ==========

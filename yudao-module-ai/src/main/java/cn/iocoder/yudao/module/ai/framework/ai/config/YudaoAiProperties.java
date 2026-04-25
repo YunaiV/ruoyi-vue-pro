@@ -69,6 +69,11 @@ public class YudaoAiProperties {
      */
     private Vllm vllm;
 
+    /**
+     * Stable Diffusion WebUI（AUTOMATIC1111 自托管图片生成服务）
+     */
+    private StableDiffusionWebUi stableDiffusionWebUi;
+
     @Data
     public static class Gemini {
 
@@ -247,6 +252,24 @@ public class YudaoAiProperties {
 
         private boolean enable;
 
+        private String apiKey;
+
+    }
+
+    @Data
+    public static class StableDiffusionWebUi {
+
+        private String enable;
+
+        /**
+         * SD WebUI 服务地址（如 http://103.196.86.126:15112）
+         * 本地启动时默认 http://localhost:7860
+         */
+        private String baseUrl;
+
+        /**
+         * API Key（仅在 SD WebUI 启动时指定了 --api-auth 时填写，否则留空）
+         */
         private String apiKey;
 
     }

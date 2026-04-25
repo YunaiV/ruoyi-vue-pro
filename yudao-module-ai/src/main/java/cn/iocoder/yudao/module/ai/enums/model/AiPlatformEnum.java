@@ -43,6 +43,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     GROK("Grok","Grok"), // Grok
     RUNPOD("Runpod", "Runpod"), // Runpod（海外 fallback）
     VLLM("vLLM", "vLLM"), // vLLM（自托管 OpenAI 兼容服务）
+    STABLE_DIFFUSION_WEBUI("StableDiffusionWebUi", "StableDiffusionWebUi"), // AUTOMATIC1111 自托管 SD WebUI
 
     ;
 

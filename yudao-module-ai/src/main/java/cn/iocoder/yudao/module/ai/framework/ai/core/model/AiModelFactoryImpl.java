@@ -18,6 +18,8 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiImageModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.vllm.VllmChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
@@ -249,6 +251,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(OpenAiImageModel.class);
             case STABLE_DIFFUSION:
                 return SpringUtil.getBean(StabilityAiImageModel.class);
+            case STABLE_DIFFUSION_WEBUI:
+                return SpringUtil.getBean(StableDiffusionWebUiImageModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -270,6 +274,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildSiliconFlowImageModel(apiKey,url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageModel(apiKey, url);
+            case STABLE_DIFFUSION_WEBUI:
+                return buildStableDiffusionWebUiImageModel(url, apiKey);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -594,6 +600,18 @@ public class AiModelFactoryImpl implements AiModelFactory {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);
         return new StabilityAiImageModel(stabilityAiApi);
+    }
+
+    /**
+     * 构建 StableDiffusionWebUiImageModel。
+     *
+     * <p>url 参数为 SD WebUI HTTP 服务地址，如 {@code http://103.196.86.126:15112}。
+     * apiKey 仅在服务启动时指定了 {@code --api-auth} 时需填写，否则传 null 或空字符串。</p>
+     */
+    private StableDiffusionWebUiImageModel buildStableDiffusionWebUiImageModel(String url, String apiKey) {
+        String baseUrl = StrUtil.blankToDefault(url, StableDiffusionWebUiImageModel.DEFAULT_BASE_URL);
+        StableDiffusionWebUiApi api = new StableDiffusionWebUiApi(baseUrl, apiKey);
+        return new StableDiffusionWebUiImageModel(api);
     }
 
     private ChatModel buildGrokChatModel(String apiKey,String url) {
