@@ -267,7 +267,7 @@ async function doSave() {
 }
 
 function scoreColor(score) {
-  if (score >= 85) return '#00FF88'
+  if (score >= 85) return '#1abc9c'
   if (score >= 70) return '#F59E0B'
   return '#9CA3AF'
 }
@@ -289,7 +289,7 @@ function scoreColor(score) {
       </button>
       <div class="flex flex-col flex-1">
         <span class="font-semibold text-sm">✨ AI 改款设计</span>
-        <span class="text-[10px]" style="color:#00FF88">上传参考图 → 生成 6 款 → 自动选最优</span>
+        <span class="text-[10px]" style="color:#1abc9c">上传参考图 → 生成 6 款 → 自动选最优</span>
       </div>
     </header>
 
@@ -387,7 +387,7 @@ function scoreColor(score) {
           <p class="text-[11px] text-muted font-semibold uppercase tracking-widest">
             改动强度
           </p>
-          <span class="text-xs font-bold" style="color:#00FF88">
+          <span class="text-xs font-bold" style="color:#1abc9c">
             {{ strength < 0.4 ? '微调' : strength > 0.7 ? '大改' : '适中' }}
             ({{ Math.round(strength * 100) }}%)
           </span>
@@ -409,7 +409,7 @@ function scoreColor(score) {
                active:scale-95 transition-transform duration-100
                disabled:opacity-50 disabled:cursor-not-allowed
                flex items-center justify-center gap-2"
-        style="background:#00FF88;color:#000"
+        style="background:#1abc9c;color:#fff"
         @click="generate"
       >
         <svg v-if="loading" class="animate-spin h-4 w-4 shrink-0"
@@ -466,7 +466,7 @@ function scoreColor(score) {
             <div v-if="img.recommended"
                  class="absolute top-2 left-2 px-2 py-0.5 rounded-full
                         text-[10px] font-black"
-                 style="background:#00FF88;color:#000">
+                 style="background:#1abc9c;color:#fff">
               ⭐ 推荐
             </div>
 
@@ -523,7 +523,7 @@ function scoreColor(score) {
                      active:scale-95 transition-transform duration-100
                      disabled:opacity-50 disabled:cursor-not-allowed
                      flex items-center gap-1.5"
-              style="background:#00FF88;color:#000"
+              style="background:#1abc9c;color:#fff"
               @click="doTweak"
             >
               <svg v-if="tweaking" class="animate-spin h-4 w-4 shrink-0"
@@ -541,7 +541,7 @@ function scoreColor(score) {
 
         <!-- ── 保存区 ────────────────────────────────────── -->
         <div v-if="selected" class="space-y-2.5">
-          <p v-if="saveOk" class="text-center text-xs font-semibold" style="color:#00FF88">
+          <p v-if="saveOk" class="text-center text-xs font-semibold" style="color:#1abc9c">
             ✔ 已保存到款库
           </p>
           <p v-if="saveError" class="text-center text-xs text-danger">{{ saveError }}</p>
@@ -552,7 +552,7 @@ function scoreColor(score) {
                    active:scale-95 transition-transform duration-100
                    disabled:opacity-50 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2"
-            style="background:#00FF88;color:#000"
+            style="background:#1abc9c;color:#fff"
             @click="doSave"
           >
             <svg v-if="saving" class="animate-spin h-4 w-4 shrink-0"
@@ -585,7 +585,7 @@ function scoreColor(score) {
           可不上传参考图（AI 纯创作）<br>
           选好风格后点击生成
         </p>
-        <p class="mt-4 text-xs" style="color:#00FF88">
+        <p class="mt-4 text-xs" style="color:#1abc9c">
           🤖 自动评分 · 标出推荐 Top-3
         </p>
       </div>
@@ -654,13 +654,13 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 18px; height: 18px;
   border-radius: 50%;
-  background: #00FF88;
+  background: #1abc9c;
   cursor: pointer;
 }
 input[type="range"]::-moz-range-thumb {
   width: 18px; height: 18px;
   border-radius: 50%;
-  background: #00FF88;
+  background: #1abc9c;
   border: none;
   cursor: pointer;
 }

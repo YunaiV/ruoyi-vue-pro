@@ -154,14 +154,14 @@ function levelFor(url) {
 
 function scoreBg(score) {
   if (!score) return '#1A1A1A'
-  if (score >= 85) return '#00FF8833'
+  if (score >= 85) return 'rgba(26,188,156,0.2)'
   if (score >= 70) return '#F59E0B33'
   return '#9CA3AF33'
 }
 
 function scoreTextColor(score) {
   if (!score) return '#9CA3AF'
-  if (score >= 85) return '#00FF88'
+  if (score >= 85) return '#1abc9c'
   if (score >= 70) return '#F59E0B'
   return '#9CA3AF'
 }
@@ -190,7 +190,7 @@ async function doSave(url) {
       </button>
       <div class="flex flex-col flex-1">
         <span class="font-semibold text-sm">🌿 整季系列生成</span>
-        <span class="text-[10px]" style="color:#00FF88">一键生成 A/B/C 三档系列</span>
+        <span class="text-[10px]" style="color:#1abc9c">一键生成 A/B/C 三档系列</span>
       </div>
     </header>
 
@@ -270,7 +270,7 @@ async function doSave(url) {
                 :key="opt.value"
                 class="flex-1 h-9 rounded-xl text-xs font-semibold transition-all"
                 :style="controls[ctrl.key] === opt.value
-                  ? 'background:#00FF88;color:#000'
+                  ? 'background:#1abc9c;color:#fff'
                   : 'background:#1A1A1A;border:1px solid #333;color:#9CA3AF'"
                 @click="controls[ctrl.key] = opt.value"
               >{{ opt.label }}</button>
@@ -288,7 +288,7 @@ async function doSave(url) {
             :key="n"
             class="flex-1 h-11 rounded-full text-sm font-bold transition-all"
             :style="count === n
-              ? 'background:#00FF88;color:#000'
+              ? 'background:#1abc9c;color:#fff'
               : 'background:#1A1A1A;border:1px solid #333;color:#9CA3AF'"
             @click="count = n"
           >{{ n }} 款</button>
@@ -298,7 +298,7 @@ async function doSave(url) {
       <!-- ── 生成按钮 ──────────────────────────────────── -->
       <button
         class="w-full h-14 rounded-full font-black text-base active:scale-95 transition-transform"
-        style="background:linear-gradient(135deg,#A855F7,#00FF88);color:#000"
+        style="background:linear-gradient(135deg,#A855F7,#1abc9c);color:#000"
         :disabled="loading"
         @click="generate"
       >
@@ -311,7 +311,7 @@ async function doSave(url) {
 
       <!-- ── 结果区 ─────────────────────────────────────── -->
       <section v-if="season">
-        <h2 class="font-bold text-sm mb-3" style="color:#00FF88">✨ 生成结果</h2>
+        <h2 class="font-bold text-sm mb-3" style="color:#1abc9c">✨ 生成结果</h2>
 
         <!-- 系列 tabs -->
         <div class="flex gap-2 mb-4">
@@ -332,7 +332,7 @@ async function doSave(url) {
             v-for="(url, idx) in currentSeries.slice(0,4)"
             :key="idx"
             class="rounded-2xl overflow-hidden relative cursor-pointer"
-            :style="selectedImage === url ? 'border:2px solid #00FF88' : 'border:2px solid #222'"
+            :style="selectedImage === url ? 'border:2px solid #1abc9c' : 'border:2px solid #222'"
             @click="selectedImage = selectedImage === url ? null : url"
           >
             <img :src="url" class="w-full aspect-[3/4] object-cover" loading="lazy"/>
@@ -350,7 +350,7 @@ async function doSave(url) {
             <button
               v-if="selectedImage === url"
               class="absolute bottom-2 left-2 right-2 h-9 rounded-full text-xs font-bold active:scale-95 transition-transform"
-              :style="savedUrls.has(url) ? 'background:#1A1A1A;border:1px solid #00FF88;color:#00FF88' : 'background:#00FF88;color:#000'"
+              :style="savedUrls.has(url) ? 'background:#1A1A1A;border:1px solid #1abc9c;color:#1abc9c' : 'background:#1abc9c;color:#fff'"
               :disabled="savingUrl === url"
               @click.stop="doSave(url)"
             >

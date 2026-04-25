@@ -34,7 +34,7 @@ defineEmits(['select'])
     <!-- Selected badge -->
     <div v-if="selected"
          class="absolute bottom-2.5 left-1/2 -translate-x-1/2
-                bg-accent text-black text-xs font-bold
+                bg-accent text-white text-xs font-bold
                 px-3 py-1 rounded-full whitespace-nowrap">
       ✓ 已选
     </div>

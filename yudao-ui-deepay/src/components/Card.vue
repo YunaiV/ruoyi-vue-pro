@@ -10,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-  <div :class="['bg-surface rounded-2xl overflow-hidden', pad ? 'p-4' : '']">
+  <div :class="['bg-surface2 rounded-2xl overflow-hidden border border-border transition-all duration-200', pad ? 'p-4' : '']">
     <slot />
   </div>
 </template>

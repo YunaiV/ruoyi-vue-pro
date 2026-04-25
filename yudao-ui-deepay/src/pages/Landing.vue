@@ -71,14 +71,14 @@ const previews = [
 
     <!-- ── 顶部 Nav ──────────────────────────────────── -->
     <nav class="sticky top-0 z-20 bg-bg/85 backdrop-blur-md
-                border-b border-[#1A1A1A] px-5 py-3.5
+                border-b border-border px-5 py-3.5
                 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-accent flex items-center justify-center
-                     text-black font-black text-sm select-none">D</span>
+                     text-white font-black text-sm select-none">D</span>
         <span class="font-medium text-sm">Deepay</span>
       </div>
-      <button class="bg-accent text-black font-medium text-xs px-4 h-8 rounded-full
+      <button class="bg-accent text-white font-medium text-xs px-4 h-8 rounded-full
                      active:scale-95 transition-transform duration-100"
               @click="router.push('/generate')">
         开始生成
@@ -221,11 +221,11 @@ const previews = [
           class="reveal card relative p-5 flex items-center gap-4
                  cursor-pointer active:scale-[.98] transition-all duration-200"
           :style="`transition-delay:${i*.06}s;
-                   ${p.accent ? 'border-color:#00FF88;box-shadow:0 0 0 1px #00FF88,0 0 20px rgba(0,255,136,.12)' : ''}`"
+                   ${p.accent ? 'border-color:#1abc9c;box-shadow:0 0 0 1px #1abc9c,0 0 20px rgba(26,188,156,.12)' : ''}`"
           @click="router.push(p.id === 'FREE' ? '/generate' : `/generate?plan=${p.id}`)"
         >
           <span v-if="p.tag"
-                class="absolute -top-2.5 right-4 bg-accent text-black
+                class="absolute -top-2.5 right-4 bg-accent text-white
                        text-[10px] font-bold px-2 py-0.5 rounded-full">
             {{ p.tag }}
           </span>
@@ -262,7 +262,7 @@ const previews = [
           <Transition name="faq">
             <div v-if="openFaq === i"
                  class="px-5 pb-5 sub text-[13px] leading-relaxed
-                        border-t border-[#1A1A1A] pt-4">
+                        border-t border-border pt-4">
               {{ faq.a }}
             </div>
           </Transition>
@@ -283,7 +283,7 @@ const previews = [
       </div>
     </section>
 
-    <footer class="text-center sub text-xs py-8 border-t border-[#1A1A1A] opacity-50">
+    <footer class="text-center sub text-xs py-8 border-t border-border opacity-50">
       © 2025 Deepay AI · 让设计更快成为销量
     </footer>
 

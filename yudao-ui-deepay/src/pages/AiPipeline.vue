@@ -173,10 +173,10 @@ const top3 = computed(() => designs.value.slice(0, 3))
 const hasRef = computed(() => inputRefs.value.length > 0 || Object.values(autoRefs.value).some(Boolean))
 
 function levelColor(level) {
-  return level === 'A' ? '#00FF88' : level === 'B' ? '#F59E0B' : '#9CA3AF'
+  return level === 'A' ? '#1abc9c' : level === 'B' ? '#F59E0B' : '#9CA3AF'
 }
 function scoreLabel(score) {
-  if (score >= 85) return '#00FF88'
+  if (score >= 85) return '#1abc9c'
   if (score >= 70) return '#F59E0B'
   return '#9CA3AF'
 }
@@ -253,14 +253,14 @@ function selectDesign(item) {
             @click="brandId = b.id; style = b.style"
             :class="['py-2 px-3 rounded-xl text-xs font-semibold transition-all',
                      brandId === b.id ? 'text-black' : 'border border-[#333] text-[#9CA3AF]']"
-            :style="brandId === b.id ? 'background:#00FF88' : ''">
+            :style="brandId === b.id ? 'background:#1abc9c' : ''">
             {{ b.name }}
           </button>
         </div>
 
         <button @click="handleGenerate" :disabled="loading"
           class="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-95"
-          :style="loading ? 'background:#1F2937;color:#6B7280' : 'background:#00FF88;color:#000'">
+          :style="loading ? 'background:#1F2937;color:#6B7280' : 'background:#1abc9c;color:#fff'">
           <span v-if="loading">{{ loadingStep || '生成中…' }}</span>
           <span v-else>🚀 生成设计系列（6张）</span>
         </button>
@@ -281,7 +281,7 @@ function selectDesign(item) {
           <div v-for="(item, idx) in designs" :key="item.url"
             @click="selectDesign(item)"
             :class="['relative rounded-2xl overflow-hidden cursor-pointer transition-all',
-                     selected?.url === item.url ? 'ring-2 ring-[#00FF88]' : 'ring-1 ring-[#222]']">
+                     selected?.url === item.url ? 'ring-2 ring-accent' : 'ring-1 ring-[#222]']">
 
             <!-- Image -->
             <img :src="item.url" class="w-full aspect-[3/4] object-cover"/>
@@ -305,8 +305,8 @@ function selectDesign(item) {
 
             <!-- Selected overlay -->
             <div v-if="selected?.url === item.url"
-                 class="absolute inset-0 flex items-center justify-center bg-[#00FF88]/10">
-              <div class="w-8 h-8 rounded-full bg-[#00FF88] flex items-center justify-center">
+                 class="absolute inset-0 flex items-center justify-center bg-accent/10">
+              <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
                 <svg class="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -349,7 +349,7 @@ function selectDesign(item) {
       </button>
       <button @click="goDetail"
         class="flex-1 py-3 rounded-xl font-bold text-sm active:scale-95 transition-all"
-        style="background:#00FF88;color:#000">
+        style="background:#1abc9c;color:#fff">
         📋 生成设计稿
       </button>
     </div>

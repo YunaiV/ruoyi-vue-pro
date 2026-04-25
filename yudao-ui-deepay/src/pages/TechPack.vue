@@ -157,7 +157,7 @@ function exportPDF() {
               class="flex items-start gap-2 text-sm"
               style="color:#E5E7EB"
             >
-              <span style="color:#00FF88">◆</span>
+              <span style="color:#1abc9c">◆</span>
               {{ d }}
             </li>
           </ul>
@@ -201,7 +201,7 @@ function exportPDF() {
         >🖨 导出PDF</button>
         <button
           class="flex-1 h-12 rounded-full font-bold text-sm active:scale-95 transition-transform"
-          style="background:#00FF88;color:#000"
+          style="background:#1abc9c;color:#fff"
           @click="router.back()"
         >← 返回</button>
       </div>

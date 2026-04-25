@@ -330,7 +330,7 @@ async function doSave() {
 }
 
 function scoreColor(score) {
-  if (score >= 85) return '#00FF88'
+  if (score >= 85) return '#1abc9c'
   if (score >= 70) return '#F59E0B'
   return '#9CA3AF'
 }
@@ -348,7 +348,7 @@ function scoreColor(score) {
       </button>
       <div class="flex flex-col flex-1">
         <span class="font-semibold text-sm">🎯 AI 可控设计系统</span>
-        <span class="text-[10px]" style="color:#00FF88">
+        <span class="text-[10px]" style="color:#1abc9c">
           选图 → 控参数 → 生成系列 → 局部改 → 精修 → 改色
         </span>
       </div>
@@ -362,7 +362,7 @@ function scoreColor(score) {
       <section class="mb-5">
         <div class="flex items-center justify-between mb-2">
           <p class="label-xs">灵感图（版型 / 风格 / 细节）</p>
-          <button class="text-[11px]" style="color:#00FF88" @click="router.push('/inspiration')">灵感库 →</button>
+          <button class="text-[11px]" style="color:#1abc9c" @click="router.push('/inspiration')">灵感库 →</button>
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div v-for="slot in REF_SLOTS" :key="slot.key"
@@ -416,7 +416,7 @@ function scoreColor(score) {
                       :class="controls[ctrl.key] === opt.value
                         ? 'border-transparent text-black'
                         : 'border-border text-muted bg-surface2'"
-                      :style="controls[ctrl.key] === opt.value ? 'background:#00FF88' : ''"
+                      :style="controls[ctrl.key] === opt.value ? 'background:#1abc9c' : ''"
                       @click="controls[ctrl.key] = opt.value">
                 {{ opt.label }}
               </button>
@@ -429,7 +429,7 @@ function scoreColor(score) {
       <button :disabled="loading"
               class="w-full h-14 rounded-2xl font-bold text-sm mb-2 active:scale-95 transition-transform
                      disabled:opacity-50 flex items-center justify-center gap-2"
-              style="background:#00FF88;color:#000"
+              style="background:#1abc9c;color:#fff"
               @click="generate">
         <svg v-if="loading" class="animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity=".3" stroke-width="3"/>
@@ -443,7 +443,7 @@ function scoreColor(score) {
       <!-- ── 5 系列结果 ─────────────────────────────── -->
       <div v-if="generatedImages.length">
         <div class="flex items-center justify-between mb-3">
-          <p class="font-bold text-sm" style="color:#00FF88">{{ collectionName }}</p>
+          <p class="font-bold text-sm" style="color:#1abc9c">{{ collectionName }}</p>
           <span class="text-[10px] text-muted">{{ generatedImages.filter(i => i.recommended).length }} 款推荐</span>
         </div>
 
@@ -458,7 +458,7 @@ function scoreColor(score) {
             </div>
             <div v-if="img.recommended && !img.bad"
                  class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-black"
-                 style="background:#00FF88;color:#000">⭐ 推荐</div>
+                 style="background:#1abc9c;color:#fff">⭐ 推荐</div>
             <div v-if="!img.bad"
                  class="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[11px] font-bold bg-black/60"
                  :style="{ color: scoreColor(img.score) }">{{ img.score }}</div>
@@ -544,7 +544,7 @@ function scoreColor(score) {
             <button v-for="scheme in COLOR_SCHEMES" :key="scheme.key"
                     class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-semibold transition-all"
                     :class="selectedScheme === scheme.key ? 'border-transparent text-black' : 'border-border text-muted bg-surface2'"
-                    :style="selectedScheme === scheme.key ? 'background:#00FF88' : ''"
+                    :style="selectedScheme === scheme.key ? 'background:#1abc9c' : ''"
                     @click="selectedScheme = scheme.key; recolorResult = null">
               <span class="flex gap-0.5">
                 <span v-for="c in scheme.swatch" :key="c" class="w-3 h-3 rounded-full border border-white/10 shrink-0" :style="`background:${c}`"></span>
@@ -573,11 +573,11 @@ function scoreColor(score) {
 
         <!-- ── 9 保存 ───────────────────────────────── -->
         <div v-if="finalImage" class="space-y-2.5">
-          <p v-if="saveOk" class="text-center text-xs font-semibold" style="color:#00FF88">✔ 已保存到款库</p>
+          <p v-if="saveOk" class="text-center text-xs font-semibold" style="color:#1abc9c">✔ 已保存到款库</p>
           <p v-if="saveError" class="text-center text-xs text-danger">{{ saveError }}</p>
           <button :disabled="saving || saveOk"
                   class="w-full h-12 rounded-full font-bold text-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-                  style="background:#00FF88;color:#000"
+                  style="background:#1abc9c;color:#fff"
                   @click="doSave">
             <svg v-if="saving" class="animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity=".3" stroke-width="3"/>

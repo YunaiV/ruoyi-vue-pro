@@ -301,7 +301,7 @@ async function createFromAI() {
 function defaultTheme() {
   return {
     bg: '#0B0B0B', card: '#111111', border: '#1A1A1A',
-    text: '#FFFFFF', subText: '#9CA3AF', primary: '#00FF88',
+    text: '#FFFFFF', subText: '#9CA3AF', primary: '#1abc9c',
   }
 }
 
@@ -329,7 +329,7 @@ function openPaywall(msg, plans) {
       </button>
       <div class="flex flex-col items-center">
         <span class="font-semibold text-sm tracking-wide">AI一键开店</span>
-        <span class="text-[10px]" style="color:#00FF88">输入想法 → 自动赚钱</span>
+        <span class="text-[10px]" style="color:#1abc9c">输入想法 → 自动赚钱</span>
       </div>
       <button
         :class="['text-xs font-semibold px-3 py-1.5 rounded-full', quotaBadgeClass]"
@@ -344,17 +344,17 @@ function openPaywall(msg, plans) {
                 flex items-center justify-around text-center">
       <div>
         <p class="text-[10px] text-muted">已有用户赚了</p>
-        <p class="text-xs font-bold" style="color:#00FF88">€320+</p>
+        <p class="text-xs font-bold" style="color:#1abc9c">€320+</p>
       </div>
       <div class="w-px h-6 bg-border" />
       <div>
         <p class="text-[10px] text-muted">平均月收益</p>
-        <p class="text-xs font-bold" style="color:#00FF88">€120</p>
+        <p class="text-xs font-bold" style="color:#1abc9c">€120</p>
       </div>
       <div class="w-px h-6 bg-border" />
       <div>
         <p class="text-[10px] text-muted">邀请好友额外得</p>
-        <p class="text-xs font-bold" style="color:#00FF88">€2 / 人</p>
+        <p class="text-xs font-bold" style="color:#1abc9c">€2 / 人</p>
       </div>
     </div>
 
@@ -407,7 +407,7 @@ function openPaywall(msg, plans) {
 
       <!-- 转化率暗示 -->
       <p class="text-center text-xs text-muted mb-5">
-        这个风格转化率高 · 预计月收益 <span style="color:#00FF88">€80~€200</span>
+        这个风格转化率高 · 预计月收益 <span style="color:#1abc9c">€80~€200</span>
       </p>
 
       <!-- 错误 -->
@@ -422,7 +422,7 @@ function openPaywall(msg, plans) {
           基于 1688 · TikTok · Shein 实时数据<br>
           点击上方按钮，立即生成专属款式
         </p>
-        <p class="mt-4 text-xs" style="color:#00FF88">
+        <p class="mt-4 text-xs" style="color:#1abc9c">
           👆 已有用户靠这个赚到 €320+
         </p>
       </div>
@@ -514,7 +514,7 @@ function openPaywall(msg, plans) {
                   {{ productInfo.title }}
                 </p>
                 <div class="flex items-center gap-2">
-                  <span class="text-lg font-black" style="color:#00FF88">
+                  <span class="text-lg font-black" style="color:#1abc9c">
                     €{{ Number(productInfo.price).toFixed(2) }}
                   </span>
                   <span class="text-xs text-muted line-through">
@@ -522,7 +522,7 @@ function openPaywall(msg, plans) {
                   </span>
                 </div>
                 <!-- 预估收益 -->
-                <p class="text-[10px] mt-1" style="color:#00FF88">
+                <p class="text-[10px] mt-1" style="color:#1abc9c">
                   预计月赚 €{{ productInfo.estimatedMonthlyEarn ?? Math.round(productInfo.price * 0.1 * 40) }}
                 </p>
               </div>
@@ -536,7 +536,7 @@ function openPaywall(msg, plans) {
                 :key="i"
                 class="flex items-start gap-2 text-xs"
               >
-                <span style="color:#00FF88">✓</span>
+                <span style="color:#1abc9c">✓</span>
                 <span>{{ pt }}</span>
               </div>
             </div>
@@ -580,7 +580,7 @@ function openPaywall(msg, plans) {
                        active:scale-95 transition-transform duration-100
                        disabled:opacity-50 disabled:cursor-not-allowed
                        flex items-center justify-center gap-1"
-                style="background:#00FF88;color:#000"
+                style="background:#1abc9c;color:#fff"
                 @click="createFromAI"
               >
                 <svg v-if="creating" class="animate-spin h-3.5 w-3.5 shrink-0"
@@ -598,9 +598,9 @@ function openPaywall(msg, plans) {
 
           <!-- 邀请好友提示 -->
           <div class="text-center text-xs py-2 border border-dashed border-border rounded-xl"
-               style="color:#00FF8899">
+               style="color:#1abc9c99">
             邀请好友下单得 €2 · 分享越多赚越多 →
-            <button class="underline ml-1" style="color:#00FF88"
+            <button class="underline ml-1" style="color:#1abc9c"
                     @click="router.push('/invite')">
               立即邀请
             </button>

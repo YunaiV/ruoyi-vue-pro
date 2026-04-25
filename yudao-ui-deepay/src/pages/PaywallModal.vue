@@ -89,7 +89,7 @@ async function buy() {
                     : 'border-[#1A1A1A] bg-[#1A1A1A]',
                 ]"
                 :style="selectedPlan === plan.id
-                  ? 'box-shadow: 0 0 0 1px #00FF88' : ''"
+                  ? 'box-shadow: 0 0 0 1px #1abc9c' : ''"
                 @click="selectedPlan = plan.id"
               >
                 <!-- 标签 -->

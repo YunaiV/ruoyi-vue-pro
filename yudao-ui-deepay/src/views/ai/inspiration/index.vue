@@ -106,7 +106,7 @@ function goGenerate() {
 
 // ── 色彩工具 ─────────────────────────────────────────────────────────
 function scoreColor(n) {
-  if (n >= 90) return '#00FF88'
+  if (n >= 90) return '#1abc9c'
   if (n >= 80) return '#F59E0B'
   return '#9CA3AF'
 }
@@ -282,7 +282,7 @@ function scoreColor(n) {
   background: transparent; color: #555; font-size: 12px; cursor: pointer; white-space: nowrap;
 }
 .chip:hover { border-color: #444; color: #aaa; }
-.chip-active { background: #0f2a1a; border-color: #00FF88; color: #00FF88; }
+.chip-active { background: #0f2a1a; border-color: #1abc9c; color: #1abc9c; }
 .chip-active-purple { background: #1a0a2e; border-color: #A855F7; color: #A855F7; }
 .sel-season {
   padding: 6px 10px; background: #111; border: 1px solid #222;
@@ -308,7 +308,7 @@ function scoreColor(n) {
   cursor: pointer; transition: border-color 0.15s, transform 0.1s;
 }
 .card:hover { transform: translateY(-2px); }
-.card-sel   { border-color: #00FF88; }
+.card-sel   { border-color: #1abc9c; }
 
 .img-wrap { position: relative; }
 .img      { width: 100%; display: block; object-fit: cover; }
@@ -331,12 +331,12 @@ function scoreColor(n) {
 }
 .check-mask {
   position: absolute; inset: 0;
-  background: rgba(0,255,136,.12);
+  background: rgba(26,188,156,.12);
   display: flex; align-items: center; justify-content: center;
 }
 .check-circle {
   width: 36px; height: 36px; border-radius: 50%;
-  background: #00FF88; color: #000;
+  background: #1abc9c; color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; font-weight: 900;
 }
@@ -369,14 +369,14 @@ function scoreColor(n) {
   box-shadow: 0 8px 32px rgba(0,0,0,.7); z-index: 100; white-space: nowrap;
 }
 .float-info { font-size: 13px; color: #666; }
-.float-info strong { color: #00FF88; }
+.float-info strong { color: #1abc9c; }
 .float-actions { display: flex; gap: 8px; }
 .btn-redesign, .btn-generate {
   padding: 8px 18px; border-radius: 10px;
   font-size: 13px; font-weight: 700; border: none; cursor: pointer;
 }
 .btn-redesign { background: #1a1a1a; color: #F59E0B; border: 1px solid #F59E0B44; }
-.btn-generate { background: #00FF88; color: #000; }
+.btn-generate { background: #1abc9c; color: #fff; }
 .btn-redesign:hover, .btn-generate:hover { opacity: .85; }
 
 .slide-up-enter-active, .slide-up-leave-active { transition: all .25s ease; }

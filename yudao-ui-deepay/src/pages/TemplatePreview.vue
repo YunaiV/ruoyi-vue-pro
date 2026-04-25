@@ -108,7 +108,7 @@ function share() {
       <p class="text-sm opacity-60">模板不存在</p>
       <button
         class="h-12 px-8 rounded-full font-bold text-sm"
-        style="background:#00FF88;color:#000"
+        style="background:#1abc9c;color:#fff"
         @click="router.push('/template')"
       >
         返回模板列表

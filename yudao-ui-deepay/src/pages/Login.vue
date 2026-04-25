@@ -76,7 +76,7 @@ function continueAsGuest() {
     <!-- 顶部 logo -->
     <header class="px-6 pt-12 pb-8 text-center">
       <div class="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center
-                  text-black font-black text-xl mx-auto mb-4">D</div>
+                  text-white font-black text-xl mx-auto mb-4">D</div>
       <h1 class="text-2xl font-black">欢迎回来</h1>
       <p class="text-muted text-sm mt-1">登录后查看收益、排名和邀请奖励</p>
     </header>
@@ -122,7 +122,7 @@ function continueAsGuest() {
         class="w-full h-12 rounded-full font-bold text-sm mb-4
                active:scale-95 transition-transform duration-100
                disabled:opacity-50 disabled:cursor-not-allowed"
-        style="background:#00FF88;color:#000"
+        style="background:#1abc9c;color:#fff"
         @click="login"
       >
         {{ submitting ? '登录中…' : '登录' }}
