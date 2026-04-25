@@ -298,7 +298,7 @@ async function doSave(url) {
       <!-- ── 生成按钮 ──────────────────────────────────── -->
       <button
         class="w-full h-14 rounded-full font-black text-base active:scale-95 transition-transform"
-        style="background:linear-gradient(135deg,#A855F7,#1abc9c);color:#000"
+        style="background:linear-gradient(135deg,#A855F7,#1abc9c);color:#fff"
         :disabled="loading"
         @click="generate"
       >
