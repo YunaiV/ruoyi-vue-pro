@@ -53,7 +53,7 @@ NGINX_CONF="${NGINX_CONF:-/www/server/panel/vhost/nginx/deepay.conf}"
 
 DB="${DB:-deepay}"
 DB_USER="${DB_USER:-deepay}"
-DB_PASS="${DB_PASS:-SRx3ETXjNWRKofo51jvc}"
+DB_PASS="${DB_PASS:-deepay393163}"
 
 NONINTERACTIVE="${NONINTERACTIVE:-0}"
 
