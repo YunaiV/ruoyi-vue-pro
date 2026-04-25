@@ -99,15 +99,32 @@ export function getMyShareLinks() {
  * @param {string} linkId
  * @returns {Promise<object>}
  */
+/**
+ * Compute derived metrics from raw stats.
+ * @param {object} data  — must contain { clicks, orders, revenue }
+ * @returns {object} data with conversionRate (%) and avgOrderValue appended
+ */
+function _enrichStats(data) {
+  if (!data) return data
+  const clicks  = data.clicks  || 0
+  const orders  = data.orders  || 0
+  const revenue = data.revenue || 0
+  return {
+    ...data,
+    conversionRate: clicks > 0 ? +((orders / clicks) * 100).toFixed(2) : 0,
+    avgOrderValue:  orders > 0 ? +(revenue / orders).toFixed(2) : 0,
+  }
+}
+
 export async function getShareStats(linkId) {
   const map  = _readLinks()
   const local = map[linkId] || null
 
   try {
     const res = await http.get(`/api/share/stats/${linkId}`)
-    return res?.data || local
+    return _enrichStats(res?.data || local)
   } catch {
-    return local
+    return _enrichStats(local)
   }
 }
 

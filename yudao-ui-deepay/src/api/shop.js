@@ -144,6 +144,23 @@ export async function updateProduct(shopId, index, patch) {
   return shop
 }
 
+/**
+ * 搜索商品
+ * @param {string} query               — 关键词
+ * @param {object} [options]           — { category, minPrice, maxPrice, page, limit }
+ * @returns {Promise<Array>}           — 商品列表，后端不可用时返回空数组
+ */
+export async function searchProducts(query, options = {}) {
+  try {
+    const res = await http.get('/api/products/search', {
+      params: { q: query, ...options },
+    })
+    return res?.data || []
+  } catch (_) {
+    return []
+  }
+}
+
 function defaultTheme() {
   return {
     bg:      '#0B0B0B',
