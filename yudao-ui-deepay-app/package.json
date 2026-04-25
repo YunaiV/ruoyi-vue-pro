@@ -20,7 +20,7 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5000820260420001",
     "vue":                     "3.4.21",
     "wot-design-uni":          "^1.5.0",
-    "pinia":                   "^2.1.7",
+    "pinia":                   "2.2.8",
     "axios":                   "^1.6.0"
   },
   "devDependencies": {
