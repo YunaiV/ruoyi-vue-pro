@@ -167,6 +167,9 @@ public class CryptoUsdcPayClient extends AbstractPayClient<CryptoUsdcPayClientCo
                     null, outTradeNo, null);
         }
         // 扫描近 1000 个区块（约 3-4 小时）
+        // 注意：当前实现取最新一笔 Transfer 事件作为匹配，未按 outTradeNo 精确过滤。
+        // 生产环境建议：链上监听器解析 Transfer 的 input data/memo 并回调 /pay/notify/order/{channelId}，
+        // 通过 doParseOrderNotify 精确匹配订单，而非依赖此轮询方法。
         long fromBlock = Math.max(0, latestBlock - 1000);
 
         // address 为 USDC 合约；topic[2] 为收款地址

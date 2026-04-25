@@ -49,6 +49,13 @@ public class CoinbaseCommercePayClientConfig implements PayClientConfig {
      */
     private String cancelUrl;
 
+    /**
+     * 人民币兑 USD 汇率（1 CNY = 1/X USD；仅当 currency=USD 且订单金额为人民币时使用）
+     * <b>请在管理后台配置实时汇率，或对接汇率 API 后定期更新此值。</b>
+     * 默认值 7.20（即 1 USD ≈ 7.20 CNY）。
+     */
+    private java.math.BigDecimal cnyToUsdRate = new java.math.BigDecimal("7.20");
+
     @Override
     public void validate(Validator validator) {
         // 使用 Bean Validation 验证必填字段

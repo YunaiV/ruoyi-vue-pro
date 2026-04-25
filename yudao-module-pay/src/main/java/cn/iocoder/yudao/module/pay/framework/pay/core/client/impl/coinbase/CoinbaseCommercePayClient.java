@@ -50,8 +50,11 @@ public class CoinbaseCommercePayClient extends AbstractPayClient<CoinbaseCommerc
     private static final String CHARGES_PATH = "/charges";
     private static final String API_VERSION_HEADER = "2018-03-22";
 
-    /** 分转美元/计价货币时的除数（人民币订单按 1:7.2 汇率换算为 USD，实际应从汇率服务获取） */
-    private static final BigDecimal CNY_TO_USD_RATE = new BigDecimal("7.20");
+    /** 默认人民币兑 USD 汇率（fallback 值，实际应通过 CryptoUsdcPayClientConfig.cnyToUsdcRate 或汇率服务获取）
+     *  Coinbase Commerce 计价货币为 USD 时使用；如配置 currency=USD 且订单为人民币，则按此汇率换算。
+     *  <b>生产环境请通过 {@code CoinbaseCommercePayClientConfig} 的 {@code cnyToUsdRate} 字段配置实时汇率。</b>
+     */
+    private static final BigDecimal DEFAULT_CNY_TO_USD_RATE = new BigDecimal("7.20");
 
     public CoinbaseCommercePayClient(Long channelId, CoinbaseCommercePayClientConfig config) {
         super(channelId, PayChannelEnum.COINBASE_COMMERCE.getCode(), config);
@@ -258,8 +261,9 @@ public class CoinbaseCommercePayClient extends AbstractPayClient<CoinbaseCommerc
     private String fenpToDecimalStr(Integer fen, String currency) {
         BigDecimal yuan = BigDecimal.valueOf(fen).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         if ("CNY".equalsIgnoreCase(currency)) {
-            // 换算为 USD（实际应接入汇率服务）
-            yuan = yuan.divide(CNY_TO_USD_RATE, 2, RoundingMode.HALF_UP);
+            // 换算为 USD（使用 config 中的可配置汇率）
+            BigDecimal rate = config.getCnyToUsdRate() != null ? config.getCnyToUsdRate() : DEFAULT_CNY_TO_USD_RATE;
+            yuan = yuan.divide(rate, 2, RoundingMode.HALF_UP);
         }
         return yuan.toPlainString();
     }
