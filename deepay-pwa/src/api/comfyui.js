@@ -358,6 +358,199 @@ export function buildImageUrl(baseUrl, { filename, subfolder = '', type = 'outpu
 }
 
 /**
+ * WebSocket 实时进度监听 — 替代 HTTP 轮询，体验更流畅
+ *
+ * ComfyUI WS 端点: ws(s)://{host}/ws?clientId={uuid}
+ * 消息类型:
+ *   status      → 队列状态
+ *   progress    → { value, max }          当前节点步数进度
+ *   executing   → { node, prompt_id }     正在执行哪个节点
+ *   executed    → { node, output, prompt_id }  某节点执行完毕（含图像）
+ *   execution_success / execution_error
+ *
+ * @param {string}   baseUrl    ComfyUI Pod 地址（http/https，自动转 ws/wss）
+ * @param {string}   apiKey     Auth Key（RunPod built-in auth）
+ * @param {string}   promptId   submitWorkflow 返回的 prompt_id
+ * @param {object}   callbacks
+ *   onProgress(step, maxStep, nodeId, msg)  — 步进回调
+ *   onNodeStart(nodeId, nodeType)            — 节点开始
+ *   onNodeDone(nodeId, images)              — 节点完成（如有图）
+ *   onDone(imageInfos)                      — 全部完成
+ *   onError(msg)                            — 失败
+ * @returns {{ close: () => void }}  调用 close() 可手动断开
+ */
+export function connectWs(baseUrl, apiKey, promptId, callbacks = {}) {
+  const { onProgress, onNodeStart, onNodeDone, onDone, onError } = callbacks
+
+  // http(s) → ws(s)
+  const wsBase = baseUrl.replace(/\/+$/, '').replace(/^http/, 'ws')
+  const clientId = crypto.randomUUID?.() || Math.random().toString(36).slice(2)
+
+  // Build WebSocket URL; attach auth token as query param (RunPod built-in auth method)
+  const url = `${wsBase}/ws?clientId=${clientId}${apiKey ? `&token=${encodeURIComponent(apiKey)}` : ''}`
+
+  let ws
+  let timeoutId
+  const TIMEOUT_MS = 600000  // 10 min
+
+  function cleanup() {
+    clearTimeout(timeoutId)
+    try { ws?.close() } catch {}
+  }
+
+  timeoutId = setTimeout(() => {
+    onError?.('WebSocket 超时（10分钟）')
+    cleanup()
+  }, TIMEOUT_MS)
+
+  try {
+    ws = new WebSocket(url)
+  } catch (e) {
+    onError?.(`WebSocket 创建失败: ${e.message}`)
+    return { close: () => {} }
+  }
+
+  ws.onopen = () => {
+    onProgress?.(0, 0, null, '已连接 ComfyUI WebSocket，等待生成...')
+  }
+
+  ws.onerror = (e) => {
+    cleanup()
+    onError?.(`WebSocket 连接失败 — 请检查 Pod 地址和 Auth Key（错误: ${e.message || 'network error'}）`)
+  }
+
+  ws.onclose = (e) => {
+    clearTimeout(timeoutId)
+    // code 1000 = normal close; others may be unexpected
+    if (e.code !== 1000 && e.code !== 1005) {
+      onError?.(`WebSocket 意外断开 (code ${e.code})`)
+    }
+  }
+
+  ws.onmessage = (event) => {
+    let msg
+    try {
+      msg = typeof event.data === 'string'
+        ? JSON.parse(event.data)
+        : null  // binary frame (preview images) — skip
+    } catch { return }
+    if (!msg) return
+
+    const { type, data } = msg
+
+    if (type === 'progress') {
+      const { value, max, node } = data
+      onProgress?.(value, max, node, `节点 ${node} — 步进 ${value}/${max}`)
+    }
+
+    else if (type === 'executing') {
+      if (!data.node) return  // null node = workflow done marker
+      onNodeStart?.(data.node, '')
+      onProgress?.(0, 0, data.node, `执行节点 ${data.node}...`)
+    }
+
+    else if (type === 'executed') {
+      if (data.prompt_id !== promptId) return  // belongs to another job
+      const images = data.output?.images || []
+      onNodeDone?.(data.node, images)
+      if (images.length) {
+        onProgress?.(1, 1, data.node, `节点 ${data.node} 完成，输出 ${images.length} 张图`)
+      }
+    }
+
+    else if (type === 'execution_success') {
+      if (data.prompt_id !== promptId) return
+      // Fetch final outputs via HTTP history as WS only gives partial info
+      cleanup()
+      onDone?.(promptId)  // caller should fetch /history/{id} to get full image list
+    }
+
+    else if (type === 'execution_error') {
+      if (data.prompt_id !== promptId) return
+      cleanup()
+      const detail = data.exception_message || data.error || JSON.stringify(data).slice(0, 200)
+      onError?.(`ComfyUI 执行错误: ${detail}`)
+    }
+
+    else if (type === 'status') {
+      const q = data?.status?.exec_info?.queue_remaining
+      if (q !== undefined && q > 0) {
+        onProgress?.(0, 0, null, `排队中，前方还有 ${q} 个任务...`)
+      }
+    }
+  }
+
+  return { close: cleanup }
+}
+
+/**
+ * 一站式 WebSocket 生成（提交 + WS 监听 + HTTP 拉取最终图）
+ * 优先用 WS，WS 失败自动降级到 HTTP 轮询
+ * @returns {Promise<{ images: string[], promptId: string }>}
+ */
+export async function generateWithWs(baseUrl, apiKey, workflowJson, callbacks = {}) {
+  const { onProgress, onNodeStart, onNodeDone, onError: _onError } = callbacks
+
+  onProgress?.(0, 0, null, '正在提交到 ComfyUI...')
+  const promptId = await submitWorkflow(baseUrl, apiKey, workflowJson)
+  onProgress?.(0, 0, null, `✓ 已提交 (${promptId.slice(0, 8)}...)`)
+
+  const client = makeClient(baseUrl, apiKey)
+
+  async function fetchFinalImages() {
+    // Poll history once to get the definitive image list
+    for (let i = 0; i < 10; i++) {
+      await sleep(1500)
+      try {
+        const resp = await client.get(`/history/${promptId}`)
+        const entry = resp.data?.[promptId]
+        if (!entry) continue
+        const allImages = []
+        for (const nodeOut of Object.values(entry.outputs || {})) {
+          if (nodeOut.images) allImages.push(...nodeOut.images)
+        }
+        if (allImages.length) return allImages
+      } catch { /* retry */ }
+    }
+    throw new Error('无法从 /history 获取最终图像，请检查 ComfyUI 日志')
+  }
+
+  return new Promise((resolve, reject) => {
+    const wsHandle = connectWs(baseUrl, apiKey, promptId, {
+      onProgress,
+      onNodeStart,
+      onNodeDone,
+      onDone: async () => {
+        try {
+          const imageInfos = await fetchFinalImages()
+          const images = imageInfos.map(info => buildImageUrl(baseUrl, info))
+          resolve({ images, promptId })
+        } catch (e) { reject(e) }
+      },
+      onError: async (msg) => {
+        // Fallback: try HTTP polling when WS fails (e.g. auth mismatch on WS)
+        if (msg.includes('WebSocket') || msg.includes('连接失败')) {
+          onProgress?.(0, 0, null, `⚠️ WS 失败，切换到 HTTP 轮询: ${msg}`)
+          try {
+            const imageInfos = await pollUntilDone(baseUrl, apiKey, promptId, onProgress)
+            const images = imageInfos.map(info => buildImageUrl(baseUrl, info))
+            resolve({ images, promptId })
+          } catch (e2) { reject(e2) }
+        } else {
+          reject(new Error(msg))
+        }
+      },
+    })
+
+    // Safety: also set overall timeout
+    setTimeout(() => {
+      wsHandle.close()
+      reject(new Error('整体超时（10分钟）'))
+    }, 600000)
+  })
+}
+
+/**
  * 一站式：提交工作流 → 轮询 → 返回可显示的图片 URL 列表
  * @returns {Promise<{ images: string[], promptId: string }>}
  */

@@ -299,6 +299,28 @@
 
       </template>
 
+      <!-- ── ComfyUI：实时进度条 ────────────────── -->
+      <div v-if="mode === 'comfyui' && (cRunning || wsProgress.step > 0)" class="tg-progress-wrap">
+        <div class="tg-progress-header">
+          <span class="tg-progress-label">{{ wsProgress.msg || '生成中...' }}</span>
+          <span class="tg-progress-pct" v-if="wsProgress.max > 0">{{ wsProgress.step }}/{{ wsProgress.max }}</span>
+        </div>
+        <div class="tg-progress-bar">
+          <div
+            class="tg-progress-fill"
+            :style="{ width: wsProgress.max > 0 ? (wsProgress.step / wsProgress.max * 100) + '%' : '0%' }"
+          ></div>
+        </div>
+        <div v-if="wsProgress.activeNode" class="tg-node-pills">
+          <span
+            v-for="n in wsProgress.executedNodes"
+            :key="n"
+            class="tg-node-pill done"
+          >✓ {{ n }}</span>
+          <span class="tg-node-pill active">⚡ {{ wsProgress.activeNode }}</span>
+        </div>
+      </div>
+
       <!-- ── 共用：执行日志 ──────────────────────────── -->
       <div v-if="running || cRunning || log.length" class="tg-log-wrap">
         <div class="tg-log-head">
@@ -324,8 +346,24 @@
           <span class="tg-result-title">✨ 生成结果</span>
           <div class="tg-result-actions">
             <span class="tg-result-meta">seed: {{ resultSeed }}</span>
+            <button
+              v-if="mode === 'comfyui' && cRefImage && resultImages.length"
+              class="tg-btn-sm"
+              :class="{ active: showCompare }"
+              @click="showCompare = !showCompare"
+            >{{ showCompare ? '关闭对比' : '⇔ 前后对比' }}</button>
             <button class="tg-btn-sm" @click="copyUrl">📋 复制 URL</button>
           </div>
+        </div>
+
+        <!-- Before/After Compare -->
+        <div v-if="showCompare && cRefImage && resultImages[0]" class="tg-compare-wrap">
+          <ImageCompare
+            :before="cRefImage"
+            :after="toSrc(resultImages[0])"
+            before-label="原图"
+            after-label="生成后"
+          />
         </div>
 
         <video
@@ -369,10 +407,12 @@ import {
   buildImageUrl,
   injectParams,
   detectNodes,
+  generateWithWs,
   WORKFLOW_FLUX_TEXT2IMG,
   WORKFLOW_FLUX_KONTEXT,
 } from '@/api/comfyui.js'
 import { useComfyStore } from '@/store/index.js'
+import ImageCompare from '@/components/ImageCompare.vue'
 
 const comfyStore = useComfyStore()
 
@@ -447,6 +487,10 @@ const resultVideo  = ref('')
 const resultSeed   = ref(-1)
 const rawResponse  = ref(null)
 const errorMsg     = ref('')
+const showCompare  = ref(false)
+
+// ComfyUI WebSocket real-time progress
+const wsProgress = ref({ step: 0, max: 0, msg: '', activeNode: null, executedNodes: [] })
 
 // Clear results when mode changes
 watch(mode, () => {
@@ -602,7 +646,10 @@ async function doPing() {
 
 async function runComfy() {
   if (cRunning.value) return
-  cRunning.value = true; errorMsg.value = ''; resultImages.value = []; resultVideo.value = ''; rawResponse.value = null
+  cRunning.value = true
+  errorMsg.value = ''; resultImages.value = []; resultVideo.value = ''; rawResponse.value = null
+  showCompare.value = false
+  wsProgress.value = { step: 0, max: 0, msg: '', activeNode: null, executedNodes: [] }
 
   const baseUrl = comfyUrl.value.trim()
   const authKey = comfyKey.value.trim()
@@ -611,17 +658,14 @@ async function runComfy() {
     let workflowJson
 
     if (wfMode.value === 'custom') {
-      // Parse user's workflow JSON
       if (!customWfJson.value.trim()) throw new Error('请粘贴 workflow_api.json')
       workflowJson = JSON.parse(customWfJson.value)
-      // Inject prompt if user specified a node + prompt
       if (cPromptNode.value.trim() && cPrompt.value.trim() && workflowJson[cPromptNode.value]) {
         workflowJson[cPromptNode.value].inputs = workflowJson[cPromptNode.value].inputs || {}
         workflowJson[cPromptNode.value].inputs.text = cPrompt.value.trim()
         addLog('info', `已将 Prompt 注入节点 ${cPromptNode.value}`)
       }
     } else {
-      // Use built-in template + injectParams
       const wfDef = selectedWfObj.value
       if (!wfDef) throw new Error('未选择工作流模板')
       workflowJson = injectParams(wfDef.template, {
@@ -635,26 +679,48 @@ async function runComfy() {
       addLog('info', `使用模板: ${wfDef.label}`)
     }
 
-    addLog('info', `提交工作流到: ${baseUrl}`)
-    cStatusText.value = '提交中...'
-    const promptId = await submitWorkflow(baseUrl, authKey, workflowJson)
-    addLog('success', `✓ 已提交，promptId: ${promptId}`)
-    console.log('[ComfyUI] promptId:', promptId)
+    addLog('info', `提交工作流到: ${baseUrl}（WebSocket 实时进度）`)
 
-    const imageInfos = await pollUntilDone(
-      baseUrl, authKey, promptId,
-      (msg) => {
-        cStatusText.value = msg
-        addLog('info', msg)
-      }
-    )
+    const { images, promptId } = await generateWithWs(baseUrl, authKey, workflowJson, {
+      onProgress: (step, max, nodeId, msg) => {
+        wsProgress.value = {
+          step: step ?? wsProgress.value.step,
+          max:  max  ?? wsProgress.value.max,
+          msg:  msg  || wsProgress.value.msg,
+          activeNode:    nodeId || wsProgress.value.activeNode,
+          executedNodes: wsProgress.value.executedNodes,
+        }
+        cStatusText.value = msg || cStatusText.value
+        addLog('info', msg || `步进 ${step}/${max}`)
+      },
+      onNodeStart: (nodeId) => {
+        wsProgress.value = {
+          ...wsProgress.value,
+          step: 0, max: 0,
+          activeNode: nodeId,
+        }
+        addLog('info', `▶ 节点 ${nodeId} 开始执行`)
+      },
+      onNodeDone: (nodeId, imgs) => {
+        const prev = wsProgress.value.executedNodes
+        wsProgress.value = {
+          ...wsProgress.value,
+          executedNodes: prev.includes(nodeId) ? prev : [...prev, nodeId],
+          activeNode: wsProgress.value.activeNode === nodeId ? null : wsProgress.value.activeNode,
+        }
+        if (imgs.length) addLog('success', `✓ 节点 ${nodeId} 完成 (${imgs.length} 张图)`)
+      },
+    })
 
-    const images = imageInfos.map(info => buildImageUrl(baseUrl, info))
     resultImages.value = images
     resultSeed.value   = -1
-    rawResponse.value  = { promptId, imageInfos }
-    addLog('success', `✅ 完成！${images.length} 张图`)
-    console.log('[ComfyUI] Output images:', images)
+    rawResponse.value  = { promptId, images }
+    wsProgress.value   = { ...wsProgress.value, step: 1, max: 1, msg: `✅ 完成！${images.length} 张图`, activeNode: null }
+    addLog('success', `✅ 全部完成！共 ${images.length} 张图`)
+    console.log('[ComfyUI] Output:', images)
+
+    // Auto-show compare if we have a reference image
+    if (cRefImage.value && images.length) showCompare.value = true
 
   } catch (err) {
     errorMsg.value = err.message
