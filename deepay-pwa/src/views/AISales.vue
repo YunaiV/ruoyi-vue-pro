@@ -103,6 +103,14 @@
           <span class="chip-icon">{{ chip.icon }}</span>
           {{ chip.label }}
         </button>
+        <button class="action-chip nav-chip" @click="router.push('/image-library')">
+          <span class="chip-icon">🖼️</span>
+          图库素材
+        </button>
+        <button class="action-chip nav-chip" @click="router.push('/template-library')">
+          <span class="chip-icon">📋</span>
+          更多模板
+        </button>
       </div>
     </section>
 
@@ -113,6 +121,10 @@
           <h2 class="lib-title">推荐店铺模板</h2>
           <span class="lib-badge">{{ templates.length }}</span>
         </div>
+        <button class="lib-more-btn" @click="router.push('/template-library')">
+          全部模板
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
         <!-- Search filter -->
         <div class="lib-search">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -263,10 +275,12 @@
 
 <script setup>
 import { ref, reactive, computed, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/index.js'
 
 /* ── Theme ── */
 const themeStore = useThemeStore()
+const router = useRouter()
 
 /* ── Input state ── */
 const inputRef = ref(null)
@@ -406,36 +420,24 @@ function showToastMsg(text, type = 'success') {
 <style scoped>
 /* ══ ROOT ══ */
 .shop-page {
-  --page-bg:    #212121;
-  --surface:    #2a2a2a;
-  --surface2:   #333;
-  --border:     rgba(255,255,255,0.08);
-  --text:       #ececec;
-  --text-sub:   #8e8ea0;
-  --text-muted: #555;
-  --accent:     #10a37f;
-  --accent-hov: #0d8b6e;
-  --chip-bg:    rgba(255,255,255,0.06);
-  --shadow:     0 4px 24px rgba(0,0,0,0.5);
-  --shadow-lg:  0 12px 48px rgba(0,0,0,0.65);
+  --page-bg:    var(--gpt-main);
+  --surface:    var(--gpt-input-bg);
+  --surface2:   var(--dp-surface2);
+  --border:     var(--gpt-border);
+  --text:       var(--gpt-text);
+  --text-sub:   var(--gpt-text-sub);
+  --text-muted: var(--gpt-text-muted);
+  --accent:     var(--gpt-accent);
+  --accent-hov: var(--gpt-accent-hover);
+  --chip-bg:    var(--dp-chip-bg);
+  --shadow:     var(--dp-shadow);
+  --shadow-lg:  var(--dp-shadow-lg);
   background: var(--page-bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
   padding: 0 0 60px;
   position: relative;
-}
-.shop-page.light-mode {
-  --page-bg:    #f9f9f9;
-  --surface:    #ffffff;
-  --surface2:   #f1f1f1;
-  --border:     rgba(0,0,0,0.08);
-  --text:       #111;
-  --text-sub:   #6b7280;
-  --text-muted: #aaa;
-  --chip-bg:    rgba(0,0,0,0.05);
-  --shadow:     0 4px 20px rgba(0,0,0,0.1);
-  --shadow-lg:  0 12px 40px rgba(0,0,0,0.15);
 }
 
 /* ══ HERO ══ */
@@ -591,6 +593,8 @@ function showToastMsg(text, type = 'success') {
 }
 .action-chip:hover    { background: rgba(255,255,255,0.1); color: var(--text); border-color: var(--accent); }
 .action-chip.selected { background: rgba(16,163,127,0.15); color: var(--accent); border-color: var(--accent); }
+.action-chip.nav-chip { border-style: dashed; opacity: 0.8; }
+.action-chip.nav-chip:hover { opacity: 1; border-style: solid; }
 .chip-icon { font-size: 14px; }
 
 /* ══ LIBRARY ══ */
@@ -606,6 +610,14 @@ function showToastMsg(text, type = 'success') {
   background: var(--accent); color: #fff;
   padding: 2px 8px; border-radius: 20px;
 }
+.lib-more-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px; background: transparent;
+  border: 1px solid var(--border); border-radius: 20px;
+  color: var(--text-sub); font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.15s;
+}
+.lib-more-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 .lib-search {
   display: flex; align-items: center; gap: 7px;

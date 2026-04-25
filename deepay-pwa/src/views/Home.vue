@@ -31,6 +31,30 @@
             {{ chip.label }}
           </button>
         </div>
+
+        <!-- 快速入口 -->
+        <div class="quick-nav">
+          <button class="qn-card" @click="router.push('/image-library')">
+            <span class="qn-emoji">🖼️</span>
+            <span class="qn-label">图库</span>
+            <span class="qn-sub">AI 素材库</span>
+          </button>
+          <button class="qn-card" @click="router.push('/ai-sales')">
+            <span class="qn-emoji">🏪</span>
+            <span class="qn-label">AI 开店</span>
+            <span class="qn-sub">60 秒建店</span>
+          </button>
+          <button class="qn-card" @click="router.push('/template-library')">
+            <span class="qn-emoji">📋</span>
+            <span class="qn-label">模板库</span>
+            <span class="qn-sub">精选风格</span>
+          </button>
+          <button class="qn-card" @click="router.push('/settings')">
+            <span class="qn-emoji">⚙️</span>
+            <span class="qn-label">设置</span>
+            <span class="qn-sub">账号管理</span>
+          </button>
+        </div>
       </div>
 
       <!-- Input bar -->
@@ -171,8 +195,10 @@
 
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore, useChatStore } from '@/store/index.js'
 
+const router = useRouter()
 const userStore = useUserStore()
 const chatStore = useChatStore()
 
@@ -383,6 +409,39 @@ watch(() => chatStore.messages.length, () => {
   transform: translateY(-1px);
 }
 .chip-icon { font-size: 16px; }
+
+/* ── Quick Nav Cards ─────────────────────────── */
+.quick-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 560px;
+}
+.qn-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 20px;
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  min-width: 100px;
+  flex: 1;
+}
+.qn-card:hover {
+  border-color: #10a37f;
+  background: rgba(16,163,127,0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(16,163,127,0.15);
+}
+.qn-emoji { font-size: 24px; }
+.qn-label { font-size: 13px; font-weight: 600; color: var(--gpt-text); }
+.qn-sub   { font-size: 11px; color: var(--gpt-text-muted); }
 
 /* ── Chat screen ─────────────────────────────── */
 .chat-screen {

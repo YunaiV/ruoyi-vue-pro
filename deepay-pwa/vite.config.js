@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'robots.txt'],
       manifest: {
-        name: 'Deepay · AI时尚设计',
+        name: 'Deepay · AI时尚设计平台',
         short_name: 'Deepay',
-        description: 'AI时尚设计助手，图库/模特库/设计库/AI销售一站式平台',
+        description: 'AI驱动的时尚设计平台，一站式图库、模特试衣、AI开店、模板库',
         theme_color: '#0a0a0a',
         background_color: '#0a0a0a',
         display: 'standalone',
@@ -20,20 +20,26 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         lang: 'zh-CN',
+        id: 'com.deepay.pwa',
         icons: [
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }
         ],
-        categories: ['productivity', 'lifestyle'],
+        categories: ['productivity', 'lifestyle', 'shopping'],
         shortcuts: [
-          { name: '图库', url: '/image-library', icons: [{ src: 'icon.svg', sizes: 'any' }] },
-          { name: 'AI销售', url: '/ai-sales', icons: [{ src: 'icon.svg', sizes: 'any' }] }
-        ]
+          { name: '图库',   short_name: '图库',   url: '/image-library',    icons: [{ src: 'icon.svg', sizes: 'any' }] },
+          { name: 'AI开店', short_name: 'AI开店', url: '/ai-sales',         icons: [{ src: 'icon.svg', sizes: 'any' }] },
+          { name: '模板库', short_name: '模板库', url: '/template-library', icons: [{ src: 'icon.svg', sizes: 'any' }] }
+        ],
+        related_applications: [],
+        prefer_related_applications: false
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/admin-api\//, /^\/actuator\//],
         runtimeCaching: [
           {
             urlPattern: /^\/api\//,
@@ -68,5 +74,21 @@ export default defineConfig({
     })
   ],
   resolve: { alias: { '@': resolve(__dirname, 'src') } },
-  server: { port: 3100, proxy: { '/api': { target: 'http://localhost:48080', changeOrigin: true } } }
+  server: {
+    port: 3100,
+    proxy: {
+      '/api':       { target: 'http://localhost:48080', changeOrigin: true },
+      '/admin-api': { target: 'http://localhost:48080', changeOrigin: true }
+    }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['vue', 'vue-router', 'pinia'],
+          vueuse: ['@vueuse/core']
+        }
+      }
+    }
+  }
 })

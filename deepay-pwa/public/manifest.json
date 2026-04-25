@@ -1,14 +1,20 @@
 {
-  "name": "Deepay · AI时尚设计",
+  "name": "Deepay · AI时尚设计平台",
   "short_name": "Deepay",
-  "description": "AI时尚设计助手",
+  "description": "AI驱动的时尚设计平台，一站式图库、模特试衣、AI开店、模板库",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#1abc9c",
+  "theme_color": "#10a37f",
   "orientation": "portrait-primary",
   "lang": "zh-CN",
+  "id": "com.deepay.pwa",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "图库",   "url": "/image-library",    "icons": [{ "src": "/icon.svg", "sizes": "any" }] },
+    { "name": "AI开店", "url": "/ai-sales",         "icons": [{ "src": "/icon.svg", "sizes": "any" }] },
+    { "name": "模板库", "url": "/template-library", "icons": [{ "src": "/icon.svg", "sizes": "any" }] }
   ]
 }

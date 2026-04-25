@@ -207,6 +207,29 @@
         </div>
       </div>
 
+      <!-- ── 快速导航 ──────────────────────── -->
+      <div class="settings-section">
+        <h2 class="section-label">快速导航</h2>
+        <div class="quick-nav-grid">
+          <button class="qng-btn" @click="router.push('/')">
+            <span class="qng-icon">💬</span>
+            <span class="qng-label">AI 对话</span>
+          </button>
+          <button class="qng-btn" @click="router.push('/image-library')">
+            <span class="qng-icon">🖼️</span>
+            <span class="qng-label">图库</span>
+          </button>
+          <button class="qng-btn" @click="router.push('/ai-sales')">
+            <span class="qng-icon">🏪</span>
+            <span class="qng-label">AI 开店</span>
+          </button>
+          <button class="qng-btn" @click="router.push('/template-library')">
+            <span class="qng-icon">📋</span>
+            <span class="qng-label">模板库</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Logout -->
       <button class="logout-btn" @click="showLogoutConfirm = true">退出登录</button>
 
@@ -485,6 +508,34 @@ function logout() {
   padding: 4px 10px;
   border-radius: 6px;
 }
+
+/* Quick Nav Grid */
+.quick-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 480px) { .quick-nav-grid { grid-template-columns: repeat(2, 1fr); } }
+.qng-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.qng-btn:hover {
+  border-color: #10a37f;
+  background: rgba(16,163,127,0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(16,163,127,0.12);
+}
+.qng-icon  { font-size: 22px; }
+.qng-label { font-size: 12px; font-weight: 600; color: var(--gpt-text); }
 
 /* Logout */
 .logout-btn {

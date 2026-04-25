@@ -8,6 +8,23 @@
         <p class="page-sub">发现并使用 AI 生成的时尚设计素材</p>
       </div>
 
+      <!-- Cross-page nav -->
+      <div class="page-nav-row">
+        <button class="pnr-btn" @click="router.push('/')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          AI 对话
+        </button>
+        <button class="pnr-btn active-page" disabled>🖼️ 图库</button>
+        <button class="pnr-btn" @click="router.push('/ai-sales')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          AI 开店
+        </button>
+        <button class="pnr-btn" @click="router.push('/template-library')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          模板库
+        </button>
+      </div>
+
       <!-- Search + filters -->
       <div class="header-controls">
         <div class="search-box">
@@ -47,9 +64,9 @@
         >
           <div class="card-img" :style="{ background: item.gradient }">
             <div class="card-overlay">
-              <button class="use-btn">使用</button>
-              <button class="preview-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <button class="use-btn" @click.stop="router.push({ path: '/ai-sales', query: { img: item.title } })">用于开店</button>
+              <button class="preview-btn" @click.stop="router.push('/template-library')" title="查看模板">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
               </button>
             </div>
             <div class="card-badge">{{ item.category }}</div>
@@ -86,6 +103,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const loading = ref(true)
 const cardsVisible = ref(false)
@@ -142,7 +162,32 @@ onMounted(() => {
   max-width: 1100px;
   margin: 0 auto 28px;
 }
-.header-top { margin-bottom: 20px; }
+.header-top { margin-bottom: 14px; }
+
+/* Cross-page nav row */
+.page-nav-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.pnr-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 20px;
+  color: var(--gpt-text-sub);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.pnr-btn:hover { border-color: #10a37f; color: #10a37f; background: rgba(16,163,127,0.07); }
+.pnr-btn.active-page { background: rgba(16,163,127,0.12); border-color: rgba(16,163,127,0.35); color: #10a37f; font-weight: 600; cursor: default; }
 .page-title {
   font-size: 26px;
   font-weight: 700;
