@@ -62,14 +62,16 @@
           class="gallery-card"
           :class="{ visible: cardsVisible }"
         >
-          <div class="card-img" :style="{ background: item.gradient }">
+          <div class="card-img" :style="item.src ? {} : { background: item.gradient }">
+            <!-- Real AI-generated image -->
+            <img v-if="item.src" :src="item.src" :alt="item.title" class="card-real-img" />
             <div class="card-overlay">
-              <button class="use-btn" @click.stop="router.push({ path: '/ai-sales', query: { img: item.title } })">用于开店</button>
-              <button class="preview-btn" @click.stop="router.push('/template-library')" title="查看模板">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <button class="use-btn" @click.stop="router.push({ path: '/ai-sales', query: { img: item.src || item.title } })">用于开店</button>
+              <button class="preview-btn" @click.stop="item.isAI ? openDetail(item) : router.push('/template-library')" title="查看">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
-            <div class="card-badge">{{ item.category }}</div>
+            <div class="card-badge" :class="{ 'badge-ai': item.isAI }">{{ item.category }}</div>
           </div>
           <div class="card-info">
             <span class="card-title">{{ item.title }}</span>
@@ -85,53 +87,310 @@
       AI 生成
     </button>
 
-    <!-- Simple modal -->
-    <div v-if="showGenModal" class="modal-backdrop" @click.self="showGenModal = false">
-      <div class="modal">
-        <h3 class="modal-title">AI 图像生成</h3>
-        <p class="modal-sub">描述你想要生成的图像</p>
-        <textarea class="modal-textarea" placeholder="例如：一款高级感秋冬外套，深藏蓝色，简约廓形..." rows="4"></textarea>
-        <div class="modal-actions">
-          <button class="modal-cancel" @click="showGenModal = false">取消</button>
-          <button class="modal-confirm" @click="showGenModal = false">开始生成</button>
+    <!-- ── AI Generation Modal ────────────────────────────── -->
+    <Transition name="modal-fade">
+    <div v-if="showGenModal" class="modal-backdrop" @click.self="closeModal">
+      <div class="gen-modal">
+
+        <!-- Modal header -->
+        <div class="gen-modal-head">
+          <div class="gen-modal-title-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <h3 class="gen-modal-title">AI 图像生成</h3>
+          </div>
+          <button class="gen-modal-close" @click="closeModal" :disabled="genStore.isGenerating">✕</button>
         </div>
+
+        <!-- No API key warning -->
+        <div v-if="!genStore.apiKey" class="api-key-warn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          未设置 RunPod API Key —
+          <button class="warn-link" @click="$router.push('/settings'); closeModal()">前往设置</button>
+          填入后即可生成
+        </div>
+
+        <!-- Tab bar -->
+        <div class="gen-tabs">
+          <button class="gen-tab" :class="{ active: genTab === 'txt2img' }" @click="genTab = 'txt2img'">
+            ✏️ 文生图
+          </button>
+          <button class="gen-tab" :class="{ active: genTab === 'img2img' }" @click="genTab = 'img2img'">
+            🔄 图生图 / 局部编辑
+          </button>
+        </div>
+
+        <!-- Model selector -->
+        <div class="gen-section">
+          <label class="gen-label">选择模型</label>
+          <div class="model-cards">
+            <button
+              v-for="m in availableModels"
+              :key="m.id"
+              class="model-card"
+              :class="{ selected: selectedModel === m.id }"
+              @click="selectedModel = m.id"
+            >
+              <span class="model-badge" :style="{ background: m.badgeColor }">{{ m.badge }}</span>
+              <span class="model-name">{{ m.label }}</span>
+              <span class="model-desc">{{ m.desc }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prompt -->
+        <div class="gen-section">
+          <label class="gen-label">
+            描述 Prompt
+            <span class="gen-label-hint">用中文或英文描述你想要的效果</span>
+          </label>
+          <textarea
+            v-model="prompt"
+            class="gen-textarea"
+            :placeholder="promptPlaceholder"
+            rows="4"
+            :disabled="genStore.isGenerating"
+          ></textarea>
+        </div>
+
+        <!-- Negative prompt -->
+        <div class="gen-section">
+          <label class="gen-label">
+            反向词 <span class="gen-label-hint optional">可选</span>
+          </label>
+          <input
+            v-model="negativePrompt"
+            class="gen-input"
+            placeholder="模糊、低质量、水印、文字..."
+            :disabled="genStore.isGenerating"
+          />
+        </div>
+
+        <!-- Reference image (img2img / Kontext / Qwen) -->
+        <div v-if="genTab === 'img2img' || currentModel?.supportsImg" class="gen-section">
+          <label class="gen-label">
+            参考图片 URL
+            <span class="gen-label-hint">{{ genTab === 'img2img' ? '必填' : '可选' }}</span>
+          </label>
+          <input
+            v-model="refImageUrl"
+            class="gen-input"
+            placeholder="https://... 或从图库点击「用于开店」自动填入"
+            :disabled="genStore.isGenerating"
+          />
+          <div v-if="refImageUrl" class="ref-preview">
+            <img :src="refImageUrl" alt="参考图" @error="refImageUrl = ''" />
+          </div>
+        </div>
+
+        <!-- Advanced params (collapsible) -->
+        <details class="gen-advanced">
+          <summary class="gen-advanced-toggle">⚙️ 高级参数</summary>
+          <div class="gen-advanced-body">
+
+            <div class="param-row">
+              <label class="param-label">尺寸</label>
+              <div class="size-chips">
+                <button
+                  v-for="s in sizeOptions"
+                  :key="s"
+                  class="size-chip"
+                  :class="{ active: selectedSize === s }"
+                  @click="selectedSize = s"
+                >{{ s }}</button>
+              </div>
+            </div>
+
+            <div class="param-row">
+              <label class="param-label">
+                推理步数
+                <span class="param-val">{{ steps }}</span>
+              </label>
+              <input type="range" v-model.number="steps" :min="currentModel?.id === 'flux-schnell' ? 1 : 10" :max="50" step="1" class="param-slider" :disabled="genStore.isGenerating" />
+            </div>
+
+            <div class="param-row">
+              <label class="param-label">
+                引导系数 (Guidance)
+                <span class="param-val">{{ guidance }}</span>
+              </label>
+              <input type="range" v-model.number="guidance" min="0" max="15" step="0.5" class="param-slider" :disabled="genStore.isGenerating" />
+            </div>
+
+            <div class="param-row">
+              <label class="param-label">
+                随机种子
+                <span class="param-val">{{ seed === -1 ? '随机' : seed }}</span>
+              </label>
+              <div class="seed-row">
+                <input type="range" v-model.number="seed" min="-1" max="999999999" step="1" class="param-slider" :disabled="genStore.isGenerating" />
+                <button class="seed-reset" @click="seed = -1" title="随机">🎲</button>
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+        <!-- Progress bar -->
+        <div v-if="genStore.isGenerating || genStore.status === 'error'" class="gen-progress-wrap">
+          <div class="gen-progress-bar" :class="genStore.status">
+            <div v-if="genStore.isGenerating" class="gen-progress-fill"></div>
+          </div>
+          <p class="gen-progress-text" :class="{ error: genStore.status === 'error' }">
+            {{ genStore.progress }}
+          </p>
+        </div>
+
+        <!-- Latest result preview -->
+        <div v-if="latestResult" class="gen-result">
+          <div class="gen-result-head">
+            <span class="gen-result-label">✨ 生成结果</span>
+            <div class="gen-result-actions">
+              <a :href="latestResult" download="deepay-generated.png" class="result-action-btn">
+                ⬇ 下载
+              </a>
+              <button class="result-action-btn accent" @click="useInSales">🏪 用于开店</button>
+            </div>
+          </div>
+          <img :src="latestResult" class="gen-result-img" alt="AI 生成结果" />
+        </div>
+
+        <!-- Action buttons -->
+        <div class="gen-modal-footer">
+          <button class="gen-cancel-btn" @click="closeModal">
+            {{ genStore.isGenerating ? '后台运行' : '关闭' }}
+          </button>
+          <button
+            v-if="genStore.isGenerating"
+            class="gen-stop-btn"
+            @click="stopGeneration"
+          >⏹ 停止</button>
+          <button
+            v-else
+            class="gen-submit-btn"
+            :disabled="!prompt.trim() || !genStore.apiKey"
+            @click="startGeneration"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            开始生成
+          </button>
+        </div>
+
       </div>
     </div>
+    </Transition>
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useImageGenStore } from '@/store/index.js'
+import { generate, cancelJob, MODELS, toImageSrc } from '@/api/runpod.js'
 
 const router = useRouter()
+const route  = useRoute()
+const genStore = useImageGenStore()
 
-const loading = ref(true)
+// ── Gallery state ──────────────────────────────────────
+const loading      = ref(true)
 const cardsVisible = ref(false)
-const searchQuery = ref('')
+const searchQuery  = ref('')
 const activeFilter = ref('全部')
-const showGenModal = ref(false)
 
-const filters = ['全部', '服装', '配饰', '鞋靴', '背景']
+// ── Generation modal state ─────────────────────────────
+const showGenModal  = ref(false)
+const genTab        = ref('txt2img')
+const selectedModel = ref('flux-kontext')
+const prompt        = ref('')
+const negativePrompt = ref('')
+const refImageUrl   = ref('')
+const selectedSize  = ref('1024x1024')
+const steps         = ref(28)
+const guidance      = ref(2)
+const seed          = ref(-1)
+const latestResult  = ref('')
 
-const images = [
-  { id: 1, title: '春季宽松外套', category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { id: 2, title: '复古皮革手包', category: '配饰', size: '1920×1920', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-  { id: 3, title: '极简白色连衣裙', category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-  { id: 4, title: '厚底增高老爹鞋', category: '鞋靴', size: '1800×1800', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-  { id: 5, title: '工作室白背景', category: '背景', size: '3000×2000', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-  { id: 6, title: '丹宁牛仔套装', category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
-  { id: 7, title: '丝巾配饰', category: '配饰', size: '1600×1600', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
-  { id: 8, title: '秋冬针织毛衣', category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)' },
-  { id: 9, title: '高跟细跟凉鞋', category: '鞋靴', size: '1800×1800', gradient: 'linear-gradient(135deg, #fd7043 0%, #ff8a65 100%)' },
-  { id: 10, title: '渐变粉色背景', category: '背景', size: '3000×2000', gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)' },
-  { id: 11, title: '运动休闲套装', category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg, #0fd850 0%, #f9f047 100%)' },
-  { id: 12, title: '金属质感腰带', category: '配饰', size: '1600×600', gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' },
+const sizeOptions = ['512x512', '768x768', '1024x1024', '1024x768', '768x1024', '1280x720']
+
+// Models available per tab
+const availableModels = computed(() => {
+  const all = Object.values(MODELS)
+  if (genTab.value === 'img2img') return all.filter(m => m.supportsImg)
+  return all
+})
+
+const currentModel = computed(() => MODELS[selectedModel.value])
+
+const promptPlaceholder = computed(() => {
+  if (genTab.value === 'img2img') {
+    return '描述想要的修改，例如：把领口改成深V领，颜色换成深海蓝，保持其他部分不变'
+  }
+  return '例如：一款高级感秋冬外套，深藏蓝色，简约廓形，欧根纱领，模特平铺拍摄，超清质感'
+})
+
+// Sync model defaults with params when model changes
+watch(selectedModel, (id) => {
+  const m = MODELS[id]
+  if (!m) return
+  steps.value    = m.defaults.num_inference_steps
+  guidance.value = m.defaults.guidance
+  genStore.setModel(id)
+})
+
+// When img2img tab is selected, switch to a model that supports images
+watch(genTab, (tab) => {
+  if (tab === 'img2img' && !currentModel.value?.supportsImg) {
+    selectedModel.value = 'flux-kontext'
+  }
+})
+
+// Pre-fill ref image URL from route query (?img=)
+watch(() => route.query.img, (v) => {
+  if (v) {
+    refImageUrl.value = String(v)
+    genTab.value = 'img2img'
+    showGenModal.value = true
+  }
+}, { immediate: true })
+
+// ── Gallery data: static + AI-generated history ─────────
+const staticImages = [
+  { id: 1,  title: '春季宽松外套',   category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg,#667eea,#764ba2)', src: null },
+  { id: 2,  title: '复古皮革手包',   category: '配饰', size: '1920×1920', gradient: 'linear-gradient(135deg,#f093fb,#f5576c)', src: null },
+  { id: 3,  title: '极简白色连衣裙', category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg,#4facfe,#00f2fe)', src: null },
+  { id: 4,  title: '厚底增高老爹鞋', category: '鞋靴', size: '1800×1800', gradient: 'linear-gradient(135deg,#43e97b,#38f9d7)', src: null },
+  { id: 5,  title: '工作室白背景',   category: '背景', size: '3000×2000', gradient: 'linear-gradient(135deg,#fa709a,#fee140)', src: null },
+  { id: 6,  title: '丹宁牛仔套装',   category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg,#a18cd1,#fbc2eb)', src: null },
+  { id: 7,  title: '丝巾配饰',       category: '配饰', size: '1600×1600', gradient: 'linear-gradient(135deg,#ffecd2,#fcb69f)', src: null },
+  { id: 8,  title: '秋冬针织毛衣',   category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg,#a1c4fd,#c2e9fb)', src: null },
+  { id: 9,  title: '高跟细跟凉鞋',   category: '鞋靴', size: '1800×1800', gradient: 'linear-gradient(135deg,#fd7043,#ff8a65)', src: null },
+  { id: 10, title: '渐变粉色背景',   category: '背景', size: '3000×2000', gradient: 'linear-gradient(135deg,#e0c3fc,#8ec5fc)', src: null },
+  { id: 11, title: '运动休闲套装',   category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg,#0fd850,#f9f047)', src: null },
+  { id: 12, title: '金属质感腰带',   category: '配饰', size: '1600×600',  gradient: 'linear-gradient(135deg,#30cfd0,#330867)', src: null },
 ]
 
+const filters = ['全部', '服装', '配饰', '鞋靴', '背景', 'AI 生成']
+
+// Merge static + generated history as gallery items
+const allImages = computed(() => {
+  const genItems = genStore.history.map(h => ({
+    id:       h.id,
+    title:    h.prompt.slice(0, 20) + (h.prompt.length > 20 ? '…' : ''),
+    category: 'AI 生成',
+    size:     '1024×1024',
+    gradient: 'linear-gradient(135deg,#10a37f,#0d5f4e)',
+    src:      toImageSrc(h.src),
+    isAI:     true,
+    prompt:   h.prompt,
+    model:    h.model,
+    seed:     h.seed,
+  }))
+  return [...genItems, ...staticImages]
+})
+
 const filteredItems = computed(() => {
-  let list = images
+  let list = allImages.value
   if (activeFilter.value !== '全部') {
     list = list.filter(i => i.category === activeFilter.value)
   }
@@ -142,9 +401,80 @@ const filteredItems = computed(() => {
   return list
 })
 
+// ── Generation logic ───────────────────────────────────
+async function startGeneration() {
+  if (!prompt.value.trim() || !genStore.apiKey) return
+  genStore.reset()
+  latestResult.value = ''
+
+  const params = {
+    prompt:              prompt.value.trim(),
+    negative_prompt:     negativePrompt.value.trim(),
+    seed:                seed.value,
+    num_inference_steps: steps.value,
+    guidance:            guidance.value,
+    size:                selectedSize.value,
+    output_format:       'png',
+  }
+  if (refImageUrl.value.trim()) {
+    params.image = refImageUrl.value.trim()
+  }
+
+  try {
+    const result = await generate(
+      genStore.apiKey,
+      selectedModel.value,
+      params,
+      (status, msg) => genStore.updateProgress(status, msg),
+    )
+
+    genStore.addResult({
+      images: result.images,
+      seed:   result.seed,
+      prompt: params.prompt,
+      model:  selectedModel.value,
+      params,
+    })
+
+    // Show first image as preview
+    if (result.images[0]) {
+      latestResult.value = toImageSrc(result.images[0])
+    }
+
+  } catch (err) {
+    genStore.setError(`❌ ${err.message}`)
+  }
+}
+
+async function stopGeneration() {
+  if (genStore.jobId) {
+    try {
+      await cancelJob(genStore.apiKey, selectedModel.value, genStore.jobId)
+    } catch { /* ignore */ }
+  }
+  genStore.reset()
+}
+
+function closeModal() {
+  if (!genStore.isGenerating) {
+    showGenModal.value = false
+    genStore.reset()
+  } else {
+    // Keep generating in background, just close UI
+    showGenModal.value = false
+  }
+}
+
+function useInSales() {
+  if (latestResult.value) {
+    router.push({ path: '/ai-sales', query: { img: latestResult.value.startsWith('http') ? latestResult.value : 'generated' } })
+  }
+}
+
+// ── Lifecycle ──────────────────────────────────────────
 onMounted(() => {
-  setTimeout(() => { loading.value = false }, 1000)
-  setTimeout(() => { cardsVisible.value = true }, 1050)
+  setTimeout(() => { loading.value = false }, 800)
+  setTimeout(() => { cardsVisible.value = true }, 850)
 })
 </script>
 
