@@ -234,29 +234,6 @@ function share() {
 
   </div>
 </template>
-<script setup>
-import { ref } from 'vue'
-
-const props = defineProps({ shop: { type: Object, required: true } })
-const emit  = defineEmits(['buy', 'share'])
-
-const imgLoaded  = ref(false)
-const buying     = ref(false)
-
-function share() {
-  const url = window.location.href
-  if (navigator.share) navigator.share({ title: props.shop.products?.[0]?.title || 'Deepay', url })
-  else navigator.clipboard?.writeText(url).then(() => alert('链接已复制'))
-}
-
-async function buy() {
-  if (buying.value) return
-  buying.value = true
-  try { emit('buy') } finally { buying.value = false }
-}
-
-const product = props.shop.products?.[0] || {}
-</script>
 
 <template>
   <div class="min-h-screen pb-32"

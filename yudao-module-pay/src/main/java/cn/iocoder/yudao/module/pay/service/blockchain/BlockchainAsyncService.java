@@ -75,6 +75,14 @@ public class BlockchainAsyncService implements ApplicationEventPublisherAware {
     @Value("${blockchain.batch.size:10}")
     private int batchSize;
 
+    /** 分布式锁等待时间（秒），超时则跳过本次任务 */
+    @Value("${blockchain.lock.wait-seconds:3}")
+    private int lockWaitSeconds;
+
+    /** 分布式锁持有时间（秒），防止节点宕机时锁不释放 */
+    @Value("${blockchain.lock.lease-seconds:300}")
+    private int lockLeaseSeconds;
+
     // ========== 内存批量队列 ==========
 
     private final Queue<BlockchainTaskDO> memoryQueue = new LinkedList<>();
@@ -115,8 +123,8 @@ public class BlockchainAsyncService implements ApplicationEventPublisherAware {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            // 分布式锁防重，最多等待 3 秒竞争锁
-            if (!lock.tryLock(3, 5 * 60, TimeUnit.SECONDS)) {
+            // 分布式锁防重，等待 lockWaitSeconds 秒；锁最多持有 lockLeaseSeconds 秒
+            if (!lock.tryLock(lockWaitSeconds, lockLeaseSeconds, TimeUnit.SECONDS)) {
                 log.warn("订单 {} 存证锁竞争失败，已有其他节点处理，跳过", orderId);
                 return CompletableFuture.completedFuture("LOCKED");
             }

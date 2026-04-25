@@ -99,6 +99,18 @@ export function getMyShareLinks() {
  * @param {string} linkId
  * @returns {Promise<object>}
  */
+export async function getShareStats(linkId) {
+  const map  = _readLinks()
+  const local = map[linkId] || null
+
+  try {
+    const res = await http.get(`/api/share/stats/${linkId}`)
+    return _enrichStats(res?.data || local)
+  } catch {
+    return _enrichStats(local)
+  }
+}
+
 /**
  * Compute derived metrics from raw share-link stats.
  * Appends two calculated fields to the data object returned by the backend:
@@ -117,18 +129,6 @@ function _enrichStats(data) {
     ...data,
     conversionRate: clicks > 0 ? +((orders / clicks) * 100).toFixed(2) : 0,
     avgOrderValue:  orders > 0 ? +(revenue / orders).toFixed(2) : 0,
-  }
-}
-
-export async function getShareStats(linkId) {
-  const map  = _readLinks()
-  const local = map[linkId] || null
-
-  try {
-    const res = await http.get(`/api/share/stats/${linkId}`)
-    return _enrichStats(res?.data || local)
-  } catch {
-    return _enrichStats(local)
   }
 }
 
