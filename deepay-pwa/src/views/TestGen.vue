@@ -12,93 +12,295 @@
         <p class="tg-sub">直连 RunPod · 完整 response 打印到控制台 · 验证 API 链路</p>
       </div>
 
-      <!-- Step 1: API Key -->
-      <div class="tg-section">
-        <label class="tg-label">① RunPod API Key</label>
-        <div class="tg-row">
+      <!-- Mode Tabs -->
+      <div class="tg-mode-tabs">
+        <button class="tg-mode-tab" :class="{ active: mode === 'serverless' }" @click="mode = 'serverless'">
+          ☁️ RunPod 无服务器 API
+        </button>
+        <button class="tg-mode-tab" :class="{ active: mode === 'comfyui' }" @click="mode = 'comfyui'">
+          🖥️ ComfyUI Pod 直连
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           TAB A: RunPod Serverless
+           ══════════════════════════════════════════════════════════ -->
+      <template v-if="mode === 'serverless'">
+
+        <!-- Step 1: API Key -->
+        <div class="tg-section">
+          <label class="tg-label">① RunPod API Key</label>
+          <div class="tg-row">
+            <input
+              v-model="apiKey"
+              :type="showKey ? 'text' : 'password'"
+              class="tg-input mono"
+              placeholder="Bearer Key（仅存本地，不提交代码）"
+              spellcheck="false"
+              autocomplete="off"
+            />
+            <button class="tg-btn-sm" @click="showKey = !showKey">{{ showKey ? '🙈' : '👁️' }}</button>
+            <button class="tg-btn-sm green" @click="saveKey">保存</button>
+          </div>
+          <p v-if="keySaved" class="tg-hint green">✓ 已保存到 localStorage</p>
+        </div>
+
+        <!-- Step 2: Model -->
+        <div class="tg-section">
+          <label class="tg-label">② 选择模型端点</label>
+          <div class="tg-model-grid">
+            <button
+              v-for="m in quickModels"
+              :key="m.id"
+              class="tg-model-btn"
+              :class="{ active: selectedModelId === m.id }"
+              @click="selectModel(m)"
+            >
+              <span class="tg-mbadge" :style="{ background: m.color }">{{ m.badge }}</span>
+              <span class="tg-mname">{{ m.label }}</span>
+              <span class="tg-mendpoint">{{ m.endpointId }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Prompt -->
+        <div class="tg-section">
+          <label class="tg-label">③ Prompt</label>
+          <textarea
+            v-model="prompt"
+            class="tg-input tg-textarea"
+            rows="4"
+            placeholder="描述要生成的内容，支持中英文。例如：一件深海蓝丝绒晚礼服，V领，模特正面，白背景商业摄影"
+            :disabled="running"
+          ></textarea>
+        </div>
+
+        <!-- Step 4: Ref Image -->
+        <div class="tg-section">
+          <label class="tg-label">④ 参考图片 URL <span class="tg-opt">（编辑/视频模型必填，其余可选）</span></label>
           <input
-            v-model="apiKey"
-            :type="showKey ? 'text' : 'password'"
-            class="tg-input mono"
-            placeholder="Bearer Key（仅存本地，不提交代码）"
+            v-model="refImage"
+            class="tg-input"
+            placeholder="https://..."
+            :disabled="running"
+          />
+          <div v-if="refImage" class="tg-ref-preview">
+            <img :src="refImage" @error="refImage = ''" alt="参考图" />
+          </div>
+        </div>
+
+        <!-- Raw JSON override -->
+        <details class="tg-details">
+          <summary class="tg-summary">⚙️ 高级 · 直接编辑 JSON input</summary>
+          <textarea
+            v-model="rawJson"
+            class="tg-input tg-textarea mono"
+            rows="8"
+            spellcheck="false"
+            placeholder='{"prompt":"...","num_inference_steps":28,"guidance":2,"seed":-1,"size":"1024*1024","output_format":"png","enable_safety_checker":true}'
+          ></textarea>
+          <p class="tg-hint">留空则使用上方表单参数自动构建</p>
+        </details>
+
+        <!-- Run Button -->
+        <button
+          class="tg-run-btn"
+          :disabled="running || !apiKey.trim() || !prompt.trim()"
+          @click="runServerless"
+        >
+          <span v-if="running" class="tg-spinner">⏳</span>
+          <span v-else>🚀</span>
+          {{ running ? statusText : '提交出图 (Serverless)' }}
+        </button>
+
+      </template>
+
+      <!-- ══════════════════════════════════════════════════════════
+           TAB B: ComfyUI Direct
+           ══════════════════════════════════════════════════════════ -->
+      <template v-if="mode === 'comfyui'">
+
+        <!-- Pod URL + Auth Key -->
+        <div class="tg-section">
+          <label class="tg-label">① Pod 地址 + Auth Key</label>
+          <p class="tg-info-box">
+            📍 格式：<code>https://[pod-id]-8188.proxy.runpod.net</code><br/>
+            🔒 你的镜像启用了 Built-in Auth，必须填写 Auth Key，否则返回 401/403
+          </p>
+          <input
+            v-model="comfyUrl"
+            class="tg-input"
+            placeholder="https://x1ik3wb0zvch3v-64410f01-8188.proxy.runpod.net"
             spellcheck="false"
             autocomplete="off"
+            :disabled="cRunning"
           />
-          <button class="tg-btn-sm" @click="showKey = !showKey">{{ showKey ? '🙈' : '👁️' }}</button>
-          <button class="tg-btn-sm green" @click="saveKey">保存</button>
+          <div class="tg-row" style="margin-top:8px">
+            <input
+              v-model="comfyKey"
+              :type="showComfyKey ? 'text' : 'password'"
+              class="tg-input mono"
+              placeholder="Auth Key（ComfyUI 启动时设置的密钥）"
+              spellcheck="false"
+              autocomplete="off"
+              :disabled="cRunning"
+            />
+            <button class="tg-btn-sm" @click="showComfyKey = !showComfyKey">{{ showComfyKey ? '🙈' : '👁️' }}</button>
+          </div>
+          <div class="tg-row" style="margin-top:8px;gap:8px">
+            <button class="tg-btn-sm green" @click="saveComfy">💾 保存</button>
+            <button class="tg-btn-sm" :disabled="!comfyUrl.trim() || cPinging" @click="doPing">
+              {{ cPinging ? '检测中...' : '🔗 测试连通性' }}
+            </button>
+            <span v-if="pingResult" class="tg-ping-badge" :class="pingResult.ok ? 'ok' : 'err'">
+              {{ pingResult.ok ? `✅ ${pingResult.version}` : `❌ ${pingResult.error}` }}
+            </span>
+          </div>
         </div>
-        <p v-if="keySaved" class="tg-hint green">✓ 已保存到 localStorage</p>
-      </div>
 
-      <!-- Step 2: Model -->
-      <div class="tg-section">
-        <label class="tg-label">② 选择模型端点</label>
-        <div class="tg-model-grid">
-          <button
-            v-for="m in quickModels"
-            :key="m.id"
-            class="tg-model-btn"
-            :class="{ active: selectedModelId === m.id }"
-            @click="selectModel(m)"
-          >
-            <span class="tg-mbadge" :style="{ background: m.color }">{{ m.badge }}</span>
-            <span class="tg-mname">{{ m.label }}</span>
-            <span class="tg-mendpoint">{{ m.endpointId }}</span>
-          </button>
+        <!-- Workflow mode -->
+        <div class="tg-section">
+          <label class="tg-label">② 工作流模式</label>
+          <div class="tg-model-grid" style="grid-template-columns:1fr 1fr">
+            <button
+              class="tg-model-btn"
+              :class="{ active: wfMode === 'template' }"
+              @click="wfMode = 'template'"
+            >
+              <span class="tg-mbadge" style="background:#10a37f">模板</span>
+              <span class="tg-mname">使用内置模板</span>
+              <span class="tg-mendpoint">自动注入 Prompt + 参数</span>
+            </button>
+            <button
+              class="tg-model-btn"
+              :class="{ active: wfMode === 'custom' }"
+              @click="wfMode = 'custom'"
+            >
+              <span class="tg-mbadge" style="background:#7c3aed">自定义</span>
+              <span class="tg-mname">粘贴 workflow_api.json</span>
+              <span class="tg-mendpoint">从 ComfyUI 界面导出</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Step 3: Inputs -->
-      <div class="tg-section">
-        <label class="tg-label">③ Prompt</label>
-        <textarea
-          v-model="prompt"
-          class="tg-input tg-textarea"
-          rows="4"
-          placeholder="描述要生成的内容，支持中英文。例如：一件深海蓝丝绒晚礼服，V领，模特正面，白背景商业摄影"
-          :disabled="running"
-        ></textarea>
-      </div>
+        <!-- Template: select + params -->
+        <template v-if="wfMode === 'template'">
+          <div class="tg-section">
+            <label class="tg-label">③ 选择工作流模板</label>
+            <div class="tg-model-grid" style="grid-template-columns:1fr 1fr">
+              <button
+                v-for="wf in builtinWorkflows"
+                :key="wf.id"
+                class="tg-model-btn"
+                :class="{ active: selectedWf === wf.id }"
+                @click="selectedWf = wf.id"
+              >
+                <span class="tg-mbadge" :style="{ background: wf.color }">{{ wf.badge }}</span>
+                <span class="tg-mname">{{ wf.label }}</span>
+                <span class="tg-mendpoint">{{ wf.desc }}</span>
+              </button>
+            </div>
+          </div>
 
-      <div class="tg-section">
-        <label class="tg-label">④ 参考图片 URL <span class="tg-opt">（编辑/视频模型必填，其余可选）</span></label>
-        <input
-          v-model="refImage"
-          class="tg-input"
-          placeholder="https://..."
-          :disabled="running"
-        />
-        <div v-if="refImage" class="tg-ref-preview">
-          <img :src="refImage" @error="refImage = ''" alt="参考图" />
-        </div>
-      </div>
+          <div class="tg-section">
+            <label class="tg-label">④ Prompt</label>
+            <textarea
+              v-model="cPrompt"
+              class="tg-input tg-textarea"
+              rows="4"
+              placeholder="描述要生成或修改的内容。例如：一件深海蓝真丝晚礼服，V领设计，白色摄影棚背景，超清商业摄影"
+              :disabled="cRunning"
+            ></textarea>
+          </div>
 
-      <!-- Raw JSON override -->
-      <details class="tg-details">
-        <summary class="tg-summary">⚙️ 高级 · 直接编辑 JSON input（会覆盖上面的设置）</summary>
-        <textarea
-          v-model="rawJson"
-          class="tg-input tg-textarea mono"
-          rows="8"
-          spellcheck="false"
-          placeholder='{"prompt":"...","num_inference_steps":28,"guidance":2,"seed":-1,"size":"1024*1024","output_format":"png","enable_safety_checker":true}'
-        ></textarea>
-        <p class="tg-hint">留空则使用上方表单参数自动构建</p>
-      </details>
+          <div class="tg-section" v-if="selectedWfObj?.needsImage">
+            <label class="tg-label">⑤ 参考图片 URL <span class="tg-opt">（此工作流必填）</span></label>
+            <input v-model="cRefImage" class="tg-input" placeholder="https://..." :disabled="cRunning" />
+            <div v-if="cRefImage" class="tg-ref-preview">
+              <img :src="cRefImage" @error="cRefImage = ''" alt="参考图" />
+            </div>
+          </div>
 
-      <!-- Run Button -->
-      <button
-        class="tg-run-btn"
-        :disabled="running || !apiKey.trim() || !prompt.trim()"
-        @click="runTest"
-      >
-        <span v-if="running" class="tg-spinner">⏳</span>
-        <span v-else>🚀</span>
-        {{ running ? statusText : '提交出图' }}
-      </button>
+          <!-- Node IDs customisation -->
+          <details class="tg-details">
+            <summary class="tg-summary">⚙️ 节点 ID 映射（默认自动检测，通常不需要修改）</summary>
+            <div class="tg-params-grid">
+              <div>
+                <label class="tg-label" style="text-transform:none;font-size:11px">正向 Prompt 节点 ID</label>
+                <input v-model="nodePrompt" class="tg-input mono" style="padding:6px 10px;font-size:12px" />
+              </div>
+              <div>
+                <label class="tg-label" style="text-transform:none;font-size:11px">KSampler 节点 ID</label>
+                <input v-model="nodeSampler" class="tg-input mono" style="padding:6px 10px;font-size:12px" />
+              </div>
+              <div>
+                <label class="tg-label" style="text-transform:none;font-size:11px">Latent 节点 ID</label>
+                <input v-model="nodeLatent" class="tg-input mono" style="padding:6px 10px;font-size:12px" />
+              </div>
+              <div>
+                <label class="tg-label" style="text-transform:none;font-size:11px">参考图节点 ID</label>
+                <input v-model="nodeImage" class="tg-input mono" style="padding:6px 10px;font-size:12px" />
+              </div>
+            </div>
+          </details>
+        </template>
 
-      <!-- Progress -->
-      <div v-if="running || log.length" class="tg-log-wrap">
+        <!-- Custom JSON workflow -->
+        <template v-if="wfMode === 'custom'">
+          <div class="tg-section">
+            <label class="tg-label">③ 粘贴 workflow_api.json</label>
+            <p class="tg-info-box">
+              在 ComfyUI 界面 → ⚙️ Settings → Enable Dev Mode → 保存按钮旁边选择 <strong>Save (API Format)</strong>，复制 JSON 粘贴到下方
+            </p>
+            <textarea
+              v-model="customWfJson"
+              class="tg-input tg-textarea mono"
+              rows="14"
+              spellcheck="false"
+              placeholder='{"6":{"class_type":"CLIPTextEncode","inputs":{"text":"your prompt here",...}},...}'
+              :disabled="cRunning"
+            ></textarea>
+            <div v-if="detectedNodes" class="tg-detected">
+              <span class="tg-detected-label">🔍 自动检测到的节点：</span>
+              <span v-if="detectedNodes.promptNodes.length">Prompt: {{ detectedNodes.promptNodes.map(n=>n.id).join(', ') }}</span>
+              <span v-if="detectedNodes.samplerNodes.length">· Sampler: {{ detectedNodes.samplerNodes.map(n=>n.id).join(', ') }}</span>
+              <span v-if="detectedNodes.saveNodes.length">· Output: {{ detectedNodes.saveNodes.map(n=>n.id).join(', ') }}</span>
+            </div>
+          </div>
+
+          <div class="tg-section">
+            <label class="tg-label">④ 注入 Prompt（可选）</label>
+            <p class="tg-hint" style="margin:0 0 8px">如果你已经在 JSON 里写好了 Prompt，这里可以留空；填写则会覆盖 JSON 里的文本</p>
+            <div class="tg-row">
+              <input v-model="cPromptNode" class="tg-input mono" style="max-width:80px" placeholder="节点ID" />
+              <textarea
+                v-model="cPrompt"
+                class="tg-input tg-textarea"
+                rows="2"
+                placeholder="要注入的提示词（留空则不修改 JSON）"
+                :disabled="cRunning"
+                style="flex:1"
+              ></textarea>
+            </div>
+          </div>
+        </template>
+
+        <!-- Run -->
+        <button
+          class="tg-run-btn"
+          :class="{ purple: true }"
+          :disabled="cRunning || !comfyUrl.trim() || (wfMode === 'custom' && !customWfJson.trim())"
+          @click="runComfy"
+        >
+          <span v-if="cRunning" class="tg-spinner">⏳</span>
+          <span v-else>🎨</span>
+          {{ cRunning ? cStatusText : '提交到 ComfyUI' }}
+        </button>
+
+      </template>
+
+      <!-- ── 共用：执行日志 ──────────────────────────── -->
+      <div v-if="running || cRunning || log.length" class="tg-log-wrap">
         <div class="tg-log-head">
           <span class="tg-log-title">📋 执行日志</span>
           <button class="tg-btn-sm" @click="log = []">清空</button>
@@ -116,7 +318,7 @@
         </div>
       </div>
 
-      <!-- Result -->
+      <!-- ── 共用：结果 ──────────────────────────────── -->
       <div v-if="resultImages.length || resultVideo" class="tg-result">
         <div class="tg-result-head">
           <span class="tg-result-title">✨ 生成结果</span>
@@ -126,35 +328,28 @@
           </div>
         </div>
 
-        <!-- Video -->
         <video
           v-if="resultVideo"
           :src="resultVideo"
           class="tg-result-video"
-          controls
-          autoplay
-          loop
-          muted
-          playsinline
+          controls autoplay loop muted playsinline
         ></video>
 
-        <!-- Images -->
         <div v-for="(img, i) in resultImages" :key="i" class="tg-result-img-wrap">
           <img :src="toSrc(img)" class="tg-result-img" :alt="`生成图 ${i+1}`" />
           <div class="tg-result-img-actions">
             <a :href="toSrc(img)" :download="`deepay-${Date.now()}-${i}.png`" class="tg-btn-sm green">⬇ 下载</a>
-            <button class="tg-btn-sm" @click="copyToClipboard(toSrc(img))">📋 复制图链接</button>
+            <button class="tg-btn-sm" @click="copyToClipboard(toSrc(img))">📋 复制链接</button>
           </div>
         </div>
 
-        <!-- Raw JSON -->
         <details class="tg-details" style="margin-top:12px">
           <summary class="tg-summary">📦 完整 API Response (JSON)</summary>
           <pre class="tg-json">{{ JSON.stringify(rawResponse, null, 2) }}</pre>
         </details>
       </div>
 
-      <!-- Error -->
+      <!-- ── 错误 ──────────────────────────────────────── -->
       <div v-if="errorMsg" class="tg-error">
         <span>❌ {{ errorMsg }}</span>
         <button class="tg-btn-sm" @click="errorMsg = ''">✕</button>
@@ -165,266 +360,307 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import axios from 'axios'
+import {
+  pingComfy as pingComfyApi,
+  submitWorkflow,
+  pollUntilDone,
+  buildImageUrl,
+  injectParams,
+  detectNodes,
+  WORKFLOW_FLUX_TEXT2IMG,
+  WORKFLOW_FLUX_KONTEXT,
+} from '@/api/comfyui.js'
+import { useComfyStore } from '@/store/index.js'
 
-// ── Quick models (the most useful ones for testing) ─────────────
+const comfyStore = useComfyStore()
+
+// ── Mode ─────────────────────────────────────────────────────────
+const mode = ref('comfyui')  // 'serverless' | 'comfyui'
+
+// ════════════════════════════════════════════════════════════════
+//  A) RunPod Serverless state
+// ════════════════════════════════════════════════════════════════
 const quickModels = [
-  {
-    id: 'flux-kontext',
-    label: 'Flux.1 Kontext',
-    endpointId: 'black-forest-labs-flux-1-kontext-dev',
-    badge: '编辑',
-    color: '#7c3aed',
-    defaults: { num_inference_steps: 28, guidance: 2 },
-  },
-  {
-    id: 'flux-schnell',
-    label: 'Flux.1 Schnell',
-    endpointId: 'black-forest-labs-flux-1-schnell',
-    badge: '极速',
-    color: '#f59e0b',
-    defaults: { num_inference_steps: 4, guidance: 0 },
-  },
-  {
-    id: 'flux-dev',
-    label: 'Flux.1 Dev',
-    endpointId: 'black-forest-labs-flux-1-dev',
-    badge: '旗舰',
-    color: '#10a37f',
-    defaults: { num_inference_steps: 28, guidance: 3.5 },
-  },
-  {
-    id: 'qwen-edit-2511',
-    label: 'Qwen Edit 2511',
-    endpointId: 'qwen-image-edit-2511',
-    badge: '中文',
-    color: '#ef4444',
-    defaults: { num_inference_steps: 20, guidance: 7.5 },
-  },
-  {
-    id: 'wan-2.5-i2v',
-    label: 'WAN 2.5 i2v',
-    endpointId: 'alibaba-wan-2-5-i2v',
-    badge: '视频',
-    color: '#0ea5e9',
-    defaults: { num_inference_steps: 25, guidance: 7.5, num_frames: 81, fps: 16 },
-  },
-  {
-    id: 'kling-v2.1-i2v',
-    label: 'Kling v2.1 Pro',
-    endpointId: 'kwaivgi-kling-v2-1-i2v-pro',
-    badge: 'Pro',
-    color: '#ec4899',
-    defaults: { num_inference_steps: 30, guidance: 7.5, num_frames: 97, fps: 24 },
-  },
+  { id: 'flux-kontext',  label: 'Flux.1 Kontext',  endpointId: 'black-forest-labs-flux-1-kontext-dev', badge: '编辑', color: '#7c3aed', defaults: { num_inference_steps: 28, guidance: 2 } },
+  { id: 'flux-schnell',  label: 'Flux.1 Schnell',  endpointId: 'black-forest-labs-flux-1-schnell',     badge: '极速', color: '#f59e0b', defaults: { num_inference_steps: 4,  guidance: 0 } },
+  { id: 'flux-dev',      label: 'Flux.1 Dev',      endpointId: 'black-forest-labs-flux-1-dev',         badge: '旗舰', color: '#10a37f', defaults: { num_inference_steps: 28, guidance: 3.5 } },
+  { id: 'qwen-edit-2511',label: 'Qwen Edit 2511',  endpointId: 'qwen-image-edit-2511',                 badge: '中文', color: '#ef4444', defaults: { num_inference_steps: 20, guidance: 7.5 } },
+  { id: 'wan-2.5-i2v',   label: 'WAN 2.5 i2v',    endpointId: 'alibaba-wan-2-5-i2v',                  badge: '视频', color: '#0ea5e9', defaults: { num_inference_steps: 25, guidance: 7.5, num_frames: 81, fps: 16 } },
+  { id: 'kling-v2.1-i2v',label: 'Kling v2.1 Pro', endpointId: 'kwaivgi-kling-v2-1-i2v-pro',           badge: 'Pro',  color: '#ec4899', defaults: { num_inference_steps: 30, guidance: 7.5, num_frames: 97, fps: 24 } },
 ]
 
-const BASE = 'https://api.runpod.ai/v2'
-const POLL_MS = 2000
-const TIMEOUT_MS = 600000
-
-// ── State ────────────────────────────────────────────────────────
-const apiKey         = ref(localStorage.getItem('deepay_runpod_key') || '')
-const showKey        = ref(false)
-const keySaved       = ref(false)
-
+const apiKey        = ref(localStorage.getItem('deepay_runpod_key') || '')
+const showKey       = ref(false)
+const keySaved      = ref(false)
 const selectedModelId = ref('flux-kontext')
 const selectedModel   = ref(quickModels[0])
 const prompt          = ref('一件深海蓝真丝晚礼服，V领设计，肩部裸露，模特正面站立，白色摄影棚背景，超清商业摄影')
 const refImage        = ref('https://image.runpod.ai/asset/black-forest-labs/black-forest-labs-flux-1-kontext-dev.png')
 const rawJson         = ref('')
+const running         = ref(false)
+const statusText      = ref('')
 
-const running     = ref(false)
-const statusText  = ref('')
-const log         = ref([])
-const logEl       = ref(null)
+// ════════════════════════════════════════════════════════════════
+//  B) ComfyUI Direct state
+// ════════════════════════════════════════════════════════════════
+const comfyUrl      = ref(comfyStore.podUrl)
+const comfyKey      = ref(comfyStore.apiKey)
+const showComfyKey  = ref(false)
+const cPinging      = ref(false)
+const pingResult    = ref(null)
 
-const resultImages  = ref([])
-const resultVideo   = ref('')
-const resultSeed    = ref(-1)
-const rawResponse   = ref(null)
-const errorMsg      = ref('')
+const wfMode        = ref('template')  // 'template' | 'custom'
+const selectedWf    = ref('flux-t2i')
+const cPrompt       = ref('一件深海蓝真丝晚礼服，V领设计，模特正面，白色摄影棚背景，超清商业摄影，8k')
+const cRefImage     = ref('')
+const customWfJson  = ref('')
+const cPromptNode   = ref('6')     // node ID to inject prompt into (custom mode)
+const nodePrompt    = ref('2')
+const nodeSampler   = ref('5')
+const nodeLatent    = ref('4')
+const nodeImage     = ref('10')
+const cRunning      = ref(false)
+const cStatusText   = ref('')
 
-// ── Methods ───────────────────────────────────────────────────────
-function saveKey() {
-  localStorage.setItem('deepay_runpod_key', apiKey.value.trim())
-  keySaved.value = true
-  setTimeout(() => { keySaved.value = false }, 3000)
-}
+const builtinWorkflows = [
+  { id: 'flux-t2i',      label: 'Flux.1 文生图',    desc: 'flux1-dev.safetensors',         badge: 'T2I',  color: '#10a37f', needsImage: false, template: WORKFLOW_FLUX_TEXT2IMG, promptNode:'2', samplerNode:'5', latentNode:'4', imageNode:'' },
+  { id: 'flux-kontext',  label: 'Flux.1 Kontext',   desc: 'flux1-kontext-dev.safetensors', badge: '编辑', color: '#7c3aed', needsImage: true,  template: WORKFLOW_FLUX_KONTEXT,   promptNode:'2', samplerNode:'4', latentNode:'',  imageNode:'10' },
+]
 
-function selectModel(m) {
-  selectedModelId.value = m.id
-  selectedModel.value   = m
-}
+const selectedWfObj = computed(() => builtinWorkflows.find(w => w.id === selectedWf.value))
 
-function addLog(type, msg) {
-  const time = new Date().toLocaleTimeString('zh-CN', { hour12: false })
-  log.value.push({ type, msg, time })
-  nextTick(() => {
-    if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight
-  })
-}
+// Auto-detect nodes when custom JSON changes
+const detectedNodes = computed(() => {
+  if (!customWfJson.value.trim()) return null
+  try {
+    return detectNodes(JSON.parse(customWfJson.value))
+  } catch { return null }
+})
 
-function buildInput() {
-  // If user provided raw JSON, parse and use it
-  if (rawJson.value.trim()) {
-    try {
-      return JSON.parse(rawJson.value)
-    } catch {
-      throw new Error('JSON 格式错误，请检查高级输入框')
-    }
-  }
+// ── Shared output state ─────────────────────────────────────────
+const log          = ref([])
+const logEl        = ref(null)
+const resultImages = ref([])
+const resultVideo  = ref('')
+const resultSeed   = ref(-1)
+const rawResponse  = ref(null)
+const errorMsg     = ref('')
 
-  const m = selectedModel.value
-  const isVideo = ['wan-2.5-i2v', 'wan-2.2-i2v', 'wan-2.2-i2v-lora', 'wan-2.1-i2v', 'kling-v2.1-i2v'].includes(m.id)
-
-  const input = {
-    prompt:                prompt.value.trim(),
-    negative_prompt:       '',
-    seed:                  -1,
-    num_inference_steps:   m.defaults.num_inference_steps,
-    output_format:         'png',
-    enable_safety_checker: true,
-  }
-
-  if (isVideo) {
-    input.guidance_scale = m.defaults.guidance
-    input.num_frames     = m.defaults.num_frames
-    input.fps            = m.defaults.fps
-    if (refImage.value.trim()) input.image = refImage.value.trim()
-  } else {
-    input.guidance = m.defaults.guidance
-    input.size     = '1024*1024'
-    if (refImage.value.trim()) input.image = refImage.value.trim()
-  }
-
-  return input
-}
-
-async function runTest() {
-  if (running.value) return
-
-  running.value   = true
-  errorMsg.value  = ''
+// Clear results when mode changes
+watch(mode, () => {
+  log.value = []
   resultImages.value = []
   resultVideo.value  = ''
   rawResponse.value  = null
+  errorMsg.value     = ''
+})
 
-  const key = apiKey.value.trim()
-  const m   = selectedModel.value
-
-  const client = axios.create({
-    baseURL: BASE,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${key}`,
-    },
-    timeout: 30000,
-  })
-
-  try {
-    // ── Step 1: Submit ─────────────────────────────────────────
-    let input
-    try {
-      input = buildInput()
-    } catch (e) {
-      throw e
-    }
-
-    addLog('info', `提交到端点: ${m.endpointId}`)
-    addLog('info', `Input: ${JSON.stringify(input).slice(0, 200)}...`)
-
-    statusText.value = '提交中...'
-    const submitResp = await client.post(`/${m.endpointId}/run`, { input })
-    const jobId = submitResp.data?.id
-    if (!jobId) throw new Error(`提交失败，未返回 jobId。Response: ${JSON.stringify(submitResp.data)}`)
-
-    addLog('success', `✓ 任务已提交，jobId: ${jobId}`)
-    console.log('[TestGen] Submit response:', submitResp.data)
-
-    // ── Step 2: Poll ────────────────────────────────────────────
-    const start = Date.now()
-    let pollCount = 0
-
-    while (true) {
-      if (Date.now() - start > TIMEOUT_MS) throw new Error('轮询超时（10分钟）')
-
-      await sleep(POLL_MS)
-      pollCount++
-
-      const pollResp = await client.get(`/${m.endpointId}/status/${jobId}`)
-      const { status, output, error } = pollResp.data
-      const elapsed = Math.round((Date.now() - start) / 1000)
-
-      statusText.value = `${statusLabel(status)} (${elapsed}s · ${pollCount}次轮询)`
-      addLog(status === 'FAILED' ? 'error' : 'info', `[${pollCount}] ${status} (${elapsed}s)`)
-
-      console.log(`[TestGen] Poll #${pollCount}:`, pollResp.data)
-
-      if (status === 'COMPLETED') {
-        rawResponse.value = pollResp.data
-        addLog('success', `✅ 完成！耗时 ${elapsed}s`)
-        console.log('[TestGen] ✅ Final output:', output)
-        parseOutput(output)
-        break
-      }
-
-      if (['FAILED', 'CANCELLED', 'TIMED_OUT'].includes(status)) {
-        rawResponse.value = pollResp.data
-        throw new Error(error || `任务${statusLabel(status)}`)
-      }
-    }
-
-  } catch (err) {
-    errorMsg.value = err.message || String(err)
-    addLog('error', `❌ ${errorMsg.value}`)
-    console.error('[TestGen] Error:', err)
-  } finally {
-    running.value = false
-    statusText.value = ''
-  }
-}
-
-function parseOutput(output) {
-  if (!output) { errorMsg.value = '生成结果为空'; return }
-
-  // Video
-  if (output.video)       { resultVideo.value = output.video;       resultSeed.value = output.seed ?? -1; return }
-  if (output.video_url)   { resultVideo.value = output.video_url;   resultSeed.value = output.seed ?? -1; return }
-
-  // Image array
-  if (Array.isArray(output)) {
-    const imgs = output.map(i => typeof i === 'string' ? i : (i.url || i.image || '')).filter(Boolean)
-    if (imgs.length) { resultImages.value = imgs; resultSeed.value = output[0]?.seed ?? -1; return }
-  }
-  if (output.images) { resultImages.value = output.images; resultSeed.value = output.seed ?? -1; return }
-  if (output.image)  { resultImages.value = [output.image]; resultSeed.value = output.seed ?? -1; return }
-  if (typeof output === 'string') { resultImages.value = [output]; return }
-
-  errorMsg.value = `无法解析输出，请查看控制台。Output keys: ${Object.keys(output || {}).join(', ')}`
-}
-
-function toSrc(raw) {
-  if (!raw) return ''
-  if (raw.startsWith('http') || raw.startsWith('blob:')) return raw
-  if (!raw.startsWith('data:')) return `data:image/png;base64,${raw}`
-  return raw
-}
-
-function statusLabel(s) {
-  return { IN_QUEUE: '排队中', IN_PROGRESS: '生成中', COMPLETED: '完成', FAILED: '失败', CANCELLED: '取消', TIMED_OUT: '超时' }[s] || s
+// ── Helpers ─────────────────────────────────────────────────────
+function addLog(type, msg) {
+  const time = new Date().toLocaleTimeString('zh-CN', { hour12: false })
+  log.value.push({ type, msg, time })
+  nextTick(() => { if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight })
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+function toSrc(raw) {
+  if (!raw) return ''
+  if (raw.startsWith('http') || raw.startsWith('blob:') || raw.startsWith('data:')) return raw
+  return `data:image/png;base64,${raw}`
+}
+
+function statusLabel(s) {
+  return { IN_QUEUE:'排队中', IN_PROGRESS:'生成中', COMPLETED:'完成', FAILED:'失败', CANCELLED:'取消', TIMED_OUT:'超时' }[s] || s
+}
 
 function copyUrl() {
   const url = resultImages.value[0] ? toSrc(resultImages.value[0]) : resultVideo.value
   if (url) navigator.clipboard?.writeText(url)
 }
 
-function copyToClipboard(text) {
-  navigator.clipboard?.writeText(text)
+function copyToClipboard(text) { navigator.clipboard?.writeText(text) }
+
+// ════════════════════════════════════════════════════════════════
+//  A) RunPod Serverless methods
+// ════════════════════════════════════════════════════════════════
+function saveKey() {
+  localStorage.setItem('deepay_runpod_key', apiKey.value.trim())
+  keySaved.value = true
+  setTimeout(() => { keySaved.value = false }, 3000)
+}
+
+function selectModel(m) { selectedModelId.value = m.id; selectedModel.value = m }
+
+function buildServerlessInput() {
+  if (rawJson.value.trim()) {
+    try { return JSON.parse(rawJson.value) } catch { throw new Error('JSON 格式错误') }
+  }
+  const m = selectedModel.value
+  const isVideo = ['wan-2.5-i2v','wan-2.2-i2v','wan-2.2-i2v-lora','wan-2.1-i2v','kling-v2.1-i2v'].includes(m.id)
+  const input = {
+    prompt: prompt.value.trim(), negative_prompt: '', seed: -1,
+    num_inference_steps: m.defaults.num_inference_steps, output_format: 'png', enable_safety_checker: true,
+  }
+  if (isVideo) {
+    input.guidance_scale = m.defaults.guidance; input.num_frames = m.defaults.num_frames; input.fps = m.defaults.fps
+  } else {
+    input.guidance = m.defaults.guidance; input.size = '1024*1024'
+  }
+  if (refImage.value.trim()) input.image = refImage.value.trim()
+  return input
+}
+
+async function runServerless() {
+  if (running.value) return
+  running.value = true; errorMsg.value = ''; resultImages.value = []; resultVideo.value = ''; rawResponse.value = null
+
+  const BASE = 'https://api.runpod.ai/v2'
+  const client = axios.create({
+    baseURL: BASE,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey.value.trim()}` },
+    timeout: 30000,
+  })
+  const m = selectedModel.value
+
+  try {
+    const input = buildServerlessInput()
+    addLog('info', `提交到: ${m.endpointId}`)
+    addLog('info', `Input: ${JSON.stringify(input).slice(0,200)}...`)
+    statusText.value = '提交中...'
+    const submitResp = await client.post(`/${m.endpointId}/run`, { input })
+    const jobId = submitResp.data?.id
+    if (!jobId) throw new Error(`未返回 jobId。Response: ${JSON.stringify(submitResp.data)}`)
+    addLog('success', `✓ 任务已提交，jobId: ${jobId}`)
+    console.log('[Serverless] Submit:', submitResp.data)
+
+    const start = Date.now(); let pollCount = 0
+    while (true) {
+      if (Date.now() - start > 600000) throw new Error('轮询超时')
+      await sleep(2000); pollCount++
+      const pollResp = await client.get(`/${m.endpointId}/status/${jobId}`)
+      const { status, output, error } = pollResp.data
+      const elapsed = Math.round((Date.now() - start) / 1000)
+      statusText.value = `${statusLabel(status)} (${elapsed}s · #${pollCount})`
+      addLog(status === 'FAILED' ? 'error' : 'info', `[${pollCount}] ${status} (${elapsed}s)`)
+      console.log(`[Serverless] Poll #${pollCount}:`, pollResp.data)
+      if (status === 'COMPLETED') {
+        rawResponse.value = pollResp.data
+        addLog('success', `✅ 完成！耗时 ${elapsed}s`)
+        parseServerlessOutput(output); break
+      }
+      if (['FAILED','CANCELLED','TIMED_OUT'].includes(status)) {
+        rawResponse.value = pollResp.data
+        throw new Error(error || `任务${statusLabel(status)}`)
+      }
+    }
+  } catch (err) {
+    errorMsg.value = err.message
+    addLog('error', `❌ ${err.message}`)
+    console.error('[Serverless]', err)
+  } finally { running.value = false; statusText.value = '' }
+}
+
+function parseServerlessOutput(output) {
+  if (!output) { errorMsg.value = '生成结果为空'; return }
+  if (output.video)     { resultVideo.value = output.video;     resultSeed.value = output.seed ?? -1; return }
+  if (output.video_url) { resultVideo.value = output.video_url; resultSeed.value = output.seed ?? -1; return }
+  if (Array.isArray(output)) {
+    const imgs = output.map(i => typeof i === 'string' ? i : (i.url || i.image || '')).filter(Boolean)
+    if (imgs.length) { resultImages.value = imgs; resultSeed.value = output[0]?.seed ?? -1; return }
+  }
+  if (output.images) { resultImages.value = output.images; resultSeed.value = output.seed ?? -1; return }
+  if (output.image)  { resultImages.value = [output.image]; return }
+  if (typeof output === 'string') { resultImages.value = [output]; return }
+  errorMsg.value = `无法解析输出，查看控制台。Keys: ${Object.keys(output||{}).join(', ')}`
+}
+
+// ════════════════════════════════════════════════════════════════
+//  B) ComfyUI Direct methods
+// ════════════════════════════════════════════════════════════════
+function saveComfy() {
+  comfyStore.setPodUrl(comfyUrl.value)
+  comfyStore.setApiKey(comfyKey.value)
+  addLog('success', '✓ ComfyUI 配置已保存')
+}
+
+async function doPing() {
+  if (!comfyUrl.value.trim()) return
+  cPinging.value = true; pingResult.value = null
+  addLog('info', `连接测试: ${comfyUrl.value}`)
+  try {
+    const r = await pingComfyApi(comfyUrl.value, comfyKey.value)
+    pingResult.value = r
+    addLog(r.ok ? 'success' : 'error', r.ok ? `✅ 连通正常 · ${r.version}` : `❌ ${r.error}`)
+  } catch (e) {
+    pingResult.value = { ok: false, error: e.message }
+    addLog('error', `❌ ${e.message}`)
+  } finally { cPinging.value = false }
+}
+
+async function runComfy() {
+  if (cRunning.value) return
+  cRunning.value = true; errorMsg.value = ''; resultImages.value = []; resultVideo.value = ''; rawResponse.value = null
+
+  const baseUrl = comfyUrl.value.trim()
+  const authKey = comfyKey.value.trim()
+
+  try {
+    let workflowJson
+
+    if (wfMode.value === 'custom') {
+      // Parse user's workflow JSON
+      if (!customWfJson.value.trim()) throw new Error('请粘贴 workflow_api.json')
+      workflowJson = JSON.parse(customWfJson.value)
+      // Inject prompt if user specified a node + prompt
+      if (cPromptNode.value.trim() && cPrompt.value.trim() && workflowJson[cPromptNode.value]) {
+        workflowJson[cPromptNode.value].inputs = workflowJson[cPromptNode.value].inputs || {}
+        workflowJson[cPromptNode.value].inputs.text = cPrompt.value.trim()
+        addLog('info', `已将 Prompt 注入节点 ${cPromptNode.value}`)
+      }
+    } else {
+      // Use built-in template + injectParams
+      const wfDef = selectedWfObj.value
+      if (!wfDef) throw new Error('未选择工作流模板')
+      workflowJson = injectParams(wfDef.template, {
+        prompt:      cPrompt.value.trim(),
+        imageUrl:    cRefImage.value.trim() || undefined,
+        promptNode:  nodePrompt.value  || wfDef.promptNode,
+        samplerNode: nodeSampler.value || wfDef.samplerNode,
+        latentNode:  nodeLatent.value  || wfDef.latentNode,
+        imageNode:   nodeImage.value   || wfDef.imageNode,
+      })
+      addLog('info', `使用模板: ${wfDef.label}`)
+    }
+
+    addLog('info', `提交工作流到: ${baseUrl}`)
+    cStatusText.value = '提交中...'
+    const promptId = await submitWorkflow(baseUrl, authKey, workflowJson)
+    addLog('success', `✓ 已提交，promptId: ${promptId}`)
+    console.log('[ComfyUI] promptId:', promptId)
+
+    const imageInfos = await pollUntilDone(
+      baseUrl, authKey, promptId,
+      (msg) => {
+        cStatusText.value = msg
+        addLog('info', msg)
+      }
+    )
+
+    const images = imageInfos.map(info => buildImageUrl(baseUrl, info))
+    resultImages.value = images
+    resultSeed.value   = -1
+    rawResponse.value  = { promptId, imageInfos }
+    addLog('success', `✅ 完成！${images.length} 张图`)
+    console.log('[ComfyUI] Output images:', images)
+
+  } catch (err) {
+    errorMsg.value = err.message
+    addLog('error', `❌ ${err.message}`)
+    console.error('[ComfyUI]', err)
+  } finally { cRunning.value = false; cStatusText.value = '' }
 }
 </script>
 

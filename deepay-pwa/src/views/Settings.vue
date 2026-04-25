@@ -99,6 +99,51 @@
             <button class="edit-btn" @click="router.push('/image-library')">去生成</button>
           </div>
 
+          <div class="settings-divider"></div>
+
+          <!-- ComfyUI Pod 地址 -->
+          <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+            <div class="row-left" style="width:100%">
+              <span class="row-icon">🖥️</span>
+              <div class="row-text">
+                <span class="row-title">ComfyUI Pod 地址</span>
+                <span class="row-sub">你的 RunPod Pod 公网地址（内置 Auth，需同时填写 Key）</span>
+              </div>
+            </div>
+            <input
+              v-model="comfyUrlInput"
+              class="field-input"
+              placeholder="https://x1ik3wb0zvch3v-64410f01-8188.proxy.runpod.net"
+              autocomplete="off"
+              spellcheck="false"
+              :disabled="comfyPinging"
+            />
+            <div class="api-key-input-row">
+              <input
+                :type="showComfyKey ? 'text' : 'password'"
+                v-model="comfyKeyInput"
+                class="field-input api-key-input"
+                placeholder="ComfyUI 内置 Auth Key（--enable-api-access-token 对应的值）"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button class="key-toggle-btn" @click="showComfyKey = !showComfyKey">{{ showComfyKey ? '🙈' : '👁️' }}</button>
+              <button class="key-save-btn" @click="saveComfyConfig" :disabled="!comfyUrlInput.trim()">保存</button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button
+                class="edit-btn"
+                style="border-color:rgba(16,163,127,0.4);color:#10a37f"
+                :disabled="!comfyUrlInput.trim() || comfyPinging"
+                @click="pingComfy"
+              >
+                {{ comfyPinging ? '检测中...' : '🔗 测试连通性' }}
+              </button>
+              <button class="edit-btn" @click="router.push('/test-gen')">🚀 去测试出图</button>
+            </div>
+            <p v-if="comfyStatus" class="key-status" :class="comfyStatusType">{{ comfyStatus }}</p>
+          </div>
+
         </div>
       </div>
 
@@ -328,13 +373,15 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useThemeStore, useUserStore, useChatStore, useImageGenStore } from '@/store/index.js'
+import { useThemeStore, useUserStore, useChatStore, useImageGenStore, useComfyStore } from '@/store/index.js'
+import { pingComfy as pingComfyApi } from '@/api/comfyui.js'
 
-const router = useRouter()
+const router     = useRouter()
 const themeStore = useThemeStore()
 const userStore  = useUserStore()
 const chatStore  = useChatStore()
 const genStore   = useImageGenStore()
+const comfyStore = useComfyStore()
 
 const fontSize = ref(1)
 const fontSizeLabels = ['小', '中（默认）', '大']
@@ -345,11 +392,11 @@ const showLogoutConfirm = ref(false)
 const showEditModal = ref(false)
 const editName = ref(userStore.displayName)
 
-// RunPod API Key
+// ── RunPod Serverless API Key ──────────────────────────
 const runpodKeyInput = ref(genStore.apiKey)
-const showApiKey = ref(false)
-const keyStatus = ref('')
-const keyStatusType = ref('success')
+const showApiKey     = ref(false)
+const keyStatus      = ref('')
+const keyStatusType  = ref('success')
 
 function saveRunpodKey() {
   const k = runpodKeyInput.value.trim()
@@ -360,6 +407,49 @@ function saveRunpodKey() {
   setTimeout(() => { keyStatus.value = '' }, 3000)
 }
 
+// ── ComfyUI Pod 配置 ───────────────────────────────────
+const comfyUrlInput  = ref(comfyStore.podUrl)
+const comfyKeyInput  = ref(comfyStore.apiKey)
+const showComfyKey   = ref(false)
+const comfyStatus    = ref('')
+const comfyStatusType = ref('success')
+const comfyPinging   = ref(false)
+
+function saveComfyConfig() {
+  comfyStore.setPodUrl(comfyUrlInput.value)
+  comfyStore.setApiKey(comfyKeyInput.value)
+  comfyStatus.value = '✓ ComfyUI 配置已保存'
+  comfyStatusType.value = 'success'
+  setTimeout(() => { comfyStatus.value = '' }, 3000)
+}
+
+async function pingComfy() {
+  const url = comfyUrlInput.value.trim()
+  if (!url) return
+  comfyPinging.value = true
+  comfyStatus.value  = '正在连接...'
+  comfyStatusType.value = 'success'
+  try {
+    const result = await pingComfyApi(url, comfyKeyInput.value)
+    if (result.ok) {
+      comfyStore.setPingResult(true, result.version)
+      comfyStatus.value = `✅ 连通正常 · ComfyUI ${result.version}`
+      comfyStatusType.value = 'success'
+    } else {
+      comfyStore.setPingResult(false, result.error)
+      comfyStatus.value = `❌ ${result.error}`
+      comfyStatusType.value = 'error'
+    }
+  } catch (e) {
+    comfyStatus.value = `❌ ${e.message}`
+    comfyStatusType.value = 'error'
+  } finally {
+    comfyPinging.value = false
+    setTimeout(() => { comfyStatus.value = '' }, 6000)
+  }
+}
+
+// ── Profile & Misc ────────────────────────────────────
 function clearChats() {
   chatStore.clearSessions()
   showClearConfirm.value = false

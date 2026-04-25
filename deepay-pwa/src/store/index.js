@@ -130,7 +130,7 @@ export const useImageGenStore = defineStore('imageGen', () => {
     progress.value = msg
   }
 
-  function addResult({ images, seed, prompt, model, params }) {
+  function addResult({ images, seed, prompt, model, params, type = 'image' }) {
     const entries = images.map(src => ({
       id:        `gen-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       src,
@@ -138,6 +138,7 @@ export const useImageGenStore = defineStore('imageGen', () => {
       model,
       seed,
       params,
+      type,
       createdAt: new Date().toISOString(),
     }))
     history.value = [...entries, ...history.value].slice(0, 50)
@@ -166,4 +167,34 @@ export const useImageGenStore = defineStore('imageGen', () => {
     apiKey, status, progress, jobId, modelId, history, isGenerating,
     setApiKey, setModel, startJob, updateProgress, addResult, setError, reset, clearHistory,
   }
+})
+
+/* ── ComfyUI Store ───────────────────────────────────────────── */
+export const useComfyStore = defineStore('comfyui', () => {
+  // Pod 公网地址，例如：https://x1ik3wb0zvch3v-64410f01-8188.proxy.runpod.net
+  const podUrl   = ref(storage.get('deepay_comfy_url', ''))
+  // ComfyUI 内置 Auth Key（如果启用了 --enable-cors-header 之外的认证）
+  const apiKey   = ref(storage.get('deepay_comfy_key', ''))
+  // 连通性状态
+  const pingStatus = ref('')  // '' | 'ok' | 'error'
+  const pingMsg    = ref('')
+
+  function setPodUrl(url) {
+    podUrl.value = url.trim().replace(/\/+$/, '')
+    storage.set('deepay_comfy_url', podUrl.value)
+  }
+
+  function setApiKey(k) {
+    apiKey.value = k.trim()
+    storage.set('deepay_comfy_key', apiKey.value)
+  }
+
+  function setPingResult(ok, msg) {
+    pingStatus.value = ok ? 'ok' : 'error'
+    pingMsg.value    = msg
+  }
+
+  const isConfigured = computed(() => !!podUrl.value)
+
+  return { podUrl, apiKey, pingStatus, pingMsg, isConfigured, setPodUrl, setApiKey, setPingResult }
 })
