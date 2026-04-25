@@ -9,11 +9,15 @@ import { RouterView } from 'vue-router'
 <style>
 /* ── CSS design tokens (used by inline styles where Tailwind can't reach) ── */
 :root {
-  --bg-main:  #0B0B0B;
-  --bg-card:  #111111;
-  --bg-soft:  #1A1A1A;
-  --text-main:#FFFFFF;
-  --text-sub: #9CA3AF;
-  --accent:   #00FF88;
+  --bg-main:   #000000;
+  --bg-card:   #0d0d0d;
+  --bg-soft:   #141414;
+  --bg-soft2:  #1a1a1a;
+  --text-main: #e7e9ea;
+  --text-sub:  #8b95a1;
+  --accent:    #1abc9c;
+  --accent-dk: #16a085;
+  --border:    #222222;
+  --danger:    #e74c3c;
 }
 </style>
