@@ -120,21 +120,24 @@ public class AiFashionConversationServiceImpl implements AiFashionConversationSe
         // 并行创建多个任务，最多6个线程
         int poolSize = Math.min(count, 6);
         ExecutorService executor = Executors.newFixedThreadPool(poolSize);
-        List<CompletableFuture<Long>> futures = new ArrayList<>();
-        for (String prompt : variantPrompts) {
-            futures.add(CompletableFuture.supplyAsync(
-                    () -> createSingleTask(userId, reqVO, parsed, prompt),
-                    executor));
-        }
         List<Long> taskIds = new ArrayList<>();
-        for (CompletableFuture<Long> future : futures) {
-            try {
-                taskIds.add(future.get(30, TimeUnit.SECONDS));
-            } catch (Exception e) {
-                log.error("[SmartChat] 并行创建任务失败", e);
+        try {
+            List<CompletableFuture<Long>> futures = new ArrayList<>();
+            for (String prompt : variantPrompts) {
+                futures.add(CompletableFuture.supplyAsync(
+                        () -> createSingleTask(userId, reqVO, parsed, prompt),
+                        executor));
             }
+            for (CompletableFuture<Long> future : futures) {
+                try {
+                    taskIds.add(future.get(30, TimeUnit.SECONDS));
+                } catch (Exception e) {
+                    log.error("[SmartChat] 并行创建任务失败", e);
+                }
+            }
+        } finally {
+            executor.shutdown();
         }
-        executor.shutdown();
         return taskIds;
     }
 

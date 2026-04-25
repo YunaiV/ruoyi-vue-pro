@@ -86,7 +86,7 @@ Authorization: {{token}}
   "upscale": true,
   "upscaleFactor": 2,
   "upscalerName": "R-ESRGAN 4x+",
-  "routingStrategy": "quality",
+  "routingStrategy": "QUALITY_FIRST",
   "workflowMode": "PROFESSIONAL",
   "require3d": false,
   "colorPalette": "#FFFFFF,#3A3A3A,#8B6914"
@@ -105,8 +105,8 @@ Authorization: {{token}}
   "seed": -1,
   "qualityPreset": "MEDIUM",
   "upscale": false,
-  "routingStrategy": "speed",
-  "workflowMode": "FAST",
+  "routingStrategy": "SPEED_FIRST",
+  "workflowMode": "BASIC",
   "require3d": false
 }
 
