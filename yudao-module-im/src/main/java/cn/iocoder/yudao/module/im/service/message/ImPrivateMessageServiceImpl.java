@@ -144,19 +144,19 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         privateMessageMapper.updateById(new ImPrivateMessageDO().setId(messageId)
                 .setStatus(ImMessageStatusEnum.RECALL.getStatus()));
 
-        // 3. 插入一条 TIP_TEXT 消息作为撤回提示
+        // 3. 插入一条 RECALL 消息作为撤回信号（content 为 RecallMessage 序列化，前端据此找到原消息更新状态）
         RecallMessage recallContent = new RecallMessage().setMessageId(messageId);
-        ImPrivateMessageDO tipMessage = new ImPrivateMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
+        ImPrivateMessageDO recallMessage = new ImPrivateMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
                 .setSenderId(userId).setReceiverId(message.getReceiverId())
-                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(JsonUtils.toJsonString(recallContent))
+                .setType(ImMessageTypeEnum.RECALL.getType()).setContent(JsonUtils.toJsonString(recallContent))
                 .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now());
-        privateMessageMapper.insert(tipMessage);
+        privateMessageMapper.insert(recallMessage);
 
-        // 4. 异步推送撤回提示消息（前端据此更新原消息状态 + 插入撤回提示）
-        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(tipMessage);
-        imWebSocketService.sendPrivateMessageAsync(tipMessage.getReceiverId(), websocketMessage);
-        imWebSocketService.sendPrivateMessageAsync(tipMessage.getSenderId(), websocketMessage);
-        return tipMessage;
+        // 4. 异步推送撤回信号（前端据此更新原消息状态 + 插入撤回提示）
+        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(recallMessage);
+        imWebSocketService.sendPrivateMessageAsync(recallMessage.getReceiverId(), websocketMessage);
+        imWebSocketService.sendPrivateMessageAsync(recallMessage.getSenderId(), websocketMessage);
+        return recallMessage;
     }
 
     @Override
