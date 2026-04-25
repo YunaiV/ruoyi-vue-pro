@@ -283,7 +283,7 @@ function scoreColor(n) {
 }
 .chip:hover { border-color: #444; color: #aaa; }
 .chip-active { background: #0f2a1a; border-color: #1abc9c; color: #1abc9c; }
-.chip-active-purple { background: #1a0a2e; border-color: #A855F7; color: #A855F7; }
+.chip-active-purple { background: rgba(26,188,156,0.08); border-color: #1abc9c; color: #1abc9c; }
 .sel-season {
   padding: 6px 10px; background: #111; border: 1px solid #222;
   color: #666; border-radius: 8px; font-size: 12px; cursor: pointer;

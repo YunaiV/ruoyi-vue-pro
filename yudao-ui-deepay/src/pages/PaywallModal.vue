@@ -95,7 +95,7 @@ async function buy() {
                 <!-- 标签 -->
                 <span v-if="plan.tag"
                       class="absolute -top-2.5 right-3
-                             bg-accent text-black text-[10px] font-bold
+                             bg-accent text-white text-[10px] font-bold
                              px-2 py-0.5 rounded-full">
                   {{ plan.tag }}
                 </span>

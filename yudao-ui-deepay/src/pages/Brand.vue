@@ -87,7 +87,7 @@ async function save() {
           <div class="flex items-center justify-between mb-1">
             <span class="font-bold text-sm">{{ p.name }}</span>
             <div v-if="selected?.id === p.id" class="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-              <svg class="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
             </div>

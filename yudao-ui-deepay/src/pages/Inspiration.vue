@@ -140,13 +140,13 @@ function scoreColor(score) {
 }
 
 function layerColor(layer) {
-  if (layer === 'design')      return '#A855F7'
+  if (layer === 'design')      return '#1abc9c'
   if (layer === 'commercial')  return '#1abc9c'
   return '#F59E0B'
 }
 
 function sourceColor(source) {
-  if (source === 'fashion_week')   return '#A855F7'
+  if (source === 'fashion_week')   return '#1abc9c'
   if (source === 'brand_lookbook') return '#1abc9c'
   return '#F59E0B'
 }
@@ -165,11 +165,11 @@ function sourceColor(source) {
         </button>
         <div class="flex flex-col flex-1">
           <span class="font-semibold text-sm">🎭 时装灵感库</span>
-          <span class="text-[10px]" style="color:#A855F7">秀场图 × 品牌图 → AI 融合改款</span>
+          <span class="text-[10px]" style="color:#1abc9c">秀场图 × 品牌图 → AI 融合改款</span>
         </div>
         <button
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold text-xs active:scale-95 transition-transform"
-          style="background:#A855F7;color:#fff"
+          style="background:#1abc9c;color:#fff"
           :disabled="aiSelectLoading"
           @click="doAiSelect"
         >
@@ -187,7 +187,7 @@ function sourceColor(source) {
         >改款</button>
         <button
           class="flex-1 h-8 rounded-full text-xs font-bold active:scale-95 transition-transform"
-          style="background:#1A1A1A;border:1px solid #A855F7;color:#A855F7"
+          style="background:#1A1A1A;border:1px solid #1abc9c;color:#1abc9c"
           @click="goAiDesign"
         >出款</button>
         <button
@@ -222,8 +222,8 @@ function sourceColor(source) {
           v-for="cat in INSPIRATION_CATEGORIES"
           :key="cat.key"
           :class="['shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                   activeCategory === cat.key ? 'text-black' : 'border border-border text-muted']"
-          :style="activeCategory === cat.key ? 'background:#A855F7' : ''"
+                   activeCategory === cat.key ? 'text-white' : 'border border-border text-muted']"
+          :style="activeCategory === cat.key ? 'background:#1abc9c' : ''"
           @click="activeCategory = cat.key"
         >{{ cat.label }}</button>
       </div>
@@ -234,7 +234,7 @@ function sourceColor(source) {
           v-for="s in DESIGN_STYLES"
           :key="s.key"
           :class="['shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                   activeStyle === s.key ? 'text-black' : 'border border-border text-muted']"
+                   activeStyle === s.key ? 'text-white' : 'border border-border text-muted']"
           :style="activeStyle === s.key ? 'background:#1abc9c' : ''"
           @click="activeStyle = s.key"
         >{{ s.label }}</button>
@@ -347,7 +347,7 @@ function sourceColor(source) {
           <div class="w-full h-1.5 rounded-full mb-5" style="background:#222">
             <div
               class="h-full rounded-full"
-              style="background:linear-gradient(90deg,#A855F7,#1abc9c)"
+              style="background:linear-gradient(90deg,#1abc9c,#1abc9c)"
               :style="`width:${aiSelectResult?.confidence ? Math.round(aiSelectResult.confidence * 100) : 82}%`"
             />
           </div>
@@ -367,7 +367,7 @@ function sourceColor(source) {
               />
               <div v-else class="w-full aspect-[3/4] flex items-center justify-center text-2xl"
                    style="background:#1A1A1A">🖼</div>
-              <p class="text-center text-[10px] font-semibold py-1.5" style="color:#A855F7">
+              <p class="text-center text-[10px] font-semibold py-1.5" style="color:#1abc9c">
                 {{ role }}
               </p>
             </div>
@@ -421,7 +421,7 @@ function sourceColor(source) {
           >✏️ AI改款</button>
           <button
             class="h-11 rounded-full text-xs font-bold active:scale-95 transition-transform"
-            style="background:#A855F7;color:#fff"
+            style="background:#1abc9c;color:#fff"
             @click="goAiDesign"
           >🎯 AI出款</button>
           <button

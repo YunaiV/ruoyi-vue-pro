@@ -388,7 +388,7 @@ function openPaywall(msg, plans) {
       <!-- 生成按钮 -->
       <button
         :disabled="loading"
-        class="bg-accent text-black font-bold h-14 w-full rounded-2xl mb-2
+        class="bg-accent text-white font-bold h-14 w-full rounded-2xl mb-2
                text-sm tracking-wide active:scale-95 transition-transform duration-100
                disabled:opacity-50 disabled:cursor-not-allowed
                flex items-center justify-center gap-2"
@@ -481,7 +481,7 @@ function openPaywall(msg, plans) {
                  loading="lazy" class="w-full h-full object-cover" />
             <div v-if="selected === img"
                  class="absolute bottom-2.5 left-1/2 -translate-x-1/2
-                        bg-accent text-black text-xs font-bold
+                        bg-accent text-white text-xs font-bold
                         px-3 py-1 rounded-full whitespace-nowrap">
               ✓ 已选
             </div>

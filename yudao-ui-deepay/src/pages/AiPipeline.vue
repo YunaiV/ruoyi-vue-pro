@@ -197,7 +197,7 @@ function selectDesign(item) {
       </button>
       <div class="flex-1">
         <p class="font-bold text-sm">🎨 AI设计流水线</p>
-        <p class="text-[10px] text-[#A855F7]">参考图 → 生成 → 防撞 → 评分 → 设计稿</p>
+        <p class="text-[10px] text-[#1abc9c]">参考图 → 生成 → 防撞 → 评分 → 设计稿</p>
       </div>
       <button @click="$router.push('/brand')"
         class="text-[10px] px-2 py-1 rounded-full border border-[#333] text-[#9CA3AF]">
@@ -214,12 +214,12 @@ function selectDesign(item) {
           <button v-if="inputRefs.length === 0"
             @click="$router.push('/inspiration')"
             class="text-xs px-3 py-1.5 rounded-full font-bold"
-            style="background:#A855F7;color:#fff">
+            style="background:#1abc9c;color:#fff">
             + 从灵感库选图
           </button>
           <button v-else @click="doSelectRefs"
             class="text-xs px-3 py-1.5 rounded-full font-bold"
-            style="background:#1F2937;color:#A855F7">
+            style="background:#1F2937;color:#1abc9c">
             🤖 重新分析
           </button>
         </div>
@@ -252,7 +252,7 @@ function selectDesign(item) {
           <button v-for="b in BRAND_PRESETS" :key="b.id"
             @click="brandId = b.id; style = b.style"
             :class="['py-2 px-3 rounded-xl text-xs font-semibold transition-all',
-                     brandId === b.id ? 'text-black' : 'border border-[#333] text-[#9CA3AF]']"
+                     brandId === b.id ? 'text-white' : 'border border-[#333] text-[#9CA3AF]']"
             :style="brandId === b.id ? 'background:#1abc9c' : ''">
             {{ b.name }}
           </button>
@@ -274,7 +274,7 @@ function selectDesign(item) {
         <div class="flex items-center gap-2 mb-3">
           <p class="text-sm font-bold">设计结果</p>
           <span class="text-xs text-[#6B7280]">{{ designs.length }} 款（已过滤相似款）</span>
-          <span class="ml-auto text-[10px] text-[#A855F7]">Top3 推荐 ↓</span>
+          <span class="ml-auto text-[10px] text-[#1abc9c]">Top3 推荐 ↓</span>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -307,7 +307,7 @@ function selectDesign(item) {
             <div v-if="selected?.url === item.url"
                  class="absolute inset-0 flex items-center justify-center bg-accent/10">
               <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-                <svg class="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                 </svg>
               </div>
@@ -325,16 +325,16 @@ function selectDesign(item) {
       <!-- ④ 精修结果 -->
       <div v-if="showRefine && refineResults.length">
         <div class="flex items-center gap-2 mb-3">
-          <p class="text-sm font-bold text-[#A855F7]">✨ 精修结果</p>
+          <p class="text-sm font-bold text-[#1abc9c]">✨ 精修结果</p>
           <button @click="showRefine=false" class="ml-auto text-[10px] text-[#6B7280]">收起</button>
         </div>
         <div class="flex gap-3 overflow-x-auto pb-2">
           <div v-for="item in refineResults" :key="item.url"
             @click="selectDesign(item)"
             :class="['flex-shrink-0 w-36 relative rounded-2xl overflow-hidden cursor-pointer',
-                     selected?.url === item.url ? 'ring-2 ring-[#A855F7]' : 'ring-1 ring-[#333]']">
+                     selected?.url === item.url ? 'ring-2 ring-[#1abc9c]' : 'ring-1 ring-[#333]']">
             <img :src="item.url" class="w-full aspect-[3/4] object-cover"/>
-            <div class="absolute top-1 right-1 text-[9px] bg-[#A855F7]/20 text-[#A855F7] px-1.5 rounded-full">精修</div>
+            <div class="absolute top-1 right-1 text-[9px] bg-[#1abc9c]/20 text-[#1abc9c] px-1.5 rounded-full">精修</div>
           </div>
         </div>
       </div>
@@ -344,7 +344,7 @@ function selectDesign(item) {
     <!-- ⑤ Bottom action bar -->
     <div v-if="selected" class="fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#222] px-4 py-3 flex gap-3">
       <button @click="handleRefine" :disabled="loading"
-        class="flex-1 py-3 rounded-xl font-bold text-sm border border-[#A855F7] text-[#A855F7] active:scale-95 transition-all">
+        class="flex-1 py-3 rounded-xl font-bold text-sm border border-[#1abc9c] text-[#1abc9c] active:scale-95 transition-all">
         ✨ 精修
       </button>
       <button @click="goDetail"

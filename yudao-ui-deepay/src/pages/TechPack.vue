@@ -93,7 +93,7 @@ function exportPDF() {
       <!-- Loading -->
       <div v-if="loading" class="flex flex-col items-center justify-center py-16 gap-4">
         <div class="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
-             style="border-color:#A855F7;border-top-color:transparent"/>
+             style="border-color:#1abc9c;border-top-color:transparent"/>
         <p class="text-muted text-sm">AI 正在生成设计稿…</p>
       </div>
 
@@ -105,7 +105,7 @@ function exportPDF() {
 
         <!-- 概览 -->
         <div>
-          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:#A855F7">概览</p>
+          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:#1abc9c">概览</p>
           <div class="grid grid-cols-3 gap-2">
             <div class="rounded-xl p-3 text-center" style="background:#1A1A1A">
               <p class="text-[10px] text-muted mb-1">款式</p>
@@ -124,7 +124,7 @@ function exportPDF() {
 
         <!-- 配色 -->
         <div v-if="techPack.colors?.length">
-          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:#A855F7">配色方案</p>
+          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:#1abc9c">配色方案</p>
           <div class="flex flex-wrap gap-2">
             <div
               v-for="(c, i) in techPack.colors"
@@ -143,13 +143,13 @@ function exportPDF() {
 
         <!-- 面料 -->
         <div v-if="techPack.fabric">
-          <p class="text-xs font-black uppercase tracking-widest mb-2" style="color:#A855F7">面料</p>
+          <p class="text-xs font-black uppercase tracking-widest mb-2" style="color:#1abc9c">面料</p>
           <p class="text-sm" style="color:#E5E7EB">{{ techPack.fabric }}</p>
         </div>
 
         <!-- 细节列表 -->
         <div v-if="techPack.details?.length">
-          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:#A855F7">设计细节</p>
+          <p class="text-xs font-black uppercase tracking-widest mb-3" style="color:#1abc9c">设计细节</p>
           <ul class="space-y-2">
             <li
               v-for="(d, i) in techPack.details"
@@ -182,7 +182,7 @@ function exportPDF() {
 
         <!-- 版型注记 -->
         <div v-if="techPack.patternNotes">
-          <p class="text-xs font-black uppercase tracking-widest mb-2" style="color:#A855F7">版型注记</p>
+          <p class="text-xs font-black uppercase tracking-widest mb-2" style="color:#1abc9c">版型注记</p>
           <p class="text-sm italic" style="color:#F59E0B">{{ techPack.patternNotes }}</p>
         </div>
       </div>
@@ -196,7 +196,7 @@ function exportPDF() {
         >{{ copied ? '✓ 已复制' : '📋 复制' }}</button>
         <button
           class="flex-1 h-12 rounded-full font-bold text-sm active:scale-95 transition-transform"
-          style="background:#1A1A1A;border:1px solid #A855F7;color:#A855F7"
+          style="background:#1A1A1A;border:1px solid #1abc9c;color:#1abc9c"
           @click="exportPDF"
         >🖨 导出PDF</button>
         <button
@@ -210,7 +210,7 @@ function exportPDF() {
       <button
         v-if="!loading && !techPack"
         class="w-full h-12 rounded-full font-bold text-sm active:scale-95 transition-transform"
-        style="background:#A855F7;color:#fff"
+        style="background:#1abc9c;color:#fff"
         @click="generate"
       >📋 生成设计稿</button>
 

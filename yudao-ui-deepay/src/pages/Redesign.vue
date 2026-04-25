@@ -298,7 +298,7 @@ function scoreColor(score) {
       <!-- 灵感库来源提示 -->
       <div v-if="refImageUrls.length && route.query.refs"
            class="mb-4 p-3 rounded-xl text-xs leading-relaxed"
-           style="background:#A855F71A; border:1px solid #A855F733; color:#A855F7">
+           style="background:#1abc9c1A; border:1px solid #1abc9c33; color:#1abc9c">
         💡 <strong>灵感融合提示：</strong>
         秀场图提供结构/剪裁灵感，品牌图提供可穿性，AI 将融合两者生成新款
       </div>
@@ -440,7 +440,7 @@ function scoreColor(score) {
           <button
             :class="['text-xs font-semibold px-3 py-1 rounded-full transition-all',
                      showOnlyBest
-                       ? 'bg-accent text-black'
+                       ? 'bg-accent text-white'
                        : 'border border-border text-muted']"
             @click="showOnlyBest = !showOnlyBest"
           >
@@ -480,7 +480,7 @@ function scoreColor(score) {
             <!-- 选中提示 -->
             <div v-if="selected === img.url"
                  class="absolute bottom-2 left-1/2 -translate-x-1/2
-                        bg-accent text-black text-[10px] font-bold
+                        bg-accent text-white text-[10px] font-bold
                         px-3 py-1 rounded-full whitespace-nowrap">
               ✓ 已选
             </div>

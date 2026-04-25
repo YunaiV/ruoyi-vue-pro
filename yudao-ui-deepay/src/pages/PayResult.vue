@@ -77,7 +77,7 @@ onMounted(async () => {
       </div>
 
       <button
-        class="bg-accent text-black font-bold h-12 w-full max-w-[320px]
+        class="bg-accent text-white font-bold h-12 w-full max-w-[320px]
                rounded-full active:scale-95 transition-transform duration-100 text-sm"
         @click="router.push('/generate')"
       >
@@ -90,7 +90,7 @@ onMounted(async () => {
       <p class="text-6xl mb-5">😕</p>
       <h2 class="text-xl font-bold mb-6">{{ message }}</h2>
       <button
-        class="bg-accent text-black font-bold h-12 w-full max-w-[320px]
+        class="bg-accent text-white font-bold h-12 w-full max-w-[320px]
                rounded-full active:scale-95 transition-transform duration-100 text-sm"
         @click="router.push('/generate')"
       >
