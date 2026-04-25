@@ -1,5 +1,5 @@
 <template>
-  <div class="shop-page" :class="{ 'light-mode': isLight }">
+  <div class="shop-page">
 
     <!-- ══ HERO BANNER ══ -->
     <div class="hero-banner">
@@ -30,9 +30,9 @@
         </div>
       </div>
       <!-- Theme toggle -->
-      <button class="theme-btn" @click="isLight = !isLight" :title="isLight ? '切换深色' : '切换浅色'">
+      <button class="theme-btn" @click="themeStore.toggle()" :title="themeStore.isDark ? '切换浅色' : '切换深色'">
         <Transition name="icon-flip" mode="out-in">
-          <svg v-if="isLight" key="moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <svg v-if="!themeStore.isDark" key="moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
           <svg v-else key="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </Transition>
       </button>
@@ -146,7 +146,7 @@
               <span class="tpl-emoji">{{ tpl.emoji }}</span>
               <span class="tpl-cat-tag">{{ tpl.cat }}</span>
               <div class="banner-stars">
-                <span v-for="n in 3" :key="n" class="bstar" :style="{'--d': n*0.3+'s','--x':Math.random()*80+'%','--y':Math.random()*80+'%'}">✦</span>
+                <span v-for="n in 3" :key="n" class="bstar" :style="starStyle(tpl.id, n)">✦</span>
               </div>
             </div>
             <!-- Info -->
@@ -263,9 +263,10 @@
 
 <script setup>
 import { ref, reactive, computed, nextTick } from 'vue'
+import { useThemeStore } from '@/store/index.js'
 
 /* ── Theme ── */
-const isLight = ref(false)
+const themeStore = useThemeStore()
 
 /* ── Input state ── */
 const inputRef = ref(null)
@@ -370,7 +371,12 @@ const swatches = [
 ]
 const emojiOptions = ['👗','☕','🌸','📚','💻','🍰','🐾','💪','🎨','🛋️','💄','✂️','🏪','🍜','🎵','📷','🌿','🍷']
 
-function openEditor(tpl) { Object.assign(editTpl, { ...tpl }); showEditor.value = true }
+function starStyle(id, n) {
+  // Deterministic positions based on template id + star index (no Math.random in template)
+  const x = ((id * 37 + n * 97) % 70) + 5
+  const y = ((id * 53 + n * 61) % 70) + 5
+  return { '--d': (n * 0.3) + 's', '--x': x + '%', '--y': y + '%' }
+}
 function closeEditor() { showEditor.value = false }
 
 function saveTemplate() {
