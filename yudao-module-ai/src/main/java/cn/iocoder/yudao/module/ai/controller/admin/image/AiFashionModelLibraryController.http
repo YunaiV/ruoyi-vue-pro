@@ -1,0 +1,103 @@
+### ============================================================
+### AI 服装素材库 & 悬浮对话框 HTTP 测试
+### ============================================================
+
+### 1. 分页查询素材库（所有类型）
+GET http://localhost:48080/admin-api/ai/fashion/library/page?pageNo=1&pageSize=20
+Authorization: Bearer test1
+
+### 2. 分页查询模特库（仅含模特）
+GET http://localhost:48080/admin-api/ai/fashion/library/page?pageNo=1&pageSize=20&isModel=true&modelBodyType=slim
+Authorization: Bearer test1
+
+### 3. 按关键词搜索
+GET http://localhost:48080/admin-api/ai/fashion/library/page?pageNo=1&pageSize=10&keyword=连衣裙&sourceType=fashion_show
+Authorization: Bearer test1
+
+### 4. 素材详情（含模特特征）
+GET http://localhost:48080/admin-api/ai/fashion/library/detail?id=1
+Authorization: Bearer test1
+
+### 5. 素材库统计
+GET http://localhost:48080/admin-api/ai/fashion/library/stats
+Authorization: Bearer test1
+
+### 6. 查询全部采集源
+GET http://localhost:48080/admin-api/ai/fashion/library/sources
+Authorization: Bearer test1
+
+### 7. 查询时装秀采集源
+GET http://localhost:48080/admin-api/ai/fashion/library/sources?sourceType=fashion_show
+Authorization: Bearer test1
+
+### 8. 触发异步采集（全部 active 来源）
+POST http://localhost:48080/admin-api/ai/fashion/library/collect
+Authorization: Bearer test1
+Content-Type: application/json
+
+{
+  "limitPerSource": 20,
+  "async": true
+}
+
+### 9. 触发同步采集（单个来源）
+POST http://localhost:48080/admin-api/ai/fashion/library/collect
+Authorization: Bearer test1
+Content-Type: application/json
+
+{
+  "sourceId": "vogue_runway",
+  "limitPerSource": 10,
+  "async": false
+}
+
+### 10. AI 悬浮对话框 - 首页
+POST http://localhost:48080/admin-api/ai/fashion/library/page-chat
+Authorization: Bearer test1
+Content-Type: application/json
+
+{
+  "pageName": "home",
+  "message": "我想去看模特库"
+}
+
+### 11. AI 悬浮对话框 - 模特库（触发筛选行动）
+POST http://localhost:48080/admin-api/ai/fashion/library/page-chat
+Authorization: Bearer test1
+Content-Type: application/json
+
+{
+  "pageName": "model_library",
+  "message": "帮我找一个高挑苗条的模特",
+  "minimized": false,
+  "positionX": 30,
+  "positionY": 150
+}
+
+### 12. AI 悬浮对话框 - 设计工作室（触发颜色修改）
+POST http://localhost:48080/admin-api/ai/fashion/library/page-chat
+Authorization: Bearer test1
+Content-Type: application/json
+
+{
+  "pageName": "design_studio",
+  "message": "改成红色，再生成3D"
+}
+
+### 13. AI 悬浮对话框 - 3D 预览页面
+POST http://localhost:48080/admin-api/ai/fashion/library/page-chat
+Authorization: Bearer test1
+Content-Type: application/json
+
+{
+  "pageName": "3d_viewer",
+  "message": "旋转360度看看，然后导出OBJ"
+}
+
+### 14. 更新悬浮窗状态（最小化到角落）
+PUT http://localhost:48080/admin-api/ai/fashion/library/assistant-state?pageName=model_library&minimized=true&x=10&y=10
+Authorization: Bearer test1
+
+### 15. 恢复悬浮窗
+PUT http://localhost:48080/admin-api/ai/fashion/library/assistant-state?pageName=model_library&minimized=false&x=30&y=150
+Authorization: Bearer test1

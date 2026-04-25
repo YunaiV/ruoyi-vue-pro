@@ -3,8 +3,8 @@
 > 服务器环境：Linux（CentOS 7/8 或 Ubuntu 20+）+ 宝塔面板  
 > 项目根目录：`/www/wwwroot/deepay.srl`  
 > 后端 JAR 目录：`/www/wwwroot/deepay.srl/yudao-server/target`  
-> 管理前端目录：`/www/wwwroot/admin`（对应域名 `admin.deepay.srl`）  
-> 后端 API 域名：`api.deepay.srl` → 反代 `127.0.0.1:48080`
+> 前端部署目录：`/www/wwwroot/deepay.srl`（域名 `deepay.srl`）  
+> 后端 API 路径：`/api/` 与 `/admin-api/` → 反代 `127.0.0.1:48080`
 
 ---
 
@@ -106,27 +106,24 @@ mysql -u root -p
 
 ```sql
 -- 创建数据库（字符集必须 utf8mb4）
-CREATE DATABASE sdsdsdas CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE deepay CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 创建账号并授权
-CREATE USER 'sdsdsdas'@'localhost' IDENTIFIED BY 'sdsdsdas';
-GRANT ALL PRIVILEGES ON sdsdsdas.* TO 'sdsdsdas'@'localhost';
+-- 创建账号并授权（密码：deepay393163）
+CREATE USER 'deepay'@'localhost' IDENTIFIED BY 'deepay393163';
+GRANT ALL PRIVILEGES ON deepay.* TO 'deepay'@'localhost';
 FLUSH PRIVILEGES;
 
 -- 退出
 EXIT;
 ```
 
-导入初始化 SQL（选其中一个，根据项目 sql 目录选最新文件）：
+导入初始化 SQL（按顺序执行，密码提示时输入 `deepay393163`）：
 
 ```bash
-# 查看 sql 目录
-ls /www/wwwroot/deepay.srl/sql/mysql/
-
-# 导入（文件名以实际为准）
-mysql -u sdsdsdas -p sdsdsdas sdsdsdas < /www/wwwroot/deepay.srl/sql/mysql/sdsdsdas.sql
-# 如果文件名还是旧的：
-# mysql -u sdsdsdas -p sdsdsdas sdsdsdas < /www/wwwroot/deepay.srl/sql/mysql/ruoyi-vue-pro.sql
+# 按顺序导入全部 3 个 SQL 文件
+mysql -u deepay -p deepay < /www/wwwroot/deepay.srl/sql/mysql/ruoyi-vue-pro.sql
+mysql -u deepay -p deepay < /www/wwwroot/deepay.srl/sql/mysql/quartz.sql
+mysql -u deepay -p deepay < /www/wwwroot/deepay.srl/sql/mysql/deepay.sql
 ```
 
 ---
@@ -160,9 +157,9 @@ grep -A2 "master:" /www/wwwroot/deepay.srl/yudao-server/src/main/resources/appli
 应该看到：
 
 ```
-url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?...
-username: sdsdsdas
-password: sdsdsdas
+url: jdbc:mysql://127.0.0.1:3306/deepay?...
+username: deepay
+password: deepay393163
 ```
 
 如果没有，手动编辑：
@@ -175,14 +172,14 @@ nano /www/wwwroot/deepay.srl/yudao-server/src/main/resources/application-local.y
 
 ```yaml
 master:
-  url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
-  username: sdsdsdas
-  password: sdsdsdas
+  url: jdbc:mysql://127.0.0.1:3306/deepay?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+  username: deepay
+  password: deepay393163
 slave:
   lazy: true
-  url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
-  username: sdsdsdas
-  password: sdsdsdas
+  url: jdbc:mysql://127.0.0.1:3306/deepay?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
+  username: deepay
+  password: deepay393163
 ```
 
 ---
@@ -287,141 +284,102 @@ echo "前端部署完成"
 
 ## 7. 宝塔 Nginx 配置
 
-### 7.1 创建两个网站
+### 7.1 创建站点
 
-在宝塔面板 → **网站** → **添加站点**：
+在宝塔面板 → **网站** → **添加站点**，填入：
 
 | 域名 | 根目录 | 备注 |
 |------|--------|------|
-| `admin.deepay.srl` | `/www/wwwroot/admin` | 管理后台前端 |
-| `api.deepay.srl`   | `/www/wwwroot/deepay.srl` | 后端反代（根目录随便填） |
+| `deepay.srl` | `/www/wwwroot/deepay.srl` | 前端 + 后端反代（单站点） |
 
-### 7.2 管理前端 Nginx 配置
+### 7.2 Nginx 配置文件
 
-宝塔面板 → 网站 → `admin.deepay.srl` → **设置** → **配置文件**，替换为：
+宝塔面板 → 网站 → `deepay.srl` → **设置** → **配置文件**，替换为：
 
 ```nginx
 server {
     listen 80;
     listen [::]:80;
-    server_name admin.deepay.srl;
+    server_name deepay.srl www.deepay.srl;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name admin.deepay.srl;
+    server_name deepay.srl www.deepay.srl;
 
     # SSL 证书（宝塔申请 Let's Encrypt 后自动填入）
-    ssl_certificate     /www/server/panel/vhost/cert/admin.deepay.srl/fullchain.pem;
-    ssl_certificate_key /www/server/panel/vhost/cert/admin.deepay.srl/privkey.pem;
+    ssl_certificate     /www/server/panel/vhost/cert/deepay.srl/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/deepay.srl/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
-    root /www/wwwroot/admin;
+    root /www/wwwroot/deepay.srl;
     index index.html;
 
-    # Vue Router history 模式支持
+    client_max_body_size 32m;
+
+    # 前端 SPA（Vue Router history 模式）
     location / {
         try_files $uri $uri/ /index.html;
     }
 
+    # 后端业务 API
+    location /api/ {
+        proxy_pass         http://127.0.0.1:48080/api/;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+    }
+
+    # 后端管理 API
+    location /admin-api/ {
+        proxy_pass         http://127.0.0.1:48080/admin-api/;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+    }
+
+    # WebSocket（实时推送）
+    location /infra/ws {
+        proxy_pass         http://127.0.0.1:48080/infra/ws;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    $http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host       $host;
+        proxy_read_timeout 3600s;
+    }
+
+    # Swagger（调试用，生产可删）
+    location /swagger-ui {
+        proxy_pass http://127.0.0.1:48080/swagger-ui;
+        proxy_set_header Host $host;
+    }
+    location /v3/api-docs {
+        proxy_pass http://127.0.0.1:48080/v3/api-docs;
+        proxy_set_header Host $host;
+    }
+
     # 静态资源缓存
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)$ {
         expires 30d;
         add_header Cache-Control "public, no-transform";
     }
-
-    # ── Deepay 前端 API（/api/**）→ 后端 48080 ──────────────────────────
-    # 前端所有业务接口均以 /api/ 开头（design / quota / pay / shop / user …）
-    # 必须在 location / 之前声明，否则 try_files 会把 API 请求当静态文件处理。
-    location /api/ {
-        proxy_pass http://127.0.0.1:48080/api/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 300s;
-        proxy_send_timeout 300s;
-    }
-
-    # 代理到后端管理 API（/admin-api/）
-    location /admin-api/ {
-        proxy_pass http://127.0.0.1:48080/admin-api/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 300s;
-        proxy_send_timeout 300s;
-    }
-
-    # WebSocket 支持
-    location /infra/ws {
-        proxy_pass http://127.0.0.1:48080/infra/ws;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_read_timeout 3600s;
-    }
 }
 ```
 
-### 7.3 后端 API Nginx 配置
+### 7.3 申请 SSL 证书
 
-宝塔面板 → 网站 → `api.deepay.srl` → **设置** → **配置文件**，替换为：
-
-```nginx
-server {
-    listen 80;
-    listen [::]:80;
-    server_name api.deepay.srl;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name api.deepay.srl;
-
-    ssl_certificate     /www/server/panel/vhost/cert/api.deepay.srl/fullchain.pem;
-    ssl_certificate_key /www/server/panel/vhost/cert/api.deepay.srl/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
-    # 上传文件大小限制
-    client_max_body_size 32m;
-
-    location / {
-        proxy_pass http://127.0.0.1:48080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 60s;
-        proxy_read_timeout 300s;
-        proxy_send_timeout 300s;
-    }
-
-    # WebSocket 支持
-    location /infra/ws {
-        proxy_pass http://127.0.0.1:48080/infra/ws;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_read_timeout 3600s;
-    }
-}
-```
-
-### 7.4 申请 SSL 证书
-
-宝塔面板 → 网站 → 对应域名 → **SSL** → **Let's Encrypt** → 申请免费证书  
+宝塔面板 → 网站 → `deepay.srl` → **SSL** → **Let's Encrypt** → 申请免费证书  
 （需要域名 DNS 已解析到本服务器 IP）
 
 ---
@@ -497,10 +455,10 @@ bash /www/wwwroot/deepay.srl/script/shell/deepay-deploy.sh
 # ---- 数据库相关 ----
 
 # 连接数据库
-mysql -u sdsdsdas -p sdsdsdas
+mysql -u deepay -p deepay
 
 # 备份数据库
-mysqldump -u sdsdsdas -p sdsdsdas sdsdsdas > /www/backup/sdsdsdas-$(date +%Y%m%d).sql
+mysqldump -u deepay -p deepay > /www/backup/deepay-$(date +%Y%m%d).sql
 
 # ---- 重新部署 ----
 
@@ -523,7 +481,7 @@ bash script/shell/deepay-deploy.sh
 systemctl status mysqld
 
 # 检查账号密码
-mysql -u sdsdsdas -p sdsdsdas -e "SELECT 1"
+mysql -u deepay -p deepay -e "SELECT 1"
 
 # 检查配置文件
 grep -A5 "master:" /www/wwwroot/deepay.srl/yudao-server/src/main/resources/application-local.yaml
@@ -551,7 +509,7 @@ location / {
 ### Q4：API 请求 403 / CORS 跨域
 
 **原因**：前端请求的 API 地址和后端配置不一致  
-**解决**：检查前端 `yudao-ui-deepay/vite.config.js` 中的 `proxy` 设置，以及 `application.yaml` 中 `yudao.web.admin-ui.url` 是否为 `https://admin.deepay.srl`。
+**解决**：检查前端 `yudao-ui-deepay/vite.config.js` 中的 `proxy` 设置，以及 `application.yaml` 中 `yudao.web.admin-ui.url` 是否为 `https://deepay.srl`。
 
 ### Q5：Maven 打包很慢 / 超时
 
@@ -579,13 +537,130 @@ kill -9 $(lsof -t -i:48080)
 部署完成后按以下项目逐一确认：
 
 - [ ] `curl http://127.0.0.1:48080/actuator/health` 返回 `{"status":"UP"}`
-- [ ] `curl https://api.deepay.srl/actuator/health` 返回 `{"status":"UP"}`
-- [ ] 浏览器访问 `https://admin.deepay.srl` 可以看到登录页
+- [ ] `curl https://deepay.srl/actuator/health` 返回 `{"status":"UP"}`
+- [ ] 浏览器访问 `https://deepay.srl` 可以看到登录页
 - [ ] 能用管理员账号 `admin / admin123` 登录（初始密码以 SQL 文件为准）
-- [ ] Swagger 文档 `https://api.deepay.srl/swagger-ui` 可访问
+- [ ] Swagger 文档 `https://deepay.srl/swagger-ui` 可访问
 - [ ] MySQL / Redis 宝塔面板显示运行中
 - [ ] Nginx 两个站点 SSL 证书有效
 
 ---
 
-*本文档最后更新于部署时生成，如有疑问查看 `script/shell/deepay-deploy.sh` 源码。*
+## 11. 海外部署：Runpod AI Fallback 配置
+
+当你的服务器在**海外**（或需要访问 Runpod API）时，可将 Runpod 配置为 AI 模型网关的 fallback 提供商。
+
+### 11.1 工作原理
+
+```
+主模型（任意 provider）调用
+        ↓ 失败 / 超时 / 异常
+ModelGateway 自动切换
+        ↓
+RunpodChatModel → POST https://api.runpod.ai/v2/{endpointId}/openai/v1
+```
+
+Runpod 暴露 **OpenAI 兼容** 端点，调用方式与 OpenAI 完全一致，无需额外适配。
+
+### 11.2 环境变量
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `RUNPOD_API_KEY` | ✅ 必需 | — | Runpod 控制台申请的 API Key |
+| `RUNPOD_BASE_URL` | 可选 | `https://api.runpod.ai` | Runpod API 地址 |
+| `RUNPOD_MODEL_ID` | 可选 | `qwen3-32b-awq` | Runpod 端点 ID（URL 路径中使用） |
+
+> **安全提示**：请勿将 `RUNPOD_API_KEY` 写入代码或配置文件，始终通过环境变量或 Secrets 注入。
+
+### 11.3 配置方式
+
+**方式 A：application-local.yaml（开发/测试）**
+
+```yaml
+yudao:
+  ai:
+    runpod:
+      enable: true
+      api-key: ${RUNPOD_API_KEY}          # 从环境变量读取
+      base-url: ${RUNPOD_BASE_URL:https://api.runpod.ai}
+      endpoint-id: ${RUNPOD_MODEL_ID:qwen3-32b-awq}
+      model: Qwen/Qwen3-32B-AWQ          # 发送给模型的 model 参数
+      temperature: 0.7
+      max-tokens: 2048
+      top-p: 1.0
+```
+
+**方式 B：.env 文件（配合 docker-compose）**
+
+```dotenv
+# Runpod AI Fallback（海外部署必填）
+RUNPOD_API_KEY=rpa_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+RUNPOD_BASE_URL=https://api.runpod.ai
+RUNPOD_MODEL_ID=qwen3-32b-awq
+```
+
+**方式 C：docker-compose.yml**
+
+```yaml
+services:
+  deepay-server:
+    image: deepay/server:latest
+    environment:
+      - RUNPOD_API_KEY=${RUNPOD_API_KEY}
+      - RUNPOD_BASE_URL=${RUNPOD_BASE_URL:-https://api.runpod.ai}
+      - RUNPOD_MODEL_ID=${RUNPOD_MODEL_ID:-qwen3-32b-awq}
+    env_file:
+      - .env
+```
+
+**方式 D：systemd（宝塔/Linux 生产）**
+
+```bash
+# 编辑服务文件
+nano /etc/systemd/system/deepay-server.service
+
+# 在 [Service] 区块添加：
+Environment="RUNPOD_API_KEY=rpa_xxx"
+Environment="RUNPOD_BASE_URL=https://api.runpod.ai"
+Environment="RUNPOD_MODEL_ID=qwen3-32b-awq"
+
+# 重载并重启
+systemctl daemon-reload
+systemctl restart deepay-server
+```
+
+### 11.4 验证 Runpod 连通性
+
+```bash
+# 快速测试：直接 curl Runpod OpenAI 兼容端点
+curl -s -X POST \
+  "https://api.runpod.ai/v2/qwen3-32b-awq/openai/v1/chat/completions" \
+  -H "Authorization: Bearer $RUNPOD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen3-32B-AWQ",
+    "messages": [{"role": "user", "content": "Reply OK if you can read this."}],
+    "max_tokens": 10
+  }' | python3 -m json.tool
+```
+
+返回包含 `choices[0].message.content` 即表示连通正常。
+
+### 11.5 usage 日志说明
+
+每次 AI 调用（含 fallback 切换）均通过 `ModelGateway` 统一记录，日志格式：
+
+```
+[ModelGateway] usage: AiUsageRecord(tenantId=1, customerId=null, module=chat,
+  sessionId=sess-abc, provider=runpod, modelId=Qwen/Qwen3-32B-AWQ,
+  latencyMs=1234, error=null, promptTokens=42, completionTokens=128, estimated=false)
+```
+
+- `estimated=false`：从 OpenAI 响应中拿到真实 token 数
+- `estimated=true`：响应未包含 usage，按字符数粗估（`chars/4`）
+
+> **后续计划（PR4）**：Runpod 图片生成，支持两个端点（均走 `POST /v2/{endpointId}/run`，非 OpenAI 兼容格式）：
+> - `google-nano-banana-2-edit` — 通用图片编辑，input 含 `resolution`/`output_format`/`enable_safety_checker`
+> - `qwen-image-edit-2511` — Qwen 图片编辑，input 含 `size`/`output_format`/`enable_base64_output`/`enable_sync_mode`
+
+---
