@@ -1,535 +1,485 @@
 <template>
-  <div class="sales-page">
+  <div class="shop-page">
 
-    <!-- Header -->
-    <div class="sales-header">
-      <div>
-        <h1 class="page-title">AI 销售助手</h1>
-        <p class="page-sub">智能分析销售数据，优化运营策略</p>
-      </div>
-      <button class="refresh-btn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-        刷新数据
-      </button>
-    </div>
-
-    <!-- Stat cards -->
-    <div class="stat-grid">
-      <div
-        v-for="(stat, i) in stats"
-        :key="stat.label"
-        class="stat-card"
-        :class="{ visible: statsVisible }"
-        :style="{ transitionDelay: (i * 80) + 'ms' }"
-      >
-        <div class="stat-icon" :style="{ background: stat.iconBg }">
-          <span>{{ stat.icon }}</span>
-        </div>
-        <div class="stat-body">
-          <div class="stat-value">{{ stat.prefix }}{{ displayedStats[i] }}{{ stat.suffix }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
-          <div class="stat-change" :class="stat.trend > 0 ? 'up' : 'down'">
-            {{ stat.trend > 0 ? '↑' : '↓' }} {{ Math.abs(stat.trend) }}% 较昨日
-          </div>
+    <!-- ══ PAGE HEADER ══ -->
+    <div class="shop-header">
+      <div class="header-left">
+        <div class="header-icon">🏪</div>
+        <div>
+          <h1 class="page-title">AI 开店助手</h1>
+          <p class="page-sub">告诉我你的开店想法，或选择一个模板快速启动</p>
         </div>
       </div>
     </div>
 
-    <!-- Chart + Table row -->
-    <div class="content-row">
-
-      <!-- Line chart (SVG) -->
-      <div class="chart-card">
-        <div class="card-header">
-          <h3 class="card-title">销售趋势</h3>
-          <div class="period-tabs">
-            <button
-              v-for="p in periods"
-              :key="p"
-              class="period-tab"
-              :class="{ active: activePeriod === p }"
-              @click="activePeriod = p"
-            >{{ p }}</button>
-          </div>
-        </div>
-        <div class="chart-wrap">
-          <svg class="line-chart" viewBox="0 0 600 180" preserveAspectRatio="none">
-            <!-- Grid lines -->
-            <line v-for="y in [36, 72, 108, 144]" :key="y" x1="0" :y1="y" x2="600" :y2="y" stroke="var(--gpt-border)" stroke-width="1"/>
-            <!-- Area fill -->
-            <path :d="areaPath" fill="rgba(16,163,127,0.08)" />
-            <!-- Line -->
-            <path :d="linePath" fill="none" stroke="#10a37f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Dots -->
-            <circle
-              v-for="(pt, i) in chartPoints"
-              :key="i"
-              :cx="pt.x"
-              :cy="pt.y"
-              r="4"
-              fill="#10a37f"
-              stroke="var(--gpt-main)"
-              stroke-width="2"
-            />
-          </svg>
-          <!-- X labels -->
-          <div class="chart-labels">
-            <span v-for="l in chartLabels" :key="l">{{ l }}</span>
-          </div>
-        </div>
+    <!-- ══ CHAT INPUT AREA ══ -->
+    <section class="chat-section">
+      <!-- Input box -->
+      <div class="input-box" :class="{ focused: inputFocused }">
+        <button class="ib-icon-btn" title="附件上传">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <input
+          v-model="userInput"
+          class="ib-input"
+          placeholder="告诉我你的开店想法，或选择一个模板开始..."
+          @keydown.enter.exact.prevent="sendMessage"
+          @focus="inputFocused = true"
+          @blur="inputFocused = false"
+        />
+        <button class="ib-icon-btn" title="语音输入">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <button class="ib-send-btn" :class="{ active: userInput.trim() }" :disabled="!userInput.trim()" @click="sendMessage">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
 
-      <!-- Product table -->
-      <div class="table-card">
-        <div class="card-header">
-          <h3 class="card-title">商品排行</h3>
-        </div>
-        <table class="product-table">
-          <thead>
-            <tr>
-              <th>商品</th>
-              <th>浏览</th>
-              <th>销售</th>
-              <th>转化率</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(p, i) in products" :key="p.name">
-              <td>
-                <div class="product-cell">
-                  <span class="rank" :class="'rank-' + (i + 1)">{{ i + 1 }}</span>
-                  <span class="product-name">{{ p.name }}</span>
-                </div>
-              </td>
-              <td class="num-cell">{{ p.views.toLocaleString() }}</td>
-              <td class="num-cell">{{ p.sales }}</td>
-              <td>
-                <div class="conv-cell">
-                  <div class="conv-bar">
-                    <div class="conv-fill" :style="{ width: p.conv + '%', background: convColor(p.conv) }"></div>
-                  </div>
-                  <span class="conv-text">{{ p.conv }}%</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Quick action chips -->
+      <div class="quick-chips">
+        <button class="qc-chip" @click="fillInput('帮我生成一张店铺封面图')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          生成图片
+        </button>
+        <button class="qc-chip" @click="fillInput('帮我撰写一段店铺介绍文案')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          撰写/编辑
+        </button>
+        <button class="qc-chip" @click="fillInput('查找适合我店铺的行业资料和竞品分析')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          查找资料
+        </button>
+        <button class="qc-chip" @click="fillInput('帮我规划一个完整的开店方案')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          开店方案
+        </button>
       </div>
-    </div>
+    </section>
 
-    <!-- AI Recommendations -->
-    <div class="rec-section">
-      <h3 class="section-title">AI 推荐策略</h3>
-      <div class="rec-grid">
+    <!-- ══ TEMPLATE LIBRARY ══ -->
+    <section class="templates-section">
+      <div class="section-head">
+        <h2 class="section-title">推荐店铺模板</h2>
+        <span class="section-count">{{ templates.length }} 个模板</span>
+      </div>
+
+      <div class="templates-grid">
         <div
-          v-for="(rec, i) in recommendations"
-          :key="rec.title"
-          class="rec-card"
-          :class="{ visible: statsVisible }"
-          :style="{ transitionDelay: (400 + i * 100) + 'ms' }"
+          v-for="(tpl, i) in templates"
+          :key="tpl.id"
+          class="tpl-card"
+          :style="{ '--enter-delay': (i * 40) + 'ms' }"
+          @click="openEditor(tpl)"
         >
-          <div class="rec-accent"></div>
-          <div class="rec-body">
-            <div class="rec-tag">{{ rec.tag }}</div>
-            <h4 class="rec-title">{{ rec.title }}</h4>
-            <p class="rec-desc">{{ rec.desc }}</p>
-            <button class="rec-btn">查看详情 →</button>
+          <!-- Preview banner -->
+          <div class="tpl-banner" :style="{ background: tpl.gradient }">
+            <span class="tpl-emoji">{{ tpl.emoji }}</span>
+            <div class="tpl-tag">{{ tpl.tag }}</div>
+          </div>
+          <!-- Info -->
+          <div class="tpl-info">
+            <h3 class="tpl-name">{{ tpl.name }}</h3>
+            <p class="tpl-desc">{{ tpl.desc }}</p>
+          </div>
+          <!-- Hover overlay -->
+          <div class="tpl-hover-overlay">
+            <span class="tpl-edit-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              点击编辑
+            </span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- ══ EDITOR MODAL ══ -->
+    <Transition name="modal">
+      <div v-if="showEditor" class="modal-backdrop" @click.self="closeEditor">
+        <div class="modal-box">
+          <!-- Modal header -->
+          <div class="modal-head">
+            <div class="modal-head-left">
+              <span class="modal-emoji">{{ editingTpl.emoji }}</span>
+              <div>
+                <h3 class="modal-title">编辑模板</h3>
+                <p class="modal-sub">{{ editingTpl.tag }}</p>
+              </div>
+            </div>
+            <button class="modal-close" @click="closeEditor">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div class="form-field">
+              <label class="field-label">店铺名称</label>
+              <input v-model="editingTpl.name" class="field-input" placeholder="输入店铺名称" />
+            </div>
+            <div class="form-field">
+              <label class="field-label">店铺介绍</label>
+              <textarea v-model="editingTpl.desc" class="field-textarea" rows="3" placeholder="描述你的店铺特色..."></textarea>
+            </div>
+            <div class="form-field">
+              <label class="field-label">行业标签</label>
+              <input v-model="editingTpl.tag" class="field-input" placeholder="如：服装、餐饮、美妆..." />
+            </div>
+            <div class="form-field">
+              <label class="field-label">主题渐变色</label>
+              <div class="color-row">
+                <div
+                  v-for="preset in colorPresets"
+                  :key="preset.label"
+                  class="color-swatch"
+                  :class="{ selected: editingTpl.gradient === preset.value }"
+                  :style="{ background: preset.value }"
+                  :title="preset.label"
+                  @click="editingTpl.gradient = preset.value"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-foot">
+            <button class="foot-btn secondary" @click="closeEditor">取消</button>
+            <button class="foot-btn primary" @click="saveTemplate">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              保存修改
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- ══ SAVE TOAST ══ -->
+    <Transition name="toast">
+      <div v-if="showToast" class="save-toast">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        模板已保存
+      </div>
+    </Transition>
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 
-const statsVisible = ref(false)
-const activePeriod = ref('7天')
-const periods = ['7天', '30天', '90天']
+/* ── State ── */
+const userInput = ref('')
+const inputFocused = ref(false)
+const showEditor = ref(false)
+const showToast = ref(false)
+const editingTpl = reactive({})
 
-const stats = [
-  { label: '今日销售', icon: '💰', iconBg: 'rgba(16,163,127,0.15)', prefix: '¥', suffix: '', rawValue: 12480, trend: 12.3 },
-  { label: '转化率', icon: '📈', iconBg: 'rgba(99,102,241,0.15)', prefix: '', suffix: '%', rawValue: 86, trend: 2.1 },
-  { label: '活跃用户', icon: '👥', iconBg: 'rgba(245,158,11,0.15)', prefix: '', suffix: '', rawValue: 1240, trend: -3.5 },
-  { label: 'AI推荐转化', icon: '🤖', iconBg: 'rgba(239,68,68,0.15)', prefix: '', suffix: '%', rawValue: 34, trend: 8.7 },
+/* ── Color presets ── */
+const colorPresets = [
+  { label: '绿色', value: 'linear-gradient(135deg,#10a37f,#0d6b5a)' },
+  { label: '蓝色', value: 'linear-gradient(135deg,#3b82f6,#1d4ed8)' },
+  { label: '紫色', value: 'linear-gradient(135deg,#8b5cf6,#6d28d9)' },
+  { label: '玫红', value: 'linear-gradient(135deg,#ec4899,#be185d)' },
+  { label: '橙色', value: 'linear-gradient(135deg,#f97316,#c2410c)' },
+  { label: '黄色', value: 'linear-gradient(135deg,#eab308,#a16207)' },
+  { label: '青色', value: 'linear-gradient(135deg,#06b6d4,#0e7490)' },
+  { label: '深灰', value: 'linear-gradient(135deg,#374151,#111827)' },
 ]
 
-const displayedStats = ref([0, 0, 0, 0])
+/* ── Templates ── */
+const templates = ref([
+  { id:1,  emoji:'👗', name:'时尚服装店',   desc:'潮流服饰，个性化搭配推荐，引领时尚风向',    tag:'服装',   gradient:'linear-gradient(135deg,#10a37f,#0d6b5a)' },
+  { id:2,  emoji:'☕', name:'精品咖啡馆',   desc:'手工精品咖啡，舒适空间，美好时光',          tag:'餐饮',   gradient:'linear-gradient(135deg,#eab308,#a16207)' },
+  { id:3,  emoji:'🌸', name:'浪漫花店',     desc:'鲜花定制与配送，传递浪漫与心意',            tag:'花艺',   gradient:'linear-gradient(135deg,#ec4899,#be185d)' },
+  { id:4,  emoji:'📚', name:'文艺书店',     desc:'精选好书与文创周边，构建阅读社区',          tag:'文化',   gradient:'linear-gradient(135deg,#3b82f6,#1d4ed8)' },
+  { id:5,  emoji:'💻', name:'科技工作室',   desc:'数码产品销售与技术咨询服务',                tag:'科技',   gradient:'linear-gradient(135deg,#06b6d4,#0e7490)' },
+  { id:6,  emoji:'��', name:'美食烘焙坊',   desc:'新鲜手工烘焙，每日限量出品的美味甜点',      tag:'美食',   gradient:'linear-gradient(135deg,#f97316,#c2410c)' },
+  { id:7,  emoji:'🐾', name:'宠物生活馆',   desc:'宠物用品、美容护理与寄养服务一站式',        tag:'宠物',   gradient:'linear-gradient(135deg,#8b5cf6,#6d28d9)' },
+  { id:8,  emoji:'💪', name:'健身工作室',   desc:'私教课程预约，健康生活方式指导',            tag:'健康',   gradient:'linear-gradient(135deg,#10a37f,#065f46)' },
+  { id:9,  emoji:'🎨', name:'艺术画廊',     desc:'原创艺术品展览与销售，定期举办艺术活动',    tag:'艺术',   gradient:'linear-gradient(135deg,#ec4899,#7c3aed)' },
+  { id:10, emoji:'🛋️', name:'家居生活馆',   desc:'软装搭配设计与品质家居好物精选',            tag:'家居',   gradient:'linear-gradient(135deg,#06b6d4,#3b82f6)' },
+  { id:11, emoji:'💄', name:'美妆工作室',   desc:'美妆教程分享，精选产品推荐与试用体验',      tag:'美妆',   gradient:'linear-gradient(135deg,#f472b6,#ec4899)' },
+  { id:12, emoji:'✂️', name:'手作工坊',     desc:'手工DIY课程与创意材料套件，激发创造力',    tag:'创意',   gradient:'linear-gradient(135deg,#84cc16,#15803d)' },
+])
 
-const products = [
-  { name: '春季宽松外套', views: 8420, sales: 312, conv: 13.2 },
-  { name: '丹宁牛仔套装', views: 6180, sales: 248, conv: 10.8 },
-  { name: '极简连衣裙', views: 5930, sales: 189, conv: 8.6 },
-  { name: '运动休闲套装', views: 4760, sales: 143, conv: 7.4 },
-  { name: '秋冬针织毛衣', views: 3890, sales: 97, conv: 5.2 },
-]
-
-const recommendations = [
-  {
-    tag: '📊 数据洞察',
-    title: '周末促销窗口',
-    desc: 'AI 分析显示周六下午 2-5 点转化率比平均高 34%。建议在此时段推出限时优惠，预计可提升销售额 18-25%。',
-  },
-  {
-    tag: '🎯 精准营销',
-    title: '复购用户激活',
-    desc: '有 420 名 90 天未购买的用户，AI 模型预测通过专属优惠券触达，可激活其中 28% 的用户，带来约 ¥3.2万 增量收入。',
-  },
-]
-
-const chartData = [42, 68, 55, 78, 92, 71, 88]
-const chartLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-
-const chartPoints = computed(() => {
-  const maxVal = Math.max(...chartData)
-  const minVal = Math.min(...chartData)
-  const range = maxVal - minVal || 1
-  return chartData.map((v, i) => ({
-    x: 20 + (i / (chartData.length - 1)) * 560,
-    y: 160 - ((v - minVal) / range) * 120,
-  }))
-})
-
-const linePath = computed(() => {
-  return chartPoints.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-})
-
-const areaPath = computed(() => {
-  const pts = chartPoints.value
-  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-  return `${line} L ${pts[pts.length - 1].x} 165 L ${pts[0].x} 165 Z`
-})
-
-function convColor(val) {
-  if (val >= 12) return '#10a37f'
-  if (val >= 8) return '#6366f1'
-  if (val >= 5) return '#f59e0b'
-  return '#ef4444'
+/* ── Methods ── */
+function fillInput(text) {
+  userInput.value = text
 }
 
-function animateCount(index, target, duration) {
-  const start = Date.now()
-  const tick = () => {
-    const elapsed = Date.now() - start
-    const progress = Math.min(elapsed / duration, 1)
-    const eased = 1 - Math.pow(1 - progress, 3)
-    const val = Math.round(target * eased)
-    displayedStats.value[index] = index === 1 || index === 3
-      ? (val / 10).toFixed(1)
-      : val.toLocaleString()
-    if (progress < 1) requestAnimationFrame(tick)
+function sendMessage() {
+  if (!userInput.value.trim()) return
+  console.log('[AI Shop] send:', userInput.value)
+  userInput.value = ''
+}
+
+function openEditor(tpl) {
+  Object.assign(editingTpl, { ...tpl })
+  showEditor.value = true
+}
+
+function closeEditor() {
+  showEditor.value = false
+}
+
+function saveTemplate() {
+  const idx = templates.value.findIndex(t => t.id === editingTpl.id)
+  if (idx !== -1) {
+    templates.value[idx] = { ...editingTpl }
   }
-  tick()
+  closeEditor()
+  showToast.value = true
+  setTimeout(() => { showToast.value = false }, 2200)
 }
-
-onMounted(() => {
-  setTimeout(() => {
-    statsVisible.value = true
-    stats.forEach((s, i) => {
-      animateCount(i, s.rawValue, 1200)
-    })
-  }, 200)
-})
 </script>
 
 <style scoped>
-.sales-page {
-  min-height: 100%;
-  padding: 24px 28px 60px;
-  background: var(--gpt-main);
+.shop-page {
+  padding: 24px 28px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
   color: var(--gpt-text);
 }
 
-.sales-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.page-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--gpt-text);
-  margin: 0 0 6px;
-  letter-spacing: -0.02em;
-}
-.page-sub {
-  font-size: 14px;
-  color: var(--gpt-text-sub);
-  margin: 0;
-}
+/* ── Header ── */
+.shop-header { display: flex; align-items: center; justify-content: space-between; }
+.header-left { display: flex; align-items: center; gap: 14px; }
+.header-icon { font-size: 32px; line-height: 1; }
+.page-title { font-size: 20px; font-weight: 600; color: var(--gpt-text); margin: 0 0 2px; }
+.page-sub   { font-size: 13px; color: var(--gpt-text-sub); margin: 0; }
 
-.refresh-btn {
+/* ── Chat Section ── */
+.chat-section { display: flex; flex-direction: column; gap: 12px; }
+
+.input-box {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 16px;
-  background: var(--gpt-input-bg);
-  border: 1px solid var(--gpt-border);
-  border-radius: 8px;
-  color: var(--gpt-text-sub);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.refresh-btn:hover { color: var(--gpt-text); border-color: #10a37f; }
-
-/* Stats */
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-@media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .stat-grid { grid-template-columns: 1fr; } }
-
-.stat-card {
-  background: var(--dp-card);
-  border: 1px solid var(--gpt-border);
-  border-radius: 14px;
-  padding: 18px;
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.stat-card.visible { opacity: 1; transform: translateY(0); }
-
-.stat-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-.stat-body { flex: 1; min-width: 0; }
-.stat-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--gpt-text);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-.stat-label {
-  font-size: 12px;
-  color: var(--gpt-text-sub);
-  margin: 3px 0 4px;
-}
-.stat-change {
-  font-size: 11.5px;
-  font-weight: 500;
-}
-.stat-change.up { color: #10a37f; }
-.stat-change.down { color: #ef4444; }
-
-/* Content row */
-.content-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 28px;
-}
-@media (max-width: 800px) { .content-row { grid-template-columns: 1fr; } }
-
-/* Chart card */
-.chart-card,
-.table-card {
-  background: var(--dp-card);
-  border: 1px solid var(--gpt-border);
-  border-radius: 14px;
-  padding: 20px;
-  overflow: hidden;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-.card-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--gpt-text);
-  margin: 0;
-}
-
-.period-tabs {
-  display: flex;
   gap: 4px;
   background: var(--gpt-input-bg);
-  border-radius: 8px;
-  padding: 3px;
+  border: 1px solid var(--gpt-border);
+  border-radius: 16px;
+  padding: 6px 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.period-tab {
-  padding: 4px 10px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  font-size: 12px;
-  color: var(--gpt-text-sub);
-  cursor: pointer;
-  transition: all 0.15s;
+.input-box.focused {
+  border-color: var(--gpt-accent);
+  box-shadow: 0 0 0 3px rgba(16,163,127,0.12);
 }
-.period-tab.active { background: var(--gpt-main); color: var(--gpt-text); }
 
-.chart-wrap { overflow: hidden; }
-.line-chart { width: 100%; height: 180px; display: block; }
-.chart-labels {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 10px 0;
+.ib-icon-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--gpt-text-sub); border-radius: 8px; cursor: pointer;
+  transition: background 0.15s, color 0.15s; flex-shrink: 0;
 }
-.chart-labels span { font-size: 11px; color: var(--gpt-text-muted); }
+.ib-icon-btn:hover { background: rgba(255,255,255,0.07); color: var(--gpt-text); }
 
-/* Table */
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
+.ib-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 14px; color: var(--gpt-text); padding: 6px 4px;
 }
-.product-table th {
-  text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gpt-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0 0 10px;
-  border-bottom: 1px solid var(--gpt-border);
-}
-.product-table td {
-  padding: 11px 0;
-  font-size: 13.5px;
-  color: var(--gpt-text);
-  border-bottom: 1px solid var(--gpt-border);
-}
-.product-table tr:last-child td { border-bottom: none; }
+.ib-input::placeholder { color: var(--gpt-text-sub); }
 
-.product-cell { display: flex; align-items: center; gap: 8px; }
-.rank {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--gpt-input-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--gpt-text-sub);
-  flex-shrink: 0;
+.ib-send-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.08); border: none;
+  border-radius: 8px; cursor: pointer; color: var(--gpt-text-sub);
+  transition: all 0.2s; flex-shrink: 0;
 }
-.rank-1 { background: rgba(245,158,11,0.2); color: #f59e0b; }
-.rank-2 { background: rgba(148,163,184,0.2); color: #94a3b8; }
-.rank-3 { background: rgba(180,120,74,0.2); color: #b4783a; }
+.ib-send-btn.active { background: var(--gpt-accent); color: #fff; }
+.ib-send-btn:disabled { cursor: default; }
 
-.product-name {
-  font-size: 13px;
-  color: var(--gpt-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
+/* ── Quick Chips ── */
+.quick-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.qc-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; font-size: 13px; font-weight: 500;
+  background: var(--dp-chip-bg); border: 1px solid var(--dp-chip-border);
+  color: var(--gpt-text-sub); border-radius: 20px; cursor: pointer;
+  transition: all 0.2s;
 }
-.num-cell {
-  color: var(--gpt-text-sub);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-.conv-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.conv-bar {
-  width: 60px;
-  height: 6px;
-  background: var(--gpt-input-bg);
-  border-radius: 3px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.conv-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 1s ease;
-}
-.conv-text { font-size: 12px; color: var(--gpt-text-sub); }
+.qc-chip:hover { background: var(--gpt-sidebar-hover); color: var(--gpt-text); border-color: var(--gpt-accent); }
 
-/* Recommendations */
-.section-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--gpt-text);
-  margin: 0 0 16px;
+/* ── Templates Section ── */
+.section-head {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;
 }
-.rec-grid {
+.section-title { font-size: 16px; font-weight: 600; color: var(--gpt-text); margin: 0; }
+.section-count  { font-size: 12px; color: var(--gpt-text-muted); }
+
+.templates-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
 }
-@media (max-width: 640px) { .rec-grid { grid-template-columns: 1fr; } }
 
-.rec-card {
-  background: var(--dp-card);
+.tpl-card {
+  position: relative;
+  background: var(--dp-surface2);
   border: 1px solid var(--gpt-border);
   border-radius: 14px;
   overflow: hidden;
-  display: flex;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.rec-card.visible { opacity: 1; transform: translateY(0); }
-.rec-card:hover { border-color: #10a37f; }
-
-.rec-accent {
-  width: 4px;
-  background: linear-gradient(180deg, #10a37f, #0d8b6e);
-  flex-shrink: 0;
-}
-.rec-body { padding: 18px 20px; flex: 1; }
-.rec-tag {
-  font-size: 12px;
-  color: #10a37f;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-.rec-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--gpt-text);
-  margin: 0 0 8px;
-}
-.rec-desc {
-  font-size: 13.5px;
-  color: var(--gpt-text-sub);
-  line-height: 1.6;
-  margin: 0 0 14px;
-}
-.rec-btn {
-  background: transparent;
-  border: none;
-  color: #10a37f;
-  font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
-  padding: 0;
-  transition: opacity 0.15s;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  animation: cardEnter 0.4s var(--enter-delay, 0ms) both ease-out;
 }
-.rec-btn:hover { opacity: 0.8; }
+.tpl-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  border-color: var(--gpt-accent);
+}
+.tpl-card:hover .tpl-hover-overlay { opacity: 1; }
 
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tpl-banner {
+  height: 120px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.tpl-emoji { font-size: 42px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+.tpl-tag {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.35); color: rgba(255,255,255,0.9);
+  padding: 3px 8px; border-radius: 20px; backdrop-filter: blur(4px);
+}
+
+.tpl-info { padding: 14px; }
+.tpl-name { font-size: 14px; font-weight: 600; color: var(--gpt-text); margin: 0 0 5px; }
+.tpl-desc { font-size: 12px; color: var(--gpt-text-sub); line-height: 1.5; margin: 0; }
+
+.tpl-hover-overlay {
+  position: absolute; inset: 0;
+  background: rgba(16,163,127,0.12);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+  border-radius: 14px;
+}
+.tpl-edit-hint {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--gpt-accent); color: #fff;
+  font-size: 13px; font-weight: 500;
+  padding: 8px 18px; border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(16,163,127,0.4);
+}
+
+/* ── Modal ── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.modal-box {
+  width: 100%; max-width: 500px;
+  background: var(--dp-surface2);
+  border: 1px solid var(--gpt-border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--dp-shadow-lg);
+}
+
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--gpt-border);
+}
+.modal-head-left { display: flex; align-items: center; gap: 12px; }
+.modal-emoji { font-size: 28px; }
+.modal-title { font-size: 15px; font-weight: 600; color: var(--gpt-text); margin: 0 0 2px; }
+.modal-sub   { font-size: 12px; color: var(--gpt-text-sub); margin: 0; }
+.modal-close {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--gpt-text-sub); border-radius: 8px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.07); color: var(--gpt-text); }
+
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; max-height: 60vh; overflow-y: auto; }
+
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--gpt-text-sub); text-transform: uppercase; letter-spacing: 0.4px; }
+.field-input, .field-textarea {
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 10px;
+  color: var(--gpt-text);
+  font-size: 14px; font-family: inherit;
+  padding: 10px 14px; outline: none; resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field-input:focus, .field-textarea:focus {
+  border-color: var(--gpt-accent);
+  box-shadow: 0 0 0 3px rgba(16,163,127,0.12);
+}
+
+.color-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-swatch {
+  width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+  border: 2px solid transparent; transition: transform 0.15s, border-color 0.15s;
+}
+.color-swatch:hover { transform: scale(1.12); }
+.color-swatch.selected { border-color: var(--gpt-accent); transform: scale(1.12); box-shadow: 0 0 0 2px rgba(16,163,127,0.3); }
+
+.modal-foot {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--gpt-border);
+}
+.foot-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 18px; font-size: 14px; font-weight: 500;
+  border: none; border-radius: 10px; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.foot-btn:active { transform: scale(0.97); }
+.foot-btn.secondary { background: rgba(255,255,255,0.06); color: var(--gpt-text-sub); }
+.foot-btn.secondary:hover { background: rgba(255,255,255,0.1); color: var(--gpt-text); }
+.foot-btn.primary { background: var(--gpt-accent); color: #fff; }
+.foot-btn.primary:hover { background: var(--gpt-accent-hover); }
+
+/* ── Toast ── */
+.save-toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+  background: var(--gpt-accent); color: #fff;
+  font-size: 13px; font-weight: 500;
+  padding: 10px 20px; border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(16,163,127,0.4);
+  z-index: 500; pointer-events: none;
+}
+
+/* ── Transitions ── */
+.modal-enter-active  { transition: all 0.22s ease-out; }
+.modal-leave-active  { transition: all 0.18s ease-in; }
+.modal-enter-from    { opacity: 0; }
+.modal-leave-to      { opacity: 0; }
+.modal-enter-from .modal-box { transform: scale(0.94) translateY(12px); }
+.modal-leave-to .modal-box   { transform: scale(0.94) translateY(8px); }
+
+.toast-enter-active  { transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+.toast-leave-active  { transition: all 0.2s ease-in; }
+.toast-enter-from    { opacity: 0; transform: translateX(-50%) translateY(12px); }
+.toast-leave-to      { opacity: 0; transform: translateX(-50%) translateY(8px); }
+
+/* ── Responsive ── */
 @media (max-width: 640px) {
-  .sales-page { padding: 16px 16px 60px; }
+  .shop-page { padding: 16px 16px 32px; gap: 20px; }
+  .templates-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .tpl-banner { height: 90px; }
+  .tpl-emoji { font-size: 32px; }
+  .quick-chips { gap: 6px; }
+  .qc-chip { padding: 6px 10px; font-size: 12px; }
 }
 </style>
