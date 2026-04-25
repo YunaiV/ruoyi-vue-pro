@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service;
 
 import cn.iocoder.yudao.module.deepay.agent.*;
+import cn.iocoder.yudao.module.deepay.controller.vo.ChatContextVO;
 import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayInventoryDO;
 import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayOrderDO;
 import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayProductDO;
@@ -76,6 +77,8 @@ public class AiChatService {
     @Resource private DeepayProductMapper   productMapper;
     @Resource private DeepayOrderMapper     orderMapper;
     @Resource private DeepayMetricsMapper   metricsMapper;
+    @Resource private AiPersonaService      aiPersonaService;
+    @Resource private AiMemoryService       aiMemoryService;
 
     // ====================================================================
     // 角色人设 system prompt（与前端 aiRoles.ts 对应）
@@ -114,6 +117,18 @@ public class AiChatService {
         );
     }
 
+    /**
+     * 通过 AiPersonaService 动态加载 system prompt（DB 优先，代码兜底）。
+     */
+    public String getDynamicRolePrompt(Long tenantId, String module) {
+        try {
+            return aiPersonaService.getSystemPrompt(tenantId, module);
+        } catch (Exception e) {
+            log.warn("[AiChatService] 加载 persona 失败，使用硬编码默认 module={}", module, e);
+            return getRolePrompt(module);
+        }
+    }
+
     // ====================================================================
     // 主入口：处理一条对话消息
     // ====================================================================
@@ -128,6 +143,22 @@ public class AiChatService {
      * @return AI 回复结构
      */
     public ChatReply chat(String module, String sessionId, Long customerId, String userMessage) {
+        return chat(module, sessionId, customerId, userMessage, null, 0L);
+    }
+
+    /**
+     * 处理用户消息（支持上下文注入 + 多租户 persona）。
+     *
+     * @param module      板块名
+     * @param sessionId   会话 ID（首次传 null，系统自动创建）
+     * @param customerId  用户/客户 ID
+     * @param userMessage 用户输入的自然语言
+     * @param chatCtx     前端页面上下文（路由/实体类型/实体ID/快照），可为 null
+     * @param tenantId    租户 ID（0=默认）
+     * @return AI 回复结构
+     */
+    public ChatReply chat(String module, String sessionId, Long customerId,
+                          String userMessage, ChatContextVO chatCtx, Long tenantId) {
         log.info("[AiChatService] module={} sessionId={} customerId={} message='{}'",
                 module, sessionId, customerId, userMessage);
 
@@ -144,11 +175,26 @@ public class AiChatService {
             ctx.customerId = customerId;
         }
 
-        // 2. NLP 解析：将自然语言映射到结构化字段（注入角色人设 prompt）
-        String rolePrompt = getRolePrompt(module);
+        // 2. 注入前端上下文（route/entityType/entityId/snapshot）
+        if (chatCtx != null) {
+            injectPageContext(ctx, chatCtx, module);
+        }
+
+        // 3. NLP 解析：动态加载 persona（DB优先）+ 内存注入
+        String rolePrompt = getDynamicRolePrompt(tenantId, module);
+
+        // 注入长久记忆（在 system prompt 之后、用户消息之前）
+        if (customerId != null) {
+            String memoryPack = aiMemoryService.buildMemoryPack(
+                    tenantId, String.valueOf(customerId), module);
+            if (StringUtils.hasText(memoryPack)) {
+                rolePrompt = rolePrompt + "\n\n" + memoryPack;
+            }
+        }
+
         nlpParserService.parse(userMessage, ctx, rolePrompt);
 
-        // 3. 根据 module 路由执行
+        // 4. 根据 module 路由执行
         ChatReply reply;
         switch (module == null ? "selection" : module.toLowerCase()) {
             case "selection":
@@ -176,10 +222,47 @@ public class AiChatService {
                 reply = handleSelection(ctx, userMessage);
         }
 
-        // 4. 保存 Context（覆盖写）
+        // 5. 保存 Context（覆盖写）
         chatSessionService.save(sessionId, ctx);
         reply.setSessionId(sessionId);
         return reply;
+    }
+
+    /**
+     * 将前端页面上下文注入到 AI Context 中。
+     * 优先使用前端 snapshot；snapshot 不足时根据 entityType+entityId 查 DB 补充关键字段。
+     */
+    private void injectPageContext(Context ctx, ChatContextVO chatCtx, String module) {
+        if (chatCtx == null) return;
+
+        // 注入 entityId 到 Context 对应字段
+        String entityType = chatCtx.getEntityType();
+        String entityId   = chatCtx.getEntityId();
+        if (StringUtils.hasText(entityType) && StringUtils.hasText(entityId)) {
+            switch (entityType.toLowerCase()) {
+                case "order":
+                    // entityId 可能是 chainCode 或 paymentId
+                    if (entityId.startsWith("PAY-")) {
+                        ctx.paymentId = entityId;
+                    } else {
+                        ctx.chainCode = entityId;
+                    }
+                    break;
+                case "product":
+                case "design":
+                    ctx.chainCode = entityId;
+                    break;
+                case "customer":
+                case "paymentlink":
+                    // 尝试解析为 customerId
+                    try { ctx.customerId = Long.parseLong(entityId); } catch (Exception ignored) {}
+                    break;
+                default:
+                    // 通用：存入 chainCode
+                    ctx.chainCode = entityId;
+                    break;
+            }
+        }
     }
 
     // ====================================================================

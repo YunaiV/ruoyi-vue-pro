@@ -1,0 +1,117 @@
+version: '3.8'
+
+# ================================================================
+# MongoDB Replica Set (rs0) — 3 节点高可用方案
+# ================================================================
+# 用途：Deepay AI 数据高可用存储（AI Session / Memory / Analytics）
+#
+# 使用方式：
+#   docker-compose -f docker-compose.mongodb-rs.yml up -d
+#   # 等待约 10 秒后执行初始化：
+#   docker exec -it deepay-mongo1 mongosh --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'deepay-mongo1:27017'},{_id:1,host:'deepay-mongo2:27017'},{_id:2,host:'deepay-mongo3:27017'}]})"
+#
+# Spring Boot 连接串：
+#   spring.data.mongodb.uri=mongodb://deepay-mongo1:27017,deepay-mongo2:27017,deepay-mongo3:27017/ruoyi_ai?replicaSet=rs0
+# ================================================================
+
+services:
+
+  deepay-mongo1:
+    image: mongo:7.0
+    container_name: deepay-mongo1
+    hostname: deepay-mongo1
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: deepay
+      MONGO_INITDB_ROOT_PASSWORD: deepay123
+      MONGO_INITDB_DATABASE: ruoyi_ai
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /etc/mongo-keyfile
+    volumes:
+      - mongo1-data:/data/db
+      - ./script/mongo-keyfile:/etc/mongo-keyfile:ro
+    networks:
+      - mongo-net
+    healthcheck:
+      test: mongosh --quiet --eval "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  deepay-mongo2:
+    image: mongo:7.0
+    container_name: deepay-mongo2
+    hostname: deepay-mongo2
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: deepay
+      MONGO_INITDB_ROOT_PASSWORD: deepay123
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /etc/mongo-keyfile
+    volumes:
+      - mongo2-data:/data/db
+      - ./script/mongo-keyfile:/etc/mongo-keyfile:ro
+    networks:
+      - mongo-net
+    depends_on:
+      deepay-mongo1:
+        condition: service_healthy
+
+  deepay-mongo3:
+    image: mongo:7.0
+    container_name: deepay-mongo3
+    hostname: deepay-mongo3
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: deepay
+      MONGO_INITDB_ROOT_PASSWORD: deepay123
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /etc/mongo-keyfile
+    volumes:
+      - mongo3-data:/data/db
+      - ./script/mongo-keyfile:/etc/mongo-keyfile:ro
+    networks:
+      - mongo-net
+    depends_on:
+      deepay-mongo1:
+        condition: service_healthy
+
+  # ── 自动初始化 Replica Set ───────────────────────────────────
+  mongo-init:
+    image: mongo:7.0
+    container_name: deepay-mongo-init
+    depends_on:
+      deepay-mongo1:
+        condition: service_healthy
+      deepay-mongo2:
+        condition: service_started
+      deepay-mongo3:
+        condition: service_started
+    networks:
+      - mongo-net
+    entrypoint: >
+      /bin/bash -c "
+        sleep 5
+        mongosh --host deepay-mongo1:27017 -u deepay -p deepay123 --authenticationDatabase admin --eval \"
+          rs.initiate({
+            _id: 'rs0',
+            members: [
+              { _id: 0, host: 'deepay-mongo1:27017', priority: 2 },
+              { _id: 1, host: 'deepay-mongo2:27017', priority: 1 },
+              { _id: 2, host: 'deepay-mongo3:27017', priority: 1 }
+            ]
+          })
+        \"
+        sleep 10
+        mongosh --host deepay-mongo1:27017 -u deepay -p deepay123 --authenticationDatabase admin --eval \"rs.status()\"
+      "
+    restart: "no"
+
+volumes:
+  mongo1-data:
+  mongo2-data:
+  mongo3-data:
+
+networks:
+  mongo-net:
+    driver: bridge

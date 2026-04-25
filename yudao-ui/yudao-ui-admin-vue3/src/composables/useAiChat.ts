@@ -1,5 +1,5 @@
 import { ref, nextTick } from 'vue'
-import { AiChatApi, type ChatMeta, type ChatReply } from '@/api/ai/chat'
+import { AiChatApi, type ChatMeta, type ChatReply, type ChatContext } from '@/api/ai/chat'
 import { uid } from '@/utils/uid'
 
 // ============================================================
@@ -20,6 +20,7 @@ export interface ChatMessage {
 export interface UseAiChatOptions {
   module: string
   customerId?: number
+  tenantId?: number
   /** Enable typewriter animation (SSE). Default true. */
   typewriter?: boolean | (() => boolean)
   /** Ref to the scroll container for auto-scroll */
@@ -28,6 +29,8 @@ export interface UseAiChatOptions {
   greeting?: string
   /** Persist sessionId in localStorage under this key */
   persistKey?: string
+  /** Context provider: called on each message to get current page context */
+  contextProvider?: () => Partial<ChatContext>
 }
 
 // ============================================================
@@ -35,7 +38,7 @@ export interface UseAiChatOptions {
 // ============================================================
 
 export function useAiChat(options: UseAiChatOptions) {
-  const { module, customerId, scrollEl, greeting, persistKey } = options
+  const { module, customerId, tenantId, scrollEl, greeting, persistKey, contextProvider } = options
 
   // ── State ──────────────────────────────────────────────────
   const messages    = ref<ChatMessage[]>([])
@@ -87,8 +90,21 @@ export function useAiChat(options: UseAiChatOptions) {
       messages.value.push({ id: msgId, role: 'ai', content: '', streaming: true })
       scrollToBottom()
 
+      // Gather page context
+      const ctx = contextProvider?.() ?? {}
+
       currentEs = AiChatApi.streamMessage(
-        { module, sessionId: sessionId.value, customerId, userMessage: text },
+        {
+          module,
+          sessionId: sessionId.value,
+          customerId,
+          tenantId,
+          userMessage: text,
+          route:       ctx.route,
+          entityType:  ctx.entityType,
+          entityId:    ctx.entityId,
+          snapshot:    ctx.snapshot,
+        },
         {
           onToken: (char) => {
             const m = _find(msgId)
@@ -121,8 +137,14 @@ export function useAiChat(options: UseAiChatOptions) {
   // ── REST fallback ───────────────────────────────────────────
   async function _sendRest(text: string): Promise<void> {
     try {
+      // Gather page context
+      const ctx = contextProvider?.() ?? {}
       const reply: ChatReply = await AiChatApi.sendMessage({
-        module, sessionId: sessionId.value, customerId, userMessage: text,
+        module, sessionId: sessionId.value, customerId, tenantId, userMessage: text,
+        route:      ctx.route,
+        entityType: ctx.entityType,
+        entityId:   ctx.entityId,
+        snapshot:   ctx.snapshot,
       })
       _saveSession(reply.sessionId)
       pushMsg({ role: 'ai', content: reply.aiMessage, images: reply.images, quickReplies: reply.quickReplies })

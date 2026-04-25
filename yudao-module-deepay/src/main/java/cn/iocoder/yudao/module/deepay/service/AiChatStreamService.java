@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service;
 
 import cn.iocoder.yudao.module.deepay.agent.Context;
+import cn.iocoder.yudao.module.deepay.controller.vo.ChatContextVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -40,22 +41,25 @@ public class AiChatStreamService {
     @Resource private ChatSessionService chatSessionService;
 
     /**
-     * 异步流式推送对话回复。
-     * 由 {@link cn.iocoder.yudao.module.deepay.controller.AiChatStreamController} 调用。
+     * 异步流式推送对话回复（含上下文注入 + 多租户 persona）。
      *
      * @param emitter     SSE 发射器
      * @param module      板块
      * @param sessionId   会话 ID（null → 自动创建）
      * @param customerId  用户 ID
      * @param userMessage 用户输入
+     * @param chatCtx     前端页面上下文（可为 null）
+     * @param tenantId    租户 ID（0=默认）
      */
     @Async("deepayAsyncExecutor")
     public void streamChat(SseEmitter emitter, String module, String sessionId,
-                           Long customerId, String userMessage) {
+                           Long customerId, String userMessage,
+                           ChatContextVO chatCtx, Long tenantId) {
         try {
-            // 1. 调用 AiChatService 获取完整回复
+            // 1. 调用 AiChatService 获取完整回复（支持上下文注入）
             AiChatService.ChatReply reply = aiChatService.chat(
-                    module, sessionId, customerId, userMessage);
+                    module, sessionId, customerId, userMessage,
+                    chatCtx, tenantId != null ? tenantId : 0L);
 
             // 2. 逐字推送 aiMessage
             String text = reply.getAiMessage();
@@ -72,7 +76,7 @@ public class AiChatStreamService {
                 }
             }
 
-            // 3. 推送元数据（pendingField、quickReplies、images、done、sessionId）
+            // 3. 推送元数据
             Map<String, Object> meta = buildMeta(reply);
             emitter.send(SseEmitter.event()
                     .name("meta")
@@ -91,6 +95,28 @@ public class AiChatStreamService {
         } catch (Exception e) {
             log.error("[AiChatStream] 流式推送异常", e);
             sendError(emitter, "服务暂时不可用，请稍后重试");
+        }
+    }
+
+    /**
+     * 兼容旧调用（无上下文）。
+     */
+    @Async("deepayAsyncExecutor")
+    public void streamChat(SseEmitter emitter, String module, String sessionId,
+                           Long customerId, String userMessage) {
+        streamChat(emitter, module, sessionId, customerId, userMessage, null, 0L);
+    }
+
+    /**
+     * 发送限流错误并立即完成 SSE。
+     */
+    public void sendRateLimitError(SseEmitter emitter, String message) {
+        try {
+            emitter.send(SseEmitter.event().name("error").data(message));
+            emitter.send(SseEmitter.event().name("done").data(""));
+            emitter.complete();
+        } catch (Exception ex) {
+            emitter.completeWithError(ex);
         }
     }
 

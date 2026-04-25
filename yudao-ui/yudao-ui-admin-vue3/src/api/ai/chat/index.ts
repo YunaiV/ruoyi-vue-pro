@@ -31,6 +31,22 @@ export interface ChatMessageReq {
   sessionId?: string
   customerId?: number
   userMessage: string
+  /** 租户 ID（SaaS 多租户，默认 0）*/
+  tenantId?: number
+  /** 上下文注入 v1 */
+  route?: string
+  entityType?: string
+  entityId?: string
+  snapshot?: string
+}
+
+/** 页面上下文（自动注入）*/
+export interface ChatContext {
+  route: string
+  module: string
+  entityType?: string
+  entityId?: string
+  snapshot?: string
 }
 
 /** SSE 流式对话回调 */
@@ -96,8 +112,14 @@ export const AiChatApi = {
     const qs = new URLSearchParams()
     qs.set('module',      params.module)
     qs.set('userMessage', params.userMessage)
-    if (params.sessionId)   qs.set('sessionId',  params.sessionId)
-    if (params.customerId != null) qs.set('customerId', String(params.customerId))
+    if (params.sessionId)               qs.set('sessionId',  params.sessionId)
+    if (params.customerId != null)      qs.set('customerId', String(params.customerId))
+    if (params.tenantId != null)        qs.set('tenantId',   String(params.tenantId))
+    // Context injection v1
+    if (params.route)                   qs.set('route',       params.route)
+    if (params.entityType)              qs.set('entityType',  params.entityType)
+    if (params.entityId)                qs.set('entityId',    params.entityId)
+    if (params.snapshot)                qs.set('snapshot',    params.snapshot)
 
     // Use relative URL so it goes through the same base path as REST calls
     const url = `/deepay/chat/stream?${qs.toString()}`
