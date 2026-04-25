@@ -96,7 +96,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 
-const chatStore = useUserStore()
 const cs = useChatStore()
 const userStore = useUserStore()
 const inputText = ref('')
