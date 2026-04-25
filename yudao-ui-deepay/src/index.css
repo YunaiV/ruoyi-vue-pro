@@ -83,6 +83,73 @@
 /* ── Component library ────────────────────────────────────── */
 @layer components {
 
+  /* ── GLASS CARD (new premium variant) ─── */
+  .card-glass {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .card-glass:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(26, 188, 156, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+  .card-glass:active { transform: scale(0.97); }
+
+  /* ── FEATURE CHIP (Gemini-style suggestion pill) ─── */
+  .chip-feature {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d0d0d0;
+    transition: all 0.15s;
+  }
+  .chip-feature:hover {
+    background: rgba(26, 188, 156, 0.1);
+    border-color: rgba(26, 188, 156, 0.35);
+    color: #1abc9c;
+  }
+  .chip-feature:active { transform: scale(0.95); }
+
+  /* ── NAV TAB (bottom nav active dot) ─── */
+  .nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: color 0.15s;
+    color: #555;
+    font-size: 10px;
+    font-weight: 600;
+    position: relative;
+  }
+  .nav-tab.active {
+    color: #1abc9c;
+  }
+  .nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #1abc9c;
+  }
+
   /* ── LAYOUT TOKENS ─── */
   .container {
     @apply max-w-[480px] mx-auto px-4;
@@ -155,11 +222,11 @@
 
   /* ── PRIMARY BUTTON ─── */
   .btn-primary {
-    background: #1abc9c;
+    background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
     color: #ffffff;
-    border: 1px solid #1abc9c;
-    border-radius: 8px;
-    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-weight: 600;
     height: 48px;
     width: 100%;
     display: flex;
@@ -170,22 +237,23 @@
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    box-shadow: 0 4px 16px rgba(26, 188, 156, 0.3);
+    letter-spacing: 0.01em;
   }
   .btn-primary::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 60%);
     pointer-events: none;
   }
   .btn-primary:hover:not(:disabled) {
-    background: #16a085;
-    border-color: #16a085;
-    box-shadow: 0 0 20px rgba(26,188,156,0.4), 0 4px 12px rgba(26,188,156,0.2);
+    background: linear-gradient(135deg, #22d3b4 0%, #1abc9c 100%);
+    box-shadow: 0 0 28px rgba(26,188,156,0.5), 0 4px 16px rgba(26,188,156,0.3);
     transform: translateY(-1px);
   }
-  .btn-primary:active:not(:disabled) { transform: translateY(0) scale(0.96); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary:active:not(:disabled) { transform: translateY(0) scale(0.96); box-shadow: none; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
   /* ── GHOST BUTTON ─── */
   .btn-ghost {
@@ -252,16 +320,16 @@
 
   /* ── CARD ─── */
   .card {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
   }
   .card:hover {
-    border-color: #1abc9c;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(26,188,156,0.15);
+    border-color: rgba(26, 188, 156, 0.25);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(26,188,156,0.1);
     transform: translateY(-2px);
   }
 
