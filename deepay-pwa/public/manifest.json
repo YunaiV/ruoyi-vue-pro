@@ -1,0 +1,14 @@
+{
+  "name": "Deepay · AI时尚设计",
+  "short_name": "Deepay",
+  "description": "AI时尚设计助手",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#1abc9c",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
