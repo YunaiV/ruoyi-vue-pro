@@ -64,6 +64,9 @@ public class AiFashionTaskServiceImpl implements AiFashionTaskService {
     @Resource
     private FileApi fileApi;
 
+    @Resource
+    private AiFashionModelOrchestratorService orchestrator;
+
     /**
      * SD WebUI 服务地址，注入自 application 配置
      * 示例：http://103.196.86.126:15112
@@ -97,12 +100,17 @@ public class AiFashionTaskServiceImpl implements AiFashionTaskService {
                 .setUpscale(createVO.getUpscale() != null ? createVO.getUpscale() : Boolean.TRUE)
                 .setUpscaleFactor(createVO.getUpscaleFactor() != null ? createVO.getUpscaleFactor() : 2)
                 .setUpscalerName(StrUtil.blankToDefault(createVO.getUpscalerName(), "R-ESRGAN 4x+"))
+                .setRoutingStrategy(createVO.getRoutingStrategy())
+                .setWorkflowMode(createVO.getWorkflowMode())
+                .setRequire3d(createVO.getRequire3d())
+                .setColorPalette(createVO.getColorPalette())
                 .setStatus(AiFashionTaskStatusEnum.IN_PROGRESS.getStatus())
                 .setTraceId(traceId);
         taskMapper.insert(task);
 
-        // 2. 构建步骤记录（不执行，仅预建记录）
-        buildInitialSteps(task).forEach(step -> stepMapper.insert(step));
+        // 2. 构建步骤记录（委托给 Orchestrator）
+        List<AiFashionTaskStepDO> steps = orchestrator.buildStageList(task);
+        steps.forEach(step -> stepMapper.insert(step));
 
         // 3. 触发异步执行
         getSelf().executeTaskAsync(task.getId());
@@ -220,105 +228,40 @@ public class AiFashionTaskServiceImpl implements AiFashionTaskService {
 
     /**
      * 实际执行流水线（同步，运行在 @Async 线程）
+     * 委托给 Orchestrator 统一执行；完成后记录 totalDurationMs。
      */
     private void doExecute(AiFashionTaskDO task) {
+        long pipelineStart = System.currentTimeMillis();
+
         // 更新开始时间
         taskMapper.updateById(new AiFashionTaskDO().setId(task.getId())
                 .setStartTime(LocalDateTime.now()));
 
-        StableDiffusionWebUiApi api = buildApi();
         List<AiFashionTaskStepDO> steps = stepMapper.selectListByTaskId(task.getId());
-
-        String currentImageBase64 = null; // 当前步骤的输入图片 base64
-        String currentPicUrl = null;      // 当前步骤产物的持久化 URL
-
         try {
-            for (AiFashionTaskStepDO step : steps) {
-                long stepStart = System.currentTimeMillis();
-                String stepType = step.getStepType();
-
-                log.info("[FashionPipeline][taskId={} step={} type={}] 开始执行",
-                        task.getId(), step.getStepOrder(), stepType);
-
-                try {
-                    if (AiFashionTaskStepTypeEnum.SDXL.getType().equals(stepType)) {
-                        currentImageBase64 = executeSDXL(task, step, api);
-                    } else if (AiFashionTaskStepTypeEnum.POSE.getType().equals(stepType)) {
-                        currentImageBase64 = executePose(task, step, api, currentImageBase64);
-                    } else if (AiFashionTaskStepTypeEnum.FABRIC.getType().equals(stepType)) {
-                        currentImageBase64 = executeFabric(task, step, api, currentImageBase64);
-                    } else if (AiFashionTaskStepTypeEnum.UPSCALE.getType().equals(stepType)) {
-                        currentImageBase64 = executeUpscale(task, step, api, currentImageBase64, currentPicUrl);
-                    }
-
-                    // 上传产物到 FileApi
-                    byte[] imageBytes = Base64.decode(currentImageBase64);
-                    currentPicUrl = fileApi.createFile(imageBytes);
-
-                    long durationMs = System.currentTimeMillis() - stepStart;
-                    log.info("[FashionPipeline][taskId={} step={} type={}] 完成，耗时 {}ms，产物：{}",
-                            task.getId(), step.getStepOrder(), stepType, durationMs, currentPicUrl);
-
-                    // 更新步骤为成功
-                    stepMapper.updateById(new AiFashionTaskStepDO()
-                            .setId(step.getId())
-                            .setStatus(AiFashionTaskStepStatusEnum.SUCCESS.getStatus())
-                            .setOutputPicUrl(currentPicUrl)
-                            .setDurationMs(durationMs));
-
-                } catch (Exception ex) {
-                    long durationMs = System.currentTimeMillis() - stepStart;
-                    log.error("[FashionPipeline][taskId={} step={} type={}] 步骤失败，耗时 {}ms",
-                            task.getId(), step.getStepOrder(), stepType, durationMs, ex);
-
-                    // UPSCALE 失败降级：不中断任务，使用上一步产物作为最终图并标记 WARN
-                    if (AiFashionTaskStepTypeEnum.UPSCALE.getType().equals(stepType)) {
-                        log.warn("[FashionPipeline][taskId={}] UPSCALE 步骤失败，降级使用上一步产物: {}",
-                                task.getId(), currentPicUrl);
-                        stepMapper.updateById(new AiFashionTaskStepDO()
-                                .setId(step.getId())
-                                .setStatus(AiFashionTaskStepStatusEnum.FAIL.getStatus())
-                                .setDurationMs(durationMs)
-                                .setErrorMessage("[WARN-DEGRADED] " + ex.getMessage()));
-                        // currentPicUrl 保持上一步的值，继续完成任务
-                        break;
-                    }
-
-                    // 其他步骤失败：整体任务失败
-                    stepMapper.updateById(new AiFashionTaskStepDO()
-                            .setId(step.getId())
-                            .setStatus(AiFashionTaskStepStatusEnum.FAIL.getStatus())
-                            .setDurationMs(durationMs)
-                            .setErrorMessage(ex.getMessage()));
-
-                    taskMapper.updateById(new AiFashionTaskDO()
-                            .setId(task.getId())
-                            .setStatus(AiFashionTaskStatusEnum.FAIL.getStatus())
-                            .setErrorMessage("[" + stepType + "] " + ex.getMessage())
-                            .setFinishTime(LocalDateTime.now()));
-                    return;
-                }
-            }
-
-            // 所有步骤完成，更新任务为成功
+            String finalPicUrl = orchestrator.executePipeline(task, steps);
+            long totalDurationMs = System.currentTimeMillis() - pipelineStart;
             taskMapper.updateById(new AiFashionTaskDO()
                     .setId(task.getId())
                     .setStatus(AiFashionTaskStatusEnum.SUCCESS.getStatus())
-                    .setFinalPicUrl(currentPicUrl)
+                    .setFinalPicUrl(finalPicUrl)
+                    .setTotalDurationMs(totalDurationMs)
                     .setFinishTime(LocalDateTime.now()));
-            log.info("[FashionPipeline][taskId={}] 全流水线完成，最终图：{}", task.getId(), currentPicUrl);
-
+            log.info("[FashionPipeline][taskId={}] 全流水线完成，最终图：{}，耗时 {}ms",
+                    task.getId(), finalPicUrl, totalDurationMs);
         } catch (Exception ex) {
-            log.error("[FashionPipeline][taskId={}] 未捕获异常", task.getId(), ex);
+            long totalDurationMs = System.currentTimeMillis() - pipelineStart;
+            log.error("[FashionPipeline][taskId={}] 流水线失败，耗时 {}ms", task.getId(), totalDurationMs, ex);
             taskMapper.updateById(new AiFashionTaskDO()
                     .setId(task.getId())
                     .setStatus(AiFashionTaskStatusEnum.FAIL.getStatus())
+                    .setTotalDurationMs(totalDurationMs)
                     .setErrorMessage(ex.getMessage())
                     .setFinishTime(LocalDateTime.now()));
         }
     }
 
-    // ===== 各步骤执行方法 =====
+    // ===== 各步骤执行方法（保留供内部/测试使用）=====
 
     /**
      * SDXL 步骤：txt2img 生成基础服装设计图

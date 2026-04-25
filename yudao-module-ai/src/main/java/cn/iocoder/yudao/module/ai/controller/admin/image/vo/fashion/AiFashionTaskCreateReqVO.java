@@ -74,4 +74,16 @@ public class AiFashionTaskCreateReqVO {
     @Schema(description = "超分模型名称", example = "R-ESRGAN 4x+")
     private String upscalerName = "R-ESRGAN 4x+";
 
+    @Schema(description = "路由策略")
+    private String routingStrategy;
+
+    @Schema(description = "工作流模式")
+    private String workflowMode;
+
+    @Schema(description = "是否需要3D转换")
+    private Boolean require3d;
+
+    @Schema(description = "色板（JSON数组）")
+    private String colorPalette;
+
 }

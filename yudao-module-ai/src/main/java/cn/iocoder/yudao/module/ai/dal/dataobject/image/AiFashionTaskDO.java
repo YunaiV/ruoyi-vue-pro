@@ -135,4 +135,19 @@ public class AiFashionTaskDO extends BaseDO {
      */
     private LocalDateTime finishTime;
 
+    /** 路由策略（QUALITY_FIRST / COST_FIRST / SPEED_FIRST / BALANCED） */
+    private String routingStrategy;
+
+    /** 工作流模式（BASIC / STANDARD / PROFESSIONAL / FULL） */
+    private String workflowMode;
+
+    /** 任务总耗时（毫秒） */
+    private Long totalDurationMs;
+
+    /** 是否需要 3D 转换 */
+    private Boolean require3d;
+
+    /** 色板（JSON 字符串，List<String>） */
+    private String colorPalette;
+
 }

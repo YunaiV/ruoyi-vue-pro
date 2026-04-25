@@ -1,5 +1,13 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.image;
 
+import cn.iocoder.yudao.module.ai.service.image.AiFashionNlpParserServiceImpl;
+import cn.iocoder.yudao.module.ai.service.image.AiFashionMeshGenerator;
+import cn.iocoder.yudao.module.ai.service.image.AiFashionMeshData;
+import cn.iocoder.yudao.module.ai.service.image.AiFashionObjExporter;
+import cn.iocoder.yudao.module.ai.service.image.AiFashion3dColorChanger;
+import cn.iocoder.yudao.module.ai.service.image.AiFashionIntentParseResult;
+import cn.iocoder.yudao.module.ai.service.image.AiFashionSessionContext;
+import cn.iocoder.yudao.module.ai.enums.image.AiFashionIntentEnum;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.fashion.AiFashionTaskCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiFashionTaskDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiFashionTaskStepDO;
@@ -273,6 +281,148 @@ public class AiFashionPipelineTests {
         assertEquals(AiFashionTaskStepStatusEnum.FAIL.getStatus(), upscaleStep.getStatus(),
                 "步骤状态标记为 FAIL");
         // 即使步骤 FAIL，主任务应保持 SUCCESS（在 impl 中 break 后不设置任务失败）
+    }
+
+    // ========== NLP 解析单元测试 ==========
+
+    @Test
+    @DisplayName("NLP：单字颜色 '红' → MODIFY_COLOR，detectedColor 不为空")
+    public void testNlp_singleCharColor_red() {
+        AiFashionNlpParserServiceImpl parser = new AiFashionNlpParserServiceImpl();
+        AiFashionSessionContext ctx = AiFashionSessionContext.builder()
+                .lastPrompt("white dress, elegant, minimalist style")
+                .build();
+        AiFashionIntentParseResult result = parser.parse("红", ctx);
+
+        assertEquals(AiFashionIntentEnum.MODIFY_COLOR, result.getIntent(),
+                "单字颜色应识别为 MODIFY_COLOR");
+        assertNotNull(result.getDetectedColor(), "应检测到颜色词");
+        assertFalse(result.getDetectedColor().isBlank(), "颜色词不应为空");
+    }
+
+    @Test
+    @DisplayName("NLP：'换蓝色' → MODIFY_COLOR，颜色关键词含 blue")
+    public void testNlp_changeBlue() {
+        AiFashionNlpParserServiceImpl parser = new AiFashionNlpParserServiceImpl();
+        AiFashionSessionContext ctx = AiFashionSessionContext.builder()
+                .lastPrompt("red dress, sweet cool style")
+                .build();
+        AiFashionIntentParseResult result = parser.parse("换蓝色", ctx);
+
+        assertEquals(AiFashionIntentEnum.MODIFY_COLOR, result.getIntent(),
+                "'换蓝色' 应识别为 MODIFY_COLOR");
+        assertNotNull(result.getDetectedColor(), "应检测到蓝色");
+        assertTrue(result.getDetectedColor().toLowerCase().contains("blue"),
+                "颜色关键词应含 blue，实际: " + result.getDetectedColor());
+    }
+
+    @Test
+    @DisplayName("NLP：'出5款甜酷风连衣裙' → BATCH_GENERATE，batchCount=5")
+    public void testNlp_batchGenerate_count5() {
+        AiFashionNlpParserServiceImpl parser = new AiFashionNlpParserServiceImpl();
+        AiFashionIntentParseResult result = parser.parse("出5款甜酷风连衣裙", null);
+
+        assertEquals(AiFashionIntentEnum.BATCH_GENERATE, result.getIntent(),
+                "批量生成意图应为 BATCH_GENERATE");
+        assertEquals(5, result.getBatchCount(), "批量数量应为5");
+        assertNotNull(result.getVariantPrompts(), "变体提示词列表不应为 null");
+        assertEquals(5, result.getVariantPrompts().size(), "变体提示词应有5条");
+    }
+
+    @Test
+    @DisplayName("NLP：'宽松一点' → MODIFY_FIT（需要会话上下文）")
+    public void testNlp_looseFit() {
+        AiFashionNlpParserServiceImpl parser = new AiFashionNlpParserServiceImpl();
+        AiFashionSessionContext ctx = AiFashionSessionContext.builder()
+                .lastPrompt("slim fit dress, fashion show style")
+                .build();
+        AiFashionIntentParseResult result = parser.parse("宽松一点", ctx);
+
+        assertEquals(AiFashionIntentEnum.MODIFY_FIT, result.getIntent(),
+                "'宽松一点' 应识别为 MODIFY_FIT");
+    }
+
+    @Test
+    @DisplayName("NLP：'转3D' → GENERATE_3D")
+    public void testNlp_generate3D() {
+        AiFashionNlpParserServiceImpl parser = new AiFashionNlpParserServiceImpl();
+        AiFashionIntentParseResult result = parser.parse("转3D", null);
+
+        assertEquals(AiFashionIntentEnum.GENERATE_3D, result.getIntent(),
+                "'转3D' 应识别为 GENERATE_3D");
+    }
+
+    @Test
+    @DisplayName("NLP：'来几款牛仔裙' → BATCH_GENERATE，batchCount=4（默认批量数）")
+    public void testNlp_batchGenerate_defaultCount() {
+        AiFashionNlpParserServiceImpl parser = new AiFashionNlpParserServiceImpl();
+        AiFashionIntentParseResult result = parser.parse("来几款牛仔裙", null);
+
+        assertEquals(AiFashionIntentEnum.BATCH_GENERATE, result.getIntent(),
+                "'来几款' 应识别为 BATCH_GENERATE");
+        assertEquals(4, result.getBatchCount(), "'几款' 应映射默认批量数 4");
+    }
+
+    // ========== 3D 网格生成测试 ==========
+
+    @Test
+    @DisplayName("MeshGenerator：gridResolution=8 时顶点与面数量正确")
+    public void testMeshGenerator_vertexAndFaceCount() {
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(
+                64, 64, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        // 填充灰色
+        java.awt.Graphics2D g = img.createGraphics();
+        g.setColor(java.awt.Color.GRAY);
+        g.fillRect(0, 0, 64, 64);
+        g.dispose();
+
+        java.awt.image.BufferedImage depth = AiFashionMeshGenerator.estimateDepthSimple(img);
+        AiFashionMeshData mesh = AiFashionMeshGenerator.generateFromDepthMap(depth, 8);
+
+        // gridResolution=8 → (8+1)^2 = 81 顶点，8*8*2 = 128 面
+        assertEquals(81, mesh.getVertices().size(),
+                "9×9 网格应有 81 个顶点，实际: " + mesh.getVertices().size());
+        assertEquals(128, mesh.getFaces().size(),
+                "8×8 网格每格2个三角形 = 128 面，实际: " + mesh.getFaces().size());
+    }
+
+    @Test
+    @DisplayName("ObjExporter：导出内容含 'v '（顶点）和 'f '（面）")
+    public void testObjExporter_containsVerticesAndFaces() {
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(
+                32, 32, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.image.BufferedImage depth = AiFashionMeshGenerator.estimateDepthSimple(img);
+        AiFashionMeshData mesh = AiFashionMeshGenerator.generateFromDepthMap(depth, 4);
+
+        String obj = AiFashionObjExporter.exportObj(mesh, "texture.mtl");
+
+        assertTrue(obj.contains("v "), "OBJ 应包含顶点行 'v '");
+        assertTrue(obj.contains("f "), "OBJ 应包含面行 'f '");
+        assertTrue(obj.contains("vt "), "OBJ 应包含 UV 坐标行 'vt '");
+    }
+
+    @Test
+    @DisplayName("ColorChanger：换色后主导色 Hue 应接近目标颜色 Hue")
+    public void testColorChanger_hueShift() {
+        // 创建纯红色图像（HSB hue≈0）
+        java.awt.image.BufferedImage src = new java.awt.image.BufferedImage(
+                50, 50, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = src.createGraphics();
+        g.setColor(new java.awt.Color(200, 50, 50));
+        g.fillRect(0, 0, 50, 50);
+        g.dispose();
+
+        // 换为蓝色（#0000FF，HSB hue≈240°）
+        java.awt.image.BufferedImage result = AiFashion3dColorChanger.changeColor(src, "#0000FF");
+
+        // 检测结果图主导色
+        String dominantHex = AiFashion3dColorChanger.detectDominantColor(result);
+        assertNotNull(dominantHex, "主导色 Hex 不应为 null");
+
+        // 解析 Hex 并判断色调偏蓝（B 分量 > R 分量）
+        int r = Integer.parseInt(dominantHex.substring(1, 3), 16);
+        int b = Integer.parseInt(dominantHex.substring(5, 7), 16);
+        assertTrue(b >= r, "换蓝色后蓝色分量应 >= 红色分量，dominant=" + dominantHex);
     }
 
 }
