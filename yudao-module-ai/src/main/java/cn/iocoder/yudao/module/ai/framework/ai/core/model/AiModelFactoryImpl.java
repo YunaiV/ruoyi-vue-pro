@@ -17,6 +17,10 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiImageModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.vllm.VllmChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
@@ -180,6 +184,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildOllamaChatModel(url);
                 case GROK:
                     return buildGrokChatModel(apiKey,url);
+                case RUNPOD:
+                    return buildRunpodChatModel(apiKey, url);
+                case VLLM:
+                    return buildVllmChatModel(apiKey, url);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -243,6 +251,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(OpenAiImageModel.class);
             case STABLE_DIFFUSION:
                 return SpringUtil.getBean(StabilityAiImageModel.class);
+            case STABLE_DIFFUSION_WEBUI:
+                return SpringUtil.getBean(StableDiffusionWebUiImageModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -264,6 +274,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildSiliconFlowImageModel(apiKey,url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageModel(apiKey, url);
+            case STABLE_DIFFUSION_WEBUI:
+                return buildStableDiffusionWebUiImageModel(url, apiKey);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -590,11 +602,74 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return new StabilityAiImageModel(stabilityAiApi);
     }
 
+    /**
+     * 构建 StableDiffusionWebUiImageModel。
+     *
+     * <p>url 参数为 SD WebUI HTTP 服务地址，如 {@code http://103.196.86.126:15112}。
+     * apiKey 仅在服务启动时指定了 {@code --api-auth} 时需填写，否则传 null 或空字符串。</p>
+     */
+    private StableDiffusionWebUiImageModel buildStableDiffusionWebUiImageModel(String url, String apiKey) {
+        String baseUrl = StrUtil.blankToDefault(url, StableDiffusionWebUiImageModel.DEFAULT_BASE_URL);
+        StableDiffusionWebUiApi api = new StableDiffusionWebUiApi(baseUrl, apiKey);
+        return new StableDiffusionWebUiImageModel(api);
+    }
+
     private ChatModel buildGrokChatModel(String apiKey,String url) {
         YudaoAiProperties.Grok properties = new YudaoAiProperties.Grok()
                 .setBaseUrl(url)
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildGrokChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#buildRunpodChatClient(YudaoAiProperties.Runpod)}
+     *
+     * <p>url 参数存完整的 OpenAI 兼容 base URL，格式：
+     * {@code https://api.runpod.ai/v2/{endpointId}/openai/v1}
+     * 也可直接传 {@code https://api.runpod.ai}，此时使用默认端点。</p>
+     *
+     * TODO @deepay：PR4 补充 Runpod 图片生成（自定义端点 POST /v2/{endpointId}/run，非 OpenAI 兼容）
+     *   curl 格式：POST https://api.runpod.ai/v2/google-nano-banana-2-edit/run
+     *              POST https://api.runpod.ai/v2/qwen-image-edit-2511/run
+     *   qwen-image-edit-2511 body：
+     *     {"input":{
+     *       "prompt":"...",
+     *       "size":"1024*1024",          // 宽高格式，优先于 width/height
+     *       "output_format":"jpeg",      // "jpeg" | "png"
+     *       "seed":-1,
+     *       "enable_base64_output":false,
+     *       "enable_sync_mode":false
+     *     }}
+     *   google-nano-banana-2-edit body：
+     *     {"input":{
+     *       "prompt":"...",
+     *       "resolution":"1k",
+     *       "output_format":"png",
+     *       "enable_safety_checker":true
+     *     }}
+     *   注意：Key 通过环境变量 RUNPOD_API_KEY 注入，绝不硬编码。
+     *         与聊天路径 /openai/v1 完全独立，需要单独的 RunpodImageModel 适配器
+     */
+    private ChatModel buildRunpodChatModel(String apiKey, String url) {
+        YudaoAiProperties.Runpod properties = new YudaoAiProperties.Runpod()
+                .setApiKey(apiKey)
+                .setBaseUrl(url);
+        return new AiAutoConfiguration().buildRunpodChatClient(properties);
+    }
+
+    /**
+     * 构建 VllmChatModel。
+     *
+     * <p>url 参数为 vLLM HTTP 服务地址，如 {@code http://10.0.0.8:8000}。
+     * 若未填，默认使用 {@link VllmChatModel#DEFAULT_BASE_URL}（localhost:8000）。</p>
+     *
+     * <p>apiKey 为 vllm serve --api-key 指定的值，无鉴权时可留空。</p>
+     */
+    private ChatModel buildVllmChatModel(String apiKey, String url) {
+        YudaoAiProperties.Vllm properties = new YudaoAiProperties.Vllm()
+                .setApiKey(apiKey)
+                .setBaseUrl(url);
+        return new AiAutoConfiguration().buildVllmChatClient(properties);
     }
 
     // ========== 各种创建 EmbeddingModel 的方法 ==========
