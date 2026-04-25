@@ -24,7 +24,24 @@
 
 ## 🚀 一键部署（快速上手）
 
-> 适用于宝塔面板 Linux 服务器。确保已在宝塔软件商店安装 **Java 8+、Maven 3.8+、Node 18+、MySQL 8、Redis 7、Nginx**。
+> 适用于宝塔面板 Linux 服务器。确保已在宝塔软件商店安装 **Java 8+、Maven 3.8+、Node 18+（推荐 Node 20 LTS）、MySQL 8、Redis 7、Nginx**。
+
+### ⚡ 前端一键构建（只需两条命令）
+
+```bash
+cd /www/wwwroot/deepay.srl   # 进入项目根目录
+bash build.sh                 # 构建所有前端（Vue3 PWA + uni-app H5）
+```
+
+| 命令 | 说明 |
+|------|------|
+| `bash build.sh` | 构建全部前端（默认） |
+| `bash build.sh admin` | 仅构建 `yudao-ui-deepay`（Vue3 PWA） |
+| `bash build.sh app` | 仅构建 `yudao-ui-deepay-app`（uni-app H5） |
+
+> ✅ 无需手动改版本、无需 `--legacy-peer-deps`、无需任何私有 registry。
+
+---
 
 ### ① 首次全量部署（自动建库 + 打包 + Nginx + 开机自启）
 
@@ -48,8 +65,11 @@ bash script/shell/deepay-deploy.sh
 # 仅更新后端
 bash script/shell/deepay-deploy.sh backend
 
-# 仅更新前端
+# 仅更新前端（Vue3 PWA）
 bash script/shell/deepay-deploy.sh frontend
+
+# 仅更新 uni-app H5
+bash script/shell/deepay-deploy.sh app
 ```
 
 ### ③ Docker Compose 部署

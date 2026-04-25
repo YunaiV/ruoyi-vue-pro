@@ -1,0 +1,56 @@
+name: uni-app H5 Build
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'yudao-ui-deepay-app/**'
+      - '.github/workflows/uni-app.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'yudao-ui-deepay-app/**'
+      - '.github/workflows/uni-app.yml'
+
+env:
+  TZ: Asia/Shanghai
+
+defaults:
+  run:
+    working-directory: yudao-ui-deepay-app
+
+jobs:
+  build-h5:
+    name: Build H5
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: yudao-ui-deepay-app/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build H5
+        run: npm run build:h5
+
+      - name: Upload H5 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepay-app-h5-${{ github.sha }}
+          path: yudao-ui-deepay-app/dist/build/h5/
+          retention-days: 7
