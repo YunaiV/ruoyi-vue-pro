@@ -140,6 +140,40 @@ export const templates = [
   },
 
   /* ─────────────────────────────────────────────────────────
+     6. 社交电商  —  Share & Earn 分享赚钱
+  ───────────────────────────────────────────────────────── */
+  {
+    id: 'social',
+    name: '分享赚钱',
+    tag: '社交',
+    type: 'social',
+    commissionRate: 15,
+    theme: {
+      bg:      '#0D0D0D',
+      card:    '#161616',
+      border:  '#252525',
+      text:    '#FFFFFF',
+      subText: '#888888',
+      primary: '#F7C948',
+    },
+    style: {
+      prompt:    'social commerce fashion, vibrant lifestyle, trendy, influencer style',
+      colorRule: 'dark background, gold accent, energetic, share-worthy visuals',
+    },
+    gradient: 'linear-gradient(150deg, #0D0D0D 0%, #1c1500 100%)',
+    products: [
+      { id: 'sc-001', name: '爆款连帽卫衣', title: '爆款连帽卫衣', price: 89,  originalPrice: 129, badge: 'HOT',  commissionRate: 15, img: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?auto=format&fit=crop&w=600&q=80', rating: 4.9, reviews: 1243, desc: '450g重磅，宽松廓形，分享最多款', gradient: 'linear-gradient(135deg,#1a1505,#2e2008)', shareStats: { total: 3421 }, wishlistCount: 892 },
+      { id: 'sc-002', name: '时髦格纹外套', title: '时髦格纹外套', price: 149, originalPrice: 210, badge: 'NEW',  commissionRate: 15, img: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=600&q=80', rating: 4.8, reviews:  567, desc: '经典格纹，英伦风格，高级感十足', gradient: 'linear-gradient(135deg,#161610,#282818)', shareStats: { total: 1876 }, wishlistCount: 435 },
+      { id: 'sc-003', name: '修身真丝衬衫', title: '修身真丝衬衫', price: 119, originalPrice: null, badge: 'SALE', commissionRate: 12, img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80', rating: 4.7, reviews:  389, desc: '100%真丝，飘逸垂感，优雅必备', gradient: 'linear-gradient(135deg,#1a1005,#2a1a08)', shareStats: { total: 1234 }, wishlistCount: 321 },
+      { id: 'sc-004', name: '阔腿休闲裤',   title: '阔腿休闲裤',   price:  79, originalPrice: 109, badge: 'HOT',  commissionRate: 15, img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=600&q=80', rating: 4.8, reviews:  812, desc: '垂感面料，阔腿版型，百搭神裤',   gradient: 'linear-gradient(135deg,#101518,#182028)', shareStats: { total: 2109 }, wishlistCount: 567 },
+      { id: 'sc-005', name: '针织短裙套装', title: '针织短裙套装', price: 129, originalPrice: 189, badge: 'NEW',  commissionRate: 18, img: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80', rating: 4.9, reviews:  423, desc: '上衣+裙子两件套，复古针织风',   gradient: 'linear-gradient(135deg,#1a0a10,#2e1018)', shareStats: { total: 1567 }, wishlistCount: 412 },
+      { id: 'sc-006', name: '工装多口袋裤', title: '工装多口袋裤', price:  99, originalPrice: null, badge: 'DROP', commissionRate: 12, img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80', rating: 4.7, reviews:  298, desc: '机能风格，多口袋设计，街头必备', gradient: 'linear-gradient(135deg,#0d1520,#182030)', shareStats: { total:  876 }, wishlistCount: 234 },
+      { id: 'sc-007', name: '廓形皮质夹克', title: '廓形皮质夹克', price: 199, originalPrice: 289, badge: 'SALE', commissionRate: 20, img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=600&q=80', rating: 5.0, reviews:  187, desc: '头层牛皮，廓形剪裁，高佣金款', gradient: 'linear-gradient(135deg,#181008,#281808)', shareStats: { total: 2341 }, wishlistCount: 654 },
+      { id: 'sc-008', name: '运动休闲套装', title: '运动休闲套装', price:  69, originalPrice:  99, badge: 'HOT',  commissionRate: 15, img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80', rating: 4.8, reviews:  943, desc: '速干弹力，健身日常两用，爆款', gradient: 'linear-gradient(135deg,#0e0e14,#1a1a22)', shareStats: { total: 3102 }, wishlistCount: 789 },
+    ],
+  },
+
+  /* ─────────────────────────────────────────────────────────
      5. 单品爆款  —  Argon Hero Spotlight
   ───────────────────────────────────────────────────────── */
   {
