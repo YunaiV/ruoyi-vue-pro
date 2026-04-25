@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.deepay.controller;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.deepay.controller.vo.ChatContextVO;
 import cn.iocoder.yudao.module.deepay.service.AiChatService;
+import cn.iocoder.yudao.module.deepay.vo.AiChatContextVO;
 import cn.iocoder.yudao.module.deepay.service.AiRateLimitService;
 import cn.iocoder.yudao.module.deepay.service.ChatSessionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,16 +72,24 @@ public class AiChatController {
             return error(429, rlResult.message);
         }
 
-        // 构建上下文 VO
+        // 构建上下文 VO，并转换为服务层所需类型
         ChatContextVO chatCtx = req.toChatContext();
+        AiChatContextVO aiCtx = null;
+        if (chatCtx != null) {
+            aiCtx = new AiChatContextVO();
+            aiCtx.setRoute(chatCtx.getRoute());
+            aiCtx.setModule(chatCtx.getModule());
+            aiCtx.setEntityType(chatCtx.getEntityType());
+            aiCtx.setEntityId(chatCtx.getEntityId());
+            aiCtx.setSnapshot(chatCtx.getSnapshot());
+        }
 
         AiChatService.ChatReply reply = aiChatService.chat(
                 req.getModule(),
                 req.getSessionId(),
                 req.getCustomerId(),
                 req.getUserMessage(),
-                chatCtx,
-                tenantId
+                aiCtx
         );
         return success(reply);
     }
