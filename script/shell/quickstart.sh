@@ -43,7 +43,7 @@ PID=$RUN/deepay.pid
 PORT="${PORT:-48080}"
 PROFILE="${PROFILE:-prod}"
 
-FRONTEND_SRC=$PROJECT/yudao-ui-deepay
+FRONTEND_SRC=$PROJECT/deepay-pwa
 # 单站点模式：前端直接输出到站点根目录
 FRONTEND_OUT="${FRONTEND_OUT:-$PROJECT}"
 
@@ -401,7 +401,7 @@ spring:
 yudao:
   web:
     admin-ui:
-      url: https://${DOMAIN}
+      url: https://${DOMAIN},https://www.${DOMAIN},https://admin.${DOMAIN},https://modaui.com,https://www.modaui.com,https://ai.${DOMAIN}
 YAML
 ok "已写入 $CFG/application-prod.yml"
 
@@ -511,9 +511,9 @@ cp -r "$FRONTEND_SRC/dist"/. "$FRONTEND_OUT/"
 ok "前端已部署 → $FRONTEND_OUT"
 
 # ══════════════════════════════════════════════════════════
-# 步骤 9 — 写 Nginx 配置（单站点：deepay.srl）
+# 步骤 9 — 写 Nginx 配置（多域名：所有入口一次搞定）
 # ══════════════════════════════════════════════════════════
-title "步骤 9  配置 Nginx（单站点 ${DOMAIN}）"
+title "步骤 9  配置 Nginx（多域名）"
 
 mkdir -p "$(dirname "$NGINX_CONF")"
 
@@ -523,39 +523,67 @@ if [ -f "$NGINX_CONF" ]; then
   ok "旧 Nginx 配置已备份 → ${NGINX_CONF}.bak.${DATE}"
 fi
 
-# 写单站点配置（使用 shell 变量替换 DOMAIN / FRONTEND_OUT / PORT）
-# Nginx 内部变量用 \$ 转义
+# 公共代理 snippet（避免重复）
+# Nginx 内部变量用 \$ 转义，SHELL 变量不转义
 cat > "$NGINX_CONF" << NGINX_EOF
 # ============================================================
-#  Deepay — Nginx 虚拟主机配置（单站点）
+#  Deepay — Nginx 多域名配置
 #
-#  ${DOMAIN}  → Vue 前端（${FRONTEND_OUT}）
-#               /api/       反代 → 127.0.0.1:${PORT}
-#               /admin-api/ 反代 → 127.0.0.1:${PORT}
-#               /infra/ws   WebSocket
+#  域名架构：
+#    deepay.srl / www.deepay.srl     → PWA 前端（Web + 手机 App）
+#    modaui.com / www.modaui.com     → 同上（国际域名，302 → deepay.srl）
+#    admin.deepay.srl                → PWA 前端（同一 dist，/admin 路由全屏）
+#    api.deepay.srl                  → Spring Boot :${PORT} 纯 API 代理
+#    ai.deepay.srl                   → 302 → deepay.srl/ai-sales
 #
 #  自动生成于 $(date)
-#  HTTPS：宝塔面板 → 网站 → ${DOMAIN} → SSL → Let's Encrypt
+#  HTTPS：宝塔面板 → 每个域名 → SSL → Let's Encrypt
 # ============================================================
 
+# ── 公共代理参数 ──────────────────────────────────────────
+map \$http_upgrade \$connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+# ── HTTP → HTTPS 全局跳转 ─────────────────────────────────
 server {
-    listen 80;
-    listen [::]:80;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    return 301 https://\$host\$request_uri;
+}
+
+# ═══════════════════════════════════════════════════════════
+# ① deepay.srl — 主站 PWA（Web 入口 + 手机 App 入口）
+#    包含路由：/ /image-library /ai-sales /template-library /settings /admin
+# ═══════════════════════════════════════════════════════════
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name ${DOMAIN} www.${DOMAIN};
+
+    ssl_certificate     /www/server/panel/vhost/cert/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_session_cache shared:SSL:10m;
 
     root ${FRONTEND_OUT};
     index index.html;
 
     client_max_body_size 32m;
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
 
-    # 前端 SPA（Vue Router history 模式）
+    # Vue Router history 模式 — 所有前端路由均回落到 index.html
     location / {
         try_files \$uri \$uri/ /index.html;
     }
 
-    # 后端 admin-api
-    location /admin-api/ {
-        proxy_pass         http://127.0.0.1:${PORT}/admin-api/;
+    # 后端业务 API
+    location /api/ {
+        proxy_pass         http://127.0.0.1:${PORT}/api/;
         proxy_set_header   Host              \$host;
         proxy_set_header   X-Real-IP         \$remote_addr;
         proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
@@ -565,9 +593,9 @@ server {
         proxy_send_timeout    300s;
     }
 
-    # 后端 api（业务接口）
-    location /api/ {
-        proxy_pass         http://127.0.0.1:${PORT}/api/;
+    # 后端管理 API
+    location /admin-api/ {
+        proxy_pass         http://127.0.0.1:${PORT}/admin-api/;
         proxy_set_header   Host              \$host;
         proxy_set_header   X-Real-IP         \$remote_addr;
         proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
@@ -582,12 +610,12 @@ server {
         proxy_pass         http://127.0.0.1:${PORT}/infra/ws;
         proxy_http_version 1.1;
         proxy_set_header   Upgrade    \$http_upgrade;
-        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Connection \$connection_upgrade;
         proxy_set_header   Host       \$host;
         proxy_read_timeout 3600s;
     }
 
-    # Swagger（调试用）
+    # Swagger（生产可用 IP 白名单限制）
     location /swagger-ui {
         proxy_pass http://127.0.0.1:${PORT}/swagger-ui;
         proxy_set_header Host \$host;
@@ -597,11 +625,141 @@ server {
         proxy_set_header Host \$host;
     }
 
-    # 静态资源缓存
+    # 静态资源长缓存
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)\$ {
         expires 30d;
         add_header Cache-Control "public, no-transform";
     }
+}
+
+# ═══════════════════════════════════════════════════════════
+# ② modaui.com — 国际域名，302 跳转到主站
+# ═══════════════════════════════════════════════════════════
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name modaui.com www.modaui.com;
+
+    ssl_certificate     /www/server/panel/vhost/cert/modaui.com/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/modaui.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    return 302 https://${DOMAIN}\$request_uri;
+}
+
+# ═══════════════════════════════════════════════════════════
+# ③ admin.deepay.srl — 管理后台独立入口（同一 PWA dist，/admin 路由全屏）
+# ═══════════════════════════════════════════════════════════
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name admin.${DOMAIN};
+
+    ssl_certificate     /www/server/panel/vhost/cert/admin.${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/admin.${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    root ${FRONTEND_OUT};
+    index index.html;
+    client_max_body_size 32m;
+
+    # 直接访问 admin.deepay.srl → 跳转到 /admin 路由
+    location = / {
+        return 302 /admin;
+    }
+
+    # Vue Router history 模式
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    # 管理 API 代理
+    location /admin-api/ {
+        proxy_pass         http://127.0.0.1:${PORT}/admin-api/;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+    }
+
+    location /api/ {
+        proxy_pass         http://127.0.0.1:${PORT}/api/;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)\$ {
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}
+
+# ═══════════════════════════════════════════════════════════
+# ④ api.deepay.srl — 纯 API 网关（Spring Boot :${PORT}）
+# ═══════════════════════════════════════════════════════════
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name api.${DOMAIN};
+
+    ssl_certificate     /www/server/panel/vhost/cert/api.${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/api.${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 32m;
+
+    # CORS（生产环境建议仅允许已知前端域名）
+    add_header Access-Control-Allow-Origin  "https://${DOMAIN}" always;
+    add_header Access-Control-Allow-Methods "GET,POST,PUT,DELETE,OPTIONS,PATCH" always;
+    add_header Access-Control-Allow-Headers "Authorization,Content-Type,X-Requested-With" always;
+    add_header Access-Control-Max-Age       86400 always;
+
+    location / {
+        if (\$request_method = OPTIONS) { return 204; }
+        proxy_pass         http://127.0.0.1:${PORT};
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+    }
+
+    # WebSocket
+    location /infra/ws {
+        proxy_pass         http://127.0.0.1:${PORT}/infra/ws;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade    \$http_upgrade;
+        proxy_set_header   Connection \$connection_upgrade;
+        proxy_set_header   Host       \$host;
+        proxy_read_timeout 3600s;
+    }
+}
+
+# ═══════════════════════════════════════════════════════════
+# ⑤ ai.deepay.srl — AI 开店独立入口（302 → 主站 /ai-sales）
+# ═══════════════════════════════════════════════════════════
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name ai.${DOMAIN};
+
+    ssl_certificate     /www/server/panel/vhost/cert/ai.${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/ai.${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    return 302 https://${DOMAIN}/ai-sales\$is_args\$args;
 }
 NGINX_EOF
 
@@ -655,19 +813,41 @@ systemctl restart deepay 2>/dev/null && ok "deepay.service 已启动" || warn "s
 # ══════════════════════════════════════════════════════════
 echo ""
 echo -e "${G}${B}"
-echo "  ╔══════════════════════════════════════════════════════════╗"
-echo "  ║           🎉  全自动部署完成！                          ║"
-echo "  ╠══════════════════════════════════════════════════════════╣"
-echo "  ║  站点    http://${DOMAIN}"
-echo "  ║  API     http://${DOMAIN}/api/"
-echo "  ║  Swagger http://${DOMAIN}/swagger-ui"
-echo "  ╠══════════════════════════════════════════════════════════╣"
-echo "  ║  数据库  ${DB}  用户: ${DB_USER}"
-echo "  ║  后端日志  tail -f ${LOG}"
-echo "  ║  重新部署  bash ${PROJECT}/script/shell/quickstart.sh"
-echo "  ╠══════════════════════════════════════════════════════════╣"
-echo "  ║  💡 开启 HTTPS：                                        ║"
-echo "  ║     宝塔面板 → 网站 → ${DOMAIN} → SSL → Let's Encrypt  ║"
-echo "  ╚══════════════════════════════════════════════════════════╝"
+echo "  ╔══════════════════════════════════════════════════════════════╗"
+echo "  ║              🎉  全自动部署完成！                           ║"
+echo "  ╠══════════════════════════════════════════════════════════════╣"
+echo "  ║                                                              ║"
+echo "  ║  🌐 Web 入口（用户 / 手机 App）                             ║"
+echo "  ║     https://${DOMAIN}            主站 PWA                   ║"
+echo "  ║     https://modaui.com            国际域名 → 跳转主站        ║"
+echo "  ║                                                              ║"
+echo "  ║  📱 手机 App 安装                                           ║"
+echo "  ║     iOS：Safari 打开主站 → 分享 → 添加到主屏幕              ║"
+echo "  ║     Android：Chrome → 菜单 → 安装应用                       ║"
+echo "  ║                                                              ║"
+echo "  ║  ⚙️  管理后台                                               ║"
+echo "  ║     https://admin.${DOMAIN}      独立后台入口               ║"
+echo "  ║     https://${DOMAIN}/admin      前台侧栏按钮直达            ║"
+echo "  ║                                                              ║"
+echo "  ║  🔌 API 接口                                                ║"
+echo "  ║     https://api.${DOMAIN}        REST API 网关              ║"
+echo "  ║     https://${DOMAIN}/api/       Nginx 反代（同上）          ║"
+echo "  ║                                                              ║"
+echo "  ║  🤖 AI 开店                                                 ║"
+echo "  ║     https://ai.${DOMAIN}         → 跳转 /ai-sales           ║"
+echo "  ║                                                              ║"
+echo "  ║  🔧 调试                                                    ║"
+echo "  ║     Swagger  https://${DOMAIN}/swagger-ui                   ║"
+echo "  ║     日志      tail -f ${LOG}                                 ║"
+echo "  ║     重新部署  bash ${PROJECT}/script/shell/quickstart.sh    ║"
+echo "  ║                                                              ║"
+echo "  ╠══════════════════════════════════════════════════════════════╣"
+echo "  ║  💡 开启 HTTPS（每个域名都需要单独申请证书）：              ║"
+echo "  ║     宝塔面板 → 网站 → 域名 → SSL → Let's Encrypt           ║"
+echo "  ║     需要申请的域名（5个）：                                  ║"
+echo "  ║       ${DOMAIN}  www.${DOMAIN}                              ║"
+echo "  ║       admin.${DOMAIN}  api.${DOMAIN}  ai.${DOMAIN}         ║"
+echo "  ║       modaui.com  www.modaui.com                            ║"
+echo "  ╚══════════════════════════════════════════════════════════════╝"
 echo -e "${N}"
 
