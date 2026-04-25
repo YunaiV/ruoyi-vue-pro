@@ -106,7 +106,31 @@ CREATE TABLE `ai_fashion_collection_source`  (
   COMMENT = 'AI 服装设计素材采集源配置';
 
 -- ----------------------------
--- 4. 初始化采集源数据
+-- 4. AI 悬浮对话框页面状态表
+-- ----------------------------
+CREATE TABLE `ai_fashion_assistant_state`  (
+  `id`               bigint        NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `user_id`          bigint        NOT NULL               COMMENT '用户编号',
+  `page_name`        varchar(100)  NOT NULL               COMMENT '页面名称（home/model_library/design_studio/image_library/3d_viewer）',
+  `minimized`        bit(1)        NOT NULL DEFAULT b'0'  COMMENT '是否最小化（缩到角落）',
+  `position_x`       int           NOT NULL DEFAULT 20    COMMENT '窗口 X 坐标（像素）',
+  `position_y`       int           NOT NULL DEFAULT 20    COMMENT '窗口 Y 坐标（像素）',
+  `last_active_time` datetime      NULL     DEFAULT NULL  COMMENT '最近一次活跃时间',
+  `creator`          varchar(64)   NOT NULL DEFAULT ''    COMMENT '创建者',
+  `create_time`      datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater`          varchar(64)   NOT NULL DEFAULT ''    COMMENT '更新者',
+  `update_time`      datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted`          bit(1)        NOT NULL DEFAULT b'0'  COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_user_page` (`user_id`, `page_name`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'AI 悬浮对话框页面状态（位置/最小化）';
+
+-- ----------------------------
+-- 5. 初始化采集源数据
 -- 10大时装秀 + 10大品牌 + 5大模特机构
 -- ----------------------------
 
