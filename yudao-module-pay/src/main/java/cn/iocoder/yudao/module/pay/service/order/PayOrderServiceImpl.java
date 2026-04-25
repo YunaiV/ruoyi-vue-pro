@@ -29,9 +29,11 @@ import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.blockchain.event.PaymentSuccessEvent;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -73,6 +75,9 @@ public class PayOrderServiceImpl implements PayOrderService {
     private PayChannelService channelService;
     @Resource
     private PayNotifyService notifyService;
+
+    @Resource
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     public PayOrderDO getOrder(Long id) {
@@ -301,6 +306,20 @@ public class PayOrderServiceImpl implements PayOrderService {
         // 3. 插入支付通知记录
         notifyService.createPayNotifyTask(PayNotifyTypeEnum.ORDER.getType(),
                 orderExtension.getOrderId());
+
+        // 4. 发布支付成功事件，触发区块链异步存证（@TransactionalEventListener 在事务提交后执行，不阻塞当前响应）
+        PayOrderDO order = orderMapper.selectById(orderExtension.getOrderId());
+        if (order != null) {
+            eventPublisher.publishEvent(new PaymentSuccessEvent(
+                    String.valueOf(order.getId()),
+                    MoneyUtils.fenToYuan(order.getPrice()),
+                    "CNY",
+                    notify.getSuccessTime() != null ? notify.getSuccessTime().toString() : "",
+                    order.getUserId() != null ? String.valueOf(order.getUserId()) : "",
+                    order.getSubject(),
+                    notify.getChannelOrderNo()
+            ));
+        }
     }
 
     /**
