@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.vllm.VllmChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
@@ -183,6 +184,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildGrokChatModel(apiKey,url);
                 case RUNPOD:
                     return buildRunpodChatModel(apiKey, url);
+                case VLLM:
+                    return buildVllmChatModel(apiKey, url);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -634,6 +637,21 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .setApiKey(apiKey)
                 .setBaseUrl(url);
         return new AiAutoConfiguration().buildRunpodChatClient(properties);
+    }
+
+    /**
+     * 构建 VllmChatModel。
+     *
+     * <p>url 参数为 vLLM HTTP 服务地址，如 {@code http://10.0.0.8:8000}。
+     * 若未填，默认使用 {@link VllmChatModel#DEFAULT_BASE_URL}（localhost:8000）。</p>
+     *
+     * <p>apiKey 为 vllm serve --api-key 指定的值，无鉴权时可留空。</p>
+     */
+    private ChatModel buildVllmChatModel(String apiKey, String url) {
+        YudaoAiProperties.Vllm properties = new YudaoAiProperties.Vllm()
+                .setApiKey(apiKey)
+                .setBaseUrl(url);
+        return new AiAutoConfiguration().buildVllmChatClient(properties);
     }
 
     // ========== 各种创建 EmbeddingModel 的方法 ==========

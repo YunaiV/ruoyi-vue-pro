@@ -42,6 +42,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     SUNO("Suno", "Suno"), // Suno AI
     GROK("Grok","Grok"), // Grok
     RUNPOD("Runpod", "Runpod"), // Runpod（海外 fallback）
+    VLLM("vLLM", "vLLM"), // vLLM（自托管 OpenAI 兼容服务）
 
     ;
 

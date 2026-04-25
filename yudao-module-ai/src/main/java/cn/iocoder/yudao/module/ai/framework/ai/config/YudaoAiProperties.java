@@ -64,6 +64,11 @@ public class YudaoAiProperties {
      */
     private Runpod runpod;
 
+    /**
+     * vLLM（自托管 OpenAI 兼容服务）
+     */
+    private Vllm vllm;
+
     @Data
     public static class Gemini {
 
@@ -201,6 +206,33 @@ public class YudaoAiProperties {
 
         /**
          * 发送给模型的 model 参数（默认 Qwen/Qwen3-32B-AWQ）
+         */
+        private String model;
+
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class Vllm {
+
+        private String enable;
+
+        /**
+         * vLLM HTTP 服务地址（默认 http://localhost:8000）
+         * 典型用法：vllm serve {model} --host 0.0.0.0 --port 8000
+         */
+        private String baseUrl;
+
+        /**
+         * API Key（对应 vllm serve --api-key 参数，无鉴权可留空）
+         */
+        private String apiKey;
+
+        /**
+         * 模型名称（与 vllm serve 指定的模型一致，如 NousResearch/Meta-Llama-3-8B-Instruct）
          */
         private String model;
 

@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.vllm.VllmChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
@@ -330,6 +331,42 @@ public class AiAutoConfiguration {
     @Bean
     public ModelGateway modelGateway(@Autowired(required = false) RunpodChatModel runpodChatModel) {
         return new ModelGateway(runpodChatModel);
+    }
+
+    // ========== vLLM ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.vllm.enable", havingValue = "true")
+    public VllmChatModel vllmChatModel(YudaoAiProperties yudaoAiProperties) {
+        return buildVllmChatClient(yudaoAiProperties.getVllm());
+    }
+
+    /**
+     * 构建 VllmChatModel。
+     *
+     * <p>vLLM 暴露标准 OpenAI 兼容端点 {@code {baseUrl}/v1/chat/completions}，
+     * 因此直接复用 OpenAiChatModel 作为底层实现。</p>
+     *
+     * <p>若 vLLM 服务启动时未指定 {@code --api-key}，则 apiKey 留空字符串即可。</p>
+     */
+    public VllmChatModel buildVllmChatClient(YudaoAiProperties.Vllm properties) {
+        String baseUrl = StrUtil.blankToDefault(properties.getBaseUrl(), VllmChatModel.DEFAULT_BASE_URL);
+        // apiKey 可为空（vLLM 无鉴权时），OpenAiApi 不允许 null，传空字符串
+        String apiKey = StrUtil.blankToDefault(properties.getApiKey(), "EMPTY");
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(baseUrl)
+                        .apiKey(apiKey)
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new VllmChatModel(openAiChatModel);
     }
 
     // ========== RAG 相关 ==========
