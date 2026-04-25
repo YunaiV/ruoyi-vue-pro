@@ -45,73 +45,142 @@
           <p v-if="keySaved" class="tg-hint green">✓ 已保存到 localStorage</p>
         </div>
 
-        <!-- Step 2: Model -->
+        <!-- Sub-mode selector -->
         <div class="tg-section">
-          <label class="tg-label">② 选择模型端点</label>
-          <div class="tg-model-grid">
-            <button
-              v-for="m in quickModels"
-              :key="m.id"
-              class="tg-model-btn"
-              :class="{ active: selectedModelId === m.id }"
-              @click="selectModel(m)"
-            >
-              <span class="tg-mbadge" :style="{ background: m.color }">{{ m.badge }}</span>
-              <span class="tg-mname">{{ m.label }}</span>
-              <span class="tg-mendpoint">{{ m.endpointId }}</span>
+          <label class="tg-label">② 调用模式</label>
+          <div class="tg-model-grid" style="grid-template-columns:1fr 1fr">
+            <button class="tg-model-btn" :class="{ active: slMode === 'prebuilt' }" @click="slMode = 'prebuilt'">
+              <span class="tg-mbadge" style="background:#10a37f">内置模型</span>
+              <span class="tg-mname">RunPod 预置端点</span>
+              <span class="tg-mendpoint">flux / qwen / wan / kling</span>
+            </button>
+            <button class="tg-model-btn" :class="{ active: slMode === 'comfy' }" @click="slMode = 'comfy'">
+              <span class="tg-mbadge" style="background:#7c3aed">⚡ 推荐</span>
+              <span class="tg-mname">Serverless ComfyUI</span>
+              <span class="tg-mendpoint">自定义 Endpoint + 工作流</span>
             </button>
           </div>
         </div>
 
-        <!-- Step 3: Prompt -->
-        <div class="tg-section">
-          <label class="tg-label">③ Prompt</label>
-          <textarea
-            v-model="prompt"
-            class="tg-input tg-textarea"
-            rows="4"
-            placeholder="描述要生成的内容，支持中英文。例如：一件深海蓝丝绒晚礼服，V领，模特正面，白背景商业摄影"
-            :disabled="running"
-          ></textarea>
-        </div>
+        <!-- ── Sub-mode A: Pre-built model endpoints ── -->
+        <template v-if="slMode === 'prebuilt'">
 
-        <!-- Step 4: Ref Image -->
-        <div class="tg-section">
-          <label class="tg-label">④ 参考图片 URL <span class="tg-opt">（编辑/视频模型必填，其余可选）</span></label>
-          <input
-            v-model="refImage"
-            class="tg-input"
-            placeholder="https://..."
-            :disabled="running"
-          />
-          <div v-if="refImage" class="tg-ref-preview">
-            <img :src="refImage" @error="refImage = ''" alt="参考图" />
+          <!-- Step 3: Model -->
+          <div class="tg-section">
+            <label class="tg-label">③ 选择模型端点</label>
+            <div class="tg-model-grid">
+              <button
+                v-for="m in quickModels"
+                :key="m.id"
+                class="tg-model-btn"
+                :class="{ active: selectedModelId === m.id }"
+                @click="selectModel(m)"
+              >
+                <span class="tg-mbadge" :style="{ background: m.color }">{{ m.badge }}</span>
+                <span class="tg-mname">{{ m.label }}</span>
+                <span class="tg-mendpoint">{{ m.endpointId }}</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Raw JSON override -->
-        <details class="tg-details">
-          <summary class="tg-summary">⚙️ 高级 · 直接编辑 JSON input</summary>
-          <textarea
-            v-model="rawJson"
-            class="tg-input tg-textarea mono"
-            rows="8"
-            spellcheck="false"
-            placeholder='{"prompt":"...","num_inference_steps":28,"guidance":2,"seed":-1,"size":"1024*1024","output_format":"png","enable_safety_checker":true}'
-          ></textarea>
-          <p class="tg-hint">留空则使用上方表单参数自动构建</p>
-        </details>
+          <div class="tg-section">
+            <label class="tg-label">④ Prompt</label>
+            <textarea v-model="prompt" class="tg-input tg-textarea" rows="4"
+              placeholder="描述要生成的内容，支持中英文。例如：一件深海蓝丝绒晚礼服，V领，模特正面，白背景商业摄影"
+              :disabled="running"></textarea>
+          </div>
 
-        <!-- Run Button -->
-        <button
-          class="tg-run-btn"
-          :disabled="running || !apiKey.trim() || !prompt.trim()"
-          @click="runServerless"
-        >
-          <span v-if="running" class="tg-spinner">⏳</span>
-          <span v-else>🚀</span>
-          {{ running ? statusText : '提交出图 (Serverless)' }}
-        </button>
+          <div class="tg-section">
+            <label class="tg-label">⑤ 参考图片 URL <span class="tg-opt">（编辑/视频模型必填，其余可选）</span></label>
+            <input v-model="refImage" class="tg-input" placeholder="https://..." :disabled="running" />
+            <div v-if="refImage" class="tg-ref-preview"><img :src="refImage" @error="refImage=''" alt="参考图" /></div>
+          </div>
+
+          <details class="tg-details">
+            <summary class="tg-summary">⚙️ 高级 · 直接编辑 JSON input</summary>
+            <textarea v-model="rawJson" class="tg-input tg-textarea mono" rows="8" spellcheck="false"
+              placeholder='{"prompt":"...","num_inference_steps":28,"guidance":2,"seed":-1,"size":"1024*1024","output_format":"png","enable_safety_checker":true}'></textarea>
+            <p class="tg-hint">留空则使用上方表单参数自动构建</p>
+          </details>
+
+          <button class="tg-run-btn" :disabled="running || !apiKey.trim() || !prompt.trim()" @click="runServerless">
+            <span v-if="running" class="tg-spinner">⏳</span><span v-else>🚀</span>
+            {{ running ? statusText : '提交出图 (内置模型)' }}
+          </button>
+
+        </template>
+
+        <!-- ── Sub-mode B: Serverless ComfyUI Endpoint ── -->
+        <template v-if="slMode === 'comfy'">
+
+          <div class="tg-section">
+            <label class="tg-label">③ Serverless Endpoint ID</label>
+            <p class="tg-info-box">
+              在 RunPod Console → <strong>Serverless</strong> 页签 → 找到你的 ComfyUI Worker → 复制 Endpoint ID<br/>
+              格式例：<code>abc1def2ghi3</code>（不是完整 URL，只是 ID 部分）<br/>
+              调用地址：<code>api.runpod.ai/v2/<strong>[你的ID]</strong>/runsync</code>
+            </p>
+            <input
+              v-model="slEndpointId"
+              class="tg-input mono"
+              placeholder="例: abc1def2ghi3jkl4"
+              spellcheck="false"
+              autocomplete="off"
+              :disabled="running"
+            />
+          </div>
+
+          <div class="tg-section">
+            <label class="tg-label">④ 工作流 JSON <span class="tg-opt">（从 ComfyUI → Save API Format 导出）</span></label>
+            <p class="tg-info-box" style="margin-bottom:8px">
+              在 ComfyUI 界面 → ⚙️ Settings → Enable Dev Mode → 顶栏"Save"旁边选 <strong>Save (API Format)</strong><br/>
+              将得到的 JSON 完整粘贴到下方（不需要包 <code>"workflow"</code> 外层，系统自动包装）
+            </p>
+            <textarea
+              v-model="slWorkflowJson"
+              class="tg-input tg-textarea mono"
+              rows="12"
+              spellcheck="false"
+              placeholder='{"6": {"class_type": "CLIPTextEncode", "inputs": {"text": "your prompt"}}, ...}'
+              :disabled="running"
+            ></textarea>
+          </div>
+
+          <div class="tg-section">
+            <label class="tg-label">⑤ 快速注入 Prompt（可选）</label>
+            <p class="tg-hint" style="margin:0 0 8px">填写后会覆盖 JSON 里指定节点的 text 字段；留空则直接使用 JSON 原文</p>
+            <div class="tg-row">
+              <input v-model="slPromptNode" class="tg-input mono" style="max-width:90px;flex-shrink:0" placeholder="节点 ID" :disabled="running" />
+              <input v-model="slPromptText" class="tg-input" placeholder="注入的提示词文字" :disabled="running" />
+            </div>
+          </div>
+
+          <div class="tg-section">
+            <label class="tg-label">⑥ 调用方式</label>
+            <div class="tg-model-grid" style="grid-template-columns:1fr 1fr">
+              <button class="tg-model-btn" :class="{ active: slSync }" @click="slSync = true">
+                <span class="tg-mbadge" style="background:#10a37f">同步</span>
+                <span class="tg-mname">runsync（推荐）</span>
+                <span class="tg-mendpoint">等待结果，直接返回图片</span>
+              </button>
+              <button class="tg-model-btn" :class="{ active: !slSync }" @click="slSync = false">
+                <span class="tg-mbadge" style="background:#f59e0b">异步</span>
+                <span class="tg-mname">run + 轮询</span>
+                <span class="tg-mendpoint">适合超长工作流（>3分钟）</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            class="tg-run-btn"
+            :disabled="running || !apiKey.trim() || !slEndpointId.trim() || !slWorkflowJson.trim()"
+            @click="runServerlessComfy"
+          >
+            <span v-if="running" class="tg-spinner">⏳</span><span v-else>🚀</span>
+            {{ running ? statusText : `提交到 Serverless ComfyUI (${slSync ? 'runsync' : 'run'})` }}
+          </button>
+
+        </template>
 
       </template>
 
@@ -411,6 +480,7 @@ import {
   WORKFLOW_FLUX_TEXT2IMG,
   WORKFLOW_FLUX_KONTEXT,
 } from '@/api/comfyui.js'
+import { generateServerlessComfy } from '@/api/runpod.js'
 import { useComfyStore } from '@/store/index.js'
 import ImageCompare from '@/components/ImageCompare.vue'
 
@@ -441,6 +511,14 @@ const refImage        = ref('https://image.runpod.ai/asset/black-forest-labs/bla
 const rawJson         = ref('')
 const running         = ref(false)
 const statusText      = ref('')
+
+// Serverless sub-mode
+const slMode         = ref('comfy')       // 'prebuilt' | 'comfy'
+const slEndpointId   = ref('')            // user's own Serverless Endpoint ID
+const slWorkflowJson = ref('')            // workflow_api.json content
+const slPromptNode   = ref('6')           // node ID to inject prompt text
+const slPromptText   = ref('')            // prompt text to inject
+const slSync         = ref(true)          // true = runsync, false = run+poll
 
 // ════════════════════════════════════════════════════════════════
 //  B) ComfyUI Direct state
@@ -619,6 +697,53 @@ function parseServerlessOutput(output) {
   if (output.image)  { resultImages.value = [output.image]; return }
   if (typeof output === 'string') { resultImages.value = [output]; return }
   errorMsg.value = `无法解析输出，查看控制台。Keys: ${Object.keys(output||{}).join(', ')}`
+}
+
+// ── Serverless ComfyUI Workflow (方案 A) ────────────────────────
+async function runServerlessComfy() {
+  if (running.value) return
+  running.value = true; errorMsg.value = ''; resultImages.value = []; resultVideo.value = ''; rawResponse.value = null
+
+  try {
+    // Parse and optionally inject prompt
+    if (!slWorkflowJson.value.trim()) throw new Error('请粘贴 workflow_api.json 内容')
+    let workflowJson
+    try { workflowJson = JSON.parse(slWorkflowJson.value) } catch { throw new Error('workflow JSON 格式错误，请检查是否是合法 JSON') }
+
+    if (slPromptNode.value.trim() && slPromptText.value.trim()) {
+      if (!workflowJson[slPromptNode.value]) throw new Error(`节点 "${slPromptNode.value}" 不存在，请检查 JSON 中的节点 ID`)
+      workflowJson[slPromptNode.value].inputs = workflowJson[slPromptNode.value].inputs || {}
+      workflowJson[slPromptNode.value].inputs.text = slPromptText.value.trim()
+      addLog('info', `✓ 已注入 Prompt 到节点 ${slPromptNode.value}`)
+    }
+
+    addLog('info', `提交到 Serverless ComfyUI Endpoint: ${slEndpointId.value} (${slSync.value ? 'runsync' : 'run+轮询'})`)
+    statusText.value = slSync.value ? '同步等待结果...' : '提交中...'
+
+    const result = await generateServerlessComfy(
+      slEndpointId.value.trim(),
+      apiKey.value.trim(),
+      workflowJson,
+      {
+        sync: slSync.value,
+        onProgress: (status, msg) => {
+          statusText.value = msg
+          addLog(status === 'COMPLETED' ? 'success' : 'info', msg)
+        },
+      }
+    )
+
+    resultImages.value = result.images
+    rawResponse.value  = result.rawOutput
+    resultSeed.value   = -1
+    addLog('success', `✅ 完成！${result.images.length} 张图`)
+    console.log('[SL-ComfyUI] result:', result)
+
+  } catch (err) {
+    errorMsg.value = err.message
+    addLog('error', `❌ ${err.message}`)
+    console.error('[SL-ComfyUI]', err)
+  } finally { running.value = false; statusText.value = '' }
 }
 
 // ════════════════════════════════════════════════════════════════
