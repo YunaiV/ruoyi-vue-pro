@@ -21,7 +21,7 @@ export const templates = [
       border:  '#1A1A1A',
       text:    '#FFFFFF',
       subText: '#9CA3AF',
-      primary: '#00FF88',
+      primary: '#1abc9c',
     },
     style: {
       prompt:    'minimalist fashion, clean lines, premium quality, studio lighting',
@@ -187,7 +187,7 @@ export const templates = [
       border:  '#252525',
       text:    '#FFFFFF',
       subText: '#9CA3AF',
-      primary: '#00FF88',
+      primary: '#1abc9c',
     },
     style: {
       prompt:    'hero product shot, spotlight lighting, dramatic, single item focus',

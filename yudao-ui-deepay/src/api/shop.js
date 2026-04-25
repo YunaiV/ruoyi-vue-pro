@@ -168,6 +168,6 @@ function defaultTheme() {
     border:  '#1A1A1A',
     text:    '#FFFFFF',
     subText: '#9CA3AF',
-    primary: '#00FF88',
+    primary: '#1abc9c',
   }
 }

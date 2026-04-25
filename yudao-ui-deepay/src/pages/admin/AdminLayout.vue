@@ -198,23 +198,23 @@ const ICON_MAP = {
 </script>
 
 <style scoped>
-/* ── 基础层 ────────────────────────────────── */
+/* ── Base ─────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 .shell {
   display: flex;
   min-height: 100vh;
-  background: #0B0B0B;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* ── 侧边栏 ─────────────────────────────────── */
+/* ── Sidebar ─────────────────────────────────── */
 .sidebar {
   width: 230px;
   min-height: 100vh;
-  background: #101010;
-  border-right: 1px solid #1c1c1c;
+  background: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -224,13 +224,13 @@ const ICON_MAP = {
 }
 .sidebar.collapsed { width: 60px; }
 
-/* ── Logo 行 ─────────────────────────────────── */
+/* ── Logo row ─────────────────────────────────── */
 .logo-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 18px 14px 14px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
 }
 .logo {
   display: flex;
@@ -243,51 +243,50 @@ const ICON_MAP = {
 }
 .logo-icon {
   width: 30px; height: 30px;
-  background: linear-gradient(135deg, #00FF88, #00cc6a);
-  color: #000;
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+  color: #fff;
   border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
   font-weight: 900; font-size: 15px;
   flex-shrink: 0;
-  box-shadow: 0 0 12px #00FF8840;
+  box-shadow: 0 0 12px rgba(26,188,156,0.35);
 }
 .logo-text {
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
 }
 .collapse-btn {
   width: 26px; height: 26px;
   display: flex; align-items: center; justify-content: center;
-  background: #1a1a1a;
-  border: 1px solid #252525;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
   border-radius: 7px;
-  color: #555;
+  color: #666666;
   cursor: pointer;
   flex-shrink: 0;
   font-size: 12px;
-  transition: color 0.15s, background 0.15s;
+  transition: color 0.15s, border-color 0.15s;
 }
-.collapse-btn:hover { color: #fff; background: #222; }
+.collapse-btn:hover { color: #1abc9c; border-color: #1abc9c; }
 
-/* ── 菜单导航 ────────────────────────────────── */
+/* ── Nav ─────────────────────────────────────── */
 .nav {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 8px;
   scrollbar-width: thin;
-  scrollbar-color: #222 transparent;
+  scrollbar-color: #1abc9c #1a1a1a;
 }
 .nav::-webkit-scrollbar { width: 4px; }
-.nav::-webkit-scrollbar-track { background: transparent; }
-.nav::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+.nav::-webkit-scrollbar-track { background: #1a1a1a; }
+.nav::-webkit-scrollbar-thumb { background: #1abc9c; border-radius: 2px; }
 
 .nav-group { margin-bottom: 4px; }
 
-/* 分组标题 */
 .group-hdr {
   display: flex;
   align-items: center;
@@ -297,24 +296,25 @@ const ICON_MAP = {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #3a3a3a;
+  color: #555555;
   transition: color 0.15s;
 }
-.group-hdr:hover { color: #555; }
+.group-hdr:hover { color: #a0a0a0; }
 .group-label {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: #555555;
 }
 .group-arrow {
   font-size: 14px;
   transition: transform 0.2s;
   line-height: 1;
+  color: #555555;
 }
 .group-arrow.open { transform: rotate(90deg); }
 
-/* 菜单项 */
 .group-items { display: flex; flex-direction: column; gap: 1px; }
 .group-items.hidden { display: none; }
 
@@ -326,20 +326,23 @@ const ICON_MAP = {
   padding: 9px 10px;
   border-radius: 9px;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  color: #666;
+  color: #a0a0a0;
   font-size: 13px;
   text-align: left;
   position: relative;
-  transition: background 0.12s, color 0.12s;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
   white-space: nowrap;
   overflow: hidden;
 }
-.nav-item:hover { background: #181818; color: #ccc; }
+.nav-item:hover { background: #2a2a2a; border-color: #1abc9c; color: #e0e0e0; }
 .nav-item.active {
-  background: #0f2a1a;
-  color: #00FF88;
+  background: rgba(26,188,156,0.08);
+  border-color: #1abc9c;
+  color: #1abc9c;
+  border-left: 3px solid #1abc9c;
+  padding-left: 7px;
 }
 
 .item-emoji { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
@@ -348,36 +351,34 @@ const ICON_MAP = {
 .active-dot {
   width: 5px; height: 5px;
   border-radius: 50%;
-  background: #00FF88;
+  background: #1abc9c;
   flex-shrink: 0;
-  box-shadow: 0 0 6px #00FF88;
+  box-shadow: 0 0 6px #1abc9c;
 }
 
-/* 收起模式：居中显示 emoji */
 .nav-collapsed .nav-item { justify-content: center; padding: 10px 0; }
 .nav-collapsed .group-items { gap: 2px; }
 .sidebar.collapsed .jeepay-btn,
 .sidebar.collapsed .back-btn  { justify-content: center; padding: 10px 0; border-color: transparent; }
 
-/* ── 底部按钮区 ──────────────────────────────── */
+/* ── Bottom buttons ──────────────────────────── */
 .bottom-btns {
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  border-top: 1px solid #1a1a1a;
+  border-top: 1px solid #2a2a2a;
 }
 
-/* JeePay 按钮 */
 .jeepay-btn {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 9px 10px;
   border-radius: 9px;
-  border: 1px solid #2a1f4a;
-  background: #130e2a;
-  color: #a78bfa;
+  border: 1px solid #1abc9c;
+  background: #2a2a2a;
+  color: #1abc9c;
   font-size: 13px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
@@ -387,9 +388,9 @@ const ICON_MAP = {
   text-align: left;
 }
 .jeepay-btn:hover {
-  color: #c4b5fd;
-  border-color: #5b21b6;
-  background: #1e1040;
+  color: #22d3b4;
+  border-color: #22d3b4;
+  background: rgba(26,188,156,0.12);
 }
 .ext-icon {
   margin-left: auto;
@@ -397,16 +398,15 @@ const ICON_MAP = {
   opacity: 0.6;
 }
 
-/* ── 底部"返回用户端" ─────────────────────────── */
 .back-btn {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 9px 10px;
   border-radius: 9px;
-  border: 1px solid #1c1c1c;
+  border: 1px solid #2a2a2a;
   background: transparent;
-  color: #333;
+  color: #666666;
   font-size: 13px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -415,9 +415,9 @@ const ICON_MAP = {
   width: 100%;
   text-align: left;
 }
-.back-btn:hover { color: #888; border-color: #333; }
+.back-btn:hover { color: #a0a0a0; border-color: #1abc9c; }
 
-/* ── 主区域 ──────────────────────────────────── */
+/* ── Main area ───────────────────────────────── */
 .main-wrap {
   flex: 1;
   display: flex;
@@ -429,32 +429,33 @@ const ICON_MAP = {
   flex: 1;
   padding: 32px;
   overflow-y: auto;
+  background: #0a0a0a;
 }
 
-/* ── 移动端 ───────────────────────────────────── */
+/* ── Mobile ──────────────────────────────────── */
 .mob-header {
   display: none;
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: #101010;
-  border-bottom: 1px solid #1c1c1c;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
   position: sticky;
   top: 0;
   z-index: 20;
 }
-.mob-title { font-size: 14px; font-weight: 700; }
+.mob-title { font-size: 14px; font-weight: 700; color: #e0e0e0; }
 .hamburger {
   display: flex; flex-direction: column; gap: 4px;
   background: none; border: none; cursor: pointer; padding: 4px;
 }
 .hamburger span {
   display: block; width: 20px; height: 2px;
-  background: #fff; border-radius: 1px;
+  background: #e0e0e0; border-radius: 1px;
 }
 .mob-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.75);
   z-index: 25;
   backdrop-filter: blur(2px);
 }

@@ -20,14 +20,14 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
-          username: sdsdsdas
-          password: sdsdsdas
+          url: jdbc:mysql://127.0.0.1:3306/deepay?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: deepay
+          password: deepay393163
         slave:
           lazy: true   # 懒加载，避免从库未配置时启动报错
-          url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
-          username: sdsdsdas
-          password: sdsdsdas
+          url: jdbc:mysql://127.0.0.1:3306/deepay?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: deepay
+          password: deepay393163
 
   # ⚠️ Spring Boot 2.7.x：Redis 前缀是 spring.redis（非 spring.data.redis）
   redis:

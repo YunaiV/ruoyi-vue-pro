@@ -164,7 +164,7 @@ onMounted(() => {
       <!-- ── 总收益英雄卡 ──────────────────────────────────────────── -->
       <section class="mb-4">
         <div class="card p-5 rounded-2xl"
-             style="background:linear-gradient(135deg,#0f2d1a,#111)">
+             style="background:linear-gradient(135deg,#1a2e28,#1a1a1a)">
 
           <div class="flex items-start justify-between mb-4">
             <div>
@@ -172,12 +172,12 @@ onMounted(() => {
               <!-- loading skeleton -->
               <div v-if="dash === null"
                    class="h-10 w-32 bg-surface2 rounded animate-pulse" />
-              <p v-else class="text-4xl font-black" style="color:#00FF88">
+              <p v-else class="text-4xl font-black" style="color:#1abc9c">
                 €{{ fmt(dash.totalEarn) }}
               </p>
             </div>
             <span class="text-xs px-2 py-1 rounded-full font-semibold mt-1"
-                  style="background:#00FF8822;color:#00FF88">
+                  style="background:rgba(26,188,156,0.15);color:#1abc9c">
               10% 佣金
             </span>
           </div>
@@ -204,7 +204,7 @@ onMounted(() => {
               <p class="text-[10px] text-muted mb-1">分红</p>
               <div v-if="dash === null"
                    class="h-5 w-12 bg-surface2 rounded animate-pulse mx-auto" />
-              <p v-else class="text-sm font-bold" style="color:#00FF88">
+              <p v-else class="text-sm font-bold" style="color:#1abc9c">
                 €{{ fmt(dash.dividendEarn) }}
               </p>
             </div>
@@ -226,12 +226,12 @@ onMounted(() => {
             <div v-if="dash === null"
                  class="h-7 w-16 bg-surface2 rounded animate-pulse mb-1" />
             <template v-else>
-              <p class="text-xl font-black" style="color:#00FF88">
+              <p class="text-xl font-black" style="color:#1abc9c">
                 €{{ fmt(dash.inviteEarn) }}
               </p>
               <p class="text-xs text-muted mt-1">已邀请 {{ dash.inviteCount }} 人</p>
             </template>
-            <p class="text-[10px] mt-2" style="color:#00FF8888">每人 €2 →</p>
+            <p class="text-[10px] mt-2" style="color:rgba(26,188,156,0.5)">每人 €2 →</p>
           </button>
 
           <!-- 份额 -->
@@ -278,7 +278,7 @@ onMounted(() => {
             <div class="flex-1 text-left">
               <p class="text-sm font-semibold">邀请好友</p>
             </div>
-            <span class="text-xs font-bold" style="color:#00FF88">每人 +€2</span>
+            <span class="text-xs font-bold" style="color:#1abc9c">每人 +€2</span>
             <svg class="h-4 w-4 text-muted" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -337,7 +337,7 @@ onMounted(() => {
               class="w-full h-11 rounded-full font-bold text-sm
                      active:scale-95 transition-transform duration-100
                      disabled:opacity-50 disabled:cursor-not-allowed"
-              style="background:#00FF88;color:#000"
+              style="background:#1abc9c;color:#fff"
               @click="submitWithdraw"
             >
               {{ withdrawing ? '提交中…' : '申请提现' }}
@@ -361,7 +361,7 @@ onMounted(() => {
                 <p class="font-semibold text-xs">€{{ fmt(w.amount) }}</p>
                 <p class="text-[10px]"
                    :style="{
-                     color: w.status === 'success' ? '#00FF88'
+                     color: w.status === 'success' ? '#1abc9c'
                           : w.status === 'reject'  ? '#FF6B6B'
                           : '#F59E0B'
                    }">
@@ -429,7 +429,7 @@ onMounted(() => {
               <button
                 class="text-xs font-semibold px-3 py-1.5 rounded-full
                        active:scale-95 transition-transform duration-100"
-                style="background:#00FF8820;color:#00FF88;border:1px solid #00FF8840"
+                style="background:rgba(26,188,156,0.12);color:#1abc9c;border:1px solid rgba(26,188,156,0.25)"
                 @click="shareShop(shop.shopId, shop.name)"
               >分享赚钱</button>
               <button

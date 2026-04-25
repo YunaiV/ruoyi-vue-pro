@@ -63,7 +63,7 @@ const displayPlans = computed(() => {
               >
                 <!-- 推荐标签 -->
                 <span v-if="plan.tag"
-                      class="absolute -top-2.5 right-3 bg-accent text-black
+                      class="absolute -top-2.5 right-3 bg-accent text-white
                              text-[10px] font-bold px-2 py-0.5 rounded-full">
                   {{ plan.tag }}
                 </span>
@@ -85,7 +85,7 @@ const displayPlans = computed(() => {
 
             <!-- CTA -->
             <button
-              class="bg-accent text-black font-bold h-12 w-full rounded-full
+              class="bg-accent text-white font-bold h-12 w-full rounded-full
                      active:scale-95 transition-transform duration-100 text-sm"
               @click="$emit('buy', selected)"
             >

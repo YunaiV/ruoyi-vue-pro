@@ -79,7 +79,7 @@ function exportPDF() {
         </button>
         <button @click="exportPDF"
           class="text-xs px-3 py-1.5 rounded-full font-semibold active:scale-95 transition-all print:hidden"
-          style="background:#00FF88;color:#000">
+          style="background:#1abc9c;color:#fff">
           🖨 导出PDF
         </button>
       </div>
@@ -93,7 +93,7 @@ function exportPDF() {
 
       <!-- Loading -->
       <div v-if="loading" class="flex flex-col items-center py-8 gap-3">
-        <div class="w-8 h-8 rounded-full border-2 border-[#00FF88] border-t-transparent animate-spin"/>
+        <div class="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin"/>
         <p class="text-xs text-[#6B7280]">正在生成设计说明…</p>
       </div>
 
@@ -143,7 +143,7 @@ function exportPDF() {
           <ul class="space-y-1.5">
             <li v-for="d in (tech.details || [])" :key="d"
               class="flex items-start gap-2 text-sm">
-              <span class="text-[#00FF88] mt-0.5 flex-shrink-0">·</span>
+              <span class="text-accent mt-0.5 flex-shrink-0">·</span>
               <span class="print:text-black">{{ d }}</span>
             </li>
           </ul>
@@ -177,7 +177,7 @@ function exportPDF() {
       </button>
       <button @click="router.push('/')"
         class="flex-1 py-3 rounded-xl font-bold text-sm active:scale-95"
-        style="background:#00FF88;color:#000">
+        style="background:#1abc9c;color:#fff">
         🏠 首页
       </button>
     </div>

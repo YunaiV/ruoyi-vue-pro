@@ -147,7 +147,7 @@ const fmt = v => v !== undefined && v !== null ? Number(v).toFixed(2) : ''
         class="text-sm font-bold px-4 py-1.5 rounded-full
                active:scale-95 transition-transform duration-100
                disabled:opacity-50 disabled:cursor-not-allowed"
-        style="background:#00FF88;color:#000"
+        style="background:#1abc9c;color:#fff"
         @click="save"
       >
         {{ saving ? '保存中…' : saved ? '✔ 已保存' : '保存' }}
@@ -225,9 +225,9 @@ const fmt = v => v !== undefined && v !== null ? Number(v).toFixed(2) : ''
                     <span v-if="product.badge"
                           class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                           :style="{
-                            background: product.badge === 'NEW'  ? '#00FF8820' :
+                            background: product.badge === 'NEW'  ? 'rgba(26,188,156,0.12)' :
                                         product.badge === 'HOT'  ? '#FF6B6B20' : '#8B5CF620',
-                            color:      product.badge === 'NEW'  ? '#00FF88' :
+                            color:      product.badge === 'NEW'  ? '#1abc9c' :
                                         product.badge === 'HOT'  ? '#FF6B6B' : '#A78BFA',
                           }">
                       {{ product.badge }}
@@ -438,7 +438,7 @@ const fmt = v => v !== undefined && v !== null ? Number(v).toFixed(2) : ''
               <button
                 class="flex-1 h-10 rounded-full text-sm font-bold
                        active:scale-95 transition-transform duration-100"
-                style="background:#00FF88;color:#000"
+                style="background:#1abc9c;color:#fff"
                 @click="submitAdd"
               >
                 添加
@@ -485,7 +485,7 @@ const fmt = v => v !== undefined && v !== null ? Number(v).toFixed(2) : ''
           class="flex-1 h-12 rounded-full text-sm font-bold
                  flex items-center justify-center gap-2
                  active:scale-95 transition-transform duration-100"
-          style="background:#00FF88;color:#000"
+          style="background:#1abc9c;color:#fff"
           @click="shareShop"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"

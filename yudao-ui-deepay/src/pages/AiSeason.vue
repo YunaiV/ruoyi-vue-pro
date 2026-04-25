@@ -154,14 +154,14 @@ function levelFor(url) {
 
 function scoreBg(score) {
   if (!score) return '#1A1A1A'
-  if (score >= 85) return '#00FF8833'
+  if (score >= 85) return 'rgba(26,188,156,0.2)'
   if (score >= 70) return '#F59E0B33'
   return '#9CA3AF33'
 }
 
 function scoreTextColor(score) {
   if (!score) return '#9CA3AF'
-  if (score >= 85) return '#00FF88'
+  if (score >= 85) return '#1abc9c'
   if (score >= 70) return '#F59E0B'
   return '#9CA3AF'
 }
@@ -190,7 +190,7 @@ async function doSave(url) {
       </button>
       <div class="flex flex-col flex-1">
         <span class="font-semibold text-sm">🌿 整季系列生成</span>
-        <span class="text-[10px]" style="color:#00FF88">一键生成 A/B/C 三档系列</span>
+        <span class="text-[10px]" style="color:#1abc9c">一键生成 A/B/C 三档系列</span>
       </div>
     </header>
 
@@ -198,7 +198,7 @@ async function doSave(url) {
 
       <!-- ── Section 1: 品牌设置 ──────────────────────── -->
       <section>
-        <h2 class="font-bold text-sm mb-3" style="color:#A855F7">① 品牌设置</h2>
+        <h2 class="font-bold text-sm mb-3" style="color:#1abc9c">① 品牌设置</h2>
         <div class="rounded-2xl p-4 space-y-3" style="background:#111;border:1px solid #222">
           <div>
             <label class="text-xs text-muted mb-1 block">品牌名称</label>
@@ -218,7 +218,7 @@ async function doSave(url) {
                 :key="s.key"
                 class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                 :style="brandStyle === s.key
-                  ? 'background:#A855F7;color:#fff'
+                  ? 'background:#1abc9c;color:#fff'
                   : 'background:#1A1A1A;border:1px solid #333;color:#9CA3AF'"
                 @click="brandStyle = s.key"
               >{{ s.label }}</button>
@@ -229,7 +229,7 @@ async function doSave(url) {
 
       <!-- ── Section 2: 参考图槽位 ─────────────────────── -->
       <section>
-        <h2 class="font-bold text-sm mb-3" style="color:#A855F7">② 参考图（最多3张）</h2>
+        <h2 class="font-bold text-sm mb-3" style="color:#1abc9c">② 参考图（最多3张）</h2>
         <div class="grid grid-cols-3 gap-3">
           <div
             v-for="(slot, i) in REF_SLOTS"
@@ -244,7 +244,7 @@ async function doSave(url) {
             />
             <div v-else class="w-full h-full flex flex-col items-center justify-center gap-1 p-2">
               <span class="text-xl">{{ slot.icon }}</span>
-              <span class="text-[10px] text-center font-semibold" style="color:#A855F7">{{ slot.label }}</span>
+              <span class="text-[10px] text-center font-semibold" style="color:#1abc9c">{{ slot.label }}</span>
               <span class="text-[9px] text-center text-muted">{{ slot.hint }}</span>
             </div>
             <button
@@ -260,7 +260,7 @@ async function doSave(url) {
 
       <!-- ── Section 3: 细节控制 ───────────────────────── -->
       <section>
-        <h2 class="font-bold text-sm mb-3" style="color:#A855F7">③ 细节控制</h2>
+        <h2 class="font-bold text-sm mb-3" style="color:#1abc9c">③ 细节控制</h2>
         <div class="rounded-2xl p-4 space-y-3" style="background:#111;border:1px solid #222">
           <div v-for="ctrl in CONTROLS_DEF" :key="ctrl.key">
             <p class="text-xs text-muted mb-2">{{ ctrl.icon }} {{ ctrl.label }}</p>
@@ -270,7 +270,7 @@ async function doSave(url) {
                 :key="opt.value"
                 class="flex-1 h-9 rounded-xl text-xs font-semibold transition-all"
                 :style="controls[ctrl.key] === opt.value
-                  ? 'background:#00FF88;color:#000'
+                  ? 'background:#1abc9c;color:#fff'
                   : 'background:#1A1A1A;border:1px solid #333;color:#9CA3AF'"
                 @click="controls[ctrl.key] = opt.value"
               >{{ opt.label }}</button>
@@ -281,14 +281,14 @@ async function doSave(url) {
 
       <!-- ── Section 4: 数量 ───────────────────────────── -->
       <section>
-        <h2 class="font-bold text-sm mb-3" style="color:#A855F7">④ 生成数量</h2>
+        <h2 class="font-bold text-sm mb-3" style="color:#1abc9c">④ 生成数量</h2>
         <div class="flex gap-3">
           <button
             v-for="n in [6,9,12]"
             :key="n"
             class="flex-1 h-11 rounded-full text-sm font-bold transition-all"
             :style="count === n
-              ? 'background:#00FF88;color:#000'
+              ? 'background:#1abc9c;color:#fff'
               : 'background:#1A1A1A;border:1px solid #333;color:#9CA3AF'"
             @click="count = n"
           >{{ n }} 款</button>
@@ -298,7 +298,7 @@ async function doSave(url) {
       <!-- ── 生成按钮 ──────────────────────────────────── -->
       <button
         class="w-full h-14 rounded-full font-black text-base active:scale-95 transition-transform"
-        style="background:linear-gradient(135deg,#A855F7,#00FF88);color:#000"
+        style="background:linear-gradient(135deg,#1abc9c,#1abc9c);color:#fff"
         :disabled="loading"
         @click="generate"
       >
@@ -311,7 +311,7 @@ async function doSave(url) {
 
       <!-- ── 结果区 ─────────────────────────────────────── -->
       <section v-if="season">
-        <h2 class="font-bold text-sm mb-3" style="color:#00FF88">✨ 生成结果</h2>
+        <h2 class="font-bold text-sm mb-3" style="color:#1abc9c">✨ 生成结果</h2>
 
         <!-- 系列 tabs -->
         <div class="flex gap-2 mb-4">
@@ -320,7 +320,7 @@ async function doSave(url) {
             :key="k"
             class="flex-1 h-10 rounded-full text-sm font-bold transition-all"
             :style="selectedSeries === k
-              ? 'background:#A855F7;color:#fff'
+              ? 'background:#1abc9c;color:#fff'
               : 'background:#1A1A1A;border:1px solid #333;color:#9CA3AF'"
             @click="selectedSeries = k"
           >{{ SERIES_NAMES[k] }} {{ k }}</button>
@@ -332,7 +332,7 @@ async function doSave(url) {
             v-for="(url, idx) in currentSeries.slice(0,4)"
             :key="idx"
             class="rounded-2xl overflow-hidden relative cursor-pointer"
-            :style="selectedImage === url ? 'border:2px solid #00FF88' : 'border:2px solid #222'"
+            :style="selectedImage === url ? 'border:2px solid #1abc9c' : 'border:2px solid #222'"
             @click="selectedImage = selectedImage === url ? null : url"
           >
             <img :src="url" class="w-full aspect-[3/4] object-cover" loading="lazy"/>
@@ -350,7 +350,7 @@ async function doSave(url) {
             <button
               v-if="selectedImage === url"
               class="absolute bottom-2 left-2 right-2 h-9 rounded-full text-xs font-bold active:scale-95 transition-transform"
-              :style="savedUrls.has(url) ? 'background:#1A1A1A;border:1px solid #00FF88;color:#00FF88' : 'background:#00FF88;color:#000'"
+              :style="savedUrls.has(url) ? 'background:#1A1A1A;border:1px solid #1abc9c;color:#1abc9c' : 'background:#1abc9c;color:#fff'"
               :disabled="savingUrl === url"
               @click.stop="doSave(url)"
             >
@@ -363,7 +363,7 @@ async function doSave(url) {
         <button
           v-if="selectedImage"
           class="w-full h-12 rounded-full font-bold text-sm mt-4 active:scale-95 transition-transform"
-          style="background:#A855F7;color:#fff"
+          style="background:#1abc9c;color:#fff"
           @click="router.push(`/ai/design?refs=${encodeURIComponent(selectedImage)}`)"
         >🎯 用这张出款</button>
         <button

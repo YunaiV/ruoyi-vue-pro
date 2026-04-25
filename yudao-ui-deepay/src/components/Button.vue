@@ -23,7 +23,7 @@ defineProps({
       'transition-transform duration-100 active:scale-95',
       'disabled:opacity-40 disabled:cursor-not-allowed',
       variant === 'primary'
-        ? 'bg-accent text-black'
+        ? 'bg-accent text-white'
         : 'bg-surface2 text-white border border-border',
       size === 'lg' ? 'h-14 text-base'
         : size === 'sm' ? 'h-9 text-sm'
