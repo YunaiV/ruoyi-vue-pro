@@ -8,7 +8,7 @@ spring:
 spring:
   # 数据源配置项
   datasource:
-    name: sdsdsdas
+    name: deepay
     url: jdbc:h2:mem:testdb;MODE=MYSQL;DATABASE_TO_UPPER=false;NON_KEYWORDS=value; # MODE 使用 MySQL 模式；DATABASE_TO_UPPER 配置表和字段使用小写
     driver-class-name: org.h2.Driver
     username: sa

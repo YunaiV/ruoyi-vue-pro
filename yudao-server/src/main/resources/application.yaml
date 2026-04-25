@@ -299,7 +299,7 @@ yudao:
     url: ${yudao.web.admin-ui.url}
     email: xingyu4j@vip.qq.com
     license: MIT
-    license-url: https://gitee.com/zhijiantianya/sdsdsdas/blob/master/LICENSE
+    license-url: https://gitee.com/zhijiantianya/deepay/blob/master/LICENSE
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
