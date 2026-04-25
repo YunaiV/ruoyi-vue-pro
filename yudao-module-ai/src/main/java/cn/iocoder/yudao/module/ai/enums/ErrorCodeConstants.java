@@ -65,4 +65,10 @@ public interface ErrorCodeConstants {
     ErrorCode WORKFLOW_NOT_EXISTS = new ErrorCode(1_040_011_000, "工作流不存在");
     ErrorCode WORKFLOW_CODE_EXISTS = new ErrorCode(1_040_011_001, "工作流标识已存在");
 
+    // ========== AI 服装设计流水线 1-040-012-000 ==========
+    ErrorCode FASHION_TASK_NOT_EXISTS = new ErrorCode(1_040_012_000, "服装设计任务不存在");
+    ErrorCode FASHION_TASK_STEP_NOT_EXISTS = new ErrorCode(1_040_012_001, "服装设计任务步骤不存在");
+    ErrorCode FASHION_TASK_NOT_FAIL = new ErrorCode(1_040_012_002, "服装设计任务未处于失败状态，无法重试");
+    ErrorCode FASHION_TASK_STEP_INVOKE_FAIL = new ErrorCode(1_040_012_003, "步骤({})调用模型失败：{}");
+
 }

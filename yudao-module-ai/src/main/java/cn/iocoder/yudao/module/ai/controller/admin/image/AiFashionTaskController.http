@@ -1,0 +1,79 @@
+### ==============================================================
+### AI 服装设计流水线任务 - 示例 HTTP 请求
+### 文档：SDXL → Pose(ControlNet) → Fabric(img2img) → Upscale(extras)
+### ==============================================================
+
+# 配置变量（根据实际环境修改）
+@baseUrl    = http://localhost:48080
+@token      = Bearer your-access-token-here
+
+### ── 1. 最简单：仅 SDXL 生成（无姿势/面料/超分）──────────────────
+POST {{baseUrl}}/admin-api/ai/fashion/task/create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "prompt": "女装春夏极简风白色衬衫，宽松版型，电商白底棚拍，高清细节",
+  "negativePrompt": "低清晰度，模糊，变形，多余肢体，文字水印",
+  "width": 768,
+  "height": 1024,
+  "seed": -1,
+  "qualityPreset": "MEDIUM",
+  "upscale": false
+}
+
+### ── 2. SDXL + ControlNet 姿势控制 ─────────────────────────────
+POST {{baseUrl}}/admin-api/ai/fashion/task/create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "prompt": "女装春夏甜酷风短款夹克+高腰A字裙，模特站姿，白底电商棚拍，细节清晰",
+  "negativePrompt": "低清晰度，模糊，畸形手，文字水印，多余肢体",
+  "width": 768,
+  "height": 1024,
+  "seed": 20260425,
+  "qualityPreset": "HIGH",
+  "modelCheckpoint": "sdXL_v211.safetensors",
+  "poseImageUrl": "https://example.com/pose_reference.png",
+  "upscale": true,
+  "upscaleFactor": 2,
+  "upscalerName": "R-ESRGAN 4x+"
+}
+
+### ── 3. 完整流水线：SDXL + Pose + Fabric + Upscale ────────────
+POST {{baseUrl}}/admin-api/ai/fashion/task/create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "prompt": "女装秋冬新中式盘扣立领外套，牛仔面料，修身版型，模特正面站姿，专业服装摄影，白底",
+  "negativePrompt": "低清晰度，模糊，畸形手，多余肢体，文字水印，动漫风格",
+  "width": 768,
+  "height": 1024,
+  "seed": 88888,
+  "qualityPreset": "HIGH",
+  "modelCheckpoint": "sdXL_v211.safetensors",
+  "poseImageUrl": "https://example.com/pose_standing_front.png",
+  "fabricRefUrl": "https://example.com/fabric_denim_texture.png",
+  "fabricStrength": 0.70,
+  "upscale": true,
+  "upscaleFactor": 2,
+  "upscalerName": "R-ESRGAN 4x+"
+}
+
+### ── 4. 查询任务详情（含步骤列表）────────────────────────────────
+GET {{baseUrl}}/admin-api/ai/fashion/task/get?id=1
+Authorization: {{token}}
+
+### ── 5. 分页查询任务列表 ─────────────────────────────────────────
+GET {{baseUrl}}/admin-api/ai/fashion/task/page?pageNo=1&pageSize=10&status=20
+Authorization: {{token}}
+
+### ── 6. 分页：按提示词模糊搜索 ──────────────────────────────────
+GET {{baseUrl}}/admin-api/ai/fashion/task/page?pageNo=1&pageSize=10&prompt=牛仔
+Authorization: {{token}}
+
+### ── 7. 重试失败任务 ─────────────────────────────────────────────
+POST {{baseUrl}}/admin-api/ai/fashion/task/retry?id=1
+Authorization: {{token}}
