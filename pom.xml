@@ -27,7 +27,7 @@
 <!--        <module>yudao-module-iot</module>-->
 <!--        <module>yudao-module-mes</module>-->
 <!-- 请参考 https://admin.deepay.srl/ai/build/ 文档，完成 AI 模块的启动！！！ -->
-<!--        <module>yudao-module-ai</module>-->
+        <module>yudao-module-ai</module>
     </modules>
 
     <name>${project.artifactId}</name>
