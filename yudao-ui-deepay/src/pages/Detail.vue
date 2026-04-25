@@ -91,7 +91,7 @@ function share() {
 
       <!-- 生成类似款 -->
       <button
-        class="bg-accent text-black font-bold h-12 flex-1 rounded-2xl
+        class="bg-accent text-white font-bold h-12 flex-1 rounded-2xl
                active:scale-95 transition-transform duration-100 text-sm"
         @click="generateSimilar"
       >

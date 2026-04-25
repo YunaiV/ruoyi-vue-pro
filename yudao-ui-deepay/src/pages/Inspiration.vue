@@ -134,20 +134,20 @@ function confirmAiSelect() {
 
 // ── 颜色工具 ──────────────────────────────────────────────────────────
 function scoreColor(score) {
-  if (score >= 85) return '#00FF88'
+  if (score >= 85) return '#1abc9c'
   if (score >= 70) return '#F59E0B'
   return '#9CA3AF'
 }
 
 function layerColor(layer) {
-  if (layer === 'design')      return '#A855F7'
-  if (layer === 'commercial')  return '#00FF88'
+  if (layer === 'design')      return '#1abc9c'
+  if (layer === 'commercial')  return '#1abc9c'
   return '#F59E0B'
 }
 
 function sourceColor(source) {
-  if (source === 'fashion_week')   return '#A855F7'
-  if (source === 'brand_lookbook') return '#00FF88'
+  if (source === 'fashion_week')   return '#1abc9c'
+  if (source === 'brand_lookbook') return '#1abc9c'
   return '#F59E0B'
 }
 </script>
@@ -165,11 +165,11 @@ function sourceColor(source) {
         </button>
         <div class="flex flex-col flex-1">
           <span class="font-semibold text-sm">🎭 时装灵感库</span>
-          <span class="text-[10px]" style="color:#A855F7">秀场图 × 品牌图 → AI 融合改款</span>
+          <span class="text-[10px]" style="color:#1abc9c">秀场图 × 品牌图 → AI 融合改款</span>
         </div>
         <button
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold text-xs active:scale-95 transition-transform"
-          style="background:#A855F7;color:#fff"
+          style="background:#1abc9c;color:#fff"
           :disabled="aiSelectLoading"
           @click="doAiSelect"
         >
@@ -182,12 +182,12 @@ function sourceColor(source) {
       <div v-if="selectedIds.size > 0" class="flex gap-2 mb-2">
         <button
           class="flex-1 h-8 rounded-full text-xs font-bold active:scale-95 transition-transform"
-          style="background:#1A1A1A;border:1px solid #00FF88;color:#00FF88"
+          style="background:#1A1A1A;border:1px solid #1abc9c;color:#1abc9c"
           @click="goRedesign"
         >改款</button>
         <button
           class="flex-1 h-8 rounded-full text-xs font-bold active:scale-95 transition-transform"
-          style="background:#1A1A1A;border:1px solid #A855F7;color:#A855F7"
+          style="background:#1A1A1A;border:1px solid #1abc9c;color:#1abc9c"
           @click="goAiDesign"
         >出款</button>
         <button
@@ -222,8 +222,8 @@ function sourceColor(source) {
           v-for="cat in INSPIRATION_CATEGORIES"
           :key="cat.key"
           :class="['shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                   activeCategory === cat.key ? 'text-black' : 'border border-border text-muted']"
-          :style="activeCategory === cat.key ? 'background:#A855F7' : ''"
+                   activeCategory === cat.key ? 'text-white' : 'border border-border text-muted']"
+          :style="activeCategory === cat.key ? 'background:#1abc9c' : ''"
           @click="activeCategory = cat.key"
         >{{ cat.label }}</button>
       </div>
@@ -234,8 +234,8 @@ function sourceColor(source) {
           v-for="s in DESIGN_STYLES"
           :key="s.key"
           :class="['shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                   activeStyle === s.key ? 'text-black' : 'border border-border text-muted']"
-          :style="activeStyle === s.key ? 'background:#00FF88' : ''"
+                   activeStyle === s.key ? 'text-white' : 'border border-border text-muted']"
+          :style="activeStyle === s.key ? 'background:#1abc9c' : ''"
           @click="activeStyle = s.key"
         >{{ s.label }}</button>
       </div>
@@ -247,7 +247,7 @@ function sourceColor(source) {
           <span class="text-[10px] text-muted">只看可用 (≥{{ SCORE_THRESHOLD }}分)</span>
           <button
             class="relative w-9 h-5 rounded-full transition-colors duration-200"
-            :style="usableOnly ? 'background:#00FF88' : 'background:#333'"
+            :style="usableOnly ? 'background:#1abc9c' : 'background:#333'"
             @click="usableOnly = !usableOnly"
           >
             <span
@@ -264,7 +264,7 @@ function sourceColor(source) {
           v-for="item in filtered"
           :key="item.id"
           class="break-inside-avoid mb-3 rounded-2xl overflow-hidden relative cursor-pointer group"
-          :style="isSelected(item) ? 'border:2px solid #00FF88' : 'border:2px solid transparent'"
+          :style="isSelected(item) ? 'border:2px solid #1abc9c' : 'border:2px solid transparent'"
           @click="toggleSelect(item)"
         >
           <!-- 图片 -->
@@ -311,9 +311,9 @@ function sourceColor(source) {
           <!-- 选中勾 -->
           <div v-if="isSelected(item)"
                class="absolute inset-0 flex items-center justify-center"
-               style="background:#00FF8822">
+               style="background:rgba(26,188,156,0.13)">
             <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm"
-                  style="background:#00FF88;color:#000">✓</span>
+                  style="background:#1abc9c;color:#fff">✓</span>
           </div>
         </div>
       </div>
@@ -347,7 +347,7 @@ function sourceColor(source) {
           <div class="w-full h-1.5 rounded-full mb-5" style="background:#222">
             <div
               class="h-full rounded-full"
-              style="background:linear-gradient(90deg,#A855F7,#00FF88)"
+              style="background:linear-gradient(90deg,#1abc9c,#1abc9c)"
               :style="`width:${aiSelectResult?.confidence ? Math.round(aiSelectResult.confidence * 100) : 82}%`"
             />
           </div>
@@ -367,7 +367,7 @@ function sourceColor(source) {
               />
               <div v-else class="w-full aspect-[3/4] flex items-center justify-center text-2xl"
                    style="background:#1A1A1A">🖼</div>
-              <p class="text-center text-[10px] font-semibold py-1.5" style="color:#A855F7">
+              <p class="text-center text-[10px] font-semibold py-1.5" style="color:#1abc9c">
                 {{ role }}
               </p>
             </div>
@@ -377,7 +377,7 @@ function sourceColor(source) {
           <div class="flex gap-3">
             <button
               class="flex-1 h-11 rounded-full text-sm font-bold active:scale-95 transition-transform"
-              style="background:#00FF88;color:#000"
+              style="background:#1abc9c;color:#fff"
               @click="confirmAiSelect"
             >确认使用</button>
             <button
@@ -406,7 +406,7 @@ function sourceColor(source) {
            class="fixed bottom-0 left-0 right-0 z-30 bg-bg/95 backdrop-blur-md border-t border-border
                   px-4 pt-3 pb-[calc(.75rem+env(safe-area-inset-bottom))]">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-semibold" style="color:#00FF88">
+          <span class="text-xs font-semibold" style="color:#1abc9c">
             已选 {{ selectedIds.size }}/5 张
           </span>
           <button class="text-xs text-muted active:text-white" @click="selectedIds = new Set()">
@@ -416,12 +416,12 @@ function sourceColor(source) {
         <div class="grid grid-cols-3 gap-2">
           <button
             class="h-11 rounded-full text-xs font-bold active:scale-95 transition-transform"
-            style="background:#00FF88;color:#000"
+            style="background:#1abc9c;color:#fff"
             @click="goRedesign"
           >✏️ AI改款</button>
           <button
             class="h-11 rounded-full text-xs font-bold active:scale-95 transition-transform"
-            style="background:#A855F7;color:#fff"
+            style="background:#1abc9c;color:#fff"
             @click="goAiDesign"
           >🎯 AI出款</button>
           <button

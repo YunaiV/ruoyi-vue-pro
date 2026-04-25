@@ -155,7 +155,7 @@ onUnmounted(() => clearInterval(timer))
           <button
             class="w-full h-11 rounded-full font-bold text-sm
                    active:scale-95 transition-transform duration-100"
-            style="background:#00FF88;color:#000"
+            style="background:#1abc9c;color:#fff"
             @click="share"
           >
             {{ my.rank ? `我排第${my.rank}名 · 分享炫耀 🎉` : '分享我的排名' }}

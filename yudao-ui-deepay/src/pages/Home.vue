@@ -64,7 +64,7 @@ const myShops = computed(() => {
                    flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-accent flex items-center justify-center
-                     text-black font-black text-sm select-none">D</span>
+                     text-white font-black text-sm select-none">D</span>
         <span class="font-semibold text-sm tracking-wide">Deepay</span>
       </div>
       <span
@@ -99,7 +99,7 @@ const myShops = computed(() => {
           <!-- 发送图标 -->
           <button
             class="absolute right-3 top-1/2 -translate-y-1/2
-                   w-8 h-8 rounded-full bg-accent text-black
+                   w-8 h-8 rounded-full bg-accent text-white
                    flex items-center justify-center active:scale-90
                    transition-transform duration-100"
             @click="goGenerate"
@@ -188,7 +188,7 @@ const myShops = computed(() => {
           >
             <span class="text-2xl mb-2 block">🎭</span>
             <p class="font-semibold text-sm">灵感库</p>
-            <p class="text-xs mt-0.5" style="color:#A855F7">精选秀场 + 品牌图</p>
+            <p class="text-xs mt-0.5" style="color:#1abc9c">精选秀场 + 品牌图</p>
           </button>
 
           <button
@@ -254,7 +254,7 @@ const myShops = computed(() => {
           >
             <span class="text-2xl mb-2 block">🎭</span>
             <p class="font-semibold text-sm">灵感库</p>
-            <p class="text-muted text-xs mt-0.5" style="color:#A855F7">秀场 + 品牌图</p>
+            <p class="text-muted text-xs mt-0.5" style="color:#1abc9c">秀场 + 品牌图</p>
           </button>
 
           <button
@@ -272,7 +272,7 @@ const myShops = computed(() => {
           >
             <span class="text-2xl mb-2 block">🎁</span>
             <p class="font-semibold text-sm">邀请好友</p>
-            <p class="text-xs mt-0.5" style="color:#00FF88">每邀请一人得 €2</p>
+            <p class="text-xs mt-0.5" style="color:#1abc9c">每邀请一人得 €2</p>
           </button>
 
         </div>

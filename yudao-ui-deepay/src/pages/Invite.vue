@@ -94,7 +94,7 @@ onMounted(load)
              style="background:linear-gradient(135deg,#0f2d1a,#111)">
           <p class="text-4xl mb-3">🎁</p>
           <p class="text-xl font-black text-white mb-1">每邀请1位好友</p>
-          <p class="text-3xl font-black" style="color:#00FF88">得 €2 奖励</p>
+          <p class="text-3xl font-black" style="color:#1abc9c">得 €2 奖励</p>
           <p class="text-xs text-muted mt-3">
             好友首次下单即触发 · 奖励自动到账 · 无上限
           </p>
@@ -114,7 +114,7 @@ onMounted(load)
             <div class="text-center">
               <div v-if="loading"
                    class="h-9 w-20 bg-surface2 rounded animate-pulse mx-auto mb-1" />
-              <p v-else class="text-3xl font-black" style="color:#00FF88">
+              <p v-else class="text-3xl font-black" style="color:#1abc9c">
                 €{{ Number(bonusEarn).toFixed(2) }}
               </p>
               <p class="text-xs text-muted">邀请奖励</p>
@@ -131,7 +131,7 @@ onMounted(load)
           <button
             class="w-full h-11 rounded-full font-bold text-sm
                    active:scale-95 transition-transform duration-100"
-            style="background:#00FF88;color:#000"
+            style="background:#1abc9c;color:#fff"
             @click="share"
           >
             复制邀请链接 · 分享给好友
@@ -182,7 +182,7 @@ onMounted(load)
               </p>
               <p class="text-[10px] text-muted mt-0.5">首次下单已触发</p>
             </div>
-            <p class="text-sm font-bold" style="color:#00FF88">
+            <p class="text-sm font-bold" style="color:#1abc9c">
               +€{{ Number(item.amount).toFixed(2) }}
             </p>
           </div>

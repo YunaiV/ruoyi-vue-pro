@@ -52,6 +52,12 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!-- MongoDB（聊天记忆 / 工具审计 / 模型用量统计） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

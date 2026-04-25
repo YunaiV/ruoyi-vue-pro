@@ -1,106 +1,125 @@
 package cn.iocoder.yudao.module.deepay.controller;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayAiMemoryItemDO;
-import cn.iocoder.yudao.module.deepay.service.AiMemoryService;
+import cn.iocoder.yudao.module.deepay.dal.mongodb.AiChatMessageDocument;
+import cn.iocoder.yudao.module.deepay.dal.mongodb.AiChatSessionDocument;
+import cn.iocoder.yudao.module.deepay.dal.mongodb.AiMemoryItemDocument;
+import cn.iocoder.yudao.module.deepay.service.memory.AiMemoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Data;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
 /**
- * AI 长久记忆管理接口（用户可控 + 合规删除）。
+ * AI 记忆管理后台接口。
  *
- * <h3>接口列表</h3>
- * <ul>
- *   <li>GET    /deepay/memory/list   — 查询用户记忆列表</li>
- *   <li>POST   /deepay/memory/save   — 手动写入记忆</li>
- *   <li>DELETE /deepay/memory/clear  — 合规删除用户所有记忆</li>
- *   <li>GET    /deepay/memory/allowed-keys — 查询各板块允许记忆的字段白名单</li>
- * </ul>
+ * <p>提供：记忆开关、删除记忆、清空会话、合规删除全部聊天与记忆。</p>
  */
-@Tag(name = "Deepay - AI 长久记忆管理")
+@Tag(name = "Deepay - AI 记忆管理")
 @RestController
 @RequestMapping("/deepay/memory")
 @Validated
 public class AiMemoryController {
 
-    @Resource private AiMemoryService aiMemoryService;
+    @Resource
+    private AiMemoryService aiMemoryService;
 
-    @GetMapping("/list")
-    @Operation(summary = "查询用户记忆列表（按板块）")
-    public CommonResult<List<DeepayAiMemoryItemDO>> list(
-            @RequestParam               String customerId,
-            @RequestParam(required = false, defaultValue = "") String module,
-            @RequestParam(defaultValue = "0") Long tenantId) {
-        List<DeepayAiMemoryItemDO> items = module.isEmpty()
-                ? aiMemoryService.listAllMemory(tenantId, customerId)
-                : aiMemoryService.listMemory(tenantId, customerId, module);
-        return success(items);
+    // =========================================================================
+    // Session
+    // =========================================================================
+
+    @GetMapping("/sessions")
+    @Operation(summary = "查询某客户的会话列表")
+    public Page<AiChatSessionDocument> listSessions(
+            @RequestParam @NotNull Long tenantId,
+            @RequestParam @NotNull Long customerId,
+            @RequestParam(defaultValue = "0")  @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) int size) {
+        return aiMemoryService.listSessions(tenantId, customerId, page, size);
     }
 
-    @PostMapping("/save")
-    @Operation(summary = "手动写入/更新一条记忆")
-    public CommonResult<Boolean> save(@RequestBody SaveMemoryReqVO req) {
-        aiMemoryService.saveMemory(
-                req.getTenantId() != null ? req.getTenantId() : 0L,
-                req.getCustomerId(),
-                req.getModule(),
-                req.getMemoryType(),
-                req.getMemKey(),
-                req.getMemValue(),
-                req.getConfidence() != null ? req.getConfidence() : 0.9,
-                req.getSourceSessionId()
-        );
-        return success(true);
+    @DeleteMapping("/sessions/{sessionId}")
+    @Operation(summary = "删除会话及其消息")
+    public void deleteSession(
+            @PathVariable String sessionId,
+            @RequestParam @NotNull Long tenantId) {
+        aiMemoryService.deleteSession(sessionId, tenantId);
     }
 
-    @DeleteMapping("/clear")
-    @Operation(summary = "合规删除用户所有记忆（GDPR）")
-    public CommonResult<Boolean> clear(
-            @RequestParam               String customerId,
-            @RequestParam(defaultValue = "0") Long tenantId) {
-        aiMemoryService.deleteAllMemory(tenantId, customerId);
-        return success(true);
+    @PutMapping("/sessions/{sessionId}/memory-switch")
+    @Operation(summary = "切换会话记忆开关")
+    public void setMemoryEnabled(
+            @PathVariable String sessionId,
+            @RequestParam boolean enabled) {
+        aiMemoryService.setMemoryEnabled(sessionId, enabled);
     }
 
-    @GetMapping("/allowed-keys")
-    @Operation(summary = "查询各板块允许记忆的字段白名单")
-    public CommonResult<Map<String, java.util.Set<String>>> allowedKeys() {
-        return success(aiMemoryService.getAllowedKeys());
+    // =========================================================================
+    // Message
+    // =========================================================================
+
+    @GetMapping("/messages")
+    @Operation(summary = "查询会话消息列表")
+    public List<AiChatMessageDocument> listMessages(@RequestParam String sessionId) {
+        return aiMemoryService.listMessages(sessionId);
     }
 
-    public static class SaveMemoryReqVO {
-        private Long   tenantId;
-        private String customerId;
-        private String module;
-        private String memoryType;
-        private String memKey;
-        private String memValue;
-        private Double confidence;
-        private String sourceSessionId;
+    // =========================================================================
+    // Memory
+    // =========================================================================
 
-        public Long   getTenantId()        { return tenantId; }
-        public void   setTenantId(Long v)         { this.tenantId = v; }
-        public String getCustomerId()      { return customerId; }
-        public void   setCustomerId(String v)     { this.customerId = v; }
-        public String getModule()          { return module; }
-        public void   setModule(String v)         { this.module = v; }
-        public String getMemoryType()      { return memoryType; }
-        public void   setMemoryType(String v)     { this.memoryType = v; }
-        public String getMemKey()          { return memKey; }
-        public void   setMemKey(String v)         { this.memKey = v; }
-        public String getMemValue()        { return memValue; }
-        public void   setMemValue(String v)       { this.memValue = v; }
-        public Double getConfidence()      { return confidence; }
-        public void   setConfidence(Double v)     { this.confidence = v; }
-        public String getSourceSessionId() { return sourceSessionId; }
-        public void   setSourceSessionId(String v){ this.sourceSessionId = v; }
+    @GetMapping("/items")
+    @Operation(summary = "查询某客户的所有记忆")
+    public List<AiMemoryItemDocument> listMemory(
+            @RequestParam @NotNull Long tenantId,
+            @RequestParam @NotNull Long customerId) {
+        return aiMemoryService.listMemory(tenantId, customerId);
     }
+
+    @DeleteMapping("/items")
+    @Operation(summary = "删除某客户某板块的记忆")
+    public void deleteMemoryByModule(
+            @RequestParam @NotNull Long tenantId,
+            @RequestParam @NotNull Long customerId,
+            @RequestParam @NotNull String module) {
+        aiMemoryService.deleteMemoryByModule(tenantId, customerId, module);
+    }
+
+    @PostMapping("/items/upsert")
+    @Operation(summary = "（测试/运营）更新某客户某板块的记忆")
+    public void upsertMemory(@RequestBody @Validated UpsertMemoryReq req) {
+        aiMemoryService.upsertMemory(req.getTenantId(), req.getCustomerId(), req.getModule(), req.getFacts());
+    }
+
+    // =========================================================================
+    // 合规删除
+    // =========================================================================
+
+    @DeleteMapping("/compliance/delete-all")
+    @Operation(summary = "合规删除：按 customerId 全量删除所有聊天与记忆")
+    public void deleteAll(
+            @RequestParam @NotNull Long tenantId,
+            @RequestParam @NotNull Long customerId) {
+        aiMemoryService.deleteAll(tenantId, customerId);
+    }
+
+    // =========================================================================
+    // DTO
+    // =========================================================================
+
+    @Data
+    public static class UpsertMemoryReq {
+        @NotNull private Long tenantId;
+        @NotNull private Long customerId;
+        @NotNull private String module;
+        private Map<String, Object> facts;
+    }
+
 }

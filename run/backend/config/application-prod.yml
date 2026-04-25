@@ -20,14 +20,14 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
-          username: sdsdsdas
-          password: sdsdsdas
+          url: jdbc:mysql://127.0.0.1:3306/deepay?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: deepay
+          password: deepay393163
         slave:
           lazy: true   # 懒加载，避免从库未配置时启动报错
-          url: jdbc:mysql://127.0.0.1:3306/sdsdsdas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
-          username: sdsdsdas
-          password: sdsdsdas
+          url: jdbc:mysql://127.0.0.1:3306/deepay?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: deepay
+          password: deepay393163
 
   # ⚠️ Spring Boot 2.7.x：Redis 前缀是 spring.redis（非 spring.data.redis）
   redis:
@@ -37,7 +37,28 @@ spring:
     timeout: 5000ms
     # password:   # 若宝塔 Redis 设了密码，取消注释并填入
 
+  # MongoDB（聊天记忆 / 工具审计 / 模型用量）
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/deepay
+      # 若有鉴权：mongodb://user:password@127.0.0.1:27017/deepay?authSource=admin
+      auto-index-creation: true   # 自动创建 @Indexed 定义的索引（含 TTL）
+
 yudao:
   web:
     admin-ui:
       url: https://admin.deepay.srl  # CORS 允许来源，与前端域名保持一致
+
+# ——————————————————————————————————————————————
+# Deepay AI 配置（按需填入真实 key）
+# ——————————————————————————————————————————————
+deepay:
+  gateway:
+    primary-model:   deepseek-chat
+    primary-api-url: https://api.deepseek.com/v1/chat/completions
+    primary-api-key: ""       # 填入真实 API Key
+    fallback-model:   moonshot-v1-8k
+    fallback-api-url: https://api.moonshot.cn/v1/chat/completions
+    fallback-api-key: ""      # 填入真实 API Key
+    timeout-seconds: 30
+    max-retries:     2

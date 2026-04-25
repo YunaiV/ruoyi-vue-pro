@@ -103,7 +103,7 @@ onMounted(loadDashboard)
               <p class="text-[10px] text-muted mb-1 uppercase tracking-widest">分红收益</p>
               <div v-if="dash === null"
                    class="h-9 w-20 bg-surface2 rounded animate-pulse mx-auto" />
-              <p v-else class="text-3xl font-black" style="color:#00FF88">
+              <p v-else class="text-3xl font-black" style="color:#1abc9c">
                 €{{ fmt(dash.dividendEarn) }}
               </p>
               <p class="text-xs text-muted mt-0.5">累计到账</p>
@@ -158,11 +158,11 @@ onMounted(loadDashboard)
               ? 'border-accent bg-accent/5'
               : 'border-border'"
             :style="selectedPlan === plan.id
-              ? 'box-shadow: 0 0 0 1px #00FF88' : ''"
+              ? 'box-shadow: 0 0 0 1px #1abc9c' : ''"
             @click="selectedPlan = plan.id"
           >
             <span v-if="plan.tag"
-                  class="absolute -top-2.5 right-3 bg-accent text-black
+                  class="absolute -top-2.5 right-3 bg-accent text-white
                          text-[10px] font-bold px-2 py-0.5 rounded-full">
               {{ plan.tag }}
             </span>
@@ -185,7 +185,7 @@ onMounted(loadDashboard)
                  active:scale-95 transition-transform duration-100
                  disabled:opacity-50 disabled:cursor-not-allowed
                  flex items-center justify-center gap-2"
-          style="background:#00FF88;color:#000"
+          style="background:#1abc9c;color:#fff"
           @click="buyShares"
         >
           <svg v-if="buying" class="animate-spin h-4 w-4 shrink-0"

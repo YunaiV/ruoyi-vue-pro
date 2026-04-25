@@ -89,13 +89,13 @@ async function buy() {
                     : 'border-[#1A1A1A] bg-[#1A1A1A]',
                 ]"
                 :style="selectedPlan === plan.id
-                  ? 'box-shadow: 0 0 0 1px #00FF88' : ''"
+                  ? 'box-shadow: 0 0 0 1px #1abc9c' : ''"
                 @click="selectedPlan = plan.id"
               >
                 <!-- 标签 -->
                 <span v-if="plan.tag"
                       class="absolute -top-2.5 right-3
-                             bg-accent text-black text-[10px] font-bold
+                             bg-accent text-white text-[10px] font-bold
                              px-2 py-0.5 rounded-full">
                   {{ plan.tag }}
                 </span>

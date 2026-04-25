@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.deepay.service;
 
-import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayAiMemoryItemDO;
-import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayAiMemoryItemMapper;
+import cn.iocoder.yudao.module.deepay.dal.mongodb.*;
+import cn.iocoder.yudao.module.deepay.service.memory.AiMemoryService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -9,175 +10,135 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link AiMemoryService} 单元测试。
+ * AiMemoryService 单元测试。
  */
 @ExtendWith(MockitoExtension.class)
 class AiMemoryServiceTest {
 
-    @Mock  private DeepayAiMemoryItemMapper memoryItemMapper;
-    @InjectMocks private AiMemoryService aiMemoryService;
+    @Mock private AiChatSessionRepository sessionRepo;
+    @Mock private AiChatMessageRepository messageRepo;
+    @Mock private AiMemoryItemRepository  memoryRepo;
 
-    // ====================================================================
-    // buildMemoryPack
-    // ====================================================================
+    @InjectMocks
+    private AiMemoryService aiMemoryService;
+
+    // =========================================================================
+    // getOrCreateSession
+    // =========================================================================
 
     @Test
-    void testBuildMemoryPack_hasMemory_shouldReturnFormattedPack() {
-        // Given
-        DeepayAiMemoryItemDO item1 = new DeepayAiMemoryItemDO();
-        item1.setMemKey("preferredStyle");
-        item1.setMemValue("极简");
+    void getOrCreateSession_newSession_createsAndReturnsId() {
+        AiChatSessionDocument saved = AiChatSessionDocument.builder()
+                .id("session-123")
+                .tenantId(1L)
+                .customerId(100L)
+                .module("design")
+                .createdAt(Instant.now())
+                .lastActiveAt(Instant.now())
+                .build();
+        when(sessionRepo.save(any())).thenReturn(saved);
 
-        DeepayAiMemoryItemDO item2 = new DeepayAiMemoryItemDO();
-        item2.setMemKey("budgetRange");
-        item2.setMemValue("300-600元");
+        String id = aiMemoryService.getOrCreateSession(null, 1L, 100L, "design");
 
-        when(memoryItemMapper.selectByCustomerAndModule(0L, "cust001", "design"))
-                .thenReturn(Arrays.asList(item1, item2));
-
-        // When
-        String pack = aiMemoryService.buildMemoryPack(0L, "cust001", "design");
-
-        // Then
-        assertNotNull(pack);
-        assertTrue(pack.contains("preferredStyle: 极简"));
-        assertTrue(pack.contains("budgetRange: 300-600元"));
-        assertTrue(pack.contains("用户记忆"));
+        assertThat(id).isEqualTo("session-123");
+        verify(sessionRepo, times(1)).save(any());
     }
 
     @Test
-    void testBuildMemoryPack_noMemory_shouldReturnEmpty() {
-        when(memoryItemMapper.selectByCustomerAndModule(anyLong(), anyString(), anyString()))
-                .thenReturn(Collections.emptyList());
+    void getOrCreateSession_existingSession_updatesLastActive() {
+        AiChatSessionDocument existing = AiChatSessionDocument.builder()
+                .id("existing-456")
+                .tenantId(1L)
+                .build();
+        when(sessionRepo.findById("existing-456")).thenReturn(Optional.of(existing));
+        when(sessionRepo.save(any())).thenReturn(existing);
 
-        String pack = aiMemoryService.buildMemoryPack(0L, "cust001", "design");
+        String id = aiMemoryService.getOrCreateSession("existing-456", 1L, 100L, "design");
 
-        assertEquals("", pack);
+        assertThat(id).isEqualTo("existing-456");
+        verify(sessionRepo, times(1)).save(any());
+    }
+
+    // =========================================================================
+    // saveUserMessage
+    // =========================================================================
+
+    @Test
+    void saveUserMessage_savesCorrectRole() {
+        aiMemoryService.saveUserMessage("s1", 1L, 100L, "design", "我想做外套");
+
+        ArgumentCaptor<AiChatMessageDocument> captor = ArgumentCaptor.forClass(AiChatMessageDocument.class);
+        verify(messageRepo).save(captor.capture());
+        AiChatMessageDocument msg = captor.getValue();
+        assertThat(msg.getRole()).isEqualTo("user");
+        assertThat(msg.getContent()).isEqualTo("我想做外套");
+        assertThat(msg.getSessionId()).isEqualTo("s1");
+    }
+
+    // =========================================================================
+    // upsertMemory - 只允许字段过滤
+    // =========================================================================
+
+    @Test
+    void upsertMemory_design_filtersAllowedFields() {
+        when(memoryRepo.findByTenantIdAndCustomerIdAndModule(1L, 100L, "design"))
+                .thenReturn(Optional.empty());
+
+        Map<String, Object> rawFacts = new LinkedHashMap<>();
+        rawFacts.put("stylePreference", "工装");
+        rawFacts.put("sizePreference",  "L");
+        rawFacts.put("illegalField",    "should-be-filtered");
+
+        aiMemoryService.upsertMemory(1L, 100L, "design", rawFacts);
+
+        ArgumentCaptor<AiMemoryItemDocument> captor = ArgumentCaptor.forClass(AiMemoryItemDocument.class);
+        verify(memoryRepo).save(captor.capture());
+        AiMemoryItemDocument item = captor.getValue();
+        assertThat(item.getFacts()).containsKey("stylePreference");
+        assertThat(item.getFacts()).containsKey("sizePreference");
+        assertThat(item.getFacts()).doesNotContainKey("illegalField");
     }
 
     @Test
-    void testBuildMemoryPack_nullCustomerId_shouldReturnEmpty() {
-        String pack = aiMemoryService.buildMemoryPack(0L, null, "design");
-        assertEquals("", pack);
-        verify(memoryItemMapper, never()).selectByCustomerAndModule(any(), any(), any());
-    }
-
-    // ====================================================================
-    // saveMemory — 白名单过滤
-    // ====================================================================
-
-    @Test
-    void testSaveMemory_allowedKey_shouldCallMapper() {
-        // Given: design module, preferredStyle 在白名单内
-        // When
-        aiMemoryService.saveMemory(0L, "cust001", "design", "profile",
-                "preferredStyle", "极简", 0.9, "sess123");
-
-        // Then: 应调用 mapper upsert
-        ArgumentCaptor<DeepayAiMemoryItemDO> captor =
-                ArgumentCaptor.forClass(DeepayAiMemoryItemDO.class);
-        verify(memoryItemMapper).upsertMemory(captor.capture());
-        DeepayAiMemoryItemDO saved = captor.getValue();
-        assertEquals("preferredStyle", saved.getMemKey());
-        assertEquals("极简", saved.getMemValue());
-        assertEquals("design", saved.getModule());
-        assertEquals("cust001", saved.getCustomerId());
-        assertEquals(0, saved.getDeleted());
-        assertNotNull(saved.getExpiresAt(), "应设置过期时间");
+    void upsertMemory_unknownModule_skips() {
+        aiMemoryService.upsertMemory(1L, 100L, "unknown_module", Map.of("key", "val"));
+        verify(memoryRepo, never()).save(any());
     }
 
     @Test
-    void testSaveMemory_blockedKey_shouldNotCallMapper() {
-        // Given: design module, "sensitiveKey" 不在白名单内
-        aiMemoryService.saveMemory(0L, "cust001", "design", "profile",
-                "sensitivePrivateKey", "secret", 0.9, "sess123");
-
-        // Then: 不应写入
-        verify(memoryItemMapper, never()).upsertMemory(any());
+    void upsertMemory_emptyParams_skips() {
+        aiMemoryService.upsertMemory(null, 100L, "design", Map.of("k", "v"));
+        verify(memoryRepo, never()).save(any());
     }
 
-    @Test
-    void testSaveMemory_nullCustomerId_shouldNotCallMapper() {
-        aiMemoryService.saveMemory(0L, null, "design", "fact",
-                "preferredStyle", "极简", 0.9, "sess123");
+    // =========================================================================
+    // deleteAll
+    // =========================================================================
 
-        verify(memoryItemMapper, never()).upsertMemory(any());
+    @Test
+    void deleteAll_deletesAllThreeCollections() {
+        aiMemoryService.deleteAll(1L, 100L);
+        verify(messageRepo).deleteByTenantIdAndCustomerId(1L, 100L);
+        verify(sessionRepo).deleteByTenantIdAndCustomerId(1L, 100L);
+        verify(memoryRepo).deleteByTenantIdAndCustomerId(1L, 100L);
     }
 
-    @Test
-    void testSaveMemory_ttl365Days_shouldBeSet() {
-        aiMemoryService.saveMemory(0L, "cust001", "design", "profile",
-                "preferredStyle", "极简", 0.9, "sess123");
-
-        ArgumentCaptor<DeepayAiMemoryItemDO> captor =
-                ArgumentCaptor.forClass(DeepayAiMemoryItemDO.class);
-        verify(memoryItemMapper).upsertMemory(captor.capture());
-
-        // 过期时间应大约在 365 天后
-        DeepayAiMemoryItemDO saved = captor.getValue();
-        long daysUntilExpiry = java.time.Duration.between(
-                java.time.LocalDateTime.now(), saved.getExpiresAt()).toDays();
-        assertTrue(daysUntilExpiry >= 364 && daysUntilExpiry <= 366,
-                "过期时间应为 365 天");
-    }
-
-    // ====================================================================
-    // deleteAllMemory
-    // ====================================================================
+    // =========================================================================
+    // deleteMemoryByModule
+    // =========================================================================
 
     @Test
-    void testDeleteAllMemory_shouldCallSoftDelete() {
-        aiMemoryService.deleteAllMemory(0L, "cust001");
-        verify(memoryItemMapper).softDeleteAllByCustomer(0L, "cust001");
-    }
-
-    @Test
-    void testDeleteAllMemory_nullCustomerId_shouldNotCallMapper() {
-        aiMemoryService.deleteAllMemory(0L, null);
-        verify(memoryItemMapper, never()).softDeleteAllByCustomer(any(), any());
-    }
-
-    // ====================================================================
-    // saveMemoriesFromJson
-    // ====================================================================
-
-    @Test
-    void testSaveMemoriesFromJson_validJson_shouldSaveAllowed() {
-        String json = "[{\"key\":\"preferredStyle\",\"value\":\"极简\",\"type\":\"profile\",\"confidence\":0.9}]";
-
-        aiMemoryService.saveMemoriesFromJson(0L, "cust001", "design", json, "sess123");
-
-        verify(memoryItemMapper, atLeastOnce()).upsertMemory(any());
-    }
-
-    @Test
-    void testSaveMemoriesFromJson_invalidJson_shouldNotThrow() {
-        assertDoesNotThrow(() ->
-                aiMemoryService.saveMemoriesFromJson(0L, "cust001", "design",
-                        "not-valid-json", "sess123"));
-    }
-
-    // ====================================================================
-    // getAllowedKeys
-    // ====================================================================
-
-    @Test
-    void testGetAllowedKeys_shouldReturnImmutableMap() {
-        var keys = aiMemoryService.getAllowedKeys();
-        assertNotNull(keys);
-        assertTrue(keys.containsKey("design"));
-        assertTrue(keys.get("design").contains("preferredStyle"));
-        assertTrue(keys.containsKey("sales"));
-        assertTrue(keys.containsKey("finance"));
+    void deleteMemoryByModule_callsRepoWithCorrectArgs() {
+        aiMemoryService.deleteMemoryByModule(1L, 100L, "sales");
+        verify(memoryRepo).deleteByTenantIdAndCustomerIdAndModule(1L, 100L, "sales");
     }
 
 }

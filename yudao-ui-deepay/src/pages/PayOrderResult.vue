@@ -87,7 +87,7 @@ function shareShop() {
         v-if="shopId"
         class="w-full h-12 rounded-full font-bold text-sm mb-3
                active:scale-95 transition-transform duration-100"
-        style="background:#00FF88;color:#000"
+        style="background:#1abc9c;color:#fff"
         @click="shareShop"
       >
         📤 分享店铺赚佣金
@@ -111,7 +111,7 @@ function shareShop() {
       <button
         class="w-full h-12 rounded-full font-bold text-sm mb-3
                active:scale-95 transition-transform duration-100"
-        style="background:#00FF88;color:#000"
+        style="background:#1abc9c;color:#fff"
         @click="goShop"
       >
         返回重试

@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.sdwebui.StableDiffusionWebUiImageOptions;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageOptions;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
@@ -175,6 +176,17 @@ public class AiImageServiceImpl implements AiImageService {
         } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform())) {
             return ZhiPuAiImageOptions.builder()
                     .model(model.getModel())
+                    .build();
+        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION_WEBUI.getPlatform())) {
+            // http://103.196.86.126:15112/sdapi/v1/txt2img （AUTOMATIC1111 SD WebUI）
+            return StableDiffusionWebUiImageOptions.builder()
+                    .width(draw.getWidth())
+                    .height(draw.getHeight())
+                    .negativePrompt(MapUtil.getStr(draw.getOptions(), "negativePrompt"))
+                    .steps(MapUtil.getInt(draw.getOptions(), "steps", 20))
+                    .cfgScale(draw.getOptions() != null && draw.getOptions().containsKey("scale")
+                            ? Float.valueOf(draw.getOptions().get("scale")) : 7.0F)
+                    .samplerName(MapUtil.getStr(draw.getOptions(), "sampler", "Euler a"))
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + model.getPlatform());

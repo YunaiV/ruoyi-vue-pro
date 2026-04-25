@@ -21,14 +21,14 @@ function share() {
 <template>
   <div
     class="min-h-screen pb-28"
-    :style="{ background: shop.theme?.bg || '#0B0B0B', color: shop.theme?.text || '#fff' }"
+    :style="{ background: shop.theme?.bg || '#080e0c', color: shop.theme?.text || '#fff' }"
   >
 
     <!-- 顶栏 -->
     <header class="flex items-center justify-between px-5 py-4">
       <div class="flex items-center gap-2">
         <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black"
-              :style="{ background: shop.theme?.primary || '#00FF88', color: shop.theme?.bg || '#0B0B0B' }">
+              :style="{ background: shop.theme?.primary || '#1abc9c', color: shop.theme?.bg || '#080e0c' }">
           AI
         </span>
         <span class="text-xs tracking-widest uppercase font-semibold">Deepay</span>
@@ -64,7 +64,7 @@ function share() {
 
       <!-- AI 角标 -->
       <div class="absolute top-3 right-3 px-2 py-1 rounded-full text-[10px] font-bold"
-           :style="{ background: shop.theme?.primary || '#00FF88', color: shop.theme?.bg || '#0B0B0B' }">
+           :style="{ background: shop.theme?.primary || '#1abc9c', color: shop.theme?.bg || '#080e0c' }">
         AI Generated
       </div>
     </div>
@@ -79,7 +79,7 @@ function share() {
         <h1 class="text-xl font-bold mt-1">{{ shop.name || 'AI设计款' }}</h1>
       </div>
       <p class="text-3xl font-black"
-         :style="{ color: shop.theme?.primary || '#00FF88' }">
+         :style="{ color: shop.theme?.primary || '#1abc9c' }">
         €{{ shop.products?.[0]?.price || '29.99' }}
       </p>
       <p class="text-sm leading-relaxed"
@@ -93,7 +93,7 @@ function share() {
       class="fixed bottom-0 left-0 right-0 z-20 backdrop-blur-md
              px-5 pt-3 pb-[calc(.75rem+env(safe-area-inset-bottom))]"
       :style="{
-        background: (shop.theme?.bg || '#0B0B0B') + 'F0',
+        background: (shop.theme?.bg || '#080e0c') + 'F0',
         borderTop: `1px solid ${shop.theme?.border || '#1A1A1A'}`
       }"
     >
@@ -112,7 +112,7 @@ function share() {
         <button
           class="flex-1 h-12 rounded-full font-black text-sm
                  active:scale-95 transition-transform duration-100"
-          :style="{ background: shop.theme?.primary || '#00FF88', color: shop.theme?.bg || '#0B0B0B' }"
+          :style="{ background: shop.theme?.primary || '#1abc9c', color: shop.theme?.bg || '#080e0c' }"
           @click="emit('buy')"
         >
           立即购买

@@ -83,11 +83,11 @@ async function save() {
         <div v-for="p in PRESET_PROFILES" :key="p.id"
           @click="select(p)"
           :class="['rounded-2xl p-4 border cursor-pointer transition-all',
-                   selected?.id === p.id ? 'border-[#00FF88] bg-[#00FF88]/5' : 'border-[#222] bg-[#111]']">
+                   selected?.id === p.id ? 'border-accent bg-accent/5' : 'border-[#222] bg-[#111]']">
           <div class="flex items-center justify-between mb-1">
             <span class="font-bold text-sm">{{ p.name }}</span>
-            <div v-if="selected?.id === p.id" class="w-5 h-5 rounded-full bg-[#00FF88] flex items-center justify-center">
-              <svg class="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <div v-if="selected?.id === p.id" class="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
+              <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
             </div>
@@ -104,14 +104,14 @@ async function save() {
         <p class="text-xs text-[#9CA3AF] mb-2">自定义品牌名称（可选）</p>
         <input v-model="customName" type="text"
           placeholder="输入品牌名称…"
-          class="w-full h-10 px-3 rounded-xl bg-[#1A1A1A] border border-[#333] text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#00FF88]"/>
+          class="w-full h-10 px-3 rounded-xl bg-[#1A1A1A] border border-[#333] text-sm text-white placeholder-[#444] focus:outline-none focus:border-accent"/>
       </div>
     </div>
 
     <div class="fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#222] px-4 py-3">
       <button @click="save" :disabled="!selected || saving"
         class="w-full py-3.5 rounded-2xl font-bold text-sm active:scale-95 transition-all"
-        :style="selected ? 'background:#00FF88;color:#000' : 'background:#1A1A1A;color:#444'">
+        :style="selected ? 'background:#1abc9c;color:#fff' : 'background:#1A1A1A;color:#444'">
         {{ saving ? '保存中…' : '确认使用此风格 →' }}
       </button>
     </div>
