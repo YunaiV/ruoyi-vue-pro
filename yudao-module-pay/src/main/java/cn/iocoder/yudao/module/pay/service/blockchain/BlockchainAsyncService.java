@@ -376,19 +376,25 @@ public class BlockchainAsyncService implements ApplicationEventPublisherAware {
     }
 
     private static String buildBatchJson(List<BlockchainTaskDO> tasks) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"batchId\":\"").append(UUID.randomUUID())
-          .append("\",\"timestamp\":").append(System.currentTimeMillis())
-          .append(",\"count\":").append(tasks.size())
-          .append(",\"items\":[");
-        for (int i = 0; i < tasks.size(); i++) {
-            BlockchainTaskDO t = tasks.get(i);
-            if (i > 0) sb.append(",");
-            sb.append("{\"orderId\":\"").append(t.getOrderId())
-              .append("\",\"hash\":\"").append(t.getDataHash()).append("\"}");
+        // Use Jackson to avoid JSON injection from orderId / dataHash values
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<String, Object> batch = new LinkedHashMap<>();
+            batch.put("batchId", UUID.randomUUID().toString());
+            batch.put("timestamp", System.currentTimeMillis());
+            batch.put("count", tasks.size());
+            List<Map<String, String>> items = new ArrayList<>(tasks.size());
+            for (BlockchainTaskDO t : tasks) {
+                Map<String, String> item = new LinkedHashMap<>();
+                item.put("orderId", t.getOrderId());
+                item.put("hash", t.getDataHash());
+                items.add(item);
+            }
+            batch.put("items", items);
+            return mapper.writeValueAsString(batch);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new RuntimeException("批量数据序列化失败", e);
         }
-        sb.append("]}");
-        return sb.toString();
     }
 
     /**

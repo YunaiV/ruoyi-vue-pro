@@ -100,9 +100,13 @@ export function getMyShareLinks() {
  * @returns {Promise<object>}
  */
 /**
- * Compute derived metrics from raw stats.
- * @param {object} data  — must contain { clicks, orders, revenue }
- * @returns {object} data with conversionRate (%) and avgOrderValue appended
+ * Compute derived metrics from raw share-link stats.
+ * Appends two calculated fields to the data object returned by the backend:
+ *   - conversionRate: percentage of clicks that resulted in an order (0–100, 2 dp)
+ *   - avgOrderValue:  average revenue per completed order (2 dp)
+ * Returns the enriched object, or the original value unchanged when data is null/falsy.
+ * @param {object|null} data  Raw stats with at least { clicks, orders, revenue }
+ * @returns {object|null}
  */
 function _enrichStats(data) {
   if (!data) return data
