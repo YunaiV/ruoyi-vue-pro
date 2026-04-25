@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.deepay.service;
 
-import cn.iocoder.yudao.module.deepay.agent.Context;
+import cn.iocoder.yudao.module.deepay.service.memory.AiMemoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.Resource;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +38,7 @@ public class AiChatStreamService {
 
     @Resource private AiChatService    aiChatService;
     @Resource private ChatSessionService chatSessionService;
+    @Resource private AiMemoryService   aiMemoryService;
 
     /**
      * 异步流式推送对话回复。
@@ -52,12 +53,21 @@ public class AiChatStreamService {
     @Async("deepayAsyncExecutor")
     public void streamChat(SseEmitter emitter, String module, String sessionId,
                            Long customerId, String userMessage) {
+        // default tenantId = 1 (单租户 MVP；后续从登录态取)
+        final Long tenantId = 1L;
         try {
-            // 1. 调用 AiChatService 获取完整回复
-            AiChatService.ChatReply reply = aiChatService.chat(
-                    module, sessionId, customerId, userMessage);
+            // 0. 确保会话存在（落库 / 续期）
+            String effectiveSessionId = aiMemoryService.getOrCreateSession(
+                    sessionId, tenantId, customerId, module);
 
-            // 2. 逐字推送 aiMessage
+            // 1. 立即落 user message
+            aiMemoryService.saveUserMessage(effectiveSessionId, tenantId, customerId, module, userMessage);
+
+            // 2. 调用 AiChatService 获取完整回复
+            AiChatService.ChatReply reply = aiChatService.chat(
+                    module, effectiveSessionId, customerId, userMessage);
+
+            // 3. 逐字推送 aiMessage
             String text = reply.getAiMessage();
             if (text != null && !text.isEmpty()) {
                 int i = 0;
@@ -72,18 +82,23 @@ public class AiChatStreamService {
                 }
             }
 
-            // 3. 推送元数据（pendingField、quickReplies、images、done、sessionId）
-            Map<String, Object> meta = buildMeta(reply);
+            // 4. 推送元数据（pendingField、quickReplies、images、done、sessionId）
+            Map<String, Object> meta = buildMeta(reply, effectiveSessionId);
             emitter.send(SseEmitter.event()
                     .name("meta")
                     .data(MAPPER.writeValueAsString(meta)));
 
-            // 4. 发送结束信号
+            // 5. 发送结束信号
             emitter.send(SseEmitter.event()
                     .name("done")
                     .data(""));
 
             emitter.complete();
+
+            // 6. AI 完成后落 assistant 最终消息（合并）
+            if (StringUtils.hasText(text)) {
+                aiMemoryService.saveAssistantMessage(effectiveSessionId, tenantId, customerId, module, text);
+            }
 
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
@@ -98,9 +113,9 @@ public class AiChatStreamService {
     // 工具
     // ====================================================================
 
-    private Map<String, Object> buildMeta(AiChatService.ChatReply reply) {
+    private Map<String, Object> buildMeta(AiChatService.ChatReply reply, String effectiveSessionId) {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("sessionId",    reply.getSessionId());
+        m.put("sessionId",    effectiveSessionId);
         m.put("pendingField", reply.getPendingField());
         m.put("quickReplies", reply.getQuickReplies());
         m.put("images",       reply.getImages());
