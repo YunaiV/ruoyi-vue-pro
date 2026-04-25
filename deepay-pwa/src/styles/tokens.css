@@ -9,6 +9,8 @@
   --gpt-text: #ececec;
   --gpt-text-sub: #8e8ea0;
   --gpt-text-muted: #555;
+  --gpt-accent: #10a37f;
+  --gpt-accent-hover: #0d8b6e;
 
   /* Deepay tokens (alias) */
   --dp-bg: #212121;
@@ -44,6 +46,9 @@
   --gpt-text: #0d0d0d;
   --gpt-text-sub: #6e6e80;
   --gpt-text-muted: #ababab;
+
+  --gpt-accent: #10a37f;
+  --gpt-accent-hover: #0d8b6e;
 
   /* Deepay tokens (alias) */
   --dp-bg: #ffffff;
