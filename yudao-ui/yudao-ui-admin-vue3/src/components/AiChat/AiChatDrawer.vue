@@ -270,13 +270,19 @@ import type { ChatMessage } from '@/composables/useAiChat'
 const props = withDefaults(defineProps<{
   module?:            string
   customerId?:        number
+  tenantId?:          number
   greeting?:          string
   defaultTypewriter?: boolean
+  persistKey?:        string
+  contextProvider?:   () => Partial<import('@/api/ai/chat').ChatContext>
 }>(), {
   module:            'selection',
   customerId:        undefined,
+  tenantId:          0,
   greeting:          undefined,      // falls back to role.greeting below
   defaultTypewriter: true,
+  persistKey:        undefined,
+  contextProvider:   undefined,
 })
 
 const emit = defineEmits<{
@@ -307,12 +313,14 @@ const fabRef       = ref<InstanceType<typeof AiChatFab>>()
 
 // ── Composables ────────────────────────────────────────────────
 const chat = useAiChat({
-  module:     props.module,
-  customerId: props.customerId,
+  module:          props.module,
+  customerId:      props.customerId,
+  tenantId:        props.tenantId,
   get typewriter() { return typewriterOn.value },
-  scrollEl:   () => msgsEl.value,
-  get greeting() { return effectiveGreeting.value },
-  persistKey: `ai_session_${props.module}`,
+  scrollEl:        () => msgsEl.value,
+  get greeting()   { return effectiveGreeting.value },
+  persistKey:      props.persistKey ?? `ai_session_${props.module}`,
+  contextProvider: props.contextProvider,
 })
 const tts = useAiTts({ lang: 'zh-CN', rate: 1.05 })
 

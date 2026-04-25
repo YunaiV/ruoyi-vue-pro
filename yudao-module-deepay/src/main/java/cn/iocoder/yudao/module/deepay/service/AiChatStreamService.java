@@ -51,11 +51,8 @@ public class AiChatStreamService {
     }
 
     /**
-     * 异步流式推送对话回复（带上下文注入）。
+     * 异步流式推送对话回复（带上下文注入 + MongoDB 记忆管理）。
      * 由 {@link cn.iocoder.yudao.module.deepay.controller.AiChatStreamController} 调用。
-     *
-     * <p>包含完整的会话记忆持久化（via {@link AiMemoryService}）和
-     * 页面上下文注入（via {@link AiChatContextVO}）。</p>
      *
      * @param emitter     SSE 发射器
      * @param module      板块
@@ -123,6 +120,19 @@ public class AiChatStreamService {
         }
     }
 
+    /**
+     * 发送限流错误并立即完成 SSE。
+     */
+    public void sendRateLimitError(SseEmitter emitter, String message) {
+        try {
+            emitter.send(SseEmitter.event().name("error").data(message));
+            emitter.send(SseEmitter.event().name("done").data(""));
+            emitter.complete();
+        } catch (Exception ex) {
+            emitter.completeWithError(ex);
+        }
+    }
+
     // ====================================================================
     // 工具
     // ====================================================================
@@ -149,4 +159,3 @@ public class AiChatStreamService {
     }
 
 }
-

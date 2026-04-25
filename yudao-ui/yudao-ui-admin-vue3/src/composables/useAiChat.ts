@@ -20,6 +20,7 @@ export interface ChatMessage {
 export interface UseAiChatOptions {
   module: string
   customerId?: number
+  tenantId?: number
   /** Enable typewriter animation (SSE). Default true. */
   typewriter?: boolean | (() => boolean)
   /** Ref to the scroll container for auto-scroll */
