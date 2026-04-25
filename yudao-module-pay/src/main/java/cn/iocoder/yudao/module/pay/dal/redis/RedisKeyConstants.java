@@ -33,4 +33,12 @@ public interface RedisKeyConstants {
      */
     String PAY_NO = "pay_no:";
 
+    /**
+     * 区块链存证分布式锁（Redisson）
+     *
+     * KEY 格式：pay_blockchain:lock:{orderId}
+     * 用途：防止集群环境下同一订单重复提交存证
+     */
+    String BLOCKCHAIN_PROCESSING_LOCK = "pay_blockchain:lock:%s";
+
 }
