@@ -409,6 +409,7 @@ onMounted(() => {
                 <p class="text-xs mt-0.5 truncate"
                    :style="{ color: shop.theme?.subText || '#9CA3AF' }">
                   {{ formatDate(shop.shopId) }}
+                  <span v-if="shop.products?.length"> · {{ shop.products.length }} 件商品</span>
                 </p>
               </div>
               <svg class="h-4 w-4 shrink-0 opacity-60" fill="none"
@@ -419,6 +420,12 @@ onMounted(() => {
             </div>
             <div class="flex items-center gap-2 px-3 py-2.5 border-t border-border">
               <span class="text-muted text-xs flex-1 truncate">/shop/{{ shop.shopId }}</span>
+              <button
+                class="text-xs font-semibold px-3 py-1.5 rounded-full
+                       active:scale-95 transition-transform duration-100"
+                style="background:#FFFFFF10;color:#fff;border:1px solid #333"
+                @click="router.push(`/shop/${shop.shopId}/edit`)"
+              >编辑</button>
               <button
                 class="text-xs font-semibold px-3 py-1.5 rounded-full
                        active:scale-95 transition-transform duration-100"

@@ -5,7 +5,7 @@
   规则：所有颜色绑定 tpl.theme.*，不写死
 -->
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { templates } from '@/data/templates'
 import { createShop } from '@/api/shop'
@@ -18,9 +18,13 @@ const tpl = computed(() =>
   templates.find(t => t.id === route.params.id) || null
 )
 
-const opening = ref(false)
+const opening    = ref(false)
+const shopName   = ref('')
 
 const MY_USER_ID = initUserId()
+
+// 用模板名作默认店铺名，等模板加载后填入
+watch(tpl, t => { if (t && !shopName.value) shopName.value = t.name }, { immediate: true })
 
 async function createShopAndGo() {
   if (!tpl.value || opening.value) return
@@ -29,7 +33,7 @@ async function createShopAndGo() {
     const { shopId } = await createShop({
       templateId: tpl.value.id,
       type:       tpl.value.type,
-      name:       tpl.value.name,
+      name:       shopName.value.trim() || tpl.value.name,
       theme:      tpl.value.theme,
       gradient:   tpl.value.gradient,
       style:      tpl.value.style,
@@ -189,6 +193,22 @@ function share() {
           borderTop: `1px solid ${tpl.theme.border}`
         }"
       >
+        <!-- 店铺名输入框 -->
+        <div class="mb-3">
+          <input
+            v-model="shopName"
+            type="text"
+            placeholder="给你的店铺起个名字…"
+            maxlength="30"
+            class="w-full h-10 rounded-xl px-3 text-sm
+                   focus:outline-none transition-colors"
+            :style="{
+              background: tpl.theme.card,
+              border: `1px solid ${tpl.theme.border}`,
+              color: tpl.theme.text,
+            }"
+          />
+        </div>
         <p class="text-xs text-center mb-3" :style="{ color: tpl.theme.subText }">
           预览效果 · 开店后获得专属分享链接
         </p>
