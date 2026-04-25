@@ -3,37 +3,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Plain CSS base (always applied, no @layer dependency) ── */
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  background: var(--dp-bg);
-  color: var(--dp-text);
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: none;
-  transition: background 0.25s ease, color 0.25s ease;
-}
-
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.25); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.4); }
-* { scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.25) transparent; }
 
 @layer base {
   html { transition: background 0.25s ease; }
   body {
+    margin: 0;
     background: var(--dp-bg);
     color: var(--dp-text);
-    font-family: 'Inter', 'PingFang SC', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: none;
     transition: background 0.25s ease, color 0.25s ease;
   }
-  * { box-sizing: border-box; touch-action: manipulation; }
+  * { box-sizing: border-box; touch-action: manipulation; scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.25) transparent; }
   ::selection { background: rgba(26,188,156,0.25); }
 }
 
