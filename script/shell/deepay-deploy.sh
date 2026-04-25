@@ -4,13 +4,13 @@
 #
 #  用法（服务器上执行）：
 #    cd /www/wwwroot/deepay.srl
-#    bash script/shell/deepay-deploy.sh [backend|frontend|all]
+#    bash script/shell/deepay-deploy.sh [backend|frontend|app|all]
 #
-#  不带参数默认 all（后端 + 前端全部部署）
+#  不带参数默认 all（后端 + 前端 + uni-app 全部部署）
 # =============================================================
 set -euo pipefail
 
-MODE=${1:-all}   # all | backend | frontend
+MODE=${1:-all}   # all | backend | frontend | app
 
 # ============================================================
 # ★ 所有路径 / 参数集中在这里，按需修改
@@ -29,10 +29,15 @@ JAVA_OPTS="-server -Xms512m -Xmx512m \
   -XX:+HeapDumpOnOutOfMemoryError \
   -XX:HeapDumpPath=${BACKEND_RUN}/heapDump"
 
-## 前端
+## 前端 (PWA / admin)
 FRONTEND_SRC=$PROJECT_ROOT/deepay-pwa          # PWA 前端源码目录（含 /admin 路由）
 FRONTEND_DIST=$FRONTEND_SRC/dist             # Vite 构建输出
 FRONTEND_DEPLOY=/www/wwwroot/deepay.srl      # Nginx root：同时服务 Web 入口 + PWA + /admin
+
+## uni-app H5
+APP_SRC=$PROJECT_ROOT/yudao-ui-deepay-app     # uni-app 源码目录
+APP_DIST=$APP_SRC/dist/build/h5               # uni build 输出（H5）
+APP_DEPLOY=/www/wwwroot/deepay.srl/app        # Nginx 服务的 H5 静态目录（可按需修改）
 
 ## 备份
 BACKUP_DIR=$BACKEND_RUN/backup
@@ -220,6 +225,48 @@ deploy_frontend() {
 }
 
 # ============================================================
+# 步骤 C：uni-app H5 部署
+# ============================================================
+deploy_app() {
+
+  step "C-1  环境检查"
+  need node; need npm
+  info "Node : $(node -v)"
+  info "npm  : $(npm  -v)"
+
+  step "C-2  安装依赖（npm ci / npm install）"
+  cd "$APP_SRC"
+  if [ -f package-lock.json ]; then
+    info "发现 package-lock.json，使用 npm ci（可重复安装）"
+    npm ci
+  else
+    info "未发现 lockfile，使用 npm install"
+    npm install
+  fi
+  ok "依赖安装完毕"
+
+  step "C-3  构建 H5（npm run build:h5）"
+  npm run build:h5 2>&1 | tail -10
+  [ -d "$APP_DIST" ] || error "构建失败，未找到 $APP_DIST"
+  ok "构建完成 → $APP_DIST"
+
+  step "C-4  部署到 $APP_DEPLOY"
+  mkdir -p "$APP_DEPLOY"
+  rm -rf "${APP_DEPLOY:?}"/*
+  cp -r "$APP_DIST"/. "$APP_DEPLOY/"
+  ok "H5 已部署 → $APP_DEPLOY"
+
+  step "C-5  重载 Nginx"
+  if nginx -t 2>/dev/null; then
+    systemctl reload nginx 2>/dev/null || nginx -s reload 2>/dev/null || \
+      warn "Nginx 重载失败，请手动执行: nginx -s reload"
+    ok "Nginx 已重载"
+  else
+    warn "Nginx 配置校验失败，请检查配置后手动 reload"
+  fi
+}
+
+# ============================================================
 # 主流程
 # ============================================================
 echo -e "${C}"
@@ -236,8 +283,9 @@ info "项目根: $PROJECT_ROOT"
 case "$MODE" in
   backend)   deploy_backend   ;;
   frontend)  deploy_frontend  ;;
-  all)       deploy_backend && deploy_frontend ;;
-  *)         error "未知模式: $MODE  →  用法: $0 [all|backend|frontend]" ;;
+  app)       deploy_app       ;;
+  all)       deploy_backend && deploy_frontend && deploy_app ;;
+  *)         error "未知模式: $MODE  →  用法: $0 [all|backend|frontend|app]" ;;
 esac
 
 # ============================================================
