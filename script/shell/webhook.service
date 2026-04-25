@@ -1,0 +1,58 @@
+# =============================================================
+#  Deepay Webhook Server — systemd 服务单元
+#
+#  安装步骤（服务器上执行）：
+#
+#  1. 复制到 systemd 目录：
+#       cp /www/wwwroot/deepay.srl/script/shell/webhook.service \
+#          /etc/systemd/system/deepay-webhook.service
+#
+#  2. 修改下方 WEBHOOK_SECRET（必须与 GitHub Webhook 密钥一致）
+#
+#  3. 启用并启动：
+#       systemctl daemon-reload
+#       systemctl enable deepay-webhook
+#       systemctl start  deepay-webhook
+#
+#  4. 查看状态 & 日志：
+#       systemctl status deepay-webhook
+#       journalctl -u deepay-webhook -f
+#       tail -f /www/wwwroot/deepay.srl/.build-logs/webhook.log
+#
+#  5. 修改配置后重启：
+#       systemctl restart deepay-webhook
+# =============================================================
+[Unit]
+Description=Deepay GitHub Webhook Auto-Deploy Server
+Documentation=https://github.com/deepay999/deepaystudio
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/www/wwwroot/deepay.srl
+
+# ── 必须修改：与 GitHub Webhook 配置的 Secret 一致 ──────────
+Environment=WEBHOOK_SECRET=change-me-to-your-github-webhook-secret
+
+# ── 按需修改 ─────────────────────────────────────────────────
+Environment=WEBHOOK_PORT=9000
+Environment=WEBHOOK_BRANCH=main
+Environment=WEBHOOK_MODE=all
+Environment=PROJECT_ROOT=/www/wwwroot/deepay.srl
+Environment=WEBHOOK_DEPLOY=/www/wwwroot/deepay.srl/script/shell/deepay-deploy.sh
+Environment=WEBHOOK_LOG_DIR=/www/wwwroot/deepay.srl/.build-logs
+
+ExecStart=/usr/bin/python3 /www/wwwroot/deepay.srl/script/shell/webhook.py run
+
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+StandardOutput=append:/www/wwwroot/deepay.srl/.build-logs/webhook.log
+StandardError=append:/www/wwwroot/deepay.srl/.build-logs/webhook.log
+
+[Install]
+WantedBy=multi-user.target

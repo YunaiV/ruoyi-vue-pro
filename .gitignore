@@ -60,3 +60,8 @@ run/backend/backup/
 run/backend/heapDump/
 run/backend/app.jar
 run/backend/deepay.pid
+
+# Auto-deploy script caches & logs
+.build-cache/
+.build-logs/
+.backups/
