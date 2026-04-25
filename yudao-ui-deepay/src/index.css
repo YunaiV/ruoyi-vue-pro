@@ -138,3 +138,15 @@
 
 /* Shimmer */
 @keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Product detail sheet slide-up */
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Overlay fade-in */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

@@ -18,7 +18,8 @@ export default {
         '3xl':'24px',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        sans:    ['Poppins', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
       },
       boxShadow: {
         'glow-sm': '0 0 12px rgba(0,255,136,0.35)',

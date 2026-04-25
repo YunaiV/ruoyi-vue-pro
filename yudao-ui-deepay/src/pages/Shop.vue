@@ -17,12 +17,13 @@ import { getShop } from '@/api/shop'
 import { createOrder } from '@/api'
 import { initUserId, captureRef, getRefUser, buildShareLink, shareOrCopy } from '@/utils/user'
 
-import TemplateMinimal from '@/components/templates/TemplateMinimal.vue'
-import TemplateStreet  from '@/components/templates/TemplateStreet.vue'
-import TemplateLuxury  from '@/components/templates/TemplateLuxury.vue'
-import TemplateGrid    from '@/components/templates/TemplateGrid.vue'
-import TemplateSingle  from '@/components/templates/TemplateSingle.vue'
-import TemplateAI      from '@/components/templates/TemplateAI.vue'
+import TemplateMinimal  from '@/components/templates/TemplateMinimal.vue'
+import TemplateStreet   from '@/components/templates/TemplateStreet.vue'
+import TemplateLuxury   from '@/components/templates/TemplateLuxury.vue'
+import TemplateGrid     from '@/components/templates/TemplateGrid.vue'
+import TemplateSingle   from '@/components/templates/TemplateSingle.vue'
+import TemplateAI       from '@/components/templates/TemplateAI.vue'
+import TemplateSocial   from '@/components/templates/TemplateSocial.vue'
 
 // template-id → component（模板名 + 布局类型 双映射）
 const TEMPLATE_MAP = {
@@ -32,6 +33,7 @@ const TEMPLATE_MAP = {
   luxury:     TemplateLuxury,
   ecommerce:  TemplateGrid,
   spotlight:  TemplateSingle,
+  social:     TemplateSocial,
   // 按布局 type（AI商品 / 旧数据 fallback）
   single:     TemplateSingle,
   grid:       TemplateGrid,

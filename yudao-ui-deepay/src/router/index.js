@@ -31,7 +31,8 @@ const routes = [
   { path: '/ai/design',    component: () => import('@/pages/AiDesign.vue'),    meta: { title: 'AI出款工具' } },
   { path: '/template',     component: Template,        meta: { title: '模板' } },
   { path: '/template/:id', component: TemplatePreview, meta: { title: '模板预览' } },
-  { path: '/shop/:id',     component: Shop,            meta: { title: '店铺' } },
+  { path: '/shop/:id',      component: Shop,            meta: { title: '店铺' } },
+  { path: '/shop/:id/edit', component: () => import('@/pages/ShopEdit.vue'), meta: { title: '编辑店铺' } },
   { path: '/login',        component: () => import('@/pages/Login.vue'), meta: { title: '登录' } },
 
   // ── 需要登录 ──────────────────────────────────────────────────────

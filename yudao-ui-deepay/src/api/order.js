@@ -25,3 +25,13 @@ export function createPayment(userId, planId) {
 export function getShopPage(id, currency = 'EUR') {
   return http.get(`/api/shop/${id}`, { params: { currency } })
 }
+
+/**
+ * Cancel an order.
+ * @param {string} orderId
+ * @param {string} [reason]  — optional cancellation reason shown to merchant
+ * @returns {Promise<{ orderId, status }>}
+ */
+export function cancelOrder(orderId, reason = '') {
+  return http.post(`/api/order/${orderId}/cancel`, { reason })
+}
