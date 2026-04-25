@@ -85,7 +85,13 @@ export const useChatStore = defineStore('chat', () => {
     save()
   }
 
+  function clearSessions() {
+    sessions.value = []
+    activeId.value = null
+    save()
+  }
+
   function save() { storage.set('deepay_sessions', sessions.value.slice(0, 50)) }
 
-  return { sessions, activeId, isOpen, activeSession, messages, newSession, addMessage, deleteSession }
+  return { sessions, activeId, isOpen, activeSession, messages, newSession, addMessage, deleteSession, clearSessions }
 })

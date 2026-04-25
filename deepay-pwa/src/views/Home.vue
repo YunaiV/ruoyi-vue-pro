@@ -1,93 +1,86 @@
 <template>
   <div class="chat-page">
 
-    <!-- ══ When no active session: Welcome Screen ══ -->
-    <div v-if="!chatStore.activeId || isNewChat" class="welcome-screen">
-
-      <!-- Top bar -->
+    <!-- ══ WELCOME SCREEN (no messages) ══ -->
+    <div v-if="showWelcome" class="welcome-screen">
       <header class="chat-topbar">
-        <div class="model-selector">
+        <button class="model-selector">
           <span class="model-name">Deepay</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
-        </div>
+        </button>
         <div class="topbar-actions">
-          <button class="tb-btn" title="分享">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+          <button class="tb-icon-btn" title="分享">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           </button>
-          <button class="tb-btn" title="设置">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-          </button>
-          <div class="avatar-btn">{{ userStore.avatarLetter }}</div>
+          <div class="tb-avatar">{{ userStore.avatarLetter }}</div>
         </div>
       </header>
 
-      <!-- Greeting -->
       <div class="welcome-body">
         <h1 class="welcome-greeting">你好，{{ userStore.displayName }}</h1>
-        <h2 class="welcome-question">今天想创作什么？</h2>
+        <p class="welcome-sub">今天想创作什么？</p>
 
-        <!-- Quick suggestion chips -->
         <div class="suggestion-chips">
           <button
-            v-for="chip in chips"
+            v-for="chip in suggestions"
             :key="chip.text"
             class="chip"
-            @click="sendMessage(chip.prompt)"
+            @click="sendSuggestion(chip.text)"
           >
             <span class="chip-icon">{{ chip.icon }}</span>
-            <span>{{ chip.text }}</span>
+            {{ chip.label }}
           </button>
         </div>
       </div>
 
-      <!-- Bottom input bar -->
-      <div class="input-zone">
-        <div class="input-bar">
-          <button class="input-action" title="上传文件">
+      <!-- Input bar -->
+      <div class="input-area">
+        <div class="input-box" :class="{ focused: inputFocused }">
+          <button class="input-icon-btn" title="附件">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
           </button>
           <input
-            ref="inputEl"
+            ref="inputRef"
             v-model="inputText"
-            type="text"
-            placeholder="给 Deepay 发消息"
             class="input-field"
-            @keydown.enter.prevent="sendMessage()"
+            placeholder="给 Deepay 发消息"
+            @keydown.enter.exact.prevent="sendMessage"
+            @focus="inputFocused = true"
+            @blur="inputFocused = false"
           />
-          <button class="input-action" title="语音输入">
+          <button class="input-icon-btn" title="语音">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
           </button>
           <button
             class="send-btn"
             :class="{ active: inputText.trim() }"
+            @click="sendMessage"
             :disabled="!inputText.trim()"
-            @click="sendMessage()"
-            title="发送"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
-        <p class="input-hint">Deepay 可能会出现错误，重要决策请自行核实。</p>
+        <p class="input-hint">Deepay 可能会出现错误，请核实重要信息</p>
       </div>
     </div>
 
-    <!-- ══ Active Chat ══ -->
-    <div v-else class="chat-active">
-
-      <!-- Top bar -->
+    <!-- ══ ACTIVE CHAT ══ -->
+    <div v-else class="chat-screen">
       <header class="chat-topbar">
-        <div class="model-selector">
+        <button class="model-selector">
           <span class="model-name">Deepay</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
-        </div>
+        </button>
         <div class="topbar-actions">
-          <button class="tb-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></button>
-          <div class="avatar-btn">{{ userStore.avatarLetter }}</div>
+          <button class="tb-icon-btn" title="分享">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+          </button>
+          <div class="tb-avatar">{{ userStore.avatarLetter }}</div>
         </div>
       </header>
 
       <!-- Messages -->
-      <div class="messages-wrap" ref="messagesEl">
+      <div class="messages-wrap" ref="messagesWrap">
         <div class="messages-inner">
           <div
             v-for="msg in chatStore.messages"
@@ -95,72 +88,81 @@
             class="msg-row"
             :class="msg.role"
           >
-            <!-- Assistant -->
+            <!-- AI message -->
             <template v-if="msg.role === 'assistant'">
-              <div class="msg-ai-avatar">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
+              <div class="ai-avatar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
               </div>
-              <div class="msg-ai-content">
-                <pre class="msg-text">{{ msg.content }}</pre>
+              <div class="ai-bubble-wrap">
+                <div class="ai-bubble">
+                  <span class="msg-text" v-html="formatMessage(msg.content)"></span>
+                </div>
                 <div class="msg-actions">
                   <button class="msg-action-btn" title="复制">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   </button>
                   <button class="msg-action-btn" title="点赞">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
                   </button>
                   <button class="msg-action-btn" title="重新生成">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
                   </button>
                 </div>
               </div>
             </template>
 
-            <!-- User -->
+            <!-- User message -->
             <template v-else>
-              <div class="msg-user-bubble">{{ msg.content }}</div>
+              <div class="user-bubble">{{ msg.content }}</div>
             </template>
           </div>
 
           <!-- Typing indicator -->
           <div v-if="isTyping" class="msg-row assistant">
-            <div class="msg-ai-avatar">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg>
+            <div class="ai-avatar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
             </div>
-            <div class="typing-dots">
-              <span></span><span></span><span></span>
+            <div class="ai-bubble-wrap">
+              <div class="ai-bubble typing-bubble">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
             </div>
           </div>
+
+          <div ref="bottomAnchor"></div>
         </div>
       </div>
 
-      <!-- Input bar (always at bottom) -->
-      <div class="input-zone">
-        <div class="input-bar">
-          <button class="input-action">
+      <!-- Input bar -->
+      <div class="input-area">
+        <div class="input-box" :class="{ focused: inputFocused }">
+          <button class="input-icon-btn" title="附件">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
           </button>
           <input
-            ref="inputEl"
+            ref="inputRef"
             v-model="inputText"
-            type="text"
-            placeholder="给 Deepay 发消息"
             class="input-field"
-            @keydown.enter.prevent="sendMessage()"
+            placeholder="给 Deepay 发消息"
+            @keydown.enter.exact.prevent="sendMessage"
+            @focus="inputFocused = true"
+            @blur="inputFocused = false"
           />
-          <button class="input-action">
+          <button class="input-icon-btn" title="语音">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
           </button>
           <button
             class="send-btn"
             :class="{ active: inputText.trim() }"
+            @click="sendMessage"
             :disabled="!inputText.trim()"
-            @click="sendMessage()"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
-        <p class="input-hint">Deepay 可能会出现错误，重要决策请自行核实。</p>
+        <p class="input-hint">Deepay 可能会出现错误，请核实重要信息</p>
       </div>
     </div>
 
@@ -175,58 +177,78 @@ const userStore = useUserStore()
 const chatStore = useChatStore()
 
 const inputText = ref('')
+const inputFocused = ref(false)
 const isTyping = ref(false)
-const inputEl = ref(null)
-const messagesEl = ref(null)
+const inputRef = ref(null)
+const messagesWrap = ref(null)
+const bottomAnchor = ref(null)
 
-const isNewChat = computed(() =>
-  !chatStore.messages.length || chatStore.messages.every(m => m.role === 'assistant')
+const showWelcome = computed(() =>
+  !chatStore.activeId || !chatStore.messages.length
 )
 
-const chips = [
-  { icon: '🎨', text: '生成服装设计图', prompt: '帮我生成一套简约风格的服装设计图，包含上衣和裤子' },
-  { icon: '👗', text: '模特试衣展示', prompt: '为我的服装设计选择合适的模特并展示试衣效果' },
-  { icon: '📊', text: 'AI 销售分析', prompt: '分析我的店铺销售数据，给出提升转化率的建议' },
-  { icon: '🛒', text: '电商主图生成', prompt: '帮我制作一张吸引人的电商产品主图' },
-  { icon: '✨', text: '设计灵感', prompt: '2024年最流行的服装设计趋势有哪些？' },
-  { icon: '📐', text: '模板推荐', prompt: '根据我的品牌风格推荐合适的店铺设计模板' },
+const suggestions = [
+  { icon: '🎨', label: '生成服装设计图', text: '帮我生成一款时尚的春季服装设计图，风格简约现代' },
+  { icon: '👗', label: '模特试衣展示', text: '帮我展示这套服装在模特身上的效果' },
+  { icon: '📊', label: 'AI销售分析', text: '分析我的服装销售数据，给出优化建议' },
+  { icon: '🛒', label: '电商主图', text: '帮我生成一张吸引人的电商主图' },
+  { icon: '✨', label: '设计灵感', text: '给我一些2024年流行的服装设计灵感' },
+  { icon: '📐', label: '模板推荐', text: '推荐适合我品牌风格的设计模板' },
 ]
 
-async function sendMessage(text) {
-  const content = text || inputText.value.trim()
-  if (!content) return
+const aiReplies = [
+  '好的！我来帮您设计一款时尚的春季服装 ✨\n\n**设计方案：**\n- 款式：宽松廓形外套\n- 色彩：奶油白 + 莫兰迪绿\n- 面料：天然棉麻混纺\n- 细节：隐藏式口袋，金属扣设计\n\n这个方案兼顾了时尚感和实用性，非常适合春季穿搭。需要我进一步调整任何细节吗？',
+  '当然可以！以下是我的建议 🎯\n\n根据当前市场趋势，建议您关注：\n1. **渐变色系**：粉紫渐变在年轻消费者中非常受欢迎\n2. **复古元素**：Y2K 风格正在强势回归\n3. **环保材质**：消费者对可持续时尚越来越关注\n\n您想深入了解哪个方向呢？',
+  '我帮您分析了最近的销售数据 📊\n\n**关键发现：**\n- 上装销量同比增长 23%\n- 裙装在 25-35 岁女性中转化率最高（12.4%）\n- 周末下午 2-5 点是峰值时段\n\n**建议：** 加大上装品类投入，针对核心用户群做精准推广。',
+  '为您推荐以下设计灵感 ✨\n\n**2024年流行趋势：**\n- 静奢风（Quiet Luxury）持续走热\n- 解构主义元素融入日常穿搭\n- 大地色系搭配金属光泽配饰\n- 宽松剪裁 + 腰部收束的对比感\n\n需要我为您生成具体的设计稿吗？',
+  '好的，我来为您生成电商主图方案 🛒\n\n**主图设计要点：**\n- 背景：简洁的纯白或渐变色\n- 构图：1:1 或 3:4 比例最佳\n- 主体：产品占画面 60-70%\n- 文字：简洁有力，突出卖点\n\n建议配合场景图和细节图一起展示，可以显著提升点击率！',
+]
 
-  inputText.value = ''
-  if (!chatStore.activeId) chatStore.newSession()
-  chatStore.addMessage('user', content)
-
-  await nextTick()
-  scrollToBottom()
-
-  isTyping.value = true
-  setTimeout(async () => {
-    const replies = [
-      '收到！我正在为您处理这个请求，马上为您生成设计方案 ✨',
-      '好的！根据您的需求，我将为您创作最合适的设计内容 🎨',
-      '明白了！让我来帮您分析并给出专业建议 📊',
-      '正在生成中...您的专属设计方案即将呈现 👗',
-    ]
-    const reply = replies[Math.floor(Math.random() * replies.length)]
-    isTyping.value = false
-    chatStore.addMessage('assistant', reply)
-    await nextTick()
-    scrollToBottom()
-  }, 1200 + Math.random() * 800)
+function formatMessage(text) {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  return escaped
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
 }
 
 function scrollToBottom() {
-  if (messagesEl.value) {
-    messagesEl.value.scrollTop = messagesEl.value.scrollHeight
+  nextTick(() => {
+    bottomAnchor.value?.scrollIntoView({ behavior: 'smooth' })
+  })
+}
+
+async function sendMessage() {
+  const text = inputText.value.trim()
+  if (!text || isTyping.value) return
+
+  if (!chatStore.activeId) {
+    chatStore.newSession()
   }
+
+  inputText.value = ''
+  chatStore.addMessage('user', text)
+  scrollToBottom()
+
+  isTyping.value = true
+  const delay = 1200 + Math.random() * 600
+  await new Promise(r => setTimeout(r, delay))
+
+  isTyping.value = false
+  const reply = aiReplies[Math.floor(Math.random() * aiReplies.length)]
+  chatStore.addMessage('assistant', reply)
+  scrollToBottom()
+}
+
+function sendSuggestion(text) {
+  inputText.value = text
+  nextTick(() => sendMessage())
 }
 
 watch(() => chatStore.messages.length, () => {
-  nextTick(scrollToBottom)
+  scrollToBottom()
 })
 </script>
 
@@ -235,10 +257,11 @@ watch(() => chatStore.messages.length, () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--gpt-main, #212121);
+  background: var(--gpt-main);
+  color: var(--gpt-text);
 }
 
-/* ─── Top bar ─────────────────────────────────── */
+/* ── Top bar ─────────────────────────────────── */
 .chat-topbar {
   display: flex;
   align-items: center;
@@ -247,240 +270,335 @@ watch(() => chatStore.messages.length, () => {
   flex-shrink: 0;
   border-bottom: 1px solid var(--gpt-border);
 }
+
 .model-selector {
-  display: flex; align-items: center; gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
   cursor: pointer;
+  color: var(--gpt-text);
   padding: 6px 10px;
   border-radius: 8px;
   transition: background 0.15s;
 }
-.model-selector:hover { background: var(--gpt-sidebar-hover); }
-.model-name {
-  font-size: 16px; font-weight: 700;
-  color: var(--gpt-text);
+.model-selector:hover { background: var(--gpt-input-bg); }
+.model-name { font-size: 15px; font-weight: 600; }
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-.tb-btn {
-  width: 34px; height: 34px;
-  border: 1px solid var(--gpt-border);
+
+.tb-icon-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
   background: transparent;
   border-radius: 8px;
   color: var(--gpt-text-sub);
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
 }
-.tb-btn:hover { background: var(--gpt-sidebar-hover); color: var(--gpt-text); }
-.avatar-btn {
-  width: 32px; height: 32px;
+.tb-icon-btn:hover {
+  background: var(--gpt-input-bg);
+  color: var(--gpt-text);
+}
+
+.tb-avatar {
+  width: 32px;
+  height: 32px;
   background: linear-gradient(135deg, #10a37f, #0d8b6e);
   border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
   cursor: pointer;
 }
 
-/* ─── Welcome screen ─────────────────────────── */
+/* ── Welcome ─────────────────────────────────── */
 .welcome-screen {
-  flex: 1;
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
+
 .welcome-body {
   flex: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 24px;
   text-align: center;
 }
+
 .welcome-greeting {
-  font-size: 32px; font-weight: 700;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
   color: var(--gpt-text);
   margin: 0 0 8px;
-}
-.welcome-question {
-  font-size: 32px; font-weight: 700;
-  color: var(--gpt-text);
-  margin: 0 0 40px;
-}
-@media (max-width: 600px) {
-  .welcome-greeting, .welcome-question { font-size: 24px; }
+  letter-spacing: -0.02em;
 }
 
-/* Chips */
-.suggestion-chips {
-  display: flex; flex-wrap: wrap; gap: 10px;
-  justify-content: center;
-  max-width: 640px;
-}
-.chip {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 18px;
-  background: var(--gpt-input-bg, #2f2f2f);
-  border: 1px solid var(--gpt-border);
-  border-radius: 999px;
+.welcome-sub {
+  font-size: 18px;
   color: var(--gpt-text-sub);
+  margin: 0 0 36px;
+}
+
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 680px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 24px;
+  color: var(--gpt-text);
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
   white-space: nowrap;
 }
 .chip:hover {
-  background: var(--gpt-sidebar-hover);
-  color: var(--gpt-text);
   border-color: #10a37f;
+  background: rgba(16, 163, 127, 0.08);
+  transform: translateY(-1px);
 }
 .chip-icon { font-size: 16px; }
 
-/* ─── Active chat ────────────────────────────── */
-.chat-active {
-  flex: 1;
-  display: flex; flex-direction: column;
-  overflow: hidden;
+/* ── Chat screen ─────────────────────────────── */
+.chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Messages */
 .messages-wrap {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  scrollbar-color: var(--gpt-border) transparent;
 }
-.messages-wrap::-webkit-scrollbar { width: 4px; }
-.messages-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
 .messages-inner {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 20px 24px 8px;
-  display: flex; flex-direction: column; gap: 24px;
+  padding: 24px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* Message rows */
+/* ── Message rows ────────────────────────────── */
 .msg-row {
-  display: flex; align-items: flex-start; gap: 14px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
 }
-.msg-row.user { justify-content: flex-end; }
+.msg-row.user {
+  justify-content: flex-end;
+}
 
 /* AI avatar */
-.msg-ai-avatar {
-  width: 32px; height: 32px; flex-shrink: 0;
+.ai-avatar {
+  width: 30px;
+  height: 30px;
   background: linear-gradient(135deg, #10a37f, #0d8b6e);
   border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-/* AI message */
-.msg-ai-content { flex: 1; min-width: 0; }
-.msg-text {
-  font-family: inherit;
-  font-size: 15px; line-height: 1.65;
-  color: var(--gpt-text);
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin: 0;
+.ai-bubble-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 82%;
 }
+
+.ai-bubble {
+  padding: 14px 16px;
+  background: transparent;
+  color: var(--gpt-text);
+  font-size: 15px;
+  line-height: 1.65;
+  border-radius: 0 16px 16px 16px;
+}
+
+.msg-text { display: block; }
+
+.user-bubble {
+  padding: 12px 16px;
+  background: var(--gpt-input-bg);
+  color: var(--gpt-text);
+  font-size: 15px;
+  line-height: 1.55;
+  border-radius: 16px 16px 4px 16px;
+  max-width: 72%;
+  word-break: break-word;
+}
+
+/* Action buttons under AI message */
 .msg-actions {
-  display: flex; gap: 4px; margin-top: 8px; opacity: 0;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
   transition: opacity 0.15s;
 }
-.msg-ai-content:hover .msg-actions { opacity: 1; }
+.ai-bubble-wrap:hover .msg-actions { opacity: 1; }
+
 .msg-action-btn {
-  width: 28px; height: 28px;
-  border: none; background: transparent;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
   border-radius: 6px;
-  color: var(--gpt-text-muted); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
+  color: var(--gpt-text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
 }
-.msg-action-btn:hover { background: var(--gpt-sidebar-hover); color: var(--gpt-text); }
-
-/* User bubble */
-.msg-user-bubble {
-  max-width: 480px;
-  background: var(--gpt-input-bg, #2f2f2f);
-  border: 1px solid var(--gpt-border);
-  border-radius: 18px 18px 4px 18px;
-  padding: 12px 18px;
-  font-size: 15px; line-height: 1.55;
-  color: var(--gpt-text);
-  word-break: break-word;
-}
-
-/* Typing */
-.typing-dots {
-  display: flex; align-items: center; gap: 4px;
-  padding: 14px 18px;
+.msg-action-btn:hover {
   background: var(--gpt-input-bg);
-  border-radius: 18px;
+  color: var(--gpt-text);
 }
-.typing-dots span {
-  width: 8px; height: 8px;
+
+/* Typing dots */
+.typing-bubble {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 18px;
+  min-height: 46px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
   background: var(--gpt-text-sub);
   border-radius: 50%;
   animation: bounce 1.2s ease-in-out infinite;
 }
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
 @keyframes bounce {
-  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-  40% { transform: scale(1.2); opacity: 1; }
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
 }
 
-/* ─── Input zone ─────────────────────────────── */
-.input-zone {
+/* ── Input area ──────────────────────────────── */
+.input-area {
+  padding: 12px 24px 16px;
   flex-shrink: 0;
-  padding: 16px 24px 20px;
   max-width: 760px;
   width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
-.input-bar {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--gpt-input-bg, #2f2f2f);
+
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--gpt-input-bg);
   border: 1px solid var(--gpt-border);
   border-radius: 16px;
-  padding: 8px 12px;
-  transition: border-color 0.15s;
+  padding: 6px 8px;
+  transition: border-color 0.2s;
 }
-.input-bar:focus-within { border-color: #10a37f; }
-.input-action {
-  width: 34px; height: 34px; flex-shrink: 0;
-  border: none; background: transparent;
-  border-radius: 8px;
-  color: var(--gpt-text-sub); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
+.input-box.focused { border-color: rgba(16, 163, 127, 0.5); }
+
+.input-icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: var(--gpt-text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
 }
-.input-action:hover { color: var(--gpt-text); }
+.input-icon-btn:hover {
+  color: var(--gpt-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .input-field {
   flex: 1;
-  background: transparent; border: none; outline: none;
-  font-size: 15px; line-height: 1.5;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 15px;
   color: var(--gpt-text);
-  padding: 4px 4px;
+  padding: 4px 8px;
+  min-width: 0;
+  line-height: 1.5;
 }
-.input-field::placeholder { color: var(--gpt-text-muted, #555); }
+.input-field::placeholder { color: var(--gpt-text-muted); }
+
 .send-btn {
-  width: 34px; height: 34px; flex-shrink: 0;
+  width: 36px;
+  height: 36px;
   border: none;
   background: var(--gpt-border);
-  border-radius: 8px;
-  color: var(--gpt-text-muted);
-  cursor: not-allowed;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
+  border-radius: 10px;
+  color: var(--gpt-text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
 }
 .send-btn.active {
   background: #10a37f;
   color: white;
-  cursor: pointer;
 }
-.send-btn.active:hover { background: #0d8b6e; transform: scale(1.05); }
+.send-btn.active:hover {
+  background: #0d8b6e;
+  transform: scale(1.05);
+}
+.send-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+
 .input-hint {
   text-align: center;
   font-size: 12px;
-  color: var(--gpt-text-muted, #555);
+  color: var(--gpt-text-muted);
   margin: 8px 0 0;
+}
+
+@media (max-width: 640px) {
+  .messages-inner { padding: 16px 16px 8px; }
+  .input-area { padding: 8px 16px 12px; }
+  .suggestion-chips { flex-direction: column; align-items: center; }
+  .chip { width: 100%; max-width: 320px; justify-content: center; }
 }
 </style>
