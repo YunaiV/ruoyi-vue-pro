@@ -701,6 +701,8 @@ curl -s -X POST \
 - `estimated=false`：从 OpenAI 响应中拿到真实 token 数
 - `estimated=true`：响应未包含 usage，按字符数粗估（`chars/4`）
 
-> **后续计划（PR4）**：Runpod 图片生成（`POST /v2/{endpointId}/run`，非 OpenAI 兼容格式）。
+> **后续计划（PR4）**：Runpod 图片生成，支持两个端点（均走 `POST /v2/{endpointId}/run`，非 OpenAI 兼容格式）：
+> - `google-nano-banana-2-edit` — 通用图片编辑，input 含 `resolution`/`output_format`/`enable_safety_checker`
+> - `qwen-image-edit-2511` — Qwen 图片编辑，input 含 `size`/`output_format`/`enable_base64_output`/`enable_sync_mode`
 
 ---

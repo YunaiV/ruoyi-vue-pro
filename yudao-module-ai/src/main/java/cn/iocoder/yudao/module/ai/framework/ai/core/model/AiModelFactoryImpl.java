@@ -609,11 +609,25 @@ public class AiModelFactoryImpl implements AiModelFactory {
      *
      * TODO @deepay：PR4 补充 Runpod 图片生成（自定义端点 POST /v2/{endpointId}/run，非 OpenAI 兼容）
      *   curl 格式：POST https://api.runpod.ai/v2/google-nano-banana-2-edit/run
-     *   body：{"input":{"prompt":"...","resolution":"1k","output_format":"png","enable_safety_checker":true}}
-     *   已知图片端点：
-     *     - google-nano-banana-2-edit  （通用图片编辑）
-     *     - qwen-image-edit-2511       （Qwen 图片编辑）
-     *   注意：与聊天路径 /openai/v1 完全独立，需要单独的 RunpodImageModel 适配器
+     *              POST https://api.runpod.ai/v2/qwen-image-edit-2511/run
+     *   qwen-image-edit-2511 body：
+     *     {"input":{
+     *       "prompt":"...",
+     *       "size":"1024*1024",          // 宽高格式，优先于 width/height
+     *       "output_format":"jpeg",      // "jpeg" | "png"
+     *       "seed":-1,
+     *       "enable_base64_output":false,
+     *       "enable_sync_mode":false
+     *     }}
+     *   google-nano-banana-2-edit body：
+     *     {"input":{
+     *       "prompt":"...",
+     *       "resolution":"1k",
+     *       "output_format":"png",
+     *       "enable_safety_checker":true
+     *     }}
+     *   注意：Key 通过环境变量 RUNPOD_API_KEY 注入，绝不硬编码。
+     *         与聊天路径 /openai/v1 完全独立，需要单独的 RunpodImageModel 适配器
      */
     private ChatModel buildRunpodChatModel(String apiKey, String url) {
         YudaoAiProperties.Runpod properties = new YudaoAiProperties.Runpod()

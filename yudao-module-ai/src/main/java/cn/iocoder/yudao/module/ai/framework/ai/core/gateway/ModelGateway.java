@@ -97,8 +97,9 @@ public class ModelGateway {
                     Instant fbStart = Instant.now();
                     try {
                         ChatResponse fbResponse = callFallback(prompt, context, (Exception) ex);
-                        recordUsage(context, "runpod",
-                                fallback != null ? fallback.getDefaultOptions().getModel() : "unknown",
+                        String fbModelId = (fallback != null && fallback.getDefaultOptions() != null)
+                                ? fallback.getDefaultOptions().getModel() : "unknown";
+                        recordUsage(context, "runpod", fbModelId,
                                 Duration.between(fbStart, Instant.now()), null, fbResponse);
                         return Flux.just(fbResponse);
                     } catch (Exception fbEx) {
@@ -117,7 +118,8 @@ public class ModelGateway {
                     "[ModelGateway] 主模型调用失败且 Runpod fallback 未配置（请设置 RUNPOD_API_KEY）", primaryEx);
         }
         Instant start = Instant.now();
-        String fallbackModelId = fallback.getDefaultOptions().getModel();
+        String fallbackModelId = (fallback.getDefaultOptions() != null)
+                ? fallback.getDefaultOptions().getModel() : "unknown";
         try {
             ChatResponse response = fallback.call(prompt);
             recordUsage(context, "runpod", fallbackModelId,
