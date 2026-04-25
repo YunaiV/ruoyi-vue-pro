@@ -47,7 +47,7 @@ spring:
 yudao:
   web:
     admin-ui:
-      url: https://admin.deepay.srl  # CORS 允许来源，与前端域名保持一致
+      url: https://admin.deepay.srl,https://deepay.srl,https://modaui.com,https://www.modaui.com,https://ai.deepay.srl  # CORS 允许来源
 
 # ——————————————————————————————————————————————
 # Deepay AI 配置（按需填入真实 key）

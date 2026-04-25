@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <!-- ── Viewport / PWA ── -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta id="theme-color-meta" name="theme-color" content="#0a0a0a" />
+
+  <!-- ── iOS PWA (手机桌面独立 App) ── -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Deepay" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+
+  <!-- ── Android / PWA Manifest ── -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- ── SEO Meta ── -->
+  <meta name="description" content="Deepay · AI驱动的时尚设计平台，一站式图库、AI开店、模板库，60秒极速建店" />
+  <meta name="keywords" content="AI时尚,AI开店,服装设计,图库,模特,模板,Deepay,modaui" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Deepay" />
+
+  <!-- ── Open Graph (deepay.srl / modaui.com 分享预览) ── -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Deepay · AI时尚设计平台" />
+  <meta property="og:description" content="AI驱动，60秒极速建店，一站式图库 · AI开店 · 模板库" />
+  <meta property="og:url"         content="https://deepay.srl" />
+  <meta property="og:site_name"   content="Deepay" />
+  <meta property="og:locale"      content="zh_CN" />
+
+  <!-- ── Twitter Card ── -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Deepay · AI时尚设计平台" />
+  <meta name="twitter:description" content="AI驱动，60秒极速建店" />
+
+  <!-- ── Canonical ── -->
+  <link rel="canonical" href="https://deepay.srl" />
+
+  <!-- ── Fonts ── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <title>Deepay · AI时尚设计平台</title>
+  <style>
+    html, body { margin: 0; padding: 0; background: #0a0a0a; }
+    [data-theme="light"] body { background: #f2f2f7; }
+    /* 防止首屏 FOUC */
+    #app { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

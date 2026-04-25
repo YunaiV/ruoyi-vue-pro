@@ -1,0 +1,147 @@
+/* ── Global base styles ──────────────────────────────── */
+* { box-sizing: border-box; }
+
+page {
+  background: var(--dp-bg);
+  color: var(--dp-text);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Card glass ─────────────────────────────────────── */
+.card-glass {
+  background: var(--dp-card);
+  border: 1px solid var(--dp-card-border);
+  border-radius: 16rpx;
+  transition: all 0.2s;
+}
+
+/* ── Feature chip (Gemini-style) ────────────────────── */
+.chip-feature {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 14rpx 26rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  background: var(--dp-chip-bg);
+  border: 1px solid var(--dp-chip-border);
+  color: var(--dp-text);
+  white-space: nowrap;
+}
+
+/* ── Primary button ─────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+  color: #ffffff;
+  border-radius: 24rpx;
+  font-weight: 600;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  box-shadow: 0 8rpx 32rpx rgba(26,188,156,0.35);
+  letter-spacing: 0.5rpx;
+}
+
+/* ── Cell list item ──────────────────────────────────── */
+.dp-cell {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 32rpx;
+  border-bottom: 1px solid var(--dp-border);
+  background: var(--dp-card);
+}
+.dp-cell:last-child { border-bottom: none; }
+.dp-cell-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+.dp-cell-label  { font-size: 30rpx; color: var(--dp-text); font-weight: 500; flex: 1; }
+.dp-cell-value  { font-size: 28rpx; color: var(--dp-text-sub); margin-right: 12rpx; }
+.dp-cell-arrow  { font-size: 28rpx; color: var(--dp-text-muted); }
+
+/* ── Section title ───────────────────────────────────── */
+.dp-section-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--dp-text-sub);
+  padding: 24rpx 32rpx 12rpx;
+  letter-spacing: 0.5rpx;
+}
+
+/* ── Badge ───────────────────────────────────────────── */
+.badge-new {
+  background: #1abc9c;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+}
+
+/* ── Bottom nav ──────────────────────────────────────── */
+.dp-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(100rpx + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--dp-nav-bg);
+  border-top: 1px solid var(--dp-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  backdrop-filter: blur(20px);
+  z-index: 999;
+}
+.dp-tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 20rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--dp-text-muted);
+  flex: 1;
+  position: relative;
+}
+.dp-tabbar-item.active {
+  color: #1abc9c;
+}
+.dp-tabbar-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 4rpx;
+  background: #1abc9c;
+  border-radius: 0 0 4rpx 4rpx;
+}
+.dp-tabbar-icon { font-size: 44rpx; }
+
+/* ── Shimmer skeleton ─────────────────────────────────── */
+.skeleton {
+  border-radius: 16rpx;
+  background: linear-gradient(90deg, var(--dp-surface) 0%, var(--dp-surface2) 40%, rgba(26,188,156,0.06) 50%, var(--dp-surface2) 60%, var(--dp-surface) 100%);
+  background-size: 400% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer { 0% { background-position: -400% 0; } 100% { background-position: 400% 0; } }
+
+/* ── Fade-up entrance ──────────────────────────────────── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(20rpx); } to { opacity:1; transform:translateY(0); } }
+.fade-up { animation: fadeUp 0.5s cubic-bezier(.22,1,.36,1) both; }

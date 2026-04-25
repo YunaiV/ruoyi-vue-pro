@@ -1,0 +1,120 @@
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.25); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.4); }
+
+@layer base {
+  html { transition: background 0.25s ease; }
+  body {
+    margin: 0;
+    background: var(--dp-bg);
+    color: var(--dp-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  * { box-sizing: border-box; touch-action: manipulation; scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.25) transparent; }
+  ::selection { background: rgba(26,188,156,0.25); }
+}
+
+@layer components {
+  .dp-card {
+    background: var(--dp-card);
+    border: 1px solid var(--dp-card-border);
+    border-radius: 16px;
+    transition: all 0.2s;
+    box-shadow: var(--dp-shadow);
+  }
+  .dp-card:hover {
+    border-color: rgba(26,188,156,0.3);
+    box-shadow: var(--dp-shadow-lg);
+    transform: translateY(-2px);
+  }
+  .dp-btn {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(26,188,156,0.3);
+    position: relative; overflow: hidden;
+  }
+  .dp-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .dp-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(26,188,156,0.45); }
+  .dp-btn:active { transform: scale(0.97); }
+  .dp-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .dp-btn-ghost {
+    background: var(--dp-chip-bg);
+    color: var(--dp-text);
+    border: 1px solid var(--dp-chip-border);
+    border-radius: 12px;
+    font-weight: 500;
+    padding: 11px 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .dp-btn-ghost:hover { border-color: rgba(26,188,156,0.4); color: #1abc9c; background: rgba(26,188,156,0.08); }
+  .dp-btn-ghost:active { transform: scale(0.97); }
+  .dp-input {
+    background: var(--dp-surface);
+    border: 1px solid var(--dp-card-border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--dp-text);
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .dp-input::placeholder { color: var(--dp-text-muted); }
+  .dp-input:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 0 3px rgba(26,188,156,0.12);
+  }
+  .dp-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    background: var(--dp-chip-bg); border: 1px solid var(--dp-chip-border);
+    color: var(--dp-text); cursor: pointer; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .dp-chip:hover { background: var(--dp-accent-bg); border-color: rgba(26,188,156,0.4); color: #1abc9c; }
+  .dp-chip:active { transform: scale(0.95); }
+  .dp-chip.active { background: #1abc9c; color: #fff; border-color: #1abc9c; }
+  .dp-section-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--dp-text-sub);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .dp-skeleton {
+    border-radius: 12px;
+    background: linear-gradient(90deg, var(--dp-surface) 0%, var(--dp-surface2) 40%, rgba(26,188,156,0.06) 50%, var(--dp-surface2) 60%, var(--dp-surface) 100%);
+    background-size: 400% 100%;
+    animation: dp-shimmer 2s ease-in-out infinite;
+  }
+  @keyframes dp-shimmer { 0% { background-position: -400% 0; } 100% { background-position: 400% 0; } }
+  .dp-fade-up { animation: dp-fade-up 0.5s cubic-bezier(.22,1,.36,1) both; }
+  @keyframes dp-fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .dp-badge-new { background: #1abc9c; color: #fff; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
+}

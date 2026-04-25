@@ -1,0 +1,40 @@
+# ── 依赖 ──────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── 构建输出 ────────────────────────────────────
+dist/
+dist-ssr/
+
+# ── 环境变量 / 密钥（绝对不提交）──────────────
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ── 编辑器 ──────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── 系统文件 ────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── 日志 ────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── 测试覆盖率 ──────────────────────────────────
+coverage/

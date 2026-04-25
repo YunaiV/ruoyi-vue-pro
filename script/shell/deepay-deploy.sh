@@ -30,9 +30,9 @@ JAVA_OPTS="-server -Xms512m -Xmx512m \
   -XX:HeapDumpPath=${BACKEND_RUN}/heapDump"
 
 ## 前端
-FRONTEND_SRC=$PROJECT_ROOT/yudao-ui-deepay   # 前端源码目录
+FRONTEND_SRC=$PROJECT_ROOT/deepay-pwa          # PWA 前端源码目录（含 /admin 路由）
 FRONTEND_DIST=$FRONTEND_SRC/dist             # Vite 构建输出
-FRONTEND_DEPLOY=/www/wwwroot/admin            # Nginx root 指向的目录（Vite dist 直接部署到此）
+FRONTEND_DEPLOY=/www/wwwroot/deepay.srl      # Nginx root：同时服务 Web 入口 + PWA + /admin
 
 ## 备份
 BACKUP_DIR=$BACKEND_RUN/backup
@@ -245,17 +245,36 @@ esac
 # ============================================================
 step "🚀  部署完成"
 echo ""
-echo "  ┌────────────────────────────────────────────────────┐"
-echo "  │  后端端口  http://127.0.0.1:${BACKEND_PORT}            │"
+echo "  ┌──────────────────────────────────────────────────────────────┐"
+echo "  │  后端端口  http://127.0.0.1:${BACKEND_PORT}                     │"
 echo "  │  后端日志  $BACKEND_LOG"
 echo "  │  PID 文件  $BACKEND_PID"
 echo "  │  外置配置  $BACKEND_CFG/application-prod.yml"
 echo "  │  前端目录  $FRONTEND_DEPLOY"
 echo "  │  Swagger   http://127.0.0.1:${BACKEND_PORT}/swagger-ui"
-echo "  └────────────────────────────────────────────────────┘"
+echo "  ├──────────────────────────────────────────────────────────────┤"
+echo "  │  域名访问（HTTPS 须先在宝塔申请 SSL 证书）                   │"
+echo "  │                                                              │"
+echo "  │  🌐 Web 入口（用户）                                        │"
+echo "  │     https://deepay.srl          主站 PWA（中文）             │"
+echo "  │     https://modaui.com          主站 PWA（国际）             │"
+echo "  │                                                              │"
+echo "  │  📱 手机 App 入口                                           │"
+echo "  │     浏览器访问上方任一域名 → 浏览器菜单「添加到主屏幕」     │"
+echo "  │     iOS Safari: 分享 → 添加到主屏幕                         │"
+echo "  │     Android Chrome: 菜单 → 安装应用                         │"
+echo "  │                                                              │"
+echo "  │  ⚙️  管理后台                                               │"
+echo "  │     https://admin.deepay.srl    独立管理后台入口             │"
+echo "  │     https://deepay.srl/admin    前台侧栏「管理后台」按钮     │"
+echo "  │                                                              │"
+echo "  │  🔌 API 接口                                                │"
+echo "  │     https://api.deepay.srl      Spring Boot REST API         │"
+echo "  │     https://deepay.srl/api/     同上（Nginx 反代）           │"
+echo "  │                                                              │"
+echo "  │  🤖 AI 开店                                                 │"
+echo "  │     https://ai.deepay.srl       AI 开店页独立入口            │"
+echo "  │     https://deepay.srl/ai-sales 同上（前台直达）             │"
+echo "  └──────────────────────────────────────────────────────────────┘"
 echo ""
-echo "  域名访问："
-echo "    前端  https://deepay.srl"
-echo "    API   https://deepay.srl/api/..."
-echo ""
-echo "  Nginx 配置参见: docs/deepay/deploy-guide.md"
+echo "  Nginx 多域名配置参见: docs/deepay/deploy-guide.md"

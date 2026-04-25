@@ -8,29 +8,65 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'robots.txt'],
       manifest: {
-        name: 'Deepay AI · 爆款设计',
+        name: 'Deepay · AI时尚设计',
         short_name: 'Deepay',
-        description: 'AI帮你找到爆款服装，基于1688/TikTok实时分析',
-        theme_color: '#0B0B0B',
-        background_color: '#0B0B0B',
+        description: 'AI时尚设计助手，一键出款、整季系列、改款工具',
+        theme_color: '#0a0a0a',
+        background_color: '#0a0a0a',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'portrait-primary',
         start_url: '/',
+        scope: '/',
+        lang: 'zh-CN',
         icons: [
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
+        categories: ['productivity', 'lifestyle'],
+        screenshots: [],
       },
       workbox: {
-        // Network-first for API; cache-first for static assets
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
+            // API: NetworkFirst (fresh data, fallback to cache)
             urlPattern: /^\/api\//,
-            handler: 'NetworkOnly',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'deepay-api-cache',
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 100, maxAgeSeconds: 300 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Google Fonts: CacheFirst
+            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'deepay-fonts-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Images: StaleWhileRevalidate
+            urlPattern: /\.(?:png|jpg|jpeg|webp|svg|gif)$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'deepay-image-cache',
+              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
           },
         ],
       },
+      devOptions: { enabled: true },
     }),
   ],
   resolve: {

@@ -1,0 +1,26 @@
+{
+  "name": "deepay-app",
+  "version": "1.0.0",
+  "description": "Deepay AI Fashion Design — UniApp 跨平台版",
+  "scripts": {
+    "dev:h5":        "uni",
+    "build:h5":      "uni build",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:app":     "uni build -p app"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-4010920250401001",
+    "@dcloudio/uni-h5":  "3.0.0-4010920250401001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-4010920250401001",
+    "wot-design-uni": "^1.5.0",
+    "pinia": "^2.1.7",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "*",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "vite": "^4.5.0",
+    "@uni-helper/vite-plugin-uni-components": "^0.0.9",
+    "unplugin-auto-import": "^0.17.0"
+  }
+}

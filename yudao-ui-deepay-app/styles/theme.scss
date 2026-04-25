@@ -1,0 +1,45 @@
+/* ── Dark Theme (default) ──────────────────────────────── */
+page, .dp-dark {
+  --dp-bg:           #0a0a0a;
+  --dp-surface:      #141414;
+  --dp-surface2:     #1e1e1e;
+  --dp-card:         rgba(255,255,255,0.04);
+  --dp-card-border:  rgba(255,255,255,0.09);
+  --dp-text:         #e8e8e8;
+  --dp-text-bright:  #ffffff;
+  --dp-text-sub:     #999;
+  --dp-text-muted:   #555;
+  --dp-accent:       #1abc9c;
+  --dp-accent-hover: #16a085;
+  --dp-accent-bg:    rgba(26,188,156,0.12);
+  --dp-border:       rgba(255,255,255,0.07);
+  --dp-nav-bg:       rgba(10,10,10,0.97);
+  --dp-input-bg:     rgba(22,22,22,0.98);
+  --dp-chip-bg:      rgba(255,255,255,0.07);
+  --dp-chip-border:  rgba(255,255,255,0.11);
+  --dp-shadow:       0 4px 20px rgba(0,0,0,0.5);
+  --dp-danger:       #ef4444;
+}
+
+/* ── Light Theme ───────────────────────────────────────── */
+.dp-light {
+  --dp-bg:           #f2f2f7;
+  --dp-surface:      #ffffff;
+  --dp-surface2:     #f8f8f8;
+  --dp-card:         rgba(255,255,255,0.92);
+  --dp-card-border:  rgba(0,0,0,0.08);
+  --dp-text:         #1a1a1a;
+  --dp-text-bright:  #000000;
+  --dp-text-sub:     #6e6e73;
+  --dp-text-muted:   #ababab;
+  --dp-accent:       #1abc9c;
+  --dp-accent-hover: #16a085;
+  --dp-accent-bg:    rgba(26,188,156,0.1);
+  --dp-border:       rgba(0,0,0,0.08);
+  --dp-nav-bg:       rgba(242,242,247,0.97);
+  --dp-input-bg:     rgba(255,255,255,0.99);
+  --dp-chip-bg:      rgba(0,0,0,0.05);
+  --dp-chip-border:  rgba(0,0,0,0.1);
+  --dp-shadow:       0 2px 16px rgba(0,0,0,0.08);
+  --dp-danger:       #ef4444;
+}

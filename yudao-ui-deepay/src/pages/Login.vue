@@ -24,15 +24,15 @@ if (isLoggedIn()) {
   router.replace(route.query.redirect || '/me')
 }
 
-const email     = ref('')
-const password  = ref('')
+const email      = ref('')
+const password   = ref('')
 const submitting = ref(false)
-const errorMsg  = ref('')
+const errorMsg   = ref('')
 
 async function login() {
   errorMsg.value = ''
-  if (!email.value.trim())    { errorMsg.value = '请填写邮箱';  return }
-  if (!password.value.trim()) { errorMsg.value = '请填写密码';  return }
+  if (!email.value.trim())    { errorMsg.value = '请填写邮箱'; return }
+  if (!password.value.trim()) { errorMsg.value = '请填写密码'; return }
 
   submitting.value = true
   try {
@@ -71,87 +71,239 @@ function continueAsGuest() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg text-white flex flex-col">
+  <div class="login-page">
 
-    <!-- 顶部 logo -->
-    <header class="px-6 pt-12 pb-8 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center
-                  text-white font-black text-xl mx-auto mb-4">D</div>
-      <h1 class="text-2xl font-black">欢迎回来</h1>
-      <p class="text-muted text-sm mt-1">登录后查看收益、排名和邀请奖励</p>
-    </header>
+    <!-- Background decoration -->
+    <div class="login-bg-orb login-bg-orb-1" />
+    <div class="login-bg-orb login-bg-orb-2" />
 
-    <div class="flex-1 px-6 max-w-[480px] w-full mx-auto">
+    <!-- Card -->
+    <div class="login-card">
 
-      <!-- 表单 -->
-      <div class="space-y-4 mb-6">
-        <div>
-          <label class="text-xs text-muted block mb-1">邮箱</label>
+      <!-- Logo -->
+      <div class="login-logo-wrap">
+        <div class="login-logo-mark">D</div>
+        <div class="login-logo-glow" />
+      </div>
+
+      <h1 class="login-heading">欢迎回来</h1>
+      <p class="login-subheading">登录后查看收益、排名和邀请奖励</p>
+
+      <!-- Form -->
+      <div class="login-form">
+        <div class="login-field">
+          <label class="login-label">邮箱</label>
           <input
             v-model="email"
             type="email"
             placeholder="your@email.com"
             autocomplete="email"
-            class="w-full h-12 rounded-xl px-4 text-sm bg-surface
-                   border border-border text-white placeholder:text-muted
-                   focus:outline-none focus:border-accent transition-colors"
+            class="login-input"
             @keydown.enter="login"
           />
         </div>
-        <div>
-          <label class="text-xs text-muted block mb-1">密码</label>
+
+        <div class="login-field">
+          <label class="login-label">密码</label>
           <input
             v-model="password"
             type="password"
             placeholder="••••••••"
             autocomplete="current-password"
-            class="w-full h-12 rounded-xl px-4 text-sm bg-surface
-                   border border-border text-white placeholder:text-muted
-                   focus:outline-none focus:border-accent transition-colors"
+            class="login-input"
             @keydown.enter="login"
           />
         </div>
 
-        <!-- 错误提示 -->
-        <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
+        <!-- Error -->
+        <div v-if="errorMsg" class="login-error">
+          <span>⚠️</span> {{ errorMsg }}
+        </div>
+
+        <!-- Login button -->
+        <button
+          class="login-btn"
+          :disabled="submitting"
+          @click="login"
+        >
+          <span v-if="submitting" class="login-spinner" />
+          <span>{{ submitting ? '登录中…' : '登录' }}</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="login-divider">
+          <div class="login-divider-line" />
+          <span class="login-divider-text">或</span>
+          <div class="login-divider-line" />
+        </div>
+
+        <!-- Guest button -->
+        <button class="login-guest-btn" @click="continueAsGuest">
+          先逛逛，不登录
+        </button>
       </div>
 
-      <!-- 登录按钮 -->
-      <button
-        :disabled="submitting"
-        class="w-full h-12 rounded-full font-bold text-sm mb-4
-               active:scale-95 transition-transform duration-100
-               disabled:opacity-50 disabled:cursor-not-allowed"
-        style="background:#1abc9c;color:#fff"
-        @click="login"
-      >
-        {{ submitting ? '登录中…' : '登录' }}
-      </button>
-
-      <!-- 分割线 -->
-      <div class="flex items-center gap-3 mb-4">
-        <div class="flex-1 h-px bg-border" />
-        <span class="text-muted text-xs">或</span>
-        <div class="flex-1 h-px bg-border" />
-      </div>
-
-      <!-- 访客入口 -->
-      <button
-        class="w-full h-12 rounded-full font-semibold text-sm text-muted
-               border border-border active:text-white active:border-white
-               transition-colors duration-100"
-        @click="continueAsGuest"
-      >
-        先逛逛，不登录
-      </button>
-
-      <!-- 温馨提示 -->
-      <p class="text-center text-muted text-xs mt-6 leading-relaxed">
-        登录后收益、排名和邀请奖励才能正常记录 💰<br>
+      <!-- Footer note -->
+      <p class="login-note">
+        登录后收益、排名和邀请奖励才能正常记录 💰<br />
         每邀请一位好友下单即得 €2 奖励
       </p>
 
     </div>
-
   </div>
 </template>
+
+<style scoped>
+.login-page {
+  min-height: 100vh;
+  background: var(--c-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background orbs */
+.login-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.login-bg-orb-1 {
+  width: 320px; height: 320px;
+  background: rgba(26,188,156,0.12);
+  top: -80px; right: -80px;
+}
+.login-bg-orb-2 {
+  width: 280px; height: 280px;
+  background: rgba(26,188,156,0.07);
+  bottom: -60px; left: -60px;
+}
+
+/* Card */
+.login-card {
+  width: 100%; max-width: 420px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-card-border);
+  border-radius: 24px;
+  padding: 36px 28px 28px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+}
+
+/* Logo */
+.login-logo-wrap {
+  width: 64px; height: 64px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+.login-logo-mark {
+  width: 64px; height: 64px; border-radius: 18px;
+  background: linear-gradient(135deg, #1abc9c, #0d6e5a);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 28px; color: #fff;
+  box-shadow: 0 8px 24px rgba(26,188,156,0.45);
+  position: relative; z-index: 1;
+}
+.login-logo-glow {
+  position: absolute; inset: -8px;
+  background: radial-gradient(circle, rgba(26,188,156,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.login-heading {
+  font-size: 24px; font-weight: 800;
+  color: var(--c-text-bright);
+  text-align: center; margin: 0 0 6px;
+}
+.login-subheading {
+  font-size: 13px; color: var(--c-text-sub);
+  text-align: center; margin: 0 0 24px;
+}
+
+/* Form */
+.login-form { display: flex; flex-direction: column; gap: 14px; }
+
+.login-field { display: flex; flex-direction: column; gap: 6px; }
+.login-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--c-text-sub); letter-spacing: 0.3px;
+}
+.login-input {
+  height: 48px; border-radius: 14px;
+  padding: 0 16px; font-size: 14px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  color: var(--c-text); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.login-input::placeholder { color: var(--c-text-muted); }
+.login-input:focus {
+  border-color: rgba(26,188,156,0.5);
+  box-shadow: 0 0 0 3px rgba(26,188,156,0.1);
+}
+
+/* Error */
+.login-error {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px; border-radius: 12px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  color: #ef4444; font-size: 13px;
+}
+
+/* Login button */
+.login-btn {
+  height: 50px; border-radius: 25px;
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+  border: none; color: #fff;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 16px rgba(26,188,156,0.4);
+  transition: all 0.2s;
+}
+.login-btn:hover { box-shadow: 0 6px 22px rgba(26,188,156,0.5); transform: translateY(-1px); }
+.login-btn:active { transform: scale(0.97); }
+.login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.login-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Divider */
+.login-divider {
+  display: flex; align-items: center; gap: 12px;
+}
+.login-divider-line { flex: 1; height: 1px; background: var(--c-border); }
+.login-divider-text { font-size: 12px; color: var(--c-text-muted); }
+
+/* Guest button */
+.login-guest-btn {
+  height: 48px; border-radius: 24px;
+  background: transparent;
+  border: 1px solid var(--c-card-border);
+  color: var(--c-text-sub); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.login-guest-btn:hover {
+  border-color: var(--c-text-sub);
+  color: var(--c-text);
+}
+.login-guest-btn:active { transform: scale(0.97); }
+
+/* Note */
+.login-note {
+  font-size: 12px; color: var(--c-text-muted);
+  text-align: center; margin: 20px 0 0;
+  line-height: 1.7;
+}
+</style>
