@@ -54,6 +54,54 @@
         </div>
       </div>
 
+      <!-- ── AI 接口配置 ──────────────────── -->
+      <div class="settings-section">
+        <h2 class="section-label">AI 接口配置</h2>
+        <div class="settings-group">
+
+          <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+            <div class="row-left" style="width:100%">
+              <span class="row-icon">🔑</span>
+              <div class="row-text">
+                <span class="row-title">RunPod API Key</span>
+                <span class="row-sub">用于 AI 图像生成、换装、视频生成。<a href="https://runpod.io/console/user/settings" target="_blank" rel="noopener" style="color:#10a37f">获取 Key →</a></span>
+              </div>
+            </div>
+            <div class="api-key-input-row">
+              <input
+                :type="showApiKey ? 'text' : 'password'"
+                v-model="runpodKeyInput"
+                class="field-input api-key-input"
+                placeholder="xxxxxxxxxx...（不会上传到服务器，仅存本地）"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button class="key-toggle-btn" @click="showApiKey = !showApiKey" :title="showApiKey ? '隐藏' : '显示'">
+                {{ showApiKey ? '🙈' : '👁️' }}
+              </button>
+              <button class="key-save-btn" @click="saveRunpodKey" :disabled="!runpodKeyInput.trim()">
+                保存
+              </button>
+            </div>
+            <p v-if="keyStatus" class="key-status" :class="keyStatusType">{{ keyStatus }}</p>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <div class="settings-row">
+            <div class="row-left">
+              <span class="row-icon">🤖</span>
+              <div class="row-text">
+                <span class="row-title">可用模型</span>
+                <span class="row-sub">16 个端点 · 图像生成 / 图像编辑 / 图生视频</span>
+              </div>
+            </div>
+            <button class="edit-btn" @click="router.push('/image-library')">去生成</button>
+          </div>
+
+        </div>
+      </div>
+
       <!-- ── 账号 ──────────────────────── -->
       <div class="settings-section">
         <h2 class="section-label">账号</h2>
@@ -280,12 +328,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useThemeStore, useUserStore, useChatStore } from '@/store/index.js'
+import { useThemeStore, useUserStore, useChatStore, useImageGenStore } from '@/store/index.js'
 
 const router = useRouter()
 const themeStore = useThemeStore()
-const userStore = useUserStore()
-const chatStore = useChatStore()
+const userStore  = useUserStore()
+const chatStore  = useChatStore()
+const genStore   = useImageGenStore()
 
 const fontSize = ref(1)
 const fontSizeLabels = ['小', '中（默认）', '大']
@@ -295,6 +344,21 @@ const showClearConfirm = ref(false)
 const showLogoutConfirm = ref(false)
 const showEditModal = ref(false)
 const editName = ref(userStore.displayName)
+
+// RunPod API Key
+const runpodKeyInput = ref(genStore.apiKey)
+const showApiKey = ref(false)
+const keyStatus = ref('')
+const keyStatusType = ref('success')
+
+function saveRunpodKey() {
+  const k = runpodKeyInput.value.trim()
+  if (!k) return
+  genStore.setApiKey(k)
+  keyStatus.value = '✓ API Key 已保存到本地'
+  keyStatusType.value = 'success'
+  setTimeout(() => { keyStatus.value = '' }, 3000)
+}
 
 function clearChats() {
   chatStore.clearSessions()
@@ -653,6 +717,51 @@ function logout() {
 }
 .field-input:focus { border-color: #10a37f; }
 .field-input::placeholder { color: var(--gpt-text-muted); }
+
+/* API Key input row */
+.api-key-input-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.api-key-input {
+  flex: 1;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.key-toggle-btn {
+  padding: 8px 10px;
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.key-toggle-btn:hover { background: var(--gpt-sidebar-hover); }
+.key-save-btn {
+  padding: 8px 16px;
+  background: #10a37f;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.key-save-btn:hover:not(:disabled) { background: #0d8b6e; }
+.key-save-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.key-status {
+  font-size: 12px;
+  margin: 0;
+  padding: 0;
+}
+.key-status.success { color: #10a37f; }
+.key-status.error   { color: #ef4444; }
 
 @media (max-width: 640px) {
   .settings-page { padding: 16px 16px 60px; }

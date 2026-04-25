@@ -67,7 +67,7 @@
             <img v-if="item.src" :src="item.src" :alt="item.title" class="card-real-img" />
             <div class="card-overlay">
               <button class="use-btn" @click.stop="router.push({ path: '/ai-sales', query: { img: item.src || item.title } })">用于开店</button>
-              <button class="preview-btn" @click.stop="item.isAI ? openDetail(item) : router.push('/template-library')" title="查看">
+              <button class="preview-btn" @click.stop="router.push('/template-library')" title="查看">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
@@ -115,7 +115,10 @@
             ✏️ 文生图
           </button>
           <button class="gen-tab" :class="{ active: genTab === 'img2img' }" @click="genTab = 'img2img'">
-            🔄 图生图 / 局部编辑
+            🎨 图片编辑
+          </button>
+          <button class="gen-tab" :class="{ active: genTab === 'img2vid' }" @click="genTab = 'img2vid'">
+            🎬 图生视频
           </button>
         </div>
 
@@ -123,17 +126,21 @@
         <div class="gen-section">
           <label class="gen-label">选择模型</label>
           <div class="model-cards">
-            <button
-              v-for="m in availableModels"
-              :key="m.id"
-              class="model-card"
-              :class="{ selected: selectedModel === m.id }"
-              @click="selectedModel = m.id"
-            >
-              <span class="model-badge" :style="{ background: m.badgeColor }">{{ m.badge }}</span>
-              <span class="model-name">{{ m.label }}</span>
-              <span class="model-desc">{{ m.desc }}</span>
-            </button>
+            <template v-for="group in modelGroups" :key="group.label">
+              <div class="model-group-label">{{ group.label }}</div>
+              <button
+                v-for="m in group.models"
+                :key="m.id"
+                class="model-card"
+                :class="{ selected: selectedModel === m.id }"
+                @click="selectedModel = m.id"
+              >
+                <span class="model-badge" :style="{ background: m.badgeColor }">{{ m.badge }}</span>
+                <span class="model-name">{{ m.label }}</span>
+                <span class="model-desc">{{ m.desc }}</span>
+                <span class="model-maker">{{ m.maker }}</span>
+              </button>
+            </template>
           </div>
         </div>
 
@@ -216,6 +223,24 @@
               <input type="range" v-model.number="guidance" min="0" max="15" step="0.5" class="param-slider" :disabled="genStore.isGenerating" />
             </div>
 
+            <!-- Video-only params -->
+            <template v-if="isVideoTab">
+              <div class="param-row">
+                <label class="param-label">
+                  帧数 (Frames)
+                  <span class="param-val">{{ numFrames }}</span>
+                </label>
+                <input type="range" v-model.number="numFrames" min="17" max="129" step="8" class="param-slider" :disabled="genStore.isGenerating" />
+              </div>
+              <div class="param-row">
+                <label class="param-label">
+                  帧率 (FPS)
+                  <span class="param-val">{{ fps }}</span>
+                </label>
+                <input type="range" v-model.number="fps" min="8" max="30" step="2" class="param-slider" :disabled="genStore.isGenerating" />
+              </div>
+            </template>
+
             <div class="param-row">
               <label class="param-label">
                 随机种子
@@ -241,17 +266,19 @@
         </div>
 
         <!-- Latest result preview -->
-        <div v-if="latestResult" class="gen-result">
+        <div v-if="latestResult.url" class="gen-result">
           <div class="gen-result-head">
-            <span class="gen-result-label">✨ 生成结果</span>
+            <span class="gen-result-label">✨ 生成结果 · {{ latestResult.type === 'video' ? '视频' : '图像' }}</span>
             <div class="gen-result-actions">
-              <a :href="latestResult" download="deepay-generated.png" class="result-action-btn">
+              <a :href="latestResult.url" :download="latestResult.type === 'video' ? 'deepay-video.mp4' : 'deepay-image.png'" target="_blank" class="result-action-btn">
                 ⬇ 下载
               </a>
-              <button class="result-action-btn accent" @click="useInSales">🏪 用于开店</button>
+              <button v-if="latestResult.type === 'image'" class="result-action-btn accent" @click="useInSales">🏪 用于开店</button>
+              <button v-if="latestResult.type === 'image'" class="result-action-btn" @click="useAsRefImage">🔄 作为参考图</button>
             </div>
           </div>
-          <img :src="latestResult" class="gen-result-img" alt="AI 生成结果" />
+          <video v-if="latestResult.type === 'video'" :src="latestResult.url" class="gen-result-video" controls autoplay loop muted playsinline></video>
+          <img v-else :src="latestResult.url" class="gen-result-img" alt="AI 生成结果" />
         </div>
 
         <!-- Action buttons -->
@@ -267,7 +294,7 @@
           <button
             v-else
             class="gen-submit-btn"
-            :disabled="!prompt.trim() || !genStore.apiKey"
+            :disabled="!prompt.trim() || apiKeyMissing()"
             @click="startGeneration"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -286,10 +313,10 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useImageGenStore } from '@/store/index.js'
-import { generate, cancelJob, MODELS, toImageSrc } from '@/api/runpod.js'
+import { generate, cancelJob, MODELS, MODEL_TYPES, getModelsByType, toImageSrc, hasApiKey } from '@/api/runpod.js'
 
-const router = useRouter()
-const route  = useRoute()
+const router   = useRouter()
+const route    = useRoute()
 const genStore = useImageGenStore()
 
 // ── Gallery state ──────────────────────────────────────
@@ -299,62 +326,78 @@ const searchQuery  = ref('')
 const activeFilter = ref('全部')
 
 // ── Generation modal state ─────────────────────────────
-const showGenModal  = ref(false)
-const genTab        = ref('txt2img')
-const selectedModel = ref('flux-kontext')
-const prompt        = ref('')
+const showGenModal   = ref(false)
+const genTab         = ref('txt2img')
+const selectedModel  = ref('flux-schnell')
+const prompt         = ref('')
 const negativePrompt = ref('')
-const refImageUrl   = ref('')
-const selectedSize  = ref('1024x1024')
-const steps         = ref(28)
-const guidance      = ref(2)
-const seed          = ref(-1)
-const latestResult  = ref('')
+const refImageUrl    = ref('')
+const selectedSize   = ref('1024x1024')
+const steps          = ref(4)
+const guidance       = ref(0)
+const seed           = ref(-1)
+// Video params
+const numFrames      = ref(81)
+const fps            = ref(16)
+// Result: { url, type: 'image'|'video' }
+const latestResult   = ref(null)
 
-const sizeOptions = ['512x512', '768x768', '1024x1024', '1024x768', '768x1024', '1280x720']
+const sizeOptions = ['512x512', '768x768', '1024x1024', '1024x768', '768x1024', '1280x720', '1280x1280']
 
-// Models available per tab
-const availableModels = computed(() => {
-  const all = Object.values(MODELS)
-  if (genTab.value === 'img2img') return all.filter(m => m.supportsImg)
-  return all
+// Model groups per tab (used in template)
+const modelGroups = computed(() => {
+  if (genTab.value === 'txt2img') {
+    return [{ label: '图像生成', models: getModelsByType(MODEL_TYPES.TXT2IMG) }]
+  }
+  if (genTab.value === 'img2img') {
+    return [{ label: '图像编辑', models: getModelsByType(MODEL_TYPES.IMG2IMG) }]
+  }
+  if (genTab.value === 'img2vid') {
+    return [{ label: '图生视频', models: getModelsByType(MODEL_TYPES.IMG2VID) }]
+  }
+  return []
 })
 
 const currentModel = computed(() => MODELS[selectedModel.value])
 
+const isVideoTab = computed(() => genTab.value === 'img2vid')
+
 const promptPlaceholder = computed(() => {
-  if (genTab.value === 'img2img') {
-    return '描述想要的修改，例如：把领口改成深V领，颜色换成深海蓝，保持其他部分不变'
-  }
-  return '例如：一款高级感秋冬外套，深藏蓝色，简约廓形，欧根纱领，模特平铺拍摄，超清质感'
+  if (genTab.value === 'img2img') return '描述要修改的内容，例如：把领口改成深V领，颜色换成深海蓝，保持模特姿势不变'
+  if (genTab.value === 'img2vid') return '描述视频动作，例如：模特缓缓转身，头发随风飘动，背景虚化，时尚走秀风格'
+  return '例如：一款高级感秋冬外套，深藏蓝色，简约廓形，欧根纱领，模特平铺拍摄，超清质感，商业摄影'
 })
 
-// Sync model defaults with params when model changes
+// Switch model when tab changes
+watch(genTab, (tab) => {
+  const typeMap = { txt2img: MODEL_TYPES.TXT2IMG, img2img: MODEL_TYPES.IMG2IMG, img2vid: MODEL_TYPES.IMG2VID }
+  const models  = getModelsByType(typeMap[tab])
+  if (models.length && !models.find(m => m.id === selectedModel.value)) {
+    selectedModel.value = models[0].id
+  }
+})
+
+// Sync advanced params when model changes
 watch(selectedModel, (id) => {
   const m = MODELS[id]
   if (!m) return
   steps.value    = m.defaults.num_inference_steps
-  guidance.value = m.defaults.guidance
+  guidance.value = m.defaults.guidance ?? 0
+  if (m.defaults.num_frames) numFrames.value = m.defaults.num_frames
+  if (m.defaults.fps)        fps.value        = m.defaults.fps
   genStore.setModel(id)
-})
-
-// When img2img tab is selected, switch to a model that supports images
-watch(genTab, (tab) => {
-  if (tab === 'img2img' && !currentModel.value?.supportsImg) {
-    selectedModel.value = 'flux-kontext'
-  }
 })
 
 // Pre-fill ref image URL from route query (?img=)
 watch(() => route.query.img, (v) => {
-  if (v) {
-    refImageUrl.value = String(v)
-    genTab.value = 'img2img'
+  if (v && String(v).startsWith('http')) {
+    refImageUrl.value  = String(v)
+    genTab.value       = 'img2img'
     showGenModal.value = true
   }
 }, { immediate: true })
 
-// ── Gallery data: static + AI-generated history ─────────
+// ── Gallery data ───────────────────────────────────────
 const staticImages = [
   { id: 1,  title: '春季宽松外套',   category: '服装', size: '2048×2048', gradient: 'linear-gradient(135deg,#667eea,#764ba2)', src: null },
   { id: 2,  title: '复古皮革手包',   category: '配饰', size: '1920×1920', gradient: 'linear-gradient(135deg,#f093fb,#f5576c)', src: null },
@@ -372,15 +415,15 @@ const staticImages = [
 
 const filters = ['全部', '服装', '配饰', '鞋靴', '背景', 'AI 生成']
 
-// Merge static + generated history as gallery items
 const allImages = computed(() => {
   const genItems = genStore.history.map(h => ({
     id:       h.id,
     title:    h.prompt.slice(0, 20) + (h.prompt.length > 20 ? '…' : ''),
     category: 'AI 生成',
-    size:     '1024×1024',
+    size:     h.type === 'video' ? '视频' : '1024×1024',
     gradient: 'linear-gradient(135deg,#10a37f,#0d5f4e)',
-    src:      toImageSrc(h.src),
+    src:      h.type === 'video' ? null : toImageSrc(h.src),
+    video:    h.type === 'video' ? h.src : null,
     isAI:     true,
     prompt:   h.prompt,
     model:    h.model,
@@ -391,9 +434,7 @@ const allImages = computed(() => {
 
 const filteredItems = computed(() => {
   let list = allImages.value
-  if (activeFilter.value !== '全部') {
-    list = list.filter(i => i.category === activeFilter.value)
-  }
+  if (activeFilter.value !== '全部') list = list.filter(i => i.category === activeFilter.value)
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase()
     list = list.filter(i => i.title.toLowerCase().includes(q) || i.category.toLowerCase().includes(q))
@@ -403,9 +444,9 @@ const filteredItems = computed(() => {
 
 // ── Generation logic ───────────────────────────────────
 async function startGeneration() {
-  if (!prompt.value.trim() || !genStore.apiKey) return
+  if (!prompt.value.trim()) return
   genStore.reset()
-  latestResult.value = ''
+  latestResult.value = null
 
   const params = {
     prompt:              prompt.value.trim(),
@@ -416,8 +457,10 @@ async function startGeneration() {
     size:                selectedSize.value,
     output_format:       'png',
   }
-  if (refImageUrl.value.trim()) {
-    params.image = refImageUrl.value.trim()
+  if (refImageUrl.value.trim())  params.image      = refImageUrl.value.trim()
+  if (isVideoTab.value) {
+    params.num_frames = numFrames.value
+    params.fps        = fps.value
   }
 
   try {
@@ -428,19 +471,14 @@ async function startGeneration() {
       (status, msg) => genStore.updateProgress(status, msg),
     )
 
-    genStore.addResult({
-      images: result.images,
-      seed:   result.seed,
-      prompt: params.prompt,
-      model:  selectedModel.value,
-      params,
-    })
-
-    // Show first image as preview
-    if (result.images[0]) {
-      latestResult.value = toImageSrc(result.images[0])
+    if (result.type === 'video') {
+      genStore.addResult({ images: [result.video], seed: result.seed, prompt: params.prompt, model: selectedModel.value, params, type: 'video' })
+      latestResult.value = { url: result.video, type: 'video' }
+    } else {
+      const imgSrc = toImageSrc(result.images[0])
+      genStore.addResult({ images: result.images, seed: result.seed, prompt: params.prompt, model: selectedModel.value, params, type: 'image' })
+      latestResult.value = { url: imgSrc, type: 'image' }
     }
-
   } catch (err) {
     genStore.setError(`❌ ${err.message}`)
   }
@@ -448,30 +486,33 @@ async function startGeneration() {
 
 async function stopGeneration() {
   if (genStore.jobId) {
-    try {
-      await cancelJob(genStore.apiKey, selectedModel.value, genStore.jobId)
-    } catch { /* ignore */ }
+    try { await cancelJob(genStore.apiKey, selectedModel.value, genStore.jobId) } catch { /* ignore */ }
   }
   genStore.reset()
 }
 
 function closeModal() {
-  if (!genStore.isGenerating) {
-    showGenModal.value = false
-    genStore.reset()
-  } else {
-    // Keep generating in background, just close UI
-    showGenModal.value = false
-  }
+  showGenModal.value = false
+  if (!genStore.isGenerating) genStore.reset()
 }
 
 function useInSales() {
-  if (latestResult.value) {
-    router.push({ path: '/ai-sales', query: { img: latestResult.value.startsWith('http') ? latestResult.value : 'generated' } })
+  if (latestResult.value?.url?.startsWith('http')) {
+    router.push({ path: '/ai-sales', query: { img: latestResult.value.url } })
   }
 }
 
-// ── Lifecycle ──────────────────────────────────────────
+function useAsRefImage() {
+  if (latestResult.value?.url) {
+    refImageUrl.value = latestResult.value.url.startsWith('http') ? latestResult.value.url : ''
+    genTab.value = 'img2img'
+  }
+}
+
+function apiKeyMissing() {
+  return !genStore.apiKey && !hasApiKey()
+}
+
 onMounted(() => {
   setTimeout(() => { loading.value = false }, 800)
   setTimeout(() => { cardsVisible.value = true }, 850)
@@ -743,33 +784,212 @@ onMounted(() => {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px 16px 40px;
+  overflow-y: auto;
+}
+
+/* ── Generation Modal ───────────────────────────────────── */
+.gen-modal {
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 18px;
+  padding: 0;
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.gen-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--gpt-border);
+}
+.gen-modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gen-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gpt-text);
+  margin: 0;
+}
+.gen-modal-close {
+  width: 30px;
+  height: 30px;
+  background: var(--gpt-sidebar-hover);
+  border: none;
+  border-radius: 50%;
+  color: var(--gpt-text-sub);
+  font-size: 14px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  padding: 24px;
+  transition: background 0.15s;
 }
-.modal {
-  background: var(--gpt-input-bg);
-  border: 1px solid var(--gpt-border);
-  border-radius: 16px;
-  padding: 28px;
-  width: 100%;
-  max-width: 460px;
-}
-.modal-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--gpt-text);
-  margin: 0 0 6px;
-}
-.modal-sub {
+.gen-modal-close:hover { background: var(--gpt-border); }
+.gen-modal-close:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* API key warning */
+.api-key-warn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: rgba(245,158,11,0.1);
+  border-bottom: 1px solid rgba(245,158,11,0.2);
   font-size: 13px;
-  color: var(--gpt-text-sub);
-  margin: 0 0 16px;
+  color: #d97706;
+  flex-wrap: wrap;
 }
-.modal-textarea {
+.warn-link {
+  background: none;
+  border: none;
+  color: #10a37f;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* Tabs */
+.gen-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 14px 22px 0;
+}
+.gen-tab {
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid var(--gpt-border);
+  border-radius: 10px 10px 0 0;
+  border-bottom: none;
+  color: var(--gpt-text-sub);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.gen-tab:hover { color: var(--gpt-text); background: var(--gpt-sidebar-hover); }
+.gen-tab.active {
+  background: var(--gpt-main);
+  border-color: var(--gpt-border);
+  color: #10a37f;
+  font-weight: 600;
+}
+
+/* Sections */
+.gen-section {
+  padding: 16px 22px 0;
+}
+.gen-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gpt-text-muted);
+  margin-bottom: 8px;
+}
+.gen-label-hint {
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--gpt-text-muted);
+  opacity: 0.8;
+}
+.gen-label-hint.optional { opacity: 0.6; }
+
+/* Model group header */
+.model-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gpt-text-muted);
+  padding: 8px 4px 4px;
+}
+
+/* Model cards */
+.model-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--gpt-border);
+  border-radius: 10px;
+  padding: 6px;
+  background: var(--gpt-main);
+}
+.model-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+.model-card:hover { background: var(--gpt-sidebar-hover); border-color: var(--gpt-border); }
+.model-card.selected {
+  background: rgba(16,163,127,0.1);
+  border-color: rgba(16,163,127,0.4);
+}
+.model-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 36px;
+  text-align: center;
+}
+.model-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gpt-text);
+  flex-shrink: 0;
+  min-width: 120px;
+}
+.model-desc {
+  font-size: 12px;
+  color: var(--gpt-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.model-maker {
+  font-size: 11px;
+  color: var(--gpt-text-muted);
+  opacity: 0.6;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Inputs */
+.gen-textarea {
   width: 100%;
   background: var(--gpt-main);
   border: 1px solid var(--gpt-border);
@@ -781,37 +1001,276 @@ onMounted(() => {
   resize: vertical;
   box-sizing: border-box;
   font-family: inherit;
+  line-height: 1.6;
   transition: border-color 0.2s;
 }
-.modal-textarea:focus { border-color: #10a37f; }
-.modal-textarea::placeholder { color: var(--gpt-text-muted); }
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 18px;
+.gen-textarea:focus { border-color: #10a37f; }
+.gen-textarea::placeholder { color: var(--gpt-text-muted); }
+.gen-textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.gen-input {
+  width: 100%;
+  background: var(--gpt-main);
+  border: 1px solid var(--gpt-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--gpt-text);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
 }
-.modal-cancel {
-  padding: 9px 20px;
-  background: transparent;
+.gen-input:focus { border-color: #10a37f; }
+.gen-input::placeholder { color: var(--gpt-text-muted); }
+.gen-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Reference image preview */
+.ref-preview {
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 160px;
+  border: 1px solid var(--gpt-border);
+}
+.ref-preview img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Advanced params */
+.gen-advanced {
+  margin: 12px 22px 0;
+  border: 1px solid var(--gpt-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.gen-advanced-toggle {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gpt-text-sub);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  background: var(--gpt-main);
+}
+.gen-advanced-toggle::-webkit-details-marker { display: none; }
+.gen-advanced[open] .gen-advanced-toggle { border-bottom: 1px solid var(--gpt-border); }
+.gen-advanced-body { padding: 12px 14px; background: var(--gpt-main); }
+
+.param-row {
+  margin-bottom: 12px;
+}
+.param-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--gpt-text-sub);
+  margin-bottom: 6px;
+}
+.param-val {
+  font-weight: 700;
+  color: #10a37f;
+}
+.param-slider {
+  width: 100%;
+  accent-color: #10a37f;
+}
+.param-slider:disabled { opacity: 0.5; }
+
+.size-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.size-chip {
+  padding: 5px 12px;
+  background: var(--gpt-input-bg);
   border: 1px solid var(--gpt-border);
   border-radius: 8px;
+  font-size: 12px;
+  color: var(--gpt-text-sub);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.size-chip:hover { border-color: #10a37f; color: #10a37f; }
+.size-chip.active { background: #10a37f; border-color: #10a37f; color: white; }
+
+.seed-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.seed-reset {
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.seed-reset:hover { background: var(--gpt-sidebar-hover); }
+
+/* Video params */
+.video-params {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Progress */
+.gen-progress-wrap {
+  margin: 14px 22px 0;
+}
+.gen-progress-bar {
+  height: 4px;
+  background: var(--gpt-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.gen-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10a37f, #0d8b6e, #10a37f);
+  background-size: 200% 100%;
+  animation: progress-slide 1.5s ease-in-out infinite;
+  border-radius: 2px;
+  width: 60%;
+}
+@keyframes progress-slide {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.gen-progress-bar.error { background: rgba(239,68,68,0.2); }
+.gen-progress-text {
+  font-size: 12px;
+  color: var(--gpt-text-muted);
+  margin: 0;
+}
+.gen-progress-text.error { color: #ef4444; }
+
+/* Result */
+.gen-result {
+  margin: 14px 22px 0;
+  border: 1px solid var(--gpt-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--gpt-main);
+}
+.gen-result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--gpt-border);
+}
+.gen-result-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #10a37f;
+}
+.gen-result-actions {
+  display: flex;
+  gap: 6px;
+}
+.result-action-btn {
+  padding: 5px 12px;
+  background: var(--gpt-input-bg);
+  border: 1px solid var(--gpt-border);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--gpt-text-sub);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.result-action-btn:hover { border-color: #10a37f; color: #10a37f; }
+.result-action-btn.accent { background: #10a37f; border-color: #10a37f; color: white; }
+.result-action-btn.accent:hover { background: #0d8b6e; }
+
+.gen-result-img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+.gen-result-video {
+  width: 100%;
+  max-height: 400px;
+  display: block;
+  background: #000;
+}
+
+/* Footer */
+.gen-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px 20px;
+  border-top: 1px solid var(--gpt-border);
+  margin-top: 16px;
+}
+.gen-cancel-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--gpt-border);
+  border-radius: 10px;
   color: var(--gpt-text-sub);
   font-size: 14px;
   cursor: pointer;
   transition: background 0.15s;
 }
-.modal-cancel:hover { background: var(--gpt-sidebar-hover); }
-.modal-confirm {
-  padding: 9px 22px;
-  background: #10a37f;
-  border: none;
-  border-radius: 8px;
-  color: white;
+.gen-cancel-btn:hover { background: var(--gpt-sidebar-hover); }
+.gen-stop-btn {
+  padding: 10px 20px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  color: #ef4444;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s;
 }
-.modal-confirm:hover { background: #0d8b6e; }
+.gen-stop-btn:hover { background: rgba(239,68,68,0.2); }
+.gen-submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #10a37f;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.gen-submit-btn:hover:not(:disabled) { background: #0d8b6e; transform: translateY(-1px); }
+.gen-submit-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* AI badge on card */
+.badge-ai { background: rgba(16,163,127,0.7) !important; }
+.card-real-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Transition */
+.modal-fade-enter-active,
+.modal-fade-leave-active { transition: opacity 0.2s; }
+.modal-fade-enter-from,
+.modal-fade-leave-to { opacity: 0; }
 </style>
