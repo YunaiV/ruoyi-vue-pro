@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service;
 
 import cn.iocoder.yudao.module.deepay.service.memory.AiMemoryService;
+import cn.iocoder.yudao.module.deepay.vo.AiChatContextVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -36,23 +37,36 @@ public class AiChatStreamService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Resource private AiChatService    aiChatService;
+    @Resource private AiChatService      aiChatService;
     @Resource private ChatSessionService chatSessionService;
-    @Resource private AiMemoryService   aiMemoryService;
+    @Resource private AiMemoryService    aiMemoryService;
 
     /**
-     * 异步流式推送对话回复。
+     * 异步流式推送对话回复（兼容旧接口，无上下文注入）。
+     */
+    @Async("deepayAsyncExecutor")
+    public void streamChat(SseEmitter emitter, String module, String sessionId,
+                           Long customerId, String userMessage) {
+        streamChat(emitter, module, sessionId, customerId, userMessage, null);
+    }
+
+    /**
+     * 异步流式推送对话回复（带上下文注入）。
      * 由 {@link cn.iocoder.yudao.module.deepay.controller.AiChatStreamController} 调用。
+     *
+     * <p>包含完整的会话记忆持久化（via {@link AiMemoryService}）和
+     * 页面上下文注入（via {@link AiChatContextVO}）。</p>
      *
      * @param emitter     SSE 发射器
      * @param module      板块
      * @param sessionId   会话 ID（null → 自动创建）
      * @param customerId  用户 ID
      * @param userMessage 用户输入
+     * @param context     前端注入的上下文（可为 null）
      */
     @Async("deepayAsyncExecutor")
     public void streamChat(SseEmitter emitter, String module, String sessionId,
-                           Long customerId, String userMessage) {
+                           Long customerId, String userMessage, AiChatContextVO context) {
         // default tenantId = 1 (单租户 MVP；后续从登录态取)
         final Long tenantId = 1L;
         try {
@@ -63,9 +77,9 @@ public class AiChatStreamService {
             // 1. 立即落 user message
             aiMemoryService.saveUserMessage(effectiveSessionId, tenantId, customerId, module, userMessage);
 
-            // 2. 调用 AiChatService 获取完整回复
+            // 2. 调用 AiChatService 获取完整回复（含上下文注入）
             AiChatService.ChatReply reply = aiChatService.chat(
-                    module, effectiveSessionId, customerId, userMessage);
+                    module, effectiveSessionId, customerId, userMessage, context);
 
             // 3. 逐字推送 aiMessage
             String text = reply.getAiMessage();
@@ -135,3 +149,4 @@ public class AiChatStreamService {
     }
 
 }
+
