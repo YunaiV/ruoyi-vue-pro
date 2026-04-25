@@ -164,7 +164,7 @@ onMounted(() => {
       <!-- ── 总收益英雄卡 ──────────────────────────────────────────── -->
       <section class="mb-4">
         <div class="card p-5 rounded-2xl"
-             style="background:linear-gradient(135deg,#0d2820,#080e0c)">
+             style="background:linear-gradient(135deg,#1a2e28,#1a1a1a)">
 
           <div class="flex items-start justify-between mb-4">
             <div>

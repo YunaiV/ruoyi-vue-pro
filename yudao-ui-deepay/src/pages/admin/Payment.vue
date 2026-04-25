@@ -15,6 +15,6 @@
   </div>
 </template>
 <style scoped>
-.title { font-size: 22px; font-weight: 800; color: #e7e9ea; margin: 0 0 6px; }
-.sub   { font-size: 13px; color: #627870; margin: 0 0 40px; }
+.title { font-size: 22px; font-weight: 800; color: #ffffff; margin: 0 0 6px; }
+.sub   { font-size: 13px; color: #a0a0a0; margin: 0 0 40px; }
 </style>

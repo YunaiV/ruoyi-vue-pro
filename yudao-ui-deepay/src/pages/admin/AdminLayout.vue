@@ -204,8 +204,8 @@ const ICON_MAP = {
 .shell {
   display: flex;
   min-height: 100vh;
-  background: #000000;
-  color: #e7e9ea;
+  background: #0a0a0a;
+  color: #e0e0e0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -213,8 +213,8 @@ const ICON_MAP = {
 .sidebar {
   width: 230px;
   min-height: 100vh;
-  background: #080e0c;
-  border-right: 1px solid #1e2e28;
+  background: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -230,7 +230,7 @@ const ICON_MAP = {
   align-items: center;
   justify-content: space-between;
   padding: 18px 14px 14px;
-  border-bottom: 1px solid #1e2e28;
+  border-bottom: 1px solid #2a2a2a;
 }
 .logo {
   display: flex;
@@ -254,23 +254,23 @@ const ICON_MAP = {
 .logo-text {
   font-size: 13px;
   font-weight: 700;
-  color: #e7e9ea;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
 }
 .collapse-btn {
   width: 26px; height: 26px;
   display: flex; align-items: center; justify-content: center;
-  background: #121c18;
-  border: 1px solid #1e2e28;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
   border-radius: 7px;
-  color: #627870;
+  color: #666666;
   cursor: pointer;
   flex-shrink: 0;
   font-size: 12px;
-  transition: color 0.15s, background 0.15s;
+  transition: color 0.15s, border-color 0.15s;
 }
-.collapse-btn:hover { color: #e7e9ea; background: #182620; }
+.collapse-btn:hover { color: #1abc9c; border-color: #1abc9c; }
 
 /* ── Nav ─────────────────────────────────────── */
 .nav {
@@ -279,11 +279,11 @@ const ICON_MAP = {
   overflow-x: hidden;
   padding: 10px 8px;
   scrollbar-width: thin;
-  scrollbar-color: #1e2e28 transparent;
+  scrollbar-color: #1abc9c #1a1a1a;
 }
 .nav::-webkit-scrollbar { width: 4px; }
-.nav::-webkit-scrollbar-track { background: transparent; }
-.nav::-webkit-scrollbar-thumb { background: #1e2e28; border-radius: 2px; }
+.nav::-webkit-scrollbar-track { background: #1a1a1a; }
+.nav::-webkit-scrollbar-thumb { background: #1abc9c; border-radius: 2px; }
 
 .nav-group { margin-bottom: 4px; }
 
@@ -296,20 +296,22 @@ const ICON_MAP = {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #3d5048;
+  color: #555555;
   transition: color 0.15s;
 }
-.group-hdr:hover { color: #627870; }
+.group-hdr:hover { color: #a0a0a0; }
 .group-label {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: #555555;
 }
 .group-arrow {
   font-size: 14px;
   transition: transform 0.2s;
   line-height: 1;
+  color: #555555;
 }
 .group-arrow.open { transform: rotate(90deg); }
 
@@ -324,19 +326,20 @@ const ICON_MAP = {
   padding: 9px 10px;
   border-radius: 9px;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  color: #627870;
+  color: #a0a0a0;
   font-size: 13px;
   text-align: left;
   position: relative;
-  transition: background 0.12s, color 0.12s;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
   white-space: nowrap;
   overflow: hidden;
 }
-.nav-item:hover { background: #0d1512; color: #a8b5b0; }
+.nav-item:hover { background: #2a2a2a; border-color: #1abc9c; color: #e0e0e0; }
 .nav-item.active {
   background: rgba(26,188,156,0.08);
+  border-color: #1abc9c;
   color: #1abc9c;
   border-left: 3px solid #1abc9c;
   padding-left: 7px;
@@ -350,7 +353,7 @@ const ICON_MAP = {
   border-radius: 50%;
   background: #1abc9c;
   flex-shrink: 0;
-  box-shadow: 0 0 6px rgba(26,188,156,0.6);
+  box-shadow: 0 0 6px #1abc9c;
 }
 
 .nav-collapsed .nav-item { justify-content: center; padding: 10px 0; }
@@ -364,7 +367,7 @@ const ICON_MAP = {
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  border-top: 1px solid #1e2e28;
+  border-top: 1px solid #2a2a2a;
 }
 
 .jeepay-btn {
@@ -373,8 +376,8 @@ const ICON_MAP = {
   gap: 10px;
   padding: 9px 10px;
   border-radius: 9px;
-  border: 1px solid rgba(26,188,156,0.2);
-  background: rgba(26,188,156,0.04);
+  border: 1px solid #1abc9c;
+  background: #2a2a2a;
   color: #1abc9c;
   font-size: 13px;
   cursor: pointer;
@@ -386,8 +389,8 @@ const ICON_MAP = {
 }
 .jeepay-btn:hover {
   color: #22d3b4;
-  border-color: rgba(26,188,156,0.4);
-  background: rgba(26,188,156,0.08);
+  border-color: #22d3b4;
+  background: rgba(26,188,156,0.12);
 }
 .ext-icon {
   margin-left: auto;
@@ -401,9 +404,9 @@ const ICON_MAP = {
   gap: 10px;
   padding: 9px 10px;
   border-radius: 9px;
-  border: 1px solid #1e2e28;
+  border: 1px solid #2a2a2a;
   background: transparent;
-  color: #3d5048;
+  color: #666666;
   font-size: 13px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -412,7 +415,7 @@ const ICON_MAP = {
   width: 100%;
   text-align: left;
 }
-.back-btn:hover { color: #627870; border-color: #253830; }
+.back-btn:hover { color: #a0a0a0; border-color: #1abc9c; }
 
 /* ── Main area ───────────────────────────────── */
 .main-wrap {
@@ -426,6 +429,7 @@ const ICON_MAP = {
   flex: 1;
   padding: 32px;
   overflow-y: auto;
+  background: #0a0a0a;
 }
 
 /* ── Mobile ──────────────────────────────────── */
@@ -434,20 +438,20 @@ const ICON_MAP = {
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: #080e0c;
-  border-bottom: 1px solid #1e2e28;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
   position: sticky;
   top: 0;
   z-index: 20;
 }
-.mob-title { font-size: 14px; font-weight: 700; color: #e7e9ea; }
+.mob-title { font-size: 14px; font-weight: 700; color: #e0e0e0; }
 .hamburger {
   display: flex; flex-direction: column; gap: 4px;
   background: none; border: none; cursor: pointer; padding: 4px;
 }
 .hamburger span {
   display: block; width: 20px; height: 2px;
-  background: #e7e9ea; border-radius: 1px;
+  background: #e0e0e0; border-radius: 1px;
 }
 .mob-overlay {
   position: fixed; inset: 0;
