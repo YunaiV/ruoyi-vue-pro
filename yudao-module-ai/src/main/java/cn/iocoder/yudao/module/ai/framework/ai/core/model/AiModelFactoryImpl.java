@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
@@ -180,6 +181,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildOllamaChatModel(url);
                 case GROK:
                     return buildGrokChatModel(apiKey,url);
+                case RUNPOD:
+                    return buildRunpodChatModel(apiKey, url);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -595,6 +598,28 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .setBaseUrl(url)
                 .setApiKey(apiKey);
         return new AiAutoConfiguration().buildGrokChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#buildRunpodChatClient(YudaoAiProperties.Runpod)}
+     *
+     * <p>url 参数存完整的 OpenAI 兼容 base URL，格式：
+     * {@code https://api.runpod.ai/v2/{endpointId}/openai/v1}
+     * 也可直接传 {@code https://api.runpod.ai}，此时使用默认端点。</p>
+     *
+     * TODO @deepay：PR4 补充 Runpod 图片生成（自定义端点 POST /v2/{endpointId}/run，非 OpenAI 兼容）
+     *   curl 格式：POST https://api.runpod.ai/v2/google-nano-banana-2-edit/run
+     *   body：{"input":{"prompt":"...","resolution":"1k","output_format":"png","enable_safety_checker":true}}
+     *   已知图片端点：
+     *     - google-nano-banana-2-edit  （通用图片编辑）
+     *     - qwen-image-edit-2511       （Qwen 图片编辑）
+     *   注意：与聊天路径 /openai/v1 完全独立，需要单独的 RunpodImageModel 适配器
+     */
+    private ChatModel buildRunpodChatModel(String apiKey, String url) {
+        YudaoAiProperties.Runpod properties = new YudaoAiProperties.Runpod()
+                .setApiKey(apiKey)
+                .setBaseUrl(url);
+        return new AiAutoConfiguration().buildRunpodChatClient(properties);
     }
 
     // ========== 各种创建 EmbeddingModel 的方法 ==========

@@ -588,4 +588,119 @@ kill -9 $(lsof -t -i:48080)
 
 ---
 
-*本文档最后更新于部署时生成，如有疑问查看 `script/shell/deepay-deploy.sh` 源码。*
+## 11. 海外部署：Runpod AI Fallback 配置
+
+当你的服务器在**海外**（或需要访问 Runpod API）时，可将 Runpod 配置为 AI 模型网关的 fallback 提供商。
+
+### 11.1 工作原理
+
+```
+主模型（任意 provider）调用
+        ↓ 失败 / 超时 / 异常
+ModelGateway 自动切换
+        ↓
+RunpodChatModel → POST https://api.runpod.ai/v2/{endpointId}/openai/v1
+```
+
+Runpod 暴露 **OpenAI 兼容** 端点，调用方式与 OpenAI 完全一致，无需额外适配。
+
+### 11.2 环境变量
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `RUNPOD_API_KEY` | ✅ 必需 | — | Runpod 控制台申请的 API Key |
+| `RUNPOD_BASE_URL` | 可选 | `https://api.runpod.ai` | Runpod API 地址 |
+| `RUNPOD_MODEL_ID` | 可选 | `qwen3-32b-awq` | Runpod 端点 ID（URL 路径中使用） |
+
+> **安全提示**：请勿将 `RUNPOD_API_KEY` 写入代码或配置文件，始终通过环境变量或 Secrets 注入。
+
+### 11.3 配置方式
+
+**方式 A：application-local.yaml（开发/测试）**
+
+```yaml
+yudao:
+  ai:
+    runpod:
+      enable: true
+      api-key: ${RUNPOD_API_KEY}          # 从环境变量读取
+      base-url: ${RUNPOD_BASE_URL:https://api.runpod.ai}
+      endpoint-id: ${RUNPOD_MODEL_ID:qwen3-32b-awq}
+      model: Qwen/Qwen3-32B-AWQ          # 发送给模型的 model 参数
+      temperature: 0.7
+      max-tokens: 2048
+      top-p: 1.0
+```
+
+**方式 B：.env 文件（配合 docker-compose）**
+
+```dotenv
+# Runpod AI Fallback（海外部署必填）
+RUNPOD_API_KEY=rpa_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+RUNPOD_BASE_URL=https://api.runpod.ai
+RUNPOD_MODEL_ID=qwen3-32b-awq
+```
+
+**方式 C：docker-compose.yml**
+
+```yaml
+services:
+  deepay-server:
+    image: deepay/server:latest
+    environment:
+      - RUNPOD_API_KEY=${RUNPOD_API_KEY}
+      - RUNPOD_BASE_URL=${RUNPOD_BASE_URL:-https://api.runpod.ai}
+      - RUNPOD_MODEL_ID=${RUNPOD_MODEL_ID:-qwen3-32b-awq}
+    env_file:
+      - .env
+```
+
+**方式 D：systemd（宝塔/Linux 生产）**
+
+```bash
+# 编辑服务文件
+nano /etc/systemd/system/deepay-server.service
+
+# 在 [Service] 区块添加：
+Environment="RUNPOD_API_KEY=rpa_xxx"
+Environment="RUNPOD_BASE_URL=https://api.runpod.ai"
+Environment="RUNPOD_MODEL_ID=qwen3-32b-awq"
+
+# 重载并重启
+systemctl daemon-reload
+systemctl restart deepay-server
+```
+
+### 11.4 验证 Runpod 连通性
+
+```bash
+# 快速测试：直接 curl Runpod OpenAI 兼容端点
+curl -s -X POST \
+  "https://api.runpod.ai/v2/qwen3-32b-awq/openai/v1/chat/completions" \
+  -H "Authorization: Bearer $RUNPOD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen3-32B-AWQ",
+    "messages": [{"role": "user", "content": "Reply OK if you can read this."}],
+    "max_tokens": 10
+  }' | python3 -m json.tool
+```
+
+返回包含 `choices[0].message.content` 即表示连通正常。
+
+### 11.5 usage 日志说明
+
+每次 AI 调用（含 fallback 切换）均通过 `ModelGateway` 统一记录，日志格式：
+
+```
+[ModelGateway] usage: AiUsageRecord(tenantId=1, customerId=null, module=chat,
+  sessionId=sess-abc, provider=runpod, modelId=Qwen/Qwen3-32B-AWQ,
+  latencyMs=1234, error=null, promptTokens=42, completionTokens=128, estimated=false)
+```
+
+- `estimated=false`：从 OpenAI 响应中拿到真实 token 数
+- `estimated=true`：响应未包含 usage，按字符数粗估（`chars/4`）
+
+> **后续计划（PR4）**：Runpod 图片生成（`POST /v2/{endpointId}/run`，非 OpenAI 兼容格式）。
+
+---

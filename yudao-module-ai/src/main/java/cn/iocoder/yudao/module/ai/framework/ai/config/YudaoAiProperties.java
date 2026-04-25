@@ -59,6 +59,11 @@ public class YudaoAiProperties {
      */
     private WebSearch webSearch;
 
+    /**
+     * Runpod（海外 fallback）
+     */
+    private Runpod runpod;
+
     @Data
     public static class Gemini {
 
@@ -168,6 +173,37 @@ public class YudaoAiProperties {
         private String baseUrl;
 
         private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class Runpod {
+
+        private String enable;
+
+        /**
+         * API Key（对应环境变量 RUNPOD_API_KEY）
+         */
+        private String apiKey;
+
+        /**
+         * base URL（对应环境变量 RUNPOD_BASE_URL，默认 https://api.runpod.ai）
+         */
+        private String baseUrl;
+
+        /**
+         * 端点 ID（对应环境变量 RUNPOD_MODEL_ID，默认 qwen3-32b-awq，用于 URL 路径）
+         */
+        private String endpointId;
+
+        /**
+         * 发送给模型的 model 参数（默认 Qwen/Qwen3-32B-AWQ）
+         */
+        private String model;
+
         private Double temperature;
         private Integer maxTokens;
         private Double topP;

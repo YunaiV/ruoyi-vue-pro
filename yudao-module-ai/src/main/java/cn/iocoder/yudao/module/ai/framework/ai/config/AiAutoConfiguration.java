@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.framework.ai.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.module.ai.framework.ai.core.gateway.ModelGateway;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.runpod.RunpodChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
@@ -37,6 +39,7 @@ import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClie
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreProperties;
 import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreProperties;
 import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -284,6 +287,49 @@ public class AiAutoConfiguration {
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new DouBaoChatModel(openAiChatModel);
+    }
+
+    // ========== Runpod ==========
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.runpod.enable", havingValue = "true")
+    public RunpodChatModel runpodChatModel(YudaoAiProperties yudaoAiProperties) {
+        return buildRunpodChatClient(yudaoAiProperties.getRunpod());
+    }
+
+    /**
+     * 构建 RunpodChatModel。
+     *
+     * <p>Runpod 暴露 OpenAI 兼容端点：{@code {baseUrl}/v2/{endpointId}/openai/v1}，
+     * 因此直接复用 OpenAiChatModel 作为底层实现。</p>
+     */
+    public RunpodChatModel buildRunpodChatClient(YudaoAiProperties.Runpod properties) {
+        String baseUrl = StrUtil.blankToDefault(properties.getBaseUrl(), RunpodChatModel.DEFAULT_BASE_URL);
+        String endpointId = StrUtil.blankToDefault(properties.getEndpointId(), RunpodChatModel.DEFAULT_ENDPOINT_ID);
+        String modelName = StrUtil.blankToDefault(properties.getModel(), RunpodChatModel.DEFAULT_MODEL_NAME);
+        // Runpod OpenAI 兼容端点：{baseUrl}/v2/{endpointId}/openai/v1
+        String openAiBaseUrl = baseUrl + "/v2/" + endpointId + RunpodChatModel.OPENAI_COMPAT_PATH;
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(openAiBaseUrl)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(modelName)
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new RunpodChatModel(openAiChatModel);
+    }
+
+    // ========== ModelGateway ==========
+
+    @Bean
+    public ModelGateway modelGateway(@Autowired(required = false) RunpodChatModel runpodChatModel) {
+        return new ModelGateway(runpodChatModel);
     }
 
     // ========== RAG 相关 ==========
