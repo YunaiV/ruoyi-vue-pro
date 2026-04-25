@@ -1,243 +1,348 @@
 <template>
   <div class="home-page">
-    <!-- Hero -->
-    <section class="hero dp-fade-up">
-      <p class="hero-sub">设计师，你好 👋</p>
-      <h1 class="hero-title">今天想做<br/>什么款式？</h1>
-    </section>
-
-    <!-- Feature Buttons -->
-    <section class="section">
-      <FeatureButtons @navigate="router.push($event)" />
-    </section>
-
-    <!-- Quick Templates -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="dp-section-title">快速模板</h2>
-        <button class="see-all" @click="router.push('/template-library')">查看全部</button>
+    <!-- Hero Stats -->
+    <section class="hero-section">
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-value">128</span>
+          <span class="stat-label">模特</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">5240</span>
+          <span class="stat-label">模板</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">89%</span>
+          <span class="stat-label">准确率</span>
+        </div>
       </div>
-      <div class="template-scroll scrollbar-hide">
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="section">
+      <h2 class="section-title">快速入口</h2>
+      <div class="quick-actions-grid">
         <div
-          v-for="(tpl, i) in templates"
-          :key="tpl.name"
-          class="tpl-card dp-card"
+          v-for="(action, index) in quickActions"
+          :key="action.id"
+          class="action-card"
+          :style="{ background: action.gradient }"
+          @click="router.push(action.path)"
         >
-          <div class="tpl-cover" :style="{ background: tpl.color }">
-            <span class="tpl-emoji">{{ tpl.emoji }}</span>
+          <component :is="ICONS[index]" class="action-icon" />
+          <p class="action-title">{{ action.title }}</p>
+          <p class="action-desc">{{ action.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Works -->
+    <section class="section">
+      <h2 class="section-title">近期作品</h2>
+      <div class="works-grid">
+        <div
+          v-for="work in recentWorks"
+          :key="work.id"
+          class="work-card"
+        >
+          <div class="work-thumb" :style="{ background: work.color }">
+            <span class="work-emoji">{{ work.emoji }}</span>
           </div>
-          <div class="tpl-info">
-            <span class="tpl-name">{{ tpl.name }}</span>
-            <span class="tpl-count">{{ tpl.count }}款</span>
+          <div class="work-overlay">
+            <p class="work-title">{{ work.title }}</p>
+            <p class="work-date">{{ work.date }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- AI Tools Grid -->
+    <!-- AI Recommendations -->
     <section class="section">
-      <h2 class="dp-section-title">AI工具</h2>
-      <div class="tools-grid">
+      <h2 class="section-title">AI 推荐</h2>
+      <div class="recs-list">
         <div
-          v-for="tool in aiTools"
-          :key="tool.title"
-          class="tool-card dp-card"
-          @click="router.push(tool.path)"
+          v-for="rec in aiRecs"
+          :key="rec.id"
+          class="rec-card"
         >
-          <div class="tool-icon">{{ tool.icon }}</div>
-          <div class="tool-title">{{ tool.title }}</div>
-          <div class="tool-desc">{{ tool.desc }}</div>
-          <div v-if="tool.badge" class="dp-badge-new">{{ tool.badge }}</div>
+          <div class="rec-icon-wrap">
+            <span class="rec-emoji">{{ rec.icon }}</span>
+          </div>
+          <div class="rec-body">
+            <p class="rec-title">{{ rec.title }}</p>
+            <p class="rec-desc">{{ rec.description }}</p>
+          </div>
+          <button class="rec-btn" @click="router.push(rec.path)">查看</button>
         </div>
       </div>
     </section>
 
-    <!-- Quick Links -->
-    <section class="section">
-      <h2 class="dp-section-title">快捷入口</h2>
-      <div class="links-grid">
-        <button
-          v-for="link in quickLinks"
-          :key="link.label"
-          class="link-item dp-card"
-          @click="router.push(link.path)"
-        >
-          <span class="link-icon">{{ link.icon }}</span>
-          <span class="link-label">{{ link.label }}</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Bottom spacer for fixed input -->
-    <div style="height: 80px;"></div>
-
-    <!-- Fixed Input Bar -->
-    <div class="bottom-input-bar">
-      <button class="plus-btn" aria-label="添加">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <input
-        v-model="inputText"
-        class="bottom-input dp-input"
-        placeholder="描述你想要的款式…"
-        @keydown.enter="openChatWithText"
-      />
-      <button
-        class="bottom-send"
-        :class="{ active: inputText.trim() }"
-        @click="openChatWithText"
-        aria-label="发送"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
+    <!-- Advanced Animations Section -->
+    <AdvancedUI />
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
-import FeatureButtons from '@/components/FeatureButtons.vue'
-import { useChatStore } from '@/store/index.js'
+import {
+  PhotoIcon,
+  UsersIcon,
+  RectangleGroupIcon,
+  SparklesIcon,
+  BookmarkSquareIcon,
+  ChartBarIcon,
+} from '@heroicons/vue/24/outline'
+import AdvancedUI from '@/components/AdvancedUI.vue'
 
 const router = useRouter()
-const chatStore = useChatStore()
-const inputText = ref('')
 
-const templates = [
-  { name: '极简风',  color: 'linear-gradient(135deg,#1a1a2e,#0f3460)', emoji: '🤍', count: 24 },
-  { name: '街头潮',  color: 'linear-gradient(135deg,#2d1b69,#533483)', emoji: '🔥', count: 18 },
-  { name: '高奢感',  color: 'linear-gradient(135deg,#1b1b1b,#c9a84c44)', emoji: '✨', count: 12 },
-  { name: '运动系',  color: 'linear-gradient(135deg,#0f4c75,#1abc9c44)', emoji: '⚡', count: 30 },
-  { name: '韩系甜',  color: 'linear-gradient(135deg,#3d0c11,#c93a5a44)', emoji: '🌸', count: 20 },
+const ICONS = [PhotoIcon, UsersIcon, RectangleGroupIcon, SparklesIcon, BookmarkSquareIcon, ChartBarIcon]
+
+const quickActions = [
+  { id: 1, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: '图库',   description: '浏览海量设计灵感',   path: '/image-library' },
+  { id: 2, gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: '模特库', description: '专业模特试衣展示',   path: '/model-library' },
+  { id: 3, gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: '模板库', description: '电商设计模板',       path: '/template-library' },
+  { id: 4, gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', title: 'AI设计', description: '智能生成新设计',     path: '/image-library' },
+  { id: 5, gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', title: '设计库', description: '您的设计作品',       path: '/design-library' },
+  { id: 6, gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', title: 'AI销售', description: '销售数据分析',       path: '/ai-sales' },
 ]
 
-const aiTools = [
-  { icon: '🎯', title: 'AI出款', desc: '描述款式，AI自动生成设计方案', path: '/', badge: 'NEW' },
-  { icon: '🎭', title: '灵感图库', desc: '海量时尚灵感，一键收藏', path: '/image-library', badge: '' },
-  { icon: '👗', title: '虚拟模特', desc: 'AI模特试穿，所见即所得', path: '/model-library', badge: '' },
-  { icon: '📊', title: 'AI销售', desc: '市场分析+定价策略一站式', path: '/ai-sales', badge: 'HOT' },
+const recentWorks = [
+  { id: 1, title: '夏季新款海报', date: '2024-01-15', color: 'linear-gradient(135deg,#667eea,#764ba2)', emoji: '🖼️' },
+  { id: 2, title: '模特展示图', date: '2024-01-14', color: 'linear-gradient(135deg,#f093fb,#f5576c)', emoji: '👗' },
+  { id: 3, title: '电商主图设计', date: '2024-01-13', color: 'linear-gradient(135deg,#4facfe,#00f2fe)', emoji: '🛒' },
 ]
 
-const quickLinks = [
-  { icon: '📐', label: '设计稿', path: '/design-library' },
-  { icon: '📋', label: '模板库', path: '/template-library' },
-  { icon: '👗', label: '模特库', path: '/model-library' },
-  { icon: '🖼️', label: '图库',   path: '/image-library' },
-  { icon: '📊', label: 'AI销售', path: '/ai-sales' },
-  { icon: '⚙️', label: '设置',   path: '/settings' },
+const aiRecs = [
+  { id: 1, icon: '🤖', title: 'AI 模特推荐', description: '根据您的风格偏好，为您推荐最合适的模特', path: '/model-library' },
+  { id: 2, icon: '✨', title: '智能设计建议', description: '基于当前流行趋势，为您提供设计灵感', path: '/image-library' },
 ]
-
-function openChatWithText() {
-  const t = inputText.value.trim()
-  if (!t) { chatStore.isOpen = true; return }
-  if (!chatStore.activeId) chatStore.newSession()
-  chatStore.addMessage('user', t)
-  inputText.value = ''
-  chatStore.isOpen = true
-}
 </script>
 
 <style scoped>
 .home-page {
-  padding: 24px 16px 16px;
-  max-width: 800px; margin: 0 auto;
-}
-.hero { margin-bottom: 28px; }
-.hero-sub {
-  font-size: 15px; color: var(--dp-text-sub); font-weight: 500; margin: 0 0 6px;
-}
-.hero-title {
-  font-size: 32px; font-weight: 900; line-height: 1.15;
-  letter-spacing: -0.03em; color: var(--dp-text-bright); margin: 0;
-}
-.section { margin-bottom: 28px; }
-.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.see-all { font-size: 13px; color: var(--dp-accent); background: none; border: none; cursor: pointer; font-weight: 500; }
-
-/* Templates */
-.template-scroll {
-  display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px;
-}
-.tpl-card { flex-shrink: 0; width: 120px; padding: 0; overflow: hidden; cursor: pointer; }
-.tpl-cover {
-  height: 160px; display: flex; align-items: center; justify-content: center;
-  border-radius: 14px 14px 0 0;
-}
-.tpl-emoji { font-size: 40px; }
-.tpl-info { padding: 8px 10px 10px; }
-.tpl-name { display: block; font-size: 13px; font-weight: 600; color: var(--dp-text); }
-.tpl-count { font-size: 11px; color: var(--dp-text-muted); }
-
-/* AI Tools */
-.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.tool-card {
-  padding: 18px 16px; cursor: pointer; position: relative;
-}
-.tool-icon { font-size: 28px; margin-bottom: 10px; }
-.tool-title { font-size: 15px; font-weight: 700; color: var(--dp-text-bright); margin-bottom: 4px; }
-.tool-desc { font-size: 12px; color: var(--dp-text-sub); line-height: 1.4; }
-.dp-badge-new {
-  position: absolute; top: 12px; right: 12px;
-  background: #1abc9c; color: #fff; border-radius: 999px;
-  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  background: var(--dp-bg, #f8fafc);
+  min-height: 100vh;
+  padding-bottom: 120px;
 }
 
-/* Quick Links */
-.links-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.link-item {
-  padding: 16px 8px; display: flex; flex-direction: column; align-items: center;
-  gap: 8px; cursor: pointer; background: var(--dp-card);
-  border: 1px solid var(--dp-card-border); border-radius: 14px;
-  transition: all 0.2s; color: var(--dp-text);
+/* Hero */
+.hero-section {
+  padding: 20px 16px 16px;
 }
-.link-item:hover { border-color: rgba(26,188,156,0.35); color: #1abc9c; }
-.link-icon { font-size: 24px; }
-.link-label { font-size: 12px; font-weight: 600; }
 
-/* Bottom input bar */
-.bottom-input-bar {
-  position: fixed;
-  bottom: calc(64px + env(safe-area-inset-bottom));
-  left: 0; right: 0;
-  padding: 10px 16px;
-  background: var(--dp-header-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--dp-border);
-  display: flex; align-items: center; gap: 8px;
-  z-index: 100;
+.stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--dp-surface, #fff);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--dp-shadow, 0 2px 12px rgba(0,0,0,0.08));
+  border: 1px solid var(--dp-card-border, #e5e7eb);
 }
-@media (min-width: 1024px) {
-  .bottom-input-bar { left: 240px; bottom: 0; }
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
-.plus-btn {
-  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-  background: var(--dp-chip-bg); border: 1px solid var(--dp-chip-border);
-  color: var(--dp-text-sub); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--dp-accent, #6c5ce7);
 }
-.plus-btn:hover { background: var(--dp-accent-bg); color: #1abc9c; border-color: rgba(26,188,156,0.4); }
-.bottom-input {
-  flex: 1; height: 40px; padding: 0 14px;
+
+.stat-label {
+  font-size: 13px;
+  color: var(--dp-text-sub, #6b7280);
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--dp-card-border, #e5e7eb);
+}
+
+/* Section */
+.section {
+  padding: 0 16px 8px;
+  margin-top: 16px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dp-text-bright, #111827);
+  margin: 0 0 12px;
+}
+
+/* Quick Actions */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.action-card {
+  border-radius: 16px;
+  padding: 16px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-card:active {
+  transform: scale(0.96);
+}
+
+.action-icon {
+  width: 28px;
+  height: 28px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.action-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.action-desc {
+  margin: 0;
+  font-size: 11px;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Recent Works */
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.work-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.work-thumb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.work-emoji {
+  font-size: 36px;
+}
+
+.work-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 8px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+
+.work-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.work-date {
+  margin: 0;
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+}
+
+/* AI Recommendations */
+.recs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rec-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--dp-surface, #fff);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--dp-shadow, 0 2px 12px rgba(0,0,0,0.08));
+  border: 1px solid var(--dp-card-border, #e5e7eb);
+}
+
+.rec-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rec-emoji {
+  font-size: 24px;
+}
+
+.rec-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rec-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dp-text-bright, #111827);
+}
+
+.rec-desc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--dp-text-sub, #6b7280);
+  line-height: 1.4;
+}
+
+.rec-btn {
+  padding: 8px 16px;
+  border: none;
   border-radius: 20px;
-  background: var(--dp-input-bg);
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s;
 }
-.bottom-send {
-  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-  background: var(--dp-chip-bg); border: 1px solid var(--dp-chip-border);
-  color: var(--dp-text-muted); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-}
-.bottom-send.active {
-  background: linear-gradient(135deg, #1abc9c, #16a085);
-  color: white; border-color: transparent;
-  box-shadow: 0 4px 14px rgba(26,188,156,0.4);
+
+.rec-btn:active {
+  transform: scale(0.95);
 }
 </style>
