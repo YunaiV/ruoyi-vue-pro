@@ -263,6 +263,7 @@ import RoleAvatar  from './RoleAvatar.vue'
 import { useAiChat }       from '@/composables/useAiChat'
 import { useAiTts }        from '@/composables/useAiTts'
 import { getRoleConfig }   from '@/config/aiRoles'
+import { uid }             from '@/utils/uid'
 import type { ChatMessage } from '@/composables/useAiChat'
 
 // ── Props ──────────────────────────────────────────────────────
@@ -487,9 +488,7 @@ function formatTime(id: string): string {
   } catch { return '' }
 }
 
-function uid(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2,6)
-}
+// uid imported from @/utils/uid
 
 onUnmounted(() => { chat.cancel(); tts.stop() })
 </script>

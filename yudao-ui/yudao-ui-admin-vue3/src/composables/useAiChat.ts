@@ -1,5 +1,6 @@
 import { ref, nextTick } from 'vue'
 import { AiChatApi, type ChatMeta, type ChatReply } from '@/api/ai/chat'
+import { uid } from '@/utils/uid'
 
 // ============================================================
 // Types
@@ -192,9 +193,7 @@ export function useAiChat(options: UseAiChatOptions) {
     nextTick(() => { const el = scrollEl?.(); if (el) el.scrollTop = el.scrollHeight })
   }
 
-  function uid(): string {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
-  }
+  // uid imported from @/utils/uid
 
   // ── Public API ───────────────────────────────────────────────
   return {

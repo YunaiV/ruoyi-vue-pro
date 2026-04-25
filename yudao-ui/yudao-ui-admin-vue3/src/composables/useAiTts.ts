@@ -29,14 +29,35 @@ export function useAiTts(defaults: TtsOptions = {}) {
 
   let utterance: SpeechSynthesisUtterance | null = null
 
-  /** Strip HTML tags, emoji blocks, markdown, and whitespace */
+  /** Strip HTML tags, emoji blocks, markdown, and whitespace.
+   * Uses an allowlist approach: keep only characters that are safe for TTS
+   * (CJK, basic ASCII printable, common punctuation). This prevents any
+   * residual script/tag injection from reaching the SpeechSynthesisUtterance.
+   *
+   * Unicode ranges kept:
+   *   \u4E00-\u9FFF  – CJK Unified Ideographs (Chinese characters)
+   *   \u3000-\u303F  – CJK Symbols and Punctuation (。，、…)
+   *   \u30A0-\u30FF  – Katakana
+   *   \uFF00-\uFFEF  – Fullwidth / Halfwidth Forms
+   *   \u0020-\u007E  – Basic printable ASCII (letters, digits, common punct)
+   */
   function clean(text: string): string {
-    return text
-      .replace(/<[^>]+>/g, '')                                    // HTML tags
-      .replace(/\*\*(.+?)\*\*/g, '$1')                            // bold
-      .replace(/[^\u0000-\u00FF\u4E00-\u9FFF\u3000-\u303F\u30A0-\u30FF\uFF00-\uFFEF\s\d,.!?;:'"()%¥$]/g, '') // keep CJK + ascii
-      .replace(/\s+/g, ' ')
-      .trim()
+    // Step 1: Aggressively remove any tag-like patterns (including malformed ones)
+    // Replace < and > with spaces so nothing can resemble a tag or script
+    let s = text.replace(/[<>]/g, ' ')
+
+    // Step 2: Remove markdown formatting
+    s = s.replace(/\*\*(.+?)\*\*/g, '$1')   // bold
+         .replace(/\*(.+?)\*/g, '$1')         // italic
+         .replace(/`(.+?)`/g, '$1')            // inline code
+         .replace(/#+\s/g, '')                 // headings
+         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links → label text
+
+    // Step 3: Allowlist – keep only safe characters
+    s = s.replace(/[^\u0020-\u007E\u4E00-\u9FFF\u3000-\u303F\u30A0-\u30FF\uFF00-\uFFEF]/g, ' ')
+
+    // Step 4: Collapse whitespace
+    return s.replace(/\s+/g, ' ').trim()
   }
 
   function speak(text: string, options: TtsOptions = {}): void {
