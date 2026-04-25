@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service;
 
-import cn.iocoder.yudao.module.deepay.controller.vo.ChatContextVO;
 import cn.iocoder.yudao.module.deepay.service.memory.AiMemoryService;
+import cn.iocoder.yudao.module.deepay.vo.AiChatContextVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -42,33 +42,41 @@ public class AiChatStreamService {
     @Resource private AiMemoryService    aiMemoryService;
 
     /**
-     * 异步流式推送对话回复（含上下文注入 + MongoDB 记忆管理）。
+     * 异步流式推送对话回复（兼容旧接口，无上下文注入）。
+     */
+    @Async("deepayAsyncExecutor")
+    public void streamChat(SseEmitter emitter, String module, String sessionId,
+                           Long customerId, String userMessage) {
+        streamChat(emitter, module, sessionId, customerId, userMessage, null);
+    }
+
+    /**
+     * 异步流式推送对话回复（带上下文注入 + MongoDB 记忆管理）。
+     * 由 {@link cn.iocoder.yudao.module.deepay.controller.AiChatStreamController} 调用。
      *
      * @param emitter     SSE 发射器
      * @param module      板块
      * @param sessionId   会话 ID（null → 自动创建）
      * @param customerId  用户 ID
      * @param userMessage 用户输入
-     * @param chatCtx     前端页面上下文（可为 null）
-     * @param tenantId    租户 ID（null → 1）
+     * @param context     前端注入的上下文（可为 null）
      */
     @Async("deepayAsyncExecutor")
     public void streamChat(SseEmitter emitter, String module, String sessionId,
-                           Long customerId, String userMessage,
-                           ChatContextVO chatCtx, Long tenantId) {
-        final Long effectiveTenantId = tenantId != null ? tenantId : 1L;
+                           Long customerId, String userMessage, AiChatContextVO context) {
+        // default tenantId = 1 (单租户 MVP；后续从登录态取)
+        final Long tenantId = 1L;
         try {
             // 0. 确保会话存在（落库 / 续期）
             String effectiveSessionId = aiMemoryService.getOrCreateSession(
-                    sessionId, effectiveTenantId, customerId, module);
+                    sessionId, tenantId, customerId, module);
 
             // 1. 立即落 user message
-            aiMemoryService.saveUserMessage(effectiveSessionId, effectiveTenantId, customerId, module, userMessage);
+            aiMemoryService.saveUserMessage(effectiveSessionId, tenantId, customerId, module, userMessage);
 
-            // 2. 调用 AiChatService 获取完整回复（支持上下文注入）
+            // 2. 调用 AiChatService 获取完整回复（含上下文注入）
             AiChatService.ChatReply reply = aiChatService.chat(
-                    module, effectiveSessionId, customerId, userMessage,
-                    chatCtx, effectiveTenantId);
+                    module, effectiveSessionId, customerId, userMessage, context);
 
             // 3. 逐字推送 aiMessage
             String text = reply.getAiMessage();
@@ -100,7 +108,7 @@ public class AiChatStreamService {
 
             // 6. AI 完成后落 assistant 最终消息（合并）
             if (StringUtils.hasText(text)) {
-                aiMemoryService.saveAssistantMessage(effectiveSessionId, effectiveTenantId, customerId, module, text);
+                aiMemoryService.saveAssistantMessage(effectiveSessionId, tenantId, customerId, module, text);
             }
 
         } catch (InterruptedException ie) {
@@ -110,15 +118,6 @@ public class AiChatStreamService {
             log.error("[AiChatStream] 流式推送异常", e);
             sendError(emitter, "服务暂时不可用，请稍后重试");
         }
-    }
-
-    /**
-     * 兼容旧调用（无上下文）。
-     */
-    @Async("deepayAsyncExecutor")
-    public void streamChat(SseEmitter emitter, String module, String sessionId,
-                           Long customerId, String userMessage) {
-        streamChat(emitter, module, sessionId, customerId, userMessage, null, 1L);
     }
 
     /**

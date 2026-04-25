@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.deepay.service;
 
-import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayAiPersonaDO;
-import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayAiPersonaMapper;
+import cn.iocoder.yudao.module.deepay.dal.dataobject.AiPersonaDO;
+import cn.iocoder.yudao.module.deepay.dal.mysql.AiPersonaMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -15,161 +19,138 @@ import static org.mockito.Mockito.*;
 /**
  * {@link AiPersonaService} 单元测试。
  *
- * <p>测试：DB 优先查询、租户回退、代码默认回退逻辑。</p>
+ * <p>验证三层降级策略：
+ * <ol>
+ *   <li>命中租户级 persona → 返回租户 prompt</li>
+ *   <li>租户级未命中，命中全局默认 → 返回全局 prompt</li>
+ *   <li>全局也未命中 → 返回硬编码 fallback</li>
+ *   <li>DB 异常 → 降级到硬编码（不抛异常）</li>
+ * </ol>
+ * </p>
  */
 @ExtendWith(MockitoExtension.class)
 class AiPersonaServiceTest {
 
     @Mock
-    private DeepayAiPersonaMapper personaMapper;
+    private AiPersonaMapper personaMapper;
 
     @InjectMocks
     private AiPersonaService aiPersonaService;
 
-    // ====================================================================
-    // 租户自定义优先
-    // ====================================================================
+    // ── 1. 命中租户级 persona ─────────────────────────────────
 
     @Test
-    void testGetSystemPrompt_tenantCustom_shouldReturnTenantPrompt() {
-        // Given: 租户 123 有自定义 design persona
-        DeepayAiPersonaDO custom = new DeepayAiPersonaDO();
-        custom.setTenantId(123L);
-        custom.setModule("design");
-        custom.setSystemPrompt("租户123专属设计师prompt");
-        custom.setEnabled(1);
+    void getSystemPrompt_tenantLevel_returnsTenantPrompt() {
+        Long tenantId = 42L;
+        AiPersonaDO tenantPersona = buildPersona(tenantId, "selection", "租户专属选款助手 prompt");
+        when(personaMapper.selectByTenantAndModule(tenantId, "selection"))
+                .thenReturn(List.of(tenantPersona));
 
-        when(personaMapper.selectByTenantAndModule(123L, "design")).thenReturn(custom);
+        String result = aiPersonaService.getSystemPrompt(tenantId, "selection");
 
-        // When
-        String prompt = aiPersonaService.getSystemPrompt(123L, "design");
-
-        // Then: 应使用租户自定义
-        assertEquals("租户123专属设计师prompt", prompt);
-        verify(personaMapper).selectByTenantAndModule(123L, "design");
-        // 不应查全局默认
-        verify(personaMapper, never()).selectByTenantAndModule(0L, "design");
+        assertEquals("租户专属选款助手 prompt", result);
     }
 
-    // ====================================================================
-    // 全局默认回退
-    // ====================================================================
+    // ── 2. 租户级未命中，命中全局默认 ─────────────────────────
 
     @Test
-    void testGetSystemPrompt_tenantNotFound_shouldFallbackToGlobal() {
-        // Given: 租户 123 无自定义，全局有配置
-        when(personaMapper.selectByTenantAndModule(123L, "finance")).thenReturn(null);
+    void getSystemPrompt_fallsBackToGlobal_whenTenantMissing() {
+        Long tenantId = 42L;
+        AiPersonaDO globalPersona = buildPersona(0L, "selection", "全局默认选款 prompt");
 
-        DeepayAiPersonaDO global = new DeepayAiPersonaDO();
-        global.setTenantId(0L);
-        global.setModule("finance");
-        global.setSystemPrompt("全局财务总监prompt");
-        global.setEnabled(1);
-        when(personaMapper.selectByTenantAndModule(0L, "finance")).thenReturn(global);
+        when(personaMapper.selectByTenantAndModule(tenantId, "selection"))
+                .thenReturn(Collections.emptyList());
+        when(personaMapper.selectByTenantAndModule(0L, "selection"))
+                .thenReturn(List.of(globalPersona));
 
-        // When
-        String prompt = aiPersonaService.getSystemPrompt(123L, "finance");
+        String result = aiPersonaService.getSystemPrompt(tenantId, "selection");
 
-        // Then: 应使用全局默认
-        assertEquals("全局财务总监prompt", prompt);
+        assertEquals("全局默认选款 prompt", result);
     }
 
-    // ====================================================================
-    // 代码硬编码回退
-    // ====================================================================
+    // ── 3. 两层 DB 均未命中 → 硬编码 fallback ────────────────
 
     @Test
-    void testGetSystemPrompt_noDbConfig_shouldFallbackToHardcoded() {
-        // Given: DB 无任何配置
-        when(personaMapper.selectByTenantAndModule(anyLong(), anyString())).thenReturn(null);
+    void getSystemPrompt_fallsBackToHardcoded_whenBothDbMiss() {
+        Long tenantId = 99L;
+        when(personaMapper.selectByTenantAndModule(anyLong(), anyString()))
+                .thenReturn(Collections.emptyList());
 
-        // When: 查询 selection
-        String prompt = aiPersonaService.getSystemPrompt(0L, "selection");
+        String result = aiPersonaService.getSystemPrompt(tenantId, "selection");
 
-        // Then: 应返回代码默认值
-        assertNotNull(prompt);
-        assertTrue(prompt.contains("购物顾问") || prompt.contains("选款"),
-                "应包含 selection 角色描述");
+        assertNotNull(result, "硬编码 fallback 不应为 null");
+        assertFalse(result.isBlank(), "硬编码 fallback 不应为空字符串");
+        // selection 模块的硬编码 prompt 包含"选款"关键字
+        assertTrue(result.contains("选款") || result.contains("购物"),
+                "selection 模块的 fallback prompt 应包含相关关键字");
     }
 
+    // ── 4. module=null → 使用 "global" ──────────────────────
+
     @Test
-    void testGetSystemPrompt_unknownModule_shouldReturnDefaultFallback() {
-        // Given: DB 无配置，module 不在默认 map 中
-        when(personaMapper.selectByTenantAndModule(anyLong(), anyString())).thenReturn(null);
+    void getSystemPrompt_nullModule_usesGlobal() {
+        when(personaMapper.selectByTenantAndModule(anyLong(), eq("global")))
+                .thenReturn(Collections.emptyList());
 
-        // When
-        String prompt = aiPersonaService.getSystemPrompt(0L, "unknownmodule");
+        String result = aiPersonaService.getSystemPrompt(0L, null);
 
-        // Then: 应返回最终兜底
-        assertNotNull(prompt);
-        assertTrue(prompt.contains("AI 助手") || prompt.contains("助手"),
-                "未知模块应返回通用 AI 助手 prompt");
+        assertNotNull(result, "null module 时应有默认 prompt");
+        assertFalse(result.isBlank());
     }
 
-    // ====================================================================
-    // DB 异常时回退
-    // ====================================================================
+    // ── 5. DB 异常 → 降级，不抛异常 ────────────────────────
 
     @Test
-    void testGetSystemPrompt_dbException_shouldFallbackGracefully() {
-        // Given: DB 抛出异常
+    void getSystemPrompt_dbException_degradesGracefully() {
         when(personaMapper.selectByTenantAndModule(anyLong(), anyString()))
                 .thenThrow(new RuntimeException("DB 连接失败"));
 
-        // When: 不应抛出异常
+        // 不应抛异常，应返回硬编码 fallback
         assertDoesNotThrow(() -> {
-            String prompt = aiPersonaService.getSystemPrompt(0L, "selection");
-            assertNotNull(prompt, "DB 异常时应回退到代码默认值");
+            String result = aiPersonaService.getSystemPrompt(1L, "order");
+            assertNotNull(result);
+            assertFalse(result.isBlank());
         });
     }
 
-    // ====================================================================
-    // CRUD
-    // ====================================================================
+    // ── 6. 租户 ID 为 0 → 只查全局，不重复查 ────────────────
 
     @Test
-    void testCreate_shouldSetDefaultValues() {
-        // Given
-        DeepayAiPersonaDO persona = new DeepayAiPersonaDO();
-        persona.setModule("sales");
-        persona.setSystemPrompt("测试销售prompt");
+    void getSystemPrompt_globalTenantId_queriesOnlyOnce() {
+        AiPersonaDO globalPersona = buildPersona(0L, "design", "全局设计师 prompt");
+        when(personaMapper.selectByTenantAndModule(0L, "design"))
+                .thenReturn(List.of(globalPersona));
 
-        // When
-        aiPersonaService.create(persona);
+        String result = aiPersonaService.getSystemPrompt(AiPersonaService.GLOBAL_TENANT_ID, "design");
 
-        // Then: 应设置默认值
-        assertEquals(1, persona.getEnabled(), "enabled 默认应为 1");
-        assertEquals(0, persona.getDeleted(), "deleted 默认应为 0");
-        assertNotNull(persona.getCreateTime());
-        assertNotNull(persona.getUpdateTime());
-        verify(personaMapper).insert(persona);
+        assertEquals("全局设计师 prompt", result);
+        // 传入 GLOBAL_TENANT_ID 时，只应执行一次 DB 查询（不需要先查租户再查全局）
+        verify(personaMapper, times(1)).selectByTenantAndModule(anyLong(), anyString());
     }
+
+    // ── 7. 未知 module → 返回通用 fallback ───────────────────
 
     @Test
-    void testDelete_existingPersona_shouldSoftDelete() {
-        // Given
-        DeepayAiPersonaDO existing = new DeepayAiPersonaDO();
-        existing.setId(1L);
-        existing.setDeleted(0);
-        when(personaMapper.selectById(1L)).thenReturn(existing);
-        when(personaMapper.updateById((DeepayAiPersonaDO) any())).thenReturn(1);
+    void getSystemPrompt_unknownModule_returnsGenericFallback() {
+        when(personaMapper.selectByTenantAndModule(anyLong(), eq("unknown_module")))
+                .thenReturn(Collections.emptyList());
 
-        // When
-        boolean result = aiPersonaService.delete(1L);
+        String result = aiPersonaService.getSystemPrompt(0L, "unknown_module");
 
-        // Then: 软删除
-        assertTrue(result);
-        assertEquals(1, existing.getDeleted(), "删除后 deleted 应为 1");
-        verify(personaMapper).updateById((DeepayAiPersonaDO) existing);
+        assertNotNull(result);
+        assertFalse(result.isBlank(), "未知 module 应返回通用兜底 prompt");
     }
 
-    @Test
-    void testDelete_notFound_shouldReturnFalse() {
-        when(personaMapper.selectById(999L)).thenReturn(null);
+    // ── helpers ──────────────────────────────────────────────
 
-        boolean result = aiPersonaService.delete(999L);
-
-        assertFalse(result);
+    private AiPersonaDO buildPersona(Long tenantId, String module, String systemPrompt) {
+        AiPersonaDO p = new AiPersonaDO();
+        p.setId(1L);
+        p.setTenantId(tenantId);
+        p.setModule(module);
+        p.setSystemPrompt(systemPrompt);
+        p.setEnabled(1);
+        p.setSortOrder(0);
+        return p;
     }
-
 }

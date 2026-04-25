@@ -1,5 +1,5 @@
 import { ref, nextTick } from 'vue'
-import { AiChatApi, type ChatMeta, type ChatReply, type ChatContext } from '@/api/ai/chat'
+import { AiChatApi, type ChatMeta, type ChatReply, type AiChatContext } from '@/api/ai/chat'
 import { uid } from '@/utils/uid'
 
 // ============================================================
@@ -29,8 +29,11 @@ export interface UseAiChatOptions {
   greeting?: string
   /** Persist sessionId in localStorage under this key */
   persistKey?: string
-  /** Context provider: called on each message to get current page context */
-  contextProvider?: () => Partial<ChatContext>
+  /**
+   * Context supplier — called on every send() to inject current page context.
+   * Return null/undefined to skip context injection.
+   */
+  contextFn?: () => AiChatContext | null | undefined
 }
 
 // ============================================================
@@ -38,7 +41,7 @@ export interface UseAiChatOptions {
 // ============================================================
 
 export function useAiChat(options: UseAiChatOptions) {
-  const { module, customerId, tenantId, scrollEl, greeting, persistKey, contextProvider } = options
+  const { module, customerId, scrollEl, greeting, persistKey, contextFn } = options
 
   // ── State ──────────────────────────────────────────────────
   const messages    = ref<ChatMessage[]>([])
@@ -90,21 +93,10 @@ export function useAiChat(options: UseAiChatOptions) {
       messages.value.push({ id: msgId, role: 'ai', content: '', streaming: true })
       scrollToBottom()
 
-      // Gather page context
-      const ctx = contextProvider?.() ?? {}
+      const ctx = contextFn?.() ?? undefined
 
       currentEs = AiChatApi.streamMessage(
-        {
-          module,
-          sessionId: sessionId.value,
-          customerId,
-          tenantId,
-          userMessage: text,
-          route:       ctx.route,
-          entityType:  ctx.entityType,
-          entityId:    ctx.entityId,
-          snapshot:    ctx.snapshot,
-        },
+        { module, sessionId: sessionId.value, customerId, userMessage: text, context: ctx },
         {
           onToken: (char) => {
             const m = _find(msgId)
@@ -137,14 +129,9 @@ export function useAiChat(options: UseAiChatOptions) {
   // ── REST fallback ───────────────────────────────────────────
   async function _sendRest(text: string): Promise<void> {
     try {
-      // Gather page context
-      const ctx = contextProvider?.() ?? {}
+      const ctx = contextFn?.() ?? undefined
       const reply: ChatReply = await AiChatApi.sendMessage({
-        module, sessionId: sessionId.value, customerId, tenantId, userMessage: text,
-        route:      ctx.route,
-        entityType: ctx.entityType,
-        entityId:   ctx.entityId,
-        snapshot:   ctx.snapshot,
+        module, sessionId: sessionId.value, customerId, userMessage: text, context: ctx,
       })
       _saveSession(reply.sessionId)
       pushMsg({ role: 'ai', content: reply.aiMessage, images: reply.images, quickReplies: reply.quickReplies })

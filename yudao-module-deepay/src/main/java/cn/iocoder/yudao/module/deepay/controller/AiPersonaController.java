@@ -1,97 +1,112 @@
 package cn.iocoder.yudao.module.deepay.controller;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.deepay.dal.dataobject.DeepayAiPersonaDO;
+import cn.iocoder.yudao.module.deepay.dal.dataobject.AiPersonaDO;
 import cn.iocoder.yudao.module.deepay.service.AiPersonaService;
-import cn.iocoder.yudao.module.deepay.service.AiRateLimitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import java.util.LinkedHashMap;
 
 /**
- * AI Persona（角色/提示词）管理接口。
+ * AI 角色人设配置管理接口（运营后台）。
  *
  * <h3>接口列表</h3>
  * <ul>
- *   <li>GET  /deepay/persona/list              — 查询所有 persona</li>
- *   <li>GET  /deepay/persona/preview?module=xx — 预览指定模块的 system prompt</li>
- *   <li>POST /deepay/persona/create            — 新增 persona</li>
- *   <li>PUT  /deepay/persona/update            — 更新 persona</li>
- *   <li>DELETE /deepay/persona/{id}            — 删除 persona</li>
- *   <li>GET  /deepay/persona/quota             — 查询当前用户剩余配额</li>
+ *   <li>GET  /deepay/ai/persona        — 获取所有启用的 persona 列表</li>
+ *   <li>GET  /deepay/ai/persona/{id}   — 获取单个 persona</li>
+ *   <li>POST /deepay/ai/persona        — 新增 persona</li>
+ *   <li>PUT  /deepay/ai/persona/{id}   — 更新 persona</li>
+ *   <li>DELETE /deepay/ai/persona/{id} — 删除 persona</li>
  * </ul>
  */
-@Tag(name = "Deepay - AI Persona 管理")
+@Tag(name = "Deepay - AI 角色人设配置管理")
 @RestController
-@RequestMapping("/deepay/persona")
+@RequestMapping("/deepay/ai/persona")
 @Validated
+@Slf4j
 public class AiPersonaController {
 
-    @Resource private AiPersonaService   aiPersonaService;
-    @Resource private AiRateLimitService aiRateLimitService;
+    @Resource
+    private AiPersonaService aiPersonaService;
 
-    // ====================================================================
-    // 查询
-    // ====================================================================
-
-    @GetMapping("/list")
-    @Operation(summary = "查询所有启用的 persona 配置")
-    public CommonResult<List<DeepayAiPersonaDO>> list() {
-        return success(aiPersonaService.listAll());
+    /**
+     * 获取所有启用的 persona 列表。
+     */
+    @GetMapping
+    @Operation(summary = "获取所有启用的 Persona 列表")
+    public ResponseEntity<Map<String, Object>> list() {
+        List<AiPersonaDO> list = aiPersonaService.listAll();
+        return ResponseEntity.ok(success(list));
     }
 
-    @GetMapping("/preview")
-    @Operation(summary = "预览指定模块的 system prompt（含租户优先级）")
-    public CommonResult<Map<String, String>> preview(
-            @RequestParam(defaultValue = "selection") String module,
-            @RequestParam(defaultValue = "0")         Long   tenantId) {
-        String prompt = aiPersonaService.getSystemPrompt(tenantId, module);
-        return success(java.util.Map.of(
-                "module",       module,
-                "tenantId",     String.valueOf(tenantId),
-                "systemPrompt", prompt
-        ));
+    /**
+     * 获取单个 persona。
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "获取单个 Persona")
+    public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
+        AiPersonaDO persona = aiPersonaService.getById(id);
+        if (persona == null) {
+            return ResponseEntity.ok(error(404, "Persona 不存在"));
+        }
+        return ResponseEntity.ok(success(persona));
     }
 
-    // ====================================================================
-    // CRUD
-    // ====================================================================
-
-    @PostMapping("/create")
-    @Operation(summary = "新增 persona 配置")
-    public CommonResult<DeepayAiPersonaDO> create(@RequestBody DeepayAiPersonaDO persona) {
-        return success(aiPersonaService.create(persona));
+    /**
+     * 新增 persona。
+     */
+    @PostMapping
+    @Operation(summary = "新增 Persona")
+    public ResponseEntity<Map<String, Object>> create(@RequestBody AiPersonaDO persona) {
+        AiPersonaDO created = aiPersonaService.create(persona);
+        log.info("[AiPersonaController] 新增 persona id={} module={}", created.getId(), created.getModule());
+        return ResponseEntity.ok(success(created));
     }
 
-    @PutMapping("/update")
-    @Operation(summary = "更新 persona 配置")
-    public CommonResult<Boolean> update(@RequestBody DeepayAiPersonaDO persona) {
-        return success(aiPersonaService.update(persona));
+    /**
+     * 更新 persona。
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "更新 Persona")
+    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
+                                                       @RequestBody AiPersonaDO persona) {
+        persona.setId(id);
+        aiPersonaService.update(persona);
+        log.info("[AiPersonaController] 更新 persona id={}", id);
+        return ResponseEntity.ok(success(null));
     }
 
+    /**
+     * 删除 persona（物理删除）。
+     */
     @DeleteMapping("/{id}")
-    @Operation(summary = "删除 persona 配置（软删除）")
-    public CommonResult<Boolean> delete(@PathVariable Long id) {
-        return success(aiPersonaService.delete(id));
+    @Operation(summary = "删除 Persona")
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+        aiPersonaService.delete(id);
+        log.info("[AiPersonaController] 删除 persona id={}", id);
+        return ResponseEntity.ok(success(null));
     }
 
-    // ====================================================================
-    // 配额查询
-    // ====================================================================
+    // ── helpers ────────────────────────────────────────────────
 
-    @GetMapping("/quota")
-    @Operation(summary = "查询当前用户 AI 调用剩余配额")
-    public CommonResult<Map<String, Object>> quota(
-            @RequestParam(required = false)   String userId,
-            @RequestParam(defaultValue = "0") Long   tenantId) {
-        return success(aiRateLimitService.getRemainingQuota(tenantId, userId));
+    private Map<String, Object> success(Object data) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("code", 0);
+        m.put("data", data);
+        return m;
     }
 
+    private Map<String, Object> error(int code, String message) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("code", code);
+        m.put("message", message);
+        return m;
+    }
 }
