@@ -65,11 +65,11 @@ docker compose up -d
 
 ## 🐶 新手必读
 
-* 演示地址【Vue3 + element-plus】：<https://admin.deepay.srl>
-* 演示地址【Vue3 + vben(ant-design-vue)】：<https://admin.deepay.srl>
-* 演示地址【Vue2 + element-ui】：<https://admin.deepay.srl>
-* 启动文档：<https://admin.deepay.srl/quick-start/>
-* 视频教程：<https://admin.deepay.srl/video/>
+* 演示地址【Vue3 + element-plus】：<https://deepay.srl>
+* 演示地址【Vue3 + vben(ant-design-vue)】：<https://deepay.srl>
+* 演示地址【Vue2 + element-ui】：<https://deepay.srl>
+* 启动文档：<https://deepay.srl/quick-start/>
+* 视频教程：<https://deepay.srl/video/>
 
 ## 🐰 版本说明
 
@@ -81,7 +81,7 @@ docker compose up -d
 * 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
 * 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、MES、AI 大模型、IoT 物联网 等功能
 
-可参考 [《迁移文档》](https://admin.deepay.srl/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
+可参考 [《迁移文档》](https://deepay.srl/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
 
 ## 🐯 平台简介
 
@@ -298,7 +298,7 @@ docker compose up -d
 
 ### 商城系统
 
-演示地址：<https://admin.deepay.srl/mall-preview/>
+演示地址：<https://deepay.srl/mall-preview/>
 
 ![功能图](/.image/common/mall-feature.png)
 
@@ -316,19 +316,19 @@ docker compose up -d
 
 ### ERP 系统
 
-演示地址：<https://admin.deepay.srl/erp-preview/>
+演示地址：<https://deepay.srl/erp-preview/>
 
 ![功能图](/.image/common/erp-feature.png)
 
 ### CRM 系统
 
-演示地址：<https://admin.deepay.srl/crm-preview/>
+演示地址：<https://deepay.srl/crm-preview/>
 
 ![功能图](/.image/common/crm-feature.png)
 
 ### MES 系统
 
-演示地址：<https://admin.deepay.srl/mes-preview/>
+演示地址：<https://deepay.srl/mes-preview/>
 
 ![功能图](/.image/common/mes-feature.png)
 
@@ -336,7 +336,7 @@ docker compose up -d
 
 ### AI 大模型
 
-演示地址：<https://admin.deepay.srl/ai-preview/>
+演示地址：<https://deepay.srl/ai-preview/>
 
 ![功能图](/.image/common/ai-feature.png)
 
@@ -344,7 +344,7 @@ docker compose up -d
 
 ### IoT 物联网
 
-演示地址：<https://admin.deepay.srl/iot/build>
+演示地址：<https://deepay.srl/iot/build>
 
 ![功能图](/.image/common/iot-feature.png)
 
@@ -387,7 +387,7 @@ docker compose up -d
 | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 5.3.24         | [文档](https://www.deepay.srl/SpringMVC/MVC/?yudao)               |
 | [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 5.7.11         | [文档](https://www.deepay.srl/Spring-Boot/Spring-Security/?yudao) |
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 6.2.5          | [文档](https://www.deepay.srl/Spring-Boot/Validation/?yudao)      |
-| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://admin.deepay.srl/bpm/)                              |
+| [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 6.8.0          | [文档](https://deepay.srl/bpm/)                              |
 | [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.3.2          | [文档](https://www.deepay.srl/Spring-Boot/Job/?yudao)             |
 | [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 1.7.0          | [文档](https://www.deepay.srl/Spring-Boot/Swagger/?yudao)         |
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 8.12.0         | [文档](https://www.deepay.srl/Spring-Boot/SkyWalking/?yudao)      |
