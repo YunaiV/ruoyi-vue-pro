@@ -11,6 +11,19 @@ const route  = useRoute()
 const router = useRouter()
 const theme  = useThemeStore()
 
+// Sidebar navigation items
+const NAV_ITEMS = [
+  { path: '/',            icon: '🏠', label: '首页'     },
+  { path: '/generate',    icon: '✨', label: 'AI生成'   },
+  { path: '/inspiration', icon: '🎭', label: '灵感库'   },
+  { path: '/template',    icon: '🏪', label: '模板'     },
+  { path: '/ai/design',   icon: '🎯', label: 'AI出款'   },
+  { path: '/ai/season',   icon: '🌿', label: '整季系列' },
+  { path: '/redesign',    icon: '🔧', label: '改款工具' },
+  { path: '/leaderboard', icon: '🏆', label: '排行榜'   },
+  { path: '/me',          icon: '👤', label: '我的'     },
+]
+
 // Responsive breakpoints
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile    = breakpoints.smaller('md')
@@ -141,21 +154,6 @@ watch(() => theme.isDark, (dark) => {
 
   </div>
 </template>
-
-<script>
-const NAV_ITEMS = [
-  { path: '/',            icon: '🏠', label: '首页'     },
-  { path: '/generate',    icon: '✨', label: 'AI生成'   },
-  { path: '/inspiration', icon: '🎭', label: '灵感库'   },
-  { path: '/template',    icon: '🏪', label: '模板'     },
-  { path: '/ai/design',   icon: '🎯', label: 'AI出款'   },
-  { path: '/ai/season',   icon: '🌿', label: '整季系列' },
-  { path: '/redesign',    icon: '🔧', label: '改款工具' },
-  { path: '/leaderboard', icon: '🏆', label: '排行榜'   },
-  { path: '/me',          icon: '👤', label: '我的'     },
-]
-export default { setup() { return { NAV_ITEMS } } }
-</script>
 
 <style>
 /* ── CSS design tokens — overridden per theme via [data-theme] ── */
