@@ -30,7 +30,7 @@ GitHub Webhook 配置步骤:
   2. 开放防火墙端口（宝塔面板 → 安全 → 放行 9000 端口）
 
   3. GitHub 仓库 → Settings → Webhooks → Add webhook:
-       Payload URL   : http://你的服务器IP:9000/webhook
+       Payload URL   : http://51.38.123.49:9000/webhook
        Content type  : application/json
        Secret        : 与 WEBHOOK_SECRET 一致
        Events        : Just the push event
@@ -278,7 +278,7 @@ def _banner() -> None:
     log.info("  部署脚本 : %s %s", DEPLOY_SCRIPT, DEPLOY_MODE)
     log.info("  密钥校验 : %s", "✔ 已配置（安全）" if SECRET else "✘ 未配置（危险！）")
     log.info("━" * 55)
-    log.info("  GitHub Webhook URL : http://YOUR_SERVER_IP:%d/webhook", PORT)
+    log.info("  GitHub Webhook URL : http://51.38.123.49:%d/webhook", PORT)
     log.info("  健康检查 URL       : curl http://localhost:%d/health", PORT)
     log.info("━" * 55)
 
@@ -364,7 +364,7 @@ def cmd_status() -> None:
             print(f"  监听端口 : {PORT}")
             print(f"  目标分支 : {BRANCH}")
             print(f"  密钥校验 : {'已配置 ✔' if SECRET else '未配置 ✘（危险！）'}")
-            print(f"  Webhook  : http://YOUR_IP:{PORT}/webhook")
+            print(f"  Webhook  : http://51.38.123.49:{PORT}/webhook")
             print(f"  健康检查 : curl http://localhost:{PORT}/health")
         except (ProcessLookupError, ValueError, OSError):
             print("  状态     : ❌  PID 文件存在但进程已退出")

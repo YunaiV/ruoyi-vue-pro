@@ -1,5 +1,6 @@
 # =============================================================
 #  Deepay Webhook Server — systemd 服务单元
+#  服务器 IP: 51.38.123.49
 #
 #  安装步骤（服务器上执行）：
 #
@@ -19,7 +20,13 @@
 #       journalctl -u deepay-webhook -f
 #       tail -f /www/wwwroot/deepay.srl/.build-logs/webhook.log
 #
-#  5. 修改配置后重启：
+#  5. GitHub Webhook 配置：
+#       Payload URL : http://51.38.123.49:9000/webhook
+#       Content type: application/json
+#       Secret      : 与 WEBHOOK_SECRET 一致
+#       Events      : Just the push event
+#
+#  6. 修改配置后重启：
 #       systemctl restart deepay-webhook
 # =============================================================
 [Unit]
