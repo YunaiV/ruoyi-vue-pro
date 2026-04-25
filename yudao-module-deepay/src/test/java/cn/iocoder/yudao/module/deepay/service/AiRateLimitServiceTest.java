@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -26,6 +28,8 @@ class AiRateLimitServiceTest {
     @Mock private StringRedisTemplate  stringRedisTemplate;
     @Mock private ValueOperations<String, String> valueOps;
     @Mock private DeepayAiUsageMapper  aiUsageMapper;
+    /** 使用同步执行器以便在单元测试中同步执行异步落库 */
+    @Mock private TaskExecutor asyncExecutor;
 
     @InjectMocks
     private AiRateLimitService rateLimitService;

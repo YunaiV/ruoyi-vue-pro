@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -51,6 +52,9 @@ public class AiRateLimitService {
 
     @Resource private StringRedisTemplate stringRedisTemplate;
     @Resource private DeepayAiUsageMapper  aiUsageMapper;
+    /** 复用 deepay 异步执行器，避免直接创建无托管线程 */
+    @Resource(name = "deepayAsyncExecutor")
+    private TaskExecutor asyncExecutor;
 
     // ====================================================================
     // 核心：检查并消费一次配额
@@ -144,8 +148,8 @@ public class AiRateLimitService {
     }
 
     private void asyncRecordUsage(Long tenantId, String userId, String module) {
-        // 后台线程落库，不影响响应时间
-        Thread thread = new Thread(() -> {
+        // 使用 Spring 托管的异步执行器，不直接创建线程，以便线程池管理和优雅关闭
+        asyncExecutor.execute(() -> {
             try {
                 aiUsageMapper.incrementDailyCount(
                         tenantId != null ? tenantId : 0L,
@@ -156,9 +160,6 @@ public class AiRateLimitService {
                 log.warn("[AiRateLimit] 使用量落库失败 userId={}", userId, e);
             }
         });
-        thread.setDaemon(true);
-        thread.setName("ai-usage-" + userId);
-        thread.start();
     }
 
     // ====================================================================
