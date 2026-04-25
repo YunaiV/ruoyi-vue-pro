@@ -1,0 +1,67 @@
+{
+  "name": "Deepay",
+  "appid": "__UNI__DEEPAY01",
+  "description": "AI时尚设计 · 跨平台版",
+  "versionName": "1.0.0",
+  "versionCode": 100,
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-compiler",
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {},
+    "distribute": {
+      "android": {
+        "permissions": []
+      },
+      "ios": {},
+      "sdkConfigs": {}
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false
+    },
+    "usingComponents": true,
+    "permission": {},
+    "lazyCodeLoading": "requiredComponents"
+  },
+  "h5": {
+    "title": "Deepay AI Fashion",
+    "router": {
+      "mode": "history"
+    },
+    "template": "index.html",
+    "manifest": {
+      "name": "Deepay",
+      "short_name": "Deepay",
+      "description": "AI时尚设计助手",
+      "display": "standalone",
+      "background_color": "#0a0a0a",
+      "theme_color": "#1abc9c",
+      "icons": [
+        {
+          "src": "/static/logo-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        },
+        {
+          "src": "/static/logo-512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    },
+    "devServer": {
+      "port": 3000
+    }
+  }
+}
