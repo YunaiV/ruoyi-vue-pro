@@ -34,7 +34,6 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
         wrapper.in("group_id", groupIds)
                 .gt("id", minId)
                 .gt("send_time", minSendTime)
-                .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .orderByAsc("id");
         wrapper.limitN(size);
         return selectList(wrapper);
