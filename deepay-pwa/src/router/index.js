@@ -13,6 +13,8 @@ const routes = [
   { path: '/settings',         component: () => import('@/views/Settings.vue'),        meta: { title: 'Deepay · 设置',    nav: 5 } },
   // ⑥ 管理后台 — 独立全屏，不走 App.vue 侧栏
   { path: '/admin',            component: () => import('@/views/Admin.vue'),           meta: { title: 'Deepay · 管理后台', admin: true } },
+  // ⑦ API 出图测试台（开发用）
+  { path: '/test-gen',         component: () => import('@/views/TestGen.vue'),         meta: { title: 'Deepay · 出图测试', admin: true } },
   // 旧路由 → 重定向
   { path: '/model-library',    redirect: '/image-library' },
   { path: '/design-library',   redirect: '/template-library' },
