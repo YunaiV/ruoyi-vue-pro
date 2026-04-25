@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.deepay.service;
 
 import cn.iocoder.yudao.module.deepay.agent.Context;
+import cn.iocoder.yudao.module.deepay.vo.AiChatContextVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -40,7 +41,16 @@ public class AiChatStreamService {
     @Resource private ChatSessionService chatSessionService;
 
     /**
-     * 异步流式推送对话回复。
+     * 异步流式推送对话回复（兼容旧接口，无上下文注入）。
+     */
+    @Async("deepayAsyncExecutor")
+    public void streamChat(SseEmitter emitter, String module, String sessionId,
+                           Long customerId, String userMessage) {
+        streamChat(emitter, module, sessionId, customerId, userMessage, null);
+    }
+
+    /**
+     * 异步流式推送对话回复（带上下文注入）。
      * 由 {@link cn.iocoder.yudao.module.deepay.controller.AiChatStreamController} 调用。
      *
      * @param emitter     SSE 发射器
@@ -48,14 +58,15 @@ public class AiChatStreamService {
      * @param sessionId   会话 ID（null → 自动创建）
      * @param customerId  用户 ID
      * @param userMessage 用户输入
+     * @param context     前端注入的上下文（可为 null）
      */
     @Async("deepayAsyncExecutor")
     public void streamChat(SseEmitter emitter, String module, String sessionId,
-                           Long customerId, String userMessage) {
+                           Long customerId, String userMessage, AiChatContextVO context) {
         try {
             // 1. 调用 AiChatService 获取完整回复
             AiChatService.ChatReply reply = aiChatService.chat(
-                    module, sessionId, customerId, userMessage);
+                    module, sessionId, customerId, userMessage, context);
 
             // 2. 逐字推送 aiMessage
             String text = reply.getAiMessage();

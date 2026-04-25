@@ -1,5 +1,5 @@
 import { ref, nextTick } from 'vue'
-import { AiChatApi, type ChatMeta, type ChatReply } from '@/api/ai/chat'
+import { AiChatApi, type ChatMeta, type ChatReply, type AiChatContext } from '@/api/ai/chat'
 import { uid } from '@/utils/uid'
 
 // ============================================================
@@ -28,6 +28,11 @@ export interface UseAiChatOptions {
   greeting?: string
   /** Persist sessionId in localStorage under this key */
   persistKey?: string
+  /**
+   * Context supplier — called on every send() to inject current page context.
+   * Return null/undefined to skip context injection.
+   */
+  contextFn?: () => AiChatContext | null | undefined
 }
 
 // ============================================================
@@ -35,7 +40,7 @@ export interface UseAiChatOptions {
 // ============================================================
 
 export function useAiChat(options: UseAiChatOptions) {
-  const { module, customerId, scrollEl, greeting, persistKey } = options
+  const { module, customerId, scrollEl, greeting, persistKey, contextFn } = options
 
   // ── State ──────────────────────────────────────────────────
   const messages    = ref<ChatMessage[]>([])
@@ -87,8 +92,10 @@ export function useAiChat(options: UseAiChatOptions) {
       messages.value.push({ id: msgId, role: 'ai', content: '', streaming: true })
       scrollToBottom()
 
+      const ctx = contextFn?.() ?? undefined
+
       currentEs = AiChatApi.streamMessage(
-        { module, sessionId: sessionId.value, customerId, userMessage: text },
+        { module, sessionId: sessionId.value, customerId, userMessage: text, context: ctx },
         {
           onToken: (char) => {
             const m = _find(msgId)
@@ -121,8 +128,9 @@ export function useAiChat(options: UseAiChatOptions) {
   // ── REST fallback ───────────────────────────────────────────
   async function _sendRest(text: string): Promise<void> {
     try {
+      const ctx = contextFn?.() ?? undefined
       const reply: ChatReply = await AiChatApi.sendMessage({
-        module, sessionId: sessionId.value, customerId, userMessage: text,
+        module, sessionId: sessionId.value, customerId, userMessage: text, context: ctx,
       })
       _saveSession(reply.sessionId)
       pushMsg({ role: 'ai', content: reply.aiMessage, images: reply.images, quickReplies: reply.quickReplies })

@@ -25,12 +25,31 @@ export interface ChatMeta {
 
 /** 发消息请求体 */
 export interface ChatMessageReq {
-  /** selection / design / product / inventory / finance / trend / order */
+  /** selection / design / product / inventory / finance / trend / order / global */
   module: string
   /** 首次可不传，后续必传 */
   sessionId?: string
   customerId?: number
   userMessage: string
+  /** 页面上下文（Context Injection v1）*/
+  context?: AiChatContext
+}
+
+/**
+ * 页面上下文注入（Context Injection v1）。
+ * 前端每次发消息时附带，后端注入到 AI prompt 中。
+ */
+export interface AiChatContext {
+  /** 当前路由路径，如 /order/detail */
+  route?: string
+  /** 模块名（selection/design/order 等） */
+  module?: string
+  /** 实体类型（order/product/customer/paymentLink 等）*/
+  entityType?: string
+  /** 实体 ID */
+  entityId?: string
+  /** 页面快照（JSON 字符串，前端已有的字段）*/
+  snapshot?: string
 }
 
 /** SSE 流式对话回调 */
@@ -98,6 +117,13 @@ export const AiChatApi = {
     qs.set('userMessage', params.userMessage)
     if (params.sessionId)   qs.set('sessionId',  params.sessionId)
     if (params.customerId != null) qs.set('customerId', String(params.customerId))
+    if (params.context) {
+      try {
+        qs.set('contextJson', JSON.stringify(params.context))
+      } catch {
+        // ignore serialization error
+      }
+    }
 
     // Use relative URL so it goes through the same base path as REST calls
     const url = `/deepay/chat/stream?${qs.toString()}`

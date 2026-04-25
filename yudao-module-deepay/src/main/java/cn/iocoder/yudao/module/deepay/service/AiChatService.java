@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayInventoryMapper;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayMetricsMapper;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayOrderMapper;
 import cn.iocoder.yudao.module.deepay.dal.mysql.DeepayProductMapper;
+import cn.iocoder.yudao.module.deepay.vo.AiChatContextVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -76,6 +77,7 @@ public class AiChatService {
     @Resource private DeepayProductMapper   productMapper;
     @Resource private DeepayOrderMapper     orderMapper;
     @Resource private DeepayMetricsMapper   metricsMapper;
+    @Resource private AiPersonaService      aiPersonaService;
 
     // ====================================================================
     // 角色人设 system prompt（与前端 aiRoles.ts 对应）
@@ -106,12 +108,23 @@ public class AiChatService {
                 "用温暖、亲切的语气与用户对话，始终以解决用户问题为首要目标。");
     }
 
-    /** Get the role system prompt prefix for a given module. */
-    public static String getRolePrompt(String module) {
-        return ROLE_SYSTEM_PROMPTS.getOrDefault(
-                module == null ? "selection" : module.toLowerCase(),
-                "你是一个智能 AI 助手，帮助用户解决各类业务问题。用专业、友善的语气对话。"
-        );
+    /**
+     * Get the role system prompt prefix for a given module.
+     * Queries AiPersonaService (DB → global default → hardcoded fallback).
+     *
+     * @param module 模块名
+     * @return system prompt 字符串（永不为 null）
+     */
+    public String getRolePrompt(String module) {
+        try {
+            return aiPersonaService.getSystemPrompt(AiPersonaService.GLOBAL_TENANT_ID, module);
+        } catch (Exception e) {
+            log.warn("[AiChatService] AiPersonaService 异常，使用硬编码 prompt module={}", module, e);
+            return ROLE_SYSTEM_PROMPTS.getOrDefault(
+                    module == null ? "selection" : module.toLowerCase(),
+                    "你是一个智能 AI 助手，帮助用户解决各类业务问题。用专业、友善的语气对话。"
+            );
+        }
     }
 
     // ====================================================================
@@ -128,6 +141,21 @@ public class AiChatService {
      * @return AI 回复结构
      */
     public ChatReply chat(String module, String sessionId, Long customerId, String userMessage) {
+        return chat(module, sessionId, customerId, userMessage, null);
+    }
+
+    /**
+     * 处理用户消息（带上下文注入），返回 AI 回复。
+     *
+     * @param module      板块名
+     * @param sessionId   会话 ID（首次传 null，系统自动创建）
+     * @param customerId  用户/客户 ID
+     * @param userMessage 用户输入的自然语言
+     * @param context     前端注入的上下文（可为 null）
+     * @return AI 回复结构
+     */
+    public ChatReply chat(String module, String sessionId, Long customerId,
+                          String userMessage, AiChatContextVO context) {
         log.info("[AiChatService] module={} sessionId={} customerId={} message='{}'",
                 module, sessionId, customerId, userMessage);
 
@@ -144,13 +172,28 @@ public class AiChatService {
             ctx.customerId = customerId;
         }
 
-        // 2. NLP 解析：将自然语言映射到结构化字段（注入角色人设 prompt）
-        String rolePrompt = getRolePrompt(module);
-        nlpParserService.parse(userMessage, ctx, rolePrompt);
+        // 2. 注入前端上下文（entityId 等实体信息）
+        String effectiveModule = module;
+        String contextPrefix = "";
+        if (context != null) {
+            contextPrefix = buildContextPrefix(context);
+            // 允许前端 context 中的 module 覆盖 URL param（更精确）
+            if (StringUtils.hasText(context.getModule())) {
+                effectiveModule = context.getModule();
+            }
+        }
 
-        // 3. 根据 module 路由执行
+        // 3. NLP 解析：将自然语言映射到结构化字段（注入角色人设 prompt）
+        String rolePrompt = getRolePrompt(effectiveModule);
+        // 将上下文前缀拼入 rolePrompt，让 NLP 模型感知页面状态
+        String fullPrompt = StringUtils.hasText(contextPrefix)
+                ? rolePrompt + "\n\n[当前页面上下文]\n" + contextPrefix
+                : rolePrompt;
+        nlpParserService.parse(userMessage, ctx, fullPrompt);
+
+        // 4. 根据 module 路由执行
         ChatReply reply;
-        switch (module == null ? "selection" : module.toLowerCase()) {
+        switch (effectiveModule == null ? "selection" : effectiveModule.toLowerCase()) {
             case "selection":
                 reply = handleSelection(ctx, userMessage);
                 break;
@@ -176,10 +219,22 @@ public class AiChatService {
                 reply = handleSelection(ctx, userMessage);
         }
 
-        // 4. 保存 Context（覆盖写）
+        // 5. 保存 Context（覆盖写）
         chatSessionService.save(sessionId, ctx);
         reply.setSessionId(sessionId);
         return reply;
+    }
+
+    /**
+     * 将前端上下文 VO 构建为可读的 prompt 前缀字符串。
+     */
+    private String buildContextPrefix(AiChatContextVO ctx) {
+        StringBuilder sb = new StringBuilder();
+        if (StringUtils.hasText(ctx.getRoute()))      sb.append("当前路由：").append(ctx.getRoute()).append("\n");
+        if (StringUtils.hasText(ctx.getEntityType())) sb.append("实体类型：").append(ctx.getEntityType()).append("\n");
+        if (StringUtils.hasText(ctx.getEntityId()))   sb.append("实体ID：").append(ctx.getEntityId()).append("\n");
+        if (StringUtils.hasText(ctx.getSnapshot()))   sb.append("页面数据快照：").append(ctx.getSnapshot()).append("\n");
+        return sb.toString().trim();
     }
 
     // ====================================================================

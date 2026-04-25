@@ -25,7 +25,7 @@ import java.time.Duration;
 @Service
 public class DeepayRateLimitService {
 
-    private static final int    MAX_PER_MINUTE = 3;
+    public static final int MAX_PER_MINUTE = 3;
     private static final String KEY_PREFIX     = "rate:design:";
 
     @Resource
