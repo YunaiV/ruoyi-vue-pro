@@ -153,21 +153,18 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadMessages_success() {
-        // 准备：mock 未读消息（id=1 和 id=5，maxReadId 应为 5）
-        List<ImPrivateMessageDO> unreadMessages = List.of(
-                ImPrivateMessageDO.builder().id(1L).senderId(2L).receiverId(1L)
-                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build(),
-                ImPrivateMessageDO.builder().id(5L).senderId(2L).receiverId(1L)
-                        .status(ImMessageStatusEnum.UNREAD.getStatus()).build()
-        );
-        when(privateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
-                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(unreadMessages);
+        // 准备：前端上报已读到 messageId=5；mapper 返回更新行数 2 表示有未读被翻转
+        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+                eq(2L), eq(1L), eq(5L),
+                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
+                .thenReturn(2);
 
         // 调用
-        privateMessageService.readPrivateMessages(1L, 2L);
+        privateMessageService.readPrivateMessages(1L, 2L, 5L);
 
         // 断言：更新了消息状态
-        verify(privateMessageMapper).updateByIdsAndStatus(eq(List.of(1L, 5L)),
+        verify(privateMessageMapper).updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+                eq(2L), eq(1L), eq(5L),
                 eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class));
 
         // 断言：发送了 READ + RECEIPT 事件，payload 字段正确
@@ -182,13 +179,13 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(ImMessageTypeEnum.READ.getType(), readPayload.getType());
         assertEquals(1L, readPayload.getSenderId());
         assertEquals(2L, readPayload.getReceiverId());
-        assertEquals(5L, readPayload.getId(), "READ id 应为 maxReadId");
+        assertEquals(5L, readPayload.getId(), "READ id 应为前端上报的 messageId");
 
         // 第二次：发给对方的 RECEIPT 事件
         assertEquals(2L, userCaptor.getAllValues().get(1));
         ImPrivateMessageDTO receiptPayload = contentCaptor.getAllValues().get(1);
         assertEquals(ImMessageTypeEnum.RECEIPT.getType(), receiptPayload.getType());
-        assertEquals(5L, receiptPayload.getId(), "RECEIPT id 应为 maxReadId");
+        assertEquals(5L, receiptPayload.getId(), "RECEIPT id 应为前端上报的 messageId");
     }
 
     // ========== 撤回测试 ==========
@@ -295,15 +292,16 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadMessages_noUnread() {
-        // 准备：没有未读消息
-        when(privateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(2L, 1L,
-                ImMessageStatusEnum.UNREAD.getStatus())).thenReturn(List.of());
+        // 准备：mapper 返回 0 表示 id <= messageId 范围内没有未读消息
+        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+                eq(2L), eq(1L), eq(5L),
+                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
+                .thenReturn(0);
 
         // 调用
-        privateMessageService.readPrivateMessages(1L, 2L);
+        privateMessageService.readPrivateMessages(1L, 2L, 5L);
 
-        // 断言：不更新、不推送
-        verify(privateMessageMapper, never()).updateByIdsAndStatus(anyList(), anyInt(), any(ImPrivateMessageDO.class));
+        // 断言：不推送 READ / RECEIPT
         verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }
 

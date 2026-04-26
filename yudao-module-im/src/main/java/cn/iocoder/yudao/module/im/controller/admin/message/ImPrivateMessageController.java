@@ -50,8 +50,10 @@ public class ImPrivateMessageController {
     @PutMapping("/read")
     @Operation(summary = "标记私聊消息已读")
     @Parameter(name = "receiverId", description = "接收方用户编号（对方）", required = true, example = "2")
-    public CommonResult<Boolean> readPrivateMessages(@RequestParam("receiverId") Long receiverId) {
-        privateMessageService.readPrivateMessages(getLoginUserId(), receiverId);
+    @Parameter(name = "messageId", description = "已读位置（含），通常是会话内最大消息编号", required = true, example = "100")
+    public CommonResult<Boolean> readPrivateMessages(@RequestParam("receiverId") Long receiverId,
+                                                     @RequestParam("messageId") Long messageId) {
+        privateMessageService.readPrivateMessages(getLoginUserId(), receiverId, messageId);
         return success(true);
     }
 

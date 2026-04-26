@@ -34,11 +34,15 @@ public interface ImPrivateMessageService {
 
     /**
      * 标记私聊消息已读
+     * <p>
+     * 语义：将「对方发给当前用户、id <= messageId 的未读消息」一次性翻转为已读，
+     * 与群聊 readGroupMessages 对称，避免"select-then-update"两步式带来的竞态。
      *
      * @param userId     当前用户编号
      * @param receiverId 接收方用户编号（对方）
+     * @param messageId  已读位置（含），通常是前端会话内最大消息 id
      */
-    void readPrivateMessages(Long userId, Long receiverId);
+    void readPrivateMessages(Long userId, Long receiverId, Long messageId);
 
     /**
      * 撤回私聊消息

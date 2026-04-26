@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.im.service.message;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
@@ -97,26 +96,24 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         return messages;
     }
 
-    // TODO @AI：考虑到更稳妥，是不是前端传递 messageId？不然恰好发过来，然后读取了。【后续在优化】
+    // TODO DONE @AI：考虑到更稳妥，是不是前端传递 messageId？不然恰好发过来，然后读取了。【后续在优化】
     @Override
-    public void readPrivateMessages(Long userId, Long receiverId) {
-        // 1.1 查询未读消息列表
-        List<ImPrivateMessageDO> unreadMessages = privateMessageMapper.selectListBySenderIdAndReceiverIdAndStatus(
-                receiverId, userId, ImMessageStatusEnum.UNREAD.getStatus());
-        if (CollUtil.isEmpty(unreadMessages)) {
+    public void readPrivateMessages(Long userId, Long receiverId, Long messageId) {
+        Assert.notNull(messageId, "已读消息编号不能为空");
+        // 1. 一步翻转：把 (receiverId → userId) 这条会话上、id <= messageId 的未读消息全部置为已读
+        // 仅 UNREAD 行被命中，避免覆盖已撤回/已读的状态；select-then-update 拆成单条 SQL 后也消除了竞态窗口
+        int updated = privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+                receiverId, userId, messageId, ImMessageStatusEnum.UNREAD.getStatus(),
+                new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
+        if (updated == 0) {
             return;
         }
-        // 1.2 根据 id in + status 条件更新，避免并发问题
-        List<Long> messageIds = convertList(unreadMessages, ImPrivateMessageDO::getId);
-        privateMessageMapper.updateByIdsAndStatus(messageIds, ImMessageStatusEnum.UNREAD.getStatus(),
-                new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
 
-        // 2. 异步发送 READ + RECEIPT 事件（携带已读位置）
-        Long maxReadId = CollUtil.max(messageIds);
+        // 2. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
         imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofRead(userId, receiverId, maxReadId));
+                ImPrivateMessageDTO.ofRead(userId, receiverId, messageId));
         imWebSocketService.sendPrivateMessageAsync(receiverId,
-                ImPrivateMessageDTO.ofReceipt(userId, receiverId, maxReadId));
+                ImPrivateMessageDTO.ofReceipt(userId, receiverId, messageId));
     }
 
     @Override
