@@ -45,6 +45,18 @@ public interface ImPrivateMessageService {
     void readPrivateMessages(Long userId, Long receiverId, Long messageId);
 
     /**
+     * 查询对方已读到我发的最大消息 id
+     * <p>
+     * 用于多端 / 离线场景下的已读位置补齐：客户端进入会话或断线重连后，
+     * 调用此接口拿到对方的 maxReadId，再按 id <= maxReadId 翻转本地自发消息为已读，弥补离线期间错过的 RECEIPT 推送事件。
+     *
+     * @param userId 当前用户编号
+     * @param peerId 对方用户编号
+     * @return 对方已读到的最大消息 id；对方一条都没读过时返回 null
+     */
+    Long getMaxReadMessageId(Long userId, Long peerId);
+
+    /**
      * 撤回私聊消息
      *
      * @param userId    当前用户编号

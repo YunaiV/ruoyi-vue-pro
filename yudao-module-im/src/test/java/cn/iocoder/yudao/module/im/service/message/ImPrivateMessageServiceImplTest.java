@@ -305,6 +305,34 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }
 
+    // ========== getMaxReadMessageId 测试 ==========
+
+    @Test
+    public void testGetMaxReadMessageId_hit() {
+        // 准备：对方读到我发的最大 id=10
+        when(privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
+                1L, 2L, ImMessageStatusEnum.READ.getStatus())).thenReturn(10L);
+
+        // 调用
+        Long result = privateMessageService.getMaxReadMessageId(1L, 2L);
+
+        // 断言
+        assertEquals(10L, result);
+    }
+
+    @Test
+    public void testGetMaxReadMessageId_miss() {
+        // 准备：对方一条都没读过
+        when(privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
+                1L, 2L, ImMessageStatusEnum.READ.getStatus())).thenReturn(null);
+
+        // 调用
+        Long result = privateMessageService.getMaxReadMessageId(1L, 2L);
+
+        // 断言：原样返回 null，前端按 falsy 跳过
+        assertNull(result);
+    }
+
     // ========== sendTipPrivateMessage ==========
 
     @Test

@@ -67,19 +67,16 @@ public interface ImPrivateMessageMapper extends BaseMapperX<ImPrivateMessageDO> 
                 .eq(ImPrivateMessageDO::getClientMessageId, clientMessageId));
     }
 
-    /**
-     * 标记 (senderId → receiverId) 这条会话上、id <= maxMessageId 且 status = whereStatus 的消息为新状态
-     * <p>
-     * 用于「已读」语义：前端上报"我已读到 maxMessageId"，由这一条 SQL 在 status=UNREAD 上幂等翻转，
-     * 避免"先 select 未读、再按 id in 更新"两步带来的竞态（select 后到达的消息被误标）。
-     *
-     * @param senderId      发送方用户编号（对方）
-     * @param receiverId    接收方用户编号（当前用户）
-     * @param maxMessageId  已读位置（含）
-     * @param whereStatus   匹配的当前状态
-     * @param updateObj     更新对象（仅设要变更的字段）
-     * @return 实际更新行数
-     */
+    default Long selectMaxIdBySenderIdAndReceiverIdAndStatus(Long senderId, Long receiverId, Integer status) {
+        ImPrivateMessageDO message = selectOne(new LambdaQueryWrapperX<ImPrivateMessageDO>()
+                .eq(ImPrivateMessageDO::getSenderId, senderId)
+                .eq(ImPrivateMessageDO::getReceiverId, receiverId)
+                .eq(ImPrivateMessageDO::getStatus, status)
+                .orderByDesc(ImPrivateMessageDO::getId)
+                .last("LIMIT 1"));
+        return message != null ? message.getId() : null;
+    }
+
     default int updateBySenderIdAndReceiverIdAndIdLeAndStatus(Long senderId, Long receiverId, Long maxMessageId,
                                                               Integer whereStatus, ImPrivateMessageDO updateObj) {
         return update(updateObj, new LambdaQueryWrapperX<ImPrivateMessageDO>()

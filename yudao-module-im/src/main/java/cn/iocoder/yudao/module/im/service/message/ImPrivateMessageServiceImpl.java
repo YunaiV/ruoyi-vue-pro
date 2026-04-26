@@ -117,6 +117,12 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     }
 
     @Override
+    public Long getMaxReadMessageId(Long userId, Long peerId) {
+        return privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
+                userId, peerId, ImMessageStatusEnum.READ.getStatus());
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public ImPrivateMessageDO recallPrivateMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在
