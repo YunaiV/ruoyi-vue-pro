@@ -84,8 +84,9 @@ public class ImFriendServiceImpl implements ImFriendService {
             throw exception(FRIEND_NOT_FRIEND);
         }
 
-        // 2. 更新好友属性（目前仅免打扰）
-        imFriendMapper.updateById(new ImFriendDO().setId(friend.getId()).setMuted(reqVO.getMuted()));
+        // 2. 更新好友属性
+        imFriendMapper.updateById(new ImFriendDO().setId(friend.getId())
+                .setMuted(reqVO.getMuted()).setDisplayName(reqVO.getDisplayName()));
 
         // 3. 推送好友更新通知（多端同步）
         imWebSocketService.sendPrivateMessageAsync(userId,

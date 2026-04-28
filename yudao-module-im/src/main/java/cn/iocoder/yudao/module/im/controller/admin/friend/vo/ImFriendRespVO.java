@@ -23,6 +23,9 @@ public class ImFriendRespVO {
     @Schema(description = "是否免打扰", example = "false")
     private Boolean muted;
 
+    @Schema(description = "好友展示备注（仅自己可见）", example = "老张")
+    private String displayName;
+
     @Schema(description = "好友状态（0=正常，1=已删除）", example = "0")
     private Integer status;
 

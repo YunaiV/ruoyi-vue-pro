@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS "im_friend" (
     "user_id" bigint NOT NULL COMMENT '用户编号',
     "friend_user_id" bigint NOT NULL COMMENT '好友用户编号',
     "muted" bit DEFAULT FALSE COMMENT '是否免打扰',
+    "display_name" varchar(64) NOT NULL DEFAULT '' COMMENT '好友展示备注（仅自己可见）',
     "status" tinyint NOT NULL COMMENT '好友状态',
     "add_time" timestamp DEFAULT NULL COMMENT '添加好友时间',
     "delete_time" timestamp DEFAULT NULL COMMENT '删除好友时间',

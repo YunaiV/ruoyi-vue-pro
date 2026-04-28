@@ -112,6 +112,46 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(FRIEND_NOT_FRIEND.getCode(), exception.getCode());
     }
 
+    @Test
+    public void testUpdateFriend_displayNameOnly() {
+        // 准备：只传备注、不传 muted —— 走差量更新
+        ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
+        reqVO.setFriendUserId(2L);
+        reqVO.setDisplayName("老张");
+        ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
+                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
+
+        // 调用
+        friendService.updateFriend(1L, reqVO);
+
+        // 断言：updateById 收到 displayName 但没有 muted（MyBatis-Plus 靠 NOT_NULL 跳过）
+        ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
+        verify(imFriendMapper).updateById(captor.capture());
+        assertEquals(100L, captor.getValue().getId());
+        assertEquals("老张", captor.getValue().getDisplayName());
+        assertNull(captor.getValue().getMuted());
+        // 断言：推送好友更新通知
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+    }
+
+    @Test
+    public void testUpdateFriend_emptyRequest() {
+        // 准备：muted 和 displayName 都不传 —— 短路返回，不打 SQL 也不发推送
+        ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
+        reqVO.setFriendUserId(2L);
+        ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
+                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
+
+        // 调用
+        friendService.updateFriend(1L, reqVO);
+
+        // 断言：没触发 SQL 更新 / 没发 WebSocket 推送
+        verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
+        verify(imWebSocketService, never()).sendPrivateMessageAsync(any(Long.class), any(ImPrivateMessageDTO.class));
+    }
+
     // ========== addFriend ==========
 
     @Test

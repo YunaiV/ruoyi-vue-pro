@@ -51,6 +51,10 @@ public class ImFriendDO extends BaseDO {
      */
     private Boolean muted;
     /**
+     * 好友展示备注
+     */
+    private String displayName;
+    /**
      * 好友状态
      * <p>
      * 枚举 {@link CommonStatusEnum}

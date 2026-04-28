@@ -75,7 +75,7 @@ public class ImFriendController {
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新好友信息（当前仅免打扰）")
+    @Operation(summary = "更新好友信息")
     public CommonResult<Boolean> updateFriend(@Valid @RequestBody ImFriendUpdateReqVO reqVO) {
         friendService.updateFriend(getLoginUserId(), reqVO);
         return success(true);
