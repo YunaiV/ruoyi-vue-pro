@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -51,11 +52,25 @@ public class ImGroupMemberController {
 
     @GetMapping("/get")
     @Operation(summary = "获得群成员")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameters({
+            @Parameter(name = "id", description = "编号（与 groupId + userId 二选一）", example = "1024"),
+            @Parameter(name = "groupId", description = "群编号（与 userId 配合查）", example = "1"),
+            @Parameter(name = "userId", description = "用户编号（与 groupId 配合查）", example = "100")
+    })
     @PreAuthorize("@ss.hasPermission('im:group-member:query')")
-    public CommonResult<ImGroupMemberRespVO> getGroupMember(@RequestParam("id") Long id) {
-        ImGroupMemberDO groupMember = groupMemberService.getGroupMember(id);
-        return success(BeanUtils.toBean(groupMember, ImGroupMemberRespVO.class));
+    public CommonResult<ImGroupMemberRespVO> getGroupMember(@RequestParam(value = "id", required = false) Long id,
+                                                            @RequestParam(value = "groupId", required = false) Long groupId,
+                                                            @RequestParam(value = "userId", required = false) Long userId) {
+        ImGroupMemberDO member;
+        if (id != null) {
+            member = groupMemberService.getGroupMember(id);
+        } else if (groupId != null && userId != null) {
+            member = groupMemberService.getGroupMember(groupId, userId);
+        } else {
+            // 避免 selectByGroupIdAndUserId 收到 null 参数走全表扫 / 抛 SQL 异常
+            throw new IllegalArgumentException("参数缺失：需传 id 或 (groupId, userId)");
+        }
+        return success(BeanUtils.toBean(member, ImGroupMemberRespVO.class));
     }
 
     @GetMapping("/list")
@@ -67,8 +82,8 @@ public class ImGroupMemberController {
         List<ImGroupMemberDO> members = groupMemberService.getGroupMemberListByGroupId(groupId);
         // 1.2 校验当前登录用户是否为群的有效成员，非成员不可查看
         Long loginUserId = getLoginUserId();
-        if (CollUtil.findOne(members, m -> loginUserId.equals(m.getUserId())
-                && CommonStatusEnum.ENABLE.getStatus().equals(m.getStatus())) == null) {
+        if (CollUtil.findOne(members, member -> loginUserId.equals(member.getUserId())
+                && CommonStatusEnum.ENABLE.getStatus().equals(member.getStatus())) == null) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
 
