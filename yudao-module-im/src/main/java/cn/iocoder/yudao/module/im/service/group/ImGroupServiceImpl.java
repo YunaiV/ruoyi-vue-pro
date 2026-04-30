@@ -8,7 +8,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
@@ -16,7 +15,6 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMember
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -288,24 +286,8 @@ public class ImGroupServiceImpl implements ImGroupService {
     // ==================== 管理后台 ====================
 
     @Override
-    public PageResult<ImGroupManagerRespVO> getGroupPage(ImGroupManagerPageReqVO pageReqVO) {
-        // 1. 分页查询群
-        PageResult<ImGroupDO> pageResult = groupMapper.selectPage(pageReqVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
-        }
-
-        // 2.1 批量查询群主昵称
-        Set<Long> ownerUserIds = convertSet(pageResult.getList(), ImGroupDO::getOwnerUserId);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(ownerUserIds);
-        // 2.2 一次 GROUP BY 查出本页所有群的活跃成员数，避免按行 N+1
-        Set<Long> groupIds = convertSet(pageResult.getList(), ImGroupDO::getId);
-        Map<Long, Long> memberCountMap = groupMemberService.getActiveMemberCountMap(groupIds);
-        // 2.3 转换为 VO，填充群主昵称、群成员数量
-        return BeanUtils.toBean(pageResult, ImGroupManagerRespVO.class, vo -> {
-            MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerNickname(user.getNickname()));
-            vo.setMemberCount(memberCountMap.getOrDefault(vo.getId(), 0L).intValue());
-        });
+    public PageResult<ImGroupDO> getGroupPage(ImGroupManagerPageReqVO pageReqVO) {
+        return groupMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -328,7 +310,6 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_NOT_EXISTS);
         }
         // 2. 解封（保留 bannedReason / bannedTime 作为历史记录）
-        // TODO DONE @AI：不要使用 mybatis plus 的方法，直接操作。另外，感觉封禁时间、封禁原因，没必要置空，留着问题不大。
         groupMapper.updateById(new ImGroupDO().setId(id).setBanned(false));
     }
 

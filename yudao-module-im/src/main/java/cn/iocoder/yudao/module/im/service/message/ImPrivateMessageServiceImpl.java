@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.im.service.message;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.privates.ImPrivateMessageManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.privates.ImPrivateMessageManagerRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
@@ -21,8 +18,6 @@ import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,13 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
@@ -60,9 +51,6 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Resource
     private ImWebSocketService imWebSocketService;
-
-    @Resource
-    private AdminUserApi adminUserApi;
 
     @Override
     public ImPrivateMessageDO sendPrivateMessage(Long senderId, ImPrivateMessageSendReqVO reqVO) {
@@ -183,26 +171,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     // ==================== 管理后台 ====================
 
-    // TODO @AI：这些挪到 controller 拼接 VO
+    // DONE @AI：这些挪到 controller 拼接 VO
     @Override
-    public PageResult<ImPrivateMessageManagerRespVO> getPrivateMessagePage(ImPrivateMessageManagerPageReqVO reqVO) {
-        // 1. 分页查询
-        PageResult<ImPrivateMessageDO> pageResult = privateMessageMapper.selectPage(reqVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
-        }
-
-        // 2. 一次性批量查询发送人 + 接收人昵称
-        Set<Long> userIds = new HashSet<>();
-        userIds.addAll(convertSet(pageResult.getList(), ImPrivateMessageDO::getSenderId));
-        userIds.addAll(convertSet(pageResult.getList(), ImPrivateMessageDO::getReceiverId));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-
-        // 3. 转换为 VO，填充昵称
-        return BeanUtils.toBean(pageResult, ImPrivateMessageManagerRespVO.class, vo -> {
-            MapUtils.findAndThen(userMap, vo.getSenderId(), user -> vo.setSenderNickname(user.getNickname()));
-            MapUtils.findAndThen(userMap, vo.getReceiverId(), user -> vo.setReceiverNickname(user.getNickname()));
-        });
+    public PageResult<ImPrivateMessageDO> getPrivateMessagePage(ImPrivateMessageManagerPageReqVO reqVO) {
+        return privateMessageMapper.selectPage(reqVO);
     }
 
     @Override

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
@@ -118,9 +117,9 @@ public interface ImGroupMessageService {
     // ==================== 管理后台 ====================
 
     /**
-     * 【管理后台】分页查询群聊消息（已填充群名称、发送人昵称）
+     * 【管理后台】分页查询群聊消息
      */
-    PageResult<ImGroupMessageManagerRespVO> getGroupMessagePage(ImGroupMessageManagerPageReqVO reqVO);
+    PageResult<ImGroupMessageDO> getGroupMessagePage(ImGroupMessageManagerPageReqVO reqVO);
 
     /**
      * 【管理后台】获取群聊消息详情

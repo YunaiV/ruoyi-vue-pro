@@ -62,12 +62,10 @@
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
 
-        <!-- 敏感词检测：houbb sensitive-word（trie 树高效匹配，支持忽略大小写 / 全半角 / 数字风格） -->
-        <!-- TODO @AI：放到基础 pom 里管理。 -->
+        <!-- 敏感词检测：sensitive-word（trie 树高效匹配，支持忽略大小写 / 全半角 / 数字风格），版本由 yudao-dependencies 统一管理 -->
         <dependency>
             <groupId>com.github.houbb</groupId>
             <artifactId>sensitive-word</artifactId>
-            <version>0.29.5</version>
         </dependency>
 
         <!-- Test 测试相关 -->

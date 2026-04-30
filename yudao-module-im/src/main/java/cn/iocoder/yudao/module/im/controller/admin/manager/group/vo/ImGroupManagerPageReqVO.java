@@ -21,8 +21,8 @@ public class ImGroupManagerPageReqVO extends PageParam {
     @Schema(description = "群主用户编号", example = "1024")
     private Long ownerUserId;
 
-    @Schema(description = "群状态，参见 CommonStatusEnum 枚举类（0 正常 / 1 已解散）", example = "0")
-    private Integer status;
+    @Schema(description = "群状态", example = "0")
+    private Integer status; // 参见 CommonStatusEnum 枚举类（0 正常 / 1 已解散）
 
     @Schema(description = "是否封禁", example = "false")
     private Boolean banned;

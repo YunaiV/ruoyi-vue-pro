@@ -3,21 +3,35 @@ package cn.iocoder.yudao.module.im.service.sensitiveword;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword.vo.ImSensitiveWordPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword.vo.ImSensitiveWordSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.sensitiveword.ImSensitiveWordDO;
 import cn.iocoder.yudao.module.im.dal.mysql.sensitiveword.ImSensitiveWordMapper;
 import com.github.houbb.sensitive.word.bs.SensitiveWordBs;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_SENSITIVE_WORD_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.SENSITIVE_WORD_DUPLICATED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.SENSITIVE_WORD_NOT_EXISTS;
@@ -37,34 +51,92 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
     @Resource
     private ImSensitiveWordMapper sensitiveWordMapper;
 
-    // TODO @AI：当前节点，立即刷新。其他节点，通过 job 扫描最后更新时间（只要有不同于目前最后一条记录的最大更新时间，就重新构建对应的树）。
     /**
-     * houbb 敏感词检测器，词库由 ImSensitiveWordDeny 在 init 时回调加载
+     * 缓存条目
      */
-    @Resource
-    private SensitiveWordBs sensitiveWordBs;
+    @Data
+    @AllArgsConstructor
+    private static class SensitiveWordBsCache {
 
-    // TODO @AI：你看看现有仓库里，是否有类似这种的。按照最后更新判断，是否需要刷新本地缓存。
-    /**
-     * 触发 houbb 词库重新加载（重建 trie）
-     * <p>
-     * 加 synchronized 是因为 SensitiveWordBs.init() 内部对 wordData 做就地写入，
-     * 若与并发的 contains() 重叠会读到半构建的 trie。互斥后短暂阻塞 contains 即可保证可见性。
-     * <p>
-     * init() 本身幂等，单实例可以直接调；多实例部署时需配合 Redis pub/sub 广播让各实例 init。
-     */
-    private synchronized void reloadSensitiveWords() {
-        sensitiveWordBs.init();
-        log.info("[reloadSensitiveWords][敏感词库已 reload]");
+        /**
+         * 敏感词检测器
+         */
+        private SensitiveWordBs bs;
+        /**
+         * 构建本实例时数据库里的 max(update_time)，作为下次刷新比对的基线
+         */
+        private LocalDateTime maxUpdateTime;
+
     }
 
-    // TODO @AI：需要按照租户来。
+    /**
+     * 租户 → SensitiveWordBs 实例的本地缓存
+     * <p>
+     * 每分钟触发一次异步 reload，先读 max(update_time)，没变就复用旧实例（避免 trie 重建），变了才重新读词库 + 重建。
+     * 单实例 CRUD 后另外通过 {@link #invalidateSensitiveWordBsCaches()} 立即让本机失效，多实例靠定时刷新最长 1 分钟内收敛。
+     */
+    @SuppressWarnings({"Convert2Diamond", "NullableProblems"})
+    private final LoadingCache<Long, SensitiveWordBsCache> sensitiveWordBsCaches = CacheUtils.buildAsyncReloadingCache(
+            Duration.ofMinutes(1L), // 1 分钟过期
+            new CacheLoader<Long, SensitiveWordBsCache>() {
+
+                @Override
+                public SensitiveWordBsCache load(Long tenantId) {
+                    return loadFresh(tenantId);
+                }
+
+                @Override
+                public ListenableFuture<SensitiveWordBsCache> reload(Long tenantId, SensitiveWordBsCache oldValue) {
+                    // 先比对 max(update_time)；没变 → 复用旧实例，避免无谓地重建 trie
+                    LocalDateTime currentMax = sensitiveWordMapper.selectMaxUpdateTime(tenantId);
+                    if (Objects.equals(oldValue.getMaxUpdateTime(), currentMax)) {
+                        return Futures.immediateFuture(oldValue);
+                    }
+                    // 变了 → 重新读词库并重建 trie
+                    return Futures.immediateFuture(loadFresh(tenantId));
+                }
+
+            });
+
+    private SensitiveWordBsCache loadFresh(Long tenantId) {
+        return TenantUtils.execute(tenantId, () -> {
+            // 先取基线时间再读词库：反过来在两次查询之间出现的新插入会被漏感知
+            LocalDateTime maxUpdateTime = sensitiveWordMapper.selectMaxUpdateTime(tenantId);
+            List<ImSensitiveWordDO> words = sensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+            // 构建敏感词检测器
+            SensitiveWordBs bs = SensitiveWordBs.newInstance()
+                    .wordDeny(() -> convertList(words, ImSensitiveWordDO::getWord))
+                    .ignoreCase(true)
+                    .ignoreWidth(true)         // 忽略全/半角
+                    .ignoreNumStyle(true)      // 忽略数字风格（中文/阿拉伯）
+                    .ignoreChineseStyle(true)  // 忽略繁简体
+                    .enableWordCheck(true)
+                    .init();
+            return new SensitiveWordBsCache(bs, maxUpdateTime);
+        });
+    }
+
+    /**
+     * 强制让敏感词缓存失效，下次访问按最新 DB 重建
+     * <p>
+     * 有租户上下文：仅失效该租户。无租户上下文（如系统级 / 跨租户清理）：兜底失效所有租户。
+     */
+    private void invalidateSensitiveWordBsCaches() {
+        Long tenantId = TenantContextHolder.getTenantId();
+        if (tenantId != null) {
+            sensitiveWordBsCaches.invalidate(tenantId);
+            return;
+        }
+        sensitiveWordBsCaches.invalidateAll();
+    }
+
     @Override
     public void validateText(String text) {
         if (StrUtil.isBlank(text)) {
             return;
         }
-        if (sensitiveWordBs.contains(text)) {
+        SensitiveWordBs bs = sensitiveWordBsCaches.getUnchecked(TenantContextHolder.getRequiredTenantId()).getBs();
+        if (bs.contains(text)) {
             throw exception(MESSAGE_SENSITIVE_WORD_BLOCKED);
         }
     }
@@ -89,9 +161,8 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
         // 2.1 入库
         ImSensitiveWordDO word = BeanUtils.toBean(reqVO, ImSensitiveWordDO.class);
         sensitiveWordMapper.insert(word);
-        // TODO @AI：houbb 这个注释有点奇怪！
-        // 2.2 触发 houbb 词库 reload
-        reloadSensitiveWords();
+        // 2.2 强制失效本机缓存（多实例靠定时刷新收敛）
+        invalidateSensitiveWordBsCaches();
         return word.getId();
     }
 
@@ -105,9 +176,8 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
         // 2.1 更新
         ImSensitiveWordDO updateObj = BeanUtils.toBean(reqVO, ImSensitiveWordDO.class);
         sensitiveWordMapper.updateById(updateObj);
-        // 2.2 TODO @AI：houbb 这个注释有点奇怪！
-        // 2.2 触发 houbb 词库 reload
-        reloadSensitiveWords();
+        // 2.2 强制失效本机缓存
+        invalidateSensitiveWordBsCaches();
     }
 
     @Override
@@ -117,8 +187,8 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
 
         // 2.1 删除
         sensitiveWordMapper.deleteById(id);
-        // 2.2 触发 houbb 词库 reload
-        reloadSensitiveWords();
+        // 2.2 强制失效本机缓存
+        invalidateSensitiveWordBsCaches();
     }
 
 
@@ -127,11 +197,10 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-
         // 1. 删除
         sensitiveWordMapper.deleteByIds(ids);
-        // 触发 houbb 词库 reload
-        reloadSensitiveWords();
+        // 2. 强制失效本机缓存
+        invalidateSensitiveWordBsCaches();
     }
 
     private void validateSensitiveWordExists(Long id) {
@@ -148,7 +217,6 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
         if (exist == null) {
             return;
         }
-        // TODO @AI：是不是 id 不用判断
         if (id == null || ObjUtil.notEqual(exist.getId(), id)) {
             throw exception(SENSITIVE_WORD_DUPLICATED, word);
         }

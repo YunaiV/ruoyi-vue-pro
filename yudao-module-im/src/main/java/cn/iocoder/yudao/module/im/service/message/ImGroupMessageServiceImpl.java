@@ -7,14 +7,11 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
@@ -28,8 +25,6 @@ import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -76,9 +71,6 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     @Resource
     private ImWebSocketService imWebSocketService;
-
-    @Resource
-    private AdminUserApi adminUserApi;
 
     @Override
     public ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO) {
@@ -554,26 +546,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     // ==================== 管理后台 ====================
 
-    // TODO @AI：这些挪到 controller 拼接 VO
     @Override
-    public PageResult<ImGroupMessageManagerRespVO> getGroupMessagePage(ImGroupMessageManagerPageReqVO reqVO) {
-        // 1. 分页查询
-        PageResult<ImGroupMessageDO> pageResult = groupMessageMapper.selectPage(reqVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
-        }
-
-        // 2. 批量查询群名称、发送人昵称
-        Set<Long> groupIds = convertSet(pageResult.getList(), ImGroupMessageDO::getGroupId);
-        Set<Long> senderIds = convertSet(pageResult.getList(), ImGroupMessageDO::getSenderId);
-        Map<Long, ImGroupDO> groupMap = groupService.getGroupMap(groupIds);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(senderIds);
-
-        // 3. 转换为 VO，填充群名 / 发送人昵称
-        return BeanUtils.toBean(pageResult, ImGroupMessageManagerRespVO.class, vo -> {
-            MapUtils.findAndThen(groupMap, vo.getGroupId(), group -> vo.setGroupName(group.getName()));
-            MapUtils.findAndThen(userMap, vo.getSenderId(), user -> vo.setSenderNickname(user.getNickname()));
-        });
+    public PageResult<ImGroupMessageDO> getGroupMessagePage(ImGroupMessageManagerPageReqVO reqVO) {
+        return groupMessageMapper.selectPage(reqVO);
     }
 
     @Override

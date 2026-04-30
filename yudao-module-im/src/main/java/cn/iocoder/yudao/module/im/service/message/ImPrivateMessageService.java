@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.privates.ImPrivateMessageManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.privates.ImPrivateMessageManagerRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
@@ -91,9 +90,9 @@ public interface ImPrivateMessageService {
     // ==================== 管理后台 ====================
 
     /**
-     * 【管理后台】分页查询私聊消息（已填充发送人 / 接收人昵称）
+     * 【管理后台】分页查询私聊消息
      */
-    PageResult<ImPrivateMessageManagerRespVO> getPrivateMessagePage(ImPrivateMessageManagerPageReqVO reqVO);
+    PageResult<ImPrivateMessageDO> getPrivateMessagePage(ImPrivateMessageManagerPageReqVO reqVO);
 
     /**
      * 【管理后台】获取私聊消息详情

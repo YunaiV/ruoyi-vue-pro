@@ -1,21 +1,16 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,10 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_ADD_SELF;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
@@ -189,26 +185,9 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     // ==================== 管理后台 ====================
 
-    // TODO @AI：拿到 controller 拼接数据，简化 service；
     @Override
-    public PageResult<ImFriendManagerRespVO> getFriendPage(ImFriendManagerPageReqVO reqVO) {
-        // 1. 分页查询
-        PageResult<ImFriendDO> pageResult = imFriendMapper.selectPage(reqVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
-        }
-
-        // 2. 一次性批量查询用户 + 好友的昵称
-        Set<Long> userIds = new HashSet<>();
-        userIds.addAll(convertSet(pageResult.getList(), ImFriendDO::getUserId));
-        userIds.addAll(convertSet(pageResult.getList(), ImFriendDO::getFriendUserId));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-
-        // 3. 转换为 VO，填充昵称
-        return BeanUtils.toBean(pageResult, ImFriendManagerRespVO.class, vo -> {
-            MapUtils.findAndThen(userMap, vo.getUserId(), user -> vo.setUserNickname(user.getNickname()));
-            MapUtils.findAndThen(userMap, vo.getFriendUserId(), user -> vo.setFriendNickname(user.getNickname()));
-        });
+    public PageResult<ImFriendDO> getFriendPage(ImFriendManagerPageReqVO reqVO) {
+        return imFriendMapper.selectPage(reqVO);
     }
 
 }

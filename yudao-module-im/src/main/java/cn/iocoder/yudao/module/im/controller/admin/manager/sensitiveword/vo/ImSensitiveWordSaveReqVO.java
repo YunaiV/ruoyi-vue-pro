@@ -18,9 +18,8 @@ public class ImSensitiveWordSaveReqVO {
     @Size(max = 64, message = "敏感词长度不能超过 64")
     private String word;
 
-    @Schema(description = "状态，参见 CommonStatusEnum 枚举类（0 启用 / 1 禁用）",
-            requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")
-    private Integer status;
+    private Integer status; // 参见 CommonStatusEnum 枚举类（0 启用 / 1 禁用）
 
 }

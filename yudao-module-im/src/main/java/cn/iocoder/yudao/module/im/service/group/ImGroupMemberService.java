@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.member.ImGroupMemberManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
 
@@ -155,15 +154,5 @@ public interface ImGroupMemberService {
      * @return 群成员数 Map
      */
     Map<Long, Long> getActiveMemberCountMap(Collection<Long> groupIds);
-
-    // ==================== 管理后台 ====================
-
-    /**
-     * 【管理后台】获取群成员列表
-     *
-     * @param groupId 群编号
-     * @return 群成员列表
-     */
-    List<ImGroupMemberManagerRespVO> getGroupMemberList(Long groupId);
 
 }

@@ -18,8 +18,8 @@ public class ImSensitiveWordPageReqVO extends PageParam {
     @Schema(description = "敏感词，模糊匹配", example = "敏感")
     private String word;
 
-    @Schema(description = "状态，参见 CommonStatusEnum 枚举类（0 启用 / 1 禁用）", example = "0")
-    private Integer status;
+    @Schema(description = "状态", example = "0")
+    private Integer status; // 参见 CommonStatusEnum 枚举类（0 启用 / 1 禁用）
 
     @Schema(description = "创建时间", example = "[2026-04-01 00:00:00, 2026-04-30 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

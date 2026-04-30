@@ -6,7 +6,10 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword.vo.ImSensitiveWordPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.sensitiveword.ImSensitiveWordDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,5 +37,8 @@ public interface ImSensitiveWordMapper extends BaseMapperX<ImSensitiveWordDO> {
                 .betweenIfPresent(ImSensitiveWordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ImSensitiveWordDO::getId));
     }
+
+    @Select("SELECT MAX(update_time) FROM im_sensitive_word")
+    LocalDateTime selectMaxUpdateTime(@Param("tenantId") Long tenantId);
 
 }

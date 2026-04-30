@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMember
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import jakarta.validation.Valid;
 
@@ -138,15 +137,13 @@ public interface ImGroupService {
 
     // ==================== 管理后台 ====================
 
-    // TODO DONE @AI：是不是 controller 拆分哈；（getGroupPage 留在 ImGroupService；getGroupMemberList 已拆到 ImGroupMemberService + ImGroupMemberManagerController）
-    // TODO @AI：不对；应该 VO 放在 controller 拼接
     /**
      * 【管理后台】分页查询群列表
      *
      * @param pageReqVO 分页查询条件
      * @return 群分页列表
      */
-    PageResult<ImGroupManagerRespVO> getGroupPage(ImGroupManagerPageReqVO pageReqVO);
+    PageResult<ImGroupDO> getGroupPage(ImGroupManagerPageReqVO pageReqVO);
 
     /**
      * 【管理后台】封禁群

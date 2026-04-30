@@ -2,16 +2,12 @@ package cn.iocoder.yudao.module.im.service.group;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.member.ImGroupMemberManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,9 +39,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Resource
     private ImWebSocketService webSocketService;
-
-    @Resource
-    private AdminUserApi adminUserApi;
 
     @Override
     public ImGroupMemberDO getGroupMember(Long id) {
@@ -220,27 +213,6 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     @Override
     public Map<Long, Long> getActiveMemberCountMap(Collection<Long> groupIds) {
         return groupMemberMapper.selectCountMapByGroupIdsAndStatus(groupIds, CommonStatusEnum.ENABLE.getStatus());
-    }
-
-    // ==================== 管理后台 ====================
-
-    // TODO @AI：这个拼接的逻辑，拿到 controller，这里只返回 list do；
-    @Override
-    public List<ImGroupMemberManagerRespVO> getGroupMemberList(Long groupId) {
-        // 1. 查询有效群成员
-        List<ImGroupMemberDO> members = getActiveGroupMemberListByGroupId(groupId);
-        if (CollUtil.isEmpty(members)) {
-            return Collections.emptyList();
-        }
-
-        // 2. 批量查询用户信息
-        Set<Long> userIds = convertSet(members, ImGroupMemberDO::getUserId);
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-
-        // 3. 转换为 VO，填充昵称、头像
-        return BeanUtils.toBean(members, ImGroupMemberManagerRespVO.class, vo ->
-                MapUtils.findAndThen(userMap, vo.getUserId(), user ->
-                        vo.setNickname(user.getNickname()).setAvatar(user.getAvatar())));
     }
 
 }

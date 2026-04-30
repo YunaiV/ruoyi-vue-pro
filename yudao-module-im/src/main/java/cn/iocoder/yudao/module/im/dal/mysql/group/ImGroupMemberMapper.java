@@ -90,7 +90,6 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
         if (CollUtil.isEmpty(groupIds)) {
             return Collections.emptyMap();
         }
-        // TODO @AI：使用 mybatis plus join，可以简化这个操作么？
         List<Map<String, Object>> rows = selectMaps(Wrappers.<ImGroupMemberDO>query()
                 .select("group_id AS groupId", "COUNT(*) AS cnt")
                 .in("group_id", groupIds)
