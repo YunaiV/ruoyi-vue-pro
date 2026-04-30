@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
@@ -94,6 +95,9 @@ public class ImFriendController {
             ImFriendRespVO vo = BeanUtils.toBean(f, ImFriendRespVO.class);
             MapUtils.findAndThen(userMap, f.getFriendUserId(), user ->
                     vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
+            // 备注 / 昵称的拼音，给前端做字母分桶 + 拼音搜索
+            vo.setDisplayNamePinyin(StrUtils.toPinyin(vo.getDisplayName()))
+                    .setNicknamePinyin(StrUtils.toPinyin(vo.getNickname()));
             return vo;
         });
     }

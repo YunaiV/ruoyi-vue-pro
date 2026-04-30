@@ -26,7 +26,10 @@ public class ImFriendRespVO {
     @Schema(description = "好友展示备注（仅自己可见）", example = "老张")
     private String displayName;
 
-    @Schema(description = "好友状态（0=正常，1=已删除）", example = "0")
+    @Schema(description = "好友展示备注的拼音（小写无空格）", example = "laozhang")
+    private String displayNamePinyin;
+
+    @Schema(description = "好友状态", example = "0")
     private Integer status;
 
     @Schema(description = "添加好友时间")
@@ -39,6 +42,9 @@ public class ImFriendRespVO {
 
     @Schema(description = "好友昵称（实时聚合自 AdminUser）", example = "芋道")
     private String nickname;
+
+    @Schema(description = "好友昵称的拼音（小写无空格）", example = "yudao")
+    private String nicknamePinyin;
 
     @Schema(description = "好友头像（实时聚合自 AdminUser）")
     private String avatar;

@@ -68,6 +68,12 @@
             <artifactId>sensitive-word</artifactId>
         </dependency>
 
+        <!-- 汉字转拼音：作为 hutool PinyinUtil 的底层引擎，业务侧调用 StrUtils.toPinyin 时按需引入 -->
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
