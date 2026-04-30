@@ -1,13 +1,19 @@
 package cn.iocoder.yudao.module.im.service.group;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 群 Service 接口
@@ -57,6 +63,14 @@ public interface ImGroupService {
      * @return 群
      */
     ImGroupDO getGroup(Long id);
+
+    /**
+     * 批量获得群 Map
+     *
+     * @param ids 群编号集合
+     * @return 群 Map（key = 群编号）
+     */
+    Map<Long, ImGroupDO> getGroupMap(Collection<Long> ids);
 
     /**
      * 校验群存在且未封禁、未解散
@@ -121,5 +135,31 @@ public interface ImGroupService {
      * @param removeReqVO 移除信息
      */
     void removeGroupMember(Long userId, @Valid ImGroupMemberRemoveReqVO removeReqVO);
+
+    // ==================== 管理后台 ====================
+
+    // TODO DONE @AI：是不是 controller 拆分哈；（getGroupPage 留在 ImGroupService；getGroupMemberList 已拆到 ImGroupMemberService + ImGroupMemberManagerController）
+    // TODO @AI：不对；应该 VO 放在 controller 拼接
+    /**
+     * 【管理后台】分页查询群列表
+     *
+     * @param pageReqVO 分页查询条件
+     * @return 群分页列表
+     */
+    PageResult<ImGroupManagerRespVO> getGroupPage(ImGroupManagerPageReqVO pageReqVO);
+
+    /**
+     * 【管理后台】封禁群
+     *
+     * @param banReqVO 封禁信息（含群编号、封禁原因）
+     */
+    void banGroup(@Valid ImGroupManagerBanReqVO banReqVO);
+
+    /**
+     * 【管理后台】解封群
+     *
+     * @param id 群编号
+     */
+    void unbanGroup(Long id);
 
 }

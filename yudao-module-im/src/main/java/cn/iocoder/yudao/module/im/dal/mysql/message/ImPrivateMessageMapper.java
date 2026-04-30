@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.im.dal.mysql.message;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.privates.ImPrivateMessageManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import org.apache.ibatis.annotations.Mapper;
@@ -84,6 +86,16 @@ public interface ImPrivateMessageMapper extends BaseMapperX<ImPrivateMessageDO> 
                 .eq(ImPrivateMessageDO::getReceiverId, receiverId)
                 .le(ImPrivateMessageDO::getId, maxMessageId)
                 .eq(ImPrivateMessageDO::getStatus, whereStatus));
+    }
+
+    default PageResult<ImPrivateMessageDO> selectPage(ImPrivateMessageManagerPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ImPrivateMessageDO>()
+                .eqIfPresent(ImPrivateMessageDO::getSenderId, reqVO.getSenderId())
+                .eqIfPresent(ImPrivateMessageDO::getReceiverId, reqVO.getReceiverId())
+                .eqIfPresent(ImPrivateMessageDO::getType, reqVO.getType())
+                .eqIfPresent(ImPrivateMessageDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(ImPrivateMessageDO::getSendTime, reqVO.getSendTime())
+                .orderByDesc(ImPrivateMessageDO::getId));
     }
 
 }

@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 
 import java.util.Collection;
@@ -84,5 +87,11 @@ public interface ImFriendService {
      */
     void updateFriend(Long userId, ImFriendUpdateReqVO reqVO);
 
+    // ==================== 管理后台 ====================
+
+    /**
+     * 【管理后台】分页查询好友关系（已填充用户 / 好友昵称）
+     */
+    PageResult<ImFriendManagerRespVO> getFriendPage(ImFriendManagerPageReqVO reqVO);
 
 }

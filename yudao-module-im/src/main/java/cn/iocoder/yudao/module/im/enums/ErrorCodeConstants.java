@@ -34,4 +34,8 @@ public interface ErrorCodeConstants {
     ErrorCode FRIEND_NOT_FRIEND = new ErrorCode(1_040_600_001, "对方不是您的好友");
     ErrorCode FRIEND_ADD_SELF = new ErrorCode(1_040_600_002, "不允许添加自己为好友");
 
+    // ========== 敏感词 (1-040-700-000) ==========
+    ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_040_700_000, "敏感词不存在");
+    ErrorCode SENSITIVE_WORD_DUPLICATED = new ErrorCode(1_040_700_001, "敏感词 '{}' 已存在");
+
 }

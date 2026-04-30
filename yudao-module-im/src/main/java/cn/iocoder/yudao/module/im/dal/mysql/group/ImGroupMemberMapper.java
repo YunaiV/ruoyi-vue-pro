@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.module.im.dal.mysql.group;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * IM 群成员 Mapper
@@ -76,6 +81,27 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .eq(ImGroupMemberDO::getGroupId, groupId)
                 .in(ImGroupMemberDO::getUserId, userIds)
                 .eq(ImGroupMemberDO::getStatus, oldStatus));
+    }
+
+    /**
+     * 批量按 group_id 统计指定状态的成员数
+     */
+    default Map<Long, Long> selectCountMapByGroupIdsAndStatus(Collection<Long> groupIds, Integer status) {
+        if (CollUtil.isEmpty(groupIds)) {
+            return Collections.emptyMap();
+        }
+        // TODO @AI：使用 mybatis plus join，可以简化这个操作么？
+        List<Map<String, Object>> rows = selectMaps(Wrappers.<ImGroupMemberDO>query()
+                .select("group_id AS groupId", "COUNT(*) AS cnt")
+                .in("group_id", groupIds)
+                .eq("status", status)
+                .groupBy("group_id"));
+        // 转换成 Map<Long, Long>
+        Map<Long, Long> result = new HashMap<>(rows.size());
+        rows.forEach(row -> result.put(
+                ((Number) row.get("groupId")).longValue(),
+                ((Number) row.get("cnt")).longValue()));
+        return result;
     }
 
 }

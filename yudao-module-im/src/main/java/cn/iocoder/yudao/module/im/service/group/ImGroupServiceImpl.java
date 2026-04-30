@@ -7,11 +7,16 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -35,6 +40,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
@@ -256,6 +262,14 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
+    public Map<Long, ImGroupDO> getGroupMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        return convertMap(groupMapper.selectByIds(ids), ImGroupDO::getId);
+    }
+
+    @Override
     public List<ImGroupDO> getMyGroupList(Long userId) {
         // 1.1 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
         List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByUserId(userId);
@@ -269,6 +283,53 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 2. 批量查询群信息（不按 status / banned 过滤，已解散 / 封禁的群也要返回，供前端展示历史消息的群名 / 头像）
         Set<Long> groupIds = convertSet(members, ImGroupMemberDO::getGroupId);
         return groupMapper.selectByIds(groupIds);
+    }
+
+    // ==================== 管理后台 ====================
+
+    @Override
+    public PageResult<ImGroupManagerRespVO> getGroupPage(ImGroupManagerPageReqVO pageReqVO) {
+        // 1. 分页查询群
+        PageResult<ImGroupDO> pageResult = groupMapper.selectPage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return PageResult.empty(pageResult.getTotal());
+        }
+
+        // 2.1 批量查询群主昵称
+        Set<Long> ownerUserIds = convertSet(pageResult.getList(), ImGroupDO::getOwnerUserId);
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(ownerUserIds);
+        // 2.2 一次 GROUP BY 查出本页所有群的活跃成员数，避免按行 N+1
+        Set<Long> groupIds = convertSet(pageResult.getList(), ImGroupDO::getId);
+        Map<Long, Long> memberCountMap = groupMemberService.getActiveMemberCountMap(groupIds);
+        // 2.3 转换为 VO，填充群主昵称、群成员数量
+        return BeanUtils.toBean(pageResult, ImGroupManagerRespVO.class, vo -> {
+            MapUtils.findAndThen(userMap, vo.getOwnerUserId(), user -> vo.setOwnerNickname(user.getNickname()));
+            vo.setMemberCount(memberCountMap.getOrDefault(vo.getId(), 0L).intValue());
+        });
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#banReqVO.id")
+    public void banGroup(ImGroupManagerBanReqVO banReqVO) {
+        // 1. 校验群存在
+        if (getSelf().getGroup(banReqVO.getId()) == null) {
+            throw exception(GROUP_NOT_EXISTS);
+        }
+        // 2. 更新封禁状态
+        groupMapper.updateById(new ImGroupDO().setId(banReqVO.getId())
+                .setBanned(true).setBannedReason(banReqVO.getReason()).setBannedTime(LocalDateTime.now()));
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#id")
+    public void unbanGroup(Long id) {
+        // 1. 校验群存在
+        if (getSelf().getGroup(id) == null) {
+            throw exception(GROUP_NOT_EXISTS);
+        }
+        // 2. 解封（保留 bannedReason / bannedTime 作为历史记录）
+        // TODO DONE @AI：不要使用 mybatis plus 的方法，直接操作。另外，感觉封禁时间、封禁原因，没必要置空，留着问题不大。
+        groupMapper.updateById(new ImGroupDO().setId(id).setBanned(false));
     }
 
     private ImGroupServiceImpl getSelf() {

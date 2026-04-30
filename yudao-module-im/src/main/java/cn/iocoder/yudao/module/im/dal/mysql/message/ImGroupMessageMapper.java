@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.im.dal.mysql.message;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
@@ -111,6 +113,16 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
                 .gt(minId != null, ImGroupMessageDO::getId, minId)
                 .le(ImGroupMessageDO::getId, maxId)
                 .ne(ImGroupMessageDO::getStatus, ImMessageStatusEnum.RECALL.getStatus()));
+    }
+
+    default PageResult<ImGroupMessageDO> selectPage(ImGroupMessageManagerPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ImGroupMessageDO>()
+                .eqIfPresent(ImGroupMessageDO::getGroupId, reqVO.getGroupId())
+                .eqIfPresent(ImGroupMessageDO::getSenderId, reqVO.getSenderId())
+                .eqIfPresent(ImGroupMessageDO::getType, reqVO.getType())
+                .eqIfPresent(ImGroupMessageDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(ImGroupMessageDO::getSendTime, reqVO.getSendTime())
+                .orderByDesc(ImGroupMessageDO::getId));
     }
 
 }

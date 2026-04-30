@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.member.ImGroupMemberManagerRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 群成员 Service 接口
@@ -22,6 +24,15 @@ public interface ImGroupMemberService {
      * @return 群成员
      */
     ImGroupMemberDO getGroupMember(Long id);
+
+    /**
+     * 获得群成员
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     * @return 群成员
+     */
+    ImGroupMemberDO getGroupMember(Long groupId, Long userId);
 
     /**
      * 根据群组 id 查询群成员（包含所有状态）
@@ -136,5 +147,23 @@ public interface ImGroupMemberService {
      * @param groupId 群编号
      */
     void removeGroupMembersByGroupId(Long groupId);
+
+    /**
+     * 批量按 group 统计活跃成员数：(group_id → count)
+     *
+     * @param groupIds 群编号集合
+     * @return 群成员数 Map
+     */
+    Map<Long, Long> getActiveMemberCountMap(Collection<Long> groupIds);
+
+    // ==================== 管理后台 ====================
+
+    /**
+     * 【管理后台】获取群成员列表
+     *
+     * @param groupId 群编号
+     * @return 群成员列表
+     */
+    List<ImGroupMemberManagerRespVO> getGroupMemberList(Long groupId);
 
 }

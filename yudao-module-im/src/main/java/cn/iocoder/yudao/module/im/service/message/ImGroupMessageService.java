@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.im.service.message;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
@@ -111,6 +114,18 @@ public interface ImGroupMessageService {
      * @param content     提示内容
      */
     void sendTipGroupMessage(Long senderId, Long groupId, Set<Long> memberUserIds, String content);
+
+    // ==================== 管理后台 ====================
+
+    /**
+     * 【管理后台】分页查询群聊消息（已填充群名称、发送人昵称）
+     */
+    PageResult<ImGroupMessageManagerRespVO> getGroupMessagePage(ImGroupMessageManagerPageReqVO reqVO);
+
+    /**
+     * 【管理后台】获取群聊消息详情
+     */
+    ImGroupMessageDO getGroupMessage(Long id);
 
 }
 
