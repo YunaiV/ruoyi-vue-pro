@@ -37,8 +37,10 @@ public class ImGroupMessageManagerRespVO {
     @Schema(description = "消息状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status; // 参见 ImMessageStatusEnum 枚举类
 
-    @Schema(description = "@ 目标用户编号列表")
+    @Schema(description = "@ 目标用户编号列表（-1 表示 @所有人）")
     private List<Long> atUserIds;
+    @Schema(description = "@ 目标用户昵称列表（-1 位置为 null，前端根据 atUserIds 自行展示「@所有人」）")
+    private List<String> atUserNicknames;
 
     @Schema(description = "回执状态", example = "0")
     private Integer receiptStatus; // 参见 ImGroupMessageReceiptStatusEnum 枚举类

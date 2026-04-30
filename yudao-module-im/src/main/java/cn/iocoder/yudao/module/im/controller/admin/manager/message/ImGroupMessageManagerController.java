@@ -26,9 +26,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.AT_USER_ID_ALL;
 
 @Tag(name = "管理后台 - IM 群聊消息")
 @RestController
@@ -53,15 +59,24 @@ public class ImGroupMessageManagerController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-        // 2.1 批量查询群名称、发送人昵称
+        // 2.1 批量查询群名称、发送人昵称、@ 用户昵称（-1 表示 @所有人，跳过查询，由前端判断渲染）
         Map<Long, ImGroupDO> groupMap = groupService.getGroupMap(
                 convertSet(pageResult.getList(), ImGroupMessageDO::getGroupId));
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(pageResult.getList(), ImGroupMessageDO::getSenderId));
-        // 2.2 转换为 VO，填充群名 / 发送人昵称
+        Set<Long> userIds = convertSetByFlatMap(pageResult.getList(), m -> Stream.concat(
+                Stream.of(m.getSenderId()),
+                CollUtil.emptyIfNull(m.getAtUserIds()).stream()
+                        .filter(id -> !Objects.equals(id, AT_USER_ID_ALL))));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        // 2.2 转换为 VO，填充群名 / 发送人昵称 / @ 用户昵称（-1 位置留 null，由前端展示「@所有人」）
         return success(BeanUtils.toBean(pageResult, ImGroupMessageManagerRespVO.class, vo -> {
             MapUtils.findAndThen(groupMap, vo.getGroupId(), group -> vo.setGroupName(group.getName()));
             MapUtils.findAndThen(userMap, vo.getSenderId(), user -> vo.setSenderNickname(user.getNickname()));
+            if (CollUtil.isNotEmpty(vo.getAtUserIds())) {
+                vo.setAtUserNicknames(convertList(vo.getAtUserIds(), id -> {
+                    AdminUserRespDTO user = userMap.get(id);
+                    return user != null ? user.getNickname() : null;
+                }));
+            }
         }));
     }
 

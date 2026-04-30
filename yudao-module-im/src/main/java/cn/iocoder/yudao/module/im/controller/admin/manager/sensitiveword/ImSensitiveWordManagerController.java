@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword.vo.ImSensitiveWordPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword.vo.ImSensitiveWordRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.sensitiveword.vo.ImSensitiveWordSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.sensitiveword.ImSensitiveWordDO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,8 +23,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - IM 敏感词")
 @RestController
@@ -29,6 +36,8 @@ public class ImSensitiveWordManagerController {
 
     @Resource
     private ImSensitiveWordService sensitiveWordService;
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "新增敏感词")
@@ -68,8 +77,18 @@ public class ImSensitiveWordManagerController {
     @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:query')")
     public CommonResult<PageResult<ImSensitiveWordRespVO>> getSensitiveWordPage(
             @Valid ImSensitiveWordPageReqVO pageReqVO) {
+        // 1. 分页查询
         PageResult<ImSensitiveWordDO> pageResult = sensitiveWordService.getSensitiveWordPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, ImSensitiveWordRespVO.class));
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+        // 2.1 批量查询创建人昵称
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(pageResult.getList(),
+                word -> NumberUtils.parseLong(word.getCreator())));
+        // 2.2 转换为 VO，填充创建人昵称
+        return success(BeanUtils.toBean(pageResult, ImSensitiveWordRespVO.class, vo ->
+                MapUtils.findAndThen(userMap, NumberUtils.parseLong(vo.getCreator()),
+                        user -> vo.setCreatorName(user.getNickname()))));
     }
 
     @GetMapping("/get")

@@ -18,6 +18,11 @@ public interface ImCommonConstants {
     int MAX_GROUP_MEMBER = 500;
 
     /**
+     * 群消息 @ 所有人的特殊用户编号
+     */
+    long AT_USER_ID_ALL = -1L;
+
+    /**
      * 消息撤回时间限制（分钟）
      */
     int MESSAGE_RECALL_TIMEOUT_MINUTES = 5;

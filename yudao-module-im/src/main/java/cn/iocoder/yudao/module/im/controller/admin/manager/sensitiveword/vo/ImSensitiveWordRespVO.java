@@ -20,6 +20,8 @@ public class ImSensitiveWordRespVO {
 
     @Schema(description = "创建人")
     private String creator;
+    @Schema(description = "创建人昵称", example = "张三")
+    private String creatorName;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
