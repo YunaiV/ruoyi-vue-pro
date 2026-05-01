@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -40,12 +39,12 @@ public class ImGroupMemberManagerController {
     private AdminUserApi adminUserApi;
 
     @GetMapping("/list")
-    @Operation(summary = "获得群成员列表")
+    @Operation(summary = "获得群成员列表（含已退群成员，由前端按需过滤）")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:manager:group:query')")
     public CommonResult<List<ImGroupMemberManagerRespVO>> getGroupMemberList(@RequestParam("groupId") Long groupId) {
-        // 1. 查询有效群成员
-        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
+        // 1. 查询群全部成员（含已退群）
+        List<ImGroupMemberDO> members = groupMemberService.getGroupMemberListByGroupId(groupId);
         if (CollUtil.isEmpty(members)) {
             return success(Collections.emptyList());
         }
