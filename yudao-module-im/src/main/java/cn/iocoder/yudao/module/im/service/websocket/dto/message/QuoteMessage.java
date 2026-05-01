@@ -22,6 +22,11 @@ public class QuoteMessage {
     public static final String FIELD_NAME = "quote";
 
     /**
+     * QuoteMessage 里 messageId 字段名
+     */
+    public static final String FIELD_MESSAGE_ID = "messageId";
+
+    /**
      * 被引用消息编号
      */
     private Long messageId;

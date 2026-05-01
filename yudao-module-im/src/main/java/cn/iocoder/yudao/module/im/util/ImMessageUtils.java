@@ -28,7 +28,7 @@ public class ImMessageUtils {
         if (!(quoteRaw instanceof Map)) {
             return null;
         }
-        return Convert.toLong(((Map<?, ?>) quoteRaw).get("messageId"));
+        return Convert.toLong(((Map<?, ?>) quoteRaw).get(QuoteMessage.FIELD_MESSAGE_ID));
     }
 
     /**
@@ -58,7 +58,7 @@ public class ImMessageUtils {
             return content;
         }
         Map<String, Object> map = JsonUtils.parseMap(content);
-        if (map == null || !map.containsKey(QuoteMessage.FIELD_NAME)) {
+        if (map == null) {
             return content;
         }
         map.remove(QuoteMessage.FIELD_NAME);
