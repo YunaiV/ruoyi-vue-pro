@@ -636,7 +636,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testGetReadUsers_withVisibleScope() {
+    public void testGetReadUserIds_withVisibleScope() {
         // 准备：用户 1 是群成员
         ImGroupMemberDO currentMember = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
@@ -677,7 +677,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMessageReadRedisDAO.getReadMaxMessageIdMap(10L)).thenReturn(positions);
 
         // 调用：查询 messageId=80 的已读用户
-        List<Long> readUsers = groupMessageService.getGroupReadUsers(1L, 10L, 80L);
+        List<Long> readUsers = groupMessageService.getGroupReadUserIds(1L, 10L, 80L);
 
         // 断言：
         // 用户 1: 可见 + readMaxId=100>=80 → 已读 ✓
@@ -692,14 +692,14 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testGetReadUsers_notInGroup() {
+    public void testGetReadUserIds_notInGroup() {
         // 准备：当前用户不在群中
         when(groupMemberService.validateMemberInGroup(10L, 99L))
                 .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
 
         // 调用并断言：越权校验
         ServiceException exception = assertThrows(ServiceException.class,
-                () -> groupMessageService.getGroupReadUsers(99L, 10L, 80L));
+                () -> groupMessageService.getGroupReadUserIds(99L, 10L, 80L));
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
     }
 
@@ -787,7 +787,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
     }
 
-    // ========== 已读：happy path + 短路 ==========
+    // ========== 已读：happy path + 跳过 ==========
 
     @Test
     public void testReadGroupMessages_success() {
@@ -815,7 +815,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadGroupMessages_cursorAlreadyAhead() {
-        // 准备：已读游标已 >= 目标，直接短路返回
+        // 准备：已读游标已 >= 目标，直接返回
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();

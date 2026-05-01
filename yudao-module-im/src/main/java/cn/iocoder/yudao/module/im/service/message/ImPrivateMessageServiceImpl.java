@@ -17,7 +17,9 @@ import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.util.ImMessageUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,7 +73,10 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             sensitiveWordService.validateText(reqVO.getContent());
         }
 
-        // 2. 构建并保存消息
+
+        // 2.1 引用 quote 消息规范化
+        reqVO.setContent(normalizeQuoteContent(reqVO, senderId));
+        // 2.2 构建并保存消息
         ImPrivateMessageDO message = BeanUtils.toBean(reqVO, ImPrivateMessageDO.class, m -> m
                 .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now()));
         privateMessageMapper.insert(message);
@@ -81,6 +86,42 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         imWebSocketService.sendPrivateMessageAsync(message.getReceiverId(), websocketMessage);
         imWebSocketService.sendPrivateMessageAsync(message.getSenderId(), websocketMessage);
         return message;
+    }
+
+    /**
+     * 私聊引用消息规范化
+     *
+     * @param reqVO 发送请求
+     * @param senderId 发送人编号
+     * @return 规范化后的 content
+     */
+    private String normalizeQuoteContent(ImPrivateMessageSendReqVO reqVO, Long senderId) {
+        // 解析客户端 content 里的 quote.messageId
+        Long quoteMessageId = ImMessageUtils.parseQuoteMessageId(reqVO.getContent());
+
+        // 情况一：没有 quoteMessageId，直接 remove 掉 content 里可能伪造的 quote 字段
+        if (quoteMessageId == null) {
+            return ImMessageUtils.removeQuote(reqVO.getContent());
+        }
+
+        // 情况二：有 quoteMessageId，加载原消息并校验
+        ImPrivateMessageDO original = privateMessageMapper.selectById(quoteMessageId);
+        if (original == null
+                || ImMessageStatusEnum.RECALL.getStatus().equals(original.getStatus())) {
+            throw exception(MESSAGE_QUOTE_INVALID);
+        }
+        // 校验是同对话
+        boolean sameConversation = (ObjUtil.equal(original.getSenderId(), senderId) // 发送人是当前用户，接收人是对方
+                && ObjUtil.equal(original.getReceiverId(), reqVO.getReceiverId()))
+                || (ObjUtil.equal(original.getSenderId(), reqVO.getReceiverId()) // 发送人是对方，接收人是当前用户
+                        && ObjUtil.equal(original.getReceiverId(), senderId));
+        if (!sameConversation) {
+            throw exception(MESSAGE_QUOTE_INVALID);
+        }
+        // 构建 quote 对象并注入 content
+        QuoteMessage quote = ImMessageUtils.buildQuote(original.getId(),
+                original.getSenderId(), original.getType(), original.getContent());
+        return ImMessageUtils.appendQuote(reqVO.getContent(), quote);
     }
 
     @Override

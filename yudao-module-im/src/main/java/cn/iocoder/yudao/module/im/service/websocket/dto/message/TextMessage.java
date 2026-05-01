@@ -13,4 +13,9 @@ public class TextMessage {
      */
     private String content;
 
+    /**
+     * 引用消息（可选）
+     */
+    private QuoteMessage quote;
+
 }

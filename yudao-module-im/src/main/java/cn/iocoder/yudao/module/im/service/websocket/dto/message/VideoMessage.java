@@ -33,4 +33,9 @@ public class VideoMessage {
      */
     private Long size;
 
+    /**
+     * 引用消息（可选）
+     */
+    private QuoteMessage quote;
+
 }

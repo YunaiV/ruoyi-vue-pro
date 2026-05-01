@@ -24,7 +24,9 @@ import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.util.ImMessageUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -84,13 +86,15 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         }
         // 1.2 校验群存在、发送人仍在群中
         groupService.validateGroupExists(reqVO.getGroupId());
-        groupMemberService.validateMemberInGroup(reqVO.getGroupId(), senderId);
+        ImGroupMemberDO senderMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), senderId);
         // 1.3 文本消息敏感词过滤
         if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }
 
-        // 2. 构建并保存消息
+        // 2.1 引用 quote 消息规范化
+        reqVO.setContent(normalizeQuoteContent(reqVO, senderMember));
+        // 2.2 构建并保存消息
         ImGroupMessageDO message = BeanUtils.toBean(reqVO, ImGroupMessageDO.class, m -> m
                 .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
                 .setReceiptStatus(Boolean.TRUE.equals(reqVO.getReceipt())
@@ -319,9 +323,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         return recallMessage;
     }
 
-    // TODO @芋艿：这个方法在优化下；
     @Override
-    public List<Long> getGroupReadUsers(Long userId, Long groupId, Long messageId) {
+    public List<Long> getGroupReadUserIds(Long userId, Long groupId, Long messageId) {
         // 1.1 校验用户在群中（权限校验）
         groupMemberService.validateMemberInGroup(groupId, userId);
         // 1.2 获取消息
@@ -431,6 +434,42 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     // ========== 私有工具方法 ==========
+
+    /**
+     * 群聊引用消息规范化
+     *
+     * @param reqVO 发送请求
+     * @param senderMember 发送人成员
+     * @return 规范化后的 content
+     */
+    private String normalizeQuoteContent(ImGroupMessageSendReqVO reqVO, ImGroupMemberDO senderMember) {
+        // 解析客户端 content 里的 quote.messageId
+        Long quoteMessageId = ImMessageUtils.parseQuoteMessageId(reqVO.getContent());
+
+        // 情况一：没有 quoteMessageId，直接 remove 掉 content 里可能伪造的 quote 字段
+        if (quoteMessageId == null) {
+            return ImMessageUtils.removeQuote(reqVO.getContent());
+        }
+
+        // 情况二：有 quoteMessageId，加载原消息并校验
+        ImGroupMessageDO original = groupMessageMapper.selectById(quoteMessageId);
+        if (original == null
+                || ImMessageStatusEnum.RECALL.getStatus().equals(original.getStatus())) {
+            throw exception(MESSAGE_QUOTE_INVALID);
+        }
+        // 校验是同群
+        if (ObjUtil.notEqual(original.getGroupId(), reqVO.getGroupId())) {
+            throw exception(MESSAGE_QUOTE_INVALID);
+        }
+        // 校验对发送人可见（入群时间 / 退群时间 / 定向接收）
+        if (!isMessageVisible(original, senderMember, senderMember.getUserId())) {
+            throw exception(MESSAGE_QUOTE_INVALID);
+        }
+        // 构建 quote 对象并注入 content
+        QuoteMessage quote = ImMessageUtils.buildQuote(original.getId(),
+                original.getSenderId(), original.getType(), original.getContent());
+        return ImMessageUtils.appendQuote(reqVO.getContent(), quote);
+    }
 
     /**
      * 校验群聊消息存在

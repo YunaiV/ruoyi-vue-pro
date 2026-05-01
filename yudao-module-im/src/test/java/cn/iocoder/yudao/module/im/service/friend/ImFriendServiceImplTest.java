@@ -137,7 +137,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testUpdateFriend_emptyRequest() {
-        // 准备：muted 和 displayName 都不传 —— 短路返回，不打 SQL 也不发推送
+        // 准备：muted 和 displayName 都不传 —— 直接返回，不打 SQL 也不发推送
         ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
         reqVO.setFriendUserId(2L);
         ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)

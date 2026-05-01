@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JSON 工具类
@@ -168,6 +169,23 @@ public class JsonUtils {
     public static <T> T parseObjectQuietly(String text, TypeReference<T> typeReference) {
         try {
             return objectMapper.readValue(text, typeReference);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 解析 JSON 字符串成 Map，空字符串或解析失败返回 null
+     *
+     * @param text JSON 字符串
+     * @return Map 对象
+     */
+    public static Map<String, Object> parseMap(String text) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
             return null;
         }

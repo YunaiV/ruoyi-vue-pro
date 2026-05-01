@@ -25,4 +25,9 @@ public class FileMessage {
      */
     private String type;
 
+    /**
+     * 引用消息（可选）
+     */
+    private QuoteMessage quote;
+
 }

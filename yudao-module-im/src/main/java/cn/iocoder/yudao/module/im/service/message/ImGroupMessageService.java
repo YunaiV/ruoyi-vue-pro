@@ -62,7 +62,7 @@ public interface ImGroupMessageService {
      * @param messageId 消息编号
      * @return 已读用户编号列表
      */
-    List<Long> getGroupReadUsers(Long userId, Long groupId, Long messageId);
+    List<Long> getGroupReadUserIds(Long userId, Long groupId, Long messageId);
 
     /**
      * 查询群聊历史消息（游标拉取）
