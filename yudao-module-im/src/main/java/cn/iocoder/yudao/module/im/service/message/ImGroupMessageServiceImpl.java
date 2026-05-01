@@ -461,7 +461,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         if (ObjUtil.notEqual(original.getGroupId(), reqVO.getGroupId())) {
             throw exception(MESSAGE_QUOTE_INVALID);
         }
-        // 校验对发送人可见（入群时间 / 退群时间 / 定向接收）
+        // 拒绝定向消息（仅发送人可见的内容若被全员广播 quote.content，会泄漏给原本看不到的成员）
+        if (CollUtil.isNotEmpty(original.getReceiverUserIds())) {
+            throw exception(MESSAGE_QUOTE_INVALID);
+        }
+        // 校验对发送人可见（入群时间 / 退群时间）
         if (!isMessageVisible(original, senderMember, senderMember.getUserId())) {
             throw exception(MESSAGE_QUOTE_INVALID);
         }
