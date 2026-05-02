@@ -10,8 +10,10 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -331,6 +333,46 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：原样返回 null，前端按 falsy 跳过
         assertNull(result);
+    }
+
+    // ========== sendPrivateMessage(senderId, dto)：helper 行为 ==========
+
+    @Test
+    public void testSendPrivateMessage_dto_persistsAndSerializesPojoContent() {
+        // 准备：persistent=true 类型 + POJO content
+        ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
+                .setReceiverId(2L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setContent(new RecallMessage().setMessageId(50L));
+
+        privateMessageService.sendPrivateMessage(1L, dto);
+
+        // 断言：入库 + 系统字段兜底 + content 序列化为 JSON
+        ArgumentCaptor<ImPrivateMessageDO> captor = ArgumentCaptor.forClass(ImPrivateMessageDO.class);
+        verify(privateMessageMapper).insert(captor.capture());
+        ImPrivateMessageDO message = captor.getValue();
+        assertEquals(1L, message.getSenderId());
+        assertEquals(2L, message.getReceiverId());
+        assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
+        assertEquals("{\"messageId\":50}", message.getContent());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), message.getStatus());
+        assertNotNull(message.getClientMessageId());
+        assertNotNull(message.getSendTime());
+        // 断言：sender + receiver 双端推送
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+    }
+
+    @Test
+    public void testSendPrivateMessage_dto_nonPersistentTypeNotInserted() {
+        // 准备：persistent=false 类型（FRIEND_ADD）→ 不入库，仅推送
+        ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
+                .setReceiverId(2L).setType(ImMessageTypeEnum.FRIEND_ADD.getType());
+
+        privateMessageService.sendPrivateMessage(1L, dto);
+
+        verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
     }
 
     // ========== sendTipPrivateMessage ==========

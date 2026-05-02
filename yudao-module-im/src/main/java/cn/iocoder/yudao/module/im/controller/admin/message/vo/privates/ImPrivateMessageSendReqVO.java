@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.im.controller.admin.message.vo.privates;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -22,10 +26,20 @@ public class ImPrivateMessageSendReqVO {
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "消息类型不能为空")
+    @InEnum(ImMessageTypeEnum.class)
     private Integer type;
 
     @Schema(description = "消息内容，JSON 格式", requiredMode = Schema.RequiredMode.REQUIRED, example = "{\"content\":\"你好\"}")
     @NotEmpty(message = "消息内容不能为空")
     private String content;
+
+    /**
+     * 仅允许用户消息（normal）类型
+     */
+    @AssertTrue(message = "消息类型不允许")
+    @JsonIgnore
+    public boolean isTypeNormal() {
+        return type == null || ImMessageTypeEnum.validate(type).isNormal();
+    }
 
 }

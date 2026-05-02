@@ -16,9 +16,11 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -26,11 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -907,18 +905,18 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(imWebSocketService).sendGroupMessageAsync(eq(5L), any(ImGroupMessageDTO.class));
     }
 
-    // ========== sendGroupMessageEvent：receiverUserIds 定向过滤 ==========
+    // ========== sendGroupMessage(senderId, dto)：receiverUserIds 定向过滤 ==========
 
     @Test
-    public void testSendGroupMessageEvent_noReceiverUserIds_broadcastsToAllMembers() {
+    public void testSendGroupMessage_noReceiverUserIds_broadcastsToAllMembers() {
         // 准备：无定向 → 应发给所有 ENABLE 成员（含发送者自己，多端同步）
-        ImGroupMessageDO message = ImGroupMessageDO.builder()
-                .id(100L).groupId(10L).senderId(1L)
-                .sendTime(LocalDateTime.now()).build();
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setContent("{\"messageId\":1}");
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
                 .thenReturn(List.of(1L, 2L, 3L, 4L));
 
-        groupMessageService.sendGroupMessageEvent(message);
+        groupMessageService.sendGroupMessage(1L, dto);
 
         verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
                         ids.size() == 4 && ids.contains(1L) && ids.contains(2L)
@@ -927,17 +925,17 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testSendGroupMessageEvent_withReceiverUserIds_onlyTargetedPlusSender() {
+    public void testSendGroupMessage_withReceiverUserIds_onlyTargetedPlusSender() {
         // 准备：定向给 {2,3}，发送者 1；群成员 {1,2,3,4}
         // 预期推送目标：{1,2,3}（发送者自己多端同步 + 定向列表）；4 被过滤
-        ImGroupMessageDO message = ImGroupMessageDO.builder()
-                .id(100L).groupId(10L).senderId(1L)
-                .receiverUserIds(List.of(2L, 3L))
-                .sendTime(LocalDateTime.now()).build();
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setContent("{\"messageId\":1}")
+                .setReceiverUserIds(List.of(2L, 3L));
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
                 .thenReturn(List.of(1L, 2L, 3L, 4L));
 
-        groupMessageService.sendGroupMessageEvent(message);
+        groupMessageService.sendGroupMessage(1L, dto);
 
         verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
                         ids.size() == 3 && ids.contains(1L) && ids.contains(2L)
@@ -946,21 +944,89 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testSendGroupMessageEvent_withReceiverUserIds_senderNotInGroup_senderStillExcluded() {
+    public void testSendGroupMessage_withReceiverUserIds_senderNotInGroup_senderStillExcluded() {
         // 边界：发送者不在群的 userId 列表里（理论上应先被 validateMemberInGroup 挡住，这里纯防御）
         // 预期：仅定向用户可见
-        ImGroupMessageDO message = ImGroupMessageDO.builder()
-                .id(100L).groupId(10L).senderId(99L)
-                .receiverUserIds(List.of(2L, 3L))
-                .sendTime(LocalDateTime.now()).build();
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setContent("{\"messageId\":1}")
+                .setReceiverUserIds(List.of(2L, 3L));
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
                 .thenReturn(List.of(1L, 2L, 3L, 4L));
 
-        groupMessageService.sendGroupMessageEvent(message);
+        groupMessageService.sendGroupMessage(99L, dto);
 
         verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
                         ids.size() == 2 && ids.contains(2L) && ids.contains(3L)),
                 any(ImGroupMessageDTO.class));
+    }
+
+    // ========== sendGroupMessage(senderId, dto)：helper 行为 ==========
+
+    @Test
+    public void testSendGroupMessage_dto_persistsAndSerializesPojoContent() {
+        // 准备：persistent=true 类型 + POJO content
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setContent(new RecallMessage().setMessageId(50L));
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L));
+
+        groupMessageService.sendGroupMessage(1L, dto);
+
+        // 断言：入库 + 系统字段兜底 + content 序列化为 JSON + receiptStatus=NO_RECEIPT
+        ArgumentCaptor<ImGroupMessageDO> captor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
+        verify(groupMessageMapper).insert(captor.capture());
+        ImGroupMessageDO message = captor.getValue();
+        assertEquals(1L, message.getSenderId());
+        assertEquals(10L, message.getGroupId());
+        assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
+        assertEquals("{\"messageId\":50}", message.getContent());
+        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), message.getStatus());
+        assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), message.getReceiptStatus());
+        assertNotNull(message.getClientMessageId());
+        assertNotNull(message.getSendTime());
+    }
+
+    @Test
+    public void testSendGroupMessage_dto_receiptPending() {
+        // 准备：dto.receipt=true → receiptStatus=PENDING
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setContent("{\"messageId\":50}").setReceipt(true);
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L));
+
+        groupMessageService.sendGroupMessage(1L, dto);
+
+        ArgumentCaptor<ImGroupMessageDO> captor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
+        verify(groupMessageMapper).insert(captor.capture());
+        assertEquals(ImGroupMessageReceiptStatusEnum.PENDING.getStatus(), captor.getValue().getReceiptStatus());
+    }
+
+    @Test
+    public void testSendGroupMessage_dto_nonPersistentTypeNotInserted() {
+        // 准备：persistent=false 类型（GROUP_CREATE）→ 不入库，仅推送
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.GROUP_CREATE.getType());
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L));
+
+        groupMessageService.sendGroupMessage(1L, dto);
+
+        verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
+        verify(imWebSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+    }
+
+    @Test
+    public void testSendGroupMessage_threeArg_explicitTargetsBypassActiveMembers() {
+        // 准备：调用方传入显式 targets（覆盖跨成员 disable 边界场景：解散 / 退群 / 踢人）
+        Set<Long> targets = Set.of(1L, 2L, 3L);
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
+                .setGroupId(10L).setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent("解散通知");
+
+        groupMessageService.sendGroupMessage(1L, targets, dto);
+
+        // 断言：不读取 active members，按调用方 targets 推送
+        verify(groupMemberService, never()).getActiveGroupMemberUserIdsByGroupId(anyLong());
+        verify(imWebSocketService).sendGroupMessageAsync(eq(targets), any(ImGroupMessageDTO.class));
     }
 
     // ========== sendTipGroupMessage ==========

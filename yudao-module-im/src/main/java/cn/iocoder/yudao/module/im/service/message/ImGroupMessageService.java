@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGr
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
+import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,13 +19,44 @@ import java.util.Set;
 public interface ImGroupMessageService {
 
     /**
-     * 发送群聊消息
+     * 【用户调用】发送群聊消息
+     * <p>
+     * 用户在 IM 客户端发送 TEXT / IMAGE 等消息时调用，含幂等、敏感词、quote、@ 解析等业务校验。
+     * type 校验由 VO 层 {@code @InEnum} + {@code @AssertTrue} 完成（仅允许 normal 类型）。
      *
      * @param senderId 发送人编号
      * @param reqVO    发送请求
      * @return 消息
      */
     ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO);
+
+    /**
+     * 【系统调用】发送群聊消息：自动算可见用户 + 推送
+     *
+     * @param senderId 发送人编号
+     * @param dto      消息 DTO
+     * @return 消息
+     */
+    ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendDTO dto);
+
+    /**
+     * 【系统调用】发送群聊消息：显式指定推送目标
+     *
+     * @param senderId      发送人编号
+     * @param targetUserIds 推送目标用户编号集合（调用方在变更成员状态前抓取的快照）
+     * @param dto           消息 DTO
+     * @return 构造的消息 DO（持久化时 id 已回填）
+     */
+    ImGroupMessageDO sendGroupMessage(Long senderId, Set<Long> targetUserIds, ImGroupMessageSendDTO dto);
+
+    /**
+     * 【用户调用】撤回群聊消息
+     *
+     * @param userId    当前用户编号
+     * @param messageId 消息编号
+     * @return 撤回后的提示消息
+     */
+    ImGroupMessageDO recallGroupMessage(Long userId, Long messageId);
 
     /**
      * 拉取群聊消息（增量）
@@ -44,15 +76,6 @@ public interface ImGroupMessageService {
      * @param messageId 已读到的消息编号
      */
     void readGroupMessages(Long userId, Long groupId, Long messageId);
-
-    /**
-     * 撤回群聊消息
-     *
-     * @param userId    当前用户编号
-     * @param messageId 消息编号
-     * @return 撤回后的提示消息
-     */
-    ImGroupMessageDO recallGroupMessage(Long userId, Long messageId);
 
     /**
      * 获取群消息的已读用户列表

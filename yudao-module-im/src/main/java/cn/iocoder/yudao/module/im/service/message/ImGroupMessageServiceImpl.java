@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
@@ -102,9 +103,79 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                         : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus()));
         groupMessageMapper.insert(message);
 
-        // 3. WebSocket 推送给群成员（异步）
-        sendGroupMessageEvent(message);
+        // 3. WebSocket 异步推送（群内可见成员 + 发送方多端同步）
+        List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(message.getGroupId());
+        Set<Long> targetUserIds = getVisibleUserIds(message.getReceiverUserIds(), senderId, memberUserIds);
+        imWebSocketService.sendGroupMessageAsync(targetUserIds, ImGroupMessageDTO.ofSend(message));
         return message;
+    }
+
+    @Override
+    public ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendDTO dto) {
+        List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(dto.getGroupId());
+        Set<Long> targetUserIds = getVisibleUserIds(dto.getReceiverUserIds(), senderId, memberUserIds);
+        return sendGroupMessage(senderId, targetUserIds, dto);
+    }
+
+    @Override
+    public ImGroupMessageDO sendGroupMessage(Long senderId, Set<Long> targetUserIds, ImGroupMessageSendDTO dto) {
+        // 1.1 content 序列化：null / String 透传，POJO 走 JSON
+        Object payload = dto.getContent();
+        String contentString = payload == null || payload instanceof String
+                ? (String) payload
+                : JsonUtils.toJsonString(payload);
+        // 1.2 构建并保存消息
+        ImGroupMessageDO message = new ImGroupMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
+                .setSenderId(senderId).setGroupId(dto.getGroupId())
+                .setType(dto.getType()).setContent(contentString)
+                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
+                .setAtUserIds(dto.getAtUserIds()).setReceiverUserIds(dto.getReceiverUserIds())
+                .setReceiptStatus(Boolean.TRUE.equals(dto.getReceipt())
+                        ? ImGroupMessageReceiptStatusEnum.PENDING.getStatus()
+                        : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus());
+        // 1.3 按 type.persistent 决定是否入库
+        if (ImMessageTypeEnum.validate(dto.getType()).isPersistent()) {
+            groupMessageMapper.insert(message);
+        }
+
+        // 2. WebSocket 异步推送
+        imWebSocketService.sendGroupMessageAsync(targetUserIds, ImGroupMessageDTO.ofSend(message));
+        return message;
+    }
+
+    @Override
+    public void sendTipGroupMessage(Long senderId, Long groupId, Set<Long> memberUserIds, String content) {
+        sendGroupMessage(senderId, memberUserIds, new ImGroupMessageSendDTO()
+                .setGroupId(groupId).setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ImGroupMessageDO recallGroupMessage(Long userId, Long messageId) {
+        // 1.1 校验消息存在
+        ImGroupMessageDO message = validateGroupMessageExists(messageId);
+        // 1.2 只能撤回自己发送的消息
+        if (ObjUtil.notEqual(message.getSenderId(), userId)) {
+            throw exception(MESSAGE_RECALL_DENIED);
+        }
+        // 1.3 不能重复撤回
+        if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
+            throw exception(MESSAGE_ALREADY_RECALLED);
+        }
+        // 1.4 只允许撤回限定时间内的消息
+        if (message.getSendTime().plusMinutes(MESSAGE_RECALL_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
+            throw exception(MESSAGE_RECALL_TIMEOUT, MESSAGE_RECALL_TIMEOUT_MINUTES);
+        }
+        // 1.5 校验撤回人仍在群中
+        groupMemberService.validateMemberInGroup(message.getGroupId(), userId);
+
+        // 2. 更新原消息状态为撤回
+        groupMessageMapper.updateById(new ImGroupMessageDO().setId(messageId)
+                .setStatus(ImMessageStatusEnum.RECALL.getStatus()));
+
+        // 3. 发送撤回事件
+        return sendGroupMessage(userId, new ImGroupMessageSendDTO().setGroupId(message.getGroupId())
+                .setType(ImMessageTypeEnum.RECALL.getType()).setContent(new RecallMessage().setMessageId(messageId)));
     }
 
     @Override
@@ -286,44 +357,6 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ImGroupMessageDO recallGroupMessage(Long userId, Long messageId) {
-        // 1.1 校验消息存在
-        ImGroupMessageDO message = validateGroupMessageExists(messageId);
-        // 1.2 只能撤回自己发送的消息
-        if (ObjUtil.notEqual(message.getSenderId(), userId)) {
-            throw exception(MESSAGE_RECALL_DENIED);
-        }
-        // 1.3 不能重复撤回
-        if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
-            throw exception(MESSAGE_ALREADY_RECALLED);
-        }
-        // 1.4 只允许撤回限定时间内的消息
-        if (message.getSendTime().plusMinutes(MESSAGE_RECALL_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
-            throw exception(MESSAGE_RECALL_TIMEOUT, MESSAGE_RECALL_TIMEOUT_MINUTES);
-        }
-        // 1.5 校验撤回人仍在群中
-        groupMemberService.validateMemberInGroup(message.getGroupId(), userId);
-
-        // 2. 更新原消息状态为撤回
-        groupMessageMapper.updateById(new ImGroupMessageDO().setId(messageId)
-                .setStatus(ImMessageStatusEnum.RECALL.getStatus()));
-
-        // 3. 插入一条 RECALL 消息作为撤回信号（content 为 RecallMessage 序列化，前端据此找到原消息更新状态）
-        RecallMessage recallContent = new RecallMessage().setMessageId(messageId);
-        ImGroupMessageDO recallMessage = new ImGroupMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
-                .setSenderId(userId).setGroupId(message.getGroupId())
-                .setType(ImMessageTypeEnum.RECALL.getType()).setContent(JsonUtils.toJsonString(recallContent))
-                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
-                .setReceiptStatus(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus());
-        groupMessageMapper.insert(recallMessage);
-
-        // 4. 异步推送撤回信号（前端据此更新原消息状态 + 插入撤回提示）
-        sendGroupMessageEvent(recallMessage);
-        return recallMessage;
-    }
-
-    @Override
     public List<Long> getGroupReadUserIds(Long userId, Long groupId, Long messageId) {
         // 1.1 校验用户在群中（权限校验）
         groupMemberService.validateMemberInGroup(groupId, userId);
@@ -363,28 +396,6 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     // ========== 异步 WebSocket 推送 ==========
-
-    /**
-     * 发送群聊消息 WebSocket 事件
-     * <p>
-     * 这里仅用于"新消息"（首发 or 撤回提示），{@code message.sendTime = now}：
-     * <ul>
-     *   <li>所有 ENABLE 成员的 {@code joinTime <= now}，{@link #isMessageVisible} 的 joinTime 分支恒为真；</li>
-     *   <li>ENABLE 成员 status 非 DISABLE，quitTime 分支不适用；</li>
-     * </ul>
-     * 因此只剩 {@code receiverUserIds} 定向过滤会真正起效。
-     * 故使用只含 userId 的轻量缓存 {@link ImGroupMemberService#getActiveGroupMemberUserIdsByGroupId(Long)}，
-     * 在本地以 {@link #getVisibleUserIds} 完成定向过滤即可。
-     * <p>
-     * 注意：对历史消息的可见性判断仍需 joinTime/quitTime，见 {@code readGroupMessageEvent} 等处。
-     */
-    public void sendGroupMessageEvent(ImGroupMessageDO message) {
-        ImGroupMessageDTO dto = ImGroupMessageDTO.ofSend(message);
-        // 广播给群内有效成员中的可见用户（含发送方自己，支持多端同步；定向消息自动过滤）
-        List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(message.getGroupId());
-        Set<Long> targetUserIds = getVisibleUserIds(message, memberUserIds);
-        imWebSocketService.sendGroupMessageAsync(targetUserIds, dto);
-    }
 
     /**
      * 发送已读 + 刷新群回执 WebSocket 事件
@@ -528,24 +539,24 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     /**
-     * 基于群成员 userId 列表，过滤出一条消息的可见成员集合（含发送者）。
+     * 基于群成员 userId 列表，过滤出一条新消息的可见成员集合（含发送者）。
      * <p>
-     * 仅适用于"新消息"推送场景（{@code sendTime = now}），不涉及 joinTime/quitTime 判定，
+     * 仅适用于「新消息」推送场景（{@code sendTime = now}），不涉及 joinTime / quitTime 判定，
      * 只应用 {@code receiverUserIds} 定向过滤；语义与
      * {@link #isMessageVisible(ImGroupMessageDO, ImGroupMemberDO, Long)} 的第 3 步保持一致。
      */
-    private Set<Long> getVisibleUserIds(ImGroupMessageDO message, Collection<Long> memberUserIds) {
+    private Set<Long> getVisibleUserIds(List<Long> receiverUserIds, Long senderId, Collection<Long> memberUserIds) {
         if (CollUtil.isEmpty(memberUserIds)) {
             return new HashSet<>();
         }
         // 无定向接收列表 → 全员可见
-        if (CollUtil.isEmpty(message.getReceiverUserIds())) {
+        if (CollUtil.isEmpty(receiverUserIds)) {
             return new HashSet<>(memberUserIds);
         }
         // 有定向接收列表 → 仅定向用户可见；发送者自己也能看到自己的消息（多端同步）
-        Set<Long> allowed = new HashSet<>(message.getReceiverUserIds());
-        if (message.getSenderId() != null) {
-            allowed.add(message.getSenderId());
+        Set<Long> allowed = new HashSet<>(receiverUserIds);
+        if (senderId != null) {
+            allowed.add(senderId);
         }
         Set<Long> result = new HashSet<>();
         for (Long userId : memberUserIds) {
@@ -569,22 +580,6 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     @Override
     public void deleteReadMaxMessageIdMap(Long groupId) {
         groupMessageReadRedisDAO.deleteReadMaxMessageIdMap(groupId);
-    }
-
-    @Override
-    public void sendTipGroupMessage(Long senderId, Long groupId, Set<Long> memberUserIds, String content) {
-        // 1. 插入 TIP_TEXT 消息
-        ImGroupMessageDO tipMessage = new ImGroupMessageDO()
-                .setClientMessageId(IdUtil.fastSimpleUUID())
-                .setSenderId(senderId).setGroupId(groupId)
-                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content)
-                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
-                .setReceiptStatus(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus());
-        groupMessageMapper.insert(tipMessage);
-
-        // 2. 推送给指定用户
-        imWebSocketService.sendGroupMessageAsync(memberUserIds,
-                ImGroupMessageDTO.ofSend(tipMessage));
     }
 
     // ==================== 管理后台 ====================
