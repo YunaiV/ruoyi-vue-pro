@@ -17,8 +17,8 @@ public class ImGroupMemberUpdateReqVO {
     @Schema(description = "群内昵称", example = "芋头")
     private String displayUserName;
 
-    @Schema(description = "群名备注", example = "公司群")
-    private String displayGroupName;
+    @Schema(description = "群备注", example = "公司群")
+    private String groupRemark;
 
     @Schema(description = "是否免打扰")
     private Boolean muted;

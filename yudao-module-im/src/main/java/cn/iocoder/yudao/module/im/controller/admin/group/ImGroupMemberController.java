@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +43,6 @@ public class ImGroupMemberController {
 
     @PutMapping("/update")
     @Operation(summary = "更新群成员")
-    @PreAuthorize("@ss.hasPermission('im:group-member:update')")
     public CommonResult<Boolean> updateGroupMember(@Valid @RequestBody ImGroupMemberUpdateReqVO updateReqVO) {
         groupMemberService.updateGroupMember(getLoginUserId(), updateReqVO);
         return success(true);
@@ -57,7 +55,6 @@ public class ImGroupMemberController {
             @Parameter(name = "groupId", description = "群编号（与 userId 配合查）", example = "1"),
             @Parameter(name = "userId", description = "用户编号（与 groupId 配合查）", example = "100")
     })
-    @PreAuthorize("@ss.hasPermission('im:group-member:query')")
     public CommonResult<ImGroupMemberRespVO> getGroupMember(@RequestParam(value = "id", required = false) Long id,
                                                             @RequestParam(value = "groupId", required = false) Long groupId,
                                                             @RequestParam(value = "userId", required = false) Long userId) {

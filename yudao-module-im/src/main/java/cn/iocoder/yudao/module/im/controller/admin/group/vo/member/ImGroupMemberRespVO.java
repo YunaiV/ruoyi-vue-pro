@@ -21,14 +21,17 @@ public class ImGroupMemberRespVO {
     @Schema(description = "组内显示名", example = "芋艿")
     private String displayUserName;
 
-    @Schema(description = "群显示备注", example = "核心群")
-    private String displayGroupName;
+    @Schema(description = "群备注", example = "核心群")
+    private String groupRemark;
 
     @Schema(description = "是否免打扰")
     private Boolean muted;
 
     @Schema(description = "成员状态", example = "0")
     private Integer status;
+
+    @Schema(description = "成员角色", example = "3")
+    private Integer role; // 参见 ImGroupMemberRoleEnum 枚举类
 
     @Schema(description = "入群时间")
     private LocalDateTime joinTime;

@@ -12,6 +12,9 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
@@ -19,6 +22,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
@@ -44,7 +48,6 @@ import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
-// TODO @芋艿：群主的调整，暂时不考虑。后续在弄；
 /**
  * 群 Service 实现类
  *
@@ -82,8 +85,8 @@ public class ImGroupServiceImpl implements ImGroupService {
                 .setOwnerUserId(userId).setStatus(CommonStatusEnum.ENABLE.getStatus());
         groupMapper.insert(group);
 
-        // 2. 将群主插入为群成员
-        groupMemberService.addGroupMember(group.getId(), userId);
+        // 2. 将群主插入为群成员；显式 setRole(OWNER) 避免依赖 DDL DEFAULT 把群主行误认成 MEMBER
+        groupMemberService.addGroupMember(group.getId(), userId, ImGroupMemberRoleEnum.OWNER.getRole());
 
         // 3. 推送群创建事件给群主（多端同步）
         webSocketService.sendGroupMessageAsync(userId,
@@ -207,24 +210,124 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     public void removeGroupMember(Long userId, ImGroupMemberRemoveReqVO removeReqVO) {
         Long groupId = removeReqVO.getGroupId();
-        // 1. 校验群存在 + 当前用户是群主
-        validateGroupOwner(groupId, userId);
-        // 2. 不能移除自己
-        if (removeReqVO.getMemberUserIds().contains(userId)) {
+        Set<Long> targetUserIds = new HashSet<>(removeReqVO.getMemberUserIds());
+        // 1.1 校验群存在 + 操作者是群主或管理员
+        ImGroupMemberDO operator = validateGroupOwnerOrAdmin(groupId, userId);
+        // 1.2 不能移除自己
+        if (targetUserIds.contains(userId)) {
             throw exception(GROUP_CANNOT_REMOVE_SELF);
         }
+        // 1.3 三档权限校验：群主不可被移出；管理员不能移出管理员
+        List<ImGroupMemberDO> targets = groupMemberService.getGroupMembers(groupId, targetUserIds);
+        boolean operatorIsAdmin = ImGroupMemberRoleEnum.isAdmin(operator.getRole());
+        for (ImGroupMemberDO target : targets) {
+            if (ImGroupMemberRoleEnum.isOwner(target.getRole())) {
+                throw exception(GROUP_REMOVE_OWNER_DENIED);
+            }
+            if (operatorIsAdmin && ImGroupMemberRoleEnum.isAdmin(target.getRole())) {
+                throw exception(GROUP_REMOVE_ADMIN_DENIED);
+            }
+        }
 
-        // 3.1 批量移除群成员
-        Set<Long> memberUserIds = new HashSet<>(removeReqVO.getMemberUserIds());
-        groupMemberService.removeGroupMembers(groupId, memberUserIds);
-        // 3.2 批量清理已读缓存
-        groupMessageService.deleteReadMaxMessageIds(groupId, memberUserIds);
+        // 2.1 批量移除群成员
+        groupMemberService.removeGroupMembers(groupId, targetUserIds);
+        // 2.2 批量清理已读缓存
+        groupMessageService.deleteReadMaxMessageIds(groupId, targetUserIds);
 
-        // 4.1 发送踢出提示消息（TIP_TEXT）
-        groupMessageService.sendTipGroupMessage(userId, groupId, memberUserIds, GROUP_REMOVE_TIP_MESSAGE);
-        // 4.2 推送群删除事件
-        webSocketService.sendGroupMessageAsync(memberUserIds,
+        // 3.1 发送移出提示消息（TIP_TEXT）
+        groupMessageService.sendTipGroupMessage(userId, groupId, targetUserIds, GROUP_REMOVE_TIP_MESSAGE);
+        // 3.2 推送群删除事件
+        webSocketService.sendGroupMessageAsync(targetUserIds,
                 ImGroupMessageDTO.ofGroupDelete(userId, groupId));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addGroupAdmin(Long userId, ImGroupAdminAddReqVO reqVO) {
+        Long groupId = reqVO.getGroupId();
+        Set<Long> targetUserIds = new HashSet<>(reqVO.getUserIds());
+        // 1.1 仅群主可操作
+        validateGroupOwner(groupId, userId);
+        // 1.2 校验目标都是有效成员且非群主
+        Map<Long, ImGroupMemberDO> targetMap = convertMap(
+                groupMemberService.getGroupMembers(groupId, targetUserIds), ImGroupMemberDO::getUserId);
+        validateAdminTargets(targetUserIds, targetMap);
+        // 1.3 幂等过滤：跳过已是 ADMIN
+        Set<Long> changedUserIds = convertSet(targetUserIds,
+                id -> id,
+                id -> !ImGroupMemberRoleEnum.isAdmin(targetMap.get(id).getRole()));
+        if (CollUtil.isEmpty(changedUserIds)) {
+            return;
+        }
+        // 1.4 校验上限
+        Long existAdminCount = groupMemberService.getGroupMemberCountByRole(
+                groupId, ImGroupMemberRoleEnum.ADMIN.getRole());
+        if (existAdminCount + changedUserIds.size() > GROUP_ADMIN_MAX_COUNT) {
+            throw exception(GROUP_ADMIN_MAX_LIMIT, GROUP_ADMIN_MAX_COUNT);
+        }
+
+        // 2. 批量更新角色
+        groupMemberService.updateGroupMemberRole(groupId, changedUserIds, ImGroupMemberRoleEnum.ADMIN.getRole());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeGroupAdmin(Long userId, ImGroupAdminRemoveReqVO reqVO) {
+        Long groupId = reqVO.getGroupId();
+        Set<Long> targetUserIds = new HashSet<>(reqVO.getUserIds());
+        // 1.1 仅群主可操作
+        validateGroupOwner(groupId, userId);
+        // 1.2 校验目标都是有效成员且非群主
+        Map<Long, ImGroupMemberDO> targetMap = convertMap(
+                groupMemberService.getGroupMembers(groupId, targetUserIds), ImGroupMemberDO::getUserId);
+        validateAdminTargets(targetUserIds, targetMap);
+        // 1.3 幂等过滤：跳过已是 MEMBER
+        Set<Long> changedUserIds = convertSet(targetUserIds,
+                id -> id,
+                id -> ImGroupMemberRoleEnum.isAdmin(targetMap.get(id).getRole()));
+        if (CollUtil.isEmpty(changedUserIds)) {
+            return;
+        }
+
+        // 2. 批量更新角色
+        groupMemberService.updateGroupMemberRole(groupId, changedUserIds, ImGroupMemberRoleEnum.NORMAL.getRole());
+    }
+
+    /**
+     * 校验管理员变更目标都是当前群的有效成员（status=ENABLE）且非群主
+     */
+    private void validateAdminTargets(Set<Long> targetUserIds, Map<Long, ImGroupMemberDO> targetMap) {
+        for (Long targetUserId : targetUserIds) {
+            ImGroupMemberDO target = targetMap.get(targetUserId);
+            if (target == null || CommonStatusEnum.DISABLE.getStatus().equals(target.getStatus())) {
+                throw exception(GROUP_ADMIN_TARGET_NOT_IN_GROUP);
+            }
+            if (ImGroupMemberRoleEnum.isOwner(target.getRole())) {
+                throw exception(GROUP_ADMIN_TARGET_IS_OWNER);
+            }
+        }
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#transferReqVO.groupId")
+    @Transactional(rollbackFor = Exception.class)
+    public void transferGroupOwner(Long userId, ImGroupTransferOwnerReqVO transferReqVO) {
+        Long groupId = transferReqVO.getGroupId();
+        Long newOwnerUserId = transferReqVO.getNewOwnerUserId();
+        // 1.1 仅老群主可执行
+        validateGroupOwner(groupId, userId);
+        // 1.2 不能转让给自己
+        if (ObjUtil.equal(userId, newOwnerUserId)) {
+            throw exception(GROUP_TRANSFER_OWNER_TO_SELF);
+        }
+        // 1.3 新群主必须是群的有效成员
+        ImGroupMemberDO newOwner = groupMemberService.validateMemberInGroup(groupId, newOwnerUserId);
+
+        // 2.1 更新群表 owner_user_id
+        groupMapper.updateById(new ImGroupDO().setId(groupId).setOwnerUserId(newOwnerUserId));
+        // 2.2 旧群主 role → MEMBER；新群主 role → OWNER
+        groupMemberService.updateGroupMemberRole(groupId, Set.of(userId), ImGroupMemberRoleEnum.NORMAL.getRole());
+        groupMemberService.updateGroupMemberRole(groupId, Set.of(newOwner.getUserId()), ImGroupMemberRoleEnum.OWNER.getRole());
     }
 
     // ==================== 群的读操作 ====================
@@ -244,13 +347,28 @@ public class ImGroupServiceImpl implements ImGroupService {
         return group;
     }
 
-    @Override
-    public ImGroupDO validateGroupOwner(Long groupId, Long userId) {
+    /**
+     * 校验当前用户是群主，否则抛 GROUP_NOT_OWNER
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    private ImGroupDO validateGroupOwner(Long groupId, Long userId) {
         ImGroupDO group = validateGroupExists(groupId);
         if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
             throw exception(GROUP_NOT_OWNER);
         }
         return group;
+    }
+
+    /**
+     * 校验当前用户是群主或管理员，否则抛 GROUP_NOT_OWNER_OR_ADMIN
+     */
+    private ImGroupMemberDO validateGroupOwnerOrAdmin(Long groupId, Long userId) {
+        validateGroupExists(groupId);
+        ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
+        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole())) {
+            throw exception(GROUP_NOT_OWNER_OR_ADMIN);
+        }
+        return member;
     }
 
     @Override

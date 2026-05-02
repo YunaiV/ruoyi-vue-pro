@@ -83,6 +83,20 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .eq(ImGroupMemberDO::getStatus, oldStatus));
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    default int updateListByGroupIdAndUserIds(Long groupId, Collection<Long> userIds, ImGroupMemberDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .in(ImGroupMemberDO::getUserId, userIds));
+    }
+
+    default Long selectCountByGroupIdAndRoleAndStatus(Long groupId, Integer role, Integer status) {
+        return selectCount(new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .eq(ImGroupMemberDO::getRole, role)
+                .eq(ImGroupMemberDO::getStatus, status));
+    }
+
     /**
      * 批量按 group_id 统计指定状态的成员数
      */

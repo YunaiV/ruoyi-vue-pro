@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.dal.dataobject.group;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -46,9 +47,9 @@ public class ImGroupMemberDO extends BaseDO {
      */
     private String displayUserName;
     /**
-     * 群显示备注
+     * 群备注
      */
-    private String displayGroupName;
+    private String groupRemark;
     /**
      * 是否免打扰
      */
@@ -59,6 +60,12 @@ public class ImGroupMemberDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * 成员角色
+     * <p>
+     * 枚举 {@link ImGroupMemberRoleEnum}
+     */
+    private Integer role;
     /**
      * 入群时间
      */

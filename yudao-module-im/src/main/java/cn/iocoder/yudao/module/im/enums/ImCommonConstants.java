@@ -18,6 +18,16 @@ public interface ImCommonConstants {
     int MAX_GROUP_MEMBER = 500;
 
     /**
+     * 单群管理员人数上限
+     */
+    int GROUP_ADMIN_MAX_COUNT = 3;
+
+    /**
+     * 单群置顶消息条数上限
+     */
+    int GROUP_PIN_MAX_COUNT = 5;
+
+    /**
      * 群消息 @ 所有人的特殊用户编号
      */
     long AT_USER_ID_ALL = -1L;

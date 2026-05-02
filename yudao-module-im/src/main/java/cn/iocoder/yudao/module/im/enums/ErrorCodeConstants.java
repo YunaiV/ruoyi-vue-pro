@@ -23,6 +23,8 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_BANNED = new ErrorCode(1_040_400_001, "群已被封禁");
     ErrorCode GROUP_DISSOLVED = new ErrorCode(1_040_400_002, "群已解散");
     ErrorCode GROUP_NOT_OWNER = new ErrorCode(1_040_400_003, "仅群主可执行该操作");
+    ErrorCode GROUP_NOT_OWNER_OR_ADMIN = new ErrorCode(1_040_400_004, "仅群主或管理员可执行该操作");
+    ErrorCode GROUP_TRANSFER_OWNER_TO_SELF = new ErrorCode(1_040_400_005, "不能将群主转让给自己");
 
     // ========== 群成员 (1-040-500-000) ==========
     ErrorCode GROUP_MEMBER_NOT_IN_GROUP = new ErrorCode(1_040_500_001, "您已不在该群中");
@@ -30,6 +32,11 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_CANNOT_REMOVE_SELF = new ErrorCode(1_040_500_004, "不能将自己移出群聊");
     ErrorCode GROUP_MEMBER_EXCEED = new ErrorCode(1_040_500_005, "群聊人数不能超过 {} 人");
     ErrorCode GROUP_INVITE_NOT_FRIEND = new ErrorCode(1_040_500_006, "'{}' 不是您的好友，邀请失败");
+    ErrorCode GROUP_ADMIN_TARGET_NOT_IN_GROUP = new ErrorCode(1_040_500_007, "目标用户已不在该群中");
+    ErrorCode GROUP_ADMIN_TARGET_IS_OWNER = new ErrorCode(1_040_500_008, "群主无法被设为或撤销管理员");
+    ErrorCode GROUP_ADMIN_MAX_LIMIT = new ErrorCode(1_040_500_009, "群管理员数量不能超过 {} 人");
+    ErrorCode GROUP_REMOVE_OWNER_DENIED = new ErrorCode(1_040_500_010, "群主无法被移出群聊");
+    ErrorCode GROUP_REMOVE_ADMIN_DENIED = new ErrorCode(1_040_500_011, "管理员无法移出其他管理员，请先由群主撤销其管理员身份");
 
     // ========== 好友 (1-040-600-000) ==========
     ErrorCode FRIEND_NOT_FRIEND = new ErrorCode(1_040_600_001, "对方不是您的好友");

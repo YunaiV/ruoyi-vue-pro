@@ -34,6 +34,15 @@ public interface ImGroupMemberService {
     ImGroupMemberDO getGroupMember(Long groupId, Long userId);
 
     /**
+     * 批量查询群成员（包含所有状态）
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合
+     * @return 群成员列表
+     */
+    List<ImGroupMemberDO> getGroupMembers(Long groupId, Collection<Long> userIds);
+
+    /**
      * 根据群组 id 查询群成员（包含所有状态）
      *
      * @param groupId 群组id
@@ -79,10 +88,7 @@ public interface ImGroupMemberService {
     List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime);
 
     /**
-     * 添加群成员（入群）
-     * <p>
-     * 插入一条 ENABLE 状态的群成员记录，并设置 joinTime。
-     * 可用于创建群时添加群主、邀请入群等场景。
+     * 添加群成员（入群），角色默认 MEMBER
      *
      * @param groupId 群编号
      * @param userId  用户编号
@@ -90,6 +96,19 @@ public interface ImGroupMemberService {
      */
     @SuppressWarnings("UnusedReturnValue")
     ImGroupMemberDO addGroupMember(Long groupId, Long userId);
+
+    /**
+     * 添加群成员（入群），并指定角色
+     * <p>
+     * 重置旧成员行也会强制重置 role，避免离群期间残留管理员身份被复用。
+     *
+     * @param groupId 群编号
+     * @param userId  用户编号
+     * @param role    成员角色，见 {@link cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum}
+     * @return 群成员记录
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    ImGroupMemberDO addGroupMember(Long groupId, Long userId, Integer role);
 
     /**
      * 批量添加群成员（入群）
@@ -117,6 +136,24 @@ public interface ImGroupMemberService {
      * @param updateReqVO 更新信息
      */
     void updateGroupMember(Long userId, @Valid ImGroupMemberUpdateReqVO updateReqVO);
+
+    /**
+     * 批量更新群成员角色
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合
+     * @param role    新角色，见 {@link cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum}
+     */
+    void updateGroupMemberRole(Long groupId, Collection<Long> userIds, Integer role);
+
+    /**
+     * 统计群内指定 role 的活跃成员数量
+     *
+     * @param groupId 群编号
+     * @param role    成员角色
+     * @return 数量
+     */
+    Long getGroupMemberCountByRole(Long groupId, Integer role);
 
     /**
      * 移除指定群成员（设置为 DISABLE 状态）

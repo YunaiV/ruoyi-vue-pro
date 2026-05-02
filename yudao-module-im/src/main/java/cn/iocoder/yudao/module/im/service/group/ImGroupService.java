@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
@@ -80,16 +83,6 @@ public interface ImGroupService {
     ImGroupDO validateGroupExists(Long groupId);
 
     /**
-     * 校验当前用户是否为群主
-     *
-     * @param groupId 群编号
-     * @param userId  用户编号
-     * @return 群信息
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    ImGroupDO validateGroupOwner(Long groupId, Long userId);
-
-    /**
      * 获取指定用户的群列表
      * <p>
      * 返回用户当前仍有效的群，以及最近 {@link cn.iocoder.yudao.module.im.enums.ImCommonConstants#MESSAGE_GROUP_PULL_MAX_DAYS}
@@ -128,12 +121,38 @@ public interface ImGroupService {
     /**
      * 移除群成员（踢人）
      * <p>
-     * 仅群主可执行，且不能移除自己，支持批量
+     * 群主可踢管理员和普通成员；管理员仅能踢普通成员；群主不可被踢。
      *
-     * @param userId      当前登录用户编号（群主）
+     * @param userId      当前登录用户编号
      * @param removeReqVO 移除信息
      */
     void removeGroupMember(Long userId, @Valid ImGroupMemberRemoveReqVO removeReqVO);
+
+    /**
+     * 添加群管理员（仅群主可执行）
+     *
+     * @param userId 当前登录用户编号（群主）
+     * @param reqVO  添加信息（含群编号、目标用户编号列表）
+     */
+    void addGroupAdmin(Long userId, @Valid ImGroupAdminAddReqVO reqVO);
+
+    /**
+     * 撤销群管理员（仅群主可执行）
+     *
+     * @param userId 当前登录用户编号（群主）
+     * @param reqVO  撤销信息（含群编号、目标用户编号列表）
+     */
+    void removeGroupAdmin(Long userId, @Valid ImGroupAdminRemoveReqVO reqVO);
+
+    /**
+     * 转让群主（仅老群主可执行）
+     * <p>
+     * 转让后：旧群主 role 降为 MEMBER，新群主 role 升为 OWNER
+     *
+     * @param userId      当前登录用户编号（旧群主）
+     * @param transferReqVO 转让信息
+     */
+    void transferGroupOwner(Long userId, @Valid ImGroupTransferOwnerReqVO transferReqVO);
 
     // ==================== 管理后台 ====================
 

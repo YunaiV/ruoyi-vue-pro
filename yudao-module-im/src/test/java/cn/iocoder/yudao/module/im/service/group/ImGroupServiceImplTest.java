@@ -4,7 +4,10 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
@@ -12,6 +15,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
@@ -29,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,8 +83,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(100L, result.getId());
         assertEquals(1L, result.getOwnerUserId());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), result.getStatus());
-        // 验证：群主加入群 + 推送群创建事件
-        verify(groupMemberService).addGroupMember(100L, 1L);
+        // 验证：群主加入群（带 OWNER role）+ 推送群创建事件
+        verify(groupMemberService).addGroupMember(100L, 1L, ImGroupMemberRoleEnum.OWNER.getRole());
         verify(webSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
     }
 
@@ -394,6 +399,9 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
@@ -414,6 +422,16 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
+            // 操作者：群主
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
+            // 目标：两个普通成员
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build(),
+                    ImGroupMemberDO.builder().groupId(10L).userId(3L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
@@ -425,6 +443,293 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             verify(groupMessageService).deleteReadMaxMessageIds(eq(10L), anyCollection());
             verify(groupMessageService).sendTipGroupMessage(eq(1L), eq(10L), anySet(), anyString());
             verify(webSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+        }
+    }
+
+    @Test
+    public void testRemoveGroupMember_adminCannotRemoveAdmin() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            // 操作者：管理员
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build());
+            // 目标：另一个管理员
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
+
+            ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setMemberUserIds(List.of(2L));
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.removeGroupMember(1L, reqVO));
+            assertEquals(GROUP_REMOVE_ADMIN_DENIED.getCode(), exception.getCode());
+            verify(groupMemberService, never()).removeGroupMembers(anyLong(), anyCollection());
+        }
+    }
+
+    @Test
+    public void testRemoveGroupMember_ownerCannotBeRemoved() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            // 操作者：群主（不能踢自己；这里换成另一个 userId 的群主语义 — 用 ADMIN 操作群主）
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().groupId(10L).userId(99L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build()));
+
+            ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setMemberUserIds(List.of(99L));
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.removeGroupMember(1L, reqVO));
+            assertEquals(GROUP_REMOVE_OWNER_DENIED.getCode(), exception.getCode());
+        }
+    }
+
+    // ========== addGroupAdmin ==========
+
+    @Test
+    public void testAddGroupAdmin_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            // 目标 3 是普通成员
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().userId(3L).status(CommonStatusEnum.ENABLE.getStatus())
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
+            // 群里已有 1 个 ADMIN，1 + 1 ≤ 3 不超上限
+            when(groupMemberService.getGroupMemberCountByRole(10L, ImGroupMemberRoleEnum.ADMIN.getRole()))
+                    .thenReturn(1L);
+
+            ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setUserIds(List.of(3L));
+
+            groupService.addGroupAdmin(1L, reqVO);
+
+            verify(groupMemberService).updateGroupMemberRole(eq(10L), argThat((Set<Long> ids) ->
+                            ids.size() == 1 && ids.contains(3L)),
+                    eq(ImGroupMemberRoleEnum.ADMIN.getRole()));
+        }
+    }
+
+    @Test
+    public void testAddGroupAdmin_exceedsLimit() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().userId(5L).status(CommonStatusEnum.ENABLE.getStatus())
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
+            // 群里已有 3 个 ADMIN（达到上限），再加 1 会超
+            when(groupMemberService.getGroupMemberCountByRole(10L, ImGroupMemberRoleEnum.ADMIN.getRole()))
+                    .thenReturn(3L);
+
+            ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setUserIds(List.of(5L));
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.addGroupAdmin(1L, reqVO));
+            assertEquals(GROUP_ADMIN_MAX_LIMIT.getCode(), exception.getCode());
+            verify(groupMemberService, never()).updateGroupMemberRole(anyLong(), anyCollection(), anyInt());
+        }
+    }
+
+    @Test
+    public void testAddGroupAdmin_targetIsOwner() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().userId(1L).status(CommonStatusEnum.ENABLE.getStatus())
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build()));
+
+            ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setUserIds(List.of(1L));
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.addGroupAdmin(1L, reqVO));
+            assertEquals(GROUP_ADMIN_TARGET_IS_OWNER.getCode(), exception.getCode());
+        }
+    }
+
+    @Test
+    public void testAddGroupAdmin_idempotentSkipWhenAlreadyAdmin() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            // 目标已是 ADMIN：再加无需操作
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
+
+            ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setUserIds(List.of(2L));
+
+            groupService.addGroupAdmin(1L, reqVO);
+
+            verify(groupMemberService, never()).updateGroupMemberRole(anyLong(), anyCollection(), anyInt());
+            verify(groupMemberService, never()).getGroupMemberCountByRole(anyLong(), anyInt());
+        }
+    }
+
+    // ========== removeGroupAdmin ==========
+
+    @Test
+    public void testRemoveGroupAdmin_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
+
+            ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setUserIds(List.of(2L));
+
+            groupService.removeGroupAdmin(1L, reqVO);
+
+            verify(groupMemberService).updateGroupMemberRole(eq(10L), argThat((Set<Long> ids) ->
+                            ids.size() == 1 && ids.contains(2L)),
+                    eq(ImGroupMemberRoleEnum.NORMAL.getRole()));
+        }
+    }
+
+    @Test
+    public void testRemoveGroupAdmin_idempotentSkipWhenAlreadyMember() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            // 目标已是 MEMBER：撤销无需操作
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
+
+            ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setUserIds(List.of(2L));
+
+            groupService.removeGroupAdmin(1L, reqVO);
+
+            verify(groupMemberService, never()).updateGroupMemberRole(anyLong(), anyCollection(), anyInt());
+        }
+    }
+
+    // ========== transferGroupOwner ==========
+
+    @Test
+    public void testTransferGroupOwner_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.validateMemberInGroup(10L, 2L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
+
+            ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setNewOwnerUserId(2L);
+
+            groupService.transferGroupOwner(1L, reqVO);
+
+            // 群表 owner 切换
+            ArgumentCaptor<ImGroupDO> groupCaptor = ArgumentCaptor.forClass(ImGroupDO.class);
+            verify(groupMapper).updateById(groupCaptor.capture());
+            assertEquals(2L, groupCaptor.getValue().getOwnerUserId());
+            // 旧群主 → MEMBER；新群主 → OWNER
+            verify(groupMemberService).updateGroupMemberRole(eq(10L), eq(Set.of(1L)),
+                    eq(ImGroupMemberRoleEnum.NORMAL.getRole()));
+            verify(groupMemberService).updateGroupMemberRole(eq(10L), eq(Set.of(2L)),
+                    eq(ImGroupMemberRoleEnum.OWNER.getRole()));
+        }
+    }
+
+    @Test
+    public void testTransferGroupOwner_toSelf() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setNewOwnerUserId(1L);
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.transferGroupOwner(1L, reqVO));
+            assertEquals(GROUP_TRANSFER_OWNER_TO_SELF.getCode(), exception.getCode());
+            verify(groupMapper, never()).updateById(any(ImGroupDO.class));
+        }
+    }
+
+    @Test
+    public void testTransferGroupOwner_notOwner() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setNewOwnerUserId(2L);
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.transferGroupOwner(1L, reqVO));
+            assertEquals(GROUP_NOT_OWNER.getCode(), exception.getCode());
         }
     }
 

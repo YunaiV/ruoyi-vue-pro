@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,6 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMemberDO exists = ImGroupMemberDO.builder().id(50L).groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupMemberMapper.selectByGroupIdAndUserId(10L, 1L)).thenReturn(exists);
-        when(groupMemberMapper.selectById(50L)).thenReturn(exists);
 
         ImGroupMemberDO result = groupMemberService.addGroupMember(10L, 1L);
 
@@ -72,13 +72,11 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testAddGroupMember_existingDisabledRecovers() {
-        // 准备：已存在且 DISABLE，应更新为 ENABLE
+        // 准备：已存在且 DISABLE，应重置为 ENABLE 并重置 role 为 MEMBER
         ImGroupMemberDO exists = ImGroupMemberDO.builder().id(50L).groupId(10L).userId(1L)
-                .status(CommonStatusEnum.DISABLE.getStatus()).build();
+                .status(CommonStatusEnum.DISABLE.getStatus())
+                .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build();
         when(groupMemberMapper.selectByGroupIdAndUserId(10L, 1L)).thenReturn(exists);
-        ImGroupMemberDO recovered = ImGroupMemberDO.builder().id(50L).groupId(10L).userId(1L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(groupMemberMapper.selectById(50L)).thenReturn(recovered);
 
         ImGroupMemberDO result = groupMemberService.addGroupMember(10L, 1L);
 
@@ -86,8 +84,10 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMemberMapper).updateById(captor.capture());
         assertEquals(50L, captor.getValue().getId());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), captor.getValue().getStatus());
+        assertEquals(ImGroupMemberRoleEnum.NORMAL.getRole(), captor.getValue().getRole());
         assertNotNull(captor.getValue().getJoinTime());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), result.getStatus());
+        assertEquals(ImGroupMemberRoleEnum.NORMAL.getRole(), result.getRole());
     }
 
     @Test
