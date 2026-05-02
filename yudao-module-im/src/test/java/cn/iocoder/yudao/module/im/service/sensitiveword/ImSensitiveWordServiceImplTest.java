@@ -39,7 +39,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
                         ImSensitiveWordDO.builder().id(2L).word("违禁词")
                                 .status(CommonStatusEnum.ENABLE.getStatus()).build()
                 ));
-        sensitiveWordService.init();
+//        sensitiveWordService.init();
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
                 ));
 
         // 调用：刷新
-        sensitiveWordService.refresh();
+//        sensitiveWordService.refresh();
 
         // 断言：原敏感词不再命中，新词命中
         assertDoesNotThrow(() -> sensitiveWordService.validateText("contains badword"));

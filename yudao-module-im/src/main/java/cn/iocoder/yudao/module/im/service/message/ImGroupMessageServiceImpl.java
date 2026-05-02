@@ -118,7 +118,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     }
 
     @Override
-    public ImGroupMessageDO sendGroupMessage(Long senderId, Set<Long> targetUserIds, ImGroupMessageSendDTO dto) {
+    public ImGroupMessageDO sendGroupMessage(Long senderId, Collection<Long> targetUserIds, ImGroupMessageSendDTO dto) {
         // 1.1 content 序列化：null / String 透传，POJO 走 JSON
         Object payload = dto.getContent();
         String contentString = payload == null || payload instanceof String
@@ -141,12 +141,6 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         // 2. WebSocket 异步推送
         imWebSocketService.sendGroupMessageAsync(targetUserIds, ImGroupMessageDTO.ofSend(message));
         return message;
-    }
-
-    @Override
-    public void sendTipGroupMessage(Long senderId, Long groupId, Set<Long> memberUserIds, String content) {
-        sendGroupMessage(senderId, memberUserIds, new ImGroupMessageSendDTO()
-                .setGroupId(groupId).setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content));
     }
 
     @Override

@@ -1,18 +1,20 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
-import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +41,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     private ImGroupMemberMapper groupMemberMapper;
 
     @Resource
-    private ImWebSocketService webSocketService;
+    @Lazy // 避免循环依赖
+    private ImGroupMessageService groupMessageService;
 
     @Override
     public ImGroupMemberDO getGroupMember(Long id) {
@@ -203,17 +206,25 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Override
     public void updateGroupMember(Long userId, ImGroupMemberUpdateReqVO updateReqVO) {
+        Long groupId = updateReqVO.getGroupId();
         // 1. 校验是群的有效成员
-        ImGroupMemberDO member = validateMemberInGroup(updateReqVO.getGroupId(), userId);
+        ImGroupMemberDO member = validateMemberInGroup(groupId, userId);
 
         // 2. 更新群成员信息
         ImGroupMemberDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupMemberDO.class)
                 .setId(member.getId());
         groupMemberMapper.updateById(updateObj);
 
-        // 3. 推送群成员变更通知（多端同步，仅推给自己）
-        webSocketService.sendGroupMessageAsync(userId,
-                ImGroupMessageDTO.ofGroupMemberUpdate(userId, updateReqVO.getGroupId()));
+        // 3.1 displayUserName 是公开字段，单独走 GROUP_MEMBER_NICKNAME_UPDATE 广播给全员
+        if (StrUtil.isNotEmpty(updateReqVO.getDisplayUserName())) {
+            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberNicknameUpdate(
+                    groupId, userId, updateReqVO.getDisplayUserName()));
+        }
+        // 3.2 muted / groupRemark 是个人字段，target 显式指定为自己仅推自己多端同步；payload 携带变更字段，前端按非 null 局部更新
+        if (updateReqVO.getMuted() != null || updateReqVO.getGroupRemark() != null) {
+            groupMessageService.sendGroupMessage(userId, List.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
+                    groupId, userId, updateReqVO.getMuted(), updateReqVO.getGroupRemark()));
+        }
     }
 
     @Override

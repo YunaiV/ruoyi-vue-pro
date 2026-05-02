@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * IM 群聊消息 Service 接口
@@ -47,7 +46,7 @@ public interface ImGroupMessageService {
      * @param dto           消息 DTO
      * @return 构造的消息 DO（持久化时 id 已回填）
      */
-    ImGroupMessageDO sendGroupMessage(Long senderId, Set<Long> targetUserIds, ImGroupMessageSendDTO dto);
+    ImGroupMessageDO sendGroupMessage(Long senderId, Collection<Long> targetUserIds, ImGroupMessageSendDTO dto);
 
     /**
      * 【用户调用】撤回群聊消息
@@ -124,18 +123,6 @@ public interface ImGroupMessageService {
      * @param groupId 群编号
      */
     void deleteReadMaxMessageIdMap(Long groupId);
-
-    /**
-     * 发送群聊系统提示消息（TIP_TEXT）
-     * <p>
-     * 插入一条 TIP_TEXT 消息到群聊记录，并推送给指定用户
-     *
-     * @param senderId    发送人编号（操作者）
-     * @param groupId     群编号
-     * @param memberUserIds 推送目标用户编号集合
-     * @param content     提示内容
-     */
-    void sendTipGroupMessage(Long senderId, Long groupId, Set<Long> memberUserIds, String content);
 
     // ==================== 管理后台 ====================
 

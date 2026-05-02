@@ -16,8 +16,10 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -30,7 +32,6 @@ import org.mockito.MockedStatic;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testCreateGroup_success() {
-        // 准备
+        // 准备：仅创建者，无初始成员
         ImGroupCreateReqVO reqVO = new ImGroupCreateReqVO();
         reqVO.setName("测试群");
         when(groupMapper.insert(any(ImGroupDO.class))).thenAnswer(invocation -> {
@@ -83,9 +84,66 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(100L, result.getId());
         assertEquals(1L, result.getOwnerUserId());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), result.getStatus());
-        // 验证：群主加入群（带 OWNER role）+ 推送群创建事件
+        // 验证：群主加入群（带 OWNER role）+ 不调批量加成员（无初始成员）
         verify(groupMemberService).addGroupMember(100L, 1L, ImGroupMemberRoleEnum.OWNER.getRole());
-        verify(webSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
+        verify(groupMemberService, never()).addGroupMembers(anyLong(), anyCollection());
+        // 验证：推送 GROUP_CREATE 通知（payload memberUserIds 含创建者自己）
+        ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+        verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+        assertEquals(ImMessageTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
+    }
+
+    @Test
+    public void testCreateGroup_withInitialMembers() {
+        // 准备：创建者 + 2 个初始成员，都是好友
+        ImGroupCreateReqVO reqVO = new ImGroupCreateReqVO();
+        reqVO.setName("测试群");
+        reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
+        when(groupMapper.insert(any(ImGroupDO.class))).thenAnswer(invocation -> {
+            ImGroupDO group = invocation.getArgument(0);
+            group.setId(100L);
+            return 1;
+        });
+        when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+                ImFriendDO.builder().userId(1L).friendUserId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                ImFriendDO.builder().userId(1L).friendUserId(3L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()
+        ));
+
+        // 调用
+        ImGroupDO result = groupService.createGroup(reqVO, 1L);
+
+        // 断言：群创建成功 + 创建者 + 初始成员都加入
+        assertEquals(100L, result.getId());
+        verify(groupMemberService).addGroupMember(100L, 1L, ImGroupMemberRoleEnum.OWNER.getRole());
+        verify(groupMemberService).addGroupMembers(eq(100L), anyCollection());
+        // 验证：推送 GROUP_CREATE 通知，payload memberUserIds 含全员（创建者 + 邀请）
+        ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+        verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+        assertEquals(ImMessageTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
+    }
+
+    @Test
+    public void testCreateGroup_initialMemberNotFriend() {
+        // 准备：初始成员里有非好友
+        ImGroupCreateReqVO reqVO = new ImGroupCreateReqVO();
+        reqVO.setName("测试群");
+        reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
+        // 只有 2 是好友，3 不是
+        when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+                ImFriendDO.builder().userId(1L).friendUserId(2L)
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+        AdminUserRespDTO u3 = new AdminUserRespDTO();
+        u3.setId(3L);
+        u3.setNickname("李四");
+        when(adminUserApi.getUserMap(anyCollection())).thenReturn(Map.of(3L, u3));
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupService.createGroup(reqVO, 1L));
+        assertEquals(GROUP_INVITE_NOT_FRIEND.getCode(), exception.getCode());
+        verify(groupMapper, never()).insert(any(ImGroupDO.class));
     }
 
     // ========== updateGroup ==========
@@ -122,13 +180,6 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).name("旧名字").ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
-            List<ImGroupMemberDO> members = List.of(
-                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
-                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build()
-            );
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(members);
 
             ImGroupUpdateReqVO reqVO = new ImGroupUpdateReqVO();
             reqVO.setId(10L);
@@ -140,8 +191,10 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 断言：更新了数据库
             verify(groupMapper).updateById(any(ImGroupDO.class));
             assertEquals("新名字", result.getName());
-            // 推送给所有成员
-            verify(webSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            // 推送 GROUP_NAME_UPDATE 通知给全员
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            assertEquals(ImMessageTypeEnum.GROUP_NAME_UPDATE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -164,10 +217,6 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()
             );
             when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(members);
-            AdminUserRespDTO user = new AdminUserRespDTO();
-            user.setId(1L);
-            user.setNickname("群主");
-            when(adminUserApi.getUser(1L)).thenReturn(user);
 
             // 调用
             groupService.dissolveGroup(10L, 1L);
@@ -179,9 +228,10 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             assertNotNull(captor.getValue().getDissolvedTime());
             verify(groupMemberService).removeGroupMembersByGroupId(10L);
             verify(groupMessageService).deleteReadMaxMessageIdMap(10L);
-            // 发送解散提示消息 + 推送群删除事件
-            verify(groupMessageService).sendTipGroupMessage(eq(1L), eq(10L), anySet(), anyString());
-            verify(webSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            // 推送 GROUP_DISSOLVE 通知（send-before-remove，sendGroupMessage 内部查 active 自动覆盖全员，含群主多端同步）
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            assertEquals(ImMessageTypeEnum.GROUP_DISSOLVE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -232,25 +282,16 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             );
             when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(friends);
 
-            // 用户昵称
-            AdminUserRespDTO u1 = new AdminUserRespDTO(); u1.setId(1L); u1.setNickname("群主");
-            AdminUserRespDTO u2 = new AdminUserRespDTO(); u2.setId(2L); u2.setNickname("张三");
-            AdminUserRespDTO u3 = new AdminUserRespDTO(); u3.setId(3L); u3.setNickname("李四");
-            Map<Long, AdminUserRespDTO> userMap23 = new HashMap<>();
-            userMap23.put(2L, u2);
-            userMap23.put(3L, u3);
-            Map<Long, AdminUserRespDTO> userMap1 = Map.of(1L, u1);
-            when(adminUserApi.getUserMap(List.of(2L, 3L))).thenReturn(userMap23);
-            when(adminUserApi.getUserMap(List.of(1L))).thenReturn(userMap1);
-
             // 调用
             groupService.inviteGroupMember(1L, reqVO);
 
-            // 断言：校验群成员 + 批量添加成员 + 推送事件 + 发送提示消息
+            // 断言：校验群成员 + 批量添加成员 + 推送 GROUP_MEMBER_INVITE 通知（被邀请人 bootstrap 由前端按 memberUserIds 自判，不再发 GROUP_CREATE）
             verify(groupMemberService).validateMemberInGroup(10L, 1L);
             verify(groupMemberService).addGroupMembers(eq(10L), anyCollection());
-            verify(webSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
-            verify(groupMessageService).sendTipGroupMessage(eq(1L), eq(10L), anySet(), anyString());
+            verify(webSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -383,8 +424,10 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             verify(groupMemberService).removeGroupMember(10L, 1L);
             verify(groupMessageService).deleteReadMaxMessageId(10L, 1L);
-            verify(groupMessageService).sendTipGroupMessage(eq(1L), eq(10L), anySet(), anyString());
-            verify(webSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            // 推送 GROUP_MEMBER_QUIT 通知给全员（含 quitter，前端自判清群）
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_QUIT.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -441,8 +484,10 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             verify(groupMemberService).removeGroupMembers(eq(10L), anyCollection());
             verify(groupMessageService).deleteReadMaxMessageIds(eq(10L), anyCollection());
-            verify(groupMessageService).sendTipGroupMessage(eq(1L), eq(10L), anySet(), anyString());
-            verify(webSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            // 推送 GROUP_MEMBER_KICK 通知给全员（含被踢者，前端自判清群）
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_KICK.getType(), dtoCaptor.getValue().getType());
         }
     }
 

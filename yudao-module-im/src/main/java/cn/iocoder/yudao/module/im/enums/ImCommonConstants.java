@@ -65,23 +65,4 @@ public interface ImCommonConstants {
      */
     String FRIEND_DELETE_TIP_MESSAGE = "你们的好友关系已被解除";
 
-    // ==================== 群相关提示消息 ====================
-
-    /**
-     * 群解散系统提示
-     */
-    String GROUP_DISSOLVE_TIP_MESSAGE = "\"{}\"解散了群聊";
-    /**
-     * 退群系统提示
-     */
-    String GROUP_QUIT_TIP_MESSAGE = "你已退出群聊";
-    /**
-     * 踢出群系统提示
-     */
-    String GROUP_REMOVE_TIP_MESSAGE = "你已被移出群聊";
-    /**
-     * 邀请入群系统提示
-     */
-    String GROUP_INVITE_TIP_MESSAGE = "\"{}\"邀请\"{}\"加入了群聊";
-
 }

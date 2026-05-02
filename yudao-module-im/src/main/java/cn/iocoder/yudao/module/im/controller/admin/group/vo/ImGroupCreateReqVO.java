@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Schema(description = "管理后台 - 群创建 Request VO")
 @Data
 public class ImGroupCreateReqVO {
@@ -11,5 +13,8 @@ public class ImGroupCreateReqVO {
     @Schema(description = "群名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道技术交流群")
     @NotBlank(message = "群名称不能为空")
     private String name;
+
+    @Schema(description = "初始成员用户编号列表（建群同时邀请的好友，不含创建者自己）", example = "[1024, 2048]")
+    private List<Long> memberUserIds;
 
 }

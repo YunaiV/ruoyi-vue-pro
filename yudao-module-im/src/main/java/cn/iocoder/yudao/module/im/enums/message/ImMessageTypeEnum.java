@@ -34,15 +34,132 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     TIP_TEXT(21, "系统提示", true, false), // 对应 TextMessage 类
 
     // ========== 好友变更 ==========
-    FRIEND_ADD(100, "好友添加", false, false), // 暂无
-    FRIEND_DELETE(101, "好友删除", false, false), // 暂无
-    FRIEND_UPDATE(102, "好友更新", false, false), // 暂无（客户端收到后自行拉取）
+    FRIEND_ADD(100, "好友添加", false, false), // 暂无对应类
+    FRIEND_DELETE(101, "好友删除", false, false), // 暂无对应类
+    FRIEND_UPDATE(102, "好友更新", false, false), // 暂无对应类（客户端收到后自行拉取）
 
-    // ========== 群变更 ==========
-    GROUP_CREATE(200, "群创建", false, false), // 暂无
-    GROUP_UPDATE(201, "群信息变更", false, false), // 暂无
-    GROUP_DELETE(202, "群删除", false, false), // 暂无（解散/退群/踢出均用此类型）
-    GROUP_MEMBER_UPDATE(203, "群成员信息变更", false, false); // 暂无（客户端收到后自行拉取）
+    // ========== 群事件（1501-1520 直接复用 OpenIM 段位编号；1530+ 我们独有扩展） ==========
+    // 1500 mirror OpenIM GroupNotificationBegin marker，不使用
+    /**
+     * 对应 OpenIM：sdkws.GroupCreatedTips（GroupCreatedNotification 1501）
+     * 对应自己的类：GroupCreateNotification
+     * 场景：用户创建群（同时邀请初始成员），全员广播（含创建者多端同步 + 初始成员）
+     */
+    GROUP_CREATE(1501, "群创建", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupInfoSetTips（GroupInfoSetNotification 1502，NAME / NOTICE 之外字段的 generic 兜底）
+     * 对应自己的类：GroupInfoUpdateNotification
+     * 场景：群主修改群头像 / 简介等字段后全员广播
+     */
+    GROUP_INFO_UPDATE(1502, "群信息变更", true, false),
+    /**
+     * 对应 OpenIM：sdkws.JoinGroupApplicationTips（JoinGroupApplicationNotification 1503）
+     * TODO @AI 未实现：入群申请；本期 §1.3 Tier 3 不在范围，预留段位以便未来对齐 OpenIM
+     */
+    GROUP_JOIN_APPLICATION(1503, "入群申请", true, false),
+    /**
+     * 对应 OpenIM：sdkws.MemberQuitTips（MemberQuitNotification 1504）
+     * 对应自己的类：GroupMemberQuitNotification
+     * 场景：成员主动退群（send-before-remove），全员广播（含 quitter）；quitter 自判 operatorUserId === self → removeGroup
+     */
+    GROUP_MEMBER_QUIT(1504, "成员退群", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupApplicationAcceptedTips（GroupApplicationAcceptedNotification 1505）
+     * TODO @AI 未实现：入群申请通过；本期 §1.3 Tier 3 不在范围
+     */
+    GROUP_APPLICATION_ACCEPTED(1505, "入群申请通过", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupApplicationRejectedTips（GroupApplicationRejectedNotification 1506）
+     * TODO @AI 未实现：入群申请拒绝；本期 §1.3 Tier 3 不在范围
+     */
+    GROUP_APPLICATION_REJECTED(1506, "入群申请拒绝", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupOwnerTransferredTips（GroupOwnerTransferredNotification 1507）
+     * 对应自己的类：GroupOwnerTransferNotification
+     * 场景：群主转让，全员广播；前端 transferOwner 把 ownerUserId 切到新值 + 旧群主 role → NORMAL / 新群主 role → OWNER
+     */
+    GROUP_OWNER_TRANSFER(1507, "群主转让", true, false),
+    /**
+     * 对应 OpenIM：sdkws.MemberKickedTips（MemberKickedNotification 1508）
+     * 对应自己的类：GroupMemberKickNotification
+     * 场景：群主 / 管理员移出成员（send-before-remove），全员广播（含被踢者）；被踢者自判 memberUserIds 含 self → removeGroup
+     */
+    GROUP_MEMBER_KICK(1508, "成员被移出", true, false),
+    /**
+     * 对应 OpenIM：sdkws.MemberInvitedTips（MemberInvitedNotification 1509）
+     * 对应自己的类：GroupMemberInviteNotification
+     * 场景：成员邀请新人入群，全员广播（含被邀请者）；被邀请人前端按 memberUserIds 含自己自判 fetchGroupInfo + fetchGroupMembers bootstrap
+     */
+    GROUP_MEMBER_INVITE(1509, "成员加入", true, false),
+    /**
+     * 对应 OpenIM：sdkws.MemberEnterTips（MemberEnterNotification 1510）
+     * TODO @AI 未实现：自由进群（链接 / 二维码进群）；本期 §1.3 Tier 3 不在范围
+     */
+    GROUP_MEMBER_ENTER(1510, "自由进群", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupDismissedTips（GroupDismissedNotification 1511）
+     * 对应自己的类：GroupDissolveNotification
+     * 场景：群主解散群（send-before-remove），全员广播（含群主多端同步）；前端 removeGroup 清群；离场用户离线 pull 通过 quit 路径（send_time < quit_time）也能拉到
+     */
+    GROUP_DISSOLVE(1511, "群解散", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupMemberMutedTips（GroupMemberMutedNotification 1512）
+     * TODO @AI 未实现：单成员禁言（管理员禁言某成员）；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     */
+    GROUP_MEMBER_MUTED(1512, "成员禁言", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupMemberCancelMutedTips（GroupMemberCancelMutedNotification 1513）
+     * TODO @AI 未实现：单成员取消禁言；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     */
+    GROUP_MEMBER_CANCEL_MUTED(1513, "成员取消禁言", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupMutedTips（GroupMutedNotification 1514）
+     * TODO @AI 未实现：全群禁言（管理员把整个群设为禁言状态，所有成员都不能发消息）；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     */
+    GROUP_MUTED(1514, "全群禁言", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupCancelMutedTips（GroupCancelMutedNotification 1515）
+     * TODO @AI 未实现：全群取消禁言；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     */
+    GROUP_CANCEL_MUTED(1515, "全群取消禁言", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupMemberInfoSetTips（GroupMemberInfoSetNotification 1516，窄化到 displayUserName）
+     * 对应自己的类：GroupMemberNicknameUpdateNotification
+     * 场景：成员修改自己在群里的昵称，全员广播；前端按 displayUserName 局部更新对应 member
+     */
+    GROUP_MEMBER_NICKNAME_UPDATE(1516, "成员昵称变更", true, false),
+    /**
+     * 对应 OpenIM：GroupMemberSetToAdminNotification 1517
+     * 对应自己的类：GroupAdminAddNotification
+     * 场景：群主设置管理员，全员广播；前端 updateMembersRole 把对应成员 role 提升为 ADMIN
+     */
+    GROUP_ADMIN_ADD(1517, "添加管理员", true, false),
+    /**
+     * 对应 OpenIM：GroupMemberSetToOrdinaryUserNotification 1518
+     * 对应自己的类：GroupAdminRemoveNotification
+     * 场景：群主撤销管理员，全员广播；前端 updateMembersRole 把对应成员 role 降级为 NORMAL
+     */
+    GROUP_ADMIN_REMOVE(1518, "撤销管理员", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupInfoSetAnnouncementTips（GroupInfoSetAnnouncementNotification 1519）
+     * 对应自己的类：GroupNoticeUpdateNotification
+     * 场景：群主修改群公告后全员广播
+     */
+    GROUP_NOTICE_UPDATE(1519, "群公告变更", true, false),
+    /**
+     * 对应 OpenIM：sdkws.GroupInfoSetNameTips（GroupInfoSetNameNotification 1520）
+     * 对应自己的类：GroupNameUpdateNotification
+     * 场景：群主修改群名后全员广播
+     */
+    GROUP_NAME_UPDATE(1520, "群名变更", true, false),
+
+    // 1530+ 我们独有扩展段（OpenIM 1500-1520 段位无对应物）
+    /**
+     * 对应 OpenIM：无直接对应（OpenIM 走 ConversationChangeNotification 1300 单聊路径）
+     * 对应自己的类：GroupMemberSettingUpdateNotification
+     * 场景：用户改自己的群免打扰 / 群备注，仅推该用户其他在线终端做多端同步
+     */
+    GROUP_MEMBER_SETTING_UPDATE(1530, "群成员个人设置变更", false, false);
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

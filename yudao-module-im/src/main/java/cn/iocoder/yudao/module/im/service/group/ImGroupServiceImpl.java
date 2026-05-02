@@ -8,13 +8,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
@@ -25,8 +22,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
-import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -66,8 +62,6 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Resource
     @Lazy // 避免循环依赖
     private ImGroupMessageService groupMessageService;
-    @Resource
-    private ImWebSocketService webSocketService;
 
     @Resource
     private ImFriendService friendService;
@@ -80,17 +74,39 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ImGroupDO createGroup(ImGroupCreateReqVO createReqVO, Long userId) {
-        // 1. 插入群记录
+        // 1.1 处理初始成员列表（去重 + 排除创建者自己）
+        Set<Long> initialMemberUserIds = createReqVO.getMemberUserIds() == null
+                ? new HashSet<>() : new HashSet<>(createReqVO.getMemberUserIds());
+        initialMemberUserIds.remove(userId);
+        // 1.2 校验初始成员都是创建者的好友
+        if (CollUtil.isNotEmpty(initialMemberUserIds)) {
+            List<ImFriendDO> friends = friendService.getActiveFriendList(userId, initialMemberUserIds);
+            Set<Long> friendUserIds = convertSet(friends, ImFriendDO::getFriendUserId);
+            Collection<Long> notFriendUserIds = CollUtil.subtract(initialMemberUserIds, friendUserIds);
+            if (CollUtil.isNotEmpty(notFriendUserIds)) {
+                throw exception(GROUP_INVITE_NOT_FRIEND, getUserNicknames(notFriendUserIds));
+            }
+        }
+        // 1.3 校验群人数上限（创建者 + 初始成员 ≤ MAX_GROUP_MEMBER）
+        if (initialMemberUserIds.size() + 1 > MAX_GROUP_MEMBER) {
+            throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
+        }
+
+        // 2.1 插入群记录
         ImGroupDO group = BeanUtils.toBean(createReqVO, ImGroupDO.class)
                 .setOwnerUserId(userId).setStatus(CommonStatusEnum.ENABLE.getStatus());
         groupMapper.insert(group);
-
-        // 2. 将群主插入为群成员；显式 setRole(OWNER) 避免依赖 DDL DEFAULT 把群主行误认成 MEMBER
+        // 2.2 创建者作为 OWNER 入群
         groupMemberService.addGroupMember(group.getId(), userId, ImGroupMemberRoleEnum.OWNER.getRole());
+        // 2.3 批量添加初始成员
+        if (CollUtil.isNotEmpty(initialMemberUserIds)) {
+            groupMemberService.addGroupMembers(group.getId(), initialMemberUserIds);
+        }
 
-        // 3. 推送群创建事件给群主（多端同步）
-        webSocketService.sendGroupMessageAsync(userId,
-                ImGroupMessageDTO.ofGroupCreate(userId, group.getId()));
+        // 3. 推送 GROUP_CREATE 通知给全员（含创建者多端同步 + 初始成员）
+        List<Long> allMemberUserIds = CollectionUtils.of(userId, initialMemberUserIds);
+        groupMessageService.sendGroupMessage(userId, allMemberUserIds,
+                ImGroupMessageSendDTO.ofGroupCreate(group.getId(), userId, allMemberUserIds));
         return group;
     }
 
@@ -98,23 +114,34 @@ public class ImGroupServiceImpl implements ImGroupService {
     @CacheEvict(cacheNames = GROUP, key = "#updateReqVO.id")
     @Transactional(rollbackFor = Exception.class)
     public ImGroupDO updateGroup(ImGroupUpdateReqVO updateReqVO, Long userId) {
-        // 1.1 校验群存在
+        // 1.1 校验群存在：group 留作老值备份，通知里 oldXXX 字段从这里取
         ImGroupDO group = validateGroupExists(updateReqVO.getId());
         // 1.2 校验操作人是群主
         if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
             throw exception(GROUP_NOT_OWNER);
         }
 
-        // 2. 更新数据库
-        ImGroupDO updateObj = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
-        groupMapper.updateById(updateObj);
-        BeanUtil.copyProperties(updateReqVO, group, CopyOptions.create().ignoreNullValue());
+        // 2. 更新数据库（newGroup 仅含变更字段）
+        ImGroupDO newGroup = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
+        groupMapper.updateById(newGroup);
 
-        // 3. 群信息的变更，推送给所有群成员
-        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(group.getId());
-        Set<Long> memberUserIds = convertSet(members, ImGroupMemberDO::getUserId);
-        webSocketService.sendGroupMessageAsync(memberUserIds,
-                ImGroupMessageDTO.ofGroupUpdate(userId, group.getId()));
+        // 3. 按变更字段分别推送 GROUP_NAME / NOTICE / INFO_UPDATE 通知
+        Long groupId = group.getId();
+        if (StrUtil.isNotEmpty(updateReqVO.getName())) {
+            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupNameUpdate(
+                    groupId, userId, group.getName(), updateReqVO.getName()));
+        }
+        if (updateReqVO.getNotice() != null) {
+            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupNoticeUpdate(
+                    groupId, userId, group.getNotice(), updateReqVO.getNotice()));
+        }
+        if (StrUtil.isNotEmpty(updateReqVO.getAvatar())) {
+            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupInfoUpdate(
+                    groupId, userId, group.getAvatar(), updateReqVO.getAvatar()));
+        }
+
+        // 4. 返回合并后的新群信息（updateReqVO 非空字段覆盖 group）
+        BeanUtil.copyProperties(updateReqVO, group, CopyOptions.create().ignoreNullValue());
         return group;
     }
 
@@ -125,24 +152,16 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 1. 校验群存在 + 当前用户是群主
         validateGroupOwner(id, userId);
 
-        // 2.1 获取群成员列表（在移除之前，后续推送需要）
-        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByGroupId(id);
-        Set<Long> memberUserIds = convertSet(members, ImGroupMemberDO::getUserId);
-        // 2.2 更新群状态为已解散
+        // 2. 先发 GROUP_DISSOLVE 通知：放在成员移除前，sendGroupMessage 才能查到全员
+        groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupDissolve(id, userId));
+
+        // 3.1 更新群状态为已解散
         groupMapper.updateById(new ImGroupDO().setId(id)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDissolvedTime(LocalDateTime.now()));
-        // 2.3 移除全部群成员
+        // 3.2 移除全部群成员
         groupMemberService.removeGroupMembersByGroupId(id);
-        // 2.4 清理已读缓存
+        // 3.3 清理已读缓存
         groupMessageService.deleteReadMaxMessageIdMap(id);
-
-        // 3.1 发送解散提示消息（TIP_TEXT）并推送
-        AdminUserRespDTO user = adminUserApi.getUser(userId);
-        String tipContent = StrUtil.format(GROUP_DISSOLVE_TIP_MESSAGE, user.getNickname());
-        groupMessageService.sendTipGroupMessage(userId, id, memberUserIds, tipContent);
-        // 3.2 推送群删除事件给所有原群成员
-        webSocketService.sendGroupMessageAsync(memberUserIds,
-                ImGroupMessageDTO.ofGroupDelete(userId, id));
     }
 
     // ==================== 群成员的写操作 ====================
@@ -175,15 +194,9 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 2. 批量添加群成员
         groupMemberService.addGroupMembers(groupId, memberUserIds);
 
-        // 3.1 推送群创建事件给被邀请人（让客户端新增群会话）
-        webSocketService.sendGroupMessageAsync(new HashSet<>(memberUserIds),
-                ImGroupMessageDTO.ofGroupCreate(userId, groupId));
-        // 3.2 发送邀请提示消息给所有群成员
-        String tipContent = StrUtil.format(GROUP_INVITE_TIP_MESSAGE,
-                getUserNicknames(List.of(userId)), getUserNicknames(memberUserIds));
-        List<ImGroupMemberDO> allMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
-        Set<Long> allMemberUserIds = convertSet(allMembers, ImGroupMemberDO::getUserId);
-        groupMessageService.sendTipGroupMessage(userId, groupId, allMemberUserIds, tipContent);
+        // 3. 发 GROUP_MEMBER_INVITE 通知给全员；新成员已 ENABLE，sendGroupMessage 查到的 active 自然包含
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupMemberInvite(groupId, userId, memberUserIds));
     }
 
     @Override
@@ -195,16 +208,13 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_OWNER_CANNOT_QUIT);
         }
 
-        // 3.1 移除群成员
-        groupMemberService.removeGroupMember(groupId, userId);
-        // 3.2 清理已读缓存
-        groupMessageService.deleteReadMaxMessageId(groupId, userId);
+        // 3. 先发 GROUP_MEMBER_QUIT 通知：放在 quitter 移除前，sendGroupMessage 才能查到全员（含 quitter）
+        groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberQuit(groupId, userId));
 
-        // 4.1 发送退群提示消息（TIP_TEXT）
-        groupMessageService.sendTipGroupMessage(userId, groupId, Set.of(userId), GROUP_QUIT_TIP_MESSAGE);
-        // 4.2 推送群删除事件
-        webSocketService.sendGroupMessageAsync(Set.of(userId),
-                ImGroupMessageDTO.ofGroupDelete(userId, groupId));
+        // 4.1 移除群成员
+        groupMemberService.removeGroupMember(groupId, userId);
+        // 4.2 清理已读缓存
+        groupMessageService.deleteReadMaxMessageId(groupId, userId);
     }
 
     @Override
@@ -229,16 +239,14 @@ public class ImGroupServiceImpl implements ImGroupService {
             }
         }
 
-        // 2.1 批量移除群成员
-        groupMemberService.removeGroupMembers(groupId, targetUserIds);
-        // 2.2 批量清理已读缓存
-        groupMessageService.deleteReadMaxMessageIds(groupId, targetUserIds);
+        // 2. 先发 GROUP_MEMBER_KICK 通知：放在被踢者移除前，sendGroupMessage 才能查到全员（含被踢者）
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, new ArrayList<>(targetUserIds)));
 
-        // 3.1 发送移出提示消息（TIP_TEXT）
-        groupMessageService.sendTipGroupMessage(userId, groupId, targetUserIds, GROUP_REMOVE_TIP_MESSAGE);
-        // 3.2 推送群删除事件
-        webSocketService.sendGroupMessageAsync(targetUserIds,
-                ImGroupMessageDTO.ofGroupDelete(userId, groupId));
+        // 3.1 批量移除群成员
+        groupMemberService.removeGroupMembers(groupId, targetUserIds);
+        // 3.2 批量清理已读缓存
+        groupMessageService.deleteReadMaxMessageIds(groupId, targetUserIds);
     }
 
     @Override
@@ -268,6 +276,10 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 2. 批量更新角色
         groupMemberService.updateGroupMemberRole(groupId, changedUserIds, ImGroupMemberRoleEnum.ADMIN.getRole());
+
+        // 3. 推送 GROUP_ADMIN_ADD 通知给全员
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupAdminAdd(groupId, userId, new ArrayList<>(changedUserIds)));
     }
 
     @Override
@@ -291,6 +303,10 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 2. 批量更新角色
         groupMemberService.updateGroupMemberRole(groupId, changedUserIds, ImGroupMemberRoleEnum.NORMAL.getRole());
+
+        // 3. 推送 GROUP_ADMIN_REMOVE 通知给全员
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupAdminRemove(groupId, userId, new ArrayList<>(changedUserIds)));
     }
 
     /**
@@ -328,6 +344,10 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 2.2 旧群主 role → MEMBER；新群主 role → OWNER
         groupMemberService.updateGroupMemberRole(groupId, Set.of(userId), ImGroupMemberRoleEnum.NORMAL.getRole());
         groupMemberService.updateGroupMemberRole(groupId, Set.of(newOwner.getUserId()), ImGroupMemberRoleEnum.OWNER.getRole());
+
+        // 3. 推送 GROUP_OWNER_TRANSFER 通知给全员
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupOwnerTransfer(groupId, userId, newOwnerUserId));
     }
 
     // ==================== 群的读操作 ====================

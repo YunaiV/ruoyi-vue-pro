@@ -372,4 +372,11 @@ public class CollectionUtils {
         return false;
     }
 
+    public static <T> List<T> of(T t, Collection<T> ts) {
+        List<T> list = new ArrayList<>();
+        list.add(t);
+        CollUtil.addAll(list, ts);
+        return list;
+    }
+
 }

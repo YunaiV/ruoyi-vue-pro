@@ -1017,41 +1017,15 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testSendGroupMessage_threeArg_explicitTargetsBypassActiveMembers() {
-        // 准备：调用方传入显式 targets（覆盖跨成员 disable 边界场景：解散 / 退群 / 踢人）
+        // 准备：调用方传入显式 targets（解散场景成员已被批量 DISABLE，必须按移除前快照推送）
         Set<Long> targets = Set.of(1L, 2L, 3L);
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent("解散通知");
+                .setGroupId(10L).setType(ImMessageTypeEnum.GROUP_DISSOLVE.getType()).setContent("{}");
 
         groupMessageService.sendGroupMessage(1L, targets, dto);
 
         // 断言：不读取 active members，按调用方 targets 推送
         verify(groupMemberService, never()).getActiveGroupMemberUserIdsByGroupId(anyLong());
-        verify(imWebSocketService).sendGroupMessageAsync(eq(targets), any(ImGroupMessageDTO.class));
-    }
-
-    // ========== sendTipGroupMessage ==========
-
-    @Test
-    public void testSendTipGroupMessage_success() {
-        // 准备
-        Set<Long> targets = Set.of(1L, 2L, 3L);
-
-        // 调用
-        groupMessageService.sendTipGroupMessage(1L, 10L, targets, "张三加入了群聊");
-
-        // 断言：插入一条 TIP_TEXT 提示消息
-        ArgumentCaptor<ImGroupMessageDO> msgCaptor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
-        verify(groupMessageMapper).insert(msgCaptor.capture());
-        ImGroupMessageDO tip = msgCaptor.getValue();
-        assertEquals(1L, tip.getSenderId());
-        assertEquals(10L, tip.getGroupId());
-        assertEquals(ImMessageTypeEnum.TIP_TEXT.getType(), tip.getType());
-        assertEquals("张三加入了群聊", tip.getContent());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), tip.getStatus());
-        assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), tip.getReceiptStatus());
-        assertNotNull(tip.getClientMessageId());
-        assertNotNull(tip.getSendTime());
-        // 断言：推送给指定用户集合
         verify(imWebSocketService).sendGroupMessageAsync(eq(targets), any(ImGroupMessageDTO.class));
     }
 
