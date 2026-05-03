@@ -2,15 +2,8 @@ package cn.iocoder.yudao.module.im.controller.admin.group;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupMessagePinReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageRespVO;
@@ -28,17 +21,11 @@ import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 群")
@@ -175,25 +162,21 @@ public class ImGroupController {
         if (CollUtil.isEmpty(groups)) {
             return Collections.emptyList();
         }
-        // 仅当前用户是有效成员的群才允许回填置顶消息（按 groupId 一次性 IN 查成员关系）
+        // 仅当前用户是有效成员的群才允许回填置顶消息
         Set<Long> activeGroupIds = convertSet(
                 groupMemberService.getActiveGroupMemberListByUserId(loginUserId), ImGroupMemberDO::getGroupId);
-        // 把 active 群的 pinnedMessageIds 一次性聚合 IN 查询，避免 N+1
         Set<Long> allMessageIds = convertSetByFlatMap(groups, group -> activeGroupIds.contains(group.getId())
                 ? CollUtil.emptyIfNull(group.getPinnedMessageIds()).stream() : Stream.empty());
         Map<Long, ImGroupMessageDO> messageMap = groupMessageService.getGroupMessageMap(allMessageIds);
-        return CollectionUtils.convertList(groups, group -> {
+        // 转换输出
+        return convertList(groups, group -> {
             ImGroupRespVO vo = BeanUtils.toBean(group, ImGroupRespVO.class);
             if (!activeGroupIds.contains(group.getId()) || CollUtil.isEmpty(group.getPinnedMessageIds())) {
                 return vo;
             }
             // 按 pin 顺序输出，已被删除的消息（messageMap 没命中）跳过
-            // TODO @AI：使用 CollUtils convert 进一步简化。
-            List<ImGroupMessageRespVO> pinned = group.getPinnedMessageIds().stream()
-                    .map(messageMap::get).filter(Objects::nonNull)
-                    .map(msg -> BeanUtils.toBean(msg, ImGroupMessageRespVO.class))
-                    .collect(Collectors.toList());
-            return vo.setPinnedMessages(pinned);
+            List<ImGroupMessageDO> pinnedMesages = convertList(group.getPinnedMessageIds(), messageMap::get);
+            return vo.setPinnedMessages(BeanUtils.toBean(pinnedMesages, ImGroupMessageRespVO.class));
         });
     }
 

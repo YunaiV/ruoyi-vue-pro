@@ -64,8 +64,7 @@ public class ImGroupMessageController {
         return success(BeanUtils.toBean(message, ImGroupMessageRespVO.class));
     }
 
-    // TODO @AI：改成 get-read-user-ids
-    @GetMapping("/read-users")
+    @GetMapping("/get-read-user-ids")
     @Operation(summary = "获取群消息已读用户列表")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1")
     @Parameter(name = "messageId", description = "消息编号", required = true, example = "1")
