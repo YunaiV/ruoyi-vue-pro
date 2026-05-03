@@ -10,7 +10,11 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
@@ -45,7 +49,7 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
- * 群 Service 实现类
+ * 用户群 Service 实现类
  *
  * @author 芋道源码
  */
@@ -125,19 +129,26 @@ public class ImGroupServiceImpl implements ImGroupService {
         ImGroupDO newGroup = BeanUtils.toBean(updateReqVO, ImGroupDO.class);
         groupMapper.updateById(newGroup);
 
-        // 3. 按变更字段分别推送 GROUP_NAME / NOTICE / INFO_UPDATE 通知
+        // 3. 按变更字段分别推送 GROUP_NAME / NOTICE / INFO_UPDATE 通知；活跃成员只查一次复用，避免 3 次 Redis GET
+        // name / avatar 不允许空串（业务上必须非空），notice 允许空串（清空公告也是有效操作）
         Long groupId = group.getId();
-        if (StrUtil.isNotEmpty(updateReqVO.getName())) {
-            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupNameUpdate(
-                    groupId, userId, group.getName(), updateReqVO.getName()));
-        }
-        if (updateReqVO.getNotice() != null) {
-            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupNoticeUpdate(
-                    groupId, userId, group.getNotice(), updateReqVO.getNotice()));
-        }
-        if (StrUtil.isNotEmpty(updateReqVO.getAvatar())) {
-            groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupInfoUpdate(
-                    groupId, userId, group.getAvatar(), updateReqVO.getAvatar()));
+        boolean nameChanged = StrUtil.isNotEmpty(updateReqVO.getName());
+        boolean noticeChanged = updateReqVO.getNotice() != null;
+        boolean avatarChanged = StrUtil.isNotEmpty(updateReqVO.getAvatar());
+        if (nameChanged || noticeChanged || avatarChanged) {
+            List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(groupId);
+            if (nameChanged) {
+                groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupNameUpdate(
+                        groupId, userId, group.getName(), updateReqVO.getName()));
+            }
+            if (noticeChanged) {
+                groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupNoticeUpdate(
+                        groupId, userId, group.getNotice(), updateReqVO.getNotice()));
+            }
+            if (avatarChanged) {
+                groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupInfoUpdate(
+                        groupId, userId, group.getAvatar(), updateReqVO.getAvatar()));
+            }
         }
 
         // 4. 返回合并后的新群信息（updateReqVO 非空字段覆盖 group）
@@ -194,8 +205,10 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 2. 批量添加群成员
         groupMemberService.addGroupMembers(groupId, memberUserIds);
 
-        // 3. 发 GROUP_MEMBER_INVITE 通知给全员；新成员已 ENABLE，sendGroupMessage 查到的 active 自然包含
-        groupMessageService.sendGroupMessage(userId,
+        // 3. 发 GROUP_MEMBER_INVITE 通知给全员；本地拼 receivers（已查的 active + 新邀请）避免缓存刚 evict 后强制走 DB
+        Set<Long> allReceivers = new HashSet<>(memberUserIds);
+        activeMembers.forEach(member -> allReceivers.add(member.getUserId()));
+        groupMessageService.sendGroupMessage(userId, allReceivers,
                 ImGroupMessageSendDTO.ofGroupMemberInvite(groupId, userId, memberUserIds));
     }
 
@@ -208,7 +221,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_OWNER_CANNOT_QUIT);
         }
 
-        // 3. 先发 GROUP_MEMBER_QUIT 通知：放在 quitter 移除前，sendGroupMessage 才能查到全员（含 quitter）
+        // 3. 先发广播，后移成员（见类 javadoc）
         groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberQuit(groupId, userId));
 
         // 4.1 移除群成员
@@ -241,7 +254,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 2. 先发 GROUP_MEMBER_KICK 通知：放在被踢者移除前，sendGroupMessage 才能查到全员（含被踢者）
         groupMessageService.sendGroupMessage(userId,
-                ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, new ArrayList<>(targetUserIds)));
+                ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, targetUserIds));
 
         // 3.1 批量移除群成员
         groupMemberService.removeGroupMembers(groupId, targetUserIds);
@@ -279,7 +292,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 3. 推送 GROUP_ADMIN_ADD 通知给全员
         groupMessageService.sendGroupMessage(userId,
-                ImGroupMessageSendDTO.ofGroupAdminAdd(groupId, userId, new ArrayList<>(changedUserIds)));
+                ImGroupMessageSendDTO.ofGroupAdminAdd(groupId, userId, changedUserIds));
     }
 
     @Override
@@ -306,7 +319,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 3. 推送 GROUP_ADMIN_REMOVE 通知给全员
         groupMessageService.sendGroupMessage(userId,
-                ImGroupMessageSendDTO.ofGroupAdminRemove(groupId, userId, new ArrayList<>(changedUserIds)));
+                ImGroupMessageSendDTO.ofGroupAdminRemove(groupId, userId, changedUserIds));
     }
 
     /**

@@ -4,20 +4,18 @@ import lombok.Data;
 
 /**
  * 群成员个人设置变更事件通知（个人多端同步）
+ * <p>
+ * muted / groupRemark 字段 null 表示本次未变更，前端按非 null 局部更新
  */
 @Data
-public class GroupMemberSettingUpdateNotification {
+public class GroupMemberSettingUpdateNotification extends BaseGroupNotification {
 
     /**
-     * 操作人（设置变更者本人）用户编号
-     */
-    private Long operatorUserId;
-    /**
-     * 群免打扰，null 表示本次未变更
+     * 群免打扰
      */
     private Boolean muted;
     /**
-     * 群备注，null 表示本次未变更
+     * 群备注
      */
     private String groupRemark;
 

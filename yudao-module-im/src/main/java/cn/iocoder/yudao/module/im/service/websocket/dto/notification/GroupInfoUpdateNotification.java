@@ -3,15 +3,11 @@ package cn.iocoder.yudao.module.im.service.websocket.dto.notification;
 import lombok.Data;
 
 /**
- * 群信息变更事件通知（NAME / NOTICE 之外字段的兜底）
+ * 群信息变更事件通知（当前承载头像变更，NAME / NOTICE 走独立事件）
  */
 @Data
-public class GroupInfoUpdateNotification {
+public class GroupInfoUpdateNotification extends BaseGroupNotification {
 
-    /**
-     * 操作人用户编号
-     */
-    private Long operatorUserId;
     /**
      * 旧群头像
      */

@@ -6,12 +6,8 @@ import lombok.Data;
  * 群名变更事件通知
  */
 @Data
-public class GroupNameUpdateNotification {
+public class GroupNameUpdateNotification extends BaseGroupNotification {
 
-    /**
-     * 操作人用户编号
-     */
-    private Long operatorUserId;
     /**
      * 旧群名
      */

@@ -39,7 +39,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     FRIEND_UPDATE(102, "好友更新", false, false), // 暂无对应类（客户端收到后自行拉取）
 
     // ========== 群事件（1501-1520 直接复用 OpenIM 段位编号；1530+ 我们独有扩展） ==========
-    // 1500 mirror OpenIM GroupNotificationBegin marker，不使用
+    // 1500 对应 OpenIM GroupNotificationBegin 起始位，仅作占位，不使用
     /**
      * 对应 OpenIM：sdkws.GroupCreatedTips（GroupCreatedNotification 1501）
      * 对应自己的类：GroupCreateNotification
@@ -54,7 +54,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_INFO_UPDATE(1502, "群信息变更", true, false),
     /**
      * 对应 OpenIM：sdkws.JoinGroupApplicationTips（JoinGroupApplicationNotification 1503）
-     * TODO @AI 未实现：入群申请；本期 §1.3 Tier 3 不在范围，预留段位以便未来对齐 OpenIM
+     * TODO @AI 未实现：入群申请；本期不在范围，预留段位以便未来对齐 OpenIM
      */
     GROUP_JOIN_APPLICATION(1503, "入群申请", true, false),
     /**
@@ -65,12 +65,12 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_MEMBER_QUIT(1504, "成员退群", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupApplicationAcceptedTips（GroupApplicationAcceptedNotification 1505）
-     * TODO @AI 未实现：入群申请通过；本期 §1.3 Tier 3 不在范围
+     * TODO @AI 未实现：入群申请通过；本期不在范围
      */
     GROUP_APPLICATION_ACCEPTED(1505, "入群申请通过", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupApplicationRejectedTips（GroupApplicationRejectedNotification 1506）
-     * TODO @AI 未实现：入群申请拒绝；本期 §1.3 Tier 3 不在范围
+     * TODO @AI 未实现：入群申请拒绝；本期不在范围
      */
     GROUP_APPLICATION_REJECTED(1506, "入群申请拒绝", true, false),
     /**
@@ -93,7 +93,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_MEMBER_INVITE(1509, "成员加入", true, false),
     /**
      * 对应 OpenIM：sdkws.MemberEnterTips（MemberEnterNotification 1510）
-     * TODO @AI 未实现：自由进群（链接 / 二维码进群）；本期 §1.3 Tier 3 不在范围
+     * TODO @AI 未实现：自由进群（链接 / 二维码进群）；本期不在范围
      */
     GROUP_MEMBER_ENTER(1510, "自由进群", true, false),
     /**
@@ -104,22 +104,22 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_DISSOLVE(1511, "群解散", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupMemberMutedTips（GroupMemberMutedNotification 1512）
-     * TODO @AI 未实现：单成员禁言（管理员禁言某成员）；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     * TODO @AI 未实现：单成员禁言（管理员禁言某成员）；本期发版要实现
      */
     GROUP_MEMBER_MUTED(1512, "成员禁言", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupMemberCancelMutedTips（GroupMemberCancelMutedNotification 1513）
-     * TODO @AI 未实现：单成员取消禁言；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     * TODO @AI 未实现：单成员取消禁言；本期发版要实现
      */
     GROUP_MEMBER_CANCEL_MUTED(1513, "成员取消禁言", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupMutedTips（GroupMutedNotification 1514）
-     * TODO @AI 未实现：全群禁言（管理员把整个群设为禁言状态，所有成员都不能发消息）；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     * TODO @AI 未实现：全群禁言（管理员把整个群设为禁言状态，所有成员都不能发消息）；本期发版要实现
      */
     GROUP_MUTED(1514, "全群禁言", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupCancelMutedTips（GroupCancelMutedNotification 1515）
-     * TODO @AI 未实现：全群取消禁言；本期 §1.3 Tier 3 不在范围【这个本期发版，是要实现的】
+     * TODO @AI 未实现：全群取消禁言；本期发版要实现
      */
     GROUP_CANCEL_MUTED(1515, "全群取消禁言", true, false),
     /**

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 群 Service 接口
+ * 用户群群 Service 接口
  *
  * @author 芋道源码
  */

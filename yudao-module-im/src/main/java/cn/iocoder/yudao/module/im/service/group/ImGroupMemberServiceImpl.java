@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberUpdateReqVO;
@@ -23,7 +23,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP_MEMBER_IDS;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
@@ -215,13 +216,18 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 .setId(member.getId());
         groupMemberMapper.updateById(updateObj);
 
-        // 3.1 displayUserName 是公开字段，单独走 GROUP_MEMBER_NICKNAME_UPDATE 广播给全员
-        if (StrUtil.isNotEmpty(updateReqVO.getDisplayUserName())) {
+        // 3.1 displayUserName 是公开字段，单独走 GROUP_MEMBER_NICKNAME_UPDATE 广播给全员；空串视为「清空昵称」也要广播；与旧值相同跳过
+        if (updateReqVO.getDisplayUserName() != null
+                && ObjUtil.notEqual(updateReqVO.getDisplayUserName(), member.getDisplayUserName())) {
             groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberNicknameUpdate(
                     groupId, userId, updateReqVO.getDisplayUserName()));
         }
-        // 3.2 muted / groupRemark 是个人字段，target 显式指定为自己仅推自己多端同步；payload 携带变更字段，前端按非 null 局部更新
-        if (updateReqVO.getMuted() != null || updateReqVO.getGroupRemark() != null) {
+        // 3.2 muted / groupRemark 是个人字段，仅推自己做多端同步；与旧值都相同跳过
+        boolean mutedChanged = updateReqVO.getMuted() != null
+                && ObjUtil.notEqual(updateReqVO.getMuted(), member.getMuted());
+        boolean groupRemarkChanged = updateReqVO.getGroupRemark() != null
+                && ObjUtil.notEqual(updateReqVO.getGroupRemark(), member.getGroupRemark());
+        if (mutedChanged || groupRemarkChanged) {
             groupMessageService.sendGroupMessage(userId, List.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
                     groupId, userId, updateReqVO.getMuted(), updateReqVO.getGroupRemark()));
         }

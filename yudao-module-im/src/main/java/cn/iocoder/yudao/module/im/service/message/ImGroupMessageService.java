@@ -30,7 +30,9 @@ public interface ImGroupMessageService {
     ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO);
 
     /**
-     * 【系统调用】发送群聊消息：自动算可见用户 + 推送
+     * 【系统调用】发送群聊消息：内部查 active 成员 + 推送
+     * <p>
+     * 调用方批量调用会触发多次 active 成员查询；如果调用方已经持有成员快照，优先使用 {@link #sendGroupMessage(Long, Collection, ImGroupMessageSendDTO)} 方法，避免重复查询。
      *
      * @param senderId 发送人编号
      * @param dto      消息 DTO

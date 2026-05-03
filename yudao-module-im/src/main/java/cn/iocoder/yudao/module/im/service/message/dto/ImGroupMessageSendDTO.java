@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.im.service.websocket.dto.notification.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -52,93 +54,108 @@ public class ImGroupMessageSendDTO {
 
     // ========== 群广播事件静态工厂（对应 ImMessageTypeEnum 群事件） ==========
 
-    public static ImGroupMessageSendDTO ofGroupCreate(Long groupId, Long operatorUserId, List<Long> memberUserIds) {
-        GroupCreateNotification notification = new GroupCreateNotification()
-                .setOperatorUserId(operatorUserId).setMemberUserIds(memberUserIds);
+    public static ImGroupMessageSendDTO ofGroupCreate(Long groupId, Long operatorUserId, Collection<Long> memberUserIds) {
+        GroupCreateNotification notification = new GroupCreateNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMemberUserIds(new ArrayList<>(memberUserIds));
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_CREATE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupInfoUpdate(Long groupId, Long operatorUserId, String oldAvatar, String newAvatar) {
-        GroupInfoUpdateNotification notification = new GroupInfoUpdateNotification()
-                .setOperatorUserId(operatorUserId).setOldAvatar(oldAvatar).setNewAvatar(newAvatar);
+        GroupInfoUpdateNotification notification = new GroupInfoUpdateNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setOldAvatar(oldAvatar);
+        notification.setNewAvatar(newAvatar);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_INFO_UPDATE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupMemberQuit(Long groupId, Long operatorUserId) {
-        GroupMemberQuitNotification notification = new GroupMemberQuitNotification()
-                .setOperatorUserId(operatorUserId);
+        GroupMemberQuitNotification notification = new GroupMemberQuitNotification();
+        notification.setOperatorUserId(operatorUserId);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_QUIT.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupOwnerTransfer(Long groupId, Long operatorUserId, Long newOwnerUserId) {
-        GroupOwnerTransferNotification notification = new GroupOwnerTransferNotification()
-                .setOperatorUserId(operatorUserId).setNewOwnerUserId(newOwnerUserId);
+        GroupOwnerTransferNotification notification = new GroupOwnerTransferNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setNewOwnerUserId(newOwnerUserId);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_OWNER_TRANSFER.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupMemberKick(Long groupId, Long operatorUserId, List<Long> memberUserIds) {
-        GroupMemberKickNotification notification = new GroupMemberKickNotification()
-                .setOperatorUserId(operatorUserId).setMemberUserIds(memberUserIds);
+    public static ImGroupMessageSendDTO ofGroupMemberKick(Long groupId, Long operatorUserId, Collection<Long> memberUserIds) {
+        GroupMemberKickNotification notification = new GroupMemberKickNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMemberUserIds(new ArrayList<>(memberUserIds));
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_KICK.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupMemberInvite(Long groupId, Long operatorUserId, List<Long> memberUserIds) {
-        GroupMemberInviteNotification notification = new GroupMemberInviteNotification()
-                .setOperatorUserId(operatorUserId).setMemberUserIds(memberUserIds);
+    public static ImGroupMessageSendDTO ofGroupMemberInvite(Long groupId, Long operatorUserId, Collection<Long> memberUserIds) {
+        GroupMemberInviteNotification notification = new GroupMemberInviteNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMemberUserIds(new ArrayList<>(memberUserIds));
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_INVITE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupDissolve(Long groupId, Long operatorUserId) {
-        GroupDissolveNotification notification = new GroupDissolveNotification()
-                .setOperatorUserId(operatorUserId);
+        GroupDissolveNotification notification = new GroupDissolveNotification();
+        notification.setOperatorUserId(operatorUserId);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_DISSOLVE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupMemberNicknameUpdate(Long groupId, Long operatorUserId, String displayUserName) {
-        GroupMemberNicknameUpdateNotification notification = new GroupMemberNicknameUpdateNotification()
-                .setOperatorUserId(operatorUserId).setDisplayUserName(displayUserName);
+        GroupMemberNicknameUpdateNotification notification = new GroupMemberNicknameUpdateNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setDisplayUserName(displayUserName);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_NICKNAME_UPDATE.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupAdminAdd(Long groupId, Long operatorUserId, List<Long> memberUserIds) {
-        GroupAdminAddNotification notification = new GroupAdminAddNotification()
-                .setOperatorUserId(operatorUserId).setMemberUserIds(memberUserIds);
+    public static ImGroupMessageSendDTO ofGroupAdminAdd(Long groupId, Long operatorUserId, Collection<Long> memberUserIds) {
+        GroupAdminAddNotification notification = new GroupAdminAddNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMemberUserIds(new ArrayList<>(memberUserIds));
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_ADMIN_ADD.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupAdminRemove(Long groupId, Long operatorUserId, List<Long> memberUserIds) {
-        GroupAdminRemoveNotification notification = new GroupAdminRemoveNotification()
-                .setOperatorUserId(operatorUserId).setMemberUserIds(memberUserIds);
+    public static ImGroupMessageSendDTO ofGroupAdminRemove(Long groupId, Long operatorUserId, Collection<Long> memberUserIds) {
+        GroupAdminRemoveNotification notification = new GroupAdminRemoveNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMemberUserIds(new ArrayList<>(memberUserIds));
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_ADMIN_REMOVE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupNoticeUpdate(Long groupId, Long operatorUserId, String oldNotice, String newNotice) {
-        GroupNoticeUpdateNotification notification = new GroupNoticeUpdateNotification()
-                .setOperatorUserId(operatorUserId).setOldNotice(oldNotice).setNewNotice(newNotice);
+        GroupNoticeUpdateNotification notification = new GroupNoticeUpdateNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setOldNotice(oldNotice);
+        notification.setNewNotice(newNotice);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_NOTICE_UPDATE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupNameUpdate(Long groupId, Long operatorUserId, String oldName, String newName) {
-        GroupNameUpdateNotification notification = new GroupNameUpdateNotification()
-                .setOperatorUserId(operatorUserId).setOldName(oldName).setNewName(newName);
+        GroupNameUpdateNotification notification = new GroupNameUpdateNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setOldName(oldName);
+        notification.setNewName(newName);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_NAME_UPDATE.getType()).setContent(notification);
     }
 
     public static ImGroupMessageSendDTO ofGroupMemberSettingUpdate(Long groupId, Long operatorUserId, Boolean muted, String groupRemark) {
-        GroupMemberSettingUpdateNotification notification = new GroupMemberSettingUpdateNotification()
-                .setOperatorUserId(operatorUserId).setMuted(muted).setGroupRemark(groupRemark);
+        GroupMemberSettingUpdateNotification notification = new GroupMemberSettingUpdateNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMuted(muted);
+        notification.setGroupRemark(groupRemark);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_SETTING_UPDATE.getType()).setContent(notification);
     }

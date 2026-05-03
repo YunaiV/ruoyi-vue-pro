@@ -372,10 +372,13 @@ public class CollectionUtils {
         return false;
     }
 
-    public static <T> List<T> of(T t, Collection<T> ts) {
+    /**
+     * 把单元素 head 与集合 tail 合并成新 List（head 在前，tail 顺序保留）
+     */
+    public static <T> List<T> of(T head, Collection<T> tail) {
         List<T> list = new ArrayList<>();
-        list.add(t);
-        CollUtil.addAll(list, ts);
+        list.add(head);
+        CollUtil.addAll(list, tail);
         return list;
     }
 
