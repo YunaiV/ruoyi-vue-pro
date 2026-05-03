@@ -369,7 +369,6 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         visibleUserIds.remove(message.getSenderId());
 
         // 4. 只返回在可见范围内且已读位置 >= messageId 的用户
-        // DONE @AI：根据返回结果，进行简化；应该都是 Long、Long；——RedisDAO 已返回 Map<Long, Long>，直接使用
         List<Long> readUserIds = new ArrayList<>();
         allPositions.forEach((uid, readMaxMessageId) -> {
             if (visibleUserIds.contains(uid) && readMaxMessageId >= messageId) {

@@ -15,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 
-// TODO @芋艿：后续要分析下，是不是要拆分下 notify（类似好友、群的变更）
 /**
  * IM WebSocket 推送 Service 实现类
  * <p>

@@ -382,7 +382,6 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }
         // 3. 幂等 + 上限校验
-        // TODO @AI：并发读改写非原子（两个管理员同时 pin 不同消息会丢更新），后续考虑 @Version 乐观锁或带旧值条件的 SQL
         List<Long> pinned = new ArrayList<>(CollUtil.emptyIfNull(group.getPinnedMessageIds()));
         if (pinned.contains(messageId)) {
             throw exception(GROUP_MESSAGE_ALREADY_PINNED);
@@ -405,7 +404,6 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 1. 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
         ImGroupDO group = validateOwnerOrAdminAndGetGroup(groupId, userId);
         // 2. 幂等校验
-        // TODO @AI：并发读改写非原子，后续考虑 @Version 乐观锁或带旧值条件的 SQL
         List<Long> pinned = new ArrayList<>(CollUtil.emptyIfNull(group.getPinnedMessageIds()));
         if (!pinned.contains(messageId)) {
             throw exception(GROUP_MESSAGE_NOT_PINNED);

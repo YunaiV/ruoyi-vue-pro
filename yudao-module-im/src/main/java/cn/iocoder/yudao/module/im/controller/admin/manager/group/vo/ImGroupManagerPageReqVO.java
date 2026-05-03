@@ -27,7 +27,6 @@ public class ImGroupManagerPageReqVO extends PageParam {
     @Schema(description = "是否封禁", example = "false")
     private Boolean banned;
 
-    // TODO DONE @AI：这个不太对，参考别的模块
     @Schema(description = "创建时间", example = "[2026-04-01 00:00:00, 2026-04-30 23:59:59]")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
