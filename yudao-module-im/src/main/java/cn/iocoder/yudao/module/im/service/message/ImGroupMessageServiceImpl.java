@@ -588,6 +588,19 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         return groupMessageMapper.selectById(id);
     }
 
+    @Override
+    public List<ImGroupMessageDO> getGroupMessageList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return groupMessageMapper.selectByIds(ids);
+    }
+
+    @Override
+    public Map<Long, ImGroupMessageDO> getGroupMessageMap(Collection<Long> ids) {
+        return convertMap(getGroupMessageList(ids), ImGroupMessageDO::getId);
+    }
+
     private ImGroupMessageServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }

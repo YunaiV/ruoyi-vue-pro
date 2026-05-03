@@ -159,7 +159,16 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      * 对应自己的类：GroupMemberSettingUpdateNotification
      * 场景：用户改自己的群免打扰 / 群备注，仅推该用户其他在线终端做多端同步
      */
-    GROUP_MEMBER_SETTING_UPDATE(1530, "群成员个人设置变更", false, false);
+    GROUP_MEMBER_SETTING_UPDATE(1530, "群成员个人设置变更", false, false),
+    // TODO @AI：注释风格，还是参考上面的
+    /**
+     * 自有扩展：群主 / 管理员置顶一条群消息，全员广播；前端把 messageId 加入 group.pinnedMessageIds
+     */
+    GROUP_MESSAGE_PIN(1531, "群消息置顶", true, false),
+    /**
+     * 自有扩展：群主 / 管理员取消置顶，全员广播；前端把 messageId 从 group.pinnedMessageIds 移除
+     */
+    GROUP_MESSAGE_UNPIN(1532, "群消息取消置顶", true, false);
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.im.controller.admin.group.vo;
 
+import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 群 Response VO")
 @Data
@@ -38,5 +40,8 @@ public class ImGroupRespVO {
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+    @Schema(description = "群置顶消息列表，按 pin 顺序（最先置顶的在前）；非该群有效成员时为空")
+    private List<ImGroupMessageRespVO> pinnedMessages;
 
 }

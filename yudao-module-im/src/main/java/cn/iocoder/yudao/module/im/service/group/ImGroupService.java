@@ -154,6 +154,26 @@ public interface ImGroupService {
      */
     void transferGroupOwner(Long userId, @Valid ImGroupTransferOwnerReqVO transferReqVO);
 
+    /**
+     * 置顶群消息（仅群主或管理员可执行）
+     * <p>
+     * 上限 {@link cn.iocoder.yudao.module.im.enums.ImCommonConstants#GROUP_PIN_MAX_COUNT}；幂等失败时抛业务异常
+     *
+     * @param userId    当前登录用户编号
+     * @param groupId   群编号
+     * @param messageId 被置顶的消息编号
+     */
+    void pinGroupMessage(Long userId, Long groupId, Long messageId);
+
+    /**
+     * 取消置顶群消息（仅群主或管理员可执行）
+     *
+     * @param userId    当前登录用户编号
+     * @param groupId   群编号
+     * @param messageId 被取消置顶的消息编号
+     */
+    void unpinGroupMessage(Long userId, Long groupId, Long messageId);
+
     // ==================== 管理后台 ====================
 
     /**

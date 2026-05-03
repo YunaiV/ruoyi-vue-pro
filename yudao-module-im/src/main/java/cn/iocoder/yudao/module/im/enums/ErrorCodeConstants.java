@@ -17,6 +17,7 @@ public interface ErrorCodeConstants {
     ErrorCode MESSAGE_PULL_SIZE_EXCEEDED = new ErrorCode(1_040_300_005, "单次拉取消息数量不能超过 {} 条");
     ErrorCode MESSAGE_RECALL_TIMEOUT = new ErrorCode(1_040_300_007, "超过 {} 分钟的消息无法撤回");
     ErrorCode MESSAGE_QUOTE_INVALID = new ErrorCode(1_040_300_008, "引用的消息不可用");
+    ErrorCode MESSAGE_NOT_IN_GROUP = new ErrorCode(1_040_300_009, "消息不属于该群");
 
     // ========== 群 (1-040-400-000) ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");
@@ -25,6 +26,9 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_NOT_OWNER = new ErrorCode(1_040_400_003, "仅群主可执行该操作");
     ErrorCode GROUP_NOT_OWNER_OR_ADMIN = new ErrorCode(1_040_400_004, "仅群主或管理员可执行该操作");
     ErrorCode GROUP_TRANSFER_OWNER_TO_SELF = new ErrorCode(1_040_400_005, "不能将群主转让给自己");
+    ErrorCode GROUP_MESSAGE_PIN_MAX_LIMIT = new ErrorCode(1_040_400_006, "群置顶消息数量不能超过 {} 条");
+    ErrorCode GROUP_MESSAGE_ALREADY_PINNED = new ErrorCode(1_040_400_007, "该消息已置顶");
+    ErrorCode GROUP_MESSAGE_NOT_PINNED = new ErrorCode(1_040_400_008, "该消息未置顶");
 
     // ========== 群成员 (1-040-500-000) ==========
     ErrorCode GROUP_MEMBER_NOT_IN_GROUP = new ErrorCode(1_040_500_001, "您已不在该群中");

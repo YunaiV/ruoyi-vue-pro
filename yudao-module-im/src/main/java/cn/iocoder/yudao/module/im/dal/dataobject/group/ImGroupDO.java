@@ -2,19 +2,22 @@ package cn.iocoder.yudao.module.im.dal.dataobject.group;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * IM 群信息 DO
  *
  * @author 芋道源码
  */
-@TableName("im_group")
+@TableName(value = "im_group",autoResultMap = true)
 @KeySequence("im_group_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -70,5 +73,12 @@ public class ImGroupDO extends BaseDO {
      * 解散时间
      */
     private LocalDateTime dissolvedTime;
+    /**
+     * 群置顶消息编号列表
+     * <p>
+     * 仅存 messageId，操作人 / 置顶时间从对应 PIN 事件的消息记录里反查
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> pinnedMessageIds;
 
 }

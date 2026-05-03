@@ -160,4 +160,22 @@ public class ImGroupMessageSendDTO {
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_SETTING_UPDATE.getType()).setContent(notification);
     }
 
+    public static ImGroupMessageSendDTO ofGroupMessagePin(Long groupId, Long operatorUserId,
+                                                          cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO message) {
+        GroupMessagePinNotification notification = new GroupMessagePinNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMessageId(message.getId());
+        notification.setMessage(message);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_MESSAGE_PIN.getType()).setContent(notification);
+    }
+
+    public static ImGroupMessageSendDTO ofGroupMessageUnpin(Long groupId, Long operatorUserId, Long messageId) {
+        GroupMessageUnpinNotification notification = new GroupMessageUnpinNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMessageId(messageId);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_MESSAGE_UNPIN.getType()).setContent(notification);
+    }
+
 }

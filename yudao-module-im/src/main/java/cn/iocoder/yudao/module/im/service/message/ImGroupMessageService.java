@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * IM 群聊消息 Service 接口
@@ -137,6 +138,22 @@ public interface ImGroupMessageService {
      * 【管理后台】获取群聊消息详情
      */
     ImGroupMessageDO getGroupMessage(Long id);
+
+    /**
+     * 批量按消息编号查询群聊消息
+     *
+     * @param ids 消息编号集合
+     * @return 消息列表
+     */
+    List<ImGroupMessageDO> getGroupMessageList(Collection<Long> ids);
+
+    /**
+     * 批量按消息编号查询群聊消息，返回 messageId → DO 映射
+     *
+     * @param ids 消息编号集合
+     * @return 消息 Map（key = 消息编号）
+     */
+    Map<Long, ImGroupMessageDO> getGroupMessageMap(Collection<Long> ids);
 
 }
 

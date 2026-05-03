@@ -22,8 +22,11 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManag
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
@@ -361,6 +364,68 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 3. 推送 GROUP_OWNER_TRANSFER 通知给全员
         groupMessageService.sendGroupMessage(userId,
                 ImGroupMessageSendDTO.ofGroupOwnerTransfer(groupId, userId, newOwnerUserId));
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#groupId")
+    @Transactional(rollbackFor = Exception.class)
+    public void pinGroupMessage(Long userId, Long groupId, Long messageId) {
+        // 1. 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
+        ImGroupDO group = validateOwnerOrAdminAndGetGroup(groupId, userId);
+        // 2. 校验消息属于该群、是普通聊天消息（绕过前端菜单不允许置顶群事件 / 撤回事件）、且未被撤回
+        ImGroupMessageDO message = groupMessageService.getGroupMessage(messageId);
+        if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
+            throw exception(MESSAGE_NOT_IN_GROUP);
+        }
+        if (!ImMessageTypeEnum.validate(message.getType()).isNormal()
+                || ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
+            throw exception(MESSAGE_NOT_IN_GROUP);
+        }
+        // 3. 幂等 + 上限校验
+        // TODO @AI：并发读改写非原子（两个管理员同时 pin 不同消息会丢更新），后续考虑 @Version 乐观锁或带旧值条件的 SQL
+        List<Long> pinned = new ArrayList<>(CollUtil.emptyIfNull(group.getPinnedMessageIds()));
+        if (pinned.contains(messageId)) {
+            throw exception(GROUP_MESSAGE_ALREADY_PINNED);
+        }
+        if (pinned.size() >= GROUP_PIN_MAX_COUNT) {
+            throw exception(GROUP_MESSAGE_PIN_MAX_LIMIT, GROUP_PIN_MAX_COUNT);
+        }
+        pinned.add(messageId);
+        groupMapper.updateById(new ImGroupDO().setId(groupId).setPinnedMessageIds(pinned));
+
+        // 4. 推送 GROUP_MESSAGE_PIN 通知给全员；payload 直接带消息对象，前端不用回查群详情绕开 @CacheEvict 时序
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupMessagePin(groupId, userId, message));
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#groupId")
+    @Transactional(rollbackFor = Exception.class)
+    public void unpinGroupMessage(Long userId, Long groupId, Long messageId) {
+        // 1. 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
+        ImGroupDO group = validateOwnerOrAdminAndGetGroup(groupId, userId);
+        // 2. 幂等校验
+        // TODO @AI：并发读改写非原子，后续考虑 @Version 乐观锁或带旧值条件的 SQL
+        List<Long> pinned = new ArrayList<>(CollUtil.emptyIfNull(group.getPinnedMessageIds()));
+        if (!pinned.contains(messageId)) {
+            throw exception(GROUP_MESSAGE_NOT_PINNED);
+        }
+        pinned.remove(messageId);
+        groupMapper.updateById(new ImGroupDO().setId(groupId).setPinnedMessageIds(pinned));
+
+        // 3. 推送 GROUP_MESSAGE_UNPIN 通知给全员
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupMessageUnpin(groupId, userId, messageId));
+    }
+
+    /** 校验登录用户是群主 / 管理员，同时返回 group（复用 validateGroupExists 的查询，避免调用方再查一次） */
+    private ImGroupDO validateOwnerOrAdminAndGetGroup(Long groupId, Long userId) {
+        ImGroupDO group = validateGroupExists(groupId);
+        ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
+        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole())) {
+            throw exception(GROUP_NOT_OWNER_OR_ADMIN);
+        }
+        return group;
     }
 
     // ==================== 群的读操作 ====================
