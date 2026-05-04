@@ -55,6 +55,19 @@ public interface ImFriendService {
      */
     void becomeFriends(ImFriendRequestDO request);
 
+    /**
+     * 单向静默重新建立好友关系
+     * <p>
+     * 仅用于 {@link ImFriendRequestService#applyFriend} 在「我已删除 + 对方仍把我当好友」场景：
+     * 直接恢复 userId 这边的 friend 记录，不走申请审批；不下发 TIP / 不通知对方，仅 FRIEND_ADD 给 userId 多端，避免对方感知我曾删除。
+     *
+     * @param userId       当前用户编号
+     * @param friendUserId 对方用户编号
+     * @param displayName  备注（取自申请 VO）
+     * @param addSource    添加来源（取自申请 VO）
+     */
+    void silentReAddFriend(Long userId, Long friendUserId, String displayName, Integer addSource);
+
     // ==================== 用户端 ====================
 
     /**

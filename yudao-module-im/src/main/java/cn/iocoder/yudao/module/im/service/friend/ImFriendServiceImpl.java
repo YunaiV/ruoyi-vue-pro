@@ -123,8 +123,6 @@ public class ImFriendServiceImpl implements ImFriendService {
         getSelf().addFriend0(fromUserId, toUserId, request.getDisplayName(), request.getAddSource());
         getSelf().addFriend0(toUserId, fromUserId, null, request.getAddSource());
 
-        // TODO DONE @AI：删除「在 openim 里」措辞；TIP 与 FRIEND_ADD 目的不同保持双发
-        // TODO @AI：在确认一次；是否需要发送 tip？而是通过 FRIEND_ADD 可以满足了。。。（讨论一下）
         // 2.1 推 TIP 系统消息（双方私聊会话里看到「你们已成为好友」）；TIP 走会话入库，FRIEND_ADD 走事件通知
         privateMessageService.sendTipPrivateMessage(fromUserId, toUserId, FRIEND_ADD_TIP_MESSAGE);
 
@@ -138,6 +136,19 @@ public class ImFriendServiceImpl implements ImFriendService {
                 .setOperatorUserId(fromUserId).setFriendUserId(fromUserId);
         websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
                 ImMessageTypeEnum.FRIEND_ADD.getType(), fromUserId, toUserId, toTo));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void silentReAddFriend(Long userId, Long friendUserId, String displayName, Integer addSource) {
+        // 1. 单边重新启用我侧好友关系；addFriend0 内部已做 @CacheEvict 双向失效
+        getSelf().addFriend0(userId, friendUserId, displayName, addSource);
+
+        // 2. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
+        FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
+                .setOperatorUserId(friendUserId).setFriendUserId(friendUserId);
+        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_ADD.getType(), friendUserId, userId, payload));
     }
 
     @Override

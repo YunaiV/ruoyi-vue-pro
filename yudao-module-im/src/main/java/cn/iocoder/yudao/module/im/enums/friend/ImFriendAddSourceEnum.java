@@ -17,9 +17,8 @@ import java.util.Arrays;
 @Getter
 public enum ImFriendAddSourceEnum implements ArrayValuable<Integer> {
 
-    // TODO DONE @AI：GROUP 提前到 source=2（先实现）；BUSINESS_CARD 简化为 CARD
     SEARCH(1, "搜索"), // FriendAddDialog 搜索流程
-    GROUP(2, "群聊"), // TODO @AI：群成员主页加好友，待落 UI 入口
+    GROUP(2, "群聊"), // 群成员主页 → UserInfo「加为好友」入口
     QR_CODE(3, "扫码"), // TODO @芋艿：后续实现扫码加好友
     CARD(4, "名片"); // TODO @芋艿：后续实现通过名片加好友，类似微信的「扫一扫 - 名片」功能，或者「通讯录 - 推荐好友」功能
 
