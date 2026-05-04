@@ -121,14 +121,18 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void agreeFriendRequest(Long userId, Long requestId) {
-        // 1. 校验申请存在 + 未处理 + 操作人是接收方
+        // 1. 校验申请存在 + 未处理 + 操作人是接收方（fail-fast；并发场景仍由下面的乐观锁兜底）
         ImFriendRequestDO request = validateRequestForHandle(userId, requestId);
 
-        // 2. 更新申请：handleResult=AGREED + handleTime
-        LocalDateTime now = LocalDateTime.now();
-        friendRequestMapper.updateById(new ImFriendRequestDO().setId(request.getId())
-                .setHandleResult(ImFriendRequestHandleResultEnum.AGREED.getResult()).setHandleTime(now));
-        request.setHandleResult(ImFriendRequestHandleResultEnum.AGREED.getResult()).setHandleTime(now);
+        // 2. 乐观锁更新申请：handleResult=AGREED + handleTime；并发同意会有一方 affectedRows=0
+        ImFriendRequestDO updateObj = new ImFriendRequestDO()
+                .setHandleResult(ImFriendRequestHandleResultEnum.AGREED.getResult()).setHandleTime(LocalDateTime.now());
+        int affected = friendRequestMapper.updateByIdAndHandleResult(request.getId(),
+                ImFriendRequestHandleResultEnum.UNHANDLED.getResult(), updateObj);
+        if (affected == 0) {
+            throw exception(FRIEND_REQUEST_HANDLED);
+        }
+        request.setHandleResult(ImFriendRequestHandleResultEnum.AGREED.getResult()).setHandleTime(updateObj.getHandleTime());
 
         // 3. 双向建立好友关系
         friendService.becomeFriends(request);
@@ -144,14 +148,18 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void refuseFriendRequest(Long userId, Long requestId, String handleContent) {
-        // 1. 校验申请存在 + 未处理 + 操作人是接收方
+        // 1. 校验申请存在 + 未处理 + 操作人是接收方（fail-fast；并发场景仍由下面的乐观锁兜底）
         ImFriendRequestDO request = validateRequestForHandle(userId, requestId);
 
-        // 2. 更新申请：handleResult=REFUSED + handleContent + handleTime
-        LocalDateTime now = LocalDateTime.now();
-        friendRequestMapper.updateById(new ImFriendRequestDO().setId(request.getId())
+        // 2. 乐观锁更新申请：handleResult=REFUSED + handleContent + handleTime；并发拒绝会有一方 affectedRows=0
+        ImFriendRequestDO updateObj = new ImFriendRequestDO()
                 .setHandleResult(ImFriendRequestHandleResultEnum.REFUSED.getResult())
-                .setHandleContent(handleContent).setHandleTime(now));
+                .setHandleContent(handleContent).setHandleTime(LocalDateTime.now());
+        int affected = friendRequestMapper.updateByIdAndHandleResult(request.getId(),
+                ImFriendRequestHandleResultEnum.UNHANDLED.getResult(), updateObj);
+        if (affected == 0) {
+            throw exception(FRIEND_REQUEST_HANDLED);
+        }
 
         // 3. 推 FRIEND_REQUEST_REJECTED 给 fromUser 多端
         FriendRequestRejectedNotification payload = (FriendRequestRejectedNotification)

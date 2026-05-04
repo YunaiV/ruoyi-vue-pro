@@ -96,7 +96,8 @@ CREATE TABLE IF NOT EXISTS "im_friend" (
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "uk_user_friend" UNIQUE ("user_id", "friend_user_id", "tenant_id")
 ) COMMENT 'IM 好友关系表';
 
 CREATE TABLE IF NOT EXISTS "im_friend_request" (

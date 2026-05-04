@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.dal.mysql.friend;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -31,6 +32,11 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
                 .orderByDesc(ImFriendRequestDO::getId)
                 .last("LIMIT " + limit);
         return selectList(wrapper);
+    }
+
+    default int updateByIdAndHandleResult(Long id, Integer handleResult, ImFriendRequestDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<ImFriendRequestDO>()
+                .eq(ImFriendRequestDO::getId, id).eq(ImFriendRequestDO::getHandleResult, handleResult));
     }
 
 }

@@ -115,11 +115,16 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#request.fromUserId + '_' + #request.toUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#request.toUserId + '_' + #request.fromUserId")
+    })
     @Transactional(rollbackFor = Exception.class)
     public void becomeFriends(ImFriendRequestDO request) {
         Long fromUserId = request.getFromUserId();
         Long toUserId = request.getToUserId();
         // 1. 双向建立关系：A 侧带申请的 displayName / addSource；B 侧 displayName 为空、addSource 同来源
+        //    FRIEND_STATE 双向失效由方法上的 @Caching 注解处理；framework 已开 transactionAware 自动延迟到 afterCommit
         getSelf().addFriend0(fromUserId, toUserId, request.getDisplayName(), request.getAddSource());
         getSelf().addFriend0(toUserId, fromUserId, null, request.getAddSource());
 
@@ -139,9 +144,13 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
+    })
     @Transactional(rollbackFor = Exception.class)
     public void silentReAddFriend(Long userId, Long friendUserId, String displayName, Integer addSource) {
-        // 1. 单边重新启用我侧好友关系；addFriend0 内部已做 @CacheEvict 双向失效
+        // 1. 单边重新启用我侧好友关系
         getSelf().addFriend0(userId, friendUserId, displayName, addSource);
 
         // 2. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
@@ -152,6 +161,10 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
+    })
     @Transactional(rollbackFor = Exception.class)
     public void deleteFriend(Long userId, Long friendUserId) {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
@@ -220,17 +233,15 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     /**
-     * 单向绑定好友关系（内部方法，被 {@link #becomeFriends} 调用）：
+     * 单向绑定好友关系（内部方法，被 {@link #becomeFriends} / {@link #silentReAddFriend} 调用）：
      * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，重置 muted / pinned / blocked 为 false（删好友再加回来不沿袭旧设置）
      * - 情况二：不存在记录 → 直接插入新记录
      * <p>
-     * 并发安全：业务侧通过 friend_request.handle_result 已保证 agree 不会并发触发；
-     * 极端并发下若插入唯一键冲突，让 DuplicateKeyException 向外抛出，外层事务回滚。
+     * 并发安全：agree 路径由 {@code friend_request.handle_result} 的乐观锁单边推进；
+     *         极端并发下若插入唯一键冲突，让 DuplicateKeyException 向外抛出，外层事务回滚。
+     * <p>
+     * FRIEND_STATE 缓存失效由调用方的 @Caching 注解统一处理，本方法不主动 evict
      */
-    @Caching(evict = {
-            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
-            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
-    })
     public void addFriend0(Long userId, Long friendUserId, String displayName, Integer addSource) {
         ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         // 情况一：复用旧记录 → 恢复 ENABLE + 重置 muted / pinned / blocked 与首次新增对齐
@@ -259,11 +270,9 @@ public class ImFriendServiceImpl implements ImFriendService {
      * 单向解除好友关系（status 设为 DISABLE，记录 deleteTime）
      * <p>
      * blocked 不主动重置：删好友期间保留拉黑状态；如果未来再 addFriend0，由 addFriend0 统一重置
+     * <p>
+     * FRIEND_STATE 缓存失效由调用方的 @Caching 注解统一处理，本方法不主动 evict
      */
-    @Caching(evict = {
-            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
-            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
-    })
     public void deleteFriend0(Long userId, Long friendUserId) {
         ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (exists == null || CommonStatusEnum.isDisable(exists.getStatus())) {
@@ -273,15 +282,15 @@ public class ImFriendServiceImpl implements ImFriendService {
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDeleteTime(LocalDateTime.now()));
     }
 
-    private ImFriendServiceImpl getSelf() {
-        return SpringUtil.getBean(getClass());
-    }
-
     // ==================== 管理后台 ====================
 
     @Override
     public PageResult<ImFriendDO> getFriendPage(ImFriendManagerPageReqVO reqVO) {
         return friendMapper.selectPage(reqVO);
+    }
+
+    private ImFriendServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }
