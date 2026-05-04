@@ -30,7 +30,6 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     RECEIPT(12, "回执", false, false), // 暂无
 
     // ========== 系统提示 ==========
-    TIP_TIME(20, "时间分隔", false, false), // 暂无（前端本地生成）
     TIP_TEXT(21, "系统提示", true, false), // 对应 TextMessage 类
 
     // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
