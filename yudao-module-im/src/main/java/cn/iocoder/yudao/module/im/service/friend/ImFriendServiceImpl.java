@@ -155,10 +155,12 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Transactional(rollbackFor = Exception.class)
     public void silentReAddFriend(Long userId, Long friendUserId, String displayName, Integer addSource) {
         // 1. 单边重新启用我侧好友关系
-        //    不推 TIP 系统消息：sendPrivateMessage 是 (sender, receiver) 单条入库 + 双向可见，无法仅 userId 单边可见；对方不应感知 silent 重启，TIP 整体省略
         addFriend0(userId, friendUserId, displayName, addSource);
 
-        // 2. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
+        // 2. 推 TIP「你们已成为好友」走单边语义（persistent=false）：不入库 + 仅推 userId 多端，对方完全不感知
+        privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_ADD_TIP_MESSAGE, false);
+
+        // 3. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
         //    operatorUserId 填 friendUserId（对方）：让 userId 多端 UI 呈现「对方加了我」的视觉效果，与 silent 语义对齐
         FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
                 .setOperatorUserId(friendUserId).setFriendUserId(friendUserId);
