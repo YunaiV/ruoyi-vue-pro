@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.Frie
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.FriendRequestNotification;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.FriendRequestRejectedNotification;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -98,9 +99,12 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
             friendRequestMapper.insert(request);
         }
 
-        // 3. 推送 FRIEND_REQUEST_RECEIVED 给 toUser 多端
+        // 3. 推送 FRIEND_REQUEST_RECEIVED 给 toUser 多端；payload 携带申请方昵称 / 头像，前端按 requestId 直推 push 进列表
+        AdminUserRespDTO fromUser = adminUserApi.getUser(fromUserId);
         FriendRequestNotification payload = (FriendRequestNotification) new FriendRequestNotification()
                 .setRequestId(request.getId()).setApplyContent(request.getApplyContent()).setAddSource(request.getAddSource())
+                .setFromNickname(fromUser != null ? fromUser.getNickname() : null)
+                .setFromAvatar(fromUser != null ? fromUser.getAvatar() : null)
                 .setOperatorUserId(fromUserId).setFriendUserId(fromUserId);
         websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
                 ImMessageTypeEnum.FRIEND_REQUEST_RECEIVED.getType(), fromUserId, toUserId, payload));
