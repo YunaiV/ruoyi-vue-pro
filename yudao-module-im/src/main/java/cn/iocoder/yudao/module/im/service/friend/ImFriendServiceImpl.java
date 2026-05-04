@@ -76,6 +76,11 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     @Override
+    public List<ImFriendDO> getEnableFriendList(Long userId) {
+        return friendMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
+    }
+
+    @Override
     public List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds) {
         return friendMapper.selectListByUserIdAndFriendUserIdsAndStatus(userId, friendUserIds,
                 CommonStatusEnum.ENABLE.getStatus());

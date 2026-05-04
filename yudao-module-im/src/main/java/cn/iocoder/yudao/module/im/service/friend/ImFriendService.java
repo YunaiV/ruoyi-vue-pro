@@ -33,6 +33,11 @@ public interface ImFriendService {
     List<ImFriendDO> getFriendList(Long userId);
 
     /**
+     * 获得当前用户的有效好友列表（仅 ENABLE 状态）
+     */
+    List<ImFriendDO> getEnableFriendList(Long userId);
+
+    /**
      * 获得当前用户与指定用户之间的有效好友列表（仅 ENABLE 状态）
      */
     List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds);

@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -81,7 +82,8 @@ public class ImFriendRequestController {
     public CommonResult<List<ImFriendRequestRespVO>> getMyFriendRequestList(
             @Parameter(description = "当前列表最旧记录的 id；首页不传")
             @RequestParam(value = "lastRequestId", required = false) Long lastRequestId,
-            @Parameter(description = "单次拉取条数", required = true) @RequestParam("limit") @Min(1) Integer limit) {
+            @Parameter(description = "单次拉取条数", required = true)
+            @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
         List<ImFriendRequestDO> list = friendRequestService.getMyFriendRequestList(getLoginUserId(), lastRequestId, limit);
         return success(buildList(list));
     }
