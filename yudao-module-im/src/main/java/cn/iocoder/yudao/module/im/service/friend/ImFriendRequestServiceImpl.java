@@ -98,12 +98,12 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
             friendRequestMapper.insert(request);
         }
 
-        // 3. 推送 FRIEND_APPLICATION 给 toUser 多端
+        // 3. 推送 FRIEND_REQUEST_RECEIVED 给 toUser 多端
         FriendRequestNotification payload = (FriendRequestNotification) new FriendRequestNotification()
                 .setRequestId(request.getId()).setApplyContent(request.getApplyContent()).setAddSource(request.getAddSource())
                 .setOperatorUserId(fromUserId).setFriendUserId(fromUserId);
         websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_APPLICATION.getType(), fromUserId, toUserId, payload));
+                ImMessageTypeEnum.FRIEND_REQUEST_RECEIVED.getType(), fromUserId, toUserId, payload));
 
         // 4. 全局自动通过开关：注册 afterCommit 回调，事务提交后再走同意流程
         //    回调内 try/catch 兜底 —— afterCommit 异常会被 Spring 静默吞掉，否则同意失败时申请方永远等不到 APPROVED

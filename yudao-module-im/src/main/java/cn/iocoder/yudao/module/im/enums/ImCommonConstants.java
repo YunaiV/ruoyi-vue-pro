@@ -60,9 +60,5 @@ public interface ImCommonConstants {
      * 好友添加系统提示
      */
     String FRIEND_ADD_TIP_MESSAGE = "你们已成为好友，现在可以开始聊天了";
-    /**
-     * 好友删除系统提示
-     */
-    String FRIEND_DELETE_TIP_MESSAGE = "你们的好友关系已被解除";
 
 }

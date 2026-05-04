@@ -50,7 +50,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      * 对应自己的类：FriendRequestNotification
      * 场景：A 申请加 B，推给 B 多端，前端落到「新的朋友」列表
      */
-    FRIEND_APPLICATION(1203, "收到新的好友申请", false, false),
+    FRIEND_REQUEST_RECEIVED(1203, "收到新的好友申请", false, false),
     /**
      * 对应 OpenIM：FriendAddedNotification 1204
      * 对应自己的类：FriendAddNotification

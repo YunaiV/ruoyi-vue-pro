@@ -34,7 +34,6 @@ import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND_STAT
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_ADD_TIP_MESSAGE;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_DELETE_TIP_MESSAGE;
 
 /**
  * IM 好友关系 Service 实现类
@@ -169,12 +168,10 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteFriend(Long userId, Long friendUserId) {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
+        //    不推 TIP 系统消息：单边删除语义下对方不应感知；userId 端反馈由前端 toast 承担，多端同步靠下面的 FRIEND_DELETE
         getSelf().deleteFriend0(userId, friendUserId);
 
-        // 2.1 推 TIP 系统消息
-        privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_DELETE_TIP_MESSAGE);
-
-        // 2.2 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）
+        // 2. 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）
         FriendDeleteNotification payload = (FriendDeleteNotification) new FriendDeleteNotification()
                 .setOperatorUserId(userId).setFriendUserId(friendUserId);
         websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
