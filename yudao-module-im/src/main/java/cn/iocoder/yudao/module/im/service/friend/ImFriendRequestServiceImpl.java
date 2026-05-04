@@ -69,6 +69,7 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         adminUserApi.validateUser(toUserId);
         // 1.3 已是好友：直接幂等返回
         ImFriendDO friend = friendService.getFriend(fromUserId, toUserId);
+        // TODO @AI：已经是好友，直接提示报错；不用触发；
         if (friend != null && CommonStatusEnum.isEnable(friend.getStatus())) {
             return null;
         }
@@ -80,6 +81,7 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
             log.info("[applyFriend][fromUserId({}) 被 toUserId({}) 拉黑，静默忽略]", fromUserId, toUserId);
             return null;
         }
+        // TODO @AI：如果是单向好友（对方没删除）；我删除了；是不是直接更新状态就好了；（不然会被对方发现！）
 
         // 2. 落库：复用最新一条未处理记录；否则新建
         ImFriendRequestDO request = friendRequestMapper.selectLatestByFromUserIdAndToUserId(fromUserId, toUserId);
