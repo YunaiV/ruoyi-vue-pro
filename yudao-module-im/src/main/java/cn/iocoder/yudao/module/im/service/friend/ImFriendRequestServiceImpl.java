@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -87,7 +89,7 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         ImFriendRequestDO request = friendRequestMapper.selectLatestByFromUserIdAndToUserId(fromUserId, toUserId);
         if (request != null && ImFriendRequestHandleResultEnum.isUnhandled(request.getHandleResult())) {
             // 复用未处理记录：刷新申请理由 / 备注 / 来源；createTime 维持首次申请时间不变（与列表 id DESC 排序一致）
-            BeanUtils.copyProperties(reqVO, request);
+            BeanUtil.copyProperties(reqVO, request, CopyOptions.create().setIgnoreNullValue(true));
             friendRequestMapper.updateById(request);
         } else {
             request = BeanUtils.toBean(reqVO, ImFriendRequestDO.class)
@@ -104,13 +106,19 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
                 ImMessageTypeEnum.FRIEND_APPLICATION.getType(), fromUserId, toUserId, payload));
 
         // 4. 全局自动通过开关：注册 afterCommit 回调，事务提交后再走同意流程
+        //    回调内 try/catch 兜底 —— afterCommit 异常会被 Spring 静默吞掉，否则同意失败时申请方永远等不到 APPROVED
         if (imProperties.getFriend().isAutoAccept()) {
             Long requestId = request.getId();
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
                 @Override
                 public void afterCommit() {
-                    getSelf().agreeFriendRequest(toUserId, requestId);
+                    try {
+                        getSelf().agreeFriendRequest(toUserId, requestId);
+                    } catch (Exception e) {
+                        log.error("[applyFriend][autoAccept fromUserId={} toUserId={} requestId={} 自动通过失败]",
+                                fromUserId, toUserId, requestId, e);
+                    }
                 }
 
             });
