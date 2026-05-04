@@ -80,7 +80,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      * 对应 OpenIM：FriendInfoUpdatedNotification 1209
      * 对应自己的类：FriendInfoUpdatedNotification
      * 场景：B 改了昵称 / 头像后，推给 B 的所有好友
-     * TODO @AI：未实现；待 system 模块改昵称 / 头像时回调 IM 模块批量推此事件，前端 dispatcher 已就绪
+     * 触发：system 模块发 AdminUserProfileUpdateMessage，IM 消费者 AdminUserProfileUpdateConsumer 批量推此通知
      */
     FRIEND_INFO_UPDATED(1209, "好友资料变更", false, false),
     /**
