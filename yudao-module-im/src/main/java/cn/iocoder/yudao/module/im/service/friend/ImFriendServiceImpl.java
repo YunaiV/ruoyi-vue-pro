@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
@@ -124,8 +123,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         Long toUserId = request.getToUserId();
         // 1. 双向建立关系：A 侧带申请的 displayName / addSource；B 侧 displayName 为空、addSource 同来源
         //    FRIEND_STATE 双向失效由方法上的 @Caching 注解处理；framework 已开 transactionAware 自动延迟到 afterCommit
-        getSelf().addFriend0(fromUserId, toUserId, request.getDisplayName(), request.getAddSource());
-        getSelf().addFriend0(toUserId, fromUserId, null, request.getAddSource());
+        addFriend0(fromUserId, toUserId, request.getDisplayName(), request.getAddSource());
+        addFriend0(toUserId, fromUserId, null, request.getAddSource());
 
         // 2.1 推 TIP 系统消息（双方私聊会话里看到「你们已成为好友」）；TIP 走会话入库，FRIEND_ADD 走事件通知
         privateMessageService.sendTipPrivateMessage(fromUserId, toUserId, FRIEND_ADD_TIP_MESSAGE);
@@ -150,7 +149,8 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Transactional(rollbackFor = Exception.class)
     public void silentReAddFriend(Long userId, Long friendUserId, String displayName, Integer addSource) {
         // 1. 单边重新启用我侧好友关系
-        getSelf().addFriend0(userId, friendUserId, displayName, addSource);
+        //    不推 TIP 系统消息：sendPrivateMessage 是 (sender, receiver) 单条入库 + 双向可见，无法仅 userId 单边可见；对方不应感知 silent 重启，TIP 整体省略
+        addFriend0(userId, friendUserId, displayName, addSource);
 
         // 2. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
         //    operatorUserId 填 friendUserId（对方）：让 userId 多端 UI 呈现「对方加了我」的视觉效果，与 silent 语义对齐
@@ -169,7 +169,7 @@ public class ImFriendServiceImpl implements ImFriendService {
     public void deleteFriend(Long userId, Long friendUserId) {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
         //    不推 TIP 系统消息：单边删除语义下对方不应感知；userId 端反馈由前端 toast 承担，多端同步靠下面的 FRIEND_DELETE
-        getSelf().deleteFriend0(userId, friendUserId);
+        deleteFriend0(userId, friendUserId);
 
         // 2. 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）
         FriendDeleteNotification payload = (FriendDeleteNotification) new FriendDeleteNotification()
@@ -285,10 +285,6 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Override
     public PageResult<ImFriendDO> getFriendPage(ImFriendManagerPageReqVO reqVO) {
         return friendMapper.selectPage(reqVO);
-    }
-
-    private ImFriendServiceImpl getSelf() {
-        return SpringUtil.getBean(getClass());
     }
 
 }

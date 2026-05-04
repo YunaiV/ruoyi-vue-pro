@@ -100,9 +100,9 @@ public class ImFriendController {
         // 批量聚合 AdminUser 信息（昵称 / 头像），避免 N+1
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertList(friends, ImFriendDO::getFriendUserId));
-        return convertList(friends, f -> {
-            ImFriendRespVO vo = BeanUtils.toBean(f, ImFriendRespVO.class);
-            MapUtils.findAndThen(userMap, f.getFriendUserId(), user ->
+        return convertList(friends, friend -> {
+            ImFriendRespVO vo = BeanUtils.toBean(friend, ImFriendRespVO.class);
+            MapUtils.findAndThen(userMap, friend.getFriendUserId(), user ->
                     vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
             // 备注 / 昵称的拼音，给前端做字母分桶 + 拼音搜索
             vo.setDisplayNamePinyin(StrUtils.toPinyin(vo.getDisplayName()))

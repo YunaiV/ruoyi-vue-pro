@@ -87,13 +87,15 @@ public class ImFriendRequestController {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
-        Set<Long> userIds = convertSetByFlatMap(list, r -> Stream.of(r.getFromUserId(), r.getToUserId()));
+        // 双向 OR 列表，userIds 取 from + to 两组并集
+        Set<Long> userIds = convertSetByFlatMap(list,
+                request -> Stream.of(request.getFromUserId(), request.getToUserId()));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        return convertList(list, r -> {
-            ImFriendRequestRespVO vo = BeanUtils.toBean(r, ImFriendRequestRespVO.class);
-            MapUtils.findAndThen(userMap, r.getFromUserId(), user ->
+        return convertList(list, request -> {
+            ImFriendRequestRespVO vo = BeanUtils.toBean(request, ImFriendRequestRespVO.class);
+            MapUtils.findAndThen(userMap, request.getFromUserId(), user ->
                     vo.setFromNickname(user.getNickname()).setFromAvatar(user.getAvatar()));
-            MapUtils.findAndThen(userMap, r.getToUserId(), user ->
+            MapUtils.findAndThen(userMap, request.getToUserId(), user ->
                     vo.setToNickname(user.getNickname()).setToAvatar(user.getAvatar()));
             return vo;
         });

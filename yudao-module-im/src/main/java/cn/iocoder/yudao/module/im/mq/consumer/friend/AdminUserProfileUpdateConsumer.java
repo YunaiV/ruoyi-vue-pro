@@ -33,6 +33,7 @@ public class AdminUserProfileUpdateConsumer {
     @EventListener
     @Async // Spring Event 默认在 Producer 发送的线程，通过 @Async 实现异步
     public void onMessage(AdminUserProfileUpdateMessage message) {
+        log.info("[onMessage][消息内容({})]", message);
         Long userId = message.getUserId();
         // 1. 找当前用户的所有有效好友（DISABLE 已删的不推）
         List<ImFriendDO> friends = friendService.getFriendList(userId);
@@ -41,6 +42,7 @@ public class AdminUserProfileUpdateConsumer {
         }
 
         // 2. 给每个好友的多端推 FRIEND_INFO_UPDATED；payload 里 operatorUserId / friendUserId 都是「资料被改的人」
+        int notifyCount = 0;
         for (ImFriendDO friend : friends) {
             if (CommonStatusEnum.isDisable(friend.getStatus())) {
                 continue;
@@ -49,7 +51,9 @@ public class AdminUserProfileUpdateConsumer {
                     .setOperatorUserId(userId).setFriendUserId(userId);
             websocketService.sendPrivateMessageAsync(friend.getFriendUserId(), ImPrivateMessageDTO.ofFriendNotification(
                     ImMessageTypeEnum.FRIEND_INFO_UPDATED.getType(), userId, friend.getFriendUserId(), payload));
+            notifyCount++;
         }
+        log.info("[onMessage][userId({}) 推送 FRIEND_INFO_UPDATED 给 {} 位好友]", userId, notifyCount);
     }
 
 }
