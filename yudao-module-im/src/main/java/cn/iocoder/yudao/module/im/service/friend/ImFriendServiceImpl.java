@@ -33,6 +33,7 @@ import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND_STAT
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_ADD_TIP_MESSAGE;
+import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_DELETE_TIP_MESSAGE;
 
 /**
  * IM 好友关系 Service 实现类
@@ -171,14 +172,17 @@ public class ImFriendServiceImpl implements ImFriendService {
             @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
     })
     @Transactional(rollbackFor = Exception.class)
-    public void deleteFriend(Long userId, Long friendUserId) {
+    public void deleteFriend(Long userId, Long friendUserId, Boolean clear) {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
-        //    不推 TIP 系统消息：单边删除语义下对方不应感知；userId 端反馈由前端 toast 承担，多端同步靠下面的 FRIEND_DELETE
         deleteFriend0(userId, friendUserId);
 
-        // 2. 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）
-        FriendDeleteNotification payload = (FriendDeleteNotification) new FriendDeleteNotification()
-                .setOperatorUserId(userId).setFriendUserId(friendUserId);
+        // 2. 推 TIP「你已删除好友」走单边语义（persistent=false）：
+        //    不入库 + 仅推 userId 多端，对方完全不感知；clear=true 时前端会清对话连带这条 TIP 一起清
+        privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_DELETE_TIP_MESSAGE, false);
+
+        // 3. 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）；clear 透传让多端清理动作一致
+        FriendDeleteNotification payload = ((FriendDeleteNotification) new FriendDeleteNotification()
+                .setOperatorUserId(userId).setFriendUserId(friendUserId)).setClear(clear);
         websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
                 ImMessageTypeEnum.FRIEND_DELETE.getType(), userId, userId, payload));
     }
@@ -237,7 +241,7 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     /**
      * 单向绑定好友关系（内部方法，被 {@link #becomeFriends} / {@link #silentReAddFriend} 调用）：
-     * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，重置 muted / pinned / blocked 为 false（删好友再加回来不沿袭旧设置）
+     * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，muted / pinned / blocked 一并重置为 false
      * - 情况二：不存在记录 → 直接插入新记录
      * <p>
      * 并发安全：agree 路径由 {@code friend_request.handle_result} 的乐观锁单边推进；

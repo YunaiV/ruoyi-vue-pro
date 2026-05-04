@@ -100,27 +100,37 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         String contentString = payload == null || payload instanceof String
                 ? (String) payload
                 : JsonUtils.toJsonString(payload);
-        // 1.2 构建并保存消息
+        // 1.2 构建消息
         ImPrivateMessageDO message = new ImPrivateMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
                 .setSenderId(senderId).setReceiverId(dto.getReceiverId())
                 .setType(dto.getType()).setContent(contentString)
                 .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now());
-        // 1.3 按 type.persistent 决定是否入库
-        if (ImMessageTypeEnum.validate(dto.getType()).isPersistent()) {
+        // 1.3 决定是否持久化：dto.persistent 优先；为 null 时按 type 默认
+        boolean persistent = dto.getPersistent() != null
+                ? dto.getPersistent()
+                : ImMessageTypeEnum.validate(dto.getType()).isPersistent();
+        if (persistent) {
             privateMessageMapper.insert(message);
         }
 
-        // 2. WebSocket 异步推送（接收方 + 发送方多端同步）
+        // 2. WebSocket 异步推送：双向（默认）；单边语义（persistent=false）下仅推 sender 多端，对方不感知
         ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
-        imWebSocketService.sendPrivateMessageAsync(dto.getReceiverId(), websocketMessage);
+        if (persistent) {
+            imWebSocketService.sendPrivateMessageAsync(dto.getReceiverId(), websocketMessage);
+        }
         imWebSocketService.sendPrivateMessageAsync(senderId, websocketMessage);
         return message;
     }
 
     @Override
     public void sendTipPrivateMessage(Long senderId, Long receiverId, String content) {
+        sendTipPrivateMessage(senderId, receiverId, content, null);
+    }
+
+    @Override
+    public void sendTipPrivateMessage(Long senderId, Long receiverId, String content, Boolean persistent) {
         sendPrivateMessage(senderId, new ImPrivateMessageSendDTO().setReceiverId(receiverId)
-                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content));
+                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content).setPersistent(persistent));
     }
 
     @Override

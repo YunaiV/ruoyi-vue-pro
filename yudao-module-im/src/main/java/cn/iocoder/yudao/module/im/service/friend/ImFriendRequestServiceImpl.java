@@ -86,12 +86,19 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
             return null;
         }
 
-        // 2. 落库：复用最新一条未处理记录；否则新建
+        // 2. 落库：复用最新一条未处理记录走条件 update；否则新建
         ImFriendRequestDO request = friendRequestMapper.selectLatestByFromUserIdAndToUserId(fromUserId, toUserId);
         if (request != null && ImFriendRequestHandleResultEnum.isUnhandled(request.getHandleResult())) {
-            // 复用未处理记录：刷新申请理由 / 备注 / 来源；createTime 维持首次申请时间不变（与列表 id DESC 排序一致）
+            ImFriendRequestDO updateObj = new ImFriendRequestDO().setApplyContent(reqVO.getApplyContent())
+                    .setDisplayName(reqVO.getDisplayName()).setAddSource(reqVO.getAddSource());
+            int affected = friendRequestMapper.updateByIdAndHandleResult(request.getId(),
+                    ImFriendRequestHandleResultEnum.UNHANDLED.getResult(), updateObj);
+            if (affected == 0) {
+                //    并发场景下另一方刚 agree/refuse 推进了状态，条件 update affected=0 抛已处理错让前端重试
+                throw exception(FRIEND_REQUEST_HANDLED);
+            }
+            // 同步更新字段，下面推送 payload 用
             BeanUtil.copyProperties(reqVO, request, CopyOptions.create().setIgnoreNullValue(true));
-            friendRequestMapper.updateById(request);
         } else {
             request = BeanUtils.toBean(reqVO, ImFriendRequestDO.class)
                     .setFromUserId(fromUserId).setToUserId(toUserId)
@@ -103,9 +110,10 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         AdminUserRespDTO fromUser = adminUserApi.getUser(fromUserId);
         FriendRequestNotification payload = (FriendRequestNotification) new FriendRequestNotification()
                 .setRequestId(request.getId()).setApplyContent(request.getApplyContent()).setAddSource(request.getAddSource())
-                .setFromNickname(fromUser != null ? fromUser.getNickname() : null)
-                .setFromAvatar(fromUser != null ? fromUser.getAvatar() : null)
                 .setOperatorUserId(fromUserId).setFriendUserId(fromUserId);
+        if (fromUser != null) {
+            payload.setFromNickname(fromUser.getNickname()).setFromAvatar(fromUser.getAvatar());
+        }
         websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
                 ImMessageTypeEnum.FRIEND_REQUEST_RECEIVED.getType(), fromUserId, toUserId, payload));
 

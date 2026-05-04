@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -45,6 +46,7 @@ public class ImFriendController {
     @GetMapping("/list")
     @Operation(summary = "获得当前登录用户的好友列表")
     public CommonResult<List<ImFriendRespVO>> getMyFriendList() {
+        // 含 DISABLE 历史好友：保留给前端展示「已删除好友」的历史对话信息；前端按 status 决定会话级联清理
         List<ImFriendDO> friends = friendService.getFriendList(getLoginUserId());
         return success(buildFriendRespVOList(friends));
     }
@@ -59,10 +61,14 @@ public class ImFriendController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除好友（单向软删除）")
-    @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
+    @Parameters({
+            @Parameter(description = "好友的用户编号", required = true, example = "2048"),
+            @Parameter(description = "是否级联清理本端相关数据（如私聊会话）")
+    })
     public CommonResult<Boolean> deleteFriend(
-            @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
-        friendService.deleteFriend(getLoginUserId(), friendUserId);
+            @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId,
+            @RequestParam(value = "clear", required = false) Boolean clear) {
+        friendService.deleteFriend(getLoginUserId(), friendUserId, clear);
         return success(true);
     }
 
