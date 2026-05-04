@@ -178,9 +178,11 @@ public class ImFriendServiceImpl implements ImFriendService {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
         deleteFriend0(userId, friendUserId);
 
-        // 2. 推 TIP「你已删除好友」走单边语义（persistent=false）：
-        //    不入库 + 仅推 userId 多端，对方完全不感知；clear=true 时前端会清对话连带这条 TIP 一起清
-        privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_DELETE_TIP_MESSAGE, false);
+        // 2. 仅 clear=false 时推 TIP「你已删除好友」（单边 persistent=false）；
+        //    clear=true / null 时跳过 —— 避免 TIP 晚于 FRIEND_DELETE 到达把刚清的会话复活
+        if (Boolean.FALSE.equals(clear)) {
+            privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_DELETE_TIP_MESSAGE, false);
+        }
 
         // 3. 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）；clear 透传让多端清理动作一致
         FriendDeleteNotification payload = ((FriendDeleteNotification) new FriendDeleteNotification()
