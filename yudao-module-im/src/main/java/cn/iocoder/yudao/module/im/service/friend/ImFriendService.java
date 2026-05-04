@@ -73,7 +73,7 @@ public interface ImFriendService {
     /**
      * 删除好友（单向软删除）
      * <p>
-     * 仅删除 userId 视角下的好友关系；对端 friendUserId 的视角不受影响（与 OpenIM 单边删除语义对齐）
+     * 仅删除 userId 视角下的好友关系；对端 friendUserId 的视角不受影响（单边删除语义）
      */
     void deleteFriend(Long userId, Long friendUserId);
 

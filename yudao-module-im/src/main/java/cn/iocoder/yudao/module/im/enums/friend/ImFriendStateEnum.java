@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * IM 好友关系状态（合并「是否好友」+「是否拉黑」两态）
  * <p>
- * 用 state 而非 status：避免和 ImFriendDO 的 statue 物理字段（CommonStatusEnum：ENABLE / DISABLE）混淆。
+ * 用 state 而非 status：避免和 ImFriendDO 的 status 物理字段（CommonStatusEnum：ENABLE / DISABLE）混淆。
  * <p>
  * 用于 ImFriendService.getFriendState 返回值与 FRIEND_STATE 缓存值：私聊发送热点路径下，sender 调缓存即可同时判定「能否发」和「是否屏蔽接收方」
  *

@@ -154,6 +154,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         getSelf().addFriend0(userId, friendUserId, displayName, addSource);
 
         // 2. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
+        //    operatorUserId 填 friendUserId（对方）：让 userId 多端 UI 呈现「对方加了我」的视觉效果，与 silent 语义对齐
         FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
                 .setOperatorUserId(friendUserId).setFriendUserId(friendUserId);
         websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
