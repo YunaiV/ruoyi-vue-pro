@@ -39,11 +39,18 @@ public interface ImFriendRequestService {
     void refuseFriendRequest(Long userId, Long requestId, String handleContent);
 
     /**
-     * 查询「我相关」的申请列表（含我发起的、别人加我的）
+     * 查询「我相关」的申请列表（含我发起的、别人加我的）；游标分页：传 lastRequestId 拉它之前的下一页
      *
-     * @param userId 用户编号
-     * @return 申请记录列表
+     * @param userId        用户编号
+     * @param lastRequestId 当前列表最旧记录的 id；首页传 null
+     * @param limit         单次拉取条数（page size，由前端常量控制）
+     * @return 申请记录列表，按 id 倒序
      */
-    List<ImFriendRequestDO> getMyFriendRequestList(Long userId);
+    List<ImFriendRequestDO> getMyFriendRequestList(Long userId, Long lastRequestId, Integer limit);
+
+    /**
+     * 按 id 单查申请记录；通用读接口，调用方自行做越权过滤
+     */
+    ImFriendRequestDO getFriendRequest(Long id);
 
 }

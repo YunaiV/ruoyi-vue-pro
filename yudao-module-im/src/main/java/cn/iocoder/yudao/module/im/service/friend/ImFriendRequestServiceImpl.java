@@ -183,8 +183,13 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     }
 
     @Override
-    public List<ImFriendRequestDO> getMyFriendRequestList(Long userId) {
-        return friendRequestMapper.selectMyList(userId, imProperties.getFriend().getRequestListMaxSize());
+    public List<ImFriendRequestDO> getMyFriendRequestList(Long userId, Long lastRequestId, Integer limit) {
+        return friendRequestMapper.selectMyList(userId, lastRequestId, limit);
+    }
+
+    @Override
+    public ImFriendRequestDO getFriendRequest(Long id) {
+        return friendRequestMapper.selectById(id);
     }
 
     /**

@@ -24,10 +24,14 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
                 .last("LIMIT 1"));
     }
 
-    default List<ImFriendRequestDO> selectMyList(Long userId, int limit) {
-        // 先放扩展过滤再放双向 OR；否则 .and() 返回 LambdaQueryWrapper 基类，丢失 eqIfPresent 等扩展方法
+    /**
+     * 拉取「我相关」的好友申请列表；游标分页：lastRequestId 为 null 拉首页，非 null 拉 id 严格小于它的下一页
+     */
+    default List<ImFriendRequestDO> selectMyList(Long userId, Long lastRequestId, int limit) {
+        // 先放扩展过滤再放双向 OR；否则 .and() 返回 LambdaQueryWrapper 基类，丢失 ltIfPresent 等扩展方法
         LambdaQueryWrapperX<ImFriendRequestDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.and(w -> w.eq(ImFriendRequestDO::getFromUserId, userId)
+        wrapper.ltIfPresent(ImFriendRequestDO::getId, lastRequestId)
+                .and(w -> w.eq(ImFriendRequestDO::getFromUserId, userId)
                         .or().eq(ImFriendRequestDO::getToUserId, userId))
                 .orderByDesc(ImFriendRequestDO::getId)
                 .last("LIMIT " + limit);

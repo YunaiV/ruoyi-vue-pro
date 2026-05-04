@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.controller.admin.friend;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
@@ -75,10 +77,27 @@ public class ImFriendRequestController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "查询「我相关」的好友申请列表（含我发起的、别人加我的）")
-    public CommonResult<List<ImFriendRequestRespVO>> getMyFriendRequestList() {
-        List<ImFriendRequestDO> list = friendRequestService.getMyFriendRequestList(getLoginUserId());
+    @Operation(summary = "查询「我相关」的好友申请列表（游标分页：传 lastRequestId 加载更多）")
+    public CommonResult<List<ImFriendRequestRespVO>> getMyFriendRequestList(
+            @Parameter(description = "当前列表最旧记录的 id；首页不传")
+            @RequestParam(value = "lastRequestId", required = false) Long lastRequestId,
+            @Parameter(description = "单次拉取条数", required = true) @RequestParam("limit") @Min(1) Integer limit) {
+        List<ImFriendRequestDO> list = friendRequestService.getMyFriendRequestList(getLoginUserId(), lastRequestId, limit);
         return success(buildList(list));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "按 id 单查「我相关」的申请记录（带越权过滤；WebSocket 通知到达后用）")
+    @Parameter(name = "id", description = "申请记录编号", required = true)
+    public CommonResult<ImFriendRequestRespVO> getMyFriendRequest(@RequestParam("id") Long id) {
+        ImFriendRequestDO request = friendRequestService.getFriendRequest(id);
+        // 越权过滤：fromUser / toUser 必有一方是当前用户，否则当不存在返回 null
+        Long currentUserId = getLoginUserId();
+        if (request == null || (ObjUtil.notEqual(request.getFromUserId(), currentUserId)
+                && ObjUtil.notEqual(request.getToUserId(), currentUserId))) {
+            return success(null);
+        }
+        return success(CollUtil.getFirst(buildList(Collections.singletonList(request))));
     }
 
     // ========== 私有方法：VO 组装 ==========
