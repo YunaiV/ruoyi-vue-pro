@@ -45,6 +45,14 @@ public interface ErrorCodeConstants {
     // ========== 好友 (1-040-600-000) ==========
     ErrorCode FRIEND_NOT_FRIEND = new ErrorCode(1_040_600_001, "对方不是您的好友");
     ErrorCode FRIEND_ADD_SELF = new ErrorCode(1_040_600_002, "不允许添加自己为好友");
+    ErrorCode FRIEND_NOT_BLOCKED = new ErrorCode(1_040_600_003, "对方未在黑名单中");
+    ErrorCode FRIEND_BLOCKED_BY_PEER = new ErrorCode(1_040_600_004, "您已被对方拉入黑名单，无法发送消息");
+
+    // ========== 好友申请 (1-040-610-000) ==========
+    ErrorCode FRIEND_REQUEST_NOT_EXISTS = new ErrorCode(1_040_610_001, "好友申请不存在");
+    ErrorCode FRIEND_REQUEST_HANDLED = new ErrorCode(1_040_610_002, "好友申请已处理");
+    ErrorCode FRIEND_REQUEST_NOT_TO_ME = new ErrorCode(1_040_610_003, "不能处理别人的好友申请");
+    ErrorCode FRIEND_REQUEST_TARGET_INVALID = new ErrorCode(1_040_610_004, "好友申请的对方不存在或已禁用");
 
     // ========== 敏感词 (1-040-700-000) ==========
     ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_040_700_000, "敏感词不存在");

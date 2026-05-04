@@ -16,12 +16,12 @@ public interface RedisKeyConstants {
     String GROUP_MESSAGE_READ = "im:group:message:read:%s";
 
     /**
-     * 好友关系是否存在的缓存
+     * 好友关系状态缓存（合并「是否好友」+「是否拉黑」两态）
      * <p>
-     * KEY 格式：friend:{userId}_{friendUserId}
-     * VALUE 数据类型：Boolean
+     * KEY 格式：friend_state:{userId}_{friendUserId}
+     * VALUE 数据类型：{@link cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum}
      */
-    String FRIEND = "friend";
+    String FRIEND_STATE = "friend_state";
 
     /**
      * 群信息缓存

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.service.websocket.dto.notification;
+package cn.iocoder.yudao.module.im.service.websocket.dto.notification.group;
 
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import lombok.Data;

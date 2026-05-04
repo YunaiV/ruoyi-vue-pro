@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.service.message.dto;
 
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.*;
+import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

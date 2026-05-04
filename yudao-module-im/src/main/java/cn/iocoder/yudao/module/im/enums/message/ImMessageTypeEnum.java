@@ -33,10 +33,63 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     TIP_TIME(20, "时间分隔", false, false), // 暂无（前端本地生成）
     TIP_TEXT(21, "系统提示", true, false), // 对应 TextMessage 类
 
-    // ========== 好友变更 ==========
-    FRIEND_ADD(100, "好友添加", false, false), // 暂无对应类
-    FRIEND_DELETE(101, "好友删除", false, false), // 暂无对应类
-    FRIEND_UPDATE(102, "好友更新", false, false), // 暂无对应类（客户端收到后自行拉取）
+    // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
+    /**
+     * 对应 OpenIM：FriendApplicationApprovedNotification 1201
+     * 对应自己的类：FriendRequestApprovedNotification
+     * 场景：B 同意 A 的好友申请，推给 A 多端
+     */
+    FRIEND_REQUEST_APPROVED(1201, "好友申请被同意", false, false),
+    /**
+     * 对应 OpenIM：FriendApplicationRejectedNotification 1202
+     * 对应自己的类：FriendRequestRejectedNotification
+     * 场景：B 拒绝 A 的好友申请，推给 A 多端
+     */
+    FRIEND_REQUEST_REJECTED(1202, "好友申请被拒绝", false, false),
+    /**
+     * 对应 OpenIM：FriendApplicationNotification 1203
+     * 对应自己的类：FriendRequestNotification
+     * 场景：A 申请加 B，推给 B 多端，前端落到「新的朋友」列表
+     */
+    FRIEND_APPLICATION(1203, "收到新的好友申请", false, false),
+    /**
+     * 对应 OpenIM：FriendAddedNotification 1204
+     * 对应自己的类：FriendAddNotification
+     * 场景：双方建立好友关系（同意申请 / 管理员导入），推给 A、B 双方多端
+     */
+    FRIEND_ADD(1204, "新增好友", false, false),
+    /**
+     * 对应 OpenIM：FriendDeletedNotification 1205
+     * 对应自己的类：FriendDeleteNotification
+     * 场景：A 删除 B，推给 A、B 双方多端
+     */
+    FRIEND_DELETE(1205, "好友被删除", false, false),
+    // 1206 对应 OpenIM FriendRemarkSetNotification；本系统并入 FRIEND_UPDATE(1210) 统一推送，单一字段变更不再独立通道
+    /**
+     * 对应 OpenIM：BlackAddedNotification 1207
+     * 对应自己的类：FriendBlockNotification
+     * 场景：A 拉黑 B，仅推 A 多端
+     */
+    FRIEND_BLOCK(1207, "加入黑名单", false, false),
+    /**
+     * 对应 OpenIM：BlackDeletedNotification 1208
+     * 对应自己的类：FriendUnblockNotification
+     * 场景：A 移出 B 的黑名单，仅推 A 多端
+     */
+    FRIEND_UNBLOCK(1208, "移出黑名单", false, false),
+    /**
+     * 对应 OpenIM：FriendInfoUpdatedNotification 1209
+     * 对应自己的类：FriendInfoUpdatedNotification
+     * 场景：B 改了昵称 / 头像后，推给 B 的所有好友
+     * TODO @AI：未实现；待 system 模块改昵称 / 头像时回调 IM 模块批量推此事件，前端 dispatcher 已就绪
+     */
+    FRIEND_INFO_UPDATED(1209, "好友资料变更", false, false),
+    /**
+     * 对应 OpenIM：FriendsInfoUpdateNotification 1210（窄化到 muted / pinned 单边属性）
+     * 对应自己的类：FriendUpdateNotification
+     * 场景：A 改了 muted / pinned 等单边属性，推 A 多端
+     */
+    FRIEND_UPDATE(1210, "好友信息批量更新", false, false),
 
     // ========== 群事件（1501-1520 直接复用 OpenIM 段位编号；1530+ 我们独有扩展） ==========
     // 1500 对应 OpenIM GroupNotificationBegin 起始位，仅作占位，不使用

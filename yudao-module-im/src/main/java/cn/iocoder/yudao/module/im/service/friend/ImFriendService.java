@@ -4,87 +4,80 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
+import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
  * IM 好友关系 Service 接口
+ * <p>
+ * 注意：用户端「加好友」走 {@link ImFriendRequestService#applyFriend} 申请-审批流程，
+ * 不再开放直接 add 接口；只有 {@link #becomeFriends} 是内部入口（被 agree 同意 / 管理员 import 触发）。
  *
  * @author 芋道源码
  */
 public interface ImFriendService {
 
     /**
-     * 判断两个用户是否是好友关系（未删除状态）
-     *
-     * @param userId       用户编号
-     * @param friendUserId 好友用户编号
-     * @return 是否好友
+     * 获取 userId 视角下与 friendUserId 的好友关系状态（私聊发送热点路径）
+     * <p>
+     * 合并「是否好友」+「是否被自己拉黑」两态，供调用方一次缓存查询完成判定，详见 {@link ImFriendStateEnum}
      */
-    boolean isFriend(Long userId, Long friendUserId);
+    ImFriendStateEnum getFriendState(Long userId, Long friendUserId);
 
     /**
      * 获得当前用户的好友列表（含已删除状态）
-     * <p>
-     * 返回的列表里**包含已删除状态**，前端按 status 区分展示（已删除的置灰）；
-     * 原因是本地已经建立会话的好友被单向删除后，前端仍需要展示头像/昵称。
-     *
-     * @param userId 用户编号
-     * @return 好友关系列表（含已删除的记录）
      */
     List<ImFriendDO> getFriendList(Long userId);
 
     /**
      * 获得当前用户与指定用户之间的有效好友列表（仅 ENABLE 状态）
-     *
-     * @param userId        用户编号
-     * @param friendUserIds 需要校验的好友用户编号集合
-     * @return 有效好友关系列表
      */
     List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds);
 
     /**
-     * 查询一个好友关系记录（仅限本人视角）
-     *
-     * @param userId       当前登录用户编号
-     * @param friendUserId 目标用户编号
-     * @return 好友关系记录，不存在返回 null
+     * 查询一个好友关系记录
      */
     ImFriendDO getFriend(Long userId, Long friendUserId);
 
-    /**
-     * 添加好友（双向绑定）
-     * <p>
-     * 核心流程：
-     * 1. 校验：不允许添加自己；对方必须存在
-     * 2. 双向插入/更新关系（若已存在则刷新为未删除）
-     * 3. 推送"你们已成为好友"系统提示（TODO）
-     *
-     * @param userId       当前登录用户编号
-     * @param friendUserId 好友的用户编号
-     */
-    void addFriend(Long userId, Long friendUserId);
+    // ==================== 内部入口 ====================
 
     /**
-     * 删除好友（双向软删除）
+     * 双向建立好友关系（内部入口）
      * <p>
-     * 两边关系都标记为已删除状态。
+     * 由 {@link ImFriendRequestService#agreeFriendRequest} 同意申请 / 管理后台导入触发；
+     * A 侧 displayName / addSource 取自申请记录；B 侧 displayName 为空、addSource 同来源。
+     * 写库后推送 FRIEND_ADD 通知给 A、B 双方多端，并下发 TIP 系统消息。
      *
-     * @param userId       当前登录用户编号
-     * @param friendUserId 好友的用户编号
+     * @param request 已同意的申请记录（决定 fromUserId / toUserId / addSource / displayName）
+     */
+    void becomeFriends(ImFriendRequestDO request);
+
+    // ==================== 用户端 ====================
+
+    /**
+     * 删除好友（单向软删除）
+     * <p>
+     * 仅删除 userId 视角下的好友关系；对端 friendUserId 的视角不受影响（与 OpenIM 单边删除语义对齐）
      */
     void deleteFriend(Long userId, Long friendUserId);
 
     /**
-     * 更新好友信息（仅更新本人→对方的单边关系属性）
-     * <p>
-     * 目前支持：免打扰（muted）；后续可扩展备注等字段。
-     *
-     * @param userId  当前登录用户编号
-     * @param reqVO   更新请求
+     * 更新好友单边属性（备注 / 免打扰 / 联系人置顶）
      */
     void updateFriend(Long userId, ImFriendUpdateReqVO reqVO);
+
+    /**
+     * 拉黑好友（必须先是好友）
+     */
+    void blockFriend(Long userId, Long friendUserId);
+
+    /**
+     * 移出黑名单
+     */
+    void unblockFriend(Long userId, Long friendUserId);
 
     // ==================== 管理后台 ====================
 

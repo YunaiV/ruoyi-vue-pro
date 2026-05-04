@@ -20,4 +20,7 @@ public class ImFriendUpdateReqVO {
     @Size(max = 16, message = "好友备注最多 16 个字符")
     private String displayName;
 
+    @Schema(description = "是否置顶联系人；不传表示不修改", example = "true")
+    private Boolean pinned;
+
 }

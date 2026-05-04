@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.im.service.websocket.dto;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.BaseFriendNotification;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -103,45 +105,19 @@ public class ImPrivateMessageDTO {
     // ==================== 好友变更相关 ====================
 
     /**
-     * 构建好友添加推送 DTO（通知对方"你有一位新好友"）
+     * 构建好友通知推送 DTO（统一入口）
      *
-     * @param userId       当前用户编号（即发起添加的用户）
-     * @param friendUserId 好友的用户编号（即接收通知的用户）
+     * @param type            消息类型；取自 {@link ImMessageTypeEnum} 中的 FRIEND_* 段
+     * @param operatorUserId  操作人用户编号；同时作为帧的 senderId 用于定位接收端 friendUserId
+     * @param receiverUserId  推送目标用户编号
+     * @param payload         好友通知 payload（继承 {@link BaseFriendNotification}）
      * @return 私聊 DTO
      */
-    public static ImPrivateMessageDTO ofFriendAdd(Long userId, Long friendUserId) {
-        return new ImPrivateMessageDTO()
-                .setType(ImMessageTypeEnum.FRIEND_ADD.getType())
-                .setSenderId(userId).setReceiverId(friendUserId)
-                .setSendTime(LocalDateTime.now());
-    }
-
-    /**
-     * 构建好友删除推送 DTO（通知对方"好友关系已解除"）
-     *
-     * @param userId       当前用户编号（即发起删除的用户）
-     * @param friendUserId 好友的用户编号（即接收通知的用户）
-     * @return 私聊 DTO
-     */
-    public static ImPrivateMessageDTO ofFriendDelete(Long userId, Long friendUserId) {
-        return new ImPrivateMessageDTO()
-                .setType(ImMessageTypeEnum.FRIEND_DELETE.getType())
-                .setSenderId(userId).setReceiverId(friendUserId)
-                .setSendTime(LocalDateTime.now());
-    }
-
-    /**
-     * 构建好友更新推送 DTO（通知自己多端同步好友属性变更）
-     *
-     * @param userId       当前用户编号
-     * @param friendUserId 好友的用户编号
-     * @return 私聊 DTO
-     */
-    public static ImPrivateMessageDTO ofFriendUpdate(Long userId, Long friendUserId) {
-        return new ImPrivateMessageDTO()
-                .setType(ImMessageTypeEnum.FRIEND_UPDATE.getType())
-                .setSenderId(userId).setReceiverId(friendUserId)
-                .setSendTime(LocalDateTime.now());
+    public static ImPrivateMessageDTO ofFriendNotification(Integer type, Long operatorUserId,
+                                                           Long receiverUserId, BaseFriendNotification payload) {
+        return new ImPrivateMessageDTO().setType(type)
+                .setSenderId(operatorUserId).setReceiverId(receiverUserId)
+                .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
     }
 
 }

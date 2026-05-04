@@ -57,17 +57,8 @@ public class ImFriendController {
         return success(buildFriendRespVO(friend));
     }
 
-    @PostMapping("/add")
-    @Operation(summary = "添加好友（双向建立关系）")
-    @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
-    public CommonResult<Boolean> addFriend(
-            @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
-        friendService.addFriend(getLoginUserId(), friendUserId);
-        return success(true);
-    }
-
     @DeleteMapping("/delete")
-    @Operation(summary = "删除好友（双向软删除）")
+    @Operation(summary = "删除好友（单向软删除）")
     @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
     public CommonResult<Boolean> deleteFriend(
             @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
@@ -76,9 +67,27 @@ public class ImFriendController {
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新好友信息")
+    @Operation(summary = "更新好友单边属性（备注 / 免打扰 / 联系人置顶）")
     public CommonResult<Boolean> updateFriend(@Valid @RequestBody ImFriendUpdateReqVO reqVO) {
         friendService.updateFriend(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/block")
+    @Operation(summary = "拉黑好友（必须先是好友；单边屏蔽对方私聊消息）")
+    @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
+    public CommonResult<Boolean> blockFriend(
+            @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
+        friendService.blockFriend(getLoginUserId(), friendUserId);
+        return success(true);
+    }
+
+    @PutMapping("/unblock")
+    @Operation(summary = "移出黑名单")
+    @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048")
+    public CommonResult<Boolean> unblockFriend(
+            @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId) {
+        friendService.unblockFriend(getLoginUserId(), friendUserId);
         return success(true);
     }
 

@@ -29,6 +29,15 @@ public class ImFriendRespVO {
     @Schema(description = "好友展示备注的拼音（小写无空格）", example = "laozhang")
     private String displayNamePinyin;
 
+    @Schema(description = "添加来源", example = "1")
+    private Integer addSource; // 参见 ImFriendAddSourceEnum 枚举
+
+    @Schema(description = "是否置顶联系人", example = "false")
+    private Boolean pinned;
+
+    @Schema(description = "是否拉黑（仅自己可见）", example = "false")
+    private Boolean blocked;
+
     @Schema(description = "好友状态", example = "0")
     private Integer status;
 

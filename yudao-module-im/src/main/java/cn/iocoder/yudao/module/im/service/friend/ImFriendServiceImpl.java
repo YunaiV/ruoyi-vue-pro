@@ -1,22 +1,26 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
+import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -24,11 +28,10 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_ADD_SELF;
+import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND_STATE;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_ADD_TIP_MESSAGE;
 import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_DELETE_TIP_MESSAGE;
@@ -44,138 +47,218 @@ import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_DELETE_T
 public class ImFriendServiceImpl implements ImFriendService {
 
     @Resource
-    private ImFriendMapper imFriendMapper;
+    private ImFriendMapper friendMapper;
 
     @Resource
-    private AdminUserApi adminUserApi;
-
-    @Resource
-    private ImWebSocketService imWebSocketService;
+    private ImWebSocketService websocketService;
     @Resource
     @Lazy
     private ImPrivateMessageService privateMessageService;
 
     @Override
-    @Cacheable(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId", unless = "#result == null")
-    public boolean isFriend(Long userId, Long friendUserId) {
-        ImFriendDO friend = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
-        return friend != null && CommonStatusEnum.isEnable(friend.getStatus());
+    @Cacheable(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId", unless = "#result == null")
+    public ImFriendStateEnum getFriendState(Long userId, Long friendUserId) {
+        // 1.1 我侧记录：我方删了，都算非好友
+        ImFriendDO mine = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        if (mine == null || !CommonStatusEnum.isEnable(mine.getStatus())) {
+            return ImFriendStateEnum.NONE;
+        }
+        // 1.2 对方侧记录：对方删了 = 不是好友
+        ImFriendDO peer = friendMapper.selectByUserIdAndFriendUserId(friendUserId, userId);
+        if (peer == null || !CommonStatusEnum.isEnable(peer.getStatus())) {
+            return ImFriendStateEnum.NONE;
+        }
+        // 2. 仅当双方都是 ENABLE 状态，才算好友关系；此时对方拉黑我，则是 BLOCKED
+        return BooleanUtil.isTrue(peer.getBlocked()) ? ImFriendStateEnum.BLOCKED : ImFriendStateEnum.FRIEND;
     }
 
     @Override
     public List<ImFriendDO> getFriendList(Long userId) {
-        return imFriendMapper.selectListByUserId(userId);
+        return friendMapper.selectListByUserId(userId);
     }
 
     @Override
     public List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds) {
-        return imFriendMapper.selectListByUserIdAndFriendUserIdsAndStatus(userId, friendUserIds,
+        return friendMapper.selectListByUserIdAndFriendUserIdsAndStatus(userId, friendUserIds,
                 CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Override
     public ImFriendDO getFriend(Long userId, Long friendUserId) {
-        return imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        return friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
     }
 
     @Override
     public void updateFriend(Long userId, ImFriendUpdateReqVO reqVO) {
-        // 1. 校验好友关系存在
-        ImFriendDO friend = imFriendMapper.selectByUserIdAndFriendUserId(userId, reqVO.getFriendUserId());
+        // 1.1 校验：至少改一个字段（无字段变更，直接结束）
+        if (reqVO.getDisplayName() == null && reqVO.getMuted() == null && reqVO.getPinned() == null) {
+            return;
+        }
+        // 1.2 校验好友关系存在
+        ImFriendDO friend = friendMapper.selectByUserIdAndFriendUserId(userId, reqVO.getFriendUserId());
         if (friend == null) {
             throw exception(FRIEND_NOT_FRIEND);
         }
 
-        // 2. 更新好友属性
-        imFriendMapper.updateById(new ImFriendDO().setId(friend.getId())
-                .setMuted(reqVO.getMuted()).setDisplayName(reqVO.getDisplayName()));
+        // 2. 更新好友属性（备注 / 免打扰 / 联系人置顶）
+        friendMapper.updateById(new ImFriendDO().setId(friend.getId())
+                .setMuted(reqVO.getMuted())
+                .setDisplayName(reqVO.getDisplayName())
+                .setPinned(reqVO.getPinned()));
 
-        // 3. 推送好友更新通知（多端同步）
-        imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofFriendUpdate(userId, reqVO.getFriendUserId()));
+        // 3. 推 FRIEND_UPDATE 给 A 多端：所有单边属性变更合并为单条通知，避免多通知顺序竞争
+        FriendUpdateNotification payload = (FriendUpdateNotification) new FriendUpdateNotification()
+                .setDisplayName(reqVO.getDisplayName()).setMuted(reqVO.getMuted()).setPinned(reqVO.getPinned())
+                .setOperatorUserId(userId).setFriendUserId(reqVO.getFriendUserId());
+        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_UPDATE.getType(), userId, userId, payload));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addFriend(Long userId, Long friendUserId) {
-        // 1.1 校验：不允许添加自己为好友
-        if (Objects.equals(userId, friendUserId)) {
-            throw exception(FRIEND_ADD_SELF);
-        }
-        // 1.2 校验对方存在（禁用/不存在的账号不允许添加）
-        adminUserApi.validateUser(friendUserId);
+    public void becomeFriends(ImFriendRequestDO request) {
+        Long fromUserId = request.getFromUserId();
+        Long toUserId = request.getToUserId();
+        // 1. 双向建立关系：A 侧带申请的 displayName / addSource；B 侧 displayName 为空、addSource 同来源
+        getSelf().addFriend0(fromUserId, toUserId, request.getDisplayName(), request.getAddSource());
+        getSelf().addFriend0(toUserId, fromUserId, null, request.getAddSource());
 
-        // 2. 双向绑定
-        getSelf().addFriend0(userId, friendUserId);
-        getSelf().addFriend0(friendUserId, userId);
+        // TODO DONE @AI：删除「在 openim 里」措辞；TIP 与 FRIEND_ADD 目的不同保持双发
+        // TODO @AI：在确认一次；是否需要发送 tip？而是通过 FRIEND_ADD 可以满足了。。。（讨论一下）
+        // 2.1 推 TIP 系统消息（双方私聊会话里看到「你们已成为好友」）；TIP 走会话入库，FRIEND_ADD 走事件通知
+        privateMessageService.sendTipPrivateMessage(fromUserId, toUserId, FRIEND_ADD_TIP_MESSAGE);
 
-        // 3.1 插入 TIP_TEXT 系统提示消息并推送双方
-        privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_ADD_TIP_MESSAGE);
-        // 3.2 推送好友添加通知给双方
-        imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofFriendAdd(friendUserId, userId));
-        imWebSocketService.sendPrivateMessageAsync(friendUserId,
-                ImPrivateMessageDTO.ofFriendAdd(userId, friendUserId));
+        // 2.2.1 推 FRIEND_ADD 给 fromUser 多端
+        FriendAddNotification toFrom = (FriendAddNotification) new FriendAddNotification()
+                .setOperatorUserId(toUserId).setFriendUserId(toUserId);
+        websocketService.sendPrivateMessageAsync(fromUserId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_ADD.getType(), toUserId, fromUserId, toFrom));
+        // 2.2.2 推 FRIEND_ADD 给 toUser 多端
+        FriendAddNotification toTo = (FriendAddNotification) new FriendAddNotification()
+                .setOperatorUserId(fromUserId).setFriendUserId(fromUserId);
+        websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_ADD.getType(), fromUserId, toUserId, toTo));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteFriend(Long userId, Long friendUserId) {
-        // 1. 双向标记为 DISABLE + 记录 deleteTime
+        // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
         getSelf().deleteFriend0(userId, friendUserId);
-        getSelf().deleteFriend0(friendUserId, userId);
 
-        // 2.1 插入 TIP_TEXT 系统提示消息并推送双方
+        // 2.1 推 TIP 系统消息
         privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_DELETE_TIP_MESSAGE);
-        // 2.2 推送好友删除通知给双方
-        imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofFriendDelete(userId, friendUserId));
-        imWebSocketService.sendPrivateMessageAsync(friendUserId,
-                ImPrivateMessageDTO.ofFriendDelete(friendUserId, userId));
+
+        // 2.2 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）
+        FriendDeleteNotification payload = (FriendDeleteNotification) new FriendDeleteNotification()
+                .setOperatorUserId(userId).setFriendUserId(friendUserId);
+        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_DELETE.getType(), userId, userId, payload));
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
+    })
+    public void blockFriend(Long userId, Long friendUserId) {
+        // 1.1 校验是好友
+        ImFriendDO friend = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        if (friend == null || !CommonStatusEnum.isEnable(friend.getStatus())) {
+            throw exception(FRIEND_NOT_FRIEND);
+        }
+        // 1.2 已拉黑直接返回，幂等
+        if (BooleanUtil.isTrue(friend.getBlocked())) {
+            return;
+        }
+
+        // 2. 单边更新
+        friendMapper.updateById(new ImFriendDO().setId(friend.getId()).setBlocked(true));
+
+        // 3. 推 FRIEND_BLOCK 给 A 多端
+        FriendBlockNotification payload = (FriendBlockNotification) new FriendBlockNotification()
+                .setOperatorUserId(userId).setFriendUserId(friendUserId);
+        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_BLOCK.getType(), userId, userId, payload));
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
+    })
+    public void unblockFriend(Long userId, Long friendUserId) {
+        // 1.1 校验是好友
+        ImFriendDO friend = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        if (friend == null || !CommonStatusEnum.isEnable(friend.getStatus())) {
+            throw exception(FRIEND_NOT_FRIEND);
+        }
+        // 1.2 未拉黑则报错
+        if (!BooleanUtil.isTrue(friend.getBlocked())) {
+            throw exception(FRIEND_NOT_BLOCKED);
+        }
+
+        // 2. 单边更新
+        friendMapper.updateById(new ImFriendDO().setId(friend.getId()).setBlocked(false));
+
+        // 3. 推 FRIEND_UNBLOCK 给 A 多端
+        FriendUnblockNotification payload = (FriendUnblockNotification) new FriendUnblockNotification()
+                .setOperatorUserId(userId).setFriendUserId(friendUserId);
+        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
+                ImMessageTypeEnum.FRIEND_UNBLOCK.getType(), userId, userId, payload));
     }
 
     /**
-     * 单向绑定好友关系：
-     * - 首次：新增记录（status=ENABLE，addTime=now）
-     * - 已存在且 ENABLE：无需重复操作
-     * - 已存在但 DISABLE：恢复关系（status=ENABLE，刷新 addTime，清空 deleteTime）
+     * 单向绑定好友关系（内部方法，被 {@link #becomeFriends} 调用）：
+     * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，重置 muted / pinned / blocked 为 false（删好友再加回来不沿袭旧设置）
+     * - 情况二：不存在记录 → 直接插入新记录
      * <p>
-     * 并发安全：依靠 im_friend 表的唯一索引 uk_im_friend_user_friend(user_id, friend_user_id) 保证幂等，
-     * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
+     * 并发安全：业务侧通过 friend_request.handle_result 已保证 agree 不会并发触发；
+     * 极端并发下若插入唯一键冲突，让 DuplicateKeyException 向外抛出，外层事务回滚。
      */
-    @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
-    public void addFriend0(Long userId, Long friendUserId) {
-        ImFriendDO exists = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
-        // 情况一：已存在记录 → 恢复或跳过
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
+    })
+    public void addFriend0(Long userId, Long friendUserId, String displayName, Integer addSource) {
+        ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        // 情况一：复用旧记录 → 恢复 ENABLE + 重置 muted / pinned / blocked 与首次新增对齐
         if (exists != null) {
-            if (CommonStatusEnum.isEnable(exists.getStatus())) {
-                return;
+            ImFriendDO update = new ImFriendDO().setId(exists.getId())
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()).setAddTime(LocalDateTime.now())
+                    .setMuted(false).setPinned(false).setBlocked(false);
+            if (displayName != null) {
+                update.setDisplayName(displayName);
             }
-            imFriendMapper.updateById(new ImFriendDO().setId(exists.getId())
-                    .setStatus(CommonStatusEnum.ENABLE.getStatus()).setAddTime(LocalDateTime.now()));
+            if (addSource != null) {
+                update.setAddSource(addSource);
+            }
+            friendMapper.updateById(update);
             return;
         }
-        // 情况二：新增好友关系
+        // 情况二：不存在记录 → 直接插入新记录
         ImFriendDO friend = ImFriendDO.builder().userId(userId).friendUserId(friendUserId)
-                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).addTime(LocalDateTime.now()).build();
-        try {
-            imFriendMapper.insert(friend);
-        } catch (DuplicateKeyException e) {
-            // 并发场景：另一个请求已先一步插入，且其插入的必然是 ENABLE 状态（DISABLE 场景在上方分支已处理），直接忽略
-            log.warn("[addFriend0][userId({}) friendUserId({}) 并发插入冲突，忽略]", userId, friendUserId);
-        }
+                .muted(false).pinned(false).blocked(false)
+                .displayName(displayName).addSource(addSource)
+                .status(CommonStatusEnum.ENABLE.getStatus()).addTime(LocalDateTime.now()).build();
+        friendMapper.insert(friend);
     }
 
     /**
      * 单向解除好友关系（status 设为 DISABLE，记录 deleteTime）
+     * <p>
+     * blocked 不主动重置：删好友期间保留拉黑状态；如果未来再 addFriend0，由 addFriend0 统一重置
      */
-    @CacheEvict(cacheNames = FRIEND, key = "#userId + '_' + #friendUserId")
+    @Caching(evict = {
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId"),
+            @CacheEvict(cacheNames = FRIEND_STATE, key = "#friendUserId + '_' + #userId")
+    })
     public void deleteFriend0(Long userId, Long friendUserId) {
-        ImFriendDO exists = imFriendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
+        ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (exists == null || CommonStatusEnum.isDisable(exists.getStatus())) {
             return;
         }
-        imFriendMapper.updateById(new ImFriendDO().setId(exists.getId())
+        friendMapper.updateById(new ImFriendDO().setId(exists.getId())
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDeleteTime(LocalDateTime.now()));
     }
 
@@ -187,7 +270,7 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     @Override
     public PageResult<ImFriendDO> getFriendPage(ImFriendManagerPageReqVO reqVO) {
-        return imFriendMapper.selectPage(reqVO);
+        return friendMapper.selectPage(reqVO);
     }
 
 }
