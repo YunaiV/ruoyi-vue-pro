@@ -27,8 +27,17 @@ public class ImFriendManagerRespVO {
     @Schema(description = "好友展示备注")
     private String displayName;
 
+    @Schema(description = "添加来源", example = "1")
+    private Integer addSource; // 参见 ImFriendAddSourceEnum 枚举类
+
     @Schema(description = "是否免打扰", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean silent;
+
+    @Schema(description = "是否置顶联系人", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    private Boolean pinned;
+
+    @Schema(description = "是否拉黑", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    private Boolean blocked;
 
     @Schema(description = "好友状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status; // 参见 CommonStatusEnum 枚举类

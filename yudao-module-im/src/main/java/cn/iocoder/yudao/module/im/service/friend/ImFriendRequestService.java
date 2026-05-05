@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.request.ImFriendRequestApplyReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendRequestManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
 
 import java.util.List;
@@ -52,5 +54,12 @@ public interface ImFriendRequestService {
      * 按 id 单查申请记录；通用读接口，调用方自行做越权过滤
      */
     ImFriendRequestDO getFriendRequest(Long id);
+
+    // ==================== 管理后台 ====================
+
+    /**
+     * 【管理后台】分页查询好友申请记录
+     */
+    PageResult<ImFriendRequestDO> getFriendRequestPage(ImFriendRequestManagerPageReqVO reqVO);
 
 }

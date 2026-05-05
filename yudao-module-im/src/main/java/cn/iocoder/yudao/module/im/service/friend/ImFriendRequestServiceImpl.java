@@ -5,8 +5,10 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.request.ImFriendRequestApplyReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendRequestManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendRequestMapper;
@@ -198,6 +200,11 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     @Override
     public ImFriendRequestDO getFriendRequest(Long id) {
         return friendRequestMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<ImFriendRequestDO> getFriendRequestPage(ImFriendRequestManagerPageReqVO reqVO) {
+        return friendRequestMapper.selectPage(reqVO);
     }
 
     /**

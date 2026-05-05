@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.im.dal.mysql.friend;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendRequestManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,6 +43,16 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
     default int updateByIdAndHandleResult(Long id, Integer handleResult, ImFriendRequestDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<ImFriendRequestDO>()
                 .eq(ImFriendRequestDO::getId, id).eq(ImFriendRequestDO::getHandleResult, handleResult));
+    }
+
+    default PageResult<ImFriendRequestDO> selectPage(ImFriendRequestManagerPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ImFriendRequestDO>()
+                .eqIfPresent(ImFriendRequestDO::getFromUserId, reqVO.getFromUserId())
+                .eqIfPresent(ImFriendRequestDO::getToUserId, reqVO.getToUserId())
+                .eqIfPresent(ImFriendRequestDO::getHandleResult, reqVO.getHandleResult())
+                .eqIfPresent(ImFriendRequestDO::getAddSource, reqVO.getAddSource())
+                .betweenIfPresent(ImFriendRequestDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(ImFriendRequestDO::getId));
     }
 
 }
