@@ -74,6 +74,10 @@ public class ImGroupDO extends BaseDO {
      */
     private LocalDateTime dissolvedTime;
     /**
+     * 是否全群禁言
+     */
+    private Boolean mutedAll;
+    /**
      * 群置顶消息编号列表
      * <p>
      * 仅存 messageId，操作人 / 置顶时间从对应 PIN 事件的消息记录里反查

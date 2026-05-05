@@ -74,5 +74,11 @@ public class ImGroupMemberDO extends BaseDO {
      * 退群时间
      */
     private LocalDateTime quitTime;
+    /**
+     * 禁言到期时间
+     * <p>
+     * null 表示未禁言；非 null 且在未来表示禁言中；
+     */
+    private LocalDateTime muteEndTime;
 
 }

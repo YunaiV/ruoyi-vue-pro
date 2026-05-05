@@ -29,6 +29,9 @@ public class ImGroupRespVO {
     @Schema(description = "是否封禁")
     private Boolean banned;
 
+    @Schema(description = "是否全群禁言")
+    private Boolean mutedAll;
+
     @Schema(description = "封禁时间")
     private LocalDateTime bannedTime;
 

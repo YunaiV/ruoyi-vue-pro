@@ -117,4 +117,11 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
         return result;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    default int updateMuteEndTimeNull(Long id) {
+        return update(null, Wrappers.<ImGroupMemberDO>lambdaUpdate()
+                .eq(ImGroupMemberDO::getId, id)
+                .set(ImGroupMemberDO::getMuteEndTime, null));
+    }
+
 }

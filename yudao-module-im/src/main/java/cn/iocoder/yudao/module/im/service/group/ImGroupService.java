@@ -3,7 +3,10 @@ package cn.iocoder.yudao.module.im.service.group;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCancelMuteMemberReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupMuteAllReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupMuteMemberReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
@@ -173,6 +176,32 @@ public interface ImGroupService {
      * @param messageId 被取消置顶的消息编号
      */
     void unpinGroupMessage(Long userId, Long groupId, Long messageId);
+
+    // ==================== 群禁言 ====================
+
+    /**
+     * 全群禁言 / 取消（仅群主或管理员可执行）
+     *
+     * @param userId 当前登录用户编号
+     * @param reqVO  禁言信息
+     */
+    void muteAll(Long userId, @Valid ImGroupMuteAllReqVO reqVO);
+
+    /**
+     * 禁言单个成员（三档分层权限）
+     *
+     * @param userId 当前登录用户编号
+     * @param reqVO  禁言信息
+     */
+    void muteMember(Long userId, @Valid ImGroupMuteMemberReqVO reqVO);
+
+    /**
+     * 取消成员禁言（三档分层权限）
+     *
+     * @param userId 当前登录用户编号
+     * @param reqVO  取消禁言信息
+     */
+    void cancelMuteMember(Long userId, @Valid ImGroupCancelMuteMemberReqVO reqVO);
 
     // ==================== 管理后台 ====================
 

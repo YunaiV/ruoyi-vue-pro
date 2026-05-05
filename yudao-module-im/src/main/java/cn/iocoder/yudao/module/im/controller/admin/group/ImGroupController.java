@@ -145,6 +145,29 @@ public class ImGroupController {
         return success(true);
     }
 
+    // ==================== 群禁言 ====================
+
+    @PutMapping("/mute-all")
+    @Operation(summary = "全群禁言 / 取消（群主 / 管理员）")
+    public CommonResult<Boolean> muteAll(@Valid @RequestBody ImGroupMuteAllReqVO reqVO) {
+        groupService.muteAll(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/mute-member")
+    @Operation(summary = "禁言成员")
+    public CommonResult<Boolean> muteMember(@Valid @RequestBody ImGroupMuteMemberReqVO reqVO) {
+        groupService.muteMember(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/cancel-mute-member")
+    @Operation(summary = "取消成员禁言")
+    public CommonResult<Boolean> cancelMuteMember(@Valid @RequestBody ImGroupCancelMuteMemberReqVO reqVO) {
+        groupService.cancelMuteMember(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
     /** 单群转 VO + 关联回填 pinnedMessages（仅当登录用户是该群有效成员） */
     private ImGroupRespVO buildGroupRespVO(ImGroupDO group, Long loginUserId) {
         if (group == null) {

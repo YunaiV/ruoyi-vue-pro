@@ -266,4 +266,16 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return groupMemberMapper.selectCountMapByGroupIdsAndStatus(groupIds, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    @Override
+    public void updateGroupMemberMuteEndTime(Long groupId, Long userId, LocalDateTime muteEndTime) {
+        ImGroupMemberDO member = validateMemberInGroup(groupId, userId);
+        if (muteEndTime != null) {
+            // 禁言：直接更新到期时间
+            groupMemberMapper.updateById(new ImGroupMemberDO().setId(member.getId()).setMuteEndTime(muteEndTime));
+        } else {
+            // 取消禁言
+            groupMemberMapper.updateMuteEndTimeNull(member.getId());
+        }
+    }
+
 }

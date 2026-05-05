@@ -39,6 +39,9 @@ public class ImGroupMemberRespVO {
     @Schema(description = "退群时间")
     private LocalDateTime quitTime;
 
+    @Schema(description = "禁言到期时间")
+    private LocalDateTime muteEndTime;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

@@ -12,10 +12,12 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageListReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessageSendReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -86,9 +88,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             return existing;
         }
         // 1.2 校验群存在、发送人仍在群中
-        groupService.validateGroupExists(reqVO.getGroupId());
+        ImGroupDO group = groupService.validateGroupExists(reqVO.getGroupId());
         ImGroupMemberDO senderMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), senderId);
-        // 1.3 文本消息敏感词过滤
+        // 1.3 禁言校验
+        validateMuteStatus(group, senderMember);
+        // 1.4 文本消息敏感词过滤
         if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }
@@ -602,6 +606,21 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     private ImGroupMessageServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
+    }
+
+    /**
+     * 禁言状态校验：全群禁言 → 成员禁言；群主 / 管理员豁免全群禁言
+     */
+    private void validateMuteStatus(ImGroupDO group, ImGroupMemberDO senderMember) {
+        boolean isOwnerOrAdmin = ImGroupMemberRoleEnum.isOwnerOrAdmin(senderMember.getRole());
+        // 1. 全群禁言：群主 / 管理员豁免
+        if (Boolean.TRUE.equals(group.getMutedAll()) && !isOwnerOrAdmin) {
+            throw exception(GROUP_MUTED_CANNOT_SEND);
+        }
+        // 2. 成员禁言
+        if (senderMember.getMuteEndTime() != null && senderMember.getMuteEndTime().isAfter(LocalDateTime.now())) {
+            throw exception(GROUP_MEMBER_MUTED_CANNOT_SEND, senderMember.getMuteEndTime());
+        }
     }
 
 }

@@ -174,4 +174,37 @@ public class ImGroupMessageSendDTO {
                 .setType(ImMessageTypeEnum.GROUP_MESSAGE_UNPIN.getType()).setContent(notification);
     }
 
+    public static ImGroupMessageSendDTO ofGroupMemberMuted(Long groupId, Long operatorUserId,
+                                                            Long mutedUserId,
+                                                            java.time.LocalDateTime muteEndTime) {
+        GroupMemberMutedNotification notification = new GroupMemberMutedNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMutedUserId(mutedUserId);
+        notification.setMuteEndTime(muteEndTime);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_MEMBER_MUTED.getType()).setContent(notification);
+    }
+
+    public static ImGroupMessageSendDTO ofGroupMemberCancelMuted(Long groupId, Long operatorUserId, Long mutedUserId) {
+        GroupMemberCancelMutedNotification notification = new GroupMemberCancelMutedNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setMutedUserId(mutedUserId);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_MEMBER_CANCEL_MUTED.getType()).setContent(notification);
+    }
+
+    public static ImGroupMessageSendDTO ofGroupMuted(Long groupId, Long operatorUserId) {
+        GroupMutedNotification notification = new GroupMutedNotification();
+        notification.setOperatorUserId(operatorUserId);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_MUTED.getType()).setContent(notification);
+    }
+
+    public static ImGroupMessageSendDTO ofGroupCancelMuted(Long groupId, Long operatorUserId) {
+        GroupCancelMutedNotification notification = new GroupCancelMutedNotification();
+        notification.setOperatorUserId(operatorUserId);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_CANCEL_MUTED.getType()).setContent(notification);
+    }
+
 }

@@ -156,22 +156,26 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_DISSOLVE(1511, "群解散", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupMemberMutedTips（GroupMemberMutedNotification 1512）
-     * TODO @AI 未实现：单成员禁言（管理员禁言某成员）；本期发版要实现
+     * 对应自己的类：GroupMemberMutedNotification
+     * 场景：群主 / 管理员禁言某成员，全员广播
      */
     GROUP_MEMBER_MUTED(1512, "成员禁言", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupMemberCancelMutedTips（GroupMemberCancelMutedNotification 1513）
-     * TODO @AI 未实现：单成员取消禁言；本期发版要实现
+     * 对应自己的类：GroupMemberCancelMutedNotification
+     * 场景：群主 / 管理员取消某成员禁言，全员广播
      */
     GROUP_MEMBER_CANCEL_MUTED(1513, "成员取消禁言", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupMutedTips（GroupMutedNotification 1514）
-     * TODO @AI 未实现：全群禁言（管理员把整个群设为禁言状态，所有成员都不能发消息）；本期发版要实现
+     * 对应自己的类：GroupMutedNotification
+     * 场景：群主 / 管理员开启全群禁言，全员广播
      */
     GROUP_MUTED(1514, "全群禁言", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupCancelMutedTips（GroupCancelMutedNotification 1515）
-     * TODO @AI 未实现：全群取消禁言；本期发版要实现
+     * 对应自己的类：GroupCancelMutedNotification
+     * 场景：群主 / 管理员取消全群禁言，全员广播
      */
     GROUP_CANCEL_MUTED(1515, "全群取消禁言", true, false),
     /**

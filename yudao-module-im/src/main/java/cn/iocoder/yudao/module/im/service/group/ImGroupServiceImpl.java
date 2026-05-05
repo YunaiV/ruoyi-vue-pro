@@ -12,7 +12,10 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCancelMuteMemberReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupMuteAllReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupMuteMemberReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
@@ -525,6 +528,85 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
         // 2. 解封（保留 bannedReason / bannedTime 作为历史记录）
         groupMapper.updateById(new ImGroupDO().setId(id).setBanned(false));
+    }
+
+    // ==================== 群禁言 ====================
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#reqVO.groupId")
+    public void muteAll(Long userId, ImGroupMuteAllReqVO reqVO) {
+        // 1. 校验群主或管理员
+        validateGroupOwnerOrAdmin(reqVO.getGroupId(), userId);
+
+        // 2. 更新 mutedAll
+        groupMapper.updateById(new ImGroupDO().setId(reqVO.getGroupId()).setMutedAll(reqVO.getMutedAll()));
+
+        // 3. 广播通知
+        // TODO @AI：改成 messageSendDTO；其它也是；更好理解一点；
+        ImGroupMessageSendDTO dto = Boolean.TRUE.equals(reqVO.getMutedAll())
+                ? ImGroupMessageSendDTO.ofGroupMuted(reqVO.getGroupId(), userId)
+                : ImGroupMessageSendDTO.ofGroupCancelMuted(reqVO.getGroupId(), userId);
+        groupMessageService.sendGroupMessage(userId, dto);
+    }
+
+    @Override
+    public void muteMember(Long userId, ImGroupMuteMemberReqVO reqVO) {
+        // 1.1 不能禁言自己
+        if (ObjUtil.equal(userId, reqVO.getUserId())) {
+            throw exception(GROUP_MUTE_MEMBER_SELF);
+        }
+        // 1.2 校验群存在且未封禁
+        validateGroupExists(reqVO.getGroupId());
+        // 1.3 校验操作人和目标都在群中
+        ImGroupMemberDO operatorMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), userId);
+        ImGroupMemberDO targetMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), reqVO.getUserId());
+        // 1.4 三档权限校验
+        validateMutePermission(operatorMember, targetMember);
+
+        // 2. 设置 muteEndTime
+        LocalDateTime muteEndTime = LocalDateTime.now().plusSeconds(reqVO.getMutedSeconds());
+        groupMemberService.updateGroupMemberMuteEndTime(reqVO.getGroupId(), reqVO.getUserId(), muteEndTime);
+
+        // 3. 广播通知
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupMemberMuted(reqVO.getGroupId(), userId,
+                        reqVO.getUserId(), muteEndTime));
+    }
+
+    @Override
+    public void cancelMuteMember(Long userId, ImGroupCancelMuteMemberReqVO reqVO) {
+        // 1.1 校验群存在且未封禁
+        validateGroupExists(reqVO.getGroupId());
+        // 1.2 校验操作人和目标都在群中
+        ImGroupMemberDO operatorMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), userId);
+        ImGroupMemberDO targetMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), reqVO.getUserId());
+        // 1.3 三档权限校验
+        validateMutePermission(operatorMember, targetMember);
+
+        // 2. 取消禁言（清空 muteEndTime）
+        groupMemberService.updateGroupMemberMuteEndTime(reqVO.getGroupId(), reqVO.getUserId(), null);
+
+        // 3. 广播通知
+        groupMessageService.sendGroupMessage(userId,
+                ImGroupMessageSendDTO.ofGroupMemberCancelMuted(reqVO.getGroupId(), userId, reqVO.getUserId()));
+    }
+
+    /**
+     * 三档分层禁言权限校验
+     */
+    private void validateMutePermission(ImGroupMemberDO operator, ImGroupMemberDO target) {
+        // 群主不可被禁言
+        if (ImGroupMemberRoleEnum.isOwner(target.getRole())) {
+            throw exception(GROUP_MUTE_OWNER_DENIED);
+        }
+        // 管理员不能禁言其他管理员
+        if (ImGroupMemberRoleEnum.isAdmin(target.getRole()) && !ImGroupMemberRoleEnum.isOwner(operator.getRole())) {
+            throw exception(GROUP_MUTE_ADMIN_DENIED);
+        }
+        // 普通成员不能禁言任何人
+        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole())) {
+            throw exception(GROUP_NOT_OWNER_OR_ADMIN);
+        }
     }
 
     private ImGroupServiceImpl getSelf() {

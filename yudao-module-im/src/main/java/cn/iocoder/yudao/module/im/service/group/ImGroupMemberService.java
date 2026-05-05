@@ -192,4 +192,13 @@ public interface ImGroupMemberService {
      */
     Map<Long, Long> getActiveMemberCountMap(Collection<Long> groupIds);
 
+    /**
+     * 更新成员禁言到期时间
+     *
+     * @param groupId     群编号
+     * @param userId      用户编号
+     * @param muteEndTime 禁言到期时间；null 表示取消禁言
+     */
+    void updateGroupMemberMuteEndTime(Long groupId, Long userId, LocalDateTime muteEndTime);
+
 }
