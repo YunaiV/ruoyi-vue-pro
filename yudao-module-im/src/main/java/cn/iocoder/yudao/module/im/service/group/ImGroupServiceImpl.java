@@ -552,11 +552,10 @@ public class ImGroupServiceImpl implements ImGroupService {
         groupMapper.updateById(new ImGroupDO().setId(reqVO.getGroupId()).setMutedAll(reqVO.getMutedAll()));
 
         // 3. 广播通知
-        // TODO @AI：改成 messageSendDTO；其它也是；更好理解一点；
-        ImGroupMessageSendDTO dto = Boolean.TRUE.equals(reqVO.getMutedAll())
+        ImGroupMessageSendDTO messageSendDTO = Boolean.TRUE.equals(reqVO.getMutedAll())
                 ? ImGroupMessageSendDTO.ofGroupMuted(reqVO.getGroupId(), userId)
                 : ImGroupMessageSendDTO.ofGroupCancelMuted(reqVO.getGroupId(), userId);
-        groupMessageService.sendGroupMessage(userId, dto);
+        groupMessageService.sendGroupMessage(userId, messageSendDTO);
     }
 
     @Override
