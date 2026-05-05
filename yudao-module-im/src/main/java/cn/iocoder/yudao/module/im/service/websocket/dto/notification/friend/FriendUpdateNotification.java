@@ -18,7 +18,7 @@ public class FriendUpdateNotification extends BaseFriendNotification {
     /**
      * 免打扰；不为空则更新
      */
-    private Boolean muted;
+    private Boolean silent;
     /**
      * 联系人置顶；不为空则更新
      */

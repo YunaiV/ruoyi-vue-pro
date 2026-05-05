@@ -14,7 +14,7 @@ public class ImFriendUpdateReqVO {
     private Long friendUserId;
 
     @Schema(description = "是否免打扰；不传表示不修改", example = "true")
-    private Boolean muted;
+    private Boolean silent;
 
     @Schema(description = "好友展示备注（仅自己可见）；不传表示不修改，传空串表示清空", example = "老张")
     @Size(max = 16, message = "好友备注最多 16 个字符")

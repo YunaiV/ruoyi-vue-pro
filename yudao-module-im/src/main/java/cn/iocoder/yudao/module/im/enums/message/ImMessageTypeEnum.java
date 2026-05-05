@@ -84,9 +84,9 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      */
     FRIEND_INFO_UPDATED(1209, "好友资料变更", false, false),
     /**
-     * 对应 OpenIM：FriendsInfoUpdateNotification 1210（窄化到 muted / pinned 单边属性）
+     * 对应 OpenIM：FriendsInfoUpdateNotification 1210（窄化到 silent / pinned 单边属性）
      * 对应自己的类：FriendUpdateNotification
-     * 场景：A 改了 muted / pinned 等单边属性，推 A 多端
+     * 场景：A 改了 silent / pinned 等单边属性，推 A 多端
      */
     FRIEND_UPDATE(1210, "好友信息批量更新", false, false),
 

@@ -25,7 +25,7 @@ public class ImGroupMemberManagerRespVO {
     private String groupRemark;
 
     @Schema(description = "是否免打扰", example = "false")
-    private Boolean muted;
+    private Boolean silent;
 
     @Schema(description = "成员状态", example = "0")
     private Integer status; // 参见 CommonStatusEnum 枚举类

@@ -136,8 +136,7 @@ public class ImGroupMessageSendDTO {
     public static ImGroupMessageSendDTO ofGroupNoticeUpdate(Long groupId, Long operatorUserId, String oldNotice, String newNotice) {
         GroupNoticeUpdateNotification notification = new GroupNoticeUpdateNotification();
         notification.setOperatorUserId(operatorUserId);
-        notification.setOldNotice(oldNotice);
-        notification.setNewNotice(newNotice);
+        notification.setOldNotice(oldNotice).setNewNotice(newNotice);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_NOTICE_UPDATE.getType()).setContent(notification);
     }
@@ -145,17 +144,15 @@ public class ImGroupMessageSendDTO {
     public static ImGroupMessageSendDTO ofGroupNameUpdate(Long groupId, Long operatorUserId, String oldName, String newName) {
         GroupNameUpdateNotification notification = new GroupNameUpdateNotification();
         notification.setOperatorUserId(operatorUserId);
-        notification.setOldName(oldName);
-        notification.setNewName(newName);
+        notification.setOldName(oldName).setNewName(newName);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_NAME_UPDATE.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupMemberSettingUpdate(Long groupId, Long operatorUserId, Boolean muted, String groupRemark) {
+    public static ImGroupMessageSendDTO ofGroupMemberSettingUpdate(Long groupId, Long operatorUserId, Boolean silent, String groupRemark) {
         GroupMemberSettingUpdateNotification notification = new GroupMemberSettingUpdateNotification();
         notification.setOperatorUserId(operatorUserId);
-        notification.setMuted(muted);
-        notification.setGroupRemark(groupRemark);
+        notification.setSilent(silent).setGroupRemark(groupRemark);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_SETTING_UPDATE.getType()).setContent(notification);
     }
@@ -164,8 +161,7 @@ public class ImGroupMessageSendDTO {
                                                           cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO message) {
         GroupMessagePinNotification notification = new GroupMessagePinNotification();
         notification.setOperatorUserId(operatorUserId);
-        notification.setMessageId(message.getId());
-        notification.setMessage(message);
+        notification.setMessageId(message.getId()).setMessage(message);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MESSAGE_PIN.getType()).setContent(notification);
     }

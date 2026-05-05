@@ -50,7 +50,7 @@ public interface ImFriendMapper extends BaseMapperX<ImFriendDO> {
                 .eqIfPresent(ImFriendDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(ImFriendDO::getFriendUserId, reqVO.getFriendUserId())
                 .eqIfPresent(ImFriendDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(ImFriendDO::getMuted, reqVO.getMuted())
+                .eqIfPresent(ImFriendDO::getSilent, reqVO.getSilent())
                 .betweenIfPresent(ImFriendDO::getAddTime, reqVO.getAddTime())
                 .orderByDesc(ImFriendDO::getId));
     }

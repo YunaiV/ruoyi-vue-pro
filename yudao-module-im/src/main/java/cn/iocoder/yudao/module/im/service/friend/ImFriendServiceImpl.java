@@ -95,7 +95,7 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Override
     public void updateFriend(Long userId, ImFriendUpdateReqVO reqVO) {
         // 1.1 校验：至少改一个字段（无字段变更，直接结束）
-        if (reqVO.getDisplayName() == null && reqVO.getMuted() == null && reqVO.getPinned() == null) {
+        if (reqVO.getDisplayName() == null && reqVO.getSilent() == null && reqVO.getPinned() == null) {
             return;
         }
         // 1.2 校验好友关系存在
@@ -106,13 +106,11 @@ public class ImFriendServiceImpl implements ImFriendService {
 
         // 2. 更新好友属性（备注 / 免打扰 / 联系人置顶）
         friendMapper.updateById(new ImFriendDO().setId(friend.getId())
-                .setMuted(reqVO.getMuted())
-                .setDisplayName(reqVO.getDisplayName())
-                .setPinned(reqVO.getPinned()));
+                .setSilent(reqVO.getSilent()).setDisplayName(reqVO.getDisplayName()).setPinned(reqVO.getPinned()));
 
         // 3. 推 FRIEND_UPDATE 给 A 多端：所有单边属性变更合并为单条通知，避免多通知顺序竞争
         FriendUpdateNotification payload = (FriendUpdateNotification) new FriendUpdateNotification()
-                .setDisplayName(reqVO.getDisplayName()).setMuted(reqVO.getMuted()).setPinned(reqVO.getPinned())
+                .setDisplayName(reqVO.getDisplayName()).setSilent(reqVO.getSilent()).setPinned(reqVO.getPinned())
                 .setOperatorUserId(userId).setFriendUserId(reqVO.getFriendUserId());
         websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
                 ImMessageTypeEnum.FRIEND_UPDATE.getType(), userId, userId, payload));
@@ -245,7 +243,7 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     /**
      * 单向绑定好友关系（内部方法，被 {@link #becomeFriends} / {@link #silentReAddFriend} 调用）：
-     * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，muted / pinned / blocked 一并重置为 false
+     * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，silent / pinned / blocked 一并重置为 false
      * - 情况二：不存在记录 → 直接插入新记录
      * <p>
      * 并发安全：agree 路径由 {@code friend_request.handle_result} 的乐观锁单边推进；
@@ -255,11 +253,11 @@ public class ImFriendServiceImpl implements ImFriendService {
      */
     public void addFriend0(Long userId, Long friendUserId, String displayName, Integer addSource) {
         ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
-        // 情况一：复用旧记录 → 恢复 ENABLE + 重置 muted / pinned / blocked 与首次新增对齐
+        // 情况一：复用旧记录 → 恢复 ENABLE + 重置 silent / pinned / blocked 与首次新增对齐
         if (exists != null) {
             ImFriendDO update = new ImFriendDO().setId(exists.getId())
                     .setStatus(CommonStatusEnum.ENABLE.getStatus()).setAddTime(LocalDateTime.now())
-                    .setMuted(false).setPinned(false).setBlocked(false);
+                    .setSilent(false).setPinned(false).setBlocked(false);
             if (displayName != null) {
                 update.setDisplayName(displayName);
             }
@@ -271,7 +269,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         }
         // 情况二：不存在记录 → 直接插入新记录
         ImFriendDO friend = ImFriendDO.builder().userId(userId).friendUserId(friendUserId)
-                .muted(false).pinned(false).blocked(false)
+                .silent(false).pinned(false).blocked(false)
                 .displayName(displayName).addSource(addSource)
                 .status(CommonStatusEnum.ENABLE.getStatus()).addTime(LocalDateTime.now()).build();
         friendMapper.insert(friend);

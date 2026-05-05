@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * 业务语义：
  * - 双向关系：A-B 互为好友会存 2 条记录（userId=A, friendUserId=B 和 userId=B, friendUserId=A）
  * - 状态管理：{@link #status} 使用 {@link CommonStatusEnum}，ENABLE=正常，DISABLE=已删除
- * - 免打扰：{@link #muted} 控制是否屏蔽来自该好友的通知
+ * - 免打扰：{@link #silent} 控制是否屏蔽来自该好友的通知
  * - 联系人置顶：{@link #pinned} 单边，影响联系人 / 会话排序
  * - 黑名单：{@link #blocked} 弱关联 friend，单边屏蔽对方消息（必须先是好友）
  *
@@ -51,7 +51,7 @@ public class ImFriendDO extends BaseDO {
     /**
      * 是否免打扰
      */
-    private Boolean muted;
+    private Boolean silent;
     /**
      * 好友展示备注
      */

@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * 群成员个人设置变更事件通知（个人多端同步）
  * <p>
- * muted / groupRemark 字段 null 表示本次未变更，前端按非 null 局部更新
+ * silent / groupRemark 字段 null 表示本次未变更，前端按非 null 局部更新
  */
 @Data
 public class GroupMemberSettingUpdateNotification extends BaseGroupNotification {
@@ -13,7 +13,7 @@ public class GroupMemberSettingUpdateNotification extends BaseGroupNotification 
     /**
      * 群免打扰
      */
-    private Boolean muted;
+    private Boolean silent;
     /**
      * 群备注
      */

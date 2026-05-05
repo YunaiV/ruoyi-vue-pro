@@ -28,7 +28,7 @@ public class ImFriendManagerRespVO {
     private String displayName;
 
     @Schema(description = "是否免打扰", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
-    private Boolean muted;
+    private Boolean silent;
 
     @Schema(description = "好友状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status; // 参见 CommonStatusEnum 枚举类

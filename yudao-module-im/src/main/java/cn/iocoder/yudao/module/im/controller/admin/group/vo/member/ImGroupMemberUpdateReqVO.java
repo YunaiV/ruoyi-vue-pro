@@ -21,6 +21,6 @@ public class ImGroupMemberUpdateReqVO {
     private String groupRemark;
 
     @Schema(description = "是否免打扰")
-    private Boolean muted;
+    private Boolean silent;
 
 }

@@ -53,7 +53,7 @@ public class ImGroupMemberDO extends BaseDO {
     /**
      * 是否免打扰
      */
-    private Boolean muted;
+    private Boolean silent;
     /**
      * 成员状态
      * <p>

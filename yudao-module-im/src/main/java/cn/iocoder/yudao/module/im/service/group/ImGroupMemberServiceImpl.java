@@ -222,14 +222,14 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberNicknameUpdate(
                     groupId, userId, updateReqVO.getDisplayUserName()));
         }
-        // 3.2 muted / groupRemark 是个人字段，仅推自己做多端同步；与旧值都相同跳过
-        boolean mutedChanged = updateReqVO.getMuted() != null
-                && ObjUtil.notEqual(updateReqVO.getMuted(), member.getMuted());
+        // 3.2 silent / groupRemark 是个人字段，仅推自己做多端同步；与旧值都相同跳过
+        boolean silentChanged = updateReqVO.getSilent() != null
+                && ObjUtil.notEqual(updateReqVO.getSilent(), member.getSilent());
         boolean groupRemarkChanged = updateReqVO.getGroupRemark() != null
                 && ObjUtil.notEqual(updateReqVO.getGroupRemark(), member.getGroupRemark());
-        if (mutedChanged || groupRemarkChanged) {
+        if (silentChanged || groupRemarkChanged) {
             groupMessageService.sendGroupMessage(userId, List.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
-                    groupId, userId, updateReqVO.getMuted(), updateReqVO.getGroupRemark()));
+                    groupId, userId, updateReqVO.getSilent(), updateReqVO.getGroupRemark()));
         }
     }
 

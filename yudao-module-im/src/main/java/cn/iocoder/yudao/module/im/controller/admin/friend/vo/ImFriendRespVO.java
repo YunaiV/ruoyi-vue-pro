@@ -21,7 +21,7 @@ public class ImFriendRespVO {
     private Long friendUserId;
 
     @Schema(description = "是否免打扰", example = "false")
-    private Boolean muted;
+    private Boolean silent;
 
     @Schema(description = "好友展示备注（仅自己可见）", example = "老张")
     private String displayName;

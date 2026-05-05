@@ -81,19 +81,19 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
         reqVO.setFriendUserId(2L);
-        reqVO.setMuted(true);
+        reqVO.setSilent(true);
         ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
-                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
+                .silent(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
 
         // 调用
         friendService.updateFriend(1L, reqVO);
 
-        // 断言：更新了 muted 字段
+        // 断言：更新了 silent 字段
         ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
         verify(imFriendMapper).updateById(captor.capture());
         assertEquals(100L, captor.getValue().getId());
-        assertTrue(captor.getValue().getMuted());
+        assertTrue(captor.getValue().getSilent());
         // 断言：推送了好友更新通知
         verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
     }
@@ -103,7 +103,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
         reqVO.setFriendUserId(2L);
-        reqVO.setMuted(true);
+        reqVO.setSilent(true);
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(null);
 
         // 调用并断言
@@ -114,34 +114,34 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testUpdateFriend_displayNameOnly() {
-        // 准备：只传备注、不传 muted —— 走差量更新
+        // 准备：只传备注、不传 silent —— 走差量更新
         ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
         reqVO.setFriendUserId(2L);
         reqVO.setDisplayName("老张");
         ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
-                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
+                .silent(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
 
         // 调用
         friendService.updateFriend(1L, reqVO);
 
-        // 断言：updateById 收到 displayName 但没有 muted（MyBatis-Plus 靠 NOT_NULL 跳过）
+        // 断言：updateById 收到 displayName 但没有 silent（MyBatis-Plus 靠 NOT_NULL 跳过）
         ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
         verify(imFriendMapper).updateById(captor.capture());
         assertEquals(100L, captor.getValue().getId());
         assertEquals("老张", captor.getValue().getDisplayName());
-        assertNull(captor.getValue().getMuted());
+        assertNull(captor.getValue().getSilent());
         // 断言：推送好友更新通知
         verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
     }
 
     @Test
     public void testUpdateFriend_emptyRequest() {
-        // 准备：muted 和 displayName 都不传 —— 直接返回，不打 SQL 也不发推送
+        // 准备：silent 和 displayName 都不传 —— 直接返回，不打 SQL 也不发推送
         ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
         reqVO.setFriendUserId(2L);
         ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
-                .muted(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
+                .silent(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
 
         // 调用

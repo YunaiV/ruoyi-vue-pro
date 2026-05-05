@@ -25,7 +25,7 @@ public class ImGroupMemberRespVO {
     private String groupRemark;
 
     @Schema(description = "是否免打扰")
-    private Boolean muted;
+    private Boolean silent;
 
     @Schema(description = "成员状态", example = "0")
     private Integer status;

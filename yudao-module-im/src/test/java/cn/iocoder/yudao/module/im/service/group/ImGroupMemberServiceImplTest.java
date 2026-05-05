@@ -233,14 +233,14 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberMapper.selectByGroupIdAndUserId(10L, 1L)).thenReturn(member);
 
         ImGroupMemberUpdateReqVO reqVO = new ImGroupMemberUpdateReqVO()
-                .setGroupId(10L).setMuted(true).setDisplayUserName("昵称");
+                .setGroupId(10L).setSilent(true).setDisplayUserName("昵称");
 
         groupMemberService.updateGroupMember(1L, reqVO);
 
         ArgumentCaptor<ImGroupMemberDO> captor = ArgumentCaptor.forClass(ImGroupMemberDO.class);
         verify(groupMemberMapper).updateById(captor.capture());
         assertEquals(50L, captor.getValue().getId());
-        assertTrue(captor.getValue().getMuted());
+        assertTrue(captor.getValue().getSilent());
         verify(webSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
     }
 
