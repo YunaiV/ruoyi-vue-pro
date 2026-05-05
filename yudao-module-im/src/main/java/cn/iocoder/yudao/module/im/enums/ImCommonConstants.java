@@ -54,15 +54,4 @@ public interface ImCommonConstants {
      */
     int MESSAGE_GROUP_PULL_MAX_DAYS = 30;
 
-    // ==================== 好友相关提示消息 ====================
-
-    /**
-     * 好友添加系统提示
-     */
-    String FRIEND_ADD_TIP_MESSAGE = "你们已成为好友，现在可以开始聊天了";
-    /**
-     * 好友删除系统提示（仅自己可见，单边推送）
-     */
-    String FRIEND_DELETE_TIP_MESSAGE = "你已删除好友";
-
 }

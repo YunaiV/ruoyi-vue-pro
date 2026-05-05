@@ -562,9 +562,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 调用
             ImGroupMessageDO result = groupMessageService.recallGroupMessage(1L, 50L);
 
-            // 断言：返回 TIP_TEXT 消息
+            // 断言：返回撤回消息
             assertNotNull(result);
-            // 验证：更新原消息状态 + 插入 tipMessage
+            // 验证：更新原消息状态 + 插入 RecallMessage
             verify(groupMessageMapper).updateById(any(ImGroupMessageDO.class));
             verify(groupMessageMapper).insert(any(ImGroupMessageDO.class));
             // 验证：给 2 个活跃成员推送撤回提示

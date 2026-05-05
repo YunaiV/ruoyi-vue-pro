@@ -123,17 +123,6 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     }
 
     @Override
-    public void sendTipPrivateMessage(Long senderId, Long receiverId, String content) {
-        sendTipPrivateMessage(senderId, receiverId, content, null);
-    }
-
-    @Override
-    public void sendTipPrivateMessage(Long senderId, Long receiverId, String content, Boolean persistent) {
-        sendPrivateMessage(senderId, new ImPrivateMessageSendDTO().setReceiverId(receiverId)
-                .setType(ImMessageTypeEnum.TIP_TEXT.getType()).setContent(content).setPersistent(persistent));
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public ImPrivateMessageDO recallPrivateMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在

@@ -17,20 +17,49 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
 
-    // ========== 用户聊天消息 ==========
-    TEXT(0, "文本", true, true), // 对应 TextMessage 类
-    IMAGE(1, "图片", true, true), // 对应 ImageMessage 类
-    FILE(2, "文件", true, true), // 对应 FileMessage 类
-    VOICE(3, "语音", true, true), // 对应 AudioMessage 类
-    VIDEO(4, "视频", true, true), // 对应 VideoMessage 类
+    // ========== 用户聊天消息（101-105 直接复用 OpenIM 段位编号） ==========
+    /**
+     * 对应 OpenIM：Text 101
+     * 对应自己的类：TextMessage
+     */
+    TEXT(101, "文本", true, true),
+    /**
+     * 对应 OpenIM：Picture 102
+     * 对应自己的类：ImageMessage
+     */
+    IMAGE(102, "图片", true, true),
+    /**
+     * 对应 OpenIM：Sound 103
+     * 对应自己的类：AudioMessage
+     */
+    VOICE(103, "语音", true, true),
+    /**
+     * 对应 OpenIM：Video 104
+     * 对应自己的类：VideoMessage
+     */
+    VIDEO(104, "视频", true, true),
+    /**
+     * 对应 OpenIM：File 105
+     * 对应自己的类：FileMessage
+     */
+    FILE(105, "文件", true, true),
 
-    // ========== 信号类 ==========
-    RECALL(10, "撤回", true, false), // 对应 RecallMessage 类
-    READ(11, "已读", false, false), // 暂无
-    RECEIPT(12, "回执", false, false), // 暂无
-
-    // ========== 系统提示 ==========
-    TIP_TEXT(21, "系统提示", true, false), // 对应 TextMessage 类
+    // ========== 信号类（2101 / 2200 直接复用 OpenIM 段位编号；2201 自有扩展） ==========
+    /**
+     * 对应 OpenIM：RevokeNotification 2101
+     * 对应自己的类：RecallMessage
+     */
+    RECALL(2101, "撤回", true, false),
+    /**
+     * 对应 OpenIM：HasReadReceipt 2200
+     * 对应自己的类：无（payload 走 ImXxxMessageDTO 顶层字段）
+     */
+    RECEIPT(2200, "回执", false, false),
+    /**
+     * 对应 OpenIM：无（自有扩展，OpenIM 走 ConversationChangeNotification 1300 路径）
+     * 对应自己的类：无（payload 走 ImXxxMessageDTO 顶层字段）
+     */
+    READ(2201, "已读", false, false),
 
     // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
     /**
@@ -52,11 +81,12 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      */
     FRIEND_REQUEST_RECEIVED(1203, "收到新的好友申请", false, false),
     /**
-     * 对应 OpenIM：FriendAddedNotification 1204
+     * 对应 OpenIM：FriendAddedNotification 1204（OpenIM friendAdded.isSendMsg=false 默认不入消息流；本系统改为入库当会话气泡）
      * 对应自己的类：FriendAddNotification
-     * 场景：双方建立好友关系（同意申请 / 管理员导入），推给 A、B 双方多端
+     * 场景：双方建立好友关系，单条入库（sender=fromUserId, receiver=toUserId）；双向 WebSocket 自动覆盖双方多端
+     * 注意：silentReAddFriend 单边语义场景，发送时显式 setPersistent(false) 覆盖默认值
      */
-    FRIEND_ADD(1204, "新增好友", false, false),
+    FRIEND_ADD(1204, "新增好友", true, false),
     /**
      * 对应 OpenIM：FriendDeletedNotification 1205
      * 对应自己的类：FriendDeleteNotification

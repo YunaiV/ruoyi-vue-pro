@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.*;
@@ -32,8 +33,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND_STATE;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_ADD_TIP_MESSAGE;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.FRIEND_DELETE_TIP_MESSAGE;
 
 /**
  * IM 好友关系 Service 实现类
@@ -130,19 +129,12 @@ public class ImFriendServiceImpl implements ImFriendService {
         addFriend0(fromUserId, toUserId, request.getDisplayName(), request.getAddSource());
         addFriend0(toUserId, fromUserId, null, request.getAddSource());
 
-        // 2.1 推 TIP 系统消息（双方私聊会话里看到「你们已成为好友」）；TIP 走会话入库，FRIEND_ADD 走事件通知
-        privateMessageService.sendTipPrivateMessage(fromUserId, toUserId, FRIEND_ADD_TIP_MESSAGE);
-
-        // 2.2.1 推 FRIEND_ADD 给 fromUser 多端
-        FriendAddNotification toFrom = (FriendAddNotification) new FriendAddNotification()
-                .setOperatorUserId(toUserId).setFriendUserId(toUserId);
-        websocketService.sendPrivateMessageAsync(fromUserId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_ADD.getType(), toUserId, fromUserId, toFrom));
-        // 2.2.2 推 FRIEND_ADD 给 toUser 多端
-        FriendAddNotification toTo = (FriendAddNotification) new FriendAddNotification()
-                .setOperatorUserId(fromUserId).setFriendUserId(fromUserId);
-        websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_ADD.getType(), fromUserId, toUserId, toTo));
+        // 2. 发送 FRIEND_ADD 入库（双方拉历史都能看到「你们已成为好友」会话气泡）+ 双向 WebSocket 自动覆盖双方多端
+        //    operatorUserId=fromUserId 标记申请发起方；前端按 (currentUserId === operatorUserId) 区分视角，文案固定不依赖此字段
+        FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
+                .setOperatorUserId(fromUserId).setFriendUserId(toUserId);
+        privateMessageService.sendPrivateMessage(fromUserId, new ImPrivateMessageSendDTO()
+                .setReceiverId(toUserId).setType(ImMessageTypeEnum.FRIEND_ADD.getType()).setContent(payload));
     }
 
     @Override
@@ -155,15 +147,14 @@ public class ImFriendServiceImpl implements ImFriendService {
         // 1. 单边重新启用我侧好友关系
         addFriend0(userId, friendUserId, displayName, addSource);
 
-        // 2. 推 TIP「你们已成为好友」走单边语义（persistent=false）：不入库 + 仅推 userId 多端，对方完全不感知
-        privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_ADD_TIP_MESSAGE, false);
-
-        // 3. 仅推 FRIEND_ADD 给 userId 多端（不通知对方，保持「对方一直把我当好友」的错觉）
-        //    operatorUserId 填 friendUserId（对方）：让 userId 多端 UI 呈现「对方加了我」的视觉效果，与 silent 语义对齐
+        // 2. 走 sendPrivateMessage + persistent=false：不入库 + 仅推 userId 多端（对方完全不感知，保持「对方一直把我当好友」错觉）
+        //    operatorUserId 填 friendUserId（对方）：让 userId 多端 UI 呈现「对方加了我」视角，与 silent 语义对齐
+        //    前端按 type=FRIEND_ADD 渲染会话气泡（瞬时，不入库刷新即消失）
         FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
                 .setOperatorUserId(friendUserId).setFriendUserId(friendUserId);
-        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_ADD.getType(), friendUserId, userId, payload));
+        privateMessageService.sendPrivateMessage(userId, new ImPrivateMessageSendDTO()
+                .setReceiverId(friendUserId).setType(ImMessageTypeEnum.FRIEND_ADD.getType())
+                .setContent(payload).setPersistent(false));
     }
 
     @Override
@@ -176,17 +167,14 @@ public class ImFriendServiceImpl implements ImFriendService {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
         deleteFriend0(userId, friendUserId);
 
-        // 2. 仅 clear=false 时推 TIP「你已删除好友」（单边 persistent=false）；
-        //    clear=true / null 时跳过 —— 避免 TIP 晚于 FRIEND_DELETE 到达把刚清的会话复活
-        if (Boolean.FALSE.equals(clear)) {
-            privateMessageService.sendTipPrivateMessage(userId, friendUserId, FRIEND_DELETE_TIP_MESSAGE, false);
-        }
-
-        // 3. 推 FRIEND_DELETE 给 userId 多端做同步（friendUserId 不感知）；clear 透传让多端清理动作一致
+        // 2. 走 sendPrivateMessage + persistent=false：不入库 + 仅推 userId 多端（friendUserId 不感知）；clear 透传让多端清理动作一致
+        //    clear=false 时前端按 type=FRIEND_DELETE 渲染「你已删除好友」会话气泡（瞬时）；
+        //    clear=true 时前端按 clear 字段直接清会话，跳过气泡渲染
         FriendDeleteNotification payload = ((FriendDeleteNotification) new FriendDeleteNotification()
                 .setOperatorUserId(userId).setFriendUserId(friendUserId)).setClear(clear);
-        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_DELETE.getType(), userId, userId, payload));
+        privateMessageService.sendPrivateMessage(userId, new ImPrivateMessageSendDTO()
+                .setReceiverId(friendUserId).setType(ImMessageTypeEnum.FRIEND_DELETE.getType())
+                .setContent(payload).setPersistent(false));
     }
 
     @Override

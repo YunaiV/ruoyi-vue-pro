@@ -178,10 +178,8 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
             verify(adminUserApi).validateUser(2L);
             // 断言：双向插入 2 条好友关系
             verify(imFriendMapper, times(2)).insert(any(ImFriendDO.class));
-            // 断言：发送提示消息 + 给双方各推送一次好友添加事件
-            verify(privateMessageService).sendTipPrivateMessage(eq(1L), eq(2L), anyString());
-            verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-            verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+            // 断言：FRIEND_ADD 单条入库（双向 WebSocket 推送由 sendPrivateMessage 内部完成，mock 下不可见）
+            verify(privateMessageService).sendPrivateMessage(eq(1L), any());
         }
     }
 
@@ -250,10 +248,8 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
             // 断言：双向更新为 DISABLE
             verify(imFriendMapper, times(2)).updateById(any(ImFriendDO.class));
-            // 断言：推送提示消息 + 双方各推送一次好友删除事件
-            verify(privateMessageService).sendTipPrivateMessage(eq(1L), eq(2L), anyString());
+            // 断言：仅给 userId 多端推送 FRIEND_DELETE 事件（friendUserId 不感知）
             verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-            verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
         }
     }
 

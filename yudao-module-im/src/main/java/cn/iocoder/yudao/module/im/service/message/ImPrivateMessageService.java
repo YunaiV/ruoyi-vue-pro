@@ -38,25 +38,6 @@ public interface ImPrivateMessageService {
     ImPrivateMessageDO sendPrivateMessage(Long senderId, ImPrivateMessageSendDTO dto);
 
     /**
-     * 【系统调用】发送系统提示消息（TIP_TEXT）
-     *
-     * @param senderId   发送人编号
-     * @param receiverId 接收人编号
-     * @param content    提示文本
-     */
-    void sendTipPrivateMessage(Long senderId, Long receiverId, String content);
-
-    /**
-     * 【系统调用】发送系统提示消息（TIP_TEXT），可覆盖 persistent
-     *
-     * @param senderId   发送人编号
-     * @param receiverId 接收人编号
-     * @param content    提示文本
-     * @param persistent null 走默认；false 单边（不入库 + 仅推 sender 多端，对方不感知）；true 强制双向 + 入库
-     */
-    void sendTipPrivateMessage(Long senderId, Long receiverId, String content, Boolean persistent);
-
-    /**
      * 【用户调用】撤回私聊消息
      *
      * @param userId    当前用户编号

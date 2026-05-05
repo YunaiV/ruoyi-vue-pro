@@ -206,9 +206,9 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 调用
         ImPrivateMessageDO result = privateMessageService.recallPrivateMessage(1L, 10L);
 
-        // 断言：返回 TIP_TEXT 消息
+        // 断言：返回撤回消息
         assertNotNull(result);
-        // 验证：更新原消息状态 + 插入 tipMessage
+        // 验证：更新原消息状态 + 插入 RecallMessage
         verify(privateMessageMapper).updateById(any(ImPrivateMessageDO.class));
         verify(privateMessageMapper).insert(any(ImPrivateMessageDO.class));
         // 验证推送了消息（给接收方和发送方）
@@ -371,29 +371,6 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         privateMessageService.sendPrivateMessage(1L, dto);
 
         verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
-    }
-
-    // ========== sendTipPrivateMessage ==========
-
-    @Test
-    public void testSendTipPrivateMessage_success() {
-        // 调用
-        privateMessageService.sendTipPrivateMessage(1L, 2L, "好友添加成功");
-
-        // 断言：插入一条 TIP_TEXT 提示消息
-        ArgumentCaptor<ImPrivateMessageDO> captor = ArgumentCaptor.forClass(ImPrivateMessageDO.class);
-        verify(privateMessageMapper).insert(captor.capture());
-        ImPrivateMessageDO tip = captor.getValue();
-        assertEquals(1L, tip.getSenderId());
-        assertEquals(2L, tip.getReceiverId());
-        assertEquals(ImMessageTypeEnum.TIP_TEXT.getType(), tip.getType());
-        assertEquals("好友添加成功", tip.getContent());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), tip.getStatus());
-        assertNotNull(tip.getClientMessageId());
-        assertNotNull(tip.getSendTime());
-        // 断言：给双方各推送一次
         verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
         verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
     }
