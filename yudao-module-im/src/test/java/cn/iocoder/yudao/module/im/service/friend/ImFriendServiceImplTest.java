@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
-import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -15,21 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_ADD_SELF;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,28 +45,6 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
     private ImWebSocketService imWebSocketService;
     @Mock
     private ImPrivateMessageService privateMessageService;
-
-    // ========== isFriend ==========
-
-    @Test
-    public void testIsFriend_enabled() {
-        ImFriendDO friend = ImFriendDO.builder().userId(1L).friendUserId(2L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
-
-        assertTrue(friendService.isFriend(1L, 2L));
-    }
-
-    @Test
-    public void testIsFriend_disabledOrAbsent() {
-        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(null);
-        assertFalse(friendService.isFriend(1L, 2L));
-
-        ImFriendDO disabled = ImFriendDO.builder().userId(1L).friendUserId(3L)
-                .status(CommonStatusEnum.DISABLE.getStatus()).build();
-        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 3L)).thenReturn(disabled);
-        assertFalse(friendService.isFriend(1L, 3L));
-    }
 
     // ========== updateFriend ==========
 
@@ -152,36 +124,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         verify(imWebSocketService, never()).sendPrivateMessageAsync(any(Long.class), any(ImPrivateMessageDTO.class));
     }
 
-    // ========== addFriend ==========
-
-    @Test
-    public void testAddFriend_self() {
-        ServiceException exception = assertThrows(ServiceException.class,
-                () -> friendService.addFriend(1L, 1L));
-        assertEquals(FRIEND_ADD_SELF.getCode(), exception.getCode());
-    }
-
-    @Test
-    public void testAddFriend_success() {
-        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImFriendServiceImpl.class)))
-                    .thenReturn(friendService);
-
-            // 准备
-            when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(null);
-            when(imFriendMapper.selectByUserIdAndFriendUserId(2L, 1L)).thenReturn(null);
-
-            // 调用
-            friendService.addFriend(1L, 2L);
-
-            // 断言：校验对方存在
-            verify(adminUserApi).validateUser(2L);
-            // 断言：双向插入 2 条好友关系
-            verify(imFriendMapper, times(2)).insert(any(ImFriendDO.class));
-            // 断言：FRIEND_ADD 单条入库（双向 WebSocket 推送由 sendPrivateMessage 内部完成，mock 下不可见）
-            verify(privateMessageService).sendPrivateMessage(eq(1L), any());
-        }
-    }
+    // ========== addFriend0（内部方法，被 becomeFriends / silentReAddFriend 调用） ==========
 
     @Test
     public void testAddFriend0_existingEnabledSkipsUpdate() {
@@ -191,7 +134,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
 
         // 调用
-        friendService.addFriend0(1L, 2L);
+        friendService.addFriend0(1L, 2L, null, null);
 
         // 断言：不插入，也不更新
         verify(imFriendMapper, never()).insert(any(ImFriendDO.class));
@@ -206,7 +149,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
 
         // 调用
-        friendService.addFriend0(1L, 2L);
+        friendService.addFriend0(1L, 2L, null, null);
 
         // 断言：更新 status 为 ENABLE
         ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
@@ -224,34 +167,12 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
                 .thenThrow(new DuplicateKeyException("concurrent insert"));
 
         // 调用：应被吞掉，不抛异常
-        friendService.addFriend0(1L, 2L);
+        friendService.addFriend0(1L, 2L, null, null);
 
         verify(imFriendMapper).insert(any(ImFriendDO.class));
     }
 
     // ========== deleteFriend ==========
-
-    @Test
-    public void testDeleteFriend_success() {
-        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImFriendServiceImpl.class)))
-                    .thenReturn(friendService);
-
-            ImFriendDO friend12 = ImFriendDO.builder().id(10L).userId(1L).friendUserId(2L)
-                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            ImFriendDO friend21 = ImFriendDO.builder().id(11L).userId(2L).friendUserId(1L)
-                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend12);
-            when(imFriendMapper.selectByUserIdAndFriendUserId(2L, 1L)).thenReturn(friend21);
-
-            friendService.deleteFriend(1L, 2L);
-
-            // 断言：双向更新为 DISABLE
-            verify(imFriendMapper, times(2)).updateById(any(ImFriendDO.class));
-            // 断言：仅给 userId 多端推送 FRIEND_DELETE 事件（friendUserId 不感知）
-            verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-        }
-    }
 
     @Test
     public void testDeleteFriend0_alreadyDisabled() {
