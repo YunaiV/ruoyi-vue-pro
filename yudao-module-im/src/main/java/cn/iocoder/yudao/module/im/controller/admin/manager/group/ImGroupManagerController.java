@@ -26,6 +26,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - IM 群聊管理")
 @RestController
@@ -76,7 +77,7 @@ public class ImGroupManagerController {
     @Operation(summary = "封禁群")
     @PreAuthorize("@ss.hasPermission('im:manager:group:ban')")
     public CommonResult<Boolean> banGroup(@Valid @RequestBody ImGroupManagerBanReqVO reqVO) {
-        groupService.banGroup(reqVO);
+        groupService.banGroup(getLoginUserId(), reqVO);
         return success(true);
     }
 
@@ -85,7 +86,7 @@ public class ImGroupManagerController {
     @Parameter(name = "id", description = "群编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:manager:group:ban')")
     public CommonResult<Boolean> unbanGroup(@RequestParam("id") Long id) {
-        groupService.unbanGroup(id);
+        groupService.unbanGroup(getLoginUserId(), id);
         return success(true);
     }
 

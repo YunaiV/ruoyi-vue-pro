@@ -509,25 +509,35 @@ public class ImGroupServiceImpl implements ImGroupService {
 
     @Override
     @CacheEvict(cacheNames = GROUP, key = "#banReqVO.id")
-    public void banGroup(ImGroupManagerBanReqVO banReqVO) {
+    public void banGroup(Long operatorUserId, ImGroupManagerBanReqVO banReqVO) {
         // 1. 校验群存在
         if (getSelf().getGroup(banReqVO.getId()) == null) {
             throw exception(GROUP_NOT_EXISTS);
         }
+
         // 2. 更新封禁状态
         groupMapper.updateById(new ImGroupDO().setId(banReqVO.getId())
                 .setBanned(true).setBannedReason(banReqVO.getReason()).setBannedTime(LocalDateTime.now()));
+
+        // 3. 广播通知
+        groupMessageService.sendGroupMessage(operatorUserId,
+                ImGroupMessageSendDTO.ofGroupBanned(banReqVO.getId(), operatorUserId, true));
     }
 
     @Override
     @CacheEvict(cacheNames = GROUP, key = "#id")
-    public void unbanGroup(Long id) {
+    public void unbanGroup(Long operatorUserId, Long id) {
         // 1. 校验群存在
         if (getSelf().getGroup(id) == null) {
             throw exception(GROUP_NOT_EXISTS);
         }
+
         // 2. 解封（保留 bannedReason / bannedTime 作为历史记录）
         groupMapper.updateById(new ImGroupDO().setId(id).setBanned(false));
+
+        // 3. 广播通知
+        groupMessageService.sendGroupMessage(operatorUserId,
+                ImGroupMessageSendDTO.ofGroupBanned(id, operatorUserId, false));
     }
 
     // ==================== 群禁言 ====================

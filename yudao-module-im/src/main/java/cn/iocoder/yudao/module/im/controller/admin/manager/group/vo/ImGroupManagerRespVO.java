@@ -39,6 +39,9 @@ public class ImGroupManagerRespVO {
     @Schema(description = "是否封禁", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean banned;
 
+    @Schema(description = "是否全群禁言")
+    private Boolean mutedAll;
+
     @Schema(description = "封禁原因")
     private String bannedReason;
 

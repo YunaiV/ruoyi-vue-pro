@@ -207,4 +207,12 @@ public class ImGroupMessageSendDTO {
                 .setType(ImMessageTypeEnum.GROUP_CANCEL_MUTED.getType()).setContent(notification);
     }
 
+    public static ImGroupMessageSendDTO ofGroupBanned(Long groupId, Long operatorUserId, boolean banned) {
+        GroupBannedNotification notification = new GroupBannedNotification();
+        notification.setOperatorUserId(operatorUserId);
+        notification.setBanned(banned);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_BANNED.getType()).setContent(notification);
+    }
+
 }

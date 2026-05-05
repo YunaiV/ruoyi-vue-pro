@@ -227,7 +227,13 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      * 对应自己的类：GroupMessageUnpinNotification
      * 场景：群主 / 管理员取消置顶，全员广播；前端按 messageId 从 group.pinnedMessages 移除
      */
-    GROUP_MESSAGE_UNPIN(1532, "群消息取消置顶", true, false);
+    GROUP_MESSAGE_UNPIN(1532, "群消息取消置顶", true, false),
+    /**
+     * 对应 OpenIM：无（OpenIM 无群封禁概念，自有扩展）
+     * 对应自己的类：GroupBannedNotification
+     * 场景：管理后台封禁 / 解封群，全员广播；前端按 banned 字段切换输入栏封禁覆盖层
+     */
+    GROUP_BANNED(1533, "群封禁变更", true, false);
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 

@@ -39,4 +39,7 @@ public class ImGroupMemberManagerRespVO {
     @Schema(description = "退群时间")
     private LocalDateTime quitTime;
 
+    @Schema(description = "禁言到期时间")
+    private LocalDateTime muteEndTime;
+
 }

@@ -216,15 +216,17 @@ public interface ImGroupService {
     /**
      * 【管理后台】封禁群
      *
+     * @param operatorUserId 操作人用户编号
      * @param banReqVO 封禁信息（含群编号、封禁原因）
      */
-    void banGroup(@Valid ImGroupManagerBanReqVO banReqVO);
+    void banGroup(Long operatorUserId, @Valid ImGroupManagerBanReqVO banReqVO);
 
     /**
      * 【管理后台】解封群
      *
+     * @param operatorUserId 操作人用户编号
      * @param id 群编号
      */
-    void unbanGroup(Long id);
+    void unbanGroup(Long operatorUserId, Long id);
 
 }
