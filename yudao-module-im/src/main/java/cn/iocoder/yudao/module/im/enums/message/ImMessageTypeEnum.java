@@ -43,6 +43,12 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      * 对应自己的类：FileMessage
      */
     FILE(105, "文件", true, true),
+    /**
+     * 对应 OpenIM：Card 108
+     * 对应自己的类：CardMessage
+     * 场景：把好友名片推荐给其他会话，对端点击名片可打开 UserInfoCard
+     */
+    CARD(108, "名片", true, true),
 
     // ========== 信号类（2101 / 2200 直接复用 OpenIM 段位编号；2201 自有扩展） ==========
     /**

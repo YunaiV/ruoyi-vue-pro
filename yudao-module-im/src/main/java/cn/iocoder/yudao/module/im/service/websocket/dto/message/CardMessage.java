@@ -21,4 +21,9 @@ public class CardMessage {
      */
     private String avatar;
 
+    /**
+     * 引用消息（可选）
+     */
+    private QuoteMessage quote;
+
 }
