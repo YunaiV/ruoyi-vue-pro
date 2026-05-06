@@ -246,11 +246,6 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     }
 
     @Override
-    public List<ImGroupRequestDO> getGroupRequestListByUserId(Long userId, Long lastRequestId, Integer limit) {
-        return groupRequestMapper.selectListByUserId(userId, lastRequestId, limit);
-    }
-
-    @Override
     public List<ImGroupRequestDO> getUnhandledRequestListByOwnerOrAdmin(Long userId) {
         // 1. 找出当前用户作为 OWNER / ADMIN 的所有群
         List<ImGroupMemberDO> myMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);
@@ -263,6 +258,18 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         // 2. 一次拉所有群的未处理申请
         return groupRequestMapper.selectListByGroupIdsAndHandleResult(
                 ownerOrAdminGroupIds, ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
+    }
+
+    @Override
+    public List<ImGroupRequestDO> getGroupRequestListByGroupId(Long userId, Long groupId) {
+        // 1. 校验群存在 + 当前用户是群主 / 管理员
+        groupService.validateGroupExists(groupId);
+        ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(groupId, userId);
+        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole())) {
+            throw exception(GROUP_REQUEST_NOT_TO_ME);
+        }
+        // 2. 拉取该群下全部申请（含已处理）；按 id 倒序，前端首条卡片化展示
+        return groupRequestMapper.selectListByGroupId(groupId);
     }
 
     @Override

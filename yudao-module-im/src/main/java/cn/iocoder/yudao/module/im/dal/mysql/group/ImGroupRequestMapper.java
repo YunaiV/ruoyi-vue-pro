@@ -25,18 +25,16 @@ public interface ImGroupRequestMapper extends BaseMapperX<ImGroupRequestDO> {
                 .eq(ImGroupRequestDO::getUserId, userId));
     }
 
-    default List<ImGroupRequestDO> selectListByUserId(Long userId, Long lastRequestId, int limit) {
-        return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
-                .eq(ImGroupRequestDO::getUserId, userId)
-                .ltIfPresent(ImGroupRequestDO::getId, lastRequestId)
-                .orderByDesc(ImGroupRequestDO::getId)
-                .last("LIMIT " + limit));
-    }
-
     default List<ImGroupRequestDO> selectListByGroupIdsAndHandleResult(Collection<Long> groupIds, Integer handleResult) {
         return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
                 .in(ImGroupRequestDO::getGroupId, groupIds)
                 .eq(ImGroupRequestDO::getHandleResult, handleResult)
+                .orderByDesc(ImGroupRequestDO::getId));
+    }
+
+    default List<ImGroupRequestDO> selectListByGroupId(Long groupId) {
+        return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
+                .eq(ImGroupRequestDO::getGroupId, groupId)
                 .orderByDesc(ImGroupRequestDO::getId));
     }
 

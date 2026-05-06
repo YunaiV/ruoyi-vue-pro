@@ -21,8 +21,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
@@ -82,22 +80,19 @@ public class ImGroupRequestController {
         return success(true);
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "查询「我相关」的加群申请列表（含我主动申请、我被邀请待审）；游标分页")
-    public CommonResult<List<ImGroupRequestRespVO>> getGroupRequestList(
-            @Parameter(description = "当前列表最旧记录的 id；首页不传")
-            @RequestParam(value = "lastRequestId", required = false) Long lastRequestId,
-            @Parameter(description = "单次拉取条数", required = true)
-            @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
-        List<ImGroupRequestDO> list = groupRequestService.getGroupRequestListByUserId(
-                getLoginUserId(), lastRequestId, limit);
-        return success(buildVOList(list));
-    }
-
     @GetMapping("/unhandled-list")
     @Operation(summary = "查询「我管理的所有群」下的未处理加群申请列表（不分页）；前端 store 据此派生横幅红点 + Drawer 列表")
     public CommonResult<List<ImGroupRequestRespVO>> getUnhandledRequestList() {
         List<ImGroupRequestDO> list = groupRequestService.getUnhandledRequestListByOwnerOrAdmin(getLoginUserId());
+        return success(buildVOList(list));
+    }
+
+    @GetMapping("/list-by-group")
+    @Operation(summary = "查询指定群下的全部加群申请（含已处理）；仅群主 / 管理员可查")
+    @Parameter(name = "groupId", description = "群编号", required = true, example = "1024")
+    public CommonResult<List<ImGroupRequestRespVO>> getGroupRequestListByGroupId(
+            @RequestParam("groupId") @NotNull(message = "群编号不能为空") Long groupId) {
+        List<ImGroupRequestDO> list = groupRequestService.getGroupRequestListByGroupId(getLoginUserId(), groupId);
         return success(buildVOList(list));
     }
 

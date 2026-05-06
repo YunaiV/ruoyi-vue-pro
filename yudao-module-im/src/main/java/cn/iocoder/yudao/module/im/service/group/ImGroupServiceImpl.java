@@ -191,9 +191,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     public void inviteGroupMember(Long userId, ImGroupMemberInviteReqVO inviteReqVO) {
         Long groupId = inviteReqVO.getGroupId();
-        // 1.1 校验群存在 + 当前用户是群成员
+        // 1.1 校验群存在 + 当前用户是群成员；同时拿到 role 供下面审批分支判断
         ImGroupDO group = validateGroupExists(groupId);
-        groupMemberService.validateMemberInGroup(groupId, userId);
+        ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(groupId, userId);
         // 1.2 排除已在群中的用户
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
         activeMembers.forEach(member -> inviteReqVO.getMemberUserIds().remove(member.getUserId()));
@@ -213,13 +213,15 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
         }
 
-        // 2. 情况一：群开启了审批，邀请也走审批，落 group_request 等群主 / 管理员处理
-        if (Boolean.TRUE.equals(group.getJoinApproval())) {
+        // 2. 情况一：群开启审批 + 邀请人是普通成员，落 group_request 等群主 / 管理员处理
+        // 群主 / 管理员邀请视同已审批通过，绕过审批直接拉人进群（对齐 OpenIM / 微信）
+        if (Boolean.TRUE.equals(group.getJoinApproval())
+                && !ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole())) {
             groupRequestService.createInviteRequestList(groupId, userId, memberUserIds);
             return;
         }
 
-        // 3. 情况二：未开审批，直进；批量添加群成员，写 addSource=INVITE / inviterUserId=操作人 留痕
+        // 3. 情况二：未开审批 / 群主 / 管理员邀请，直进；批量添加群成员，写 addSource=INVITE / inviterUserId=操作人 留痕
         groupMemberService.addGroupMembers(groupId, memberUserIds,
                 ImGroupAddSourceEnum.INVITE.getSource(), userId);
 

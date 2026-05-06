@@ -54,16 +54,6 @@ public interface ImGroupRequestService {
     void createInviteRequestList(Long groupId, Long inviterUserId, Collection<Long> invitedUserIds);
 
     /**
-     * 拉取「我相关」加群申请列表（含我主动申请、我被邀请待审）；游标分页
-     *
-     * @param userId        用户编号
-     * @param lastRequestId 当前列表最旧记录的 id；首页传 null
-     * @param limit         单次拉取条数
-     * @return 申请记录列表，按 id 倒序
-     */
-    List<ImGroupRequestDO> getGroupRequestListByUserId(Long userId, Long lastRequestId, Integer limit);
-
-    /**
      * 拉取「我管理的所有群」下的未处理申请列表
      * <p>
      * 前端 store 据此派生：每个群的未处理总数（用于群顶部横幅红点）+ 列表内容（用于 Drawer）
@@ -72,6 +62,17 @@ public interface ImGroupRequestService {
      * @return 未处理申请列表（不分页）
      */
     List<ImGroupRequestDO> getUnhandledRequestListByOwnerOrAdmin(Long userId);
+
+    /**
+     * 拉取指定群下的全部加群申请（含已处理）；仅群主 / 管理员可查
+     * <p>
+     * 用于群「进群申请」子页：最新一条卡片化突出 + 历史申请按 id 倒序
+     *
+     * @param userId  当前用户编号；用于校验 owner / admin 身份
+     * @param groupId 群编号
+     * @return 申请记录列表，按 id 倒序
+     */
+    List<ImGroupRequestDO> getGroupRequestListByGroupId(Long userId, Long groupId);
 
     /**
      * 按 id 单查申请记录；通用读接口，越权过滤交由调用方
