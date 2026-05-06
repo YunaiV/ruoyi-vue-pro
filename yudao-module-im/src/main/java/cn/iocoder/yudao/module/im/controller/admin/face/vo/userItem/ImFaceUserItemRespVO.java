@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem;
+package cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

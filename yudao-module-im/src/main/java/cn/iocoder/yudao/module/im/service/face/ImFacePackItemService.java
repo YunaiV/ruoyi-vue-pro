@@ -9,8 +9,6 @@ import jakarta.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
-// TODO @AI：已经分了用户端、和管理后台，注释上就不用写【用户端】【【管理后台】】了。。。
-// TODO @AI：注释的风格，参考下别的模块，一些 params、return 都要写呀；
 /**
  * IM 表情包项 Service 接口
  *
@@ -21,49 +19,73 @@ public interface ImFacePackItemService {
     // ==================== 用户端 ====================
 
     /**
-     * 【用户端】按 packIds 批量取启用项，给前端聚合接口用
+     * 按 packIds 批量取启用项，给前端聚合接口用
+     *
+     * @param packIds 表情包编号列表
+     * @return 启用状态的表情列表
      */
     List<ImFacePackItemDO> getEnabledItemListByPackIds(Collection<Long> packIds);
 
     /**
      * 取某个表情包下的表情数量；ImFacePackService 删除前校验「包下无项」用
+     *
+     * @param packId 表情包编号
+     * @return 数量
      */
     Long getFacePackItemCount(Long packId);
 
     /**
      * 取多个表情包下的表情数量合计；ImFacePackService 批量删除前校验用
+     *
+     * @param packIds 表情包编号列表
+     * @return 数量合计
      */
     Long getFacePackItemCount(Collection<Long> packIds);
 
     // ==================== 管理后台 ====================
 
     /**
-     * 【管理后台】分页查询
+     * 分页查询表情包项
+     *
+     * @param reqVO 分页查询条件
+     * @return 表情包项分页
      */
     PageResult<ImFacePackItemDO> getFacePackItemPage(ImFacePackItemPageReqVO reqVO);
 
     /**
-     * 【管理后台】获取详情
+     * 获取表情包项详情
+     *
+     * @param id 表情包项编号
+     * @return 表情包项 DO
      */
     ImFacePackItemDO getFacePackItem(Long id);
 
     /**
-     * 【管理后台】新增，返回新增 id
+     * 新增表情包项
+     *
+     * @param reqVO 新增请求
+     * @return 新增表情包项编号
      */
     Long createFacePackItem(@Valid ImFacePackItemSaveReqVO reqVO);
 
     /**
-     * 【管理后台】修改
+     * 修改表情包项
+     *
+     * @param reqVO 修改请求
      */
     void updateFacePackItem(@Valid ImFacePackItemSaveReqVO reqVO);
 
     /**
-     * 【管理后台】删除
+     * 删除表情包项
+     *
+     * @param id 表情包项编号
      */
     void deleteFacePackItem(Long id);
 
     /**
-     * 【管理后台】批量删除
+     * 批量删除表情包项
+     *
+     * @param ids 表情包项编号列表
      */
     void deleteFacePackItemList(List<Long> ids);
 

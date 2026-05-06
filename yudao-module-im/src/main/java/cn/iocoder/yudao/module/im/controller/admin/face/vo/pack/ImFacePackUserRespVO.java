@@ -15,8 +15,8 @@ public class ImFacePackUserRespVO {
     @Schema(description = "表情包名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "猫主子")
     private String name;
 
-    @Schema(description = "表情包图标 URL", example = "https://cdn.example.com/face/pack/cat.png")
-    private String iconUrl;
+    @Schema(description = "表情包图标", example = "https://cdn.example.com/face/pack/cat.png")
+    private String icon;
 
     @Schema(description = "表情列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Item> items;

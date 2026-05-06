@@ -31,13 +31,12 @@ public class ImFacePackDO extends BaseDO {
      * 表情包名称
      */
     private String name;
-    // TODO @AI:icon 一般不带 url；类似 avatar，特有单词；
     /**
-     * 表情包图标 URL
+     * 表情包图标
      * <p>
      * 面板底部 tab 栏显示
      */
-    private String iconUrl;
+    private String icon;
     /**
      * 排序
      */

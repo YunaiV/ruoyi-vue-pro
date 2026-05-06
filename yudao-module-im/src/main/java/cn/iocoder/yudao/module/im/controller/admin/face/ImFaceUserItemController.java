@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.im.controller.admin.face;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem.ImFaceUserItemRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem.ImFaceUserItemSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem.ImFaceUserItemRespVO;
+import cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem.ImFaceUserItemSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFaceUserItemDO;
 import cn.iocoder.yudao.module.im.service.face.ImFaceUserItemService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-// TODO @AI：拆分到 vo/item 目录下，如果是 item 的话；更简练；
 @Schema(description = "管理后台 - IM 表情包项分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

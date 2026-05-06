@@ -28,8 +28,8 @@ public class ImFaceUserItemDO extends BaseDO {
     private Long id;
     /**
      * 所属用户编号
-     *
-     * // TODO @AI：是不是要关联下 userid
+     * <p>
+     * 关联 AdminUserDO 的 id 编号
      */
     private Long userId;
     /**
@@ -50,14 +50,6 @@ public class ImFaceUserItemDO extends BaseDO {
      * 渲染高度（像素）
      */
     private Integer height;
-    /**
-     * 来源消息编号
-     * <p>
-     * 从消息「添加到表情」时记录；自己上传则为 NULL；用于排查 / 后续溯源
-     *
-     * TODO @AI：关联字段；
-     */
-    private Long sourceMessageId;
     /**
      * 排序
      */

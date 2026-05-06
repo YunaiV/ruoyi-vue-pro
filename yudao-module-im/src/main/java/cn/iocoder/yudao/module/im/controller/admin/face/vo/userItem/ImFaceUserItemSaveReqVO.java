@@ -1,4 +1,5 @@
-package cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem;
+// TODO @AI：java 规范，应该是 useritem
+package cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -27,8 +28,5 @@ public class ImFaceUserItemSaveReqVO {
     @Schema(description = "渲染高度（像素）", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
     @NotNull(message = "渲染高度不能为空")
     private Integer height;
-
-    @Schema(description = "来源消息编号（从消息「添加到表情」时传入；自己上传则不传）", example = "10086")
-    private Long sourceMessageId;
 
 }
