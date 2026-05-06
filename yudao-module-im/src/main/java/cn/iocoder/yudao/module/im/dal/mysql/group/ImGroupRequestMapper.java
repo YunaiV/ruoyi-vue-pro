@@ -25,16 +25,25 @@ public interface ImGroupRequestMapper extends BaseMapperX<ImGroupRequestDO> {
                 .eq(ImGroupRequestDO::getUserId, userId));
     }
 
+    default List<ImGroupRequestDO> selectListByGroupIdAndUserIds(Long groupId, Collection<Long> userIds) {
+        return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
+                .eq(ImGroupRequestDO::getGroupId, groupId)
+                .in(ImGroupRequestDO::getUserId, userIds));
+    }
+
     default List<ImGroupRequestDO> selectListByGroupIdsAndHandleResult(Collection<Long> groupIds, Integer handleResult) {
         return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
                 .in(ImGroupRequestDO::getGroupId, groupIds)
                 .eq(ImGroupRequestDO::getHandleResult, handleResult)
+                .orderByDesc(ImGroupRequestDO::getUpdateTime)
                 .orderByDesc(ImGroupRequestDO::getId));
     }
 
     default List<ImGroupRequestDO> selectListByGroupId(Long groupId) {
+        // 同上，update_time 倒序优先于 id
         return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
                 .eq(ImGroupRequestDO::getGroupId, groupId)
+                .orderByDesc(ImGroupRequestDO::getUpdateTime)
                 .orderByDesc(ImGroupRequestDO::getId));
     }
 

@@ -265,8 +265,14 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         groupRequestService.createInviteRequestList(10L, 1L, List.of(2L, 3L));
 
         // 断言：插入 2 条申请记录 + 推 1503 给 owner（每条 1 帧）共 2 帧
-        verify(groupRequestMapper, times(2)).insert(any(ImGroupRequestDO.class));
+        ArgumentCaptor<ImGroupRequestDO> captor = ArgumentCaptor.forClass(ImGroupRequestDO.class);
+        verify(groupRequestMapper, times(2)).insert(captor.capture());
         verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        // 断言：每条记录 inviterUserId=1 + addSource=INVITE，避免审批通过后回写群成员留痕的来源为空 / 脏带旧值
+        captor.getAllValues().forEach(insert -> {
+            assertEquals(1L, insert.getInviterUserId());
+            assertEquals(ImGroupAddSourceEnum.INVITE.getSource(), insert.getAddSource());
+        });
     }
 
     private AdminUserRespDTO buildUser(Long id, String nickname) {

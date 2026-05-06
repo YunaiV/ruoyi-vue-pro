@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupRequestMapper;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupRequestHandleResultEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -99,6 +100,9 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
         ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
         if (request != null) {
+            // update_time 显式置当前时间：update(null, wrapper) 不会触发 MetaObjectHandler.updateFill；
+            // 列表查询按 update_time 倒序排，复用旧记录时必须刷新这一列才能让本次重新提交排到最前
+            LocalDateTime now = LocalDateTime.now();
             groupRequestMapper.update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
                     .eq(ImGroupRequestDO::getId, request.getId())
                     .set(ImGroupRequestDO::getApplyContent, reqVO.getApplyContent())
@@ -107,11 +111,12 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
                     .set(ImGroupRequestDO::getInviterUserId, null)
                     .set(ImGroupRequestDO::getHandleUserId, null)
                     .set(ImGroupRequestDO::getHandleContent, null)
-                    .set(ImGroupRequestDO::getHandleTime, null));
+                    .set(ImGroupRequestDO::getHandleTime, null)
+                    .set(ImGroupRequestDO::getUpdateTime, now));
             request.setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
                     .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
                     .setInviterUserId(null).setHandleUserId(null)
-                    .setHandleContent(null).setHandleTime(null);
+                    .setHandleContent(null).setHandleTime(null).setUpdateTime(now);
         } else {
             request = BeanUtils.toBean(reqVO, ImGroupRequestDO.class)
                     .setUserId(userId).setInviterUserId(null)
@@ -206,27 +211,35 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         ImGroupDO group = groupService.validateGroupExists(groupId);
 
         // 1. 每个被邀请人 upsert 一条 inviter_user_id=邀请人 的记录
-        // 已有记录（同一对 group_id, user_id 唯一）：覆盖 inviter_user_id + 重置 handle_result + 清空旧处理痕迹（走 LambdaUpdateWrapper.set 显式置 null）
+        // 已有记录（同一对 group_id, user_id 唯一）：覆盖 inviter_user_id / add_source + 重置 handle_result + 清空旧处理痕迹（走 LambdaUpdateWrapper.set 显式置 null）
+        // add_source 强制覆写为 INVITE，避免审批通过后把残留的旧来源回写进群成员留痕
+        Integer inviteSource = ImGroupAddSourceEnum.INVITE.getSource();
         List<ImGroupRequestDO> requests = new ArrayList<>(invitedUserIds.size());
         // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
+        // 同 applyJoinGroup：update(null, wrapper) 不走 MetaObjectHandler.updateFill，复用旧记录必须显式刷 update_time，否则按 update_time 倒序排不到最前
+        LocalDateTime now = LocalDateTime.now();
         for (Long invitedUserId : invitedUserIds) {
             ImGroupRequestDO existing = groupRequestMapper.selectByGroupIdAndUserId(groupId, invitedUserId);
             if (existing != null) {
                 groupRequestMapper.update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
                         .eq(ImGroupRequestDO::getId, existing.getId())
                         .set(ImGroupRequestDO::getInviterUserId, inviterUserId)
+                        .set(ImGroupRequestDO::getAddSource, inviteSource)
                         .set(ImGroupRequestDO::getHandleResult, ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
                         .set(ImGroupRequestDO::getHandleUserId, null)
                         .set(ImGroupRequestDO::getHandleContent, null)
-                        .set(ImGroupRequestDO::getHandleTime, null));
-                existing.setInviterUserId(inviterUserId)
+                        .set(ImGroupRequestDO::getHandleTime, null)
+                        .set(ImGroupRequestDO::getUpdateTime, now));
+                existing.setInviterUserId(inviterUserId).setAddSource(inviteSource)
                         .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                        .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
+                        .setHandleUserId(null).setHandleContent(null).setHandleTime(null)
+                        .setUpdateTime(now);
                 requests.add(existing);
                 continue;
             }
             ImGroupRequestDO insert = new ImGroupRequestDO()
                     .setGroupId(groupId).setUserId(invitedUserId).setInviterUserId(inviterUserId)
+                    .setAddSource(inviteSource)
                     .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
             groupRequestMapper.insert(insert);
             requests.add(insert);

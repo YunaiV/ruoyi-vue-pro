@@ -194,14 +194,15 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 1.1 校验群存在 + 当前用户是群成员；同时拿到 role 供下面审批分支判断
         ImGroupDO group = validateGroupExists(groupId);
         ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(groupId, userId);
-        // 1.2 排除已在群中的用户
+        // 1.2 入参去重 + 排除已在群中的用户
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
-        activeMembers.forEach(member -> inviteReqVO.getMemberUserIds().remove(member.getUserId()));
-        if (CollUtil.isEmpty(inviteReqVO.getMemberUserIds())) {
+        Set<Long> activeMemberUserIds = convertSet(activeMembers, ImGroupMemberDO::getUserId);
+        List<Long> memberUserIds = new ArrayList<>(new LinkedHashSet<>(inviteReqVO.getMemberUserIds()));
+        memberUserIds.removeAll(activeMemberUserIds);
+        if (CollUtil.isEmpty(memberUserIds)) {
             return;
         }
         // 1.3 校验被邀请人都是当前用户的好友
-        List<Long> memberUserIds = inviteReqVO.getMemberUserIds();
         List<ImFriendDO> friends = friendService.getActiveFriendList(userId, memberUserIds);
         Set<Long> friendUserIds = convertSet(friends, ImFriendDO::getFriendUserId);
         Collection<Long> notFriendUserIds = CollUtil.subtract(memberUserIds, friendUserIds);
@@ -214,7 +215,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         // 2. 情况一：群开启审批 + 邀请人是普通成员，落 group_request 等群主 / 管理员处理
-        // 群主 / 管理员邀请视同已审批通过，绕过审批直接拉人进群（对齐 OpenIM / 微信）
+        // 群主 / 管理员邀请，直接拉人进群
         if (Boolean.TRUE.equals(group.getJoinApproval())
                 && !ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole())) {
             groupRequestService.createInviteRequestList(groupId, userId, memberUserIds);
@@ -227,7 +228,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 4. 发 GROUP_MEMBER_INVITE 通知给全员；本地拼 receivers（已查的 active + 新邀请）避免缓存刚 evict 后强制走 DB
         Set<Long> allReceivers = new HashSet<>(memberUserIds);
-        activeMembers.forEach(member -> allReceivers.add(member.getUserId()));
+        allReceivers.addAll(activeMemberUserIds);
         groupMessageService.sendGroupMessage(userId, allReceivers,
                 ImGroupMessageSendDTO.ofGroupMemberInvite(groupId, userId, memberUserIds));
     }

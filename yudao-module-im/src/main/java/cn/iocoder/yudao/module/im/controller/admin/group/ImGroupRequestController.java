@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.controller.admin.group;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -117,10 +118,14 @@ public class ImGroupRequestController {
         return success(CollUtil.getFirst(buildVOList(Collections.singletonList(request))));
     }
 
-    /** 当前用户是否该群的群主 / 管理员 */
+    /**
+     * 当前用户是否该群的有效群主 / 管理员
+     */
     private boolean isGroupOwnerOrAdmin(Long groupId, Long userId) {
         ImGroupMemberDO member = groupMemberService.getGroupMember(groupId, userId);
-        return member != null && ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole());
+        return member != null
+                && !CommonStatusEnum.DISABLE.getStatus().equals(member.getStatus())
+                && ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole());
     }
 
     /** 申请记录列表批量转 VO + 关联回填用户 / 群信息 */
