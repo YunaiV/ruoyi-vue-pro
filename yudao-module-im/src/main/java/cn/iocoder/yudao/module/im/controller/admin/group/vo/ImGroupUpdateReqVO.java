@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.im.controller.admin.group.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -20,5 +22,9 @@ public class ImGroupUpdateReqVO {
 
     @Schema(description = "群公告")
     private String notice;
+
+    @Schema(description = "加群方式", example = "1")
+    @InEnum(ImGroupJoinTypeEnum.class)
+    private Integer joinType; // 参见 ImGroupJoinTypeEnum 枚举类
 
 }

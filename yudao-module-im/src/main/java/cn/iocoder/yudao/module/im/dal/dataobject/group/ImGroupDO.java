@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.dal.dataobject.group;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -50,6 +51,12 @@ public class ImGroupDO extends BaseDO {
      * 群公告
      */
     private String notice;
+    /**
+     * 加群方式
+     * <p>
+     * 枚举 {@link ImGroupJoinTypeEnum}
+     */
+    private Integer joinType;
     /**
      * 是否封禁
      */

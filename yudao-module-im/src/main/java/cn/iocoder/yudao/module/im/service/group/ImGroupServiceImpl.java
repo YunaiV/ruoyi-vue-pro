@@ -27,6 +27,8 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -72,6 +74,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Resource
     @Lazy // 避免循环依赖
     private ImGroupMessageService groupMessageService;
+    @Resource
+    @Lazy // 避免循环依赖
+    private ImGroupRequestService groupRequestService;
 
     @Resource
     private ImFriendService friendService;
@@ -108,9 +113,10 @@ public class ImGroupServiceImpl implements ImGroupService {
         groupMapper.insert(group);
         // 2.2 创建者作为 OWNER 入群
         groupMemberService.addGroupMember(group.getId(), userId, ImGroupMemberRoleEnum.OWNER.getRole());
-        // 2.3 批量添加初始成员
+        // 2.3 批量添加初始成员；标记 addSource=INVITE / inviter=创建者
         if (CollUtil.isNotEmpty(initialMemberUserIds)) {
-            groupMemberService.addGroupMembers(group.getId(), initialMemberUserIds);
+            groupMemberService.addGroupMembers(group.getId(), initialMemberUserIds,
+                    ImGroupAddSourceEnum.INVITE.getSource(), userId);
         }
 
         // 3. 推送 GROUP_CREATE 通知给全员（含创建者多端同步 + 初始成员）
@@ -187,8 +193,8 @@ public class ImGroupServiceImpl implements ImGroupService {
     public void inviteGroupMember(Long userId, ImGroupMemberInviteReqVO inviteReqVO) {
         Long groupId = inviteReqVO.getGroupId();
         // 1.1 校验群存在 + 当前用户是群成员
-        validateGroupExists(groupId);
-        groupMemberService.validateMemberInGroup(groupId, userId);
+        ImGroupDO group = validateGroupExists(groupId);
+        ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(groupId, userId);
         // 1.2 排除已在群中的用户
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
         activeMembers.forEach(member -> inviteReqVO.getMemberUserIds().remove(member.getUserId()));
@@ -208,10 +214,21 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
         }
 
-        // 2. 批量添加群成员
-        groupMemberService.addGroupMembers(groupId, memberUserIds);
+        // TODO @AI：是不是注释的风格，是情况一、情况二，这样搞？
+        // 2. 按群 joinType + 操作人角色分流：APPLY_AND_NORMAL_INVITE 模式下，普通成员邀请走审批，落 group_request；其余直进
+        // TODO @AI：是不是可以放到 isInviteNeedApproval 判断，是否要审批，这样更简洁一点？
+        boolean needApproval = ImGroupJoinTypeEnum.isInviteNeedApproval(group.getJoinType())
+                && !ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole());
+        if (needApproval) {
+            groupRequestService.createInviteRequests(groupId, userId, memberUserIds);
+            return;
+        }
 
-        // 3. 发 GROUP_MEMBER_INVITE 通知给全员；本地拼 receivers（已查的 active + 新邀请）避免缓存刚 evict 后强制走 DB
+        // 3. 直进：批量添加群成员，写 addSource=INVITE / inviterUserId=操作人，留痕
+        groupMemberService.addGroupMembers(groupId, memberUserIds,
+                ImGroupAddSourceEnum.INVITE.getSource(), userId);
+
+        // 4. 发 GROUP_MEMBER_INVITE 通知给全员；本地拼 receivers（已查的 active + 新邀请）避免缓存刚 evict 后强制走 DB
         Set<Long> allReceivers = new HashSet<>(memberUserIds);
         activeMembers.forEach(member -> allReceivers.add(member.getUserId()));
         groupMessageService.sendGroupMessage(userId, allReceivers,
@@ -444,6 +461,15 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_DISSOLVED);
         }
         return group;
+    }
+
+    // todo @AI：这个是不是可以放到 groupmemberservice 里面？
+    @Override
+    public void validateMemberCountLimit(Long groupId, int addCount) {
+        int activeCount = groupMemberService.getActiveGroupMemberUserIdsByGroupId(groupId).size();
+        if (activeCount + addCount > MAX_GROUP_MEMBER) {
+            throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
+        }
     }
 
     /**

@@ -102,6 +102,15 @@ public class ImGroupMessageSendDTO {
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_INVITE.getType()).setContent(notification);
     }
 
+    public static ImGroupMessageSendDTO ofGroupMemberEnter(Long groupId, Long entrantUserId, Integer addSource) {
+        GroupMemberEnterNotification notification = new GroupMemberEnterNotification();
+        notification.setOperatorUserId(entrantUserId);
+        notification.setEntrantUserId(entrantUserId);
+        notification.setAddSource(addSource);
+        return new ImGroupMessageSendDTO().setGroupId(groupId)
+                .setType(ImMessageTypeEnum.GROUP_MEMBER_ENTER.getType()).setContent(notification);
+    }
+
     public static ImGroupMessageSendDTO ofGroupDissolve(Long groupId, Long operatorUserId) {
         GroupDissolveNotification notification = new GroupDissolveNotification();
         notification.setOperatorUserId(operatorUserId);

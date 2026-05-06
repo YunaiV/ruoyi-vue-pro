@@ -10,7 +10,9 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.group.ImGroupMessa
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
+import cn.iocoder.yudao.module.im.service.group.ImGroupRequestService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +42,8 @@ public class ImGroupController {
     private ImGroupMemberService groupMemberService;
     @Resource
     private ImGroupMessageService groupMessageService;
+    @Resource
+    private ImGroupRequestService groupRequestService;
 
     // ==================== 群的写操作 ====================
 
@@ -177,23 +181,34 @@ public class ImGroupController {
     }
 
     /**
-     * 群列表批量转 VO + 关联回填 pinnedMessages
+     * 群列表批量转 VO + 关联回填 pinnedMessages 与 pendingRequestCount
      * <p>
-     * 仅当登录用户是某群的有效成员时才回填该群的 pinnedMessages，避免非成员 / 已退群用户越权拿到置顶消息内容
+     * pinnedMessages 仅当前用户是该群有效成员时回填；pendingRequestCount 仅当前用户是该群 owner / admin 时回填
      */
     private List<ImGroupRespVO> buildGroupRespVOList(List<ImGroupDO> groups, Long loginUserId) {
         if (CollUtil.isEmpty(groups)) {
             return Collections.emptyList();
         }
-        // 仅当前用户是有效成员的群才允许回填置顶消息
-        Set<Long> activeGroupIds = convertSet(
-                groupMemberService.getActiveGroupMemberListByUserId(loginUserId), ImGroupMemberDO::getGroupId);
+        // 1.1 当前用户的活跃群成员记录；用于 pinnedMessages 回填的「成员」可见性 + pendingRequestCount 回填的「owner / admin」可见性
+        List<ImGroupMemberDO> myMembers = groupMemberService.getActiveGroupMemberListByUserId(loginUserId);
+        Set<Long> activeGroupIds = convertSet(myMembers, ImGroupMemberDO::getGroupId);
+        Set<Long> ownerOrAdminGroupIds = convertSet(myMembers,
+                ImGroupMemberDO::getGroupId,
+                member -> ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole()));
+        // 1.2 批量查置顶消息
         Set<Long> allMessageIds = convertSetByFlatMap(groups, group -> activeGroupIds.contains(group.getId())
                 ? CollUtil.emptyIfNull(group.getPinnedMessageIds()).stream() : Stream.empty());
         Map<Long, ImGroupMessageDO> messageMap = groupMessageService.getGroupMessageMap(allMessageIds);
-        // 转换输出
+        // 1.3 仅 owner / admin 群批量统计未处理申请数
+        // TODO @AI：这块讨论中。。。
+        Map<Long, Long> pendingCountMap = groupRequestService.getPendingCountMap(
+                groups.stream().map(ImGroupDO::getId).filter(ownerOrAdminGroupIds::contains).toList());
+        // 2. 转换输出
         return convertList(groups, group -> {
             ImGroupRespVO vo = BeanUtils.toBean(group, ImGroupRespVO.class);
+            if (ownerOrAdminGroupIds.contains(group.getId())) {
+                vo.setPendingRequestCount(pendingCountMap.getOrDefault(group.getId(), 0L));
+            }
             if (!activeGroupIds.contains(group.getId()) || CollUtil.isEmpty(group.getPinnedMessageIds())) {
                 return vo;
             }

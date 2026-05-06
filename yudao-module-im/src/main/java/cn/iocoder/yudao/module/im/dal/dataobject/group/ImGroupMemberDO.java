@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.dal.dataobject.group;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -70,6 +71,18 @@ public class ImGroupMemberDO extends BaseDO {
      * 入群时间
      */
     private LocalDateTime joinTime;
+    /**
+     * 加入来源
+     * <p>
+     * 枚举 {@link ImGroupAddSourceEnum}
+     */
+    private Integer addSource;
+    /**
+     * 邀请人用户编号
+     * <p>
+     * 关联 AdminUserDO 的 id 字段；用户主动申请进群时为 NULL
+     */
+    private Long inviterUserId;
     /**
      * 退群时间
      */

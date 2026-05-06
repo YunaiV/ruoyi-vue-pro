@@ -53,6 +53,12 @@ public interface ErrorCodeConstants {
     ErrorCode FRIEND_NOT_BLOCKED = new ErrorCode(1_040_600_003, "对方未在黑名单中");
     ErrorCode FRIEND_BLOCKED_BY_PEER = new ErrorCode(1_040_600_004, "您已被对方拉入黑名单，无法发送消息");
 
+    // ========== 加群申请 (1-040-510-000) ==========
+    ErrorCode GROUP_REQUEST_NOT_EXISTS = new ErrorCode(1_040_510_001, "加群申请不存在");
+    ErrorCode GROUP_REQUEST_HANDLED = new ErrorCode(1_040_510_002, "加群申请已处理");
+    ErrorCode GROUP_REQUEST_NOT_TO_ME = new ErrorCode(1_040_510_003, "仅群主或管理员可处理加群申请");
+    ErrorCode GROUP_REQUEST_ALREADY_MEMBER = new ErrorCode(1_040_510_004, "您已在该群中，无需重复申请");
+
     // ========== 好友申请 (1-040-610-000) ==========
     ErrorCode FRIEND_REQUEST_NOT_EXISTS = new ErrorCode(1_040_610_001, "好友申请不存在");
     ErrorCode FRIEND_REQUEST_HANDLED = new ErrorCode(1_040_610_002, "好友申请已处理");
@@ -63,5 +69,13 @@ public interface ErrorCodeConstants {
     // ========== 敏感词 (1-040-700-000) ==========
     ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1_040_700_000, "敏感词不存在");
     ErrorCode SENSITIVE_WORD_DUPLICATED = new ErrorCode(1_040_700_001, "敏感词 '{}' 已存在");
+
+    // ========== 表情包 (1-040-800-000) ==========
+    ErrorCode FACE_PACK_NOT_EXISTS = new ErrorCode(1_040_800_000, "表情包不存在");
+    ErrorCode FACE_PACK_HAS_ITEMS = new ErrorCode(1_040_800_001, "表情包下还有表情，无法删除");
+    ErrorCode FACE_PACK_ITEM_NOT_EXISTS = new ErrorCode(1_040_800_002, "表情不存在");
+    ErrorCode FACE_USER_ITEM_NOT_EXISTS = new ErrorCode(1_040_800_010, "个人表情不存在");
+    ErrorCode FACE_USER_ITEM_NOT_OWN = new ErrorCode(1_040_800_011, "不能操作他人的表情");
+    ErrorCode FACE_USER_ITEM_DUPLICATED = new ErrorCode(1_040_800_013, "该表情已添加到个人表情");
 
 }

@@ -86,6 +86,17 @@ public interface ImGroupService {
     ImGroupDO validateGroupExists(Long groupId);
 
     /**
+     * 校验入群人数上限
+     * <p>
+     * 调用方场景：自由进群 / 审批通过等不经 inviteGroupMember 的入群路径，需在写群成员前主动校验
+     *
+     * @param groupId  群编号
+     * @param addCount 即将新增的人数
+     * @throws cn.iocoder.yudao.framework.common.exception.ServiceException 群已满抛 GROUP_MEMBER_EXCEED
+     */
+    void validateMemberCountLimit(Long groupId, int addCount);
+
+    /**
      * 获取指定用户的群列表
      * <p>
      * 返回用户当前仍有效的群，以及最近 {@link cn.iocoder.yudao.module.im.enums.ImCommonConstants#MESSAGE_GROUP_PULL_MAX_DAYS}

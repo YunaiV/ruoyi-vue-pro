@@ -15,6 +15,8 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
@@ -62,6 +64,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImFriendService friendService;
     @Mock
+    private ImGroupRequestService groupRequestService;
+    @Mock
     private AdminUserApi adminUserApi;
 
     // ========== createGroup ==========
@@ -89,7 +93,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMemberService, never()).addGroupMembers(anyLong(), anyCollection());
         // 验证：推送 GROUP_CREATE 通知（payload memberUserIds 含创建者自己）
         ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
-        verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+        verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
         assertEquals(ImMessageTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
     }
 
@@ -117,10 +121,11 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         // 断言：群创建成功 + 创建者 + 初始成员都加入
         assertEquals(100L, result.getId());
         verify(groupMemberService).addGroupMember(100L, 1L, ImGroupMemberRoleEnum.OWNER.getRole());
-        verify(groupMemberService).addGroupMembers(eq(100L), anyCollection());
+        verify(groupMemberService).addGroupMembers(eq(100L), anyCollection(),
+                eq(ImGroupAddSourceEnum.INVITE.getSource()), eq(1L));
         // 验证：推送 GROUP_CREATE 通知，payload memberUserIds 含全员（创建者 + 邀请）
         ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
-        verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+        verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
         assertEquals(ImMessageTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
     }
 
@@ -193,7 +198,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             assertEquals("新名字", result.getName());
             // 推送 GROUP_NAME_UPDATE 通知给全员
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
-            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
             assertEquals(ImMessageTypeEnum.GROUP_NAME_UPDATE.getType(), dtoCaptor.getValue().getType());
         }
     }
@@ -210,13 +215,6 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).name("群").ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
-            List<ImGroupMemberDO> members = List.of(
-                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
-                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                            .status(CommonStatusEnum.ENABLE.getStatus()).build()
-            );
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(members);
 
             // 调用
             groupService.dissolveGroup(10L, 1L);
@@ -259,14 +257,20 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
                     .thenReturn(groupService);
 
-            // 准备：群存在 + 当前用户是群成员
+            // 准备：群存在 + joinType 默认 FREE + 当前用户是群主（操作人必走「直进」分支）
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .joinType(ImGroupJoinTypeEnum.FREE.getType())
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build());
 
             // 当前成员只有群主
             List<ImGroupMemberDO> activeMembers = new ArrayList<>();
             activeMembers.add(ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                    .role(ImGroupMemberRoleEnum.OWNER.getRole())
                     .status(CommonStatusEnum.ENABLE.getStatus()).build());
             when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(activeMembers);
 
@@ -285,13 +289,94 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 调用
             groupService.inviteGroupMember(1L, reqVO);
 
-            // 断言：校验群成员 + 批量添加成员 + 推送 GROUP_MEMBER_INVITE 通知（被邀请人 bootstrap 由前端按 memberUserIds 自判，不再发 GROUP_CREATE）
+            // 断言：校验群成员 + 批量添加成员（带 INVITE 来源 + 邀请人）+ 推送 GROUP_MEMBER_INVITE
             verify(groupMemberService).validateMemberInGroup(10L, 1L);
-            verify(groupMemberService).addGroupMembers(eq(10L), anyCollection());
+            verify(groupMemberService).addGroupMembers(eq(10L), anyCollection(),
+                    eq(ImGroupAddSourceEnum.INVITE.getSource()), eq(1L));
+            verify(groupRequestService, never()).createInviteRequests(anyLong(), anyLong(), anyCollection());
             verify(webSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
-            verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
+            verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
             assertEquals(ImMessageTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
+        }
+    }
+
+    @Test
+    public void testInviteGroupMember_strictMode_normalMember_routesToApproval() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备：joinType=APPLY_AND_NORMAL_INVITE 且操作人是普通成员；应走审批分支，落 group_request
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                    .joinType(ImGroupJoinTypeEnum.APPLY_AND_NORMAL_INVITE.getType())
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build());
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+                    ImGroupMemberDO.builder().groupId(10L).userId(99L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+
+            ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+                    ImFriendDO.builder().userId(1L).friendUserId(2L)
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                    ImFriendDO.builder().userId(1L).friendUserId(3L)
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+
+            // 调用
+            groupService.inviteGroupMember(1L, reqVO);
+
+            // 断言：走审批分支：调 createInviteRequests；不写群成员、不推 1509
+            verify(groupRequestService).createInviteRequests(eq(10L), eq(1L), anyCollection());
+            verify(groupMemberService, never()).addGroupMembers(anyLong(), anyCollection(), any(), any());
+            verify(groupMessageService, never()).sendGroupMessage(anyLong(), any(ImGroupMessageSendDTO.class));
+        }
+    }
+
+    @Test
+    public void testInviteGroupMember_strictMode_owner_directJoin() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备：joinType=APPLY_AND_NORMAL_INVITE 但操作人是群主；走「直进」分支
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .joinType(ImGroupJoinTypeEnum.APPLY_AND_NORMAL_INVITE.getType())
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build());
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+
+            ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L)));
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+                    ImFriendDO.builder().userId(1L).friendUserId(2L)
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+
+            // 调用
+            groupService.inviteGroupMember(1L, reqVO);
+
+            // 断言：走直进分支
+            verify(groupMemberService).addGroupMembers(eq(10L), anyCollection(),
+                    eq(ImGroupAddSourceEnum.INVITE.getSource()), eq(1L));
+            verify(groupRequestService, never()).createInviteRequests(anyLong(), anyLong(), anyCollection());
         }
     }
 

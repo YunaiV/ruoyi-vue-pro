@@ -103,18 +103,24 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Override
     public ImGroupMemberDO addGroupMember(Long groupId, Long userId) {
-        return addGroupMember(groupId, userId, ImGroupMemberRoleEnum.NORMAL.getRole());
+        return addGroupMember(groupId, userId, ImGroupMemberRoleEnum.NORMAL.getRole(), null, null);
+    }
+
+    @Override
+    public ImGroupMemberDO addGroupMember(Long groupId, Long userId, Integer role) {
+        return addGroupMember(groupId, userId, role, null, null);
     }
 
     /**
      * 并发安全：依靠 im_group_member 表的唯一索引 uk_im_group_member_group_user(group_id, user_id) 保证幂等，
      * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
      * <p>
-     * 重置旧成员行时强制重置 role，避免离群期间残留管理员身份在重新入群后被复用。
+     * 重置旧成员行时强制重置 role / addSource / inviterUserId，确保留痕反映「本次入群」事件
      */
     @Override
     @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
-    public ImGroupMemberDO addGroupMember(Long groupId, Long userId, Integer role) {
+    public ImGroupMemberDO addGroupMember(Long groupId, Long userId, Integer role,
+                                          Integer addSource, Long inviterUserId) {
         LocalDateTime now = LocalDateTime.now();
         // 情况一：已存在记录 → 重置或跳过
         ImGroupMemberDO exists = groupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
@@ -122,8 +128,9 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             if (CommonStatusEnum.isDisable(exists.getStatus())) {
                 groupMemberMapper.updateById(new ImGroupMemberDO().setId(exists.getId())
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now)
-                        .setRole(role));
-                exists.setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now).setRole(role);
+                        .setRole(role).setAddSource(addSource).setInviterUserId(inviterUserId));
+                exists.setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now).setRole(role)
+                        .setAddSource(addSource).setInviterUserId(inviterUserId);
             }
             return exists;
         }
@@ -131,7 +138,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         ImGroupMemberDO member = new ImGroupMemberDO()
                 .setGroupId(groupId).setUserId(userId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now)
-                .setRole(role);
+                .setRole(role).setAddSource(addSource).setInviterUserId(inviterUserId);
         try {
             groupMemberMapper.insert(member);
             return member;
@@ -143,8 +150,13 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
-    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
     public void addGroupMembers(Long groupId, Collection<Long> userIds) {
+        addGroupMembers(groupId, userIds, null, null);
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
+    public void addGroupMembers(Long groupId, Collection<Long> userIds, Integer addSource, Long inviterUserId) {
         LocalDateTime now = LocalDateTime.now();
         Integer role = ImGroupMemberRoleEnum.NORMAL.getRole();
         // 1.1 查询已有记录（含已退群的 DISABLE 记录）
@@ -157,10 +169,12 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             ImGroupMemberDO exist = existMap.get(userId);
             if (exist == null) {
                 inserts.add(new ImGroupMemberDO().setGroupId(groupId).setUserId(userId)
-                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setRole(role).setJoinTime(now));
+                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setRole(role).setJoinTime(now)
+                        .setAddSource(addSource).setInviterUserId(inviterUserId));
             } else if (CommonStatusEnum.DISABLE.getStatus().equals(exist.getStatus())) {
                 updates.add(new ImGroupMemberDO().setId(exist.getId())
-                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setRole(role).setJoinTime(now));
+                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setRole(role).setJoinTime(now)
+                        .setAddSource(addSource).setInviterUserId(inviterUserId));
             }
         }
 
@@ -176,7 +190,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             } catch (DuplicateKeyException e) {
                 log.warn("[addGroupMembers][groupId({}) userIds({}) 批量插入冲突，降级为逐个处理]", groupId, userIds);
                 for (ImGroupMemberDO insert : inserts) {
-                    addGroupMember(groupId, insert.getUserId());
+                    addGroupMember(groupId, insert.getUserId(), role, addSource, inviterUserId);
                 }
             }
         }

@@ -111,12 +111,37 @@ public interface ImGroupMemberService {
     ImGroupMemberDO addGroupMember(Long groupId, Long userId, Integer role);
 
     /**
+     * 添加群成员（入群），并指定角色 / 加入来源 / 邀请人
+     * <p>
+     * 重置旧成员行也会强制重置 role / addSource / inviterUserId，确保留痕反映「本次入群」事件
+     *
+     * @param groupId       群编号
+     * @param userId        用户编号
+     * @param role          成员角色
+     * @param addSource     加入来源，见 {@link cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum}
+     * @param inviterUserId 邀请人用户编号；NULL 表示主动申请
+     * @return 群成员记录
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    ImGroupMemberDO addGroupMember(Long groupId, Long userId, Integer role, Integer addSource, Long inviterUserId);
+
+    /**
      * 批量添加群成员（入群）
      *
      * @param groupId 群编号
      * @param userIds 用户编号集合
      */
     void addGroupMembers(Long groupId, Collection<Long> userIds);
+
+    /**
+     * 批量添加群成员（入群），统一携带加入来源 / 邀请人
+     *
+     * @param groupId       群编号
+     * @param userIds       用户编号集合
+     * @param addSource     加入来源
+     * @param inviterUserId 邀请人用户编号；NULL 表示主动申请
+     */
+    void addGroupMembers(Long groupId, Collection<Long> userIds, Integer addSource, Long inviterUserId);
 
     /**
      * 校验用户是否为群的有效成员

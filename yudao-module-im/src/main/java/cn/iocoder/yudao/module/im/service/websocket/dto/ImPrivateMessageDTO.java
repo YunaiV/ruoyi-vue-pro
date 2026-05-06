@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.BaseFriendNotification;
+import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.BaseGroupNotification;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -115,6 +116,28 @@ public class ImPrivateMessageDTO {
      */
     public static ImPrivateMessageDTO ofFriendNotification(Integer type, Long operatorUserId,
                                                            Long receiverUserId, BaseFriendNotification payload) {
+        return new ImPrivateMessageDTO().setType(type)
+                .setSenderId(operatorUserId).setReceiverId(receiverUserId)
+                .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
+    }
+
+    // ==================== 群定向私聊通知 ====================
+
+    // TODO @AI：能不能走群聊的通道？？？？只是接收人不同。
+    /**
+     * 构建群通知推送 DTO（走私聊通道定向推送，不入群消息流）
+     * <p>
+     * 用于 GROUP_REQUEST_RECEIVED / GROUP_REQUEST_APPROVED / GROUP_REQUEST_REJECTED 段位；
+     * 与 {@link cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO} 走 sendGroupMessage 群广播路径不同
+     *
+     * @param type           消息类型；取自 {@link ImMessageTypeEnum} 中的 GROUP_REQUEST_* 段
+     * @param operatorUserId 操作人用户编号；同时作为帧的 senderId
+     * @param receiverUserId 推送目标用户编号
+     * @param payload        群事件 payload（继承 {@link BaseGroupNotification}）
+     * @return 私聊 DTO
+     */
+    public static ImPrivateMessageDTO ofGroupNotification(Integer type, Long operatorUserId,
+                                                          Long receiverUserId, BaseGroupNotification payload) {
         return new ImPrivateMessageDTO().setType(type)
                 .setSenderId(operatorUserId).setReceiverId(receiverUserId)
                 .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
