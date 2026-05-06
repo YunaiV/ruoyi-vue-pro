@@ -49,6 +49,12 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      * 场景：把好友名片推荐给其他会话，对端点击名片可打开 UserInfoCard
      */
     CARD(108, "名片", true, true),
+    /**
+     * 对应 OpenIM：Face 115
+     * 对应自己的类：FaceMessage
+     * 场景：表情贴图（运营配置的系统表情包 + 用户私有表情包）；Unicode emoji 仍走 TEXT
+     */
+    FACE(115, "表情", true, true),
 
     // ========== 信号类（2101 / 2200 直接复用 OpenIM 段位编号；2201 自有扩展） ==========
     /**
@@ -142,9 +148,10 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_INFO_UPDATE(1502, "群信息变更", true, false),
     /**
      * 对应 OpenIM：sdkws.JoinGroupApplicationTips（JoinGroupApplicationNotification 1503）
-     * TODO @AI 未实现：入群申请；本期不在范围，预留段位以便未来对齐 OpenIM
+     * 对应自己的类：GroupRequestNotification
+     * 场景：用户申请加群 / 普通成员邀请待审批，定向私聊推送给群主 + 全部管理员（多端同步）；不入群消息流
      */
-    GROUP_JOIN_APPLICATION(1503, "入群申请", true, false),
+    GROUP_REQUEST_RECEIVED(1503, "收到新的入群申请", false, false),
     /**
      * 对应 OpenIM：sdkws.MemberQuitTips（MemberQuitNotification 1504）
      * 对应自己的类：GroupMemberQuitNotification
@@ -153,14 +160,16 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_MEMBER_QUIT(1504, "成员退群", true, false),
     /**
      * 对应 OpenIM：sdkws.GroupApplicationAcceptedTips（GroupApplicationAcceptedNotification 1505）
-     * TODO @AI 未实现：入群申请通过；本期不在范围
+     * 对应自己的类：GroupRequestApprovedNotification
+     * 场景：群主 / 管理员同意申请，定向私聊推送给申请人 + 群主 + 全部管理员；申请人侧弹 toast，admin 侧 pendingRequestCount-1；不入群消息流
      */
-    GROUP_APPLICATION_ACCEPTED(1505, "入群申请通过", true, false),
+    GROUP_REQUEST_APPROVED(1505, "入群申请被同意", false, false),
     /**
      * 对应 OpenIM：sdkws.GroupApplicationRejectedTips（GroupApplicationRejectedNotification 1506）
-     * TODO @AI 未实现：入群申请拒绝；本期不在范围
+     * 对应自己的类：GroupRequestRejectedNotification
+     * 场景：群主 / 管理员拒绝申请，定向私聊推送给申请人 + 群主 + 全部管理员；不入群消息流
      */
-    GROUP_APPLICATION_REJECTED(1506, "入群申请拒绝", true, false),
+    GROUP_REQUEST_REJECTED(1506, "入群申请被拒绝", false, false),
     /**
      * 对应 OpenIM：sdkws.GroupOwnerTransferredTips（GroupOwnerTransferredNotification 1507）
      * 对应自己的类：GroupOwnerTransferNotification
@@ -181,7 +190,8 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_MEMBER_INVITE(1509, "成员加入", true, false),
     /**
      * 对应 OpenIM：sdkws.MemberEnterTips（MemberEnterNotification 1510）
-     * TODO @AI 未实现：自由进群（链接 / 二维码进群）；本期不在范围
+     * 对应自己的类：GroupMemberEnterNotification
+     * 场景：用户经搜索 / 二维码 / 分享链接自由进群（FREE 模式或审批通过后），全员广播；前端按 entrantUserId 局部添加成员
      */
     GROUP_MEMBER_ENTER(1510, "自由进群", true, false),
     /**
