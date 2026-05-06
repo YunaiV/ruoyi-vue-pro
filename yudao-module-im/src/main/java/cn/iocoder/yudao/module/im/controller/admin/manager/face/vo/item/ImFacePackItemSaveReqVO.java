@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.item;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -29,10 +31,14 @@ public class ImFacePackItemSaveReqVO {
 
     @Schema(description = "渲染宽度（像素）", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
     @NotNull(message = "渲染宽度不能为空")
+    @Min(value = 1, message = "渲染宽度不能小于 1 像素")
+    @Max(value = 2048, message = "渲染宽度不能大于 2048 像素")
     private Integer width;
 
     @Schema(description = "渲染高度（像素）", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
     @NotNull(message = "渲染高度不能为空")
+    @Min(value = 1, message = "渲染高度不能小于 1 像素")
+    @Max(value = 2048, message = "渲染高度不能大于 2048 像素")
     private Integer height;
 
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
