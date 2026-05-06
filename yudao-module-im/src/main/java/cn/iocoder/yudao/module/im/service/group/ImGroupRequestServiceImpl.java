@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.im.service.group;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -21,7 +20,7 @@ import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.BaseGroupNotification;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestApprovedNotification;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestNotification;
+import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestReceivedNotification;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestRejectedNotification;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -36,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
@@ -95,17 +95,23 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
 
         // 3. 情况二：群开启了审批；upsert 一条「主动申请」记录，inviterUserId=null
         // 已有记录（无论之前是未处理 / 已同意 / 已拒绝），覆盖申请理由 + 来源 + 重置为未处理 + 清空旧处理痕迹
+        // null 字段（inviterUserId / handleUserId / handleContent / handleTime）走 LambdaUpdateWrapper.set 显式清空，updateById 默认会忽略 null
+        // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
         ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
         if (request != null) {
-            // TODO @AI：相同的放在一行里；然后 null 直接这样更新是清理不掉的；看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？
-            ImGroupRequestDO updateObj = new ImGroupRequestDO()
-                    .setInviterUserId(null)
-                    .setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
+            groupRequestMapper.update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
+                    .eq(ImGroupRequestDO::getId, request.getId())
+                    .set(ImGroupRequestDO::getApplyContent, reqVO.getApplyContent())
+                    .set(ImGroupRequestDO::getAddSource, reqVO.getAddSource())
+                    .set(ImGroupRequestDO::getHandleResult, ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                    .set(ImGroupRequestDO::getInviterUserId, null)
+                    .set(ImGroupRequestDO::getHandleUserId, null)
+                    .set(ImGroupRequestDO::getHandleContent, null)
+                    .set(ImGroupRequestDO::getHandleTime, null));
+            request.setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
                     .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                    .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
-            updateObj.setId(request.getId());
-            groupRequestMapper.updateById(updateObj);
-            BeanUtil.copyProperties(updateObj, request, CopyOptions.create().setIgnoreNullValue(true));
+                    .setInviterUserId(null).setHandleUserId(null)
+                    .setHandleContent(null).setHandleTime(null);
         } else {
             request = BeanUtils.toBean(reqVO, ImGroupRequestDO.class)
                     .setUserId(userId).setInviterUserId(null)
@@ -115,9 +121,8 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
 
         // 4. 1503 私聊定向推群主 + 全部管理员（多端同步）；payload 携带申请方昵称 / 头像
         AdminUserRespDTO applyUser = adminUserApi.getUser(userId);
-        GroupRequestNotification payload = buildRequestNotification(group, request, applyUser);
-        for (Long receiverUserId : listOwnerAndAdminUserIds(group)) {
-            // TODO @AI：能不能发群的，只发给群管理员；就是 groupMessageService；只是不 persist 呀。
+        GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);
+        for (Long receiverUserId : getGroupMemberListByOwnerAndAdminUserIds(group)) {
             websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
                     ImMessageTypeEnum.GROUP_REQUEST_RECEIVED.getType(), userId, receiverUserId, payload));
         }
@@ -150,13 +155,9 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
                 ImGroupMemberRoleEnum.NORMAL.getRole(), request.getAddSource(), request.getInviterUserId());
 
         // 5.1 1505 私聊推送给申请人 + 群主 + 全部管理员（每端单推）
-        // TODO @AI：同类属性，放在一行，减少行占用；其它位置也是！
-        GroupRequestApprovedNotification payload = (GroupRequestApprovedNotification)
-                new GroupRequestApprovedNotification()
-                        .setRequestId(request.getId())
-                        .setGroupId(request.getGroupId())
-                        .setUserId(request.getUserId())
-                        .setOperatorUserId(userId);
+        GroupRequestApprovedNotification payload = (GroupRequestApprovedNotification) new GroupRequestApprovedNotification()
+                .setRequestId(request.getId()).setGroupId(request.getGroupId()).setUserId(request.getUserId())
+                .setOperatorUserId(userId);
         broadcastToOwnerAdminsAndApplicant(request.getGroupId(), request.getUserId(), payload,
                 ImMessageTypeEnum.GROUP_REQUEST_APPROVED.getType(), userId);
         // 5.2 群事件：主动申请 → 1510 自由进群；被邀请 → 1509 成员加入
@@ -189,13 +190,9 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         }
 
         // 3. 1506 私聊推送给申请人 + 群主 + 全部管理员
-        GroupRequestRejectedNotification payload = (GroupRequestRejectedNotification)
-                new GroupRequestRejectedNotification()
-                        .setRequestId(request.getId())
-                        .setGroupId(request.getGroupId())
-                        .setUserId(request.getUserId())
-                        .setHandleContent(handleContent)
-                        .setOperatorUserId(userId);
+        GroupRequestRejectedNotification payload = (GroupRequestRejectedNotification) new GroupRequestRejectedNotification()
+                .setRequestId(request.getId()).setGroupId(request.getGroupId()).setUserId(request.getUserId())
+                .setHandleContent(handleContent).setOperatorUserId(userId);
         broadcastToOwnerAdminsAndApplicant(request.getGroupId(), request.getUserId(), payload,
                 ImMessageTypeEnum.GROUP_REQUEST_REJECTED.getType(), userId);
     }
@@ -209,17 +206,19 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         ImGroupDO group = groupService.validateGroupExists(groupId);
 
         // 1. 每个被邀请人 upsert 一条 inviter_user_id=邀请人 的记录
-        // 已有记录（同一对 group_id, user_id 唯一）：覆盖 inviter_user_id + 重置 handle_result + 清空处理痕迹
+        // 已有记录（同一对 group_id, user_id 唯一）：覆盖 inviter_user_id + 重置 handle_result + 清空旧处理痕迹（走 LambdaUpdateWrapper.set 显式置 null）
         List<ImGroupRequestDO> requests = new ArrayList<>(invitedUserIds.size());
+        // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
         for (Long invitedUserId : invitedUserIds) {
             ImGroupRequestDO existing = groupRequestMapper.selectByGroupIdAndUserId(groupId, invitedUserId);
             if (existing != null) {
-                ImGroupRequestDO updateObj = new ImGroupRequestDO()
-                        .setInviterUserId(inviterUserId)
-                        .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                        .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
-                updateObj.setId(existing.getId());
-                groupRequestMapper.updateById(updateObj);
+                groupRequestMapper.update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
+                        .eq(ImGroupRequestDO::getId, existing.getId())
+                        .set(ImGroupRequestDO::getInviterUserId, inviterUserId)
+                        .set(ImGroupRequestDO::getHandleResult, ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                        .set(ImGroupRequestDO::getHandleUserId, null)
+                        .set(ImGroupRequestDO::getHandleContent, null)
+                        .set(ImGroupRequestDO::getHandleTime, null));
                 existing.setInviterUserId(inviterUserId)
                         .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
                         .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
@@ -235,11 +234,10 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
 
         // 2. 推 1503 给群主 + 全部管理员；多端同步；每条申请单独推一帧
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(invitedUserIds);
-        List<Long> ownerAndAdmins = listOwnerAndAdminUserIds(group);
+        List<Long> ownerAndAdmins = getGroupMemberListByOwnerAndAdminUserIds(group);
         for (ImGroupRequestDO request : requests) {
             AdminUserRespDTO applyUser = userMap.get(request.getUserId());
-            // TODO @AI：GroupRequestNotification 是不是要调整下命名？因为它是 RECEIVED 的，不然显得太公用了。
-            GroupRequestNotification payload = buildRequestNotification(group, request, applyUser);
+            GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);
             for (Long receiverUserId : ownerAndAdmins) {
                 websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
                         ImMessageTypeEnum.GROUP_REQUEST_RECEIVED.getType(), inviterUserId, receiverUserId, payload));
@@ -298,18 +296,14 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     /**
      * 构建 1503 通知 payload；聚合申请方昵称 / 头像供前端直接渲染
      */
-    private GroupRequestNotification buildRequestNotification(ImGroupDO group, ImGroupRequestDO request,
-                                                              AdminUserRespDTO applyUser) {
-        // TODO @AI：看看能不能链式调用；同类属性，相同行；
-        GroupRequestNotification payload = (GroupRequestNotification) new GroupRequestNotification()
-                .setRequestId(request.getId())
-                .setGroupId(group.getId())
-                .setUserId(request.getUserId())
+    private GroupRequestReceivedNotification buildRequestNotification(ImGroupDO group, ImGroupRequestDO request,
+                                                                      AdminUserRespDTO applyUser) {
+        Long operatorUserId = request.getInviterUserId() != null ? request.getInviterUserId() : request.getUserId();
+        GroupRequestReceivedNotification payload = (GroupRequestReceivedNotification) new GroupRequestReceivedNotification()
+                .setRequestId(request.getId()).setGroupId(group.getId()).setUserId(request.getUserId())
                 .setInviterUserId(request.getInviterUserId())
-                .setApplyContent(request.getApplyContent())
-                .setAddSource(request.getAddSource())
-                .setOperatorUserId(request.getInviterUserId() != null
-                        ? request.getInviterUserId() : request.getUserId());
+                .setApplyContent(request.getApplyContent()).setAddSource(request.getAddSource())
+                .setOperatorUserId(operatorUserId);
         if (applyUser != null) {
             payload.setUserNickname(applyUser.getNickname()).setUserAvatar(applyUser.getAvatar());
         }
@@ -325,7 +319,7 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         if (group == null) {
             return;
         }
-        Set<Long> receivers = new LinkedHashSet<>(listOwnerAndAdminUserIds(group));
+        Set<Long> receivers = new LinkedHashSet<>(getGroupMemberListByOwnerAndAdminUserIds(group));
         receivers.add(applicantUserId);
         for (Long receiverUserId : receivers) {
             websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
@@ -334,16 +328,14 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     }
 
     /**
-     * 列出群主 + 全部管理员的用户编号；以 group.ownerUserId 兜底，避免 group_member 表里 owner 角色记录异常缺失
+     * 列出群主 + 全部管理员的用户编号
+     *
+     * @param group 群信息
+     * @return 群主 + 全部管理员的用户编号列表
      */
-    // TODO @AI：有点过度设计了，直接 convertset 群成员即可！
-    private List<Long> listOwnerAndAdminUserIds(ImGroupDO group) {
-        Set<Long> set = new LinkedHashSet<>();
-        set.add(group.getOwnerUserId());
-        for (ImGroupMemberDO member : groupMemberService.getGroupMemberListByOwnerAndAdmin(group.getId())) {
-            set.add(member.getUserId());
-        }
-        return new ArrayList<>(set);
+    private List<Long> getGroupMemberListByOwnerAndAdminUserIds(ImGroupDO group) {
+        return convertList(groupMemberService.getGroupMemberListByOwnerAndAdmin(group.getId()),
+                ImGroupMemberDO::getUserId);
     }
 
 }

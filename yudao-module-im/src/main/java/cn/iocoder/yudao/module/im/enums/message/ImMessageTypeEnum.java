@@ -74,6 +74,10 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     READ(2201, "已读", false, false),
 
     // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
+    // TODO @芋艿：FRIEND_REQUEST_* 与 GROUP_REQUEST_* 都是 persistent=false 的 SysMsg，离线 pull 拉不到，
+    //  目前可能丢失「实时 toast 提醒」体验（业务状态不丢，前端上线 fetch{Friend,Group}RequestList 能补回来）；
+    //  未来思考下怎么优化：候选方案 1）改 persistent=true 入私聊消息流 + 让客户端按 type 自渲染；
+    //  2）服务端补一个「未读通知拉取」接口给前端冷启动调用。
     /**
      * 对应 OpenIM：FriendApplicationApprovedNotification 1201
      * 对应自己的类：FriendRequestApprovedNotification
@@ -148,7 +152,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     GROUP_INFO_UPDATE(1502, "群信息变更", true, false),
     /**
      * 对应 OpenIM：sdkws.JoinGroupApplicationTips（JoinGroupApplicationNotification 1503）
-     * 对应自己的类：GroupRequestNotification
+     * 对应自己的类：GroupRequestReceivedNotification
      * 场景：用户申请加群 / 普通成员邀请待审批，定向私聊推送给群主 + 全部管理员（多端同步）；不入群消息流
      */
     GROUP_REQUEST_RECEIVED(1503, "收到新的入群申请", false, false),

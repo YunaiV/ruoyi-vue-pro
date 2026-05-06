@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class GroupRequestNotification extends BaseGroupNotification {
+public class GroupRequestReceivedNotification extends BaseGroupNotification {
 
     /**
      * 申请记录编号
