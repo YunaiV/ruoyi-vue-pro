@@ -73,6 +73,18 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return groupMemberMapper.selectListByGroupIdAndStatus(groupId, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    @Override
+    public List<ImGroupMemberDO> getGroupMemberListByOwnerAndAdmin(Long groupId) {
+        // TODO @AI：把条件往下传；这样减少加载数据量！
+        List<ImGroupMemberDO> members = getActiveGroupMemberListByGroupId(groupId);
+        if (CollUtil.isEmpty(members)) {
+            return Collections.emptyList();
+        }
+        return members.stream()
+                .filter(member -> ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole()))
+                .toList();
+    }
+
     /**
      * 只缓存 userId 列表而非整个 {@link ImGroupMemberDO}，理由：
      * <ul>

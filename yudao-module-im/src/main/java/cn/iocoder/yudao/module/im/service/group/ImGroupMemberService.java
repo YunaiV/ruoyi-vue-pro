@@ -59,6 +59,14 @@ public interface ImGroupMemberService {
     List<ImGroupMemberDO> getActiveGroupMemberListByGroupId(Long groupId);
 
     /**
+     * 获取群里活跃的群主 + 管理员；用于审批通知定向推送
+     *
+     * @param groupId 群编号
+     * @return 群主 / 管理员的成员记录列表（按入群时间倒序的天然成员表顺序）
+     */
+    List<ImGroupMemberDO> getGroupMemberListByOwnerAndAdmin(Long groupId);
+
+    /**
      * 根据群编号查询有效成员的 userId 列表（仅 ENABLE 状态）
      * <p>
      * 相比 {@link #getActiveGroupMemberListByGroupId(Long)}，只返回 userId，结果体积小，并带有 Redis 缓存。

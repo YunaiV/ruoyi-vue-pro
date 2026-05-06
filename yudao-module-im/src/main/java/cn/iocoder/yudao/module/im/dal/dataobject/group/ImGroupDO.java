@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.im.dal.dataobject.group;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -52,11 +51,11 @@ public class ImGroupDO extends BaseDO {
      */
     private String notice;
     /**
-     * 加群方式
+     * 进群是否需群主 / 管理员审批
      * <p>
-     * 枚举 {@link ImGroupJoinTypeEnum}
+     * false 自由进群（默认）；true 需审批，所有「申请」「邀请」路径都需群主 / 管理员同意
      */
-    private Integer joinType;
+    private Boolean joinApproval;
     /**
      * 是否封禁
      */

@@ -28,7 +28,6 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -194,7 +193,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         Long groupId = inviteReqVO.getGroupId();
         // 1.1 校验群存在 + 当前用户是群成员
         ImGroupDO group = validateGroupExists(groupId);
-        ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(groupId, userId);
+        groupMemberService.validateMemberInGroup(groupId, userId);
         // 1.2 排除已在群中的用户
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
         activeMembers.forEach(member -> inviteReqVO.getMemberUserIds().remove(member.getUserId()));
@@ -214,17 +213,13 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
         }
 
-        // TODO @AI：是不是注释的风格，是情况一、情况二，这样搞？
-        // 2. 按群 joinType + 操作人角色分流：APPLY_AND_NORMAL_INVITE 模式下，普通成员邀请走审批，落 group_request；其余直进
-        // TODO @AI：是不是可以放到 isInviteNeedApproval 判断，是否要审批，这样更简洁一点？
-        boolean needApproval = ImGroupJoinTypeEnum.isInviteNeedApproval(group.getJoinType())
-                && !ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole());
-        if (needApproval) {
-            groupRequestService.createInviteRequests(groupId, userId, memberUserIds);
+        // 2. 情况一：群开启了审批，邀请也走审批，落 group_request 等群主 / 管理员处理
+        if (Boolean.TRUE.equals(group.getJoinApproval())) {
+            groupRequestService.createInviteRequestList(groupId, userId, memberUserIds);
             return;
         }
 
-        // 3. 直进：批量添加群成员，写 addSource=INVITE / inviterUserId=操作人，留痕
+        // 3. 情况二：未开审批，直进；批量添加群成员，写 addSource=INVITE / inviterUserId=操作人 留痕
         groupMemberService.addGroupMembers(groupId, memberUserIds,
                 ImGroupAddSourceEnum.INVITE.getSource(), userId);
 

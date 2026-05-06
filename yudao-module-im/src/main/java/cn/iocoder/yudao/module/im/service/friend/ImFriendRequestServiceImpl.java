@@ -88,19 +88,19 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
             return null;
         }
 
-        // 2. 落库：复用最新一条未处理记录走条件 update；否则新建
-        ImFriendRequestDO request = friendRequestMapper.selectLatestByFromUserIdAndToUserId(fromUserId, toUserId);
-        if (request != null && ImFriendRequestHandleResultEnum.isUnhandled(request.getHandleResult())) {
-            ImFriendRequestDO updateObj = new ImFriendRequestDO().setApplyContent(reqVO.getApplyContent())
-                    .setDisplayName(reqVO.getDisplayName()).setAddSource(reqVO.getAddSource());
-            int affected = friendRequestMapper.updateByIdAndHandleResult(request.getId(),
-                    ImFriendRequestHandleResultEnum.UNHANDLED.getResult(), updateObj);
-            if (affected == 0) {
-                //    并发场景下另一方刚 agree/refuse 推进了状态，条件 update affected=0 抛已处理错让前端重试
-                throw exception(FRIEND_REQUEST_HANDLED);
-            }
-            // 同步更新字段，下面推送 payload 用
-            BeanUtil.copyProperties(reqVO, request, CopyOptions.create().setIgnoreNullValue(true));
+        // 2. 落库：upsert 语义；同一对 (from, to) 唯一，已有记录覆盖申请理由 / 备注 / 来源 + 重置为未处理 + 清空旧处理痕迹
+        ImFriendRequestDO request = friendRequestMapper.selectByFromUserIdAndToUserId(fromUserId, toUserId);
+        if (request != null) {
+            // TODO @AI：相同的放在一行里；然后 null 直接这样更新是清理不掉的；看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？
+            ImFriendRequestDO updateObj = new ImFriendRequestDO()
+                    .setApplyContent(reqVO.getApplyContent())
+                    .setDisplayName(reqVO.getDisplayName())
+                    .setAddSource(reqVO.getAddSource())
+                    .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
+                    .setHandleContent(null).setHandleTime(null);
+            updateObj.setId(request.getId());
+            friendRequestMapper.updateById(updateObj);
+            BeanUtil.copyProperties(updateObj, request, CopyOptions.create().setIgnoreNullValue(true));
         } else {
             request = BeanUtils.toBean(reqVO, ImFriendRequestDO.class)
                     .setFromUserId(fromUserId).setToUserId(toUserId)

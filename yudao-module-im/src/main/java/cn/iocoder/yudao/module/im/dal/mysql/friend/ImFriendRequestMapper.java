@@ -18,12 +18,10 @@ import java.util.List;
 @Mapper
 public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
 
-    default ImFriendRequestDO selectLatestByFromUserIdAndToUserId(Long fromUserId, Long toUserId) {
+    default ImFriendRequestDO selectByFromUserIdAndToUserId(Long fromUserId, Long toUserId) {
         return selectOne(new LambdaQueryWrapperX<ImFriendRequestDO>()
                 .eq(ImFriendRequestDO::getFromUserId, fromUserId)
-                .eq(ImFriendRequestDO::getToUserId, toUserId)
-                .orderByDesc(ImFriendRequestDO::getId)
-                .last("LIMIT 1"));
+                .eq(ImFriendRequestDO::getToUserId, toUserId));
     }
 
     /**

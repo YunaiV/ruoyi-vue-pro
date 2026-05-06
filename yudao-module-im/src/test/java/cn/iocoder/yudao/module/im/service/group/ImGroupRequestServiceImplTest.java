@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupRequestMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupRequestHandleResultEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -60,7 +59,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
     public void testApplyJoinGroup_freeMode_directJoin() {
         // 准备：群是 FREE 模式
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
-                .joinType(ImGroupJoinTypeEnum.FREE.getType())
+                .joinApproval(false)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
 
@@ -88,11 +87,11 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
     public void testApplyJoinGroup_approvalMode_createsRequest() {
         // 准备：群是 APPLY 模式
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
-                .joinType(ImGroupJoinTypeEnum.APPLY.getType())
+                .joinApproval(true)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
         // 群里有 owner + 一个 admin，作为 1503 推送目标
-        when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
@@ -120,7 +119,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApplyJoinGroup_alreadyMember_throws() {
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
-                .joinType(ImGroupJoinTypeEnum.APPLY.getType())
+                .joinApproval(true)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
         when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(
@@ -156,7 +155,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.getGroup(10L)).thenReturn(group);
-        when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
@@ -234,7 +233,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.getGroup(10L)).thenReturn(group);
-        when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
@@ -246,15 +245,15 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }
 
-    // ==================== createInviteRequests ====================
+    // ==================== createInviteRequestList ====================
 
     @Test
-    public void testCreateInviteRequests_success() {
+    public void testCreateInviteRequestList_success() {
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
-                .joinType(ImGroupJoinTypeEnum.APPLY_AND_NORMAL_INVITE.getType())
+                .joinApproval(true)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
-        when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
@@ -263,7 +262,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 3L, buildUser(3L, "用户B")));
 
         // 调用：邀请人 1L 邀请 2L、3L
-        groupRequestService.createInviteRequests(10L, 1L, List.of(2L, 3L));
+        groupRequestService.createInviteRequestList(10L, 1L, List.of(2L, 3L));
 
         // 断言：插入 2 条申请记录 + 推 1503 给 owner（每条 1 帧）共 2 帧
         verify(groupRequestMapper, times(2)).insert(any(ImGroupRequestDO.class));

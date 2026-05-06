@@ -32,12 +32,8 @@ public class ImGroupRespVO {
     @Schema(description = "是否全群禁言")
     private Boolean mutedAll;
 
-    @Schema(description = "加群方式", example = "0")
-    private Integer joinType; // 参见 ImGroupJoinTypeEnum 枚举类
-
-    // TODO @AI：是不是不回填；前端自己查询 + 推送维护？类似微信，会展示有人加群，需要审批之类的。（晚点我可以给截图）；
-    @Schema(description = "未处理加群申请数；仅当登录用户是该群群主 / 管理员时回填，否则为 null", example = "3")
-    private Long pendingRequestCount;
+    @Schema(description = "进群是否需群主 / 管理员审批", example = "false")
+    private Boolean joinApproval;
 
     @Schema(description = "封禁时间")
     private LocalDateTime bannedTime;

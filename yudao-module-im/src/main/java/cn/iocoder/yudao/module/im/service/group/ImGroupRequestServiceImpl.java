@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupRequestMapper;
-import cn.iocoder.yudao.module.im.enums.group.ImGroupJoinTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupRequestHandleResultEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -37,9 +36,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
-// TODO @AI：payload 能不能改成 notification 更像通知一点。
 /**
  * IM 加群申请 Service 实现类
  *
@@ -81,30 +80,32 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
             throw exception(GROUP_REQUEST_ALREADY_MEMBER);
         }
 
-        // 2. FREE 模式：直接入群 + 推 1510 全员广播；不落申请记录
-        if (ImGroupJoinTypeEnum.isFree(group.getJoinType())) {
-            // TODO @AI：这里还是写下注释；每一行的；
+        // 2. 情况一：群未开启审批，直接入群；写群成员留痕 + 推 1510 全员广播；不落申请记录
+        if (!Boolean.TRUE.equals(group.getJoinApproval())) {
+            // 入群前校验人数上限
             groupService.validateMemberCountLimit(groupId, 1);
+            // 写群成员；addSource 来自前端入口（搜索 / 二维码 / 分享链接），inviterUserId=null（主动申请）
             groupMemberService.addGroupMember(groupId, userId,
                     ImGroupMemberRoleEnum.NORMAL.getRole(), reqVO.getAddSource(), null);
+            // 推 1510 给全员；payload 含进群者 + 来源，前端按 entrantUserId 局部插入新成员
             groupMessageService.sendGroupMessage(userId,
                     ImGroupMessageSendDTO.ofGroupMemberEnter(groupId, userId, reqVO.getAddSource()));
             return null;
         }
 
-        // 3. 非 FREE 模式：复用未处理记录或新建
-        ImGroupRequestDO request = groupRequestMapper.selectLatestPendingByGroupIdAndUserIdAndInviter(
-                groupId, userId, null);
+        // 3. 情况二：群开启了审批；upsert 一条「主动申请」记录，inviterUserId=null
+        // 已有记录（无论之前是未处理 / 已同意 / 已拒绝），覆盖申请理由 + 来源 + 重置为未处理 + 清空旧处理痕迹
+        ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
         if (request != null) {
+            // TODO @AI：相同的放在一行里；然后 null 直接这样更新是清理不掉的；看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？
             ImGroupRequestDO updateObj = new ImGroupRequestDO()
-                    .setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource());
-            int affected = groupRequestMapper.updateByIdAndHandleResult(request.getId(),
-                    ImGroupRequestHandleResultEnum.UNHANDLED.getResult(), updateObj);
-            if (affected == 0) {
-                // 并发场景另一管理端刚处理过，提示重试
-                throw exception(GROUP_REQUEST_HANDLED);
-            }
-            BeanUtil.copyProperties(reqVO, request, CopyOptions.create().setIgnoreNullValue(true));
+                    .setInviterUserId(null)
+                    .setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
+                    .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                    .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
+            updateObj.setId(request.getId());
+            groupRequestMapper.updateById(updateObj);
+            BeanUtil.copyProperties(updateObj, request, CopyOptions.create().setIgnoreNullValue(true));
         } else {
             request = BeanUtils.toBean(reqVO, ImGroupRequestDO.class)
                     .setUserId(userId).setInviterUserId(null)
@@ -126,7 +127,7 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void agreeGroupRequest(Long userId, Long requestId) {
-        // 1. 校验申请存在 + 未处理 + 操作人是 owner/admin
+        // 1. 校验申请存在 + 未处理 + 操作人是 owner / admin
         ImGroupRequestDO request = validateRequestForHandle(userId, requestId);
         // 2. 入群前校验人数上限；群已满抛错让操作人选择拒绝
         groupService.validateMemberCountLimit(request.getGroupId(), 1);
@@ -144,17 +145,18 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         request.setHandleResult(ImGroupRequestHandleResultEnum.AGREED.getResult())
                 .setHandleUserId(userId).setHandleTime(now);
 
-        // 4. 写群成员；带 addSource / inviterUserId
+        // 4. 写群成员；addSource / inviterUserId 沿用申请记录上的来源信息
         groupMemberService.addGroupMember(request.getGroupId(), request.getUserId(),
                 ImGroupMemberRoleEnum.NORMAL.getRole(), request.getAddSource(), request.getInviterUserId());
 
         // 5.1 1505 私聊推送给申请人 + 群主 + 全部管理员（每端单推）
-        GroupRequestApprovedNotification payload = new GroupRequestApprovedNotification();
-        // TODO @AI：能不能改成链式调用；
-        payload.setRequestId(request.getId());
-        payload.setGroupId(request.getGroupId());
-        payload.setUserId(request.getUserId());
-        payload.setOperatorUserId(userId);
+        // TODO @AI：同类属性，放在一行，减少行占用；其它位置也是！
+        GroupRequestApprovedNotification payload = (GroupRequestApprovedNotification)
+                new GroupRequestApprovedNotification()
+                        .setRequestId(request.getId())
+                        .setGroupId(request.getGroupId())
+                        .setUserId(request.getUserId())
+                        .setOperatorUserId(userId);
         broadcastToOwnerAdminsAndApplicant(request.getGroupId(), request.getUserId(), payload,
                 ImMessageTypeEnum.GROUP_REQUEST_APPROVED.getType(), userId);
         // 5.2 群事件：主动申请 → 1510 自由进群；被邀请 → 1509 成员加入
@@ -187,32 +189,40 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         }
 
         // 3. 1506 私聊推送给申请人 + 群主 + 全部管理员
-        GroupRequestRejectedNotification payload = new GroupRequestRejectedNotification();
-        payload.setRequestId(request.getId());
-        payload.setGroupId(request.getGroupId());
-        payload.setUserId(request.getUserId());
-        payload.setHandleContent(handleContent);
-        payload.setOperatorUserId(userId);
+        GroupRequestRejectedNotification payload = (GroupRequestRejectedNotification)
+                new GroupRequestRejectedNotification()
+                        .setRequestId(request.getId())
+                        .setGroupId(request.getGroupId())
+                        .setUserId(request.getUserId())
+                        .setHandleContent(handleContent)
+                        .setOperatorUserId(userId);
         broadcastToOwnerAdminsAndApplicant(request.getGroupId(), request.getUserId(), payload,
                 ImMessageTypeEnum.GROUP_REQUEST_REJECTED.getType(), userId);
     }
 
-    // TODO @AI：createInviteRequestList；习惯性命名；
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createInviteRequests(Long groupId, Long inviterUserId, Collection<Long> invitedUserIds) {
+    public void createInviteRequestList(Long groupId, Long inviterUserId, Collection<Long> invitedUserIds) {
         if (CollUtil.isEmpty(invitedUserIds)) {
             return;
         }
         ImGroupDO group = groupService.validateGroupExists(groupId);
 
-        // TODO @AI：= 两侧，最好有空格；看看有没别的地方，也要改的；
-        // 1. 复用或新建 inviter_user_id=inviterUserId 的待审批记录
+        // 1. 每个被邀请人 upsert 一条 inviter_user_id=邀请人 的记录
+        // 已有记录（同一对 group_id, user_id 唯一）：覆盖 inviter_user_id + 重置 handle_result + 清空处理痕迹
         List<ImGroupRequestDO> requests = new ArrayList<>(invitedUserIds.size());
         for (Long invitedUserId : invitedUserIds) {
-            ImGroupRequestDO existing = groupRequestMapper.selectLatestPendingByGroupIdAndUserIdAndInviter(
-                    groupId, invitedUserId, inviterUserId);
+            ImGroupRequestDO existing = groupRequestMapper.selectByGroupIdAndUserId(groupId, invitedUserId);
             if (existing != null) {
+                ImGroupRequestDO updateObj = new ImGroupRequestDO()
+                        .setInviterUserId(inviterUserId)
+                        .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                        .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
+                updateObj.setId(existing.getId());
+                groupRequestMapper.updateById(updateObj);
+                existing.setInviterUserId(inviterUserId)
+                        .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                        .setHandleUserId(null).setHandleContent(null).setHandleTime(null);
                 requests.add(existing);
                 continue;
             }
@@ -238,37 +248,28 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     }
 
     @Override
-    public List<ImGroupRequestDO> getMyGroupRequestList(Long userId, Long lastRequestId, Integer limit) {
-        return groupRequestMapper.selectMyList(userId, lastRequestId, limit);
+    public List<ImGroupRequestDO> getGroupRequestListByUserId(Long userId, Long lastRequestId, Integer limit) {
+        return groupRequestMapper.selectListByUserId(userId, lastRequestId, limit);
     }
 
     @Override
-    public List<ImGroupRequestDO> getPendingGroupRequestList(Long userId, Long groupId,
-                                                             Long lastRequestId, Integer limit) {
-        // 仅群主 / 管理员可拉
-        ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
-        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole())) {
-            throw exception(GROUP_REQUEST_NOT_TO_ME);
+    public List<ImGroupRequestDO> getUnhandledRequestListByOwnerOrAdmin(Long userId) {
+        // 1. 找出当前用户作为 OWNER / ADMIN 的所有群
+        List<ImGroupMemberDO> myMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);
+        Set<Long> ownerOrAdminGroupIds = convertSet(myMembers,
+                ImGroupMemberDO::getGroupId,
+                m -> ImGroupMemberRoleEnum.isOwnerOrAdmin(m.getRole()));
+        if (CollUtil.isEmpty(ownerOrAdminGroupIds)) {
+            return Collections.emptyList();
         }
-        return groupRequestMapper.selectPendingListByGroupId(groupId, lastRequestId, limit);
+        // 2. 一次拉所有群的未处理申请
+        return groupRequestMapper.selectListByGroupIdsAndHandleResult(
+                ownerOrAdminGroupIds, ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
     }
 
     @Override
     public ImGroupRequestDO getGroupRequest(Long id) {
         return groupRequestMapper.selectById(id);
-    }
-
-    // TODO @AI：【后面点改】应该批量查询；不然这样性能太差了。如果群太多；
-    @Override
-    public Map<Long, Long> getPendingCountMap(Collection<Long> groupIds) {
-        if (CollUtil.isEmpty(groupIds)) {
-            return Collections.emptyMap();
-        }
-        Map<Long, Long> result = new HashMap<>(groupIds.size());
-        for (Long groupId : groupIds) {
-            result.put(groupId, groupRequestMapper.selectPendingCountByGroupId(groupId));
-        }
-        return result;
     }
 
     @Override
@@ -299,18 +300,18 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
      */
     private GroupRequestNotification buildRequestNotification(ImGroupDO group, ImGroupRequestDO request,
                                                               AdminUserRespDTO applyUser) {
-        // TODO @AI：看看能不能链式调用；
-        GroupRequestNotification payload = new GroupRequestNotification();
-        payload.setRequestId(request.getId());
-        payload.setGroupId(group.getId());
-        payload.setUserId(request.getUserId());
-        payload.setInviterUserId(request.getInviterUserId());
-        payload.setApplyContent(request.getApplyContent());
-        payload.setAddSource(request.getAddSource());
-        payload.setOperatorUserId(request.getInviterUserId() != null ? request.getInviterUserId() : request.getUserId());
+        // TODO @AI：看看能不能链式调用；同类属性，相同行；
+        GroupRequestNotification payload = (GroupRequestNotification) new GroupRequestNotification()
+                .setRequestId(request.getId())
+                .setGroupId(group.getId())
+                .setUserId(request.getUserId())
+                .setInviterUserId(request.getInviterUserId())
+                .setApplyContent(request.getApplyContent())
+                .setAddSource(request.getAddSource())
+                .setOperatorUserId(request.getInviterUserId() != null
+                        ? request.getInviterUserId() : request.getUserId());
         if (applyUser != null) {
-            payload.setUserNickname(applyUser.getNickname());
-            payload.setUserAvatar(applyUser.getAvatar());
+            payload.setUserNickname(applyUser.getNickname()).setUserAvatar(applyUser.getAvatar());
         }
         return payload;
     }
@@ -326,25 +327,21 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         }
         Set<Long> receivers = new LinkedHashSet<>(listOwnerAndAdminUserIds(group));
         receivers.add(applicantUserId);
-        // TODO @AI：看看能不能用群的通道；
         for (Long receiverUserId : receivers) {
             websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
                     messageType, operatorUserId, receiverUserId, payload));
         }
     }
 
-    // TODO @AI：这个方法，搞到到 ImGroupMemberService 里去；getGroupMemberListByOwnerAndAdmin；返回 list《do》；
     /**
-     * 列出群主 + 全部管理员的用户编号；activeMembers 通常 ≤ 500 + admin 上限 3，过滤成本可接受
+     * 列出群主 + 全部管理员的用户编号；以 group.ownerUserId 兜底，避免 group_member 表里 owner 角色记录异常缺失
      */
+    // TODO @AI：有点过度设计了，直接 convertset 群成员即可！
     private List<Long> listOwnerAndAdminUserIds(ImGroupDO group) {
-        List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(group.getId());
         Set<Long> set = new LinkedHashSet<>();
         set.add(group.getOwnerUserId());
-        for (ImGroupMemberDO member : activeMembers) {
-            if (ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole())) {
-                set.add(member.getUserId());
-            }
+        for (ImGroupMemberDO member : groupMemberService.getGroupMemberListByOwnerAndAdmin(group.getId())) {
+            set.add(member.getUserId());
         }
         return new ArrayList<>(set);
     }

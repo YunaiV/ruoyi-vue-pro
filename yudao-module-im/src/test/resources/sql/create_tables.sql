@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "im_group" (
     "status" tinyint NOT NULL COMMENT '群状态',
     "dissolved_time" timestamp DEFAULT NULL COMMENT '解散时间',
     "muted_all" bit DEFAULT FALSE COMMENT '是否全群禁言',
-    "join_type" tinyint NOT NULL DEFAULT 0 COMMENT '加群方式；0自由进群 1申请需审批 2申请和普通成员邀请均需审批',
+    "join_approval" bit NOT NULL DEFAULT FALSE COMMENT '进群是否需群主 / 管理员审批；false 自由进群，true 需审批',
     "pinned_message_ids" varchar(128) DEFAULT NULL COMMENT '群置顶消息编号列表，逗号分隔',
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -121,7 +121,8 @@ CREATE TABLE IF NOT EXISTS "im_friend_request" (
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "uk_im_friend_request" UNIQUE ("from_user_id", "to_user_id", "tenant_id")
 ) COMMENT 'IM 好友申请记录表';
 
 CREATE TABLE IF NOT EXISTS "im_group_request" (
@@ -141,7 +142,8 @@ CREATE TABLE IF NOT EXISTS "im_group_request" (
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "uk_im_group_request" UNIQUE ("group_id", "user_id", "tenant_id")
 ) COMMENT 'IM 加群申请记录表';
 
 CREATE TABLE IF NOT EXISTS "im_face_pack" (

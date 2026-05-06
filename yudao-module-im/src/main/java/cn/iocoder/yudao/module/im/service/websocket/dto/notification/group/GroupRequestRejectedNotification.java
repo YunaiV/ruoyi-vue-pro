@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 入群申请被拒绝通知
  * <p>
- * 走私聊通道定向推送给申请人 + 群主 + 全部管理员；admin 侧据此把 pendingRequestCount 减 1 并从未处理列表移除
+ * 走私聊通道定向推送给申请人 + 群主 + 全部管理员；admin 侧据此把 unhandledCount 减 1 并从未处理列表移除
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
