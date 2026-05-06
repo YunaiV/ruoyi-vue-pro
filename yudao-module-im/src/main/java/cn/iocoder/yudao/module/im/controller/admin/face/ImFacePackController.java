@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.im.controller.admin.face;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.face.vo.ImFacePackUserRespVO;
+import cn.iocoder.yudao.module.im.controller.admin.face.vo.pack.ImFacePackUserRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFacePackDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFacePackItemDO;
 import cn.iocoder.yudao.module.im.service.face.ImFacePackItemService;

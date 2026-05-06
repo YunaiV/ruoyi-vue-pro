@@ -4,8 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.ImFacePackItemPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.ImFacePackItemSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.item.ImFacePackItemPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.item.ImFacePackItemSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFacePackItemDO;
 import cn.iocoder.yudao.module.im.dal.mysql.face.ImFacePackItemMapper;
 import jakarta.annotation.Resource;
@@ -43,6 +43,19 @@ public class ImFacePackItemServiceImpl implements ImFacePackItemService {
         return facePackItemMapper.selectListByPackIdsAndStatus(packIds, CommonStatusEnum.ENABLE.getStatus());
     }
 
+    @Override
+    public Long getFacePackItemCount(Long packId) {
+        return facePackItemMapper.selectCountByPackId(packId);
+    }
+
+    @Override
+    public Long getFacePackItemCount(Collection<Long> packIds) {
+        if (CollUtil.isEmpty(packIds)) {
+            return 0L;
+        }
+        return facePackItemMapper.selectCountByPackIds(packIds);
+    }
+
     // ==================== 管理后台 ====================
 
     @Override
@@ -57,32 +70,33 @@ public class ImFacePackItemServiceImpl implements ImFacePackItemService {
 
     @Override
     public Long createFacePackItem(ImFacePackItemSaveReqVO reqVO) {
-        // 校验所属表情包存在
+        // 1. 校验所属表情包存在
         facePackService.validateFacePackExists(reqVO.getPackId());
-        ImFacePackItemDO item = BeanUtils.toBean(reqVO, ImFacePackItemDO.class);
 
-        // TODO @AI：注释风格，和别的模块一致
+        // 2. 入库
+        ImFacePackItemDO item = BeanUtils.toBean(reqVO, ImFacePackItemDO.class);
         facePackItemMapper.insert(item);
         return item.getId();
     }
 
     @Override
     public void updateFacePackItem(ImFacePackItemSaveReqVO reqVO) {
-        // TODO @AI：注释风格，和别的模块一致
+        // 1.1 校验存在
         validateFacePackItemExists(reqVO.getId());
-        // TODO @AI：注释风格，和别的模块一致
+        // 1.2 校验所属表情包存在
         facePackService.validateFacePackExists(reqVO.getPackId());
 
-        // TODO @AI：注释风格，和别的模块一致
+        // 2. 更新
         ImFacePackItemDO updateObj = BeanUtils.toBean(reqVO, ImFacePackItemDO.class);
         facePackItemMapper.updateById(updateObj);
     }
 
     @Override
     public void deleteFacePackItem(Long id) {
-        // TODO @AI：注释风格，和别的模块一致
+        // 1. 校验存在
         validateFacePackItemExists(id);
-        // TODO @AI：注释风格，和别的模块一致
+
+        // 2. 删除
         facePackItemMapper.deleteById(id);
     }
 

@@ -14,15 +14,14 @@ public class FaceMessage {
      * 表情图 URL
      */
     private String url;
-    // TODO @AI：openim 有这个字段么？不是一般 url 就足够了呀。
     /**
-     * 渲染宽度（像素）
+     * 渲染宽度（像素，可选）
      * <p>
-     * 客户端渲染时按此尺寸占位，避免图片加载完成后的布局抖动
+     * 客户端渲染时按此尺寸占位，避免图片加载完成后的布局抖动；缺失时由客户端 CSS max-width 兜底
      */
     private Integer width;
     /**
-     * 渲染高度（像素）
+     * 渲染高度（像素，可选）
      */
     private Integer height;
     /**

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.controller.admin.manager.face.vo;
+package cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -6,19 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-@Schema(description = "管理后台 - IM 表情包项新增 / 修改 Request VO")
+@Schema(description = "IM 个人表情新增 Request VO")
 @Data
-public class ImFacePackItemSaveReqVO {
-
-    @Schema(description = "编号（修改时必填）", example = "2048")
-    private Long id;
-
-    @Schema(description = "所属表情包编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    @NotNull(message = "表情包编号不能为空")
-    private Long packId;
+public class ImFaceUserItemSaveReqVO {
 
     @Schema(description = "表情图 URL", requiredMode = Schema.RequiredMode.REQUIRED,
-            example = "https://cdn.example.com/face/pack/cat-001.png")
+            example = "https://cdn.example.com/face/user/abc.gif")
     @NotBlank(message = "表情图 URL 不能为空")
     @Size(max = 512, message = "表情图 URL 长度不能超过 512")
     private String url;
@@ -35,12 +28,7 @@ public class ImFacePackItemSaveReqVO {
     @NotNull(message = "渲染高度不能为空")
     private Integer height;
 
-    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @NotNull(message = "排序不能为空")
-    private Integer sort;
-
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @NotNull(message = "状态不能为空")
-    private Integer status; // 参见 CommonStatusEnum 枚举类（0 启用 / 1 禁用）
+    @Schema(description = "来源消息编号（从消息「添加到表情」时传入；自己上传则不传）", example = "10086")
+    private Long sourceMessageId;
 
 }

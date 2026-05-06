@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.dal.mysql.face;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.ImFacePackPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.pack.ImFacePackPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFacePackDO;
 import org.apache.ibatis.annotations.Mapper;
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.controller.admin.manager.face.vo;
+package cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.item;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

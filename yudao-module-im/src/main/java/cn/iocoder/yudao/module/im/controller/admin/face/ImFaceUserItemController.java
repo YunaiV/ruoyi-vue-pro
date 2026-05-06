@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.im.controller.admin.face;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.face.vo.ImFaceUserItemRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.face.vo.ImFaceUserItemSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem.ImFaceUserItemRespVO;
+import cn.iocoder.yudao.module.im.controller.admin.face.vo.userItem.ImFaceUserItemSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFaceUserItemDO;
 import cn.iocoder.yudao.module.im.service.face.ImFaceUserItemService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +30,8 @@ public class ImFaceUserItemController {
 
     @GetMapping("/list")
     @Operation(summary = "获得我的个人表情列表")
-    public CommonResult<List<ImFaceUserItemRespVO>> getMyFaceUserItemList() {
-        List<ImFaceUserItemDO> items = faceUserItemService.getMyFaceUserItemList(getLoginUserId());
+    public CommonResult<List<ImFaceUserItemRespVO>> getFaceUserItemList() {
+        List<ImFaceUserItemDO> items = faceUserItemService.getFaceUserItemList(getLoginUserId());
         return success(BeanUtils.toBean(items, ImFaceUserItemRespVO.class));
     }
 
@@ -46,15 +46,6 @@ public class ImFaceUserItemController {
     @Parameter(name = "id", description = "编号", required = true, example = "4096")
     public CommonResult<Boolean> deleteFaceUserItem(@RequestParam("id") Long id) {
         faceUserItemService.deleteFaceUserItem(getLoginUserId(), id);
-        return success(true);
-    }
-
-    // TODO @AI：个人应该没批量删除把？应该就一个一个删除呢。
-    @DeleteMapping("/delete-list")
-    @Operation(summary = "批量删除个人表情")
-    @Parameter(name = "ids", description = "编号列表", required = true)
-    public CommonResult<Boolean> deleteFaceUserItemList(@RequestParam("ids") List<Long> ids) {
-        faceUserItemService.deleteFaceUserItemList(getLoginUserId(), ids);
         return success(true);
     }
 

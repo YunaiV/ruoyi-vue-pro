@@ -4,12 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.ImFacePackPageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.ImFacePackSaveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.pack.ImFacePackPageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.pack.ImFacePackSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFacePackDO;
-import cn.iocoder.yudao.module.im.dal.mysql.face.ImFacePackItemMapper;
 import cn.iocoder.yudao.module.im.dal.mysql.face.ImFacePackMapper;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -31,9 +31,12 @@ public class ImFacePackServiceImpl implements ImFacePackService {
     @Resource
     private ImFacePackMapper facePackMapper;
 
-    // TODO @AI：跨模块操作，需要调用对方 service；
+    /**
+     * @Lazy 解决与 ImFacePackItemServiceImpl 的循环依赖（item.create / update 校验所属包存在 → 反向调用本类）
+     */
     @Resource
-    private ImFacePackItemMapper facePackItemMapper;
+    @Lazy
+    private ImFacePackItemService facePackItemService;
 
     // ==================== 用户端 ====================
 
@@ -72,10 +75,10 @@ public class ImFacePackServiceImpl implements ImFacePackService {
 
     @Override
     public void updateFacePack(ImFacePackSaveReqVO reqVO) {
-        // TODO @AI：注释，参考别的模块
+        // 1. 校验存在
         validateFacePackExists(reqVO.getId());
 
-        // TODO @AI：注释，参考别的模块
+        // 2. 更新
         ImFacePackDO updateObj = BeanUtils.toBean(reqVO, ImFacePackDO.class);
         facePackMapper.updateById(updateObj);
     }
@@ -85,7 +88,7 @@ public class ImFacePackServiceImpl implements ImFacePackService {
         // 1.1 校验存在
         validateFacePackExists(id);
         // 1.2 校验表情包下没有表情；防止误删表情包导致历史 face 消息无法回查归属
-        if (facePackItemMapper.selectCountByPackId(id) > 0) {
+        if (facePackItemService.getFacePackItemCount(id) > 0) {
             throw exception(FACE_PACK_HAS_ITEMS);
         }
 
@@ -95,15 +98,15 @@ public class ImFacePackServiceImpl implements ImFacePackService {
 
     @Override
     public void deleteFacePackList(List<Long> ids) {
+        // 1. 任一存在表情则拒绝整批删除，避免「只删一半」的中间态
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        // 任一存在表情则拒绝整批删除，避免「只删一半」的中间态
-        if (facePackItemMapper.selectCountByPackIds(ids) > 0) {
+        if (facePackItemService.getFacePackItemCount(ids) > 0) {
             throw exception(FACE_PACK_HAS_ITEMS);
         }
 
-        // 执行删除
+        // 2. 删除
         facePackMapper.deleteByIds(ids);
     }
 
