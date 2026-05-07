@@ -44,9 +44,14 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      */
     FILE(105, "文件", true, true),
     /**
-     * 对应 OpenIM：Card 108
+     * 对应 OpenIM：Merger 107
+     * 对应自己的类：MergeMessage
+     */
+    MERGE(107, "合并转发", true, true),
+    /**
+     * 对应 OpenIM：Card 108（OpenIM 仅用户名片；本系统扩展为用户 / 群双类型，按 targetType 区分）
      * 对应自己的类：CardMessage
-     * 场景：把好友名片推荐给其他会话，对端点击名片可打开 UserInfoCard
+     * 场景：把用户名片 / 群名片推荐给其他会话；用户名片点击打开 UserInfoCard，群名片点击「已加群跳会话 / 未加群弹申请加群」
      */
     CARD(108, "名片", true, true),
     /**
