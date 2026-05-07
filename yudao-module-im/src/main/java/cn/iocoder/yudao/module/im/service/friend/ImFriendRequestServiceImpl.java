@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
 import cn.hutool.core.util.ObjUtil;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -88,18 +87,10 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         }
 
         // 2. 落库：upsert 语义；同一对 (from, to) 唯一，已有记录覆盖申请理由 / 备注 / 来源 + 重置为未处理 + 清空旧处理痕迹
-        // null 字段（handleContent / handleTime）走 LambdaUpdateWrapper.set 显式清空，updateById 默认会忽略 null
-        // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
         ImFriendRequestDO request = friendRequestMapper.selectByFromUserIdAndToUserId(fromUserId, toUserId);
         if (request != null) {
-            friendRequestMapper.update(null, new LambdaUpdateWrapper<ImFriendRequestDO>()
-                    .eq(ImFriendRequestDO::getId, request.getId())
-                    .set(ImFriendRequestDO::getApplyContent, reqVO.getApplyContent())
-                    .set(ImFriendRequestDO::getDisplayName, reqVO.getDisplayName())
-                    .set(ImFriendRequestDO::getAddSource, reqVO.getAddSource())
-                    .set(ImFriendRequestDO::getHandleResult, ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
-                    .set(ImFriendRequestDO::getHandleContent, null)
-                    .set(ImFriendRequestDO::getHandleTime, null));
+            friendRequestMapper.updateByIdReset(request.getId(),
+                    reqVO.getApplyContent(), reqVO.getDisplayName(), reqVO.getAddSource());
             request.setApplyContent(reqVO.getApplyContent()).setDisplayName(reqVO.getDisplayName())
                     .setAddSource(reqVO.getAddSource())
                     .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult())

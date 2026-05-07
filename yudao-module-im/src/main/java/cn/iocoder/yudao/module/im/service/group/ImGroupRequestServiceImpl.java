@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -94,25 +93,12 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
             return null;
         }
 
-        // 3. 情况二：群开启了审批；upsert 一条「主动申请」记录，inviterUserId=null
-        // 已有记录（无论之前是未处理 / 已同意 / 已拒绝），覆盖申请理由 + 来源 + 重置为未处理 + 清空旧处理痕迹
-        // null 字段（inviterUserId / handleUserId / handleContent / handleTime）走 LambdaUpdateWrapper.set 显式清空，updateById 默认会忽略 null
-        // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
+        // 3. 情况二：群开启了审批；upsert 一条主动申请记录（inviterUserId=null）
         ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
         if (request != null) {
-            // update_time 显式置当前时间：update(null, wrapper) 不会触发 MetaObjectHandler.updateFill；
-            // 列表查询按 update_time 倒序排，复用旧记录时必须刷新这一列才能让本次重新提交排到最前
             LocalDateTime now = LocalDateTime.now();
-            groupRequestMapper.update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
-                    .eq(ImGroupRequestDO::getId, request.getId())
-                    .set(ImGroupRequestDO::getApplyContent, reqVO.getApplyContent())
-                    .set(ImGroupRequestDO::getAddSource, reqVO.getAddSource())
-                    .set(ImGroupRequestDO::getHandleResult, ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                    .set(ImGroupRequestDO::getInviterUserId, null)
-                    .set(ImGroupRequestDO::getHandleUserId, null)
-                    .set(ImGroupRequestDO::getHandleContent, null)
-                    .set(ImGroupRequestDO::getHandleTime, null)
-                    .set(ImGroupRequestDO::getUpdateTime, now));
+            groupRequestMapper.updateApplyByIdReset(request.getId(),
+                    reqVO.getApplyContent(), reqVO.getAddSource(), now);
             request.setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
                     .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
                     .setInviterUserId(null).setHandleUserId(null)
@@ -209,45 +195,40 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
             return;
         }
         ImGroupDO group = groupService.validateGroupExists(groupId);
-
-        // 1. 每个被邀请人 upsert 一条 inviter_user_id=邀请人 的记录
-        // 已有记录（同一对 group_id, user_id 唯一）：覆盖 inviter_user_id / add_source + 重置 handle_result + 清空旧处理痕迹（走 LambdaUpdateWrapper.set 显式置 null）
-        // add_source 强制覆写为 INVITE，避免审批通过后把残留的旧来源回写进群成员留痕
         Integer inviteSource = ImGroupAddSourceEnum.INVITE.getSource();
-        List<ImGroupRequestDO> requests = new ArrayList<>(invitedUserIds.size());
-        // TODO @AI：看看是不是在 basemapperx 里，增加一个 updateXXXX；可以根据传递的 DO，深度更新的方法？应该匹配这个场景的对哇？【主要希望 service 不要出现 mapper 相关的类】
-        // 同 applyJoinGroup：update(null, wrapper) 不走 MetaObjectHandler.updateFill，复用旧记录必须显式刷 update_time，否则按 update_time 倒序排不到最前
+        Integer unhandled = ImGroupRequestHandleResultEnum.UNHANDLED.getResult();
         LocalDateTime now = LocalDateTime.now();
-        for (Long invitedUserId : invitedUserIds) {
-            ImGroupRequestDO existing = groupRequestMapper.selectByGroupIdAndUserId(groupId, invitedUserId);
-            if (existing != null) {
-                groupRequestMapper.update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
-                        .eq(ImGroupRequestDO::getId, existing.getId())
-                        .set(ImGroupRequestDO::getInviterUserId, inviterUserId)
-                        .set(ImGroupRequestDO::getAddSource, inviteSource)
-                        .set(ImGroupRequestDO::getHandleResult, ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                        .set(ImGroupRequestDO::getHandleUserId, null)
-                        .set(ImGroupRequestDO::getHandleContent, null)
-                        .set(ImGroupRequestDO::getHandleTime, null)
-                        .set(ImGroupRequestDO::getUpdateTime, now));
-                existing.setInviterUserId(inviterUserId).setAddSource(inviteSource)
-                        .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                        .setHandleUserId(null).setHandleContent(null).setHandleTime(null)
-                        .setUpdateTime(now);
-                requests.add(existing);
-                continue;
-            }
-            ImGroupRequestDO insert = new ImGroupRequestDO()
-                    .setGroupId(groupId).setUserId(invitedUserId).setInviterUserId(inviterUserId)
-                    .setAddSource(inviteSource)
-                    .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
-            groupRequestMapper.insert(insert);
-            requests.add(insert);
+
+        // 1. 批量查现有记录，分流为「复用旧记录」+「新增」
+        List<ImGroupRequestDO> existingList = groupRequestMapper.selectListByGroupIdAndUserIds(groupId, invitedUserIds);
+        Set<Long> existingUserIds = convertSet(existingList, ImGroupRequestDO::getUserId);
+        Collection<Long> newUserIds = CollUtil.subtract(invitedUserIds, existingUserIds);
+
+        // 2. 复用旧记录：一条 update WHERE IN 完成
+        if (CollUtil.isNotEmpty(existingList)) {
+            groupRequestMapper.updateInviteByGroupIdAndUserIdsReset(groupId, existingUserIds,
+                    inviterUserId, inviteSource, now);
+            // 同步内存对象，下面 buildRequestNotification 要读 inviterUserId / addSource
+            existingList.forEach(r -> r.setInviterUserId(inviterUserId).setAddSource(inviteSource)
+                    .setHandleResult(unhandled)
+                    .setHandleUserId(null).setHandleContent(null).setHandleTime(null)
+                    .setUpdateTime(now));
         }
 
-        // 2. 推 1503 给群主 + 全部管理员；多端同步；每条申请单独推一帧
+        // 3. 新增：批量 insert
+        List<ImGroupRequestDO> newList = convertList(newUserIds, userId -> new ImGroupRequestDO()
+                .setGroupId(groupId).setUserId(userId).setInviterUserId(inviterUserId)
+                .setAddSource(inviteSource).setHandleResult(unhandled));
+        if (CollUtil.isNotEmpty(newList)) {
+            groupRequestMapper.insertBatch(newList);
+        }
+
+        // 4. 推 1503 给群主 + 全部管理员；多端同步；每条申请单独推一帧
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(invitedUserIds);
         List<Long> ownerAndAdmins = getGroupMemberListByOwnerAndAdminUserIds(group);
+        List<ImGroupRequestDO> requests = new ArrayList<>(existingList.size() + newList.size());
+        requests.addAll(existingList);
+        requests.addAll(newList);
         for (ImGroupRequestDO request : requests) {
             AdminUserRespDTO applyUser = userMap.get(request.getUserId());
             GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);

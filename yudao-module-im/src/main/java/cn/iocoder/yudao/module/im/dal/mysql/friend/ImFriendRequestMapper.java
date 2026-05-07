@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendRequestManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
+import cn.iocoder.yudao.module.im.enums.friend.ImFriendRequestHandleResultEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -41,6 +42,22 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
     default int updateByIdAndHandleResult(Long id, Integer handleResult, ImFriendRequestDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<ImFriendRequestDO>()
                 .eq(ImFriendRequestDO::getId, id).eq(ImFriendRequestDO::getHandleResult, handleResult));
+    }
+
+    /**
+     * 复用 (fromUserId, toUserId) 旧申请记录：覆盖申请理由 / 备注 / 来源，重置为未处理 + 清空旧处理痕迹
+     * <p>
+     * handleContent / handleTime 走 LambdaUpdateWrapper.set 显式置 null，updateById 默认会忽略 null 字段
+     */
+    default int updateByIdReset(Long id, String applyContent, String displayName, Integer addSource) {
+        return update(null, new LambdaUpdateWrapper<ImFriendRequestDO>()
+                .eq(ImFriendRequestDO::getId, id)
+                .set(ImFriendRequestDO::getApplyContent, applyContent)
+                .set(ImFriendRequestDO::getDisplayName, displayName)
+                .set(ImFriendRequestDO::getAddSource, addSource)
+                .set(ImFriendRequestDO::getHandleResult, ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
+                .set(ImFriendRequestDO::getHandleContent, null)
+                .set(ImFriendRequestDO::getHandleTime, null));
     }
 
     default PageResult<ImFriendRequestDO> selectPage(ImFriendRequestManagerPageReqVO reqVO) {

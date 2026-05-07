@@ -197,8 +197,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 1.2 入参去重 + 排除已在群中的用户
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByGroupId(groupId);
         Set<Long> activeMemberUserIds = convertSet(activeMembers, ImGroupMemberDO::getUserId);
-        List<Long> memberUserIds = new ArrayList<>(new LinkedHashSet<>(inviteReqVO.getMemberUserIds()));
-        memberUserIds.removeAll(activeMemberUserIds);
+        List<Long> memberUserIds = CollUtil.subtractToList(
+                CollUtil.distinct(inviteReqVO.getMemberUserIds()), activeMemberUserIds);
         if (CollUtil.isEmpty(memberUserIds)) {
             return;
         }

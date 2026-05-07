@@ -23,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
@@ -253,6 +254,8 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 .joinApproval(true)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
+        when(groupRequestMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
+                .thenReturn(List.of());
         when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
@@ -261,15 +264,18 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 2L, buildUser(2L, "用户A"),
                 3L, buildUser(3L, "用户B")));
 
-        // 调用：邀请人 1L 邀请 2L、3L
+        // 调用：邀请人 1L 邀请 2L、3L（都没有旧记录）
         groupRequestService.createInviteRequestList(10L, 1L, List.of(2L, 3L));
 
-        // 断言：插入 2 条申请记录 + 推 1503 给 owner（每条 1 帧）共 2 帧
-        ArgumentCaptor<ImGroupRequestDO> captor = ArgumentCaptor.forClass(ImGroupRequestDO.class);
-        verify(groupRequestMapper, times(2)).insert(captor.capture());
+        // 断言：批量插入 2 条 + 推 1503 给 owner（每条 1 帧）共 2 帧
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Collection<ImGroupRequestDO>> captor = ArgumentCaptor.forClass(Collection.class);
+        verify(groupRequestMapper).insertBatch(captor.capture());
         verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
         // 断言：每条记录 inviterUserId=1 + addSource=INVITE，避免审批通过后回写群成员留痕的来源为空 / 脏带旧值
-        captor.getAllValues().forEach(insert -> {
+        Collection<ImGroupRequestDO> inserted = captor.getValue();
+        assertEquals(2, inserted.size());
+        inserted.forEach(insert -> {
             assertEquals(1L, insert.getInviterUserId());
             assertEquals(ImGroupAddSourceEnum.INVITE.getSource(), insert.getAddSource());
         });
