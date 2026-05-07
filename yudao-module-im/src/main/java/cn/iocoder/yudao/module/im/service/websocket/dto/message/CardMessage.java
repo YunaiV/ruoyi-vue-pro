@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.module.im.service.websocket.dto.message;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
