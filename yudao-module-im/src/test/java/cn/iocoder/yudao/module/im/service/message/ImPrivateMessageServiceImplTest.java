@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,6 +48,10 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     private ImSensitiveWordService sensitiveWordService;
     @Mock
     private ImWebSocketService imWebSocketService;
+
+    /** 用真实实例避免 NPE；默认值与生产保持一致（recallTimeoutMinutes=5、private/group read enabled=true）；个别用例可改字段测分支 */
+    @Spy
+    private ImProperties imProperties = new ImProperties();
 
     private ImPrivateMessageSendReqVO buildSendReqVO() {
         ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
@@ -294,6 +300,21 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testReadMessages_disabled() {
+        // 准备：关闭私聊已读
+        imProperties.getMessage().setPrivateReadEnabled(false);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> privateMessageService.readPrivateMessages(1L, 2L, 5L));
+        assertEquals(MESSAGE_PRIVATE_READ_DISABLED.getCode(), exception.getCode());
+        // 断言：不更新消息状态、不推送
+        verify(privateMessageMapper, never()).updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+                anyLong(), anyLong(), anyLong(), anyInt(), any(ImPrivateMessageDO.class));
+        verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+    }
+
+    @Test
     public void testReadMessages_noUnread() {
         // 准备：mapper 返回 0 表示 id <= messageId 范围内没有未读消息
         when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
@@ -334,6 +355,17 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：原样返回 null，前端按 falsy 跳过
         assertNull(result);
+    }
+
+    @Test
+    public void testGetMaxReadMessageId_disabled() {
+        // 准备：关闭私聊已读
+        imProperties.getMessage().setPrivateReadEnabled(false);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> privateMessageService.getMaxReadMessageId(1L, 2L));
+        assertEquals(MESSAGE_PRIVATE_READ_DISABLED.getCode(), exception.getCode());
     }
 
     // ========== sendPrivateMessage(senderId, dto)：helper 行为 ==========

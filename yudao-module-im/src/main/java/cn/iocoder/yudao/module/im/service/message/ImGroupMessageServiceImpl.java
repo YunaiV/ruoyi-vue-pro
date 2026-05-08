@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -105,9 +106,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         // 2.2 构建并保存消息
         ImGroupMessageDO message = BeanUtils.toBean(reqVO, ImGroupMessageDO.class, m -> m
                 .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
-                .setReceiptStatus(Boolean.TRUE.equals(reqVO.getReceipt())
-                        ? ImGroupMessageReceiptStatusEnum.PENDING.getStatus()
-                        : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus()));
+                .setReceiptStatus(resolveReceiptStatus(reqVO.getReceipt())));
         groupMessageMapper.insert(message);
 
         // 3. WebSocket 异步推送（群内可见成员 + 发送方多端同步）
@@ -137,9 +136,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .setType(dto.getType()).setContent(contentString)
                 .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
                 .setAtUserIds(dto.getAtUserIds()).setReceiverUserIds(dto.getReceiverUserIds())
-                .setReceiptStatus(Boolean.TRUE.equals(dto.getReceipt())
-                        ? ImGroupMessageReceiptStatusEnum.PENDING.getStatus()
-                        : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus());
+                .setReceiptStatus(resolveReceiptStatus(dto.getReceipt()));
         // 1.3 按 type.persistent 决定是否入库
         if (ImMessageTypeEnum.validate(dto.getType()).isPersistent()) {
             groupMessageMapper.insert(message);
@@ -305,6 +302,10 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         if (CollUtil.isEmpty(messages)) {
             return;
         }
+        // 群已读关闭：不查 Redis 已读游标，status 保持 DB 原值（含撤回），readCount 不补齐
+        if (BooleanUtil.isFalse(imProperties.getMessage().isGroupReadEnabled())) {
+            return;
+        }
         Map<Long, Long> readMaxMessageIdsByGroup = new HashMap<>(); // 群 → 已读位置
         Map<Long, Map<Long, Long>> readPositionsByGroup = new HashMap<>(); // 群 → (用户 → 已读位置)
         Map<Long, List<ImGroupMemberDO>> membersByGroup = new HashMap<>(); // 群 → 全部成员列表
@@ -343,6 +344,10 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     @Override
     public void readGroupMessages(Long userId, Long groupId, Long messageId) {
+        // 0. 全局开关校验
+        if (BooleanUtil.isFalse(imProperties.getMessage().isGroupReadEnabled())) {
+            throw exception(MESSAGE_GROUP_READ_DISABLED);
+        }
         Assert.notNull(messageId, "已读消息编号不能为空");
         // 1. 校验用户在群中（权限校验）
         groupMemberService.validateMemberInGroup(groupId, userId);
@@ -361,6 +366,10 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     @Override
     public List<Long> getGroupReadUserIds(Long userId, Long groupId, Long messageId) {
+        // 0. 全局开关校验
+        if (BooleanUtil.isFalse(imProperties.getMessage().isGroupReadEnabled())) {
+            throw exception(MESSAGE_GROUP_READ_DISABLED);
+        }
         // 1.1 校验用户在群中（权限校验）
         groupMemberService.validateMemberInGroup(groupId, userId);
         // 1.2 获取消息
@@ -611,6 +620,18 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     private ImGroupMessageServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
+    }
+
+    /**
+     * 计算群消息回执 status：群已读关闭时强制 NO_RECEIPT，忽略发送方传入的 receipt（receipt 为 null 等价 false）
+     */
+    private Integer resolveReceiptStatus(Boolean receipt) {
+        if (BooleanUtil.isFalse(imProperties.getMessage().isGroupReadEnabled())) {
+            return ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
+        }
+        return BooleanUtil.isTrue(receipt)
+                ? ImGroupMessageReceiptStatusEnum.PENDING.getStatus()
+                : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
     }
 
     /**

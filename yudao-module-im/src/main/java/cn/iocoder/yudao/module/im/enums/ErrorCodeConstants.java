@@ -18,6 +18,8 @@ public interface ErrorCodeConstants {
     ErrorCode MESSAGE_RECALL_TIMEOUT = new ErrorCode(1_040_300_007, "超过 {} 分钟的消息无法撤回");
     ErrorCode MESSAGE_QUOTE_INVALID = new ErrorCode(1_040_300_008, "引用的消息不可用");
     ErrorCode MESSAGE_NOT_IN_GROUP = new ErrorCode(1_040_300_009, "消息不属于该群");
+    ErrorCode MESSAGE_PRIVATE_READ_DISABLED = new ErrorCode(1_040_300_010, "私聊已读功能已关闭");
+    ErrorCode MESSAGE_GROUP_READ_DISABLED = new ErrorCode(1_040_300_011, "群聊已读功能已关闭");
 
     // ========== 群 (1-040-400-000) ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");

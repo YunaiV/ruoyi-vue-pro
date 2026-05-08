@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -210,9 +211,13 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Override
     public void readPrivateMessages(Long userId, Long receiverId, Long messageId) {
+        // 1. 全局开关校验
+        if (BooleanUtil.isFalse(imProperties.getMessage().isPrivateReadEnabled())) {
+            throw exception(MESSAGE_PRIVATE_READ_DISABLED);
+        }
         Assert.notNull(messageId, "已读消息编号不能为空");
-        // 1. 一步翻转：把 (receiverId → userId) 这条会话上、id <= messageId 的未读消息全部置为已读
-        // 仅 UNREAD 行被命中，避免覆盖已撤回/已读的状态；select-then-update 拆成单条 SQL 后也消除了竞态窗口
+        // 2. 把 (receiverId → userId) 这条会话上、id <= messageId 的未读消息一步更新为已读
+        // 仅 UNREAD 行被命中，避免覆盖已撤回/已读的状态；select-then-update 合成单条 SQL 后也消除了竞态窗口
         int updated = privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
                 receiverId, userId, messageId, ImMessageStatusEnum.UNREAD.getStatus(),
                 new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
@@ -220,7 +225,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             return;
         }
 
-        // 2. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
+        // 3. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
         imWebSocketService.sendPrivateMessageAsync(userId,
                 ImPrivateMessageDTO.ofRead(userId, receiverId, messageId));
         imWebSocketService.sendPrivateMessageAsync(receiverId,
@@ -229,6 +234,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Override
     public Long getMaxReadMessageId(Long userId, Long peerId) {
+        if (BooleanUtil.isFalse(imProperties.getMessage().isPrivateReadEnabled())) {
+            throw exception(MESSAGE_PRIVATE_READ_DISABLED);
+        }
         return privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
                 userId, peerId, ImMessageStatusEnum.READ.getStatus());
     }

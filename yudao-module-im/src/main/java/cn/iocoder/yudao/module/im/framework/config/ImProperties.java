@@ -69,6 +69,23 @@ public class ImProperties {
     public static class Message {
 
         /**
+         * 是否启用私聊已读功能
+         * <p>
+         * 关闭后：private read 接口直接抛业务异常；服务端不再下发私聊 READ / RECEIPT 事件信号。
+         * 客户端侧需镜像此开关，隐藏私聊气泡的「已读 / 未读」标签
+         */
+        private boolean privateReadEnabled = true;
+
+        /**
+         * 是否启用群聊已读功能（含群消息回执）
+         * <p>
+         * 关闭后：group read 接口直接抛业务异常；服务端不再下发群 READ / RECEIPT 事件信号；
+         * 群消息回执 receiptStatus 一并停用（即使发送方传 receipt=true 也强制落 NO_RECEIPT，不再算「N 人已读」）。
+         * 客户端侧需镜像此开关，隐藏群回执 popover 与「发送回执消息」入口
+         */
+        private boolean groupReadEnabled = true;
+
+        /**
          * pull 最大拉取数量
          */
         private int maxPullSize = 1000;

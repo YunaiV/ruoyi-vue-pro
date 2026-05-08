@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
@@ -26,6 +27,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Spy;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,6 +59,10 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     private GroupMessageReadRedisDAO groupMessageReadRedisDAO;
     @Mock
     private ImWebSocketService imWebSocketService;
+
+    /** 用真实实例避免 NPE；默认值与生产保持一致（recallTimeoutMinutes=5、private/group read enabled=true、maxPullSize=1000）；个别用例可改字段测分支 */
+    @Spy
+    private ImProperties imProperties = new ImProperties();
 
     private ImGroupMessageSendReqVO buildSendReqVO() {
         ImGroupMessageSendReqVO reqVO = new ImGroupMessageSendReqVO();
@@ -808,6 +814,58 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 断言：Redis 游标更新 + READ 事件
             verify(groupMessageReadRedisDAO).updateReadMaxMessageId(10L, 1L, 100L);
             verify(imWebSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
+        }
+    }
+
+    @Test
+    public void testReadGroupMessages_disabled() {
+        // 准备：关闭群聊已读
+        imProperties.getMessage().setGroupReadEnabled(false);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
+        assertEquals(MESSAGE_GROUP_READ_DISABLED.getCode(), exception.getCode());
+        // 断言：Redis 不写、不推送
+        verify(groupMessageReadRedisDAO, never()).updateReadMaxMessageId(anyLong(), anyLong(), anyLong());
+        verify(imWebSocketService, never()).sendGroupMessageAsync(anyLong(), any(ImGroupMessageDTO.class));
+    }
+
+    @Test
+    public void testGetGroupReadUserIds_disabled() {
+        // 准备：关闭群聊已读
+        imProperties.getMessage().setGroupReadEnabled(false);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.getGroupReadUserIds(1L, 10L, 100L));
+        assertEquals(MESSAGE_GROUP_READ_DISABLED.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testSendGroupMessage_groupReadDisabled_forcesNoReceipt() {
+        // 关闭群已读：发送方传 receipt=true 也强制落 NO_RECEIPT
+        imProperties.getMessage().setGroupReadEnabled(false);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
+                    .thenReturn(groupMessageService);
+
+            ImGroupMessageSendReqVO reqVO = buildSendReqVO();
+            reqVO.setReceipt(true); // 发送方明确要求回执
+            when(groupMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-group-001"))
+                    .thenReturn(null);
+            ImGroupDO group = new ImGroupDO();
+            group.setId(10L);
+            when(groupService.validateGroupExists(10L)).thenReturn(group);
+            ImGroupMemberDO member = ImGroupMemberDO.builder()
+                    .groupId(10L).userId(1L).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+            when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L));
+
+            ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
+
+            assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus(),
+                    "群已读关闭时即使发送方传 receipt=true 也强制落 NO_RECEIPT");
         }
     }
 
