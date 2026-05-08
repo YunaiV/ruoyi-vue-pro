@@ -99,8 +99,8 @@ public interface ImGroupService {
     /**
      * 获取指定用户的群列表
      * <p>
-     * 返回用户当前仍有效的群，以及最近 {@link cn.iocoder.yudao.module.im.enums.ImCommonConstants#MESSAGE_GROUP_PULL_MAX_DAYS}
-     * 天内退群的群 —— 退群前可能还有离线消息需要展示，前端需要把这些群信息作为缓存。
+     * 返回用户当前仍有效的群，以及最近 yudao.im.message.group-pull-max-days 天内退群的群
+     * —— 退群前可能还有离线消息需要展示，前端需要把这些群信息作为缓存。
      *
      * @param userId 用户编号
      * @return 群列表
@@ -171,7 +171,7 @@ public interface ImGroupService {
     /**
      * 置顶群消息（仅群主或管理员可执行）
      * <p>
-     * 上限 {@link cn.iocoder.yudao.module.im.enums.ImCommonConstants#GROUP_PIN_MAX_COUNT}；幂等失败时抛业务异常
+     * 上限由 yudao.im.group.pin-max-count 控制；幂等失败时抛业务异常
      *
      * @param userId    当前登录用户编号
      * @param groupId   群编号

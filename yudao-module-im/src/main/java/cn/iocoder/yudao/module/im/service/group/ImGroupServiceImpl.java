@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -53,7 +54,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
  * 用户群 Service 实现类
@@ -83,6 +83,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Resource
     private AdminUserApi adminUserApi;
 
+    @Resource
+    private ImProperties imProperties;
+
     // ==================== 群的写操作 ====================
 
     @Override
@@ -101,9 +104,10 @@ public class ImGroupServiceImpl implements ImGroupService {
                 throw exception(GROUP_INVITE_NOT_FRIEND, getUserNicknames(notFriendUserIds));
             }
         }
-        // 1.3 校验群人数上限（创建者 + 初始成员 ≤ MAX_GROUP_MEMBER）
-        if (initialMemberUserIds.size() + 1 > MAX_GROUP_MEMBER) {
-            throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
+        // 1.3 校验群人数上限（创建者 + 初始成员 ≤ 群成员上限）
+        int maxMember = imProperties.getGroup().getMaxMember();
+        if (initialMemberUserIds.size() + 1 > maxMember) {
+            throw exception(GROUP_MEMBER_EXCEED, maxMember);
         }
 
         // 2.1 插入群记录
@@ -210,8 +214,9 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw exception(GROUP_INVITE_NOT_FRIEND, getUserNicknames(notFriendUserIds));
         }
         // 1.4 校验群人数上限
-        if (activeMembers.size() + memberUserIds.size() > MAX_GROUP_MEMBER) {
-            throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
+        int maxMember = imProperties.getGroup().getMaxMember();
+        if (activeMembers.size() + memberUserIds.size() > maxMember) {
+            throw exception(GROUP_MEMBER_EXCEED, maxMember);
         }
 
         // 2. 情况一：群开启审批 + 邀请人是普通成员，落 group_request 等群主 / 管理员处理
@@ -304,8 +309,9 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 1.4 校验上限
         Long existAdminCount = groupMemberService.getGroupMemberCountByRole(
                 groupId, ImGroupMemberRoleEnum.ADMIN.getRole());
-        if (existAdminCount + changedUserIds.size() > GROUP_ADMIN_MAX_COUNT) {
-            throw exception(GROUP_ADMIN_MAX_LIMIT, GROUP_ADMIN_MAX_COUNT);
+        int adminMaxCount = imProperties.getGroup().getAdminMaxCount();
+        if (existAdminCount + changedUserIds.size() > adminMaxCount) {
+            throw exception(GROUP_ADMIN_MAX_LIMIT, adminMaxCount);
         }
 
         // 2. 批量更新角色
@@ -404,8 +410,9 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (pinned.contains(messageId)) {
             throw exception(GROUP_MESSAGE_ALREADY_PINNED);
         }
-        if (pinned.size() >= GROUP_PIN_MAX_COUNT) {
-            throw exception(GROUP_MESSAGE_PIN_MAX_LIMIT, GROUP_PIN_MAX_COUNT);
+        int pinMaxCount = imProperties.getGroup().getPinMaxCount();
+        if (pinned.size() >= pinMaxCount) {
+            throw exception(GROUP_MESSAGE_PIN_MAX_LIMIT, pinMaxCount);
         }
         pinned.add(messageId);
         groupMapper.updateById(new ImGroupDO().setId(groupId).setPinnedMessageIds(pinned));
@@ -465,8 +472,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     public void validateMemberCountLimit(Long groupId, int addCount) {
         int activeCount = groupMemberService.getActiveGroupMemberUserIdsByGroupId(groupId).size();
-        if (activeCount + addCount > MAX_GROUP_MEMBER) {
-            throw exception(GROUP_MEMBER_EXCEED, MAX_GROUP_MEMBER);
+        int maxMember = imProperties.getGroup().getMaxMember();
+        if (activeCount + addCount > maxMember) {
+            throw exception(GROUP_MEMBER_EXCEED, maxMember);
         }
     }
 
@@ -512,8 +520,8 @@ public class ImGroupServiceImpl implements ImGroupService {
     public List<ImGroupDO> getMyGroupList(Long userId) {
         // 1.1 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
         List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByUserId(userId);
-        // 1.2 再查最近 MESSAGE_GROUP_PULL_MAX_DAYS 天内退群的成员记录（退群前可能有离线消息需要展示，一并返回作为前端缓存）
-        LocalDateTime minQuitTime = LocalDateTime.now().minusDays(MESSAGE_GROUP_PULL_MAX_DAYS);
+        // 1.2 再查最近 N 天（与群消息离线拉取窗口一致）内退群的成员记录（退群前可能有离线消息需要展示，一并返回作为前端缓存）
+        LocalDateTime minQuitTime = LocalDateTime.now().minusDays(imProperties.getMessage().getGroupPullMaxDays());
         members.addAll(groupMemberService.getQuitGroupMemberListByUserId(userId, minQuitTime));
         if (CollUtil.isEmpty(members)) {
             return Collections.emptyList();

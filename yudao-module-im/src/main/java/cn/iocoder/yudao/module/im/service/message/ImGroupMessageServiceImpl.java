@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
@@ -43,7 +44,6 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
  * IM 群聊消息 Service 实现类
@@ -76,6 +76,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     @Resource
     private ImWebSocketService imWebSocketService;
+
+    @Resource
+    private ImProperties imProperties;
 
     @Override
     public ImGroupMessageDO sendGroupMessage(Long senderId, ImGroupMessageSendReqVO reqVO) {
@@ -161,8 +164,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             throw exception(MESSAGE_ALREADY_RECALLED);
         }
         // 1.4 只允许撤回限定时间内的消息
-        if (message.getSendTime().plusMinutes(MESSAGE_RECALL_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
-            throw exception(MESSAGE_RECALL_TIMEOUT, MESSAGE_RECALL_TIMEOUT_MINUTES);
+        int recallTimeoutMinutes = imProperties.getMessage().getRecallTimeoutMinutes();
+        if (message.getSendTime().plusMinutes(recallTimeoutMinutes).isBefore(LocalDateTime.now())) {
+            throw exception(MESSAGE_RECALL_TIMEOUT, recallTimeoutMinutes);
         }
         // 1.5 校验撤回人仍在群中
         groupMemberService.validateMemberInGroup(message.getGroupId(), userId);
@@ -178,12 +182,13 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
     @Override
     public List<ImGroupMessageDO> pullGroupMessageList(Long userId, Long minId, Integer size) {
-        if (size > MESSAGE_MAX_PULL_SIZE) {
-            throw exception(MESSAGE_PULL_SIZE_EXCEEDED, MESSAGE_MAX_PULL_SIZE);
+        int maxPullSize = imProperties.getMessage().getMaxPullSize();
+        if (size > maxPullSize) {
+            throw exception(MESSAGE_PULL_SIZE_EXCEEDED, maxPullSize);
         }
 
-        // 0. 拉取时间窗：超过窗口的老消息不再通过离线通道推送
-        LocalDateTime minSendTime = LocalDateTime.now().minusDays(MESSAGE_GROUP_PULL_MAX_DAYS);
+        // 0. 拉取时间窗；超过窗口的老消息不再通过离线通道推送
+        LocalDateTime minSendTime = LocalDateTime.now().minusDays(imProperties.getMessage().getGroupPullMaxDays());
 
         // 1.1 主查询：仅用"当前仍在群"的成员记录驱动；若首批消息过滤后为空，则允许内部重试
         List<ImGroupMemberDO> activeMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);

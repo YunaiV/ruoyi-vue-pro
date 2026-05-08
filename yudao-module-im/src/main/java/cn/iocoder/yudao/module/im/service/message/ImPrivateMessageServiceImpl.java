@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
@@ -33,7 +34,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.im.enums.ImCommonConstants.*;
 
 /**
  * IM 私聊消息 Service 实现类
@@ -55,6 +55,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Resource
     private ImWebSocketService imWebSocketService;
+
+    @Resource
+    private ImProperties imProperties;
 
     @Override
     public ImPrivateMessageDO sendPrivateMessage(Long senderId, ImPrivateMessageSendReqVO reqVO) {
@@ -139,8 +142,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             throw exception(MESSAGE_ALREADY_RECALLED);
         }
         // 1.4 只允许撤回限定时间内的消息
-        if (message.getSendTime().plusMinutes(MESSAGE_RECALL_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
-            throw exception(MESSAGE_RECALL_TIMEOUT, MESSAGE_RECALL_TIMEOUT_MINUTES);
+        int recallTimeoutMinutes = imProperties.getMessage().getRecallTimeoutMinutes();
+        if (message.getSendTime().plusMinutes(recallTimeoutMinutes).isBefore(LocalDateTime.now())) {
+            throw exception(MESSAGE_RECALL_TIMEOUT, recallTimeoutMinutes);
         }
 
         // 2. 更新原消息状态为撤回
@@ -190,11 +194,12 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
     @Override
     public List<ImPrivateMessageDO> pullPrivateMessageList(Long userId, Long minId, Integer size) {
-        if (size > MESSAGE_MAX_PULL_SIZE) {
-            throw exception(MESSAGE_PULL_SIZE_EXCEEDED, MESSAGE_MAX_PULL_SIZE);
+        int maxPullSize = imProperties.getMessage().getMaxPullSize();
+        if (size > maxPullSize) {
+            throw exception(MESSAGE_PULL_SIZE_EXCEEDED, maxPullSize);
         }
-        // 0. 拉取时间窗：超过窗口的老消息不再通过离线通道推送
-        LocalDateTime minSendTime = LocalDateTime.now().minusDays(MESSAGE_PRIVATE_PULL_MAX_DAYS);
+        // 0. 拉取时间窗；超过窗口的老消息不再通过离线通道推送
+        LocalDateTime minSendTime = LocalDateTime.now().minusDays(imProperties.getMessage().getPrivatePullMaxDays());
 
         // 根据 minId 和 minSendTime 拉取消息，避免 minId 恰好被发出后才拉取，导致漏消息
         List<ImPrivateMessageDO> messages = privateMessageMapper.selectListByMinId(userId, minId, minSendTime, size);
