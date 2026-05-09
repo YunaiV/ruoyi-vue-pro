@@ -80,4 +80,14 @@ public interface ErrorCodeConstants {
     ErrorCode FACE_USER_ITEM_NOT_OWN = new ErrorCode(1_040_800_011, "不能操作他人的表情");
     ErrorCode FACE_USER_ITEM_DUPLICATED = new ErrorCode(1_040_800_013, "该表情已添加到个人表情");
 
+    // ========== 实时通话 (1-040-900-000) ==========
+    ErrorCode RTC_NOT_ENABLED = new ErrorCode(1_040_900_000, "通话功能未开启");
+    ErrorCode RTC_SESSION_NOT_EXISTS = new ErrorCode(1_040_900_001, "通话已结束");
+    ErrorCode RTC_PEER_BUSY = new ErrorCode(1_040_900_002, "对方正在通话中");
+    ErrorCode RTC_SELF_BUSY = new ErrorCode(1_040_900_003, "您正在通话中");
+    ErrorCode RTC_NOT_PARTICIPANT = new ErrorCode(1_040_900_004, "您不在该通话中");
+    ErrorCode RTC_INVITE_SELF = new ErrorCode(1_040_900_005, "不能呼叫自己");
+    ErrorCode RTC_PRIVATE_INVITEE_REQUIRED = new ErrorCode(1_040_900_006, "私聊通话必须指定对方");
+    ErrorCode RTC_GROUP_REQUIRED = new ErrorCode(1_040_900_007, "群聊通话必须指定群编号");
+
 }

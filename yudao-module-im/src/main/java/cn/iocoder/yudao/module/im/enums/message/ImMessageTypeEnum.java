@@ -78,6 +78,36 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      */
     READ(2201, "已读", false, false),
 
+    // ========== 实时通话信令（2300-2302） ==========
+    // TODO @AI：openim 的信号，是怎么设计的？感觉对齐下，会好一点点，不然用户不好拓展；
+    /**
+     * 通话邀请：主叫发起后推给被叫弹「来电」界面；payload 为 RtcInviteNotification（roomName / mediaType / scene / inviter / token）
+     */
+    RTC_INVITE(2300, "通话邀请", false, false),
+    /**
+     * 通话已接通：被叫接听后推给主叫切换到「通话中」UI；payload 为 RtcAcceptNotification（roomName / acceptorId）
+     */
+    RTC_ACCEPT(2301, "通话接通", false, false),
+    /**
+     * 通话结束：拒绝 / 取消 / 挂断 / 超时 / 异常 统一走这一条；payload 为 RtcEndNotification（roomName / reason / operatorId）
+     */
+    RTC_END(2302, "通话结束", false, false),
+
+    // ========== 群通话广播信号（2310-2312）：让所有群成员能感知 / 主动加入 ==========
+    /**
+     * 群通话开始：群通话发起时给所有群成员广播；payload 为 ImRtcGroupNotification（callId / roomName / mediaType / inviterId / joinedUserIds）
+     */
+    RTC_GROUP_STARTED(2310, "群通话开始", false, false),
+    /**
+     * 群通话结束：最后一人离开 / 异常关房时广播；payload 仅含 roomName / groupId
+     */
+    RTC_GROUP_ENDED(2311, "群通话结束", false, false),
+    /**
+     * 群通话成员变更：有人加入 / 离开时广播；payload 为 ImRtcGroupNotification（含最新 joinedUserIds）；
+     * 用于胶囊条上「N 人正在通话」实时刷新
+     */
+    RTC_GROUP_UPDATED(2312, "群通话成员变更", false, false),
+
     // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
     // TODO @芋艿：FRIEND_REQUEST_* 与 GROUP_REQUEST_* 都是 persistent=false 的 SysMsg，离线 pull 拉不到，
     //  目前可能丢失「实时 toast 提醒」体验（业务状态不丢，前端上线 fetch{Friend,Group}RequestList 能补回来）；
