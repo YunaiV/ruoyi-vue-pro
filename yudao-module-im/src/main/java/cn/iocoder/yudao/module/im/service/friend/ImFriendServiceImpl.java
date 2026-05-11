@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND_STATE;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_BLOCKED_BY_PEER;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 
@@ -55,19 +57,35 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     @Override
     @Cacheable(cacheNames = FRIEND_STATE, key = "#userId + '_' + #friendUserId", unless = "#result == null")
-    public ImFriendStateEnum getFriendState(Long userId, Long friendUserId) {
+    public Integer getFriendState(Long userId, Long friendUserId) {
         // 1.1 我侧记录：我方删了，都算非好友
         ImFriendDO mine = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (mine == null || !CommonStatusEnum.isEnable(mine.getStatus())) {
-            return ImFriendStateEnum.NONE;
+            return ImFriendStateEnum.NONE.getState();
         }
         // 1.2 对方侧记录：对方删了 = 不是好友
         ImFriendDO peer = friendMapper.selectByUserIdAndFriendUserId(friendUserId, userId);
         if (peer == null || !CommonStatusEnum.isEnable(peer.getStatus())) {
-            return ImFriendStateEnum.NONE;
+            return ImFriendStateEnum.NONE.getState();
         }
         // 2. 仅当双方都是 ENABLE 状态，才算好友关系；此时对方拉黑我，则是 BLOCKED
-        return BooleanUtil.isTrue(peer.getBlocked()) ? ImFriendStateEnum.BLOCKED : ImFriendStateEnum.FRIEND;
+        return BooleanUtil.isTrue(peer.getBlocked()) ? ImFriendStateEnum.BLOCKED.getState() : ImFriendStateEnum.FRIEND.getState();
+    }
+
+    @Override
+    public void validateFriend(Long userId, Long peerUserId) {
+        // 好友 ／ 黑名单校验：和私聊消息发送同一套语义；NONE 已删 ／ 未加，BLOCKED 被对方拉黑
+        Integer state = getSelf().getFriendState(userId, peerUserId);
+        if (ImFriendStateEnum.isNone(state)) {
+            throw exception(FRIEND_NOT_FRIEND);
+        }
+        if (ImFriendStateEnum.isBlocked(state)) {
+            throw exception(FRIEND_BLOCKED_BY_PEER);
+        }
+    }
+
+    private ImFriendService getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
     @Override

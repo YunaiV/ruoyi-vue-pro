@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * IM 好友关系状态（合并「是否好友」+「是否拉黑」两态）
@@ -37,6 +38,18 @@ public enum ImFriendStateEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isNone(Integer state) {
+        return Objects.equals(NONE.state, state);
+    }
+
+    public static boolean isFriend(Integer state) {
+        return Objects.equals(FRIEND.state, state);
+    }
+
+    public static boolean isBlocked(Integer state) {
+        return Objects.equals(BLOCKED.state, state);
     }
 
 }

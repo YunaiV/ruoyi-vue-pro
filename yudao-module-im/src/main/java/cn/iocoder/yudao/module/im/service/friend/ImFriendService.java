@@ -23,9 +23,19 @@ public interface ImFriendService {
     /**
      * 获取 userId 视角下与 friendUserId 的好友关系状态（私聊发送热点路径）
      * <p>
-     * 合并「是否好友」+「是否被自己拉黑」两态，供调用方一次缓存查询完成判定，详见 {@link ImFriendStateEnum}
+     * 参见 {@link ImFriendStateEnum} 枚举类
      */
-    ImFriendStateEnum getFriendState(Long userId, Long friendUserId);
+    Integer getFriendState(Long userId, Long friendUserId);
+
+    /**
+     * 校验「能否对 peerUserId 发起私聊语义动作」（消息发送 ／ RTC 邀请）
+     * <p>
+     * 好友 ／ 黑名单校验：和私聊消息发送同一套语义；NONE 已删 ／ 未加，BLOCKED 被对方拉黑
+     *
+     * @param userId     当前用户编号
+     * @param peerUserId 对方用户编号
+     */
+    void validateFriend(Long userId, Long peerUserId);
 
     /**
      * 获得当前用户的好友列表（含已删除状态）

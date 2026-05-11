@@ -71,15 +71,15 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         // 1.2 校验对方存在且启用
         adminUserApi.validateUser(toUserId);
         // 1.3 已是好友 / 被对方拉黑：直接报错（state 一次拿到双向状态，省两次单边查询）
-        ImFriendStateEnum state = friendService.getFriendState(fromUserId, toUserId);
-        if (state == ImFriendStateEnum.FRIEND) {
+        // 错误码与 ImFriendService#validateFriend 不同（语义为「申请被拒」），故保留 inline
+        Integer state = friendService.getFriendState(fromUserId, toUserId);
+        if (ImFriendStateEnum.isFriend(state)) {
             throw exception(FRIEND_REQUEST_ALREADY_FRIEND);
         }
-        if (state == ImFriendStateEnum.BLOCKED) {
+        if (ImFriendStateEnum.isBlocked(state)) {
             throw exception(FRIEND_REQUEST_BLOCKED_BY_PEER);
         }
         // 1.4 单向好友（我已删 + 对方仍把我当好友）：静默重新启用我侧关系，避免对方感知我曾删除
-        // TODO DONE @AI：前端 FriendAddDialog 按 requestId 是否为 null 区分提示文案：null → 「已添加为好友」；非 null → 「等待对方验证」
         ImFriendDO peerFriend = friendService.getFriend(toUserId, fromUserId);
         if (peerFriend != null && CommonStatusEnum.isEnable(peerFriend.getStatus())) {
             friendService.silentReAddFriend(fromUserId, toUserId, reqVO.getDisplayName(), reqVO.getAddSource());

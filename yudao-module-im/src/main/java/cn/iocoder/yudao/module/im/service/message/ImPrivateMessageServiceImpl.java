@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
-import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
@@ -71,13 +70,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             return existing;
         }
         // 1.2 好友校验
-        ImFriendStateEnum state = friendService.getFriendState(senderId, reqVO.getReceiverId());
-        if (state == ImFriendStateEnum.NONE) {
-            throw exception(FRIEND_NOT_FRIEND);
-        }
-        if (state == ImFriendStateEnum.BLOCKED) {
-            throw exception(FRIEND_BLOCKED_BY_PEER);
-        }
+        friendService.validateFriend(senderId, reqVO.getReceiverId());
         // 1.3 文本消息敏感词过滤
         if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());

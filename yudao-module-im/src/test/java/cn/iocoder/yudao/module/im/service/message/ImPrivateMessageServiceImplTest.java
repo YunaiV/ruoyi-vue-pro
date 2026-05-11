@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivate
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
-import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
@@ -70,7 +69,6 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
         when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(null);
-        when(friendService.getFriendState(1L, 2L)).thenReturn(ImFriendStateEnum.FRIEND);
         when(privateMessageMapper.insert(any(ImPrivateMessageDO.class))).thenAnswer(invocation -> {
             ImPrivateMessageDO msg = invocation.getArgument(0);
             msg.setId(99L);
@@ -89,7 +87,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertNotNull(result.getSendTime());
 
         // 验证调用
-        verify(friendService).getFriendState(1L, 2L);
+        verify(friendService).validateFriend(1L, 2L);
         verify(sensitiveWordService).validateText(reqVO.getContent());
         verify(privateMessageMapper).insert(any(ImPrivateMessageDO.class));
         // 验证推送给接收方和发送方
@@ -123,7 +121,8 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
         when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(null);
-        when(friendService.getFriendState(1L, 2L)).thenReturn(ImFriendStateEnum.NONE);
+        doThrow(new ServiceException(FRIEND_NOT_FRIEND))
+                .when(friendService).validateFriend(1L, 2L);
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -286,7 +285,6 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageSendReqVO reqVO = buildSendReqVO();
         when(privateMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-001"))
                 .thenReturn(null);
-        when(friendService.getFriendState(1L, 2L)).thenReturn(ImFriendStateEnum.FRIEND);
         doThrow(new ServiceException(MESSAGE_SENSITIVE_WORD_BLOCKED))
                 .when(sensitiveWordService).validateText(reqVO.getContent());
 
