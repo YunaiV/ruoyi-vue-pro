@@ -123,7 +123,7 @@ public class ImPrivateMessageDTO {
 
     // ==================== 群定向私聊通知 ====================
 
-    // TODO @AI：能不能走群聊的通道？？？？只是接收人不同。
+    // TODO @AI：能不能走群聊的通道？？？？只是接收人不同。【统一优化的】
     /**
      * 构建群通知推送 DTO（走私聊通道定向推送，不入群消息流）
      * <p>
@@ -140,6 +140,27 @@ public class ImPrivateMessageDTO {
                                                           Long receiverUserId, BaseGroupNotification payload) {
         return new ImPrivateMessageDTO().setType(type)
                 .setSenderId(operatorUserId).setReceiverId(receiverUserId)
+                .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
+    }
+
+    // ==================== 实时通话信令 ====================
+
+    // TODO @AI：能不能走群聊的通道？？？？只是接收人不同。【统一优化的】
+    /**
+     * 构建通话信令推送 DTO（走私聊通道仅推参与方，不入消息流）
+     * <p>
+     * 用于 RTC_CALL（INVITE / REJECT 等）/ RTC_PARTICIPANT_CONNECTED / RTC_PARTICIPANT_DISCONNECTED
+     *
+     * @param type           消息类型；取自 {@link ImMessageTypeEnum} 中的 RTC_* 段
+     * @param senderId       发送人编号；INVITE 时为发起人，REJECT 时为拒绝者，参与者事件时为加入 / 离开者
+     * @param receiverUserId 推送目标用户编号
+     * @param payload        通话事件 payload（任意 RTC 通知 DTO）
+     * @return 私聊 DTO
+     */
+    public static ImPrivateMessageDTO ofRtcNotification(Integer type, Long senderId,
+                                                        Long receiverUserId, Object payload) {
+        return new ImPrivateMessageDTO().setType(type)
+                .setSenderId(senderId).setReceiverId(receiverUserId)
                 .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
     }
 

@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.Set;
 
-@Schema(description = "管理后台 - 通话会话 Response VO；invite / accept / refreshToken / getActiveSessions 共用")
+@Schema(description = "管理后台 - 通话会话 Response VO；invite / accept / refreshToken 共用")
 @Data
 public class ImRtcCallRespVO {
 
@@ -18,7 +18,7 @@ public class ImRtcCallRespVO {
     @Schema(description = "LiveKit Server WebSocket 地址；前端 connect 用")
     private String livekitUrl;
 
-    @Schema(description = "LiveKit 接入 Token；getActiveSessions 列表里为 null，需要的话单独调 refreshToken")
+    @Schema(description = "LiveKit 接入 Token；需要时调 refreshToken 重新签发")
     private String token;
 
     @Schema(description = "会话场景")

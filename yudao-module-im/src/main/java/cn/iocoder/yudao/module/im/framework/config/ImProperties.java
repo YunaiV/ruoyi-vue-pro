@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.im.framework.config;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
-// TODO @AI：参考别的模块；是不是也要分 im；config 和 core 这样；在瞅瞅；
 /**
  * IM 模块全局配置
  * <p>
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "yudao.im")
+@Validated
 @Data
 public class ImProperties {
 
@@ -24,6 +28,7 @@ public class ImProperties {
 
     private Message message = new Message();
 
+    @Valid
     private Rtc rtc = new Rtc();
 
     /**
@@ -134,16 +139,20 @@ public class ImProperties {
         /**
          * LiveKit Server WebSocket 地址；客户端 connect 时使用，通常 ws://host:7880 或 wss://host
          */
+        @NotBlank(message = "LiveKit URL 不能为空")
         private String livekitUrl = "ws://127.0.0.1:7880";
 
         /**
          * LiveKit API Key
          */
+        @NotBlank(message = "LiveKit API Key 不能为空")
         private String apiKey = "devkey";
 
         /**
          * LiveKit API Secret；生产必须改为强随机值
          */
+        @NotBlank(message = "LiveKit API Secret 不能为空")
+        @Size(min = 32, message = "LiveKit API Secret 长度需 ≥ 32 位")
         private String apiSecret = "secret-poc-key-min-32-chars-required-here";
 
         /**

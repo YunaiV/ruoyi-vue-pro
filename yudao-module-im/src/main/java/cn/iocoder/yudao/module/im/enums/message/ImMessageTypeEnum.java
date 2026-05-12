@@ -78,35 +78,42 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      */
     READ(2201, "已读", false, false),
 
-    // ========== 实时通话信令（2300-2302） ==========
-    // TODO @AI：openim 的信号，是怎么设计的？感觉对齐下，会好一点点，不然用户不好拓展；
+    // ========== 实时通话信令（1601-1605 段位与 OpenIM 对齐；1610+ 自有扩展） ==========
     /**
-     * 通话邀请：主叫发起后推给被叫弹「来电」界面；payload 为 RtcInviteNotification（roomName / mediaType / scene / inviter / token）
+     * 对应 OpenIM：SignalingNotification 1601（通话信令统一入口）
+     * 对应自己的类：ImRtcCallNotification
+     * 场景：通话信令；不入库，走 imWebSocketService 仅推参与方；signalingType 区分 INVITE / REJECT（预留 ACCEPT / CANCEL / HUNGUP）
      */
-    RTC_INVITE(2300, "通话邀请", false, false),
+    RTC_CALL(1601, "通话信令", false, false),
     /**
-     * 通话已接通：被叫接听后推给主叫切换到「通话中」UI；payload 为 RtcAcceptNotification（roomName / acceptorId）
+     * 对应 OpenIM：RoomParticipantsConnectedNotification 1602
+     * 对应自己的类：ImRtcParticipantConnectedNotification
+     * 场景：通话参与者加入；LiveKit webhook participant_joined 触发；私聊推 peer 多端 + inviter 多端，群聊全群广播；不入库
      */
-    RTC_ACCEPT(2301, "通话接通", false, false),
+    RTC_PARTICIPANT_CONNECTED(1602, "通话参与者加入", false, false),
     /**
-     * 通话结束：拒绝 / 取消 / 挂断 / 超时 / 异常 统一走这一条；payload 为 RtcEndNotification（roomName / reason / operatorId）
+     * 对应 OpenIM：RoomParticipantsDisconnectedNotification 1603
+     * 对应自己的类：ImRtcParticipantDisconnectedNotification
+     * 场景：通话参与者离开；LiveKit webhook participant_left 触发；推送范围同 1602；不入库
      */
-    RTC_END(2302, "通话结束", false, false),
-
-    // ========== 群通话广播信号（2310-2312）：让所有群成员能感知 / 主动加入 ==========
+    RTC_PARTICIPANT_DISCONNECTED(1603, "通话参与者离开", false, false),
+    // 1604-1609 OpenIM 已用 / 留作扩展，本系统暂不使用
     /**
-     * 群通话开始：群通话发起时给所有群成员广播；payload 为 ImRtcGroupNotification（callId / roomName / mediaType / inviterId / joinedUserIds）
+     * 对应 OpenIM：无（自有扩展，OpenIM 通话事件不入消息流）
+     * 对应自己的类：ImRtcCallStartNotification
+     * 场景：群通话开始；入 im_group_message + 全群广播；前端渲染聊天 tip「{inviterNickname} 发起了{voice/video}通话」
+     * <p>
+     * 与 RTC_CALL_END(1611) 两段式配对：START 一定先于 END 入库（START 在 invite 接口事务里、END 在 cancel/leave 接口事务里，自然按请求顺序串行）
      */
-    RTC_GROUP_STARTED(2310, "群通话开始", false, false),
+    RTC_CALL_START(1610, "通话开始", true, false),
     /**
-     * 群通话结束：最后一人离开 / 异常关房时广播；payload 仅含 roomName / groupId
+     * 对应 OpenIM：无（自有扩展，OpenIM 通话事件不入消息流）
+     * 对应自己的类：ImRtcCallEndNotification
+     * 场景：通话结束；入 im_private_message / im_group_message；私聊渲染准气泡，群聊渲染 tip「{voice/video}通话已结束 [时长 X]」
+     * <p>
+     * 群通话两段式配对前导是 RTC_CALL_START(1610)；私聊场景没有 START，单 END 准气泡承载完整生命周期
      */
-    RTC_GROUP_ENDED(2311, "群通话结束", false, false),
-    /**
-     * 群通话成员变更：有人加入 / 离开时广播；payload 为 ImRtcGroupNotification（含最新 joinedUserIds）；
-     * 用于胶囊条上「N 人正在通话」实时刷新
-     */
-    RTC_GROUP_UPDATED(2312, "群通话成员变更", false, false),
+    RTC_CALL_END(1611, "通话结束", true, false),
 
     // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
     // TODO @芋艿：FRIEND_REQUEST_* 与 GROUP_REQUEST_* 都是 persistent=false 的 SysMsg，离线 pull 拉不到，
@@ -224,7 +231,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     /**
      * 对应 OpenIM：sdkws.MemberInvitedTips（MemberInvitedNotification 1509）
      * 对应自己的类：GroupMemberInviteNotification
-     * 场景：成员邀请新人入群，全员广播（含被邀请者）；被邀请人前端按 memberUserIds 含自己自判 fetchGroupInfo + fetchGroupMembers bootstrap
+     * 场景：成员邀请新人入群，全员广播（含被邀请者）；被邀请人前端按 memberUserIds 含自己自判，初次拉取 fetchGroupInfo + fetchGroupMembers
      */
     GROUP_MEMBER_INVITE(1509, "成员加入", true, false),
     /**

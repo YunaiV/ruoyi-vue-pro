@@ -14,8 +14,6 @@ import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -79,17 +77,11 @@ public class ImRtcCallController {
         return success(rtcCallService.refreshToken(getLoginUserId(), roomName));
     }
 
-    @GetMapping("/active-sessions")
-    @Operation(summary = "查询当前用户活跃通话；用于 App 冷启动 / 推送点开恢复")
-    public CommonResult<List<ImRtcCallRespVO>> getActiveSessions() {
-        return success(rtcCallService.getActiveSessions(getLoginUserId()));
-    }
-
     @GetMapping("/group-active-call")
     @Operation(summary = "查询群当前进行中的通话；用于群聊顶部「N 人正在通话」胶囊条")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "2048")
     public CommonResult<ImRtcGroupCallRespVO> getGroupActiveCall(@RequestParam("groupId") Long groupId) {
-        return success(rtcCallService.getGroupActiveCall(groupId));
+        return success(rtcCallService.getGroupActiveCall(getLoginUserId(), groupId));
     }
 
 }

@@ -32,10 +32,10 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
     private WebSocketMessageSender webSocketMessageSender;
 
     @Override
-    public void sendPrivateMessageAsync(Long userId, ImPrivateMessageDTO dto) {
+    public void sendPrivateMessageAsync(Collection<Long> userIds, ImPrivateMessageDTO dto) {
         // 说明：通过 executeAfterCommitOrNow 保证事务提交后再推送，避免客户端收到消息后查询数据库时事务尚未提交
         // 通过 getSelf() 获取 Spring 代理对象调用 @Async 方法，确保异步 AOP 生效（直接 this 调用会绕过代理）
-        executeAfterTransaction(() -> getSelf().doSendPrivateMessage(userId, dto));
+        executeAfterTransaction(() -> getSelf().doSendPrivateMessage(userIds, dto));
     }
 
     @Override
@@ -44,15 +44,17 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
     }
 
     /**
-     * 异步发送私聊 WebSocket 消息
+     * 异步发送私聊 WebSocket 消息；多收件人共享同一 dto，避免按收件人重复注册 afterCommit 回调
      */
     @Async
-    public void doSendPrivateMessage(Long userId, ImPrivateMessageDTO dto) {
-        try {
-            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                    ImPrivateMessageDTO.TYPE, dto);
-        } catch (Exception e) {
-            log.error("[doSendPrivateMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
+    public void doSendPrivateMessage(Collection<Long> userIds, ImPrivateMessageDTO dto) {
+        for (Long userId : userIds) {
+            try {
+                webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+                        ImPrivateMessageDTO.TYPE, dto);
+            } catch (Exception e) {
+                log.error("[doSendPrivateMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
+            }
         }
     }
 

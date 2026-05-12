@@ -41,4 +41,15 @@ public interface RedisKeyConstants {
      */
     String GROUP_MEMBER_IDS = "group_member_ids";
 
+    /**
+     * 通话同对 / 同群活跃唯一性的分布式锁
+     * <p>
+     * KEY 格式：im_rtc_call:{conversationType}:{suffix}
+     *   私聊（conversationType=1）：suffix = {小 userId}_{大 userId}
+     *   群聊（conversationType=2）：suffix = {groupId}
+     * VALUE 数据格式：HASH                  // RLock.class：Redisson 的 Lock 锁，使用 Hash 数据结构
+     * 过期时间：不固定（lock 时显式传 timeoutMillis）
+     */
+    String IM_RTC_CALL_LOCK = "im_rtc_call:%d:%s";
+
 }
