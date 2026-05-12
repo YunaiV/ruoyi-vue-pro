@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.im.framework.rtc.core;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
@@ -13,11 +15,13 @@ import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * LiveKit 客户端
@@ -155,6 +159,45 @@ public class LiveKitClient {
             return Long.parseLong(idPart);
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    /**
+     * 校验 LiveKit Webhook 签名；流程参见
+     * <a href="https://docs.livekit.io/home/server/webhook/#receiving-webhooks">webhook 文档</a>
+     * <p>
+     * 校验两步：
+     * 1.1 JWT HS256 签名验证；密钥使用 LiveKit API Secret
+     * 1.2 body 的 sha256 与 JWT 内 claim 一致；防止抓到 token 后篡改 body
+     *
+     * @param authHeader 请求头 Authorization 原值（含 "Bearer " 前缀）
+     * @param rawBody    请求原始 body
+     * @return 是否通过；签名异常一律视为不通过
+     */
+    public boolean verifyWebhookSignature(String authHeader, String rawBody) {
+        if (StrUtil.isBlank(authHeader)) {
+            return false;
+        }
+        String token = StrUtil.removePrefix(authHeader, "Bearer ").trim();
+        ImProperties.Rtc cfg = imProperties.getRtc();
+        try {
+            JWT jwt = JWT.of(token);
+            // JWT HS256 签名验证
+            if (!jwt.setKey(cfg.getApiSecret().getBytes(StandardCharsets.UTF_8)).verify()) {
+                return false;
+            }
+            // body sha256 一致性校验
+            Object expectedSha = jwt.getPayload("sha256");
+            if (expectedSha == null) {
+                return false;
+            }
+            // 计算 body 的 sha256，并与 JWT 内 claim 对比
+            String actualSha = Base64.encode(DigestUtil.sha256(rawBody));
+            return Objects.equals(expectedSha.toString(), actualSha);
+        } catch (Exception e) {
+            log.warn("[verifyWebhookSignature][签名解析异常 bodyLength={}]",
+                    rawBody == null ? 0 : rawBody.length(), e);
+            return false;
         }
     }
 

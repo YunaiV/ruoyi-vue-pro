@@ -82,7 +82,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     /**
      * 对应 OpenIM：SignalingNotification 1601（通话信令统一入口）
      * 对应自己的类：ImRtcCallNotification
-     * 场景：通话信令；不入库，走 imWebSocketService 仅推参与方；signalingType 区分 INVITE / REJECT（预留 ACCEPT / CANCEL / HUNGUP）
+     * 场景：通话信令；不入库，走 imWebSocketService 仅推参与方；status 复用参与者状态枚举区分 INVITING / JOINED / REJECTED / NO_ANSWER / LEFT
      */
     RTC_CALL(1601, "通话信令", false, false),
     /**

@@ -31,6 +31,11 @@ import java.time.LocalDateTime;
 public class ImRtcCallDO extends BaseDO {
 
     /**
+     * LiveKit 房间名前缀；roomName 格式固定为 {@code ROOM_NAME_PREFIX + callId}
+     */
+    public static final String ROOM_NAME_PREFIX = "im_rtc_call_";
+
+    /**
      * 编号
      */
     @TableId

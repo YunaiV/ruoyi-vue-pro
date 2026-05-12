@@ -90,5 +90,6 @@ public interface ErrorCodeConstants {
     ErrorCode RTC_PRIVATE_INVITEE_REQUIRED = new ErrorCode(1_040_900_006, "私聊通话必须指定对方");
     ErrorCode RTC_GROUP_REQUIRED = new ErrorCode(1_040_900_007, "群聊通话必须指定群编号");
     ErrorCode RTC_INVITE_BUSY = new ErrorCode(1_040_900_008, "通话发起繁忙，请稍后再试");
+    ErrorCode RTC_GROUP_CALL_ACTIVE = new ErrorCode(1_040_900_009, "该群已有进行中通话，请通过胶囊条加入");
 
 }

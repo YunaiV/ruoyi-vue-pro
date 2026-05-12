@@ -42,7 +42,4 @@ public class ImRtcCallRespVO {
     @Schema(description = "已加入房间的成员编号集合")
     private Set<Long> joinedUserIds;
 
-    @Schema(description = "是否本次新建；true 主叫弹「等待对方接受」；false 直接进通话中（已有房间）")
-    private Boolean newCreated;
-
 }
