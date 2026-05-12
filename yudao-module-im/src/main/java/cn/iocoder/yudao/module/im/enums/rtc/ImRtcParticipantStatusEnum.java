@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.enums.rtc;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public enum ImRtcParticipantStatusEnum implements ArrayValuable<Integer> {
     /**
      * 活跃状态集合；尚未离开通话（INVITING / JOINED）
      */
-    public static final List<Integer> ACTIVE_STATUSES = List.of(INVITING.getStatus(), JOINED.getStatus());
+    public static final List<Integer> ACTIVE_STATUSES = ListUtil.of(INVITING.getStatus(), JOINED.getStatus());
 
     /**
      * 状态值

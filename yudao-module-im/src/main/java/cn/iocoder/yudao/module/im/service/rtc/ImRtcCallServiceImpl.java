@@ -41,7 +41,6 @@ import org.springframework.validation.annotation.Validated;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
@@ -181,10 +180,11 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
         rtcParticipantMapper.insertBatch(participants);
 
-        // 3.1 推送通知：RTC_CALL(INVITE) 给每个被邀请人
+        // 3.1 推送通知：RTC_CALL(INVITE) 给每个被邀请人；批量取用户避免 N 次 RPC
         AdminUserRespDTO inviterUser = adminUserApi.getUser(inviterId);
+        Map<Long, AdminUserRespDTO> inviteeMap = adminUserApi.getUserMap(invitees);
         for (Long inviteeId : invitees) {
-            pushCallInviteNotification(call, inviterUser, inviteeId);
+            pushCallInviteNotification(call, inviterUser, inviteeId, inviteeMap.get(inviteeId));
         }
         // 3.2 群通话再向全群广播 RTC_CALL_START 入聊天流
         if (ImConversationTypeEnum.isGroup(reqVO.getScene())) {
@@ -268,10 +268,11 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
         rtcParticipantMapper.insertBatch(participants);
 
-        // 3. 推送通知：RTC_CALL(INVITE) 给每个新邀请人
+        // 3. 推送通知：RTC_CALL(INVITE) 给每个新邀请人；批量取用户避免 N 次 RPC
         AdminUserRespDTO inviter = adminUserApi.getUser(userId);
+        Map<Long, AdminUserRespDTO> inviteeMap = adminUserApi.getUserMap(incomingUserIds);
         for (Long inviteeId : incomingUserIds) {
-            pushCallInviteNotification(call, inviter, inviteeId);
+            pushCallInviteNotification(call, inviter, inviteeId, inviteeMap.get(inviteeId));
         }
     }
 
@@ -438,19 +439,23 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         return signToken(userId, displayName, room);
     }
 
-    // TODO DONE @AI：兼容 JDK8 —— 项目 Spring Boot 3 已要求 JDK17+，switch arrow case 可直接用
     @Override
     public void handleLiveKitEvent(LiveKitWebhookEventDTO event) {
         if (event == null || event.getEvent() == null) {
             return;
         }
         switch (event.getEvent()) {
-            case LiveKitWebhookEventDTO.EVENT_PARTICIPANT_JOINED -> handleParticipantJoined(event);
-            case LiveKitWebhookEventDTO.EVENT_PARTICIPANT_LEFT -> handleParticipantLeft(event);
-            case LiveKitWebhookEventDTO.EVENT_ROOM_FINISHED -> handleRoomFinished(event);
-            default -> {
-                /* 其它事件忽略；track_published 等业务态由 LiveKit 自身分发驱动 */
-            }
+            case LiveKitWebhookEventDTO.EVENT_PARTICIPANT_JOINED:
+                handleParticipantJoined(event);
+                break;
+            case LiveKitWebhookEventDTO.EVENT_PARTICIPANT_LEFT:
+                handleParticipantLeft(event);
+                break;
+            case LiveKitWebhookEventDTO.EVENT_ROOM_FINISHED:
+                handleRoomFinished(event);
+                break;
+            default:
+                // 其它事件忽略；track_published 等业务态由 LiveKit 自身分发驱动
         }
     }
 
@@ -611,7 +616,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
             if (reqVO.getPeerUserId() == null) {
                 throw exception(RTC_PRIVATE_INVITEE_REQUIRED);
             }
-            if (Objects.equals(userId, reqVO.getPeerUserId())) {
+            if (ObjUtil.equal(userId, reqVO.getPeerUserId())) {
                 throw exception(RTC_INVITE_SELF);
             }
             friendService.validateFriend(userId, reqVO.getPeerUserId());
@@ -629,7 +634,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * 解析被邀请池：私聊为 peerUserId 单元素；群聊优先用前端选中的子集，否则取群活跃成员；超量截断
+     * 解析被邀请池：私聊为 peerUserId 单元素；群聊优先用前端选中的子集，否则取群活跃成员；超量直接抛错
      * <p>
      * 群聊场景：被邀请人必须是该群活跃成员；防止恶意客户端塞任意 userId 进群房间
      */
@@ -653,12 +658,10 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
         // 不论来源，发起人本人不进被邀请池
         initial.remove(inviterId);
-        // 超出最大同时在房成员数；截断为 max-1 个，避免邀请整个 500 人大群
-        // TODO @AI：超过数量，直接抛出异常，不用裁剪，不然很奇怪；
+        // 超量直接抛错；前端按 max-1 限制选人
         int max = imProperties.getRtc().getGroupMaxParticipants();
         if (initial.size() + 1 > max) {
-            return initial.stream().limit(max - 1L)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            throw exception(RTC_GROUP_INVITEE_OVER_LIMIT);
         }
         return initial;
     }
@@ -671,7 +674,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (!ImRtcCallStatusEnum.isCreated(call.getStatus())) {
             return;
         }
-        if (Objects.equals(call.getInviterUserId(), acceptorId)) {
+        if (ObjUtil.equal(call.getInviterUserId(), acceptorId)) {
             return;
         }
 
@@ -745,8 +748,12 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     /**
      * RTC_CALL(INVITE)：走 webSocketService 直推到被邀请人；persistent=false 不入消息流
      */
-    private void pushCallInviteNotification(ImRtcCallDO call, AdminUserRespDTO inviter, Long inviteeId) {
-        String token = signToken(inviteeId, inviter == null ? null : inviter.getNickname(), call.getRoom());
+    private void pushCallInviteNotification(ImRtcCallDO call, AdminUserRespDTO inviter,
+                                            Long inviteeId, AdminUserRespDTO invitee) {
+        String displayName = invitee != null
+                ? StrUtil.blankToDefault(invitee.getNickname(), String.valueOf(inviteeId))
+                : String.valueOf(inviteeId);
+        String token = signToken(inviteeId, displayName, call.getRoom());
         ImRtcCallNotification payload = ImRtcCallNotification.ofInvite(
                 call, inviter, imProperties.getRtc().getLivekitUrl(), token);
         webSocketService.sendPrivateMessageAsync(inviteeId, ImPrivateMessageDTO.ofRtcNotification(
@@ -831,7 +838,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         // 私聊：发起人总是 sender；receiver = 通话另一方
         ImRtcParticipantDO peer = CollUtil.findOne(
                 rtcParticipantMapper.selectListByRoom(call.getRoom()),
-                p -> !Objects.equals(p.getUserId(), senderId));
+                p -> ObjUtil.notEqual(p.getUserId(), senderId));
         Long receiverId = peer != null ? peer.getUserId() : senderId;
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO().setReceiverId(receiverId)
                 .setType(ImMessageTypeEnum.RTC_CALL_END.getType()).setContent(payload);

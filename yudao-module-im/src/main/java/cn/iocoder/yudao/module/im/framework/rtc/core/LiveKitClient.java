@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.framework.rtc.core;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
@@ -214,7 +215,7 @@ public class LiveKitClient {
                 .setIssuer(cfg.getApiKey())
                 .setNotBefore(new Date(nowSec * 1000))
                 .setExpiresAt(new Date((nowSec + ADMIN_TOKEN_TTL.getSeconds()) * 1000))
-                .setPayload("video", Map.of("roomAdmin", true))
+                .setPayload("video", MapUtil.of("roomAdmin", true))
                 .setSigner(JWTSignerUtil.hs256(cfg.getApiSecret().getBytes()))
                 .sign();
     }
@@ -232,7 +233,7 @@ public class LiveKitClient {
         return HttpRequest.post(HttpUtils.wsUrlToHttp(imProperties.getRtc().getLivekitUrl()) + path)
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
-                .body(JSONUtil.toJsonStr(Map.of("room", room)))
+                .body(JSONUtil.toJsonStr(MapUtil.of("room", room)))
                 .timeout(SERVER_API_TIMEOUT_MS)
                 .execute();
     }

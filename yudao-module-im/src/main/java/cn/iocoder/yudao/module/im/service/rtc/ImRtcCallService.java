@@ -43,7 +43,7 @@ public interface ImRtcCallService {
     void inviteMoreCall(Long userId, ImRtcCallInviteMoreReqVO reqVO);
 
     /**
-     * 接听通话：私聊状态切换 INVITING → RUNNING；群通话直接加入已有 RUNNING 房间
+     * 接听通话：参与者 INVITING → JOINED；主表 CREATED → RUNNING（首次有非发起人接通时）
      *
      * @return 通话主表
      */
