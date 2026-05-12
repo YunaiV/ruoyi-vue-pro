@@ -26,6 +26,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
+// TODO @AI：需要讨论，到底使用 roomName 还是 callId 更好？前端传参；然后，DO 那种，是不是只存储 callId，roomName 二选 1，是不是就行了。或者统一成 room？uuid 完事；callid 还给 call.id 更好理解；
 @Tag(name = "管理后台 - IM 实时通话")
 @RestController
 @RequestMapping("/im/rtc")

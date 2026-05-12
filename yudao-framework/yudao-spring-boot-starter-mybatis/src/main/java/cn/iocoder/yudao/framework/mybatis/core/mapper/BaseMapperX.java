@@ -153,7 +153,7 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      * @param queryWrapper 查询条件
      * @return 最新一条；不存在返回 null
      */
-    default T selectLast(LambdaQueryWrapper<T> queryWrapper) {
+    default T selectLastOne(LambdaQueryWrapper<T> queryWrapper) {
         return CollUtil.getLast(selectList(queryWrapper));
     }
 

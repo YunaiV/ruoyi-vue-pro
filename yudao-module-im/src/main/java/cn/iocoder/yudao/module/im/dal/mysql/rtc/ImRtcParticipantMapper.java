@@ -33,8 +33,8 @@ public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> 
                 .eq(ImRtcParticipantDO::getStatus, status));
     }
 
-    default ImRtcParticipantDO selectLastByUserIdAndStatus(Long userId, Collection<Integer> statuses) {
-        return selectLast(new LambdaQueryWrapperX<ImRtcParticipantDO>()
+    default ImRtcParticipantDO selectLastOneByUserIdAndStatus(Long userId, Collection<Integer> statuses) {
+        return selectLastOne(new LambdaQueryWrapperX<ImRtcParticipantDO>()
                 .eq(ImRtcParticipantDO::getUserId, userId)
                 .in(ImRtcParticipantDO::getStatus, statuses));
     }

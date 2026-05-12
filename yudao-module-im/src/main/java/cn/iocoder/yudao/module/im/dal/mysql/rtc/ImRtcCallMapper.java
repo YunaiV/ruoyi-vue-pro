@@ -26,8 +26,8 @@ public interface ImRtcCallMapper extends BaseMapperX<ImRtcCallDO> {
         return selectOne(ImRtcCallDO::getRoomName, roomName);
     }
 
-    default ImRtcCallDO selectLastByGroupIdAndStatusIn(Long groupId, Collection<Integer> statuses) {
-        return selectLast(new LambdaQueryWrapperX<ImRtcCallDO>()
+    default ImRtcCallDO selectLastOneByGroupIdAndStatusIn(Long groupId, Collection<Integer> statuses) {
+        return selectLastOne(new LambdaQueryWrapperX<ImRtcCallDO>()
                 .eq(ImRtcCallDO::getGroupId, groupId)
                 .in(ImRtcCallDO::getStatus, statuses));
     }

@@ -1,0 +1,187 @@
+package cn.iocoder.yudao.module.im.service.websocket.dto.notification.rtc;
+
+import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
+import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantStatusEnum;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import lombok.Data;
+
+/**
+ * RTC_CALL 通话信令通知（通话信令统一入口）
+ * <p>
+ * 不入库；走 imWebSocketService 仅推参与方
+ * <p>
+ * status 字段复用 {@link ImRtcParticipantStatusEnum}，表达「本次信令对应的参与者状态变迁」
+ *
+ * @author 芋道源码
+ */
+@Data
+public class ImRtcCallNotification {
+
+    /**
+     * 信令对应的参与者状态
+     *
+     * 取值参见 {@link ImRtcParticipantStatusEnum}
+     */
+    private Integer status;
+
+    /**
+     * 业务通话编号
+     */
+    private String callId;
+    /**
+     * LiveKit 房间名
+     */
+    private String roomName;
+    /**
+     * 会话类型
+     */
+    private Integer conversationType;
+    /**
+     * 媒体类型
+     */
+    private Integer mediaType;
+    /**
+     * 群编号：群通话场景必填
+     */
+    private Long groupId;
+
+    // ========== INVITE 专属字段 ==========
+
+    /**
+     * LiveKit Server WebSocket 地址；INVITE 专属
+     */
+    private String livekitUrl;
+    /**
+     * 该被叫专属的 LiveKit 接听 Token；接通后直接 connect 用；INVITE 专属
+     */
+    private String token;
+    /**
+     * 发起人用户编号；INVITE 专属
+     */
+    private Long inviterUserId;
+    /**
+     * 发起人昵称；INVITE 专属，前端来电界面展示
+     */
+    private String inviterNickname;
+    /**
+     * 发起人头像；INVITE 专属，前端来电界面展示
+     */
+    private String inviterAvatar;
+
+    // ========== 非 INVITE 信令的操作者 ==========
+
+    /**
+     * 操作者用户编号；ACCEPT / REJECT / CANCEL / HUNGUP 触发本次状态变迁的人
+     */
+    private Long operatorUserId;
+    /**
+     * 操作者昵称；前端按需展示（被某某拒接 / 取消 / 挂断），普通文案不依赖
+     */
+    private String operatorNickname;
+    /**
+     * 操作者头像；前端按需展示，普通文案不依赖
+     */
+    private String operatorAvatar;
+
+    /**
+     * 构造 INVITE 信令；推被邀请人，invitee 状态变为 INVITING
+     *
+     * @param call        通话主表
+     * @param inviter     发起人；可空，缺失时 inviterNickname / inviterAvatar 留空
+     * @param livekitUrl  LiveKit Server WebSocket 地址
+     * @param token       被叫的接听 Token；按收件人单独签发
+     * @return INVITE 信令
+     */
+    public static ImRtcCallNotification ofInvite(ImRtcCallDO call, AdminUserRespDTO inviter,
+                                                 String livekitUrl, String token) {
+        ImRtcCallNotification notification = baseOf(call, ImRtcParticipantStatusEnum.INVITING.getStatus());
+        notification.livekitUrl = livekitUrl;
+        notification.token = token;
+        notification.inviterUserId = call.getInviterUserId();
+        if (inviter != null) {
+            notification.inviterNickname = inviter.getNickname();
+            notification.inviterAvatar = inviter.getAvatar();
+        }
+        return notification;
+    }
+
+    // TODO @AI：为什么没使用？
+    /**
+     * 构造 ACCEPT 信令；推除接听者外的其它参与方，让主叫尽早结束响铃 UI
+     *
+     * @param call            通话主表
+     * @param operatorUserId  接听者用户编号
+     * @param operator        接听者；可空，缺失时 operatorNickname / operatorAvatar 留空
+     * @return ACCEPT 信令
+     */
+    public static ImRtcCallNotification ofAccept(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
+        return ofOperatorAction(call, ImRtcParticipantStatusEnum.JOINED.getStatus(), operatorUserId, operator);
+    }
+
+    /**
+     * 构造 REJECT 信令；仅群通话场景；推主叫
+     *
+     * @param call            通话主表
+     * @param operatorUserId  拒接者用户编号
+     * @param operator        拒接者；可空，缺失时 operatorNickname / operatorAvatar 留空
+     * @return REJECT 信令
+     */
+    public static ImRtcCallNotification ofReject(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
+        return ofOperatorAction(call, ImRtcParticipantStatusEnum.REJECTED.getStatus(), operatorUserId, operator);
+    }
+
+    // TODO @AI：为什么没使用？
+    /**
+     * 构造 CANCEL 信令；推被邀请方，invitees 状态变为 NO_ANSWER
+     *
+     * @param call            通话主表
+     * @param operatorUserId  取消者用户编号（主叫）
+     * @param operator        取消者；可空，缺失时 operatorNickname / operatorAvatar 留空
+     * @return CANCEL 信令
+     */
+    public static ImRtcCallNotification ofCancel(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
+        return ofOperatorAction(call, ImRtcParticipantStatusEnum.NO_ANSWER.getStatus(), operatorUserId, operator);
+    }
+
+    // TODO @AI：为什么没使用？
+    /**
+     * 构造 HUNGUP 信令；推其它参与方，操作者状态变为 LEFT
+     *
+     * @param call            通话主表
+     * @param operatorUserId  挂断者用户编号
+     * @param operator        挂断者；可空，缺失时 operatorNickname / operatorAvatar 留空
+     * @return HUNGUP 信令
+     */
+    public static ImRtcCallNotification ofHungUp(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
+        return ofOperatorAction(call, ImRtcParticipantStatusEnum.LEFT.getStatus(), operatorUserId, operator);
+    }
+
+    /**
+     * ACCEPT / REJECT / CANCEL / HUNGUP 4 个工厂的公共骨架；填充 call 上下文 + status + operator
+     */
+    private static ImRtcCallNotification ofOperatorAction(ImRtcCallDO call, Integer status,
+                                                          Long operatorUserId, AdminUserRespDTO operator) {
+        ImRtcCallNotification notification = baseOf(call, status);
+        notification.operatorUserId = operatorUserId;
+        if (operator != null) {
+            notification.operatorNickname = operator.getNickname();
+            notification.operatorAvatar = operator.getAvatar();
+        }
+        return notification;
+    }
+
+    /**
+     * 各 ofXxx 工厂的公共骨架；填充 call 上下文 + status
+     */
+    private static ImRtcCallNotification baseOf(ImRtcCallDO call, Integer status) {
+        ImRtcCallNotification notification = new ImRtcCallNotification();
+        notification.status = status;
+        notification.callId = call.getCallId();
+        notification.roomName = call.getRoomName();
+        notification.conversationType = call.getConversationType();
+        notification.mediaType = call.getMediaType();
+        notification.groupId = call.getGroupId();
+        return notification;
+    }
+
+}

@@ -13,21 +13,21 @@ import cn.iocoder.yudao.module.im.dal.redis.rtc.ImRtcCallLockRedisDAO;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallEndReasonEnum;
+import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantRoleEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantStatusEnum;
-import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.framework.rtc.core.LiveKitClient;
+import cn.iocoder.yudao.module.im.framework.rtc.core.LiveKitWebhookEventDTO;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
-import cn.iocoder.yudao.module.im.framework.rtc.core.LiveKitWebhookEventDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.rtc.*;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.dto.notification.rtc.*;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -68,7 +68,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
 
     @Resource
     private ImRtcCallMapper rtcCallMapper;
-    // TODO @AI：可以搞个 ImRtcParticipantService，从而简化这个类的大小么？
+    // TODO DONE @AI：可以搞个 ImRtcParticipantService 简化本类么 —— 暂不抽：参与表 CRUD 与通话状态机紧耦合（INVITING→JOINED→LEFT 等转换都跟主表 status 联动），独立 service 会沦为薄包装且需双方互调，反而增加复杂度
+    // TODO @AI：要不试着拆出来，看看 ImRtcParticipantService 能不能稍微简化一些些；
     @Resource
     private ImRtcParticipantMapper rtcParticipantMapper;
     @Resource
@@ -102,8 +103,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         ensureEnabled();
         // 1. 校验入参与场景
         validateInviteScene(userId, reqVO);
-        // TODO @AI：2 这个注释，有点复杂。略微重复了。应该就是加锁 + 所内逻辑。为什么加锁：xxxx
-        // 2. 包锁：同好友 / 同群串行；锁内 SELECT 命中已有活跃通话改走加入分支，否则 INSERT 新通话
+
+        // 2. 加锁后跑业务主体；同好友对 / 同群串行，避免并发各开一通的竞态
         if (ImConversationTypeEnum.isGroup(reqVO.getScene())) {
             return rtcCallLockRedisDAO.lockGroup(reqVO.getGroupId(), () -> inviteCall0(userId, reqVO));
         }
@@ -111,73 +112,84 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * invite 锁内主体；SELECT 已有活跃通话 → 直接抛错（群走 joinCall，私聊用户已是参与者）；否则 INSERT 新通话
+     * invite 锁内主体：按场景先做活跃通话 / 对端忙线校验，再做发起人自身忙线校验，最后建通话
      */
     private ImRtcCallDO inviteCall0(Long userId, ImRtcCallInviteReqVO reqVO) {
-        // TODO @AI：是不是可以改成：私聊的检测、群聊的检测；通用的检测；现在 if else 有点混乱。
-        // 1.1 已有活跃通话：群通话提示走加入按钮；私聊一定是当前用户已在通话中（自身忙线）
-        ImRtcCallDO active = ImConversationTypeEnum.isGroup(reqVO.getScene())
-                // TODO @AI：selectLastOneByXXX；然后 basemapperx 也改成这样的 selectLastOne；这样整体风格对齐；
-                ? rtcCallMapper.selectLastByGroupIdAndStatusIn(reqVO.getGroupId(), ImRtcCallStatusEnum.ACTIVE_STATUSES)
-                : getActivePrivateCallByPair(userId, reqVO.getPeerUserId());
-        if (active != null) {
-            throw exception(ImConversationTypeEnum.isGroup(reqVO.getScene())
-                    ? RTC_GROUP_CALL_ACTIVE : RTC_SELF_BUSY);
-        }
-        // 1.2 自身忙线：当前用户已在另一通话；私聊场景再额外检查对端 TODO @AI：是不是要拆成 2 段注释。就是“私聊场景再额外检查对端”下面的“ImConversationTypeEnum.isPrivate(reqVO.getScene())”
-        ImRtcParticipantDO selfActive = rtcParticipantMapper.selectLastByUserIdAndStatus(userId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
-        if (selfActive != null) {
-            throw exception(RTC_SELF_BUSY);
-        }
-        if (ImConversationTypeEnum.isPrivate(reqVO.getScene())) {
-            ImRtcParticipantDO peerActive = rtcParticipantMapper.selectLastByUserIdAndStatus(reqVO.getPeerUserId(), ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
+        // 1.1 按场景检测活跃通话
+        if (ImConversationTypeEnum.isGroup(reqVO.getScene())) {
+            // 群通话已存在则引导走 joinCall（旁观者加入按钮），不再开新通话
+            ImRtcCallDO active = rtcCallMapper.selectLastOneByGroupIdAndStatusIn(
+                    reqVO.getGroupId(), ImRtcCallStatusEnum.ACTIVE_STATUSES);
+            if (active != null) {
+                throw exception(RTC_GROUP_CALL_ACTIVE);
+            }
+        } else {
+            // 私聊已在通话中说明发起人自己已是参与者，当作自身忙线
+            ImRtcCallDO active = getActivePrivateCallByPair(userId, reqVO.getPeerUserId());
+            if (active != null) {
+                throw exception(RTC_SELF_BUSY);
+            }
+            // 私聊额外检查对端忙线
+            ImRtcParticipantDO peerActive = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
+                    reqVO.getPeerUserId(), ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
             if (peerActive != null) {
                 throw exception(RTC_PEER_BUSY);
             }
         }
+        // 1.2 通用检测：发起人在另一通通话中（与上面的私聊「已是参与者」不同语义；这里覆盖跨好友 / 跨群的兜底）
+        ImRtcParticipantDO selfActive = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
+                userId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
+        if (selfActive != null) {
+            throw exception(RTC_SELF_BUSY);
+        }
 
         // 2. 新建通话
-        return doInsertNewCall(userId, reqVO);
+        return createCall(userId, reqVO);
     }
 
-    // TODO @AI：改成 createCall 方法；
-    // TODO @AI：希望逻辑是：1 构造参数，2.1 插入主表、2.2 插入参与表；3. 推送通知；
-    private ImRtcCallDO doInsertNewCall(Long inviterId, ImRtcCallInviteReqVO reqVO) {
-        // 1. 派生 callId + roomName
+    /**
+     * 新建通话
+     *
+     * @param inviterId 发起人编号
+     * @param reqVO 发起请求
+     * @return 通话主表
+     */
+    private ImRtcCallDO createCall(Long inviterId, ImRtcCallInviteReqVO reqVO) {
+        // 1. 构造参数：派生 callId / roomName，解析被邀请池（私聊单元素；群聊 invitee 子集或全员）
+        // TODO @AI：callId、roomName 都抽成小方法。
         String callId = IdUtil.fastSimpleUUID();
         String roomName = ImRtcCallDO.ROOM_NAME_PREFIX + callId;
         LocalDateTime now = LocalDateTime.now();
-        // 2. 构建被邀请池（私聊为 peerUserId 单元素；群聊取 invitee 子集 / 全员）
         Set<Long> invitees = resolveInvitees(reqVO, inviterId);
 
-        // 3. INSERT 主表；群聊发起人即时 JOINED 但通话仍处 CREATED，等首个非发起人接通才切 RUNNING
-        ImRtcCallDO call = new ImRtcCallDO()
-                .setCallId(callId).setRoomName(roomName)
+        // 2.1 INSERT 主表；群聊发起人即时 JOINED 但通话仍处 CREATED，等首个非发起人接通才切 RUNNING
+        ImRtcCallDO call = new ImRtcCallDO().setCallId(callId).setRoomName(roomName)
                 .setConversationType(reqVO.getScene()).setMediaType(reqVO.getMediaType())
                 .setInviterUserId(inviterId).setGroupId(reqVO.getGroupId())
-                .setStatus(ImRtcCallStatusEnum.CREATED.getStatus())
-                .setStartTime(now);
+                .setStatus(ImRtcCallStatusEnum.CREATED.getStatus()).setStartTime(now);
         rtcCallMapper.insert(call);
-        // TODO @AI：是不是 4 和 5，改成 批量插入；
-        // 4. INSERT 发起人 participant
-        rtcParticipantMapper.insert(new ImRtcParticipantDO()
-                .setCallId(callId).setUserId(inviterId)
+        // 2.2 批量 INSERT 参与表：发起人即时 JOINED，被邀请人 INVITING 等接通
+        List<ImRtcParticipantDO> participants = new ArrayList<>(invitees.size() + 1);
+        participants.add(new ImRtcParticipantDO().setCallId(callId).setUserId(inviterId)
                 .setRole(ImRtcParticipantRoleEnum.INVITER.getRole())
                 .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus())
                 .setInviteTime(now).setAcceptTime(now));
-        // 5. INSERT 被邀请人 participants
         for (Long inviteeId : invitees) {
-            rtcParticipantMapper.insert(new ImRtcParticipantDO()
+            participants.add(new ImRtcParticipantDO()
                     .setCallId(callId).setUserId(inviteeId)
                     .setRole(ImRtcParticipantRoleEnum.INVITEE.getRole())
                     .setStatus(ImRtcParticipantStatusEnum.INVITING.getStatus())
                     .setInviteTime(now));
         }
-        // 6. 推送 RTC_CALL(INVITE) 给被邀请人；群通话再向全群广播 RTC_CALL_START 入聊天流
+        rtcParticipantMapper.insertBatch(participants);
+
+        // TODO @AI：需要把 3.1、3.2 顺序调整下么？你分析下。
+        // 3.1 推送通知：RTC_CALL(INVITE) 给每个被邀请人
         AdminUserRespDTO inviterUser = adminUserApi.getUser(inviterId);
         for (Long inviteeId : invitees) {
             pushCallInviteNotification(call, inviterUser, inviteeId);
         }
+        // 3.2 群通话再向全群广播 RTC_CALL_START 入聊天流
         if (ImConversationTypeEnum.isGroup(reqVO.getScene())) {
             pushCallStartNotification(call, inviterUser);
         }
@@ -188,47 +200,38 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     public ImRtcCallDO joinCall(Long userId, String roomName) {
         ensureEnabled();
         // 1.1 校验通话存在且活跃
-        ImRtcCallDO call = requireActiveCall(roomName);
+        ImRtcCallDO call = validateCallActive(roomName);
         // 1.2 仅群通话支持「旁观者加入」
         if (!ImConversationTypeEnum.isGroup(call.getConversationType())) {
             throw exception(RTC_GROUP_REQUIRED);
         }
 
-        // 2. TODO 把 joinExistingCall 拿进来？避免方法太多太碎。
-        return joinExistingCall(call, userId);
-    }
-
-    /**
-     * 命中已有活跃通话；当前用户加入或重新进入；不再触发 INVITE / START 广播
-     */
-    private ImRtcCallDO joinExistingCall(ImRtcCallDO active, Long userId) {
-        ImRtcParticipantDO existing = rtcParticipantMapper.selectByCallIdAndUserId(active.getCallId(), userId);
+        // 2. 入参与表：已有记录切回 JOINED；不在记录则以 ACTIVE_JOIN 角色 INSERT
         LocalDateTime now = LocalDateTime.now();
+        ImRtcParticipantDO existing = rtcParticipantMapper.selectByCallIdAndUserId(call.getCallId(), userId);
         if (existing != null) {
             // 非 JOINED 状态切回 JOINED + accept_time；INVITER / INVITEE 重连 / 旁观点胶囊条都走这条
             if (!ImRtcParticipantStatusEnum.isJoined(existing.getStatus())) {
-                rtcParticipantMapper.updateById(new ImRtcParticipantDO()
-                        .setId(existing.getId())
-                        .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus())
-                        .setAcceptTime(now));
+                rtcParticipantMapper.updateById(new ImRtcParticipantDO().setId(existing.getId())
+                        .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus()).setAcceptTime(now));
             }
         } else {
             // 旁观者主动加入：INSERT role=ACTIVE_JOIN
-            rtcParticipantMapper.insert(new ImRtcParticipantDO()
-                    .setCallId(active.getCallId()).setUserId(userId)
-                    .setRole(ImRtcParticipantRoleEnum.ACTIVE_JOIN.getRole())
-                    .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus())
-                    .setInviteTime(now).setAcceptTime(now));
+            rtcParticipantMapper.insert(new ImRtcParticipantDO().setCallId(call.getCallId())
+                    .setUserId(userId).setRole(ImRtcParticipantRoleEnum.ACTIVE_JOIN.getRole())
+                    .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus()).setInviteTime(now).setAcceptTime(now));
         }
-        // 主表 CREATED → RUNNING（首次有非发起人加入）
-        maybeMarkOngoing(active, userId, now);
-        return active;
+
+        // 3. 主表 CREATED → RUNNING（首次有非发起人加入）
+        maybeMarkOngoing(call, userId, now);
+        return call;
     }
 
     @Override
     public void inviteMoreCall(Long userId, ImRtcCallInviteMoreReqVO reqVO) {
         ensureEnabled();
-        ImRtcCallDO call = requireActiveCall(reqVO.getRoomName());
+        // TODO @AI：校验的，按照 1.1 1.2 1.3 这样；
+        ImRtcCallDO call = validateCallActive(reqVO.getRoomName());
         // 仅群通话支持追加邀请
         if (!ImConversationTypeEnum.isGroup(call.getConversationType())) {
             throw exception(RTC_GROUP_REQUIRED);
@@ -238,19 +241,24 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (operator == null || !ImRtcParticipantStatusEnum.isJoined(operator.getStatus())) {
             throw exception(RTC_NOT_PARTICIPANT);
         }
+        // TODO @AI：如果存在非本群里，直接抛出异常。
         // 校验被邀请人必须是该群活跃成员；且未在通话池
         Set<Long> validMemberIds = new LinkedHashSet<>(
                 groupMemberService.getActiveGroupMemberUserIdsByGroupId(call.getGroupId()));
+        // TODO @AI：convertSet；
         Set<Long> existingUserIds = rtcParticipantMapper.selectListByCallId(call.getCallId()).stream()
                 .map(ImRtcParticipantDO::getUserId)
                 .collect(Collectors.toSet());
+        // TODO @AI：incomingUserIds；直接 remove 原始的元素；没必要；单独的；
         List<Long> incoming = reqVO.getInviteeIds().stream()
                 .filter(id -> validMemberIds.contains(id) && !existingUserIds.contains(id))
                 .toList();
         if (CollUtil.isEmpty(incoming)) {
             return;
         }
+
         // INSERT 新邀请人 + 推 INVITE
+        // TODO @AI：batch 插入；
         LocalDateTime now = LocalDateTime.now();
         for (Long inviteeId : incoming) {
             rtcParticipantMapper.insert(new ImRtcParticipantDO()
@@ -259,6 +267,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
                     .setStatus(ImRtcParticipantStatusEnum.INVITING.getStatus())
                     .setInviteTime(now));
         }
+
+        // TODO @AI：这里在写推送的；
         AdminUserRespDTO inviter = adminUserApi.getUser(userId);
         for (Long inviteeId : incoming) {
             pushCallInviteNotification(call, inviter, inviteeId);
@@ -268,28 +278,27 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     @Override
     public ImRtcCallDO acceptCall(Long userId, String roomName) {
         ensureEnabled();
-        ImRtcCallDO call = requireActiveCall(roomName);
+        // TODO @AI：按照 inviteMoreCall 风格，优化下注释；
+        ImRtcCallDO call = validateCallActive(roomName);
         ImRtcParticipantDO participant = rtcParticipantMapper.selectByCallIdAndUserId(call.getCallId(), userId);
         if (participant == null) {
             throw exception(RTC_NOT_PARTICIPANT);
         }
         // 已 JOINED 视为重复 accept，幂等返回
         LocalDateTime now = LocalDateTime.now();
+        // TODO @AI：如果已经是，就 if return，简化层级。
         if (!ImRtcParticipantStatusEnum.isJoined(participant.getStatus())) {
             // 仅 INVITING → JOINED；其它状态拒
             if (!ImRtcParticipantStatusEnum.isInviting(participant.getStatus())) {
                 throw exception(RTC_SESSION_NOT_EXISTS);
             }
-            int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(),
-                    ImRtcParticipantStatusEnum.INVITING.getStatus(),
-                    new ImRtcParticipantDO()
-                            .setId(participant.getId())
-                            .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus())
-                            .setAcceptTime(now));
+            int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(), ImRtcParticipantStatusEnum.INVITING.getStatus(),
+                    new ImRtcParticipantDO().setId(participant.getId()).setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus()).setAcceptTime(now));
             if (updated == 0) {
                 throw exception(RTC_SESSION_NOT_EXISTS);
             }
         }
+
         // 主表 CREATED → RUNNING（首次有非发起人接通）
         maybeMarkOngoing(call, userId, now);
         return call;
@@ -298,7 +307,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     @Override
     public void rejectCall(Long userId, String roomName) {
         ensureEnabled();
-        ImRtcCallDO call = requireActiveCall(roomName);
+        // TODO @AI：按照 inviteMoreCall 风格，优化下注释；
+        ImRtcCallDO call = validateCallActive(roomName);
         ImRtcParticipantDO participant = rtcParticipantMapper.selectByCallIdAndUserId(call.getCallId(), userId);
         if (participant == null) {
             throw exception(RTC_NOT_PARTICIPANT);
@@ -307,15 +317,16 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (!ImRtcParticipantStatusEnum.isInviting(participant.getStatus())) {
             throw exception(RTC_SESSION_NOT_EXISTS);
         }
-        int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(),
-                ImRtcParticipantStatusEnum.INVITING.getStatus(),
-                new ImRtcParticipantDO()
-                        .setId(participant.getId())
-                        .setStatus(ImRtcParticipantStatusEnum.REJECTED.getStatus())
-                        .setLeaveTime(LocalDateTime.now()));
+
+        // TODO @AI：这里写个注释
+        int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(), ImRtcParticipantStatusEnum.INVITING.getStatus(),
+                new ImRtcParticipantDO().setId(participant.getId()).setStatus(ImRtcParticipantStatusEnum.REJECTED.getStatus()).setLeaveTime(LocalDateTime.now()));
         if (updated == 0) {
             return;
         }
+
+        // TODO @AI：3.1 3.2 这样；
+        // TODO @AI：群聊如果拒绝，需要做类似的 endSession 逻辑么？
         // 群通话拒绝：仅推 RTC_CALL(REJECT) 给主叫；不影响通话整体
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
             pushCallRejectNotification(call, userId);
@@ -328,7 +339,9 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     @Override
     public void cancelCall(Long userId, String roomName) {
         ensureEnabled();
-        ImRtcCallDO call = requireActiveCall(roomName);
+        // TODO @AI：按照 inviteMoreCall 风格，优化下注释；
+        ImRtcCallDO call = validateCallActive(roomName);
+        // TODO @AI：notEquals；
         if (!Objects.equals(call.getInviterUserId(), userId)) {
             throw exception(RTC_NOT_PARTICIPANT);
         }
@@ -336,23 +349,28 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (!ImRtcCallStatusEnum.isCreated(call.getStatus())) {
             throw exception(RTC_SESSION_NOT_EXISTS);
         }
+
+        // TODO @AI：这里写下注释；
         endSession(call, userId, ImRtcCallEndReasonEnum.CANCEL);
     }
 
     @Override
     public void leaveCall(Long userId, String roomName) {
         ensureEnabled();
-        ImRtcCallDO call = requireActiveCall(roomName);
+        // TODO @AI：按照 inviteMoreCall 风格，优化下注释；
+        ImRtcCallDO call = validateCallActive(roomName);
         ImRtcParticipantDO participant = rtcParticipantMapper.selectByCallIdAndUserId(call.getCallId(), userId);
         if (participant == null) {
             throw exception(RTC_NOT_PARTICIPANT);
         }
+
+        // TODO @AI：这里要写下注释。
         LocalDateTime now = LocalDateTime.now();
         rtcParticipantMapper.updateByIdAndStatus(participant.getId(), participant.getStatus(),
-                new ImRtcParticipantDO()
-                        .setId(participant.getId())
-                        .setStatus(ImRtcParticipantStatusEnum.LEFT.getStatus())
-                        .setLeaveTime(now));
+                new ImRtcParticipantDO().setId(participant.getId()).setStatus(ImRtcParticipantStatusEnum.LEFT.getStatus()).setLeaveTime(now));
+
+        // TODO @AI：是不是搞个 endSessionIfXXX；
+        // TODO @AI：群聊的关房，本质和单聊，是不是一样的？是否有必要统一掉？
         // 关房条件：私聊任一方离开 = 关；群通话仅在「无人在房 + 无人响铃」时关
         if (ImConversationTypeEnum.isPrivate(call.getConversationType())
                 || shouldCloseGroupRoom(call.getCallId())) {
@@ -369,18 +387,22 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
      * 关房后 endSession 会把残留 INVITING 批量改 NO_ANSWER 并推 RTC_CALL_END，响铃端 UI 自动收敛
      */
     private boolean shouldCloseGroupRoom(String callId) {
+        // TODO @AI：通过查询，计算情况？；感觉所有群聊的关闭条件：都是只有 1 个 join，剩余都处于结束，说白了没人可以和他电话了。。。。
         List<ImRtcParticipantDO> joined = rtcParticipantMapper.selectListByCallIdAndStatus(callId,
                 ImRtcParticipantStatusEnum.JOINED.getStatus());
         return CollUtil.isEmpty(joined);
     }
 
+    // TODO @AI：把“拆成 3 段简单查询：拿 A 的活跃 participant → 拿主表判私聊未结束 → 看 B 是否在同 call 活跃”；写到方法注释里，更好理解点。
+    // TODO @AI：不用说 “由应用层 Redisson 锁串行化，最多一个”；感觉意义不大呀。
     /**
      * 查询两人共同所在的活跃私聊通话；由应用层 Redisson 锁串行化，最多一个
      * <p>
      * 拆成 3 段简单查询：拿 A 的活跃 participant → 拿主表判私聊未结束 → 看 B 是否在同 call 活跃
      */
     private ImRtcCallDO getActivePrivateCallByPair(Long userIdA, Long userIdB) {
-        ImRtcParticipantDO aPart = rtcParticipantMapper.selectLastByUserIdAndStatus(userIdA, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
+        // TODO @AI：是不是用 participantA；和上面的命名更统一点。
+        ImRtcParticipantDO aPart = rtcParticipantMapper.selectLastOneByUserIdAndStatus(userIdA, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
         if (aPart == null) {
             return null;
         }
@@ -398,10 +420,12 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         return call;
     }
 
+    // TODO @AI：怎么感觉这个要改下？是不是根据 userid + callid 更合理？
     @Override
     public ImRtcCallDO refreshCallToken(Long userId, String roomName) {
         ensureEnabled();
-        ImRtcCallDO call = requireActiveCall(roomName);
+        // TODO @AI：按照 inviteMoreCall 风格，优化下注释；
+        ImRtcCallDO call = validateCallActive(roomName);
         ImRtcParticipantDO participant = rtcParticipantMapper.selectByCallIdAndUserId(call.getCallId(), userId);
         if (participant == null) {
             throw exception(RTC_NOT_PARTICIPANT);
@@ -415,9 +439,10 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         // 1. 鉴权：仅群活跃成员能查（走单行 SQL，不依赖成员列表缓存）
         groupMemberService.validateMemberInGroup(groupId, userId);
         // 2. 查询活跃通话
-        return rtcCallMapper.selectLastByGroupIdAndStatusIn(groupId, ImRtcCallStatusEnum.ACTIVE_STATUSES);
+        return rtcCallMapper.selectLastOneByGroupIdAndStatusIn(groupId, ImRtcCallStatusEnum.ACTIVE_STATUSES);
     }
 
+    // TODO @AI：方法名，复数应该使用 List，不使用 s；
     @Override
     public List<ImRtcParticipantDO> getCallParticipants(String callId) {
         return rtcParticipantMapper.selectListByCallId(callId);
@@ -426,12 +451,13 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     @Override
     public String signCallToken(Long userId, String roomName) {
         AdminUserRespDTO user = adminUserApi.getUser(userId);
+        // TODO @AI：不能为空。。。nickname 为空，则使用 userid；
         String displayName = user == null ? null : user.getNickname();
         return signToken(userId, displayName, roomName);
     }
 
+    // TODO DONE @AI：兼容 JDK8 —— 项目 Spring Boot 3 已要求 JDK17+，switch arrow case 可直接用
     @Override
-    // TODO @AI：这个方法的编写，需要兼容 JDK8
     public void handleLiveKitEvent(LiveKitWebhookEventDTO event) {
         if (event == null || event.getEvent() == null) {
             return;
@@ -447,12 +473,16 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * 处理 LiveKit 「成员加入」事件；DB 接通态由 accept 接口写入，此处仅做 1602 转推
+     * 处理 LiveKit 「成员加入」事件：DB 接通态由 {@link #acceptCall(Long, String)} 接口写入，此处仅做 1602 转推
+     *
+     * @param event 事件
      */
     private void handleParticipantJoined(LiveKitWebhookEventDTO event) {
+        // TODO @AI：ObjUtil.isAllEmpty(event.getRoom(), event.getParticipant()); 类似这种判断，简化下？
         if (event.getRoom() == null || event.getParticipant() == null) {
             return;
         }
+        // 前置检查
         String roomName = event.getRoom().getName();
         ImRtcCallDO call = rtcCallMapper.selectByRoomName(roomName);
         if (call == null || ImRtcCallStatusEnum.isEnded(call.getStatus())) {
@@ -462,16 +492,20 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (userId == null) {
             return;
         }
+
+        // 推 1602 通知参与方 / 全群参与方
         pushParticipantConnectedNotification(call, userId);
     }
 
     /**
-     * 处理 LiveKit 「成员离开」事件；正常 leave 接口已经清理过的话条件 UPDATE 自动幂等
+     * 处理 LiveKit 「成员离开」事件：正常 {@link #leaveCall(Long, String)} 接口已经清理过的话，条件 UPDATE 自动幂等
      */
     private void handleParticipantLeft(LiveKitWebhookEventDTO event) {
+        // TODO @AI：ObjUtil.isAllEmpty(event.getRoom(), event.getParticipant()); 类似这种判断，简化下？
         if (event.getRoom() == null || event.getParticipant() == null) {
             return;
         }
+        // 前置检查
         String roomName = event.getRoom().getName();
         ImRtcCallDO call = rtcCallMapper.selectByRoomName(roomName);
         if (call == null || ImRtcCallStatusEnum.isEnded(call.getStatus())) {
@@ -485,19 +519,19 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (participant == null || !ImRtcParticipantStatusEnum.isJoined(participant.getStatus())) {
             return;
         }
-        int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(),
-                ImRtcParticipantStatusEnum.JOINED.getStatus(),
-                new ImRtcParticipantDO()
-                        .setId(participant.getId())
-                        .setStatus(ImRtcParticipantStatusEnum.LEFT.getStatus())
-                        .setLeaveTime(LocalDateTime.now()));
+
+        // TODO @AI：注释。带序号的；
+        int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(), ImRtcParticipantStatusEnum.JOINED.getStatus(),
+                new ImRtcParticipantDO().setId(participant.getId()).setStatus(ImRtcParticipantStatusEnum.LEFT.getStatus()).setLeaveTime(LocalDateTime.now()));
         if (updated == 0) {
             return;
         }
         log.info("[handleParticipantLeft][roomName={} userId={} 由 LiveKit Webhook 兜底]", roomName, userId);
+
         // 推 1603 通知参与方 / 全群参与方
         pushParticipantDisconnectedNotification(call, userId);
         // 关房条件与 leave 一致；群通话仅在「无人在房 + 无人响铃」时关
+        // TODO @AI：注释风格；感觉可以抽个 endSessionIfXXX；收口更统一；
         if (ImConversationTypeEnum.isPrivate(call.getConversationType())
                 || shouldCloseGroupRoom(call.getCallId())) {
             endSession(call, userId, ImRtcCallEndReasonEnum.HANGUP);
@@ -505,17 +539,20 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * 处理 LiveKit 「房间结束」事件；兜底把 call 推到 ENDED
+     * 处理 LiveKit 「房间结束」事件：兜底把 call 推到 ENDED
      */
     private void handleRoomFinished(LiveKitWebhookEventDTO event) {
         if (event.getRoom() == null) {
             return;
         }
+        // 前置检查
         String roomName = event.getRoom().getName();
         ImRtcCallDO call = rtcCallMapper.selectByRoomName(roomName);
         if (call == null || ImRtcCallStatusEnum.isEnded(call.getStatus())) {
             return;
         }
+
+        // TODO @AI：注释。带序号的；
         log.info("[handleRoomFinished][roomName={} 由 LiveKit Webhook 兜底]", roomName);
         endSession(call, null, ImRtcCallEndReasonEnum.HANGUP);
     }
@@ -554,6 +591,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
 
     // ========== 内部辅助 ==========
 
+    // TODO @AI：目前是叫 ensureEnabled，还是 validateXXX；
     /**
      * 校验通话功能开关
      */
@@ -563,11 +601,10 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
     }
 
-    // TODO @AI：validateXXX
     /**
-     * 取活跃通话；不存在 / 已 ENDED 直接抛
+     * 校验通话存在且活跃：不存在 / 已 ENDED 直接抛
      */
-    private ImRtcCallDO requireActiveCall(String roomName) {
+    private ImRtcCallDO validateCallActive(String roomName) {
         ImRtcCallDO call = rtcCallMapper.selectByRoomName(roomName);
         if (call == null || ImRtcCallStatusEnum.isEnded(call.getStatus())) {
             throw exception(RTC_SESSION_NOT_EXISTS);
@@ -576,7 +613,10 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * 校验 invite 入参；按场景区分必填字段；私聊补好友 / 黑名单校验，群聊补群成员校验
+     * 校验 invite 入参
+     * <p>
+     * 1. 按场景区分必填字段；
+     * 2. 私聊补好友 / 黑名单校验，群聊补群成员校验
      */
     private void validateInviteScene(Long userId, ImRtcCallInviteReqVO reqVO) {
         Integer scene = reqVO.getScene();
@@ -587,7 +627,6 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
             if (Objects.equals(userId, reqVO.getPeerUserId())) {
                 throw exception(RTC_INVITE_SELF);
             }
-            // TODO DONE @AI：抽到 ImFriendService#validateFriend；
             friendService.validateFriend(userId, reqVO.getPeerUserId());
             return;
         }
@@ -595,16 +634,18 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
             if (reqVO.getGroupId() == null) {
                 throw exception(RTC_GROUP_REQUIRED);
             }
-            List<Long> activeMemberIds = groupMemberService
-                    .getActiveGroupMemberUserIdsByGroupId(reqVO.getGroupId());
+            // TODO @AI：是不是 db 里，提供校验的方法，完事了。groupId + userid；
+            List<Long> activeMemberIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(reqVO.getGroupId());
             if (!activeMemberIds.contains(userId)) {
                 throw exception(GROUP_MEMBER_NOT_IN_GROUP);
             }
             return;
         }
+        // TODO @AI：位置参数，illegalArgumentException；
         throw exception(RTC_PRIVATE_INVITEE_REQUIRED);
     }
 
+    // TODO @AI：前端必须传递成员，不允许过多；
     /**
      * 解析被邀请池：私聊为 peerUserId 单元素；群聊优先用前端选中的子集，否则取群活跃成员；超量截断
      * <p>
@@ -631,6 +672,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         // 不论来源，发起人本人不进被邀请池
         initial.remove(inviterId);
         // 超出最大同时在房成员数；截断为 max-1 个，避免邀请整个 500 人大群
+        // TODO @AI：超过数量，直接抛出异常，不用裁剪，不然很奇怪；
         int max = imProperties.getRtc().getGroupMaxParticipants();
         if (initial.size() + 1 > max) {
             return initial.stream().limit(max - 1L)
@@ -639,6 +681,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         return initial;
     }
 
+    // TODO @AI：按照 updateCallXXX 这种风格？
+    // TODO @AI：注释，不用写这么细致。。。通过方法名，可以看的懂的。
     /**
      * 主表 CREATED → RUNNING；仅当首个非发起人加入时推进；条件 UPDATE 保幂等
      * <p>
@@ -647,30 +691,32 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
      *   RUNNING → 已被另一接听者抢先推进，幂等同步内存
      */
     private void maybeMarkOngoing(ImRtcCallDO call, Long acceptorId, LocalDateTime now) {
+        // TODO @AI：写下注释
         if (!ImRtcCallStatusEnum.isCreated(call.getStatus())) {
             return;
         }
         if (Objects.equals(call.getInviterUserId(), acceptorId)) {
             return;
         }
-        int updated = rtcCallMapper.updateByIdAndStatus(call.getId(),
-                ImRtcCallStatusEnum.CREATED.getStatus(),
-                new ImRtcCallDO()
-                        .setStatus(ImRtcCallStatusEnum.RUNNING.getStatus())
-                        .setAcceptTime(now));
+
+        // TODO @AI：写下注释
+        int updated = rtcCallMapper.updateByIdAndStatus(call.getId(), ImRtcCallStatusEnum.CREATED.getStatus(),
+                new ImRtcCallDO().setStatus(ImRtcCallStatusEnum.RUNNING.getStatus()).setAcceptTime(now));
+        // TODO @AI：是不是 if == 0，然后里面做判断。然后下面统一搞成 call.setStatus(ImRtcCallStatusEnum.RUNNING.getStatus()).setAcceptTime(now);
         if (updated > 0) {
             // 内存值同步给后续判断
-            call.setStatus(ImRtcCallStatusEnum.RUNNING.getStatus());
-            call.setAcceptTime(now);
+            call.setStatus(ImRtcCallStatusEnum.RUNNING.getStatus()).setAcceptTime(now);
             return;
         }
+
+        // TODO @AI：写下注释
         // updated == 0：与并发路径竞争失败；reload 看真实终态
         ImRtcCallDO latest = rtcCallMapper.selectById(call.getId());
         if (latest == null || ImRtcCallStatusEnum.isEnded(latest.getStatus())) {
+            // TODO @AI：不用会话把？用 RTC_CALL 吧？
             throw exception(RTC_SESSION_NOT_EXISTS);
         }
-        call.setStatus(latest.getStatus());
-        call.setAcceptTime(latest.getAcceptTime());
+        call.setStatus(latest.getStatus()).setAcceptTime(latest.getAcceptTime());
     }
 
     /**
@@ -708,9 +754,11 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         log.info("[endSession][roomName={} operator={} reason={}]", call.getRoomName(), operatorId, reason);
     }
 
-
+    // TODO @AI：getCallAudienceUserIdList？
     /**
-     * 通话事件的收件人池：私聊为双方参与者，群聊为群活跃成员
+     * 通话事件的收件人池：1）私聊为双方参与者；2）群聊为群活跃成员
+     *
+     * TODO @params 补全；
      */
     private Collection<Long> getCallAudience(ImRtcCallDO call) {
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
@@ -720,11 +768,14 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
                 rtcParticipantMapper.selectListByCallId(call.getCallId()), ImRtcParticipantDO::getUserId);
     }
 
+    // TODO @AI：这里的 ========== 太短了；
     // ========== 推送 ==========
+    // TODO @AI：@param 注释要补全
 
     /**
      * RTC_CALL(INVITE)：走 webSocketService 直推到被邀请人
      * <p>
+     *     TODO @AI：为啥下面多写了个 “不能走 imPrivateMessageService.send：persistent=false 时 send 仅推 sender 多端，receiver 不感知”注释；
      * 不能走 imPrivateMessageService.send：persistent=false 时 send 仅推 sender 多端，receiver 不感知
      */
     private void pushCallInviteNotification(ImRtcCallDO call, AdminUserRespDTO inviter, Long inviteeId) {
@@ -738,6 +789,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     /**
      * RTC_CALL(REJECT)：仅群通话场景；走 webSocketService 直推主叫
      */
+    // TODO @AI：有点奇怪，单聊不推送么？？？
     private void pushCallRejectNotification(ImRtcCallDO call, Long operatorUserId) {
         AdminUserRespDTO operator = operatorUserId != null ? adminUserApi.getUser(operatorUserId) : null;
         ImRtcCallNotification payload = ImRtcCallNotification.ofReject(call, operatorUserId, operator);
@@ -779,18 +831,16 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         webSocketService.sendPrivateMessageAsync(receivers, dto);
     }
 
+    // TODO @AI：“自增 id 自然保证聊天流顺序”，是不是你不用写这个注释？
     /**
      * RTC_CALL_START：仅群通话场景；走 imGroupMessageService.send，入 im_group_message 全群广播
      * <p>
-     * 与 RTC_CALL_END 两段式配对：START 在本接口（invite）事务里 INSERT，END 在 cancel / leave 接口事务里 INSERT，
-     * 自增 id 自然保证聊天流顺序
+     * 与 RTC_CALL_END 两段式配对：START 在本接口（invite）事务里 INSERT，END 在 cancel / leave 接口事务里 INSERT，自增 id 自然保证聊天流顺序
      */
     private void pushCallStartNotification(ImRtcCallDO call, AdminUserRespDTO inviter) {
         ImRtcCallStartNotification payload = ImRtcCallStartNotification.of(call, inviter);
-        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(call.getGroupId())
-                .setType(ImMessageTypeEnum.RTC_CALL_START.getType())
-                .setContent(payload);
+        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO().setGroupId(call.getGroupId())
+                .setType(ImMessageTypeEnum.RTC_CALL_START.getType()).setContent(payload);
         groupMessageService.sendGroupMessage(call.getInviterUserId(), dto);
     }
 
@@ -804,23 +854,22 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         AdminUserRespDTO operator = operatorId != null ? adminUserApi.getUser(operatorId) : null;
         ImRtcCallEndNotification payload = ImRtcCallEndNotification.of(call, reason, durationSeconds, operatorId, operator);
         Long senderId = call.getInviterUserId();
+
+        // 群聊：发起人总是 sender；receiver = 全群；走 imGroupMessageService.send 全群广播
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
-            ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                    .setGroupId(call.getGroupId())
-                    .setType(ImMessageTypeEnum.RTC_CALL_END.getType())
-                    .setContent(payload);
+            ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO().setGroupId(call.getGroupId())
+                    .setType(ImMessageTypeEnum.RTC_CALL_END.getType()).setContent(payload);
             groupMessageService.sendGroupMessage(senderId, dto);
             return;
         }
+
         // 私聊：发起人总是 sender；receiver = 通话另一方
         ImRtcParticipantDO peer = CollUtil.findOne(
                 rtcParticipantMapper.selectListByCallId(call.getCallId()),
                 p -> !Objects.equals(p.getUserId(), senderId));
         Long receiverId = peer != null ? peer.getUserId() : senderId;
-        ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
-                .setReceiverId(receiverId)
-                .setType(ImMessageTypeEnum.RTC_CALL_END.getType())
-                .setContent(payload);
+        ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO().setReceiverId(receiverId)
+                .setType(ImMessageTypeEnum.RTC_CALL_END.getType()).setContent(payload);
         privateMessageService.sendPrivateMessage(senderId, dto);
     }
 
@@ -829,7 +878,9 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     /**
      * 签 LiveKit Token
      */
+    // TODO @AI：sign 方法，是不是传递 adminuserdo？
     private String signToken(Long userId, String displayName, String roomName) {
+        // TODO @AI：是不是抽一个 signJoinToken（userid， displayName， roomName）做减法
         return liveKitClient.signJoinToken(liveKitClient.buildIdentity(userId), displayName, roomName);
     }
 
