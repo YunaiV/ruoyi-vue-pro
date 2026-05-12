@@ -45,22 +45,33 @@ public interface ImRtcCallService {
     /**
      * 接听通话：参与者 INVITING → JOINED；主表 CREATED → RUNNING（首次有非发起人接通时）
      *
+     * @param userId 接听者用户编号
+     * @param room   业务通话编号
      * @return 通话主表
      */
     ImRtcCallDO acceptCall(Long userId, String room);
 
     /**
      * 拒绝通话；仅 INVITING 状态可拒；群通话拒绝等同于不参与，房间仍存在
+     *
+     * @param userId 拒接者用户编号
+     * @param room   业务通话编号
      */
     void rejectCall(Long userId, String room);
 
     /**
      * 取消邀请；主叫在 INVITING 状态主动取消
+     *
+     * @param userId 取消者用户编号（必须是主叫）
+     * @param room   业务通话编号
      */
     void cancelCall(Long userId, String room);
 
     /**
      * 离开通话；RUNNING 状态下离开；私聊任一方离开 = 通话结束；群通话最后一人离开才结束
+     *
+     * @param userId 离开者用户编号
+     * @param room   业务通话编号
      */
     void leaveCall(Long userId, String room);
 
@@ -69,6 +80,8 @@ public interface ImRtcCallService {
      * <p>
      * 仅做校验；签发新 Token 由 Controller 调 {@link #signCallToken} 完成
      *
+     * @param userId 操作人编号
+     * @param room   业务通话编号
      * @return 通话主表
      */
     ImRtcCallDO validateCallParticipant(Long userId, String room);
@@ -106,6 +119,8 @@ public interface ImRtcCallService {
      * <p>
      * 关键事件：participant_left（成员离开） / room_finished（房间结束）。前端正常 leave 时
      * 也会触发同样的 LiveKit 事件；此处需做幂等处理，session 已被业务接口移除时直接忽略。
+     *
+     * @param event LiveKit Webhook 事件
      */
     void handleLiveKitEvent(cn.iocoder.yudao.module.im.framework.rtc.core.LiveKitWebhookEventDTO event);
 

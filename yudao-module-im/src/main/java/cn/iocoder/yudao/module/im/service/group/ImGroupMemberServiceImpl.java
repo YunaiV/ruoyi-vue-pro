@@ -25,6 +25,7 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP_MEMBER_IDS;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.GROUP_MEMBER_NOT_IN_GROUP;
 
@@ -215,6 +216,23 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
         return member;
+    }
+
+    @Override
+    public void validateMembersInGroup(Long groupId, Collection<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return;
+        }
+        // 一次性拉取目标 userId 的成员记录，仅保留活跃状态
+        List<ImGroupMemberDO> members = groupMemberMapper.selectListByGroupIdAndUserIds(groupId, userIds);
+        Set<Long> activeUserIds = convertSet(members, ImGroupMemberDO::getUserId,
+                member -> CommonStatusEnum.ENABLE.getStatus().equals(member.getStatus()));
+        // 任一 userId 不在活跃集合即抛
+        for (Long userId : userIds) {
+            if (!activeUserIds.contains(userId)) {
+                throw exception(GROUP_MEMBER_NOT_IN_GROUP);
+            }
+        }
     }
 
     @Override

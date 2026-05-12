@@ -165,6 +165,11 @@ public class ImProperties {
          */
         private int groupMaxParticipants = 16;
 
+        /**
+         * 僵尸通话清理阈值（分钟）；通话创建超过此值仍未结束才纳入扫描，避开「刚发起还在响铃」的合理零人态
+         */
+        private int cleanupZombieThresholdMinutes = 5;
+
     }
 
 }

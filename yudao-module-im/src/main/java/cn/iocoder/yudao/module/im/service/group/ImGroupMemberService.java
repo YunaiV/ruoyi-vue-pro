@@ -161,6 +161,14 @@ public interface ImGroupMemberService {
     ImGroupMemberDO validateMemberInGroup(Long groupId, Long userId);
 
     /**
+     * 批量校验用户都是该群的有效成员；任一缺失 / 禁用即抛 {@code GROUP_MEMBER_NOT_IN_GROUP}
+     *
+     * @param groupId 群编号
+     * @param userIds 用户编号集合；为空直接返回
+     */
+    void validateMembersInGroup(Long groupId, Collection<Long> userIds);
+
+    /**
      * 更新群成员信息（群内昵称、群名备注、免打扰等）
      * <p>
      * 内部会校验用户是否为群的有效成员

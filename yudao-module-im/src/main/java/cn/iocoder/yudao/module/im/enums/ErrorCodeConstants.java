@@ -92,5 +92,6 @@ public interface ErrorCodeConstants {
     ErrorCode RTC_INVITE_BUSY = new ErrorCode(1_040_900_008, "通话发起繁忙，请稍后再试");
     ErrorCode RTC_GROUP_CALL_ACTIVE = new ErrorCode(1_040_900_009, "该群已有进行中通话，请通过胶囊条加入");
     ErrorCode RTC_GROUP_INVITEE_OVER_LIMIT = new ErrorCode(1_040_900_010, "群通话邀请人数超过最大值");
+    ErrorCode RTC_GROUP_INVITEE_REQUIRED = new ErrorCode(1_040_900_011, "群通话必须选择被邀请人");
 
 }
