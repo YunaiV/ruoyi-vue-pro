@@ -57,7 +57,7 @@ public class ImRtcLiveKitController {
         }
 
         // 2. 交给 service 处理；幂等由 service 自己保证
-        log.info("[webhook][事件处理 event={} roomName={}]", event.getEvent(),
+        log.info("[webhook][事件处理 event={} room={}]", event.getEvent(),
                 event.getRoom() == null ? null : event.getRoom().getName());
         try {
             rtcCallService.handleLiveKitEvent(event);

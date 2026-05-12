@@ -62,18 +62,18 @@ public class LiveKitClient {
      *
      * @param identity    用户唯一标识；写入 sub claim；同 identity 重连会踢前一个连接
      * @param displayName 客户端展示名；可空
-     * @param roomName    房间名
+     * @param room    房间名
      * @return JWT 字符串
      */
-    public String signJoinToken(String identity, String displayName, String roomName) {
+    public String signJoinToken(String identity, String displayName, String room) {
         Assert.notBlank(identity, "identity 不可为空");
-        Assert.notBlank(roomName, "roomName 不可为空");
+        Assert.notBlank(room, "room 不可为空");
         ImProperties.Rtc cfg = imProperties.getRtc();
 
         // video claim：限定客户端能在该房间内做什么
         Map<String, Object> video = new HashMap<>();
         video.put("roomJoin", true);              // 允许加入房间
-        video.put("room", roomName);              // 限定只能加入这个房间
+        video.put("room", room);              // 限定只能加入这个房间
         video.put("canPublish", true);            // 允许发布媒体（推流）
         video.put("canSubscribe", true);          // 允许订阅媒体（拉流）
         video.put("canPublishData", true);        // 允许发送 data channel 消息
@@ -96,11 +96,11 @@ public class LiveKitClient {
     /**
      * 调用 LiveKit Server API 删除房间：用于通话结束时，强制断开异常残留客户端
      *
-     * @param roomName 房间名
+     * @param room 房间名
      */
     @SuppressWarnings("EmptyTryBlock")
-    public void deleteRoom(String roomName) {
-        try (HttpResponse ignored = postTwirp(TWIRP_DELETE_ROOM, roomName)) {
+    public void deleteRoom(String room) {
+        try (HttpResponse ignored = postTwirp(TWIRP_DELETE_ROOM, room)) {
             // 状态码不区分；调用方失败即兜底
         }
     }
@@ -110,17 +110,17 @@ public class LiveKitClient {
      * <p>
      * 房间不存在 LiveKit 返回 404，视同 0 人
      *
-     * @param roomName 房间名
+     * @param room 房间名
      * @return 参与者数量；HTTP 失败返回 -1
      */
-    public int listParticipants(String roomName) {
-        try (HttpResponse response = postTwirp(TWIRP_LIST_PARTICIPANTS, roomName)) {
+    public int listParticipants(String room) {
+        try (HttpResponse response = postTwirp(TWIRP_LIST_PARTICIPANTS, room)) {
             if (response.getStatus() == 404) {
                 return 0;
             }
             if (!response.isOk()) {
-                log.warn("[listParticipants][LiveKit 返回非 2xx status={} roomName={} body={}]",
-                        response.getStatus(), roomName, response.body());
+                log.warn("[listParticipants][LiveKit 返回非 2xx status={} room={} body={}]",
+                        response.getStatus(), room, response.body());
                 return -1;
             }
             JSONArray participants = JSONUtil.parseObj(response.body()).getJSONArray("participants");
@@ -223,16 +223,16 @@ public class LiveKitClient {
      * Twirp 协议 POST 调用；统一处理 ws→http 协议切换、签 admin token、Bearer 头、JSON body、超时
      *
      * @param path     Twirp 端点路径，例如 {@code /twirp/livekit.RoomService/DeleteRoom}
-     * @param roomName 房间名；写入 JSON body 的 room 字段
+     * @param room 房间名；写入 JSON body 的 room 字段
      * @return HTTP 响应；调用方负责 close 与状态码判断
      */
-    private HttpResponse postTwirp(String path, String roomName) {
-        Assert.notBlank(roomName, "roomName 不可为空");
+    private HttpResponse postTwirp(String path, String room) {
+        Assert.notBlank(room, "room 不可为空");
         String token = signAdminToken();
         return HttpRequest.post(HttpUtils.wsUrlToHttp(imProperties.getRtc().getLivekitUrl()) + path)
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
-                .body(JSONUtil.toJsonStr(Map.of("room", roomName)))
+                .body(JSONUtil.toJsonStr(Map.of("room", room)))
                 .timeout(SERVER_API_TIMEOUT_MS)
                 .execute();
     }

@@ -23,7 +23,7 @@ public class ImRtcCallStartNotification {
     /**
      * 业务通话编号
      */
-    private String callId;
+    private String room;
     /**
      * 会话类型：当前固定 GROUP（私聊无 START）
      */
@@ -47,7 +47,7 @@ public class ImRtcCallStartNotification {
 
     public static ImRtcCallStartNotification of(ImRtcCallDO call, AdminUserRespDTO inviter) {
         ImRtcCallStartNotification notification = new ImRtcCallStartNotification();
-        notification.callId = call.getCallId();
+        notification.room = call.getRoom();
         notification.conversationType = call.getConversationType();
         notification.mediaType = call.getMediaType();
         notification.inviterUserId = call.getInviterUserId();

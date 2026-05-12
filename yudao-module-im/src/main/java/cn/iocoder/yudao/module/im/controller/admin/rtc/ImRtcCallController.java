@@ -26,7 +26,6 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-// TODO @AI：需要讨论，到底使用 roomName 还是 callId 更好？前端传参；然后，DO 那种，是不是只存储 callId，roomName 二选 1，是不是就行了。或者统一成 room？uuid 完事；callid 还给 call.id 更好理解；
 @Tag(name = "管理后台 - IM 实时通话")
 @RestController
 @RequestMapping("/im/rtc")
@@ -47,9 +46,9 @@ public class ImRtcCallController {
 
     @PostMapping("/join")
     @Operation(summary = "加入已有群通话；用于胶囊条「加入」按钮")
-    @Parameter(name = "roomName", description = "LiveKit 房间名", required = true, example = "im_rtc_call_xxxx")
-    public CommonResult<ImRtcCallRespVO> joinCall(@RequestParam("roomName") String roomName) {
-        ImRtcCallDO call = rtcCallService.joinCall(getLoginUserId(), roomName);
+    @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
+    public CommonResult<ImRtcCallRespVO> joinCall(@RequestParam("room") String room) {
+        ImRtcCallDO call = rtcCallService.joinCall(getLoginUserId(), room);
         return success(buildCallResp(call, getLoginUserId()));
     }
 
@@ -62,41 +61,41 @@ public class ImRtcCallController {
 
     @PostMapping("/accept")
     @Operation(summary = "接听通话")
-    @Parameter(name = "roomName", description = "LiveKit 房间名", required = true, example = "call_friend_1_2")
-    public CommonResult<ImRtcCallRespVO> accept(@RequestParam("roomName") String roomName) {
-        ImRtcCallDO call = rtcCallService.acceptCall(getLoginUserId(), roomName);
+    @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
+    public CommonResult<ImRtcCallRespVO> accept(@RequestParam("room") String room) {
+        ImRtcCallDO call = rtcCallService.acceptCall(getLoginUserId(), room);
         return success(buildCallResp(call, getLoginUserId()));
     }
 
     @PostMapping("/reject")
     @Operation(summary = "拒绝通话")
-    @Parameter(name = "roomName", description = "LiveKit 房间名", required = true, example = "call_friend_1_2")
-    public CommonResult<Boolean> reject(@RequestParam("roomName") String roomName) {
-        rtcCallService.rejectCall(getLoginUserId(), roomName);
+    @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
+    public CommonResult<Boolean> reject(@RequestParam("room") String room) {
+        rtcCallService.rejectCall(getLoginUserId(), room);
         return success(true);
     }
 
     @PostMapping("/cancel")
     @Operation(summary = "取消邀请；主叫接通前调用")
-    @Parameter(name = "roomName", description = "LiveKit 房间名", required = true, example = "call_friend_1_2")
-    public CommonResult<Boolean> cancel(@RequestParam("roomName") String roomName) {
-        rtcCallService.cancelCall(getLoginUserId(), roomName);
+    @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
+    public CommonResult<Boolean> cancel(@RequestParam("room") String room) {
+        rtcCallService.cancelCall(getLoginUserId(), room);
         return success(true);
     }
 
     @PostMapping("/leave")
     @Operation(summary = "离开通话；接通后调用")
-    @Parameter(name = "roomName", description = "LiveKit 房间名", required = true, example = "call_friend_1_2")
-    public CommonResult<Boolean> leave(@RequestParam("roomName") String roomName) {
-        rtcCallService.leaveCall(getLoginUserId(), roomName);
+    @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
+    public CommonResult<Boolean> leave(@RequestParam("room") String room) {
+        rtcCallService.leaveCall(getLoginUserId(), room);
         return success(true);
     }
 
     @GetMapping("/refresh-token")
     @Operation(summary = "重新签发 Token；客户端重连或 Token 过期续期")
-    @Parameter(name = "roomName", description = "LiveKit 房间名", required = true, example = "call_friend_1_2")
-    public CommonResult<ImRtcCallRespVO> refreshToken(@RequestParam("roomName") String roomName) {
-        ImRtcCallDO call = rtcCallService.refreshCallToken(getLoginUserId(), roomName);
+    @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
+    public CommonResult<ImRtcCallRespVO> refreshToken(@RequestParam("room") String room) {
+        ImRtcCallDO call = rtcCallService.refreshCallToken(getLoginUserId(), room);
         return success(buildCallResp(call, getLoginUserId()));
     }
 
@@ -114,11 +113,11 @@ public class ImRtcCallController {
         if (call == null) {
             return null;
         }
-        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipants(call.getCallId());
+        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipants(call.getRoom());
         return new ImRtcCallRespVO()
-                .setCallId(call.getCallId()).setRoomName(call.getRoomName())
+                .setRoom(call.getRoom())
                 .setLivekitUrl(imProperties.getRtc().getLivekitUrl())
-                .setToken(rtcCallService.signCallToken(userId, call.getRoomName()))
+                .setToken(rtcCallService.signCallToken(userId, call.getRoom()))
                 .setScene(call.getConversationType()).setMediaType(call.getMediaType())
                 .setStatus(call.getStatus()).setInviterId(call.getInviterUserId())
                 .setGroupId(call.getGroupId())
@@ -130,9 +129,9 @@ public class ImRtcCallController {
         if (call == null) {
             return null;
         }
-        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipants(call.getCallId());
+        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipants(call.getRoom());
         return new ImRtcGroupCallRespVO()
-                .setCallId(call.getCallId()).setRoomName(call.getRoomName())
+                .setRoom(call.getRoom())
                 .setGroupId(call.getGroupId()).setMediaType(call.getMediaType())
                 .setInviterId(call.getInviterUserId())
                 .setJoinedUserIds(filterUserIds(participants, ImRtcParticipantStatusEnum.JOINED))

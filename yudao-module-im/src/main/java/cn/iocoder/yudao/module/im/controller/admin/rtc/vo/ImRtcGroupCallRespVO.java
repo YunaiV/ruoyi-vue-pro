@@ -10,10 +10,7 @@ import java.util.Set;
 public class ImRtcGroupCallRespVO {
 
     @Schema(description = "业务通话编号")
-    private String callId;
-
-    @Schema(description = "LiveKit 房间名")
-    private String roomName;
+    private String room;
 
     @Schema(description = "群编号")
     private Long groupId;

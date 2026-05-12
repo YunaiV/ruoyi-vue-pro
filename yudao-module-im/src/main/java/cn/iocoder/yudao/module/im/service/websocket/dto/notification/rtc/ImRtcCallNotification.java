@@ -27,11 +27,7 @@ public class ImRtcCallNotification {
     /**
      * 业务通话编号
      */
-    private String callId;
-    /**
-     * LiveKit 房间名
-     */
-    private String roomName;
+    private String room;
     /**
      * 会话类型
      */
@@ -176,8 +172,7 @@ public class ImRtcCallNotification {
     private static ImRtcCallNotification baseOf(ImRtcCallDO call, Integer status) {
         ImRtcCallNotification notification = new ImRtcCallNotification();
         notification.status = status;
-        notification.callId = call.getCallId();
-        notification.roomName = call.getRoomName();
+        notification.room = call.getRoom();
         notification.conversationType = call.getConversationType();
         notification.mediaType = call.getMediaType();
         notification.groupId = call.getGroupId();

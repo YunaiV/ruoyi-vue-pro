@@ -10,10 +10,7 @@ import java.util.Set;
 public class ImRtcCallRespVO {
 
     @Schema(description = "业务通话编号")
-    private String callId;
-
-    @Schema(description = "LiveKit 房间名")
-    private String roomName;
+    private String room;
 
     @Schema(description = "LiveKit Server WebSocket 地址；前端 connect 用")
     private String livekitUrl;

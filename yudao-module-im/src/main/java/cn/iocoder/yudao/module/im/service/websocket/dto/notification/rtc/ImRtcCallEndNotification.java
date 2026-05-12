@@ -25,7 +25,7 @@ public class ImRtcCallEndNotification {
     /**
      * 业务通话编号
      */
-    private String callId;
+    private String room;
     /**
      * 会话类型
      */
@@ -60,7 +60,7 @@ public class ImRtcCallEndNotification {
     public static ImRtcCallEndNotification of(ImRtcCallDO call, ImRtcCallEndReasonEnum reason, Long durationSeconds,
                                               Long operatorId, AdminUserRespDTO operator) {
         ImRtcCallEndNotification notification = new ImRtcCallEndNotification();
-        notification.callId = call.getCallId();
+        notification.room = call.getRoom();
         notification.conversationType = call.getConversationType();
         notification.mediaType = call.getMediaType();
         notification.endReason = reason.getReason();

@@ -18,11 +18,7 @@ public class ImRtcParticipantDisconnectedNotification {
     /**
      * 业务通话编号
      */
-    private String callId;
-    /**
-     * LiveKit 房间名
-     */
-    private String roomName;
+    private String room;
     /**
      * 离开的参与者用户编号
      */
@@ -45,8 +41,7 @@ public class ImRtcParticipantDisconnectedNotification {
      */
     public static ImRtcParticipantDisconnectedNotification of(ImRtcCallDO call, Long userId) {
         ImRtcParticipantDisconnectedNotification notification = new ImRtcParticipantDisconnectedNotification();
-        notification.callId = call.getCallId();
-        notification.roomName = call.getRoomName();
+        notification.room = call.getRoom();
         notification.userId = userId;
         notification.conversationType = call.getConversationType();
         notification.groupId = call.getGroupId();

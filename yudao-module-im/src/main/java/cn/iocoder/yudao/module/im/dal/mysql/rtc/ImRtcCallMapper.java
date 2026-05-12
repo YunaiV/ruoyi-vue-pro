@@ -18,12 +18,8 @@ import java.util.List;
 @Mapper
 public interface ImRtcCallMapper extends BaseMapperX<ImRtcCallDO> {
 
-    default ImRtcCallDO selectByCallId(String callId) {
-        return selectOne(ImRtcCallDO::getCallId, callId);
-    }
-
-    default ImRtcCallDO selectByRoomName(String roomName) {
-        return selectOne(ImRtcCallDO::getRoomName, roomName);
+    default ImRtcCallDO selectByRoom(String room) {
+        return selectOne(ImRtcCallDO::getRoom, room);
     }
 
     default ImRtcCallDO selectLastOneByGroupIdAndStatusIn(Long groupId, Collection<Integer> statuses) {

@@ -11,11 +11,10 @@ import java.util.Set;
 @Data
 public class ImRtcCallInviteMoreReqVO {
 
-    @Schema(description = "LiveKit 房间名", requiredMode = Schema.RequiredMode.REQUIRED, example = "call_group_2048")
-    @NotBlank(message = "房间名不能为空")
-    private String roomName;
+    @Schema(description = "业务通话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "f47ac10b58cc4372a567")
+    @NotBlank(message = "通话编号不能为空")
+    private String room;
 
-    // TODO @AI：targetIds？
     @Schema(description = "新邀请的用户编号集合", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "请至少选择一位成员")
     private Set<Long> inviteeIds;

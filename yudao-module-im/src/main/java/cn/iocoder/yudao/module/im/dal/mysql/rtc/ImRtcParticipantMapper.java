@@ -17,19 +17,19 @@ import java.util.List;
 @Mapper
 public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> {
 
-    default ImRtcParticipantDO selectByCallIdAndUserId(String callId, Long userId) {
+    default ImRtcParticipantDO selectByRoomAndUserId(String room, Long userId) {
         return selectOne(new LambdaQueryWrapperX<ImRtcParticipantDO>()
-                .eq(ImRtcParticipantDO::getCallId, callId)
+                .eq(ImRtcParticipantDO::getRoom, room)
                 .eq(ImRtcParticipantDO::getUserId, userId));
     }
 
-    default List<ImRtcParticipantDO> selectListByCallId(String callId) {
-        return selectList(ImRtcParticipantDO::getCallId, callId);
+    default List<ImRtcParticipantDO> selectListByRoom(String room) {
+        return selectList(ImRtcParticipantDO::getRoom, room);
     }
 
-    default List<ImRtcParticipantDO> selectListByCallIdAndStatus(String callId, Integer status) {
+    default List<ImRtcParticipantDO> selectListByRoomAndStatus(String room, Integer status) {
         return selectList(new LambdaQueryWrapperX<ImRtcParticipantDO>()
-                .eq(ImRtcParticipantDO::getCallId, callId)
+                .eq(ImRtcParticipantDO::getRoom, room)
                 .eq(ImRtcParticipantDO::getStatus, status));
     }
 
@@ -47,9 +47,9 @@ public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> 
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    default int updateByCallIdAndStatus(String callId, Integer oldStatus, ImRtcParticipantDO updateObj) {
+    default int updateByRoomAndStatus(String room, Integer oldStatus, ImRtcParticipantDO updateObj) {
         return update(updateObj, Wrappers.<ImRtcParticipantDO>lambdaUpdate()
-                .eq(ImRtcParticipantDO::getCallId, callId)
+                .eq(ImRtcParticipantDO::getRoom, room)
                 .eq(ImRtcParticipantDO::getStatus, oldStatus));
     }
 

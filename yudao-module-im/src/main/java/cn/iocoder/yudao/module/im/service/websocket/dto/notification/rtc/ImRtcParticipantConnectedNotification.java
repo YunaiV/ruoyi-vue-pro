@@ -18,11 +18,7 @@ public class ImRtcParticipantConnectedNotification {
     /**
      * 业务通话编号
      */
-    private String callId;
-    /**
-     * LiveKit 房间名
-     */
-    private String roomName;
+    private String room;
     /**
      * 加入的参与者用户编号
      */
@@ -53,8 +49,7 @@ public class ImRtcParticipantConnectedNotification {
      */
     public static ImRtcParticipantConnectedNotification of(ImRtcCallDO call, Long userId) {
         ImRtcParticipantConnectedNotification notification = new ImRtcParticipantConnectedNotification();
-        notification.callId = call.getCallId();
-        notification.roomName = call.getRoomName();
+        notification.room = call.getRoom();
         notification.userId = userId;
         notification.conversationType = call.getConversationType();
         notification.groupId = call.getGroupId();

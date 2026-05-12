@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 /**
  * IM 通话记录 DO（房间级 / 主表）
  * <p>
- * 一通通话一行；状态机 CREATED → RUNNING → ENDED；和明细表 {@link ImRtcParticipantDO} 通过 callId 关联
+ * 一通通话一行；状态机 CREATED → RUNNING → ENDED；和明细表 {@link ImRtcParticipantDO} 通过 {@link #room} 关联
  *
  * @author 芋道源码
  */
@@ -31,25 +31,14 @@ import java.time.LocalDateTime;
 public class ImRtcCallDO extends BaseDO {
 
     /**
-     * LiveKit 房间名前缀；roomName 格式固定为 {@code ROOM_NAME_PREFIX + callId}
-     */
-    public static final String ROOM_NAME_PREFIX = "im_rtc_call_";
-
-    /**
      * 编号
      */
     @TableId
     private Long id;
     /**
-     * 业务通话编号；唯一；UUID 生成
+     * 业务通话编号（UUID，同时作为 LiveKit 房间名）；唯一
      */
-    private String callId;
-    /**
-     * LiveKit 房间名
-     *
-     * 格式 {@code im_rtc_call_{callId}}
-     */
-    private String roomName;
+    private String room;
     /**
      * 会话类型
      *

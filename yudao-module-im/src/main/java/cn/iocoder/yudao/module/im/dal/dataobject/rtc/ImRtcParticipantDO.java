@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * IM 通话参与者 DO（用户级 / 明细表）
  * <p>
- * 一通通话每个参与者一行；通过 callId 关联主表 {@link ImRtcCallDO}
+ * 一通通话每个参与者一行；通过 {@link #room} 关联主表 {@link ImRtcCallDO}
  * <p>
  * 终态闭合：通话 ENDED 时所有明细 status 必属 {LEFT / REJECTED / NO_ANSWER} 之一
  *
@@ -37,9 +37,9 @@ public class ImRtcParticipantDO extends BaseDO {
     /**
      * 业务通话编号
      * <p>
-     * 关联 {@link ImRtcCallDO#getCallId()}
+     * 关联 {@link ImRtcCallDO#getRoom()}
      */
-    private String callId;
+    private String room;
     /**
      * 参与者用户编号
      * <p>
