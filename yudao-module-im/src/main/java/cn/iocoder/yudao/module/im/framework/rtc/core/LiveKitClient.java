@@ -54,6 +54,9 @@ public class LiveKitClient {
 
     private final ImProperties imProperties;
 
+    /**
+     * @param imProperties IM 全局配置；从中读 livekitUrl / apiKey / apiSecret / tokenTtlHours
+     */
     public LiveKitClient(ImProperties imProperties) {
         this.imProperties = imProperties;
     }

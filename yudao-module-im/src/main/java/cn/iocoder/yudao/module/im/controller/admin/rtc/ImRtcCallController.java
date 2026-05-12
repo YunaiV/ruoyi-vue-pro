@@ -109,6 +109,13 @@ public class ImRtcCallController {
 
     // ========== VO 拼装 ==========
 
+    /**
+     * 拼装 invite / join / accept / refresh-token 的响应 VO；含 token + 参与者分桶
+     *
+     * @param call   通话主表
+     * @param userId 当前用户编号；token 按该用户签发
+     * @return 响应 VO；call 为空返回 null
+     */
     private ImRtcCallRespVO buildCallResp(ImRtcCallDO call, Long userId) {
         if (call == null) {
             return null;
@@ -125,6 +132,12 @@ public class ImRtcCallController {
                 .setJoinedUserIds(filterUserIds(participants, ImRtcParticipantStatusEnum.JOINED));
     }
 
+    /**
+     * 拼装 get-active-call 的响应 VO；只用于群聊胶囊条，不含 token
+     *
+     * @param call 通话主表
+     * @return 响应 VO；call 为空返回 null
+     */
     private ImRtcGroupCallRespVO buildGroupActiveResp(ImRtcCallDO call) {
         if (call == null) {
             return null;
@@ -140,6 +153,10 @@ public class ImRtcCallController {
 
     /**
      * 按状态过滤参与者 userId；用 LinkedHashSet 保留前端展示顺序
+     *
+     * @param participants 参与者列表
+     * @param status       目标状态
+     * @return userId 集合
      */
     private static Set<Long> filterUserIds(List<ImRtcParticipantDO> participants,
                                            ImRtcParticipantStatusEnum status) {

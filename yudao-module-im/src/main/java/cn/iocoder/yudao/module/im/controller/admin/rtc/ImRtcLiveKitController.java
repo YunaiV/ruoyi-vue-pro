@@ -39,6 +39,13 @@ public class ImRtcLiveKitController {
     @Resource
     private ImRtcCallService rtcCallService;
 
+    /**
+     * LiveKit Webhook 回调入口
+     *
+     * @param request HTTP 请求；用于取 Authorization 头做签名校验
+     * @param rawBody 原始 JSON body；签名校验需要原始字节
+     * @return 是否处理成功；伪造 / 非法事件返回 false
+     */
     @PostMapping(value = "/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "LiveKit Webhook 回调；接收成员离开 / 房间结束等事件做业务态兜底清理")
     @PermitAll
