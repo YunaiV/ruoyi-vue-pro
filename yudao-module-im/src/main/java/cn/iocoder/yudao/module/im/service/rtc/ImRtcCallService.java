@@ -65,12 +65,13 @@ public interface ImRtcCallService {
     void leaveCall(Long userId, String room);
 
     /**
-     * 校验用户仍是该通话的参与者，用于客户端重连或 Token 过期续期前的合法性检查；
-     * 签发新 Token 由 Controller 调 {@link #signCallToken} 完成
+     * 校验通话活跃且本人是参与者；用于客户端重连或 Token 过期续期前的合法性检查
+     * <p>
+     * 仅做校验；签发新 Token 由 Controller 调 {@link #signCallToken} 完成
      *
      * @return 通话主表
      */
-    ImRtcCallDO refreshCallToken(Long userId, String room);
+    ImRtcCallDO validateCallParticipant(Long userId, String room);
 
     /**
      * 查询当前正在进行的通话；目前仅群聊场景（胶囊条），私聊未来扩展再补 peerUserId 参数
@@ -89,7 +90,7 @@ public interface ImRtcCallService {
      * @param room 业务通话编号
      * @return 参与者明细列表
      */
-    List<ImRtcParticipantDO> getCallParticipants(String room);
+    List<ImRtcParticipantDO> getCallParticipantList(String room);
 
     /**
      * 签发指定用户进入该通话的 LiveKit Token；供 Controller 拼接到响应 VO

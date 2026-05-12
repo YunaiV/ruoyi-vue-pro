@@ -95,7 +95,7 @@ public class ImRtcCallController {
     @Operation(summary = "重新签发 Token；客户端重连或 Token 过期续期")
     @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
     public CommonResult<ImRtcCallRespVO> refreshToken(@RequestParam("room") String room) {
-        ImRtcCallDO call = rtcCallService.refreshCallToken(getLoginUserId(), room);
+        ImRtcCallDO call = rtcCallService.validateCallParticipant(getLoginUserId(), room);
         return success(buildCallResp(call, getLoginUserId()));
     }
 
@@ -113,7 +113,7 @@ public class ImRtcCallController {
         if (call == null) {
             return null;
         }
-        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipants(call.getRoom());
+        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipantList(call.getRoom());
         return new ImRtcCallRespVO()
                 .setRoom(call.getRoom())
                 .setLivekitUrl(imProperties.getRtc().getLivekitUrl())
@@ -129,7 +129,7 @@ public class ImRtcCallController {
         if (call == null) {
             return null;
         }
-        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipants(call.getRoom());
+        List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipantList(call.getRoom());
         return new ImRtcGroupCallRespVO()
                 .setRoom(call.getRoom())
                 .setGroupId(call.getGroupId()).setMediaType(call.getMediaType())
