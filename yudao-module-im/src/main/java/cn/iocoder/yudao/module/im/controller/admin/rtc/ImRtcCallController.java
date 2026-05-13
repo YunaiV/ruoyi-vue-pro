@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcGroupCallRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
+import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantStatusEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.rtc.ImRtcCallService;
@@ -123,13 +124,15 @@ public class ImRtcCallController {
             return null;
         }
         List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipantList(call.getRoom());
+        boolean ended = ImRtcCallStatusEnum.isEnded(call.getStatus());
         return new ImRtcCallRespVO()
                 .setRoom(call.getRoom())
                 .setLivekitUrl(imProperties.getRtc().getLivekitUrl())
-                .setToken(rtcCallService.signCallToken(userId, call.getRoom()))
+                // 仅非 ENDED 场景才签 token，ENDED 场景不签，前端根据 token 是否存在，来判断是否展示「通话已结束」的提示
+                .setToken(ended ? null : rtcCallService.signCallToken(userId, call.getRoom()))
                 .setConversationType(call.getConversationType()).setMediaType(call.getMediaType())
-                .setStatus(call.getStatus()).setInviterId(call.getInviterUserId())
-                .setGroupId(call.getGroupId())
+                .setStatus(call.getStatus()).setEndReason(call.getEndReason())
+                .setInviterId(call.getInviterUserId()).setGroupId(call.getGroupId())
                 .setInviteeIds(filterUserIds(participants, ImRtcParticipantStatusEnum.INVITING))
                 .setJoinedUserIds(filterUserIds(participants, ImRtcParticipantStatusEnum.JOINED));
     }

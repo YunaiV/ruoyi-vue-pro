@@ -27,6 +27,9 @@ public class ImRtcCallRespVO {
     @Schema(description = "状态")
     private Integer status; // 参见 ImCallStatusEnum 枚举类
 
+    @Schema(description = "结束原因；仅 status=ENDED 时有值")
+    private Integer endReason; // 参见 ImRtcCallEndReasonEnum 枚举类
+
     @Schema(description = "发起人编号")
     private Long inviterId;
 

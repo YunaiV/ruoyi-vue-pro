@@ -112,55 +112,64 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * 群通话创建锁内主体：群有活跃通话引导走 inviteCall / joinCall；无则兜底自身忙线后新建
+     * 群通话创建锁内主体：群有活跃通话直接抛（引导走 inviteCall / joinCall）；
+     * 否则走完整生命周期，若发起人自身忙线立即 end(BUSY) 留下通话记录
      *
      * @param userId 发起人编号
      * @param reqVO  创建请求
-     * @return 通话主表
+     * @return 通话主表（可能 status=ENDED 表示自身忙线）
      */
     private ImRtcCallDO createGroupCall(Long userId, ImRtcCallCreateReqVO reqVO) {
+        // 1.1 同群有活跃通话 → 直接抛异常（UI 应已拦截），引导用户走 inviteCall / joinCall；避免重复开通
         ImRtcCallDO active = rtcCallMapper.selectLastOneByGroupIdAndStatusIn(
                 reqVO.getGroupId(), ImRtcCallStatusEnum.ACTIVE_STATUSES);
         if (active != null) {
             throw exception(RTC_GROUP_CALL_ACTIVE);
         }
-        // 兜底校验发起人不在另一通通话中（跨群 / 跨好友）
-        ImRtcParticipantDO selfActive = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
-                userId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
-        if (selfActive != null) {
-            throw exception(RTC_SELF_BUSY);
+        // 1.2 先检测发起人忙线状态；不抛，留给下方 end 决定
+        boolean selfBusy = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
+                userId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES) != null;
+
+        // 2. 完整生命周期：INSERT + INVITE × N + START 全推
+        ImRtcCallDO call = createCall0(userId, reqVO);
+
+        // 3. 自身忙线立即 end(BUSY)；END 推送给群，群成员看到完整 START + END
+        if (selfBusy) {
+            endSession(call, userId, ImRtcCallEndReasonEnum.BUSY);
         }
-        return createCall0(userId, reqVO);
+        return call;
     }
 
     /**
-     * 私聊创建锁内主体：检查双方忙线后新建
+     * 私聊创建锁内主体：双方忙线时仍走完整生命周期（create + 立即 end(BUSY)），
+     * 同一对正在通话视作数据异常直接抛
      *
      * @param userId     发起人编号
      * @param reqVO      创建请求
      * @param peerUserId 对端编号；来自 reqVO.inviteeIds 的唯一元素
-     * @return 通话主表
+     * @return 通话主表（可能 status=ENDED 表示忙线）
      */
     private ImRtcCallDO createPrivateCall(Long userId, ImRtcCallCreateReqVO reqVO, Long peerUserId) {
-        // 1.1 发起人 & 对端已在同一通话 → 视为自身忙线
-        ImRtcCallDO active = getActivePrivateCallByPair(userId, peerUserId);
-        if (active != null) {
+        // 1.1 双方已在同一通话 → 数据异常（UI 应已拦截），直接抛
+        if (getActivePrivateCallByPair(userId, peerUserId) != null) {
             throw exception(RTC_SELF_BUSY);
         }
-        // 1.2 对端忙线
-        ImRtcParticipantDO peerActive = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
-                peerUserId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
-        if (peerActive != null) {
-            throw exception(RTC_PEER_BUSY);
+        // 1.2 忙线检测：self 优先（更可执行的提示）；不抛，留给下方 end 决定
+        boolean selfBusy = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
+                userId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES) != null;
+        boolean peerBusy = !selfBusy && rtcParticipantMapper.selectLastOneByUserIdAndStatus(
+                peerUserId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES) != null;
+
+        // 2. 完整生命周期：INSERT + INVITE 全推
+        ImRtcCallDO call = createCall0(userId, reqVO);
+
+        // 3. 忙线立即 end(BUSY)；operator 决定两端看到的文案（self busy → operator=自己；peer busy → operator=对端）
+        if (selfBusy) {
+            endSession(call, userId, ImRtcCallEndReasonEnum.BUSY);
+        } else if (peerBusy) {
+            endSession(call, peerUserId, ImRtcCallEndReasonEnum.BUSY);
         }
-        // 1.3 发起人在另一通通话（跨好友 / 跨群兜底）
-        ImRtcParticipantDO selfActive = rtcParticipantMapper.selectLastOneByUserIdAndStatus(
-                userId, ImRtcParticipantStatusEnum.ACTIVE_STATUSES);
-        if (selfActive != null) {
-            throw exception(RTC_SELF_BUSY);
-        }
-        // 2. 新建通话
-        return createCall0(userId, reqVO);
+        return call;
     }
 
     @Override
@@ -769,6 +778,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
                     call.getRoom(), operatorId, reason);
             return;
         }
+        // 【特殊】同步内存 call：让 createCall 这类调用方拿到的 DO 立即反映 ENDED 终态，Controller 拼 RespVO 能直接用
+        call.setStatus(ImRtcCallStatusEnum.ENDED.getStatus()).setEndReason(reason.getReason()).setEndTime(now);
         // 1.2 更新参与表为已结束：残留 INVITING 改 NO_ANSWER；残留 JOINED 改 LEFT 并写 leaveTime
         rtcParticipantMapper.updateByRoomAndStatus(call.getRoom(), ImRtcParticipantStatusEnum.INVITING.getStatus(),
                 new ImRtcParticipantDO().setStatus(ImRtcParticipantStatusEnum.NO_ANSWER.getStatus()));
