@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.im.controller.admin.rtc;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteMoreReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallRespVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcGroupCallRespVO;
@@ -37,34 +37,35 @@ public class ImRtcCallController {
     @Resource
     private ImProperties imProperties;
 
+    @PostMapping("/create")
+    @Operation(summary = "创建新通话；按 conversationType 区分私聊 / 群聊")
+    public CommonResult<ImRtcCallRespVO> createCall(@Valid @RequestBody ImRtcCallCreateReqVO reqVO) {
+        Long userId = getLoginUserId();
+        ImRtcCallDO call = rtcCallService.createCall(userId, reqVO);
+        return success(buildCallRespVO(call, userId));
+    }
+
     @PostMapping("/invite")
-    @Operation(summary = "发起通话；私聊或群聊根据 scene 区分")
-    public CommonResult<ImRtcCallRespVO> invite(@Valid @RequestBody ImRtcCallInviteReqVO reqVO) {
-        ImRtcCallDO call = rtcCallService.inviteCall(getLoginUserId(), reqVO);
-        return success(buildCallResp(call, getLoginUserId()));
+    @Operation(summary = "通话中追加邀请；仅群通话可用")
+    public CommonResult<Boolean> inviteCall(@Valid @RequestBody ImRtcCallInviteReqVO reqVO) {
+        rtcCallService.inviteCall(getLoginUserId(), reqVO);
+        return success(true);
     }
 
     @PostMapping("/join")
     @Operation(summary = "加入已有群通话；用于胶囊条「加入」按钮")
     @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
     public CommonResult<ImRtcCallRespVO> joinCall(@RequestParam("room") String room) {
-        ImRtcCallDO call = rtcCallService.joinCall(getLoginUserId(), room);
-        return success(buildCallResp(call, getLoginUserId()));
-    }
-
-    @PostMapping("/invite-more")
-    @Operation(summary = "通话中添加成员；仅群通话可用")
-    public CommonResult<Boolean> inviteMore(@Valid @RequestBody ImRtcCallInviteMoreReqVO reqVO) {
-        rtcCallService.inviteMoreCall(getLoginUserId(), reqVO);
-        return success(true);
+        Long userId = getLoginUserId();
+        return success(buildCallRespVO(rtcCallService.joinCall(userId, room), userId));
     }
 
     @PostMapping("/accept")
     @Operation(summary = "接听通话")
     @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
     public CommonResult<ImRtcCallRespVO> accept(@RequestParam("room") String room) {
-        ImRtcCallDO call = rtcCallService.acceptCall(getLoginUserId(), room);
-        return success(buildCallResp(call, getLoginUserId()));
+        Long userId = getLoginUserId();
+        return success(buildCallRespVO(rtcCallService.acceptCall(userId, room), userId));
     }
 
     @PostMapping("/reject")
@@ -95,8 +96,9 @@ public class ImRtcCallController {
     @Operation(summary = "重新签发 Token；客户端重连或 Token 过期续期")
     @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
     public CommonResult<ImRtcCallRespVO> refreshToken(@RequestParam("room") String room) {
-        ImRtcCallDO call = rtcCallService.validateCallParticipant(getLoginUserId(), room);
-        return success(buildCallResp(call, getLoginUserId()));
+        Long userId = getLoginUserId();
+        ImRtcCallDO call = rtcCallService.validateCallParticipant(userId, room);
+        return success(buildCallRespVO(call, userId));
     }
 
     @GetMapping("/get-active-call")
@@ -104,7 +106,7 @@ public class ImRtcCallController {
     @Parameter(name = "groupId", description = "群编号", required = true, example = "2048")
     public CommonResult<ImRtcGroupCallRespVO> getActiveCall(@RequestParam("groupId") Long groupId) {
         ImRtcCallDO call = rtcCallService.getActiveCall(getLoginUserId(), groupId);
-        return success(buildGroupActiveResp(call));
+        return success(buildGroupActiveRespVO(call));
     }
 
     // ========== VO 拼装 ==========
@@ -116,7 +118,7 @@ public class ImRtcCallController {
      * @param userId 当前用户编号；token 按该用户签发
      * @return 响应 VO；call 为空返回 null
      */
-    private ImRtcCallRespVO buildCallResp(ImRtcCallDO call, Long userId) {
+    private ImRtcCallRespVO buildCallRespVO(ImRtcCallDO call, Long userId) {
         if (call == null) {
             return null;
         }
@@ -125,7 +127,7 @@ public class ImRtcCallController {
                 .setRoom(call.getRoom())
                 .setLivekitUrl(imProperties.getRtc().getLivekitUrl())
                 .setToken(rtcCallService.signCallToken(userId, call.getRoom()))
-                .setScene(call.getConversationType()).setMediaType(call.getMediaType())
+                .setConversationType(call.getConversationType()).setMediaType(call.getMediaType())
                 .setStatus(call.getStatus()).setInviterId(call.getInviterUserId())
                 .setGroupId(call.getGroupId())
                 .setInviteeIds(filterUserIds(participants, ImRtcParticipantStatusEnum.INVITING))
@@ -133,20 +135,18 @@ public class ImRtcCallController {
     }
 
     /**
-     * 拼装 get-active-call 的响应 VO；只用于群聊胶囊条，不含 token
+     * 拼装 get-active-call 的响应 VO
      *
      * @param call 通话主表
-     * @return 响应 VO；call 为空返回 null
+     * @return 响应 VO：只用于群聊胶囊条，不含 token
      */
-    private ImRtcGroupCallRespVO buildGroupActiveResp(ImRtcCallDO call) {
+    private ImRtcGroupCallRespVO buildGroupActiveRespVO(ImRtcCallDO call) {
         if (call == null) {
             return null;
         }
         List<ImRtcParticipantDO> participants = rtcCallService.getCallParticipantList(call.getRoom());
-        return new ImRtcGroupCallRespVO()
-                .setRoom(call.getRoom())
-                .setGroupId(call.getGroupId()).setMediaType(call.getMediaType())
-                .setInviterId(call.getInviterUserId())
+        return new ImRtcGroupCallRespVO().setRoom(call.getRoom()).setMediaType(call.getMediaType())
+                .setGroupId(call.getGroupId()).setInviterId(call.getInviterUserId())
                 .setJoinedUserIds(filterUserIds(participants, ImRtcParticipantStatusEnum.JOINED))
                 .setInviteeIds(filterUserIds(participants, ImRtcParticipantStatusEnum.INVITING));
     }
@@ -161,7 +161,7 @@ public class ImRtcCallController {
     private static Set<Long> filterUserIds(List<ImRtcParticipantDO> participants,
                                            ImRtcParticipantStatusEnum status) {
         return CollectionUtils.convertLinkedSet(participants, ImRtcParticipantDO::getUserId,
-                p -> Objects.equals(p.getStatus(), status.getStatus()));
+                participant -> Objects.equals(participant.getStatus(), status.getStatus()));
     }
 
 }

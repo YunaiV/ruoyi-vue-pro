@@ -20,6 +20,7 @@ public enum ImRtcCallEndReasonEnum implements ArrayValuable<Integer> {
     HANGUP(1, "通话结束"), // 接通后任一方主动挂断
     REJECT(2, "已拒绝"), // 被叫接通前点拒接
     CANCEL(3, "已取消"), // 主叫接通前主动取消
+    // TODO @AI：思考时，会看到一条，【对方正忙】；目的是：私聊后续会看到这个通话，从而去回去联系。类似未接电话一样的味道。
     BUSY(5, "对方正忙"), // 私聊呼叫时对方在另一通话
     ERROR(9, "通话异常"); // 网络中断、设备失败等
 

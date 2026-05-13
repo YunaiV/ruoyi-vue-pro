@@ -18,8 +18,8 @@ public class ImRtcCallRespVO {
     @Schema(description = "LiveKit 接入 Token；需要时调 refreshToken 重新签发")
     private String token;
 
-    @Schema(description = "会话场景")
-    private Integer scene; // 参见 ImConversationTypeEnum 枚举类
+    @Schema(description = "会话类型")
+    private Integer conversationType; // 参见 ImConversationTypeEnum 枚举类
 
     @Schema(description = "媒体类型")
     private Integer mediaType; // 参见 ImCallMediaTypeEnum 枚举类

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.im.service.rtc;
 
-import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteMoreReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
@@ -9,21 +9,27 @@ import java.util.List;
 
 /**
  * IM 实时通话 Service
- * <p>
- * 业务模型：一个好友对 / 一个群同时只能有一个进行中的通话；inviteCall 仅负责「创建新通话」，加入已有群通话走 {@link #joinCall}
  *
  * @author 芋道源码
  */
 public interface ImRtcCallService {
 
     /**
-     * 发起新通话；同好友对 / 同群已有进行中通话直接抛错（群通话场景应改走 {@link #joinCall}）
+     * 创建新通话；同好友对 / 同群已有进行中通话直接抛错（群场景应改走 {@link #inviteCall} 追加邀请，或 {@link #joinCall} 加入旁观）
      *
-     * @param userId 操作人编号；通常是当前登录用户
-     * @param reqVO  请求参数（scene / mediaType / peerUserId 或 groupId）
+     * @param userId 发起人编号；通常是当前登录用户
+     * @param reqVO  请求参数（scene / mediaType / peerUserId 或 groupId + inviteeIds）
      * @return 通话主表
      */
-    ImRtcCallDO inviteCall(Long userId, ImRtcCallInviteReqVO reqVO);
+    ImRtcCallDO createCall(Long userId, ImRtcCallCreateReqVO reqVO);
+
+    /**
+     * 通话中追加邀请：仅群通话场景可用；本人必须是房内 JOINED 参与者；给新邀请人推 RTC_CALL(INVITE)
+     *
+     * @param userId 操作人编号；必须是当前会话参与者
+     * @param reqVO  room + 新邀请的用户编号集合
+     */
+    void inviteCall(Long userId, ImRtcCallInviteReqVO reqVO);
 
     /**
      * 加入已有群通话：用于群胶囊条「加入」按钮；旁观者作为 ACTIVE_JOIN 加入，邀请池内成员转 JOINED
@@ -33,14 +39,6 @@ public interface ImRtcCallService {
      * @return 通话主表
      */
     ImRtcCallDO joinCall(Long userId, String room);
-
-    /**
-     * 通话中追加成员：仅群通话场景可用；给新邀请人推 RTC_CALL(INVITE)
-     *
-     * @param userId 操作人编号；必须是当前会话参与者
-     * @param reqVO  room + 新邀请的用户编号集合
-     */
-    void inviteMoreCall(Long userId, ImRtcCallInviteMoreReqVO reqVO);
 
     /**
      * 接听通话：参与者 INVITING → JOINED；主表 CREATED → RUNNING（首次有非发起人接通时）
@@ -117,8 +115,8 @@ public interface ImRtcCallService {
     /**
      * 处理 LiveKit Webhook 事件；用于关 tab / 强杀 / 网络断开等异常退出场景的兜底清理
      * <p>
-     * 关键事件：participant_left（成员离开） / room_finished（房间结束）。前端正常 leave 时
-     * 也会触发同样的 LiveKit 事件；此处需做幂等处理，session 已被业务接口移除时直接忽略。
+     * 关键事件：participant_left（成员离开） / room_finished（房间结束）。
+     * 前端正常 leave 时，也会触发同样的 LiveKit 事件；此处需做幂等处理，session 已被业务接口移除时直接忽略。
      *
      * @param event LiveKit Webhook 事件
      */
