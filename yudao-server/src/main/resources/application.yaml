@@ -66,7 +66,7 @@ flowable:
 # MyBatis Plus 的配置项
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+    map-underscore-to-camel-case: true
   global-config:
     db-config:
       id-type: NONE # “智能”模式，基于 IdTypeEnvironmentPostProcessor + 数据源的类型，自动适配成 AUTO、INPUT 模式。
@@ -263,7 +263,7 @@ yudao:
     base-package: cn.iocoder.yudao
   web:
     admin-ui:
-      url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
+      url: http://admin.ningxx.com # Admin 管理后台 UI 的地址
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系

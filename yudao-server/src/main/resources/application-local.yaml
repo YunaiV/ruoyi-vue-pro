@@ -275,3 +275,26 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+
+ai:
+  model: GLM-4.6 #接入的智普文本模型，GLM-4.6，GLM-4.5，GLM-4
+  limitToken: 100000  #限制每日token使用上限(输入token+输出token)
+  zhipu:
+    apiKey: aac7e6c624284d609a1b9d7dd2b0903b.9GYXLQVp1R
+iyque:
+  userName: iyque
+  pwd: iyque.cn
+  demo: false
+  fileViewUrl: http://127.0.0.1:48080/file/fileView/ #文件统一访问前缀，后端api指向 FileController.readFile
+  uploadDir: ./upload
+  inquiryAll: true
+  complaintUrl: http://iyque.cn/openmobile/customerComplaint #投诉页面
+  customerSeasUrl: https://iyque.cn/openmobile/customerSeas #客户公海页面
+  h5MarketUrl: https://iyque.cn/openmobile/H5Marketing?id={0} #h5营销页面
+  vector:
+    host: 127.0.0.1  #Milvus地址
+    port: 19530 #Milvus端口,api通信端口,非web访问端口.
+    collectionName: iyque_vectors #向量集合名称
+    dimension: 1536 #向量维度
+    vectorModel: embedding-3 #向量模型,支持智普的 embedding-3，与embedding-2
+    score: 0.5f #向量查询相似度

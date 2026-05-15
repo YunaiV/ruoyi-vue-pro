@@ -123,4 +123,9 @@ public class ProductSpuRespVO {
     @ExcelProperty("商品点击量")
     private Integer browseCount;
 
+    // ========== 代发相关字段 =========
+
+    @Schema(description = "源商品链接", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "https://www.pdd.com/goods/123456")
+    private String sourceLink;
+
 }

@@ -168,4 +168,11 @@ public class ProductSpuDO extends BaseDO {
      * 浏览量
      */
     private Integer browseCount;
+
+    // ========== 代发相关字段 =========
+
+    /**
+     * 源商品链接
+     */
+    private String sourceLink;
 }
