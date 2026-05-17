@@ -5,15 +5,14 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.im.framework.rtc.core.LiveKitClient;
-import cn.iocoder.yudao.module.im.service.rtc.ImRtcCallService;
 import cn.iocoder.yudao.module.im.framework.rtc.core.LiveKitWebhookEventDTO;
+import cn.iocoder.yudao.module.im.service.rtc.ImRtcCallService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +45,7 @@ public class ImRtcLiveKitController {
      * @param rawBody 原始 JSON body；签名校验需要原始字节
      * @return 是否处理成功；伪造 / 非法事件返回 false
      */
-    @PostMapping(value = "/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/webhook")
     @Operation(summary = "LiveKit Webhook 回调；接收成员离开 / 房间结束等事件做业务态兜底清理")
     @PermitAll
     @TenantIgnore
