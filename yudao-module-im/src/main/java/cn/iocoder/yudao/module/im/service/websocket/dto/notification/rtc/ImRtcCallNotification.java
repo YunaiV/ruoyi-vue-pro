@@ -5,6 +5,9 @@ import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantStatusEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.Data;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * RTC_CALL 通话信令通知（通话信令统一入口）
  * <p>
@@ -63,6 +66,12 @@ public class ImRtcCallNotification {
      * 发起人头像；INVITE 专属，前端来电界面展示
      */
     private String inviterAvatar;
+    /**
+     * 本次被邀请人列表；INVITE 专属，前端来电界面展示「邀请的其他人」
+     *
+     * 注意：包含收件人自身，前端按需过滤
+     */
+    private List<Long> inviteeIds;
 
     // ========== REJECT 专属字段 ==========
 
@@ -86,10 +95,12 @@ public class ImRtcCallNotification {
      * @param inviter     发起人；可空，缺失时 inviterNickname / inviterAvatar 留空
      * @param livekitUrl  LiveKit Server WebSocket 地址
      * @param token       被叫的接听 Token；按收件人单独签发
+     * @param inviteeIds  本次被邀请人列表；前端来电界面展示「邀请的其他人」用
      * @return INVITE 信令
      */
     public static ImRtcCallNotification ofInvite(ImRtcCallDO call, AdminUserRespDTO inviter,
-                                                 String livekitUrl, String token) {
+                                                 String livekitUrl, String token,
+                                                 Collection<Long> inviteeIds) {
         ImRtcCallNotification notification = baseOf(call, ImRtcParticipantStatusEnum.INVITING.getStatus());
         notification.livekitUrl = livekitUrl;
         notification.token = token;
@@ -98,6 +109,7 @@ public class ImRtcCallNotification {
             notification.inviterNickname = inviter.getNickname();
             notification.inviterAvatar = inviter.getAvatar();
         }
+        notification.inviteeIds = inviteeIds != null ? new java.util.ArrayList<>(inviteeIds) : null;
         return notification;
     }
 

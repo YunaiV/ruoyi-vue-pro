@@ -232,7 +232,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         AdminUserRespDTO inviterUser = adminUserApi.getUser(inviterId);
         Map<Long, AdminUserRespDTO> inviteeMap = adminUserApi.getUserMap(invitees);
         for (Long inviteeId : invitees) {
-            pushCallInviteNotification(call, inviterUser, inviteeId, inviteeMap.get(inviteeId));
+            pushCallInviteNotification(call, inviterUser, inviteeId, inviteeMap.get(inviteeId), invitees);
         }
         // 3.2 群通话再向全群广播 RTC_CALL_START 入聊天流
         if (ImConversationTypeEnum.isGroup(reqVO.getConversationType())) {
@@ -303,7 +303,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         AdminUserRespDTO inviter = adminUserApi.getUser(inviterId);
         Map<Long, AdminUserRespDTO> inviteeMap = adminUserApi.getUserMap(incomingUserIds);
         for (Long inviteeId : incomingUserIds) {
-            pushCallInviteNotification(call, inviter, inviteeId, inviteeMap.get(inviteeId));
+            pushCallInviteNotification(call, inviter, inviteeId, inviteeMap.get(inviteeId), incomingUserIds);
         }
     }
 
@@ -820,16 +820,18 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     /**
      * RTC_CALL(INVITE)：走 webSocketService 直推到被邀请人；persistent=false 不入消息流
      *
-     * @param call      通话主表
-     * @param inviter   发起人；可空，缺失时 payload 的 inviterNickname / Avatar 留空
-     * @param inviteeId 被邀请人用户编号
-     * @param invitee   被邀请人；可空，缺失时 token 内 displayName 降级为 userId
+     * @param call         通话主表
+     * @param inviter      发起人；可空，缺失时 payload 的 inviterNickname / Avatar 留空
+     * @param inviteeId    被邀请人用户编号
+     * @param invitee      被邀请人；可空，缺失时 token 内 displayName 降级为 userId
+     * @param inviteeIds   本次被邀请人列表；前端来电界面展示「邀请的其他人」用，包含 inviteeId 自身
      */
     private void pushCallInviteNotification(ImRtcCallDO call, AdminUserRespDTO inviter,
-                                            Long inviteeId, AdminUserRespDTO invitee) {
+                                            Long inviteeId, AdminUserRespDTO invitee,
+                                            Collection<Long> inviteeIds) {
         String token = signToken(inviteeId, resolveDisplayName(invitee, inviteeId), call.getRoom());
         ImRtcCallNotification payload = ImRtcCallNotification.ofInvite(
-                call, inviter, imProperties.getRtc().getLivekitUrl(), token);
+                call, inviter, imProperties.getRtc().getLivekitUrl(), token, inviteeIds);
         webSocketService.sendPrivateMessageAsync(inviteeId, ImPrivateMessageDTO.ofRtcNotification(
                 ImMessageTypeEnum.RTC_CALL.getType(), call.getInviterUserId(), inviteeId, payload));
     }
