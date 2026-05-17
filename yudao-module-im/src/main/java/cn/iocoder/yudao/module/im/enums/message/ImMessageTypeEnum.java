@@ -101,7 +101,8 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     /**
      * 对应 OpenIM：无（自有扩展，OpenIM 通话事件不入消息流）
      * 对应自己的类：ImRtcCallStartNotification
-     * 场景：群通话开始；入 im_group_message + 全群广播；前端渲染聊天 tip「{inviterNickname} 发起了{voice/video}通话」
+     * 场景：通话开始；群聊入 im_group_message 全群广播，前端渲染聊天 tip「{inviterNickname} 发起了语音通话」；
+     * 私聊入 im_private_message 定向给被叫，仅用于会话列表预览展示「[语音通话]」（不渲染聊天 tip）
      * <p>
      * 与 RTC_CALL_END(1611) 两段式配对：START 一定先于 END 入库（START 在 invite 接口事务里、END 在 cancel/leave 接口事务里，自然按请求顺序串行）
      */
@@ -109,9 +110,9 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     /**
      * 对应 OpenIM：无（自有扩展，OpenIM 通话事件不入消息流）
      * 对应自己的类：ImRtcCallEndNotification
-     * 场景：通话结束；入 im_private_message / im_group_message；私聊渲染准气泡，群聊渲染 tip「{voice/video}通话已结束 [时长 X]」
+     * 场景：通话结束；入 im_private_message / im_group_message；私聊渲染准气泡，群聊渲染 tip「语音通话已经结束」
      * <p>
-     * 群通话两段式配对前导是 RTC_CALL_START(1610)；私聊场景没有 START，单 END 准气泡承载完整生命周期
+     * 与 RTC_CALL_START(1610) 两段式配对
      */
     RTC_CALL_END(1611, "通话结束", true, false),
 

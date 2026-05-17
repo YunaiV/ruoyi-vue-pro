@@ -7,13 +7,13 @@ import lombok.Data;
 /**
  * RTC_CALL_START 通话开始通知
  * <p>
- * 仅群通话场景；入 im_group_message + 全群广播；前端渲染聊天 tip「{inviterNickname} 发起了{voice/video}通话」
+ * 群聊入 im_group_message 全群广播；前端渲染聊天 tip「{inviterNickname} 发起了语音通话」
+ * <p>
+ * 私聊入 im_private_message 定向给被叫；前端不渲染聊天 tip，仅用于会话列表预览展示「[语音通话]」（刷新后仍可见）
  * <p>
  * 与 {@link ImRtcCallEndNotification} 两段式配对：
  * START 在 invite 接口事务里 INSERT，END 在 cancel / leave 接口事务里 INSERT，
  * 两段位于不同请求 / 事务，自增 id 保证聊天流顺序；后续如果合并到同一事务里 push，需要额外保证 START 先于 END
- * <p>
- * 私聊场景没有 START（单 END 准气泡足够），本通知不会用于 conversationType=PRIVATE
  *
  * @author 芋道源码
  */

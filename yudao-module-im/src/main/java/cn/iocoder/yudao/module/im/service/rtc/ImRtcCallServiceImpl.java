@@ -234,10 +234,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         for (Long inviteeId : invitees) {
             pushCallInviteNotification(call, inviterUser, inviteeId, inviteeMap.get(inviteeId), invitees);
         }
-        // 3.2 群通话再向全群广播 RTC_CALL_START 入聊天流
-        if (ImConversationTypeEnum.isGroup(reqVO.getConversationType())) {
-            pushCallStartNotification(call, inviterUser);
-        }
+        // 3.2 向消息流写入 RTC_CALL_START；群聊全群广播，私聊定向给被叫，作为会话列表预览的依据
+        pushCallStartNotification(call, inviterUser, invitees);
         return call;
     }
 
@@ -891,16 +889,18 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     /**
-     * RTC_CALL_START：仅群通话场景；走 imGroupMessageService.send，入 im_group_message 全群广播；与 RTC_CALL_END 两段式配对
+     * RTC_CALL_START：群聊走 imGroupMessageService.send 全群广播；私聊走 imPrivateMessageService.send 定向给被叫
+     * <p>
+     * 私聊 peer 直接复用 createCall 解析好的 invitees，避免再查参与表；用于会话列表预览展示「[语音通话]」
      *
-     * @param call    通话主表
-     * @param inviter 发起人；可空
+     * @param call     通话主表
+     * @param inviter  发起人；可空
+     * @param invitees 本次邀请池；私聊场景取首个作为 peer
      */
-    private void pushCallStartNotification(ImRtcCallDO call, AdminUserRespDTO inviter) {
+    private void pushCallStartNotification(ImRtcCallDO call, AdminUserRespDTO inviter, Set<Long> invitees) {
         ImRtcCallStartNotification payload = ImRtcCallStartNotification.of(call, inviter);
-        ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO().setGroupId(call.getGroupId())
-                .setType(ImMessageTypeEnum.RTC_CALL_START.getType()).setContent(payload);
-        groupMessageService.sendGroupMessage(call.getInviterUserId(), dto);
+        Long peerUserId = ImConversationTypeEnum.isGroup(call.getConversationType()) ? null : CollUtil.getFirst(invitees);
+        pushCallChatMessage(call, ImMessageTypeEnum.RTC_CALL_START, payload, peerUserId);
     }
 
     /**
@@ -917,23 +917,37 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
                              Long durationSeconds) {
         AdminUserRespDTO operator = operatorId != null ? adminUserApi.getUser(operatorId) : null;
         ImRtcCallEndNotification payload = ImRtcCallEndNotification.of(call, reason, durationSeconds, operatorId, operator);
-        Long senderId = call.getInviterUserId();
+        Long peerUserId = null;
+        if (!ImConversationTypeEnum.isGroup(call.getConversationType())) {
+            ImRtcParticipantDO peer = CollUtil.findOne(
+                    rtcParticipantMapper.selectListByRoom(call.getRoom()),
+                    p -> ObjUtil.notEqual(p.getUserId(), call.getInviterUserId()));
+            peerUserId = peer != null ? peer.getUserId() : null;
+        }
+        pushCallChatMessage(call, ImMessageTypeEnum.RTC_CALL_END, payload, peerUserId);
+    }
 
-        // 群聊：发起人总是 sender；receiver = 全群；走 imGroupMessageService.send 全群广播
+    /**
+     * RTC 通话事件入消息流：群聊走 groupMessageService 全群广播，私聊走 privateMessageService 定向给 peer
+     * <p>
+     * senderId 固定取 inviterUserId，让前端按「谁发起」决定气泡左右；私聊 peer 缺失时降级为发给自己作兜底
+     *
+     * @param call       通话主表
+     * @param type       消息类型；RTC_CALL_START / RTC_CALL_END
+     * @param payload    推送 payload
+     * @param peerUserId 私聊对端用户编号；群聊忽略，私聊缺失时回退为 senderId
+     */
+    private void pushCallChatMessage(ImRtcCallDO call, ImMessageTypeEnum type, Object payload, Long peerUserId) {
+        Long senderId = call.getInviterUserId();
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
             ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO().setGroupId(call.getGroupId())
-                    .setType(ImMessageTypeEnum.RTC_CALL_END.getType()).setContent(payload);
+                    .setType(type.getType()).setContent(payload);
             groupMessageService.sendGroupMessage(senderId, dto);
             return;
         }
-
-        // 私聊：发起人总是 sender；receiver = 通话另一方
-        ImRtcParticipantDO peer = CollUtil.findOne(
-                rtcParticipantMapper.selectListByRoom(call.getRoom()),
-                p -> ObjUtil.notEqual(p.getUserId(), senderId));
-        Long receiverId = peer != null ? peer.getUserId() : senderId;
+        Long receiverId = peerUserId != null ? peerUserId : senderId;
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO().setReceiverId(receiverId)
-                .setType(ImMessageTypeEnum.RTC_CALL_END.getType()).setContent(payload);
+                .setType(type.getType()).setContent(payload);
         privateMessageService.sendPrivateMessage(senderId, dto);
     }
 

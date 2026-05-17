@@ -11,10 +11,10 @@ import lombok.Data;
  * 入 im_private_message / im_group_message；接收方关闭通话窗 + 渲染聊天 tip
  * <p>
  * 文案分场景：
- * 群聊：「{voice/video}通话已结束 [时长 X]」；发起人信息走配对的 {@link ImRtcCallStartNotification}
+ * 群聊：「语音通话已经结束」；发起人信息走配对的 {@link ImRtcCallStartNotification}
  * 私聊：仿微信准气泡，按 endReason × selfSend 视角转换文案（HANGUP / CANCEL / REJECT / BUSY / ERROR）
  * <p>
- * 与 {@link ImRtcCallStartNotification} 两段式配对（仅群通话）：START 在 invite 事务里 INSERT，END 在 cancel / leave 事务里 INSERT；
+ * 与 {@link ImRtcCallStartNotification} 两段式配对：START 在 invite 事务里 INSERT，END 在 cancel / leave 事务里 INSERT；
  * 两段位于不同请求 / 事务，自增 id 保证聊天流顺序
  *
  * @author 芋道源码
