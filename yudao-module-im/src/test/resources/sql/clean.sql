@@ -10,3 +10,4 @@ DELETE FROM "im_face_pack_item";
 DELETE FROM "im_face_user_item";
 DELETE FROM "im_rtc_call";
 DELETE FROM "im_rtc_participant";
+DELETE FROM "system_users";

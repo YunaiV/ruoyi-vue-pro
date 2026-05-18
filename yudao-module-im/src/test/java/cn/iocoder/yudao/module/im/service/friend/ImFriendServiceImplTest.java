@@ -22,6 +22,7 @@ import java.util.List;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -109,17 +110,15 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testUpdateFriend_emptyRequest() {
-        // 准备：silent 和 displayName 都不传 —— 直接返回，不打 SQL 也不发推送
+        // 准备：silent / displayName / pinned 都不传 —— 进入方法立刻返回，不查 mapper 也不发推送
         ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
         reqVO.setFriendUserId(2L);
-        ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
-                .silent(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
 
         // 调用
         friendService.updateFriend(1L, reqVO);
 
-        // 断言：没触发 SQL 更新 / 没发 WebSocket 推送
+        // 断言：没查记录、没触发 SQL 更新 / 没发 WebSocket 推送
+        verify(imFriendMapper, never()).selectByUserIdAndFriendUserId(anyLong(), anyLong());
         verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
         verify(imWebSocketService, never()).sendPrivateMessageAsync(any(Long.class), any(ImPrivateMessageDTO.class));
     }
@@ -127,18 +126,25 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
     // ========== addFriend0（内部方法，被 becomeFriends / silentReAddFriend 调用） ==========
 
     @Test
-    public void testAddFriend0_existingEnabledSkipsUpdate() {
-        // 准备：已存在且启用，第二步不应触发更新
+    public void testAddFriend0_existingEnabledResetsFields() {
+        // 准备：已存在且启用 —— 走复用旧记录路径，重置 silent / pinned / blocked
         ImFriendDO exists = ImFriendDO.builder().id(10L).userId(1L).friendUserId(2L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+                .status(CommonStatusEnum.ENABLE.getStatus()).silent(true).pinned(true).blocked(true).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
 
         // 调用
         friendService.addFriend0(1L, 2L, null, null);
 
-        // 断言：不插入，也不更新
+        // 断言：不插入；走 update 重置 silent / pinned / blocked 为 false，并刷新 addTime
         verify(imFriendMapper, never()).insert(any(ImFriendDO.class));
-        verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
+        ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
+        verify(imFriendMapper).updateById(captor.capture());
+        assertEquals(10L, captor.getValue().getId());
+        assertEquals(CommonStatusEnum.ENABLE.getStatus(), captor.getValue().getStatus());
+        assertFalse(captor.getValue().getSilent());
+        assertFalse(captor.getValue().getPinned());
+        assertFalse(captor.getValue().getBlocked());
+        assertNotNull(captor.getValue().getAddTime());
     }
 
     @Test
@@ -160,15 +166,14 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testAddFriend0_duplicateKeySwallowed() {
-        // 准备：mapper 抛并发冲突
+    public void testAddFriend0_duplicateKeyPropagates() {
+        // 准备：mapper 抛并发冲突；极端并发下让异常向外抛，由外层事务回滚
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(null);
         when(imFriendMapper.insert(any(ImFriendDO.class)))
                 .thenThrow(new DuplicateKeyException("concurrent insert"));
 
-        // 调用：应被吞掉，不抛异常
-        friendService.addFriend0(1L, 2L, null, null);
-
+        // 调用 + 断言：异常向外抛
+        assertThrows(DuplicateKeyException.class, () -> friendService.addFriend0(1L, 2L, null, null));
         verify(imFriendMapper).insert(any(ImFriendDO.class));
     }
 

@@ -43,8 +43,8 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testSelectListByMinId_excludeRecall() {
-        // 准备：一条正常 + 一条撤回
+    public void testSelectListByMinId_includesRecall() {
+        // 准备：一条正常 + 一条撤回；客户端拉离线消息需要拿到撤回状态以渲染「此消息已撤回」占位
         ImGroupMessageDO normal = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
         mapper.insert(normal);
         ImGroupMessageDO recalled = buildMessage(10L, 1L, ImMessageStatusEnum.RECALL);
@@ -52,8 +52,8 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
 
         List<ImGroupMessageDO> result = mapper.selectListByMinId(List.of(10L), 0L, FAR_PAST, 100);
 
-        assertEquals(1, result.size());
-        assertEquals(normal.getId(), result.get(0).getId());
+        // 断言：撤回消息一并返回，由客户端按 status 切换渲染
+        assertEquals(2, result.size());
     }
 
     @Test
@@ -209,64 +209,6 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
         // 断言：入群前消息不可见
         assertEquals(1, result.size());
         assertEquals(after.getId(), result.get(0).getId());
-    }
-
-    // ========== selectListByGroupIdAndPendingReceipt ==========
-
-    @Test
-    public void testSelectListByGroupIdAndPendingReceipt_basic() {
-        // 准备：待回执 + 已完成 + 无需回执，三种状态
-        ImGroupMessageDO pending = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        pending.setReceiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
-        mapper.insert(pending);
-        ImGroupMessageDO done = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        done.setReceiptStatus(ImGroupMessageReceiptStatusEnum.DONE.getStatus());
-        mapper.insert(done);
-        ImGroupMessageDO noReceipt = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        noReceipt.setReceiptStatus(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus());
-        mapper.insert(noReceipt);
-
-        List<ImGroupMessageDO> result = mapper.selectListByGroupIdAndPendingReceipt(10L, null, Long.MAX_VALUE);
-
-        // 断言：只返回 pending 记录
-        assertEquals(1, result.size());
-        assertEquals(pending.getId(), result.get(0).getId());
-    }
-
-    @Test
-    public void testSelectListByGroupIdAndPendingReceipt_windowAndRecall() {
-        // 准备：窗口外 + 撤回 + 窗口内 pending
-        ImGroupMessageDO belowRange = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        belowRange.setReceiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
-        mapper.insert(belowRange);
-        ImGroupMessageDO inRange = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        inRange.setReceiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
-        mapper.insert(inRange);
-        ImGroupMessageDO recalled = buildMessage(10L, 1L, ImMessageStatusEnum.RECALL);
-        recalled.setReceiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
-        mapper.insert(recalled);
-
-        // 调用：minId = belowRange.id（排除）, maxId = inRange.id（包含）
-        List<ImGroupMessageDO> result = mapper.selectListByGroupIdAndPendingReceipt(
-                10L, belowRange.getId(), inRange.getId());
-
-        // 断言：只返回窗口内的非撤回 pending，即 inRange
-        assertEquals(1, result.size());
-        assertEquals(inRange.getId(), result.get(0).getId());
-    }
-
-    @Test
-    public void testSelectListByGroupIdAndPendingReceipt_otherGroupExcluded() {
-        ImGroupMessageDO g10 = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
-        g10.setReceiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
-        mapper.insert(g10);
-        ImGroupMessageDO g20 = buildMessage(20L, 1L, ImMessageStatusEnum.UNREAD);
-        g20.setReceiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus());
-        mapper.insert(g20);
-
-        List<ImGroupMessageDO> result = mapper.selectListByGroupIdAndPendingReceipt(10L, null, Long.MAX_VALUE);
-        assertEquals(1, result.size());
-        assertEquals(g10.getId(), result.get(0).getId());
     }
 
     // ========== 工具方法 ==========

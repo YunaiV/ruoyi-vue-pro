@@ -36,6 +36,8 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     private ImGroupMemberMapper groupMemberMapper;
     @Mock
     private ImWebSocketService webSocketService;
+    @Mock
+    private cn.iocoder.yudao.module.im.service.message.ImGroupMessageService groupMessageService;
 
     // ========== addGroupMember ==========
 
@@ -241,7 +243,11 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMemberMapper).updateById(captor.capture());
         assertEquals(50L, captor.getValue().getId());
         assertTrue(captor.getValue().getSilent());
-        verify(webSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
+        // 公开字段昵称变化 → 全员广播 GROUP_MEMBER_NICKNAME_UPDATE
+        verify(groupMessageService).sendGroupMessage(eq(1L), any(cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO.class));
+        // 个人字段 silent 变化 → 仅自己多端同步 GROUP_MEMBER_SETTING_UPDATE
+        verify(groupMessageService).sendGroupMessage(eq(1L), eq(java.util.List.of(1L)),
+                any(cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO.class));
     }
 
     // ========== removeGroupMember ==========

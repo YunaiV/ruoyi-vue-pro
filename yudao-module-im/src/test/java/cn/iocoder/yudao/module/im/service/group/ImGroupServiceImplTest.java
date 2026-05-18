@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
@@ -30,6 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Spy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -66,6 +68,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
     private ImGroupRequestService groupRequestService;
     @Mock
     private AdminUserApi adminUserApi;
+    @Spy
+    private ImProperties imProperties = new ImProperties();
 
     // ========== createGroup ==========
 

@@ -68,7 +68,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMessageSendReqVO reqVO = new ImGroupMessageSendReqVO();
         reqVO.setClientMessageId("test-uuid-group-001");
         reqVO.setGroupId(10L);
-        reqVO.setType(0); // TEXT
+        reqVO.setType(ImMessageTypeEnum.TEXT.getType());
         reqVO.setContent("{\"content\":\"群聊你好\"}");
         return reqVO;
     }
@@ -1062,9 +1062,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testSendGroupMessage_dto_nonPersistentTypeNotInserted() {
-        // 准备：persistent=false 类型（GROUP_CREATE）→ 不入库，仅推送
+        // 准备：persistent=false 类型（RECEIPT 回执）→ 不入库，仅推送
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.GROUP_CREATE.getType());
+                .setGroupId(10L).setType(ImMessageTypeEnum.RECEIPT.getType());
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L));
 
         groupMessageService.sendGroupMessage(1L, dto);

@@ -56,7 +56,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
         reqVO.setClientMessageId("test-uuid-001");
         reqVO.setReceiverId(2L);
-        reqVO.setType(0); // TEXT
+        reqVO.setType(ImMessageTypeEnum.TEXT.getType());
         reqVO.setContent("{\"content\":\"你好\"}");
         return reqVO;
     }
@@ -82,7 +82,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertNotNull(result);
         assertEquals(1L, result.getSenderId());
         assertEquals(2L, result.getReceiverId());
-        assertEquals(0, result.getType());
+        assertEquals(ImMessageTypeEnum.TEXT.getType(), result.getType());
         assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
         assertNotNull(result.getSendTime());
 
@@ -395,15 +395,15 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testSendPrivateMessage_dto_nonPersistentTypeNotInserted() {
-        // 准备：persistent=false 类型（FRIEND_ADD）→ 不入库，仅推送
+        // 准备：persistent=false 类型（FRIEND_DELETE 通知）→ 不入库；仅推 sender 多端，receiver 不感知
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
-                .setReceiverId(2L).setType(ImMessageTypeEnum.FRIEND_ADD.getType());
+                .setReceiverId(2L).setType(ImMessageTypeEnum.FRIEND_DELETE.getType());
 
         privateMessageService.sendPrivateMessage(1L, dto);
 
         verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
         verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService, never()).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
     }
 
     // ========== getPrivateMessageList ==========
