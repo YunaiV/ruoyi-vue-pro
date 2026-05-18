@@ -32,7 +32,24 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- 会员中心。默认注释，保证编译速度 -->
+        <!-- YMQ 业务模块 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>ymq-module-social</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>ymq-module-activity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>ymq-module-poster</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- 会员中心。默认注释，保证编译速度（D5 联调微信登录时启用） -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
 <!--            <artifactId>yudao-module-member</artifactId>-->

@@ -316,6 +316,10 @@ yudao:
       - /admin-api/system/user/profile/**
       - /admin-api/system/auth/**
     ignore-tables:
+      # YMQ 业务表全部不分租户（C 端应用，未来按地域分库不会用 tenant_id）
+      - t_user
+      - t_activity
+      - t_activity_member
     ignore-caches:
       - user_role_ids
       - permission_menu_ids
