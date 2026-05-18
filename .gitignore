@@ -49,6 +49,12 @@ nbdist/
 rebel.xml
 
 application-my.yaml
+application-local.yaml
+*.secret.yaml
 
 /yudao-ui-app/unpackage/
 **/.DS_Store
+
+# Claude Code / OpenClaw session state（YMQ）
+.claude/
+.omx/
