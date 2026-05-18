@@ -25,7 +25,7 @@
 
 - [ ] 在 GitHub fork [YunaiV/ruoyi-vue-pro](https://github.com/YunaiV/ruoyi-vue-pro) 到自己账号
 - [ ] `git clone` 到 `~/IdeaProjects/ymq-backend`（保留 `ymq` 目录给整体工程后续整理）
-- [ ] 切到最新稳定 tag（如 `v2.4.0`），打 `ymq-base` 分支
+- [ ] 切到最新稳定 tag（如 `v2026.04(jdk17/21)`），打 `ymq-base` 分支
 - [ ] 用 IDEA 打开，等 Maven 下载完依赖
 - [ ] 创建本地 MySQL 数据库 `ymq_dev`
 - [ ] 执行芋道自带 SQL 脚本（`sql/mysql/ruoyi-vue-pro.sql`）
