@@ -452,16 +452,6 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
-    public ImRtcCallDO validateCallParticipant(Long userId, String room) {
-        validateEnabled();
-        // 1.1 校验通话存在且活跃
-        ImRtcCallDO call = validateCallActive(room);
-        // 1.2 校验本人是该通话的参与者
-        validateParticipant(call, userId);
-        return call;
-    }
-
-    @Override
     public ImRtcCallDO getActiveCall(Long userId, Long groupId) {
         validateEnabled();
         // 1. 鉴权：仅群活跃成员能查（走单行 SQL，不依赖成员列表缓存）
@@ -616,14 +606,36 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     public int timeoutInvitingParticipants(int thresholdMinutes) {
         // 阈值由调用方（Job）保证 > 0；低于 1 分钟可能误杀刚发起还在响铃的合理 INVITING 态
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(thresholdMinutes);
-        List<ImRtcParticipantDO> candidates = rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(
-                ImRtcParticipantStatusEnum.INVITING.getStatus(), threshold);
+        return noAnswerCallCheck0(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(
+                ImRtcParticipantStatusEnum.INVITING.getStatus(), threshold));
+    }
+
+    @Override
+    public void noAnswerCallCheck(Long userId, String room) {
+        // 鉴权：仅该 room 参与者可触发；失败静默，不暴露错误
+        ImRtcParticipantDO operator = rtcParticipantMapper.selectByRoomAndUserId(room, userId);
+        if (operator == null) {
+            return;
+        }
+        // 阈值取后端配置，避免前后端配置不一致；前端 timer 仅是触发时机
+        LocalDateTime threshold = LocalDateTime.now()
+                .minusMinutes(imProperties.getRtc().getInviteTimeoutMinutes());
+        List<ImRtcParticipantDO> candidates = rtcParticipantMapper.selectListByRoomAndStatusAndInviteTimeBefore(
+                room, ImRtcParticipantStatusEnum.INVITING.getStatus(), threshold);
+        noAnswerCallCheck0(candidates);
+    }
+
+    /**
+     * 批量超时处理：循环单参与者；同 room 复用 call、批量预查 user 避免 N+1；返回成功处理数
+     *
+     * @param candidates 已过滤的超时 INVITING 候选
+     * @return 成功处理（CAS 抢占）的数量
+     */
+    private int noAnswerCallCheck0(List<ImRtcParticipantDO> candidates) {
         if (CollUtil.isEmpty(candidates)) {
             return 0;
         }
-        // 同 room 多人同批超时时复用 call，避免 N 次 selectByRoom
         Map<String, ImRtcCallDO> callCache = new HashMap<>();
-        // 批量预查 operator user，避免循环里逐个 adminUserApi.getUser 走 N+1
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 CollectionUtils.convertSet(candidates, ImRtcParticipantDO::getUserId));
         int timedOut = 0;
@@ -850,18 +862,19 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         rtcParticipantMapper.updateByRoomAndStatus(call.getRoom(), ImRtcParticipantStatusEnum.JOINED.getStatus(),
                 new ImRtcParticipantDO().setStatus(ImRtcParticipantStatusEnum.LEFT.getStatus()).setLeaveTime(now));
 
-        // 2. 兜底删除 LiveKit 房间，强制断开异常残留客户端；失败仅记日志，不阻断业务
+        // 2. 推 RTC_CALL_END；先于 deleteRoom 异步发出，让前端按业务语义 reset（NO_ANSWER / CANCEL 等），
+        // 避免随后 LiveKit Disconnected 事件抢先触发前端 "通话已断开" 兜底 toast
+        Long durationSeconds = call.getAcceptTime() != null ?
+                Duration.between(call.getAcceptTime(), now).getSeconds() : null;
+        pushCallEndNotification(call, operatorId, reason, durationSeconds);
+
+        // 3. 兜底删除 LiveKit 房间，强制断开异常残留客户端；失败仅记日志，不阻断业务
         try {
             liveKitClient.deleteRoom(call.getRoom());
         } catch (Exception e) {
             log.warn("[endSession][删除 LiveKit 房间失败 room={} operator={} reason={}]",
                     call.getRoom(), operatorId, reason, e);
         }
-
-        // 3. 推 RTC_CALL_END
-        Long durationSeconds = call.getAcceptTime() != null ?
-                Duration.between(call.getAcceptTime(), now).getSeconds() : null;
-        pushCallEndNotification(call, operatorId, reason, durationSeconds);
         log.info("[endSession][room={} operator={} reason={}]", call.getRoom(), operatorId, reason);
     }
 

@@ -34,6 +34,13 @@ public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> 
                 .lt(ImRtcParticipantDO::getInviteTime, threshold));
     }
 
+    default List<ImRtcParticipantDO> selectListByRoomAndStatusAndInviteTimeBefore(String room, Integer status, LocalDateTime threshold) {
+        return selectList(new LambdaQueryWrapperX<ImRtcParticipantDO>()
+                .eq(ImRtcParticipantDO::getRoom, room)
+                .eq(ImRtcParticipantDO::getStatus, status)
+                .lt(ImRtcParticipantDO::getInviteTime, threshold));
+    }
+
     default ImRtcParticipantDO selectLastOneByUserIdAndStatus(Long userId, Collection<Integer> statuses) {
         return selectLastOne(new LambdaQueryWrapperX<ImRtcParticipantDO>()
                 .eq(ImRtcParticipantDO::getUserId, userId)

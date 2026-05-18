@@ -1,0 +1,255 @@
+package cn.iocoder.yudao.module.im.service.rtc;
+
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
+import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcCallMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcParticipantMapper;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
+import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantRoleEnum;
+import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantStatusEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
+import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
+
+    @InjectMocks
+    private ImRtcCallServiceImpl rtcCallService;
+
+    @Mock
+    private ImRtcParticipantMapper rtcParticipantMapper;
+    @Mock
+    private ImRtcCallMapper rtcCallMapper;
+    @Mock
+    private AdminUserApi adminUserApi;
+    @Mock
+    private ImWebSocketService webSocketService;
+    @Mock
+    private ImProperties imProperties;
+
+    // ========== timeoutInvitingParticipants（Job 入口）==========
+
+    @Test
+    public void testTimeoutInvitingParticipants_emptyCandidates_returnsZeroAndNoDownstream() {
+        // 准备：无超时候选
+        when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(
+                eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any(LocalDateTime.class)))
+                .thenReturn(Collections.emptyList());
+
+        // 调用
+        int result = rtcCallService.timeoutInvitingParticipants(1);
+
+        // 断言：返回 0；无候选时不应触发 user 预查 / call 查询 / 推送
+        assertEquals(0, result);
+        verifyNoInteractions(adminUserApi, rtcCallMapper, webSocketService);
+    }
+
+    @Test
+    public void testTimeoutInvitingParticipants_thresholdConvertedToCutoff() {
+        // 准备：阈值 5 分钟；mock 空候选避免触发后续逻辑
+        when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any(LocalDateTime.class)))
+                .thenReturn(Collections.emptyList());
+
+        // 调用
+        LocalDateTime before = LocalDateTime.now();
+        rtcCallService.timeoutInvitingParticipants(5);
+
+        // 断言：cutoff = now - 5 分钟（允许 5 秒漂移）
+        ArgumentCaptor<LocalDateTime> cutoffCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+        verify(rtcParticipantMapper).selectListByStatusAndInviteTimeBefore(
+                eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), cutoffCaptor.capture());
+        LocalDateTime cutoff = cutoffCaptor.getValue();
+        LocalDateTime expected = before.minusMinutes(5);
+        assertTrue(Duration.between(cutoff, expected).abs().getSeconds() < 5,
+                "cutoff 应当约等于 now - 5 min；实际：" + cutoff);
+    }
+
+    @Test
+    public void testTimeoutInvitingParticipants_casAllFails_noPushNoEndSession() {
+        // 准备：候选非空但每个 CAS 都失败（并发已变状态）
+        ImRtcParticipantDO p = buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING);
+        when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any()))
+                .thenReturn(List.of(p));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(100L, buildUser(100L)));
+        when(rtcParticipantMapper.updateByIdAndStatus(eq(10L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
+                .thenReturn(0);
+
+        // 调用
+        int result = rtcCallService.timeoutInvitingParticipants(1);
+
+        // 断言：CAS 全失败时返回 0；不查 call、不推送
+        assertEquals(0, result);
+        verify(rtcCallMapper, never()).selectByRoom(any());
+        verifyNoInteractions(webSocketService);
+    }
+
+    @Test
+    public void testTimeoutInvitingParticipants_groupCall_pushesNoAnswerSkipsEndSession() {
+        // 准备：群通话单候选 CAS 成功；shouldCloseGroupRoom 通过 selectListByRoom 多 JOINED 让其返 false，跳过 endSession
+        ImRtcParticipantDO p = buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING);
+        when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any()))
+                .thenReturn(List.of(p));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(100L, buildUser(100L)));
+        when(rtcParticipantMapper.updateByIdAndStatus(eq(10L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
+                .thenReturn(1);
+        ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        // 房内 2 个 JOINED + 1 个 INVITING → shouldCloseGroupRoom 返 false
+        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
+                buildParticipant(20L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
+                buildParticipant(21L, "r1", 201L, ImRtcParticipantStatusEnum.JOINED),
+                buildParticipant(22L, "r1", 202L, ImRtcParticipantStatusEnum.INVITING)
+        ));
+
+        // 调用
+        int result = rtcCallService.timeoutInvitingParticipants(1);
+
+        // 断言：成功 1 个；NO_ANSWER 信令推到主叫；不触发 endSession
+        assertEquals(1, result);
+        verify(webSocketService).sendPrivateMessageAsync(eq(200L), any(ImPrivateMessageDTO.class));
+        verify(rtcCallMapper, never()).updateByIdAndStatusIn(any(), anyCollection(), any());
+    }
+
+    @Test
+    public void testTimeoutInvitingParticipants_callMissing_silentSkip() {
+        // 准备：CAS 成功后通话主表缺失（异常兜底场景）
+        ImRtcParticipantDO p = buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING);
+        when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any()))
+                .thenReturn(List.of(p));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(100L, buildUser(100L)));
+        when(rtcParticipantMapper.updateByIdAndStatus(eq(10L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
+                .thenReturn(1);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(null);
+
+        // 调用
+        int result = rtcCallService.timeoutInvitingParticipants(1);
+
+        // 断言：CAS 已成功但 call 缺失视为部分失败返 0；不应推送
+        assertEquals(0, result);
+        verifyNoInteractions(webSocketService);
+    }
+
+    // ========== noAnswerCallCheck（前端 timer 入口）==========
+
+    @Test
+    public void testNoAnswerCallCheck_authFails_silentNoOp() {
+        // 准备：selectByRoomAndUserId 返 null 覆盖三种鉴权失败场景（非参与者 / 非法 room / null room）
+        when(rtcParticipantMapper.selectByRoomAndUserId(any(), eq(100L))).thenReturn(null);
+
+        // 调用
+        rtcCallService.noAnswerCallCheck(100L, "r1");
+        rtcCallService.noAnswerCallCheck(100L, "");
+        rtcCallService.noAnswerCallCheck(100L, null);
+
+        // 断言：仅鉴权查询了 3 次；不应进入后续超时扫描 / 推送
+        verify(rtcParticipantMapper, times(3)).selectByRoomAndUserId(any(), eq(100L));
+        verify(rtcParticipantMapper, never()).selectListByRoomAndStatusAndInviteTimeBefore(any(), any(), any());
+        verifyNoInteractions(adminUserApi, webSocketService);
+    }
+
+    @Test
+    public void testNoAnswerCallCheck_usesBackendThreshold_notFrontend() {
+        // 准备：鉴权通过 + 后端配置阈值 2 分钟 + 无候选（避免触发推送）
+        when(rtcParticipantMapper.selectByRoomAndUserId("r1", 100L))
+                .thenReturn(buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING));
+        ImProperties.Rtc rtcConfig = new ImProperties.Rtc();
+        rtcConfig.setInviteTimeoutMinutes(2);
+        when(imProperties.getRtc()).thenReturn(rtcConfig);
+        when(rtcParticipantMapper.selectListByRoomAndStatusAndInviteTimeBefore(
+                eq("r1"), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any(LocalDateTime.class)))
+                .thenReturn(Collections.emptyList());
+
+        // 调用
+        LocalDateTime before = LocalDateTime.now();
+        rtcCallService.noAnswerCallCheck(100L, "r1");
+
+        // 断言：扫描时使用 cutoff = now - 2 分钟（后端配置），而非前端 60s
+        ArgumentCaptor<LocalDateTime> cutoffCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+        verify(rtcParticipantMapper).selectListByRoomAndStatusAndInviteTimeBefore(
+                eq("r1"), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), cutoffCaptor.capture());
+        LocalDateTime cutoff = cutoffCaptor.getValue();
+        LocalDateTime expected = before.minusMinutes(2);
+        assertTrue(Duration.between(cutoff, expected).abs().getSeconds() < 5,
+                "cutoff 应当约等于 now - 2 min（后端配置）；实际：" + cutoff);
+    }
+
+    @Test
+    public void testNoAnswerCallCheck_groupCall_pushesNoAnswer() {
+        // 准备：鉴权通过 + 单候选 CAS 成功 + 群通话不关房
+        when(rtcParticipantMapper.selectByRoomAndUserId("r1", 100L))
+                .thenReturn(buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING));
+        ImProperties.Rtc rtcConfig = new ImProperties.Rtc();
+        rtcConfig.setInviteTimeoutMinutes(1);
+        when(imProperties.getRtc()).thenReturn(rtcConfig);
+        ImRtcParticipantDO timeoutTarget = buildParticipant(11L, "r1", 101L, ImRtcParticipantStatusEnum.INVITING);
+        when(rtcParticipantMapper.selectListByRoomAndStatusAndInviteTimeBefore(
+                eq("r1"), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
+                .thenReturn(List.of(timeoutTarget));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(101L, buildUser(101L)));
+        when(rtcParticipantMapper.updateByIdAndStatus(eq(11L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
+                .thenReturn(1);
+        ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        // 让 shouldCloseGroupRoom 返 false
+        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
+                buildParticipant(20L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
+                buildParticipant(21L, "r1", 201L, ImRtcParticipantStatusEnum.JOINED)
+        ));
+
+        // 调用
+        rtcCallService.noAnswerCallCheck(100L, "r1");
+
+        // 断言：NO_ANSWER 信令推到主叫 200L；不触发 endSession
+        verify(webSocketService).sendPrivateMessageAsync(eq(200L), any(ImPrivateMessageDTO.class));
+        verify(rtcCallMapper, never()).updateByIdAndStatusIn(any(), anyCollection(), any());
+    }
+
+    // ========== 测试数据构造 ==========
+
+    private ImRtcParticipantDO buildParticipant(Long id, String room, Long userId, ImRtcParticipantStatusEnum status) {
+        return new ImRtcParticipantDO()
+                .setId(id)
+                .setRoom(room)
+                .setUserId(userId)
+                .setRole(ImRtcParticipantRoleEnum.INVITEE.getRole())
+                .setStatus(status.getStatus())
+                .setInviteTime(LocalDateTime.now());
+    }
+
+    private ImRtcCallDO buildCall(String room, Long inviterUserId, ImConversationTypeEnum conversationType, Long groupId) {
+        return new ImRtcCallDO()
+                .setRoom(room)
+                .setConversationType(conversationType.getType())
+                .setMediaType(1)
+                .setInviterUserId(inviterUserId)
+                .setGroupId(groupId)
+                .setStatus(ImRtcCallStatusEnum.RUNNING.getStatus())
+                .setStartTime(LocalDateTime.now());
+    }
+
+    private AdminUserRespDTO buildUser(Long id) {
+        AdminUserRespDTO user = new AdminUserRespDTO();
+        user.setId(id);
+        user.setNickname("user-" + id);
+        return user;
+    }
+
+}

@@ -74,17 +74,6 @@ public interface ImRtcCallService {
     void leaveCall(Long userId, String room);
 
     /**
-     * 校验通话活跃且本人是参与者；用于客户端重连或 Token 过期续期前的合法性检查
-     * <p>
-     * 仅做校验；签发新 Token 由 Controller 调 {@link #signCallToken} 完成
-     *
-     * @param userId 操作人编号
-     * @param room   业务通话编号
-     * @return 通话主表
-     */
-    ImRtcCallDO validateCallParticipant(Long userId, String room);
-
-    /**
      * 查询当前正在进行的通话；目前仅群聊场景（胶囊条），私聊未来扩展再补 peerUserId 参数
      * <p>
      * 鉴权：仅群活跃成员可查；防止任意用户探测群通话状态 / 拿到 inviter / inviteeIds 等敏感信息
@@ -131,12 +120,22 @@ public interface ImRtcCallService {
     int cleanupZombieCalls(int thresholdMinutes);
 
     /**
-     * 【定时任务调用】超时未接通的 INVITING 参与者：单人粒度标 NO_ANSWER + 推 RTC_CALL(REJECT) 让前端 banner 收敛；
+     * 【定时任务调用】超时未接通的 INVITING 参与者：单人粒度标 NO_ANSWER + 推 RTC_CALL(NO_ANSWER) 让前端 banner 收敛；
      * 若导致通话只剩主叫，由 endSessionIfTerminal 级联关房
      *
      * @param thresholdMinutes 邀请时间超过此分钟数才纳入扫描；调用方保证 > 0
      * @return 超时处理数量
      */
     int timeoutInvitingParticipants(int thresholdMinutes);
+
+    /**
+     * 前端 RUNNING 端 timer 兜底；立即扫描指定 room 内超时的 INVITING 参与者，等同 Job 但限定单 room；
+     * 实际超时阈值由后端 {@link cn.iocoder.yudao.module.im.framework.config.ImProperties.Rtc#getInviteTimeoutMinutes()} 决定，
+     * 避免前后端配置不一致；接口静默，所有边界（room 不存在 / 鉴权失败 / 无超时候选）都返回 false 不抛异常
+     *
+     * @param userId 调用者用户编号；必须是该 room 的参与者
+     * @param room   业务通话编号
+     */
+    void noAnswerCallCheck(Long userId, String room);
 
 }

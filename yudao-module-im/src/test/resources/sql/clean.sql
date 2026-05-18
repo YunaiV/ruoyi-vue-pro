@@ -8,3 +8,5 @@ DELETE FROM "im_group_request";
 DELETE FROM "im_face_pack";
 DELETE FROM "im_face_pack_item";
 DELETE FROM "im_face_user_item";
+DELETE FROM "im_rtc_call";
+DELETE FROM "im_rtc_participant";

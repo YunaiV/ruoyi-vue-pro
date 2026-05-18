@@ -93,13 +93,12 @@ public class ImRtcCallController {
         return success(true);
     }
 
-    @GetMapping("/refresh-token")
-    @Operation(summary = "重新签发 Token；客户端重连或 Token 过期续期")
+    @PostMapping("/no-answer-call-check")
+    @Operation(summary = "前端 RUNNING 端 timer 兜底；触发后端立即扫描该 room 的振铃超时（接口静默）")
     @Parameter(name = "room", description = "业务通话编号", required = true, example = "f47ac10b58cc4372a567")
-    public CommonResult<ImRtcCallRespVO> refreshToken(@RequestParam("room") String room) {
-        Long userId = getLoginUserId();
-        ImRtcCallDO call = rtcCallService.validateCallParticipant(userId, room);
-        return success(buildCallRespVO(call, userId));
+    public CommonResult<Boolean> noAnswerCallCheck(@RequestParam("room") String room) {
+        rtcCallService.noAnswerCallCheck(getLoginUserId(), room);
+        return success(true);
     }
 
     @GetMapping("/get-active-call")
