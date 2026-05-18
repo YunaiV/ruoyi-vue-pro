@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.im.service.rtc;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.im.controller.admin.manager.rtc.vo.ImRtcCallManagerPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
@@ -137,5 +139,31 @@ public interface ImRtcCallService {
      * @param room   业务通话编号
      */
     void noAnswerCallCheck(Long userId, String room);
+
+    // ==================== 管理后台 ====================
+
+    /**
+     * 【管理后台】获得通话记录分页
+     *
+     * @param reqVO 分页查询条件
+     * @return 通话记录分页
+     */
+    PageResult<ImRtcCallDO> getCallPage(ImRtcCallManagerPageReqVO reqVO);
+
+    /**
+     * 【管理后台】获得通话记录
+     *
+     * @param id 通话编号
+     * @return 通话记录
+     */
+    ImRtcCallDO getCall(Long id);
+
+    /**
+     * 【管理后台】按通话编号查询参与者明细
+     *
+     * @param id 通话编号
+     * @return 参与者明细列表；通话不存在时返回空集合
+     */
+    List<ImRtcParticipantDO> getCallParticipantListByCallId(Long id);
 
 }

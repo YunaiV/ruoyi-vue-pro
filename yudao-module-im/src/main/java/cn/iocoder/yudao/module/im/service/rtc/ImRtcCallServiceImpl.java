@@ -4,7 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.im.controller.admin.manager.rtc.vo.ImRtcCallManagerPageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallCreateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
@@ -215,13 +217,13 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         rtcCallMapper.insert(call);
         // 2.2 批量 INSERT 参与表：发起人即时 JOINED，被邀请人 INVITING 等接通
         List<ImRtcParticipantDO> participants = new ArrayList<>(invitees.size() + 1);
-        participants.add(new ImRtcParticipantDO().setRoom(room).setUserId(inviterId)
+        participants.add(new ImRtcParticipantDO().setCallId(call.getId()).setRoom(room).setUserId(inviterId)
                 .setRole(ImRtcParticipantRoleEnum.INVITER.getRole())
                 .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus())
                 .setInviteTime(now).setAcceptTime(now));
         for (Long inviteeId : invitees) {
             participants.add(new ImRtcParticipantDO()
-                    .setRoom(room).setUserId(inviteeId)
+                    .setCallId(call.getId()).setRoom(room).setUserId(inviteeId)
                     .setRole(ImRtcParticipantRoleEnum.INVITEE.getRole())
                     .setStatus(ImRtcParticipantStatusEnum.INVITING.getStatus())
                     .setInviteTime(now));
@@ -260,7 +262,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
             }
         } else {
             // 旁观者主动加入：INSERT role=ACTIVE_JOIN
-            rtcParticipantMapper.insert(new ImRtcParticipantDO().setRoom(call.getRoom())
+            rtcParticipantMapper.insert(new ImRtcParticipantDO()
+                    .setCallId(call.getId()).setRoom(call.getRoom())
                     .setUserId(userId).setRole(ImRtcParticipantRoleEnum.ACTIVE_JOIN.getRole())
                     .setStatus(ImRtcParticipantStatusEnum.JOINED.getStatus()).setInviteTime(now).setAcceptTime(now));
         }
@@ -292,7 +295,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         // 2. 批量 INSERT 新邀请人
         LocalDateTime now = LocalDateTime.now();
         List<ImRtcParticipantDO> participants = CollectionUtils.convertList(incomingUserIds, inviteeId ->
-                new ImRtcParticipantDO().setRoom(call.getRoom()).setUserId(inviteeId)
+                new ImRtcParticipantDO().setCallId(call.getId()).setRoom(call.getRoom()).setUserId(inviteeId)
                         .setRole(ImRtcParticipantRoleEnum.INVITEE.getRole())
                         .setStatus(ImRtcParticipantStatusEnum.INVITING.getStatus()).setInviteTime(now));
         rtcParticipantMapper.insertBatch(participants);
@@ -1069,6 +1072,23 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     private static String resolveDisplayName(AdminUserRespDTO user, Long userId) {
         return StrUtil.blankToDefault(
                 user == null ? null : user.getNickname(), String.valueOf(userId));
+    }
+
+    // ==================== 管理后台 ====================
+
+    @Override
+    public PageResult<ImRtcCallDO> getCallPage(ImRtcCallManagerPageReqVO reqVO) {
+        return rtcCallMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public ImRtcCallDO getCall(Long id) {
+        return rtcCallMapper.selectById(id);
+    }
+
+    @Override
+    public List<ImRtcParticipantDO> getCallParticipantListByCallId(Long id) {
+        return rtcParticipantMapper.selectListByCallId(id);
     }
 
 }

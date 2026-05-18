@@ -28,6 +28,10 @@ public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> 
         return selectList(ImRtcParticipantDO::getRoom, room);
     }
 
+    default List<ImRtcParticipantDO> selectListByCallId(Long callId) {
+        return selectList(ImRtcParticipantDO::getCallId, callId);
+    }
+
     default List<ImRtcParticipantDO> selectListByStatusAndInviteTimeBefore(Integer status, LocalDateTime threshold) {
         return selectList(new LambdaQueryWrapperX<ImRtcParticipantDO>()
                 .eq(ImRtcParticipantDO::getStatus, status)

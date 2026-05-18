@@ -35,6 +35,12 @@ public class ImRtcParticipantDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 通话编号
+     * <p>
+     * 关联 {@link ImRtcCallDO#getId()}
+     */
+    private Long callId;
+    /**
      * 业务通话编号
      * <p>
      * 关联 {@link ImRtcCallDO#getRoom()}

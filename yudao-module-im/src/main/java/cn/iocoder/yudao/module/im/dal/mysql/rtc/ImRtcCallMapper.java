@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.im.dal.mysql.rtc;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.im.controller.admin.manager.rtc.vo.ImRtcCallManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
@@ -46,6 +48,17 @@ public interface ImRtcCallMapper extends BaseMapperX<ImRtcCallDO> {
         return selectList(new LambdaQueryWrapperX<ImRtcCallDO>()
                 .in(ImRtcCallDO::getStatus, statuses)
                 .lt(ImRtcCallDO::getStartTime, startTimeBefore));
+    }
+
+    default PageResult<ImRtcCallDO> selectPage(ImRtcCallManagerPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ImRtcCallDO>()
+                .eqIfPresent(ImRtcCallDO::getInviterUserId, reqVO.getInviterUserId())
+                .eqIfPresent(ImRtcCallDO::getConversationType, reqVO.getConversationType())
+                .eqIfPresent(ImRtcCallDO::getMediaType, reqVO.getMediaType())
+                .eqIfPresent(ImRtcCallDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(ImRtcCallDO::getEndReason, reqVO.getEndReason())
+                .betweenIfPresent(ImRtcCallDO::getStartTime, reqVO.getStartTime())
+                .orderByDesc(ImRtcCallDO::getId));
     }
 
 }
