@@ -130,4 +130,13 @@ public interface ImRtcCallService {
      */
     int cleanupZombieCalls(int thresholdMinutes);
 
+    /**
+     * 【定时任务调用】超时未接通的 INVITING 参与者：单人粒度标 NO_ANSWER + 推 RTC_CALL(REJECT) 让前端 banner 收敛；
+     * 若导致通话只剩主叫，由 endSessionIfTerminal 级联关房
+     *
+     * @param thresholdMinutes 邀请时间超过此分钟数才纳入扫描；调用方保证 > 0
+     * @return 超时处理数量
+     */
+    int timeoutInvitingParticipants(int thresholdMinutes);
+
 }

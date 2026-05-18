@@ -132,6 +132,24 @@ public class ImRtcCallNotification {
     }
 
     /**
+     * 构造 NO_ANSWER 信令；仅群通话场景；推主叫；超时未接听语义独立于 REJECT
+     *
+     * @param call           通话主表
+     * @param operatorUserId 未接听者用户编号
+     * @param operator       未接听者；可空，缺失时 operatorNickname / operatorAvatar 留空
+     * @return NO_ANSWER 信令
+     */
+    public static ImRtcCallNotification ofNoAnswer(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
+        ImRtcCallNotification notification = baseOf(call, ImRtcParticipantStatusEnum.NO_ANSWER.getStatus());
+        notification.operatorUserId = operatorUserId;
+        if (operator != null) {
+            notification.operatorNickname = operator.getNickname();
+            notification.operatorAvatar = operator.getAvatar();
+        }
+        return notification;
+    }
+
+    /**
      * 公共骨架；填充 call 上下文 + status
      */
     private static ImRtcCallNotification baseOf(ImRtcCallDO call, Integer status) {

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,10 +28,10 @@ public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> 
         return selectList(ImRtcParticipantDO::getRoom, room);
     }
 
-    default List<ImRtcParticipantDO> selectListByRoomAndStatus(String room, Integer status) {
+    default List<ImRtcParticipantDO> selectListByStatusAndInviteTimeBefore(Integer status, LocalDateTime threshold) {
         return selectList(new LambdaQueryWrapperX<ImRtcParticipantDO>()
-                .eq(ImRtcParticipantDO::getRoom, room)
-                .eq(ImRtcParticipantDO::getStatus, status));
+                .eq(ImRtcParticipantDO::getStatus, status)
+                .lt(ImRtcParticipantDO::getInviteTime, threshold));
     }
 
     default ImRtcParticipantDO selectLastOneByUserIdAndStatus(Long userId, Collection<Integer> statuses) {

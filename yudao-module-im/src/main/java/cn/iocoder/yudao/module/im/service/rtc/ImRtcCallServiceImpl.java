@@ -612,6 +612,72 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         return cleaned;
     }
 
+    @Override
+    public int timeoutInvitingParticipants(int thresholdMinutes) {
+        // 阈值由调用方（Job）保证 > 0；低于 1 分钟可能误杀刚发起还在响铃的合理 INVITING 态
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(thresholdMinutes);
+        List<ImRtcParticipantDO> candidates = rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(
+                ImRtcParticipantStatusEnum.INVITING.getStatus(), threshold);
+        if (CollUtil.isEmpty(candidates)) {
+            return 0;
+        }
+        // 同 room 多人同批超时时复用 call，避免 N 次 selectByRoom
+        Map<String, ImRtcCallDO> callCache = new HashMap<>();
+        // 批量预查 operator user，避免循环里逐个 adminUserApi.getUser 走 N+1
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                CollectionUtils.convertSet(candidates, ImRtcParticipantDO::getUserId));
+        int timedOut = 0;
+        for (ImRtcParticipantDO participant : candidates) {
+            if (timeoutInvitingParticipant(participant, callCache, userMap)) {
+                timedOut++;
+            }
+        }
+        return timedOut;
+    }
+
+    /**
+     * 单参与者振铃超时：CAS 把 INVITING 切到 NO_ANSWER，群通话推 RTC_CALL(NO_ANSWER) + 级联关房判定；
+     * 私聊场景被叫超时即整通话结束，走 endSession(NO_ANSWER) 推 RTC_CALL_END
+     *
+     * @param participant INVITING 状态的超时候选
+     * @param callCache   按 room 缓存 call 对象，避免同批次多人重复查询
+     * @param userMap     候选用户预查 map；避免逐个 adminUserApi.getUser 走 N+1
+     * @return 是否成功处理（CAS 失败 / 通话主表缺失等场景返回 false）
+     */
+    private boolean timeoutInvitingParticipant(ImRtcParticipantDO participant,
+                                               Map<String, ImRtcCallDO> callCache,
+                                               Map<Long, AdminUserRespDTO> userMap) {
+        // 1. CAS：INVITING → NO_ANSWER；并发已变（用户刚接 / 拒，或 endSession 整体改）跳过
+        int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(),
+                ImRtcParticipantStatusEnum.INVITING.getStatus(),
+                new ImRtcParticipantDO().setId(participant.getId())
+                        .setStatus(ImRtcParticipantStatusEnum.NO_ANSWER.getStatus())
+                        .setLeaveTime(LocalDateTime.now()));
+        if (updated == 0) {
+            return false;
+        }
+        Long userId = participant.getUserId();
+        log.info("[timeoutInvitingParticipant][参与者振铃超时 room={} userId={}]", participant.getRoom(), userId);
+
+        // 2. 查询通话主表；同 room 复用 callCache，避免同批次多人重复查询
+        ImRtcCallDO call = callCache.computeIfAbsent(participant.getRoom(), rtcCallMapper::selectByRoom);
+        if (call == null) {
+            log.warn("[timeoutInvitingParticipant][通话主表缺失 room={} userId={}]", participant.getRoom(), userId);
+            return false;
+        }
+
+        // 3.1 群通话：推 RTC_CALL(NO_ANSWER) 让前端 banner 移除该人 + 级联关房判定
+        // TODO DONE @AI：拆分独立 NO_ANSWER 信令，不再复用 REJECT
+        if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
+            pushCallNoAnswerNotification(call, userId, userMap.get(userId));
+            endSessionIfTerminal(call, userId);
+            return true;
+        }
+        // 3.2 私聊：被叫超时 = 整通话无人接听，走 endSession 推 RTC_CALL_END(NO_ANSWER)
+        endSession(call, userId, ImRtcCallEndReasonEnum.NO_ANSWER);
+        return true;
+    }
+
     // ========== 内部辅助 ==========
 
     private void validateEnabled() {
@@ -845,6 +911,21 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     private void pushCallRejectNotification(ImRtcCallDO call, Long operatorUserId) {
         AdminUserRespDTO operator = operatorUserId != null ? adminUserApi.getUser(operatorUserId) : null;
         ImRtcCallNotification payload = ImRtcCallNotification.ofReject(call, operatorUserId, operator);
+        webSocketService.sendPrivateMessageAsync(call.getInviterUserId(), ImPrivateMessageDTO.ofRtcNotification(
+                ImMessageTypeEnum.RTC_CALL.getType(), operatorUserId, call.getInviterUserId(), payload));
+    }
+
+    /**
+     * RTC_CALL(NO_ANSWER)：仅群通话场景；振铃超时由 Job 触发；走 webSocketService 直推主叫
+     * <p>
+     * 私聊未接听走 endSession → RTC_CALL_END(reason=NO_ANSWER) 入消息流，不在此推
+     *
+     * @param call           通话主表
+     * @param operatorUserId 未接听者用户编号
+     * @param operator       未接听者预查结果；调用方批量查避免 N+1，可空
+     */
+    private void pushCallNoAnswerNotification(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
+        ImRtcCallNotification payload = ImRtcCallNotification.ofNoAnswer(call, operatorUserId, operator);
         webSocketService.sendPrivateMessageAsync(call.getInviterUserId(), ImPrivateMessageDTO.ofRtcNotification(
                 ImMessageTypeEnum.RTC_CALL.getType(), operatorUserId, call.getInviterUserId(), payload));
     }

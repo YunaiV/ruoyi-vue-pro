@@ -170,6 +170,11 @@ public class ImProperties {
          */
         private int cleanupZombieThresholdMinutes = 5;
 
+        /**
+         * 振铃超时阈值（分钟）；被叫 INVITING 超过此值未接通 → 标 NO_ANSWER + 推 RTC_CALL(REJECT) 让 banner 收敛
+         */
+        private int inviteTimeoutMinutes = 1;
+
     }
 
 }
