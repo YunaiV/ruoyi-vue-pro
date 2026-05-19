@@ -47,11 +47,6 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
         return channelMessageMapper.selectListByUserAndMinId(userId, minId, size);
     }
 
-    @Override
-    public boolean isUserReceivedMaterial(Long userId, Long materialId) {
-        return channelMessageMapper.existsByUserAndMaterial(userId, materialId);
-    }
-
     // ==================== 管理后台 ====================
 
     @Override
