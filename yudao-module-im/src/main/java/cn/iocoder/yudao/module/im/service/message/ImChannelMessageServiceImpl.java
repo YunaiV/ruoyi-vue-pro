@@ -56,8 +56,9 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
         // 1. 校验素材存在
         ImChannelMaterialDO material = channelMaterialService.validateMaterialExists(reqVO.getMaterialId());
 
-        // 2.1 组装 payload（不带富文本正文）；字段同名直接 BeanUtils 拷贝
-        String payloadJson = JsonUtils.toJsonString(BeanUtils.toBean(material, MaterialMessage.class));
+        // 2.1 组装 payload（不带富文本正文）；字段同名直接 BeanUtils 拷贝，materialId 单独 set 以兼容转发场景
+        MaterialMessage payload = BeanUtils.toBean(material, MaterialMessage.class).setMaterialId(material.getId());
+        String payloadJson = JsonUtils.toJsonString(payload);
         // 2.2 落库 1 行 message；reqVO 同名字段（materialId / receiverUserIds）自动拷贝，剩余字段补 set
         ImChannelMessageDO message = BeanUtils.toBean(reqVO, ImChannelMessageDO.class).setChannelId(material.getChannelId())
                 .setType(ImMessageTypeEnum.MATERIAL.getType()).setContent(payloadJson).setSendTime(LocalDateTime.now());

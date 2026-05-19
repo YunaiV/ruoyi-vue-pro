@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.im.dal.dataobject.message;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
