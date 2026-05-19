@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.channel;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.channel.ImChannelMaterialContentTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -39,9 +39,9 @@ public class ImChannelMaterialDO extends BaseDO {
      */
     private Long channelId;
     /**
-     * 素材类型
+     * 素材内容类型
      * <p>
-     * 枚举 {@link ImMessageTypeEnum}；当前仅 MATERIAL(125)
+     * 枚举 {@link ImChannelMaterialContentTypeEnum}
      */
     private Integer type;
     /**
@@ -56,15 +56,12 @@ public class ImChannelMaterialDO extends BaseDO {
      * 摘要
      */
     private String summary;
-    // TODO @AI：素材类型，是不是有个 type；这样一个 content、url 更好区分；然后这个 type ，是不是在 MATERIAL Message 类上，也带上；
     /**
-     * 正文；富文本 HTML
+     * 富文本 HTML；在 {@link ImChannelMaterialContentTypeEnum#CONTENT} 使用
      */
     private String content;
     /**
-     * 跳转链接
-     * <p>
-     * 为空时点击在客户端内置详情页拉 {@link #content} 渲染；非空则跳 url
+     * 跳转链接；在 {@link ImChannelMaterialContentTypeEnum#LINK} 使用
      */
     private String url;
 

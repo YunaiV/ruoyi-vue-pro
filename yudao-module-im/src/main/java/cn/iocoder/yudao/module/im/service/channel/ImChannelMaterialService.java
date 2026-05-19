@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * IM 频道素材 Service 接口
@@ -17,14 +20,6 @@ import java.util.List;
 public interface ImChannelMaterialService {
 
     // ==================== 用户端 ====================
-
-    /**
-     * 获取素材正文；用于客户端点击图文卡片时拉富文本
-     *
-     * @param id 素材编号
-     * @return 富文本 HTML
-     */
-    String getMaterialContent(Long id);
 
     /**
      * 校验素材存在
@@ -41,6 +36,16 @@ public interface ImChannelMaterialService {
      * @return 素材列表
      */
     List<ImChannelMaterialDO> getMaterialList(Collection<Long> ids);
+
+    /**
+     * 按编号批量查询素材 Map
+     *
+     * @param ids 素材编号列表
+     * @return id -> 素材 Map
+     */
+   default Map<Long, ImChannelMaterialDO> getMaterialMap(Collection<Long> ids) {
+       return convertMap(getMaterialList(ids), ImChannelMaterialDO::getId);
+   }
 
     /**
      * 统计指定频道下的素材数量

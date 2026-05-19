@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.im.service.channel;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.channel.ImChannelPageReqVO;
@@ -18,9 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.IM_CHANNEL_CODE_DUPLICATED;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.IM_CHANNEL_HAS_MATERIAL;
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.IM_CHANNEL_NOT_EXISTS;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
 /**
  * IM 频道 Service 实现类
@@ -39,8 +36,8 @@ public class ImChannelServiceImpl implements ImChannelService {
     // ==================== 用户端 ====================
 
     @Override
-    public List<ImChannelDO> getEnabledChannelList() {
-        return channelMapper.selectListByStatusOrderBySort(CommonStatusEnum.ENABLE.getStatus());
+    public List<ImChannelDO> getChannelListByStatus(Integer status) {
+        return channelMapper.selectListByStatusOrderBySort(status);
     }
 
     @Override

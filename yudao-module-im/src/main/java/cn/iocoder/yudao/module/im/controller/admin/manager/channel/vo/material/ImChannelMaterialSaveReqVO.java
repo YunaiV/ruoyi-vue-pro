@@ -17,9 +17,9 @@ public class ImChannelMaterialSaveReqVO {
     @NotNull(message = "频道编号不能为空")
     private Long channelId;
 
-    @Schema(description = "素材类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "125")
-    @NotNull(message = "素材类型不能为空")
-    private Integer type; // 参见 ImMessageTypeEnum 枚举类
+    @Schema(description = "内容类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "内容类型不能为空")
+    private Integer type; // 参见 ImChannelMaterialContentTypeEnum 枚举类
 
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "双十一活动来啦")
     @NotBlank(message = "标题不能为空")

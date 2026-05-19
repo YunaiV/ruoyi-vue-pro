@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message;
+package cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

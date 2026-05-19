@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * IM 频道 Service 接口
@@ -18,13 +21,13 @@ public interface ImChannelService {
 
     // ==================== 用户端 ====================
 
-    // TODO @AI：getChannelListByStatus 这种形式；
     /**
-     * 获取所有启用的频道，按 sort 升序
+     * 按状态查询频道列表，按 sort 升序
      *
-     * @return 启用的频道列表
+     * @param status 状态；对应 CommonStatusEnum
+     * @return 频道列表
      */
-    List<ImChannelDO> getEnabledChannelList();
+    List<ImChannelDO> getChannelListByStatus(Integer status);
 
     /**
      * 按编号批量查询频道
@@ -33,6 +36,16 @@ public interface ImChannelService {
      * @return 频道列表
      */
     List<ImChannelDO> getChannelList(Collection<Long> ids);
+
+    /**
+     * 按编号批量查询频道 Map
+     *
+     * @param ids 频道编号列表
+     * @return id -> 频道 Map
+     */
+    default Map<Long, ImChannelDO> getChannelMap(Collection<Long> ids) {
+        return convertMap(getChannelList(ids), ImChannelDO::getId);
+    }
 
     /**
      * 校验频道存在

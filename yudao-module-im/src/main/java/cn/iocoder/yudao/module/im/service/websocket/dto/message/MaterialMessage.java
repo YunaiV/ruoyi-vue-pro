@@ -15,6 +15,14 @@ import lombok.experimental.Accessors;
 public class MaterialMessage {
 
     /**
+     * 素材内容类型
+     * <p>
+     * 枚举 {@link cn.iocoder.yudao.module.im.enums.channel.ImChannelMaterialContentTypeEnum}
+     * 客户端按本字段判定点击行为：CONTENT 走站内详情页拉富文本；LINK 跳 url
+     */
+    private Integer type;
+
+    /**
      * 标题
      */
     private String title;
@@ -27,7 +35,7 @@ public class MaterialMessage {
      */
     private String summary;
     /**
-     * 跳转链接；为空时点击在客户端内置详情页按 materialId 拉 content 渲染；非空则跳 url
+     * 跳转链接
      */
     private String url;
 

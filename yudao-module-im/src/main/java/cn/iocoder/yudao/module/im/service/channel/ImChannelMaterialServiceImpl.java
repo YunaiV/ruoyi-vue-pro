@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.material.I
 import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.material.ImChannelMaterialSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
 import cn.iocoder.yudao.module.im.dal.mysql.channel.ImChannelMaterialMapper;
-import cn.iocoder.yudao.module.im.dal.mysql.channel.ImChannelMessageMapper;
+import cn.iocoder.yudao.module.im.dal.mysql.message.ImChannelMessageMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -37,12 +37,6 @@ public class ImChannelMaterialServiceImpl implements ImChannelMaterialService {
     private ImChannelMessageMapper channelMessageMapper;
 
     // ==================== 用户端 ====================
-
-    @Override
-    public String getMaterialContent(Long id) {
-        ImChannelMaterialDO material = validateMaterialExists(id);
-        return material.getContent();
-    }
 
     @Override
     public ImChannelMaterialDO validateMaterialExists(Long id) {
@@ -78,20 +72,25 @@ public class ImChannelMaterialServiceImpl implements ImChannelMaterialService {
         return channelMaterialMapper.selectById(id);
     }
 
-    // TODO @AI：类似别的模块，写全注释
     @Override
     public Long createMaterial(ImChannelMaterialSaveReqVO reqVO) {
+        // 1. 校验所属频道存在
         channelService.validateChannelExists(reqVO.getChannelId());
+
+        // 2. 插入素材
         ImChannelMaterialDO material = BeanUtils.toBean(reqVO, ImChannelMaterialDO.class);
         channelMaterialMapper.insert(material);
         return material.getId();
     }
 
-    // TODO @AI：类似别的模块，写全注释
     @Override
     public void updateMaterial(ImChannelMaterialSaveReqVO reqVO) {
+        // 1.1 校验存在
         validateMaterialExists(reqVO.getId());
+        // 1.2 校验所属频道存在
         channelService.validateChannelExists(reqVO.getChannelId());
+
+        // 2. 更新素材
         ImChannelMaterialDO updateObj = BeanUtils.toBean(reqVO, ImChannelMaterialDO.class);
         channelMaterialMapper.updateById(updateObj);
     }

@@ -18,8 +18,8 @@ public class ImChannelMaterialRespVO {
     @Schema(description = "频道名称（关联查询填充）")
     private String channelName;
 
-    @Schema(description = "素材类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "125")
-    private Integer type; // 参见 ImMessageTypeEnum 枚举类
+    @Schema(description = "内容类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer type; // 参见 ImChannelMaterialContentTypeEnum 枚举类
 
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
     private String title;

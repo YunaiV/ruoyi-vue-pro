@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.im.dal.mysql.channel;
+package cn.iocoder.yudao.module.im.dal.mysql.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessagePageReqVO;
-import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMessageDO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessagePageReqVO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

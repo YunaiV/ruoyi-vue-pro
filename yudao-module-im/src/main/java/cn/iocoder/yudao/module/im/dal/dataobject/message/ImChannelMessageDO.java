@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.im.dal.dataobject.channel;
+package cn.iocoder.yudao.module.im.dal.dataobject.message;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;

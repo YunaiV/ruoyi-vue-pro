@@ -18,8 +18,8 @@ public class ImChannelMaterialPageReqVO extends PageParam {
     @Schema(description = "频道编号", example = "1")
     private Long channelId;
 
-    @Schema(description = "素材类型", example = "125")
-    private Integer type;
+    @Schema(description = "内容类型", example = "1")
+    private Integer type; // 参见 ImChannelMaterialContentTypeEnum 枚举类
 
     @Schema(description = "标题", example = "活动")
     private String title;

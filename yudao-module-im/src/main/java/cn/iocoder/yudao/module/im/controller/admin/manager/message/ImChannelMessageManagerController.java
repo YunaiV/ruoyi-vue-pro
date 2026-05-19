@@ -1,18 +1,18 @@
-package cn.iocoder.yudao.module.im.controller.admin.manager.channel;
+package cn.iocoder.yudao.module.im.controller.admin.manager.message;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessagePageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessageRespVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessageSendReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessagePageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessageRespVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
-import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMessageDO;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import cn.iocoder.yudao.module.im.service.channel.ImChannelMaterialService;
-import cn.iocoder.yudao.module.im.service.channel.ImChannelMessageService;
+import cn.iocoder.yudao.module.im.service.message.ImChannelMessageService;
 import cn.iocoder.yudao.module.im.service.channel.ImChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - IM 频道消息")
@@ -66,14 +65,11 @@ public class ImChannelMessageManagerController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-        // TODO @AI：最好是 channelService 也包出一个 getChannelMap；类似别的模块
-        Map<Long, ImChannelDO> channelMap = convertMap(
-                channelService.getChannelList(convertSet(pageResult.getList(), ImChannelMessageDO::getChannelId)),
-                ImChannelDO::getId);
-        // TODO @AI：最好是 channelService 也包出一个 getChannelMap；类似别的模块
-        Map<Long, ImChannelMaterialDO> materialMap = convertMap(
-                channelMaterialService.getMaterialList(convertSet(pageResult.getList(), ImChannelMessageDO::getMaterialId)),
-                ImChannelMaterialDO::getId);
+        // 批量查询频道和素材，并回填频道名 / 素材标题
+        Map<Long, ImChannelDO> channelMap = channelService.getChannelMap(
+                convertSet(pageResult.getList(), ImChannelMessageDO::getChannelId));
+        Map<Long, ImChannelMaterialDO> materialMap = channelMaterialService.getMaterialMap(
+                convertSet(pageResult.getList(), ImChannelMessageDO::getMaterialId));
         return success(BeanUtils.toBean(pageResult, ImChannelMessageRespVO.class, vo -> {
             MapUtils.findAndThen(channelMap, vo.getChannelId(), c -> vo.setChannelName(c.getName()));
             MapUtils.findAndThen(materialMap, vo.getMaterialId(), m -> vo.setMaterialTitle(m.getTitle()));

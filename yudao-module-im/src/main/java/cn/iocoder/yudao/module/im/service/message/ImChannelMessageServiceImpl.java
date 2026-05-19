@@ -1,15 +1,16 @@
-package cn.iocoder.yudao.module.im.service.channel;
+package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessagePageReqVO;
-import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessageSendReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessagePageReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
-import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMessageDO;
-import cn.iocoder.yudao.module.im.dal.mysql.channel.ImChannelMessageMapper;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
+import cn.iocoder.yudao.module.im.dal.mysql.message.ImChannelMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.service.channel.ImChannelMaterialService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.MaterialMessage;
