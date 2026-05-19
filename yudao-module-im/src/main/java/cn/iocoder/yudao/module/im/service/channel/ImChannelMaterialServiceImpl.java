@@ -63,6 +63,11 @@ public class ImChannelMaterialServiceImpl implements ImChannelMaterialService {
     // ==================== 管理后台 ====================
 
     @Override
+    public List<ImChannelMaterialDO> getMaterialListByChannelId(Long channelId) {
+        return channelMaterialMapper.selectListByChannelId(channelId);
+    }
+
+    @Override
     public PageResult<ImChannelMaterialDO> getMaterialPage(ImChannelMaterialPageReqVO reqVO) {
         return channelMaterialMapper.selectPage(reqVO);
     }

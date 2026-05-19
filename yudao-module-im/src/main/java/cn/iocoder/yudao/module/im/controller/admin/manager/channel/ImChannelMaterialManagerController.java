@@ -88,4 +88,12 @@ public class ImChannelMaterialManagerController {
         return success(BeanUtils.toBean(material, ImChannelMaterialRespVO.class));
     }
 
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得指定频道下的素材精简列表；用于推送弹窗的素材下拉")
+    @Parameter(name = "channelId", description = "频道编号", required = true, example = "1")
+    public CommonResult<List<ImChannelMaterialRespVO>> getSimpleMaterialList(@RequestParam("channelId") Long channelId) {
+        List<ImChannelMaterialDO> list = channelMaterialService.getMaterialListByChannelId(channelId);
+        return success(BeanUtils.toBean(list, ImChannelMaterialRespVO.class));
+    }
+
 }

@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.material.I
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IM 频道素材 Mapper
  *
@@ -17,6 +19,12 @@ public interface ImChannelMaterialMapper extends BaseMapperX<ImChannelMaterialDO
 
     default Long selectCountByChannelId(Long channelId) {
         return selectCount(ImChannelMaterialDO::getChannelId, channelId);
+    }
+
+    default List<ImChannelMaterialDO> selectListByChannelId(Long channelId) {
+        return selectList(new LambdaQueryWrapperX<ImChannelMaterialDO>()
+                .eq(ImChannelMaterialDO::getChannelId, channelId)
+                .orderByDesc(ImChannelMaterialDO::getId));
     }
 
     default PageResult<ImChannelMaterialDO> selectPage(ImChannelMaterialPageReqVO reqVO) {

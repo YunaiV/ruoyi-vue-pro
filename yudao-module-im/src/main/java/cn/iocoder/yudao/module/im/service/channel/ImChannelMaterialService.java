@@ -58,6 +58,14 @@ public interface ImChannelMaterialService {
     // ==================== 管理后台 ====================
 
     /**
+     * 按频道查询素材精简列表
+     *
+     * @param channelId 频道编号
+     * @return 素材列表
+     */
+    List<ImChannelMaterialDO> getMaterialListByChannelId(Long channelId);
+
+    /**
      * 分页查询素材
      *
      * @param reqVO 分页查询条件
