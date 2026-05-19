@@ -80,6 +80,14 @@ public interface ErrorCodeConstants {
     ErrorCode FACE_USER_ITEM_NOT_OWN = new ErrorCode(1_040_800_011, "不能操作他人的表情");
     ErrorCode FACE_USER_ITEM_DUPLICATED = new ErrorCode(1_040_800_013, "该表情已添加到个人表情");
 
+    // ========== 频道 (1-040-810-000) ==========
+    ErrorCode IM_CHANNEL_NOT_EXISTS = new ErrorCode(1_040_810_000, "频道不存在");
+    ErrorCode IM_CHANNEL_CODE_DUPLICATED = new ErrorCode(1_040_810_001, "频道编码 '{}' 已存在");
+    ErrorCode IM_CHANNEL_HAS_MATERIAL = new ErrorCode(1_040_810_002, "频道下还有素材，无法删除");
+    ErrorCode IM_CHANNEL_MATERIAL_NOT_EXISTS = new ErrorCode(1_040_810_010, "素材不存在");
+    ErrorCode IM_CHANNEL_MATERIAL_USED = new ErrorCode(1_040_810_011, "素材已被推送过，无法删除");
+    ErrorCode IM_CHANNEL_MESSAGE_NOT_EXISTS = new ErrorCode(1_040_810_020, "频道消息不存在");
+
     // ========== 实时通话 (1-040-900-000) ==========
     ErrorCode RTC_NOT_ENABLED = new ErrorCode(1_040_900_000, "通话功能未开启");
     ErrorCode RTC_SESSION_NOT_EXISTS = new ErrorCode(1_040_900_001, "通话已结束");

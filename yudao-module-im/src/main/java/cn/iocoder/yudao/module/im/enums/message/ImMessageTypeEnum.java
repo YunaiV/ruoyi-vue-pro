@@ -61,6 +61,15 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
      */
     FACE(115, "表情", true, true),
 
+    // ========== 频道消息扩展段（125+；OpenIM 122 之后未占用，本系统在 125 起步给频道 / 公众号类消息扩展） ==========
+    /**
+     * 对应 OpenIM：无（125 段位 OpenIM 未占用，作为频道消息扩展起始位）
+     * 对应自己的类：MaterialMessage
+     * 场景：频道运营推送的素材消息；当前形态为图文卡片（title + coverUrl + summary + url）
+     * 详情：url 非空跳 url；url 为空时客户端按 materialId 拉 /get-content 渲染富文本正文
+     */
+    MATERIAL(125, "素材", true, true),
+
     // ========== 信号类（2101 / 2200 直接复用 OpenIM 段位编号；2201 自有扩展） ==========
     /**
      * 对应 OpenIM：RevokeNotification 2101

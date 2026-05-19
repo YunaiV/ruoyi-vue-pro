@@ -17,7 +17,8 @@ import java.util.Objects;
 public enum ImConversationTypeEnum implements ArrayValuable<Integer> {
 
     PRIVATE(1, "私聊"), // 私聊
-    GROUP(2, "群聊"); // 群聊
+    GROUP(2, "群聊"), // 群聊
+    CHANNEL(3, "频道"); // 频道 / 公众号
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImConversationTypeEnum::getType).toArray(Integer[]::new);
 
@@ -41,6 +42,10 @@ public enum ImConversationTypeEnum implements ArrayValuable<Integer> {
 
     public static boolean isGroup(Integer type) {
         return Objects.equals(GROUP.type, type);
+    }
+
+    public static boolean isChannel(Integer type) {
+        return Objects.equals(CHANNEL.type, type);
     }
 
 }

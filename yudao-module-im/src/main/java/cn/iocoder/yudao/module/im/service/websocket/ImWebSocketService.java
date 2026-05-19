@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.websocket;
 
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 
@@ -52,5 +53,23 @@ public interface ImWebSocketService {
      * @param dto     群聊消息 DTO
      */
     void sendGroupMessageAsync(Collection<Long> userIds, ImGroupMessageDTO dto);
+
+    /**
+     * 异步推送频道消息给指定用户
+     *
+     * @param userId 目标用户编号
+     * @param dto    频道消息 DTO
+     */
+    default void sendChannelMessageAsync(Long userId, ImChannelMessageDTO dto) {
+        sendChannelMessageAsync(Collections.singleton(userId), dto);
+    }
+
+    /**
+     * 异步批量推送频道消息给多个用户
+     *
+     * @param userIds 目标用户编号列表
+     * @param dto     频道消息 DTO
+     */
+    void sendChannelMessageAsync(Collection<Long> userIds, ImChannelMessageDTO dto);
 
 }

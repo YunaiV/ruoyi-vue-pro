@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.service.websocket;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
+import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import jakarta.annotation.Resource;
@@ -43,6 +44,11 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
         executeAfterTransaction(() -> getSelf().doSendGroupMessage(userIds, dto));
     }
 
+    @Override
+    public void sendChannelMessageAsync(Collection<Long> userIds, ImChannelMessageDTO dto) {
+        executeAfterTransaction(() -> getSelf().doSendChannelMessage(userIds, dto));
+    }
+
     /**
      * 异步发送私聊 WebSocket 消息；多收件人共享同一 dto，避免按收件人重复注册 afterCommit 回调
      */
@@ -69,6 +75,21 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
                         ImGroupMessageDTO.TYPE, dto);
             } catch (Exception e) {
                 log.error("[doSendGroupMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
+            }
+        }
+    }
+
+    /**
+     * 异步发送频道 WebSocket 消息
+     */
+    @Async
+    public void doSendChannelMessage(Collection<Long> userIds, ImChannelMessageDTO dto) {
+        for (Long userId : userIds) {
+            try {
+                webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+                        ImChannelMessageDTO.TYPE, dto);
+            } catch (Exception e) {
+                log.error("[doSendChannelMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
             }
         }
     }
