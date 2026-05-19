@@ -72,4 +72,11 @@ public interface ImWebSocketService {
      */
     void sendChannelMessageAsync(Collection<Long> userIds, ImChannelMessageDTO dto);
 
+    /**
+     * 异步广播频道消息给当前所有在线管理端用户；用于全员推送
+     *
+     * @param dto 频道消息 DTO
+     */
+    void broadcastChannelMessageAsync(ImChannelMessageDTO dto);
+
 }

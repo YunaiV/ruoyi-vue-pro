@@ -49,6 +49,11 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
         executeAfterTransaction(() -> getSelf().doSendChannelMessage(userIds, dto));
     }
 
+    @Override
+    public void broadcastChannelMessageAsync(ImChannelMessageDTO dto) {
+        executeAfterTransaction(() -> getSelf().doBroadcastChannelMessage(dto));
+    }
+
     /**
      * 异步发送私聊 WebSocket 消息；多收件人共享同一 dto，避免按收件人重复注册 afterCommit 回调
      */
@@ -91,6 +96,20 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
             } catch (Exception e) {
                 log.error("[doSendChannelMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
             }
+        }
+    }
+
+    /**
+     * 异步广播频道 WebSocket 消息给当前所有在线管理端用户；
+     * 依赖 WebSocketMessageSender 按 UserType 广播能力，离线用户由客户端上线 pull 兜底
+     */
+    @Async
+    public void doBroadcastChannelMessage(ImChannelMessageDTO dto) {
+        try {
+            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(),
+                    ImChannelMessageDTO.TYPE, dto);
+        } catch (Exception e) {
+            log.error("[doBroadcastChannelMessage][dto({}) 广播失败]", dto, e);
         }
     }
 

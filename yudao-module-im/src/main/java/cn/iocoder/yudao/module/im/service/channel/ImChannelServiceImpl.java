@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.channel;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.IM_CHANNEL_CODE_DUPLICATED;
@@ -113,8 +113,7 @@ public class ImChannelServiceImpl implements ImChannelService {
         if (exist == null) {
             return;
         }
-        // TODO @AI：notEquals objutils；
-        if (id == null || !Objects.equals(exist.getId(), id)) {
+        if (id == null || ObjUtil.notEqual(exist.getId(), id)) {
             throw exception(IM_CHANNEL_CODE_DUPLICATED, code);
         }
     }

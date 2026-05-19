@@ -29,11 +29,11 @@ public interface ImChannelMessageService {
     List<ImChannelMessageDO> getMessageListForPull(Long userId, Long minId, Integer size);
 
     /**
-     * 校验用户是否能看到指定素材；用作详情接口的归属校验
+     * 校验用户是否曾经收到过指定素材；防横向越权
      *
      * @param userId     当前用户编号
      * @param materialId 素材编号
-     * @return 是否能看到（曾经收到过 / 全员消息）
+     * @return 是否曾收到（receiver_user_ids 命中 / 全员）
      */
     boolean isUserReceivedMaterial(Long userId, Long materialId);
 

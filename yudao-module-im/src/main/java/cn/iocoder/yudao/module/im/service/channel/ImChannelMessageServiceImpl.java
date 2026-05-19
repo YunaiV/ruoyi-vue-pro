@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.service.channel;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessagePageReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.message.ImChannelMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
@@ -59,31 +60,19 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
         // 1. 校验素材存在
         ImChannelMaterialDO material = channelMaterialService.validateMaterialExists(reqVO.getMaterialId());
 
-        // 2. 组装 payload（不带富文本正文）
-        // TODO @AI：链式调用；想通在一行
-        MaterialMessage payload = new MaterialMessage()
-                .setTitle(material.getTitle())
-                .setCoverUrl(material.getCoverUrl())
-                .setSummary(material.getSummary())
-                .setUrl(material.getUrl());
-        String payloadJson = JsonUtils.toJsonString(payload);
-
-        // 3. 落库 1 行 message
-        // TODO @AI：链式调用；想通在一行
-        ImChannelMessageDO message = new ImChannelMessageDO()
-                .setChannelId(material.getChannelId())
-                .setMaterialId(material.getId())
-                .setType(ImMessageTypeEnum.MATERIAL.getType())
-                .setContent(payloadJson)
-                .setReceiverUserIds(reqVO.getReceiverUserIds())
-                .setSendTime(LocalDateTime.now());
+        // 2.1 组装 payload（不带富文本正文）；字段同名直接 BeanUtils 拷贝
+        String payloadJson = JsonUtils.toJsonString(BeanUtils.toBean(material, MaterialMessage.class));
+        // 2.2 落库 1 行 message；reqVO 同名字段（materialId / receiverUserIds）自动拷贝，剩余字段补 set
+        ImChannelMessageDO message = BeanUtils.toBean(reqVO, ImChannelMessageDO.class).setChannelId(material.getChannelId())
+                .setType(ImMessageTypeEnum.MATERIAL.getType()).setContent(payloadJson).setSendTime(LocalDateTime.now());
         channelMessageMapper.insert(message);
 
-        // 4. 异步推 WebSocket；全员场景（receiverUserIds 为空）暂不实时广播，依靠客户端上线后 pull 兜底
-        // TODO @AI：全院也要发；
+        // 3. 异步推 WebSocket：指定用户走点对点；全员（receiverUserIds 为空）走广播
+        ImChannelMessageDTO dto = ImChannelMessageDTO.ofSend(message);
         if (CollUtil.isNotEmpty(reqVO.getReceiverUserIds())) {
-            webSocketService.sendChannelMessageAsync(reqVO.getReceiverUserIds(),
-                    ImChannelMessageDTO.ofSend(message));
+            webSocketService.sendChannelMessageAsync(reqVO.getReceiverUserIds(), dto);
+        } else {
+            webSocketService.broadcastChannelMessageAsync(dto);
         }
         return message.getId();
     }
