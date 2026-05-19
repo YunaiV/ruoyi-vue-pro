@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
-import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
+import cn.iocoder.yudao.module.im.dal.redis.message.ImGroupMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -56,7 +56,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImSensitiveWordService sensitiveWordService;
     @Mock
-    private GroupMessageReadRedisDAO groupMessageReadRedisDAO;
+    private ImGroupMessageReadRedisDAO groupMessageReadRedisDAO;
     @Mock
     private ImWebSocketService imWebSocketService;
 

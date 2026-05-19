@@ -16,6 +16,13 @@ public interface RedisKeyConstants {
     String GROUP_MESSAGE_READ = "im:group:message:read:%s";
 
     /**
+     * 频道消息已读位置
+     * KEY 格式：  im:channel:message:read:{channelId}
+     * VALUE 数据类型： Hash (field: userId, value: maxReadMessageId)
+     */
+    String CHANNEL_MESSAGE_READ = "im:channel:message:read:%s";
+
+    /**
      * 好友关系状态缓存（合并「是否好友」+「是否拉黑」两态）
      * <p>
      * KEY 格式：friend_state:{userId}_{friendUserId}

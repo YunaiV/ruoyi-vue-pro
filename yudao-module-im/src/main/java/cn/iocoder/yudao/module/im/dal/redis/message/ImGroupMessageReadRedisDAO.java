@@ -12,12 +12,12 @@ import java.util.Map;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP_MESSAGE_READ;
 
 /**
- * 群消息已读位置 Redis DAO
+ * IM 群消息已读位置 Redis DAO
  *
  * @author 芋道源码
  */
 @Repository
-public class GroupMessageReadRedisDAO {
+public class ImGroupMessageReadRedisDAO {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;

@@ -72,7 +72,8 @@ public class ImChannelMessageManagerController {
                 convertSet(pageResult.getList(), ImChannelMessageDO::getMaterialId));
         return success(BeanUtils.toBean(pageResult, ImChannelMessageRespVO.class, vo -> {
             MapUtils.findAndThen(channelMap, vo.getChannelId(), c -> vo.setChannelName(c.getName()));
-            MapUtils.findAndThen(materialMap, vo.getMaterialId(), m -> vo.setMaterialTitle(m.getTitle()));
+            MapUtils.findAndThen(materialMap, vo.getMaterialId(),
+                    material -> vo.setMaterialTitle(material.getTitle()).setMaterialCoverUrl(material.getCoverUrl()));
         }));
     }
 

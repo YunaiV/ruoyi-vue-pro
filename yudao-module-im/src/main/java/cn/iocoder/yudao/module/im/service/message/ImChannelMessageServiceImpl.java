@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -9,18 +11,23 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.Im
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImChannelMessageMapper;
+import cn.iocoder.yudao.module.im.dal.redis.message.ImChannelMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.channel.ImChannelMaterialService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.MaterialMessage;
 import jakarta.annotation.Resource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.IM_CHANNEL_MESSAGE_NOT_EXISTS;
@@ -36,16 +43,61 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
 
     @Resource
     private ImChannelMessageMapper channelMessageMapper;
+
     @Resource
     private ImChannelMaterialService channelMaterialService;
     @Resource
     private ImWebSocketService webSocketService;
+
+    @Resource
+    private ImChannelMessageReadRedisDAO channelMessageReadRedisDAO;
 
     // ==================== 用户端 ====================
 
     @Override
     public List<ImChannelMessageDO> getMessageListForPull(Long userId, Long minId, Integer size) {
         return channelMessageMapper.selectListByUserAndMinId(userId, minId, size);
+    }
+
+    @Override
+    public Map<Long, Long> getChannelReadMaxMessageIdMap(Long userId, Collection<Long> channelIds) {
+        Map<Long, Long> result = new HashMap<>(channelIds.size());
+        for (Long channelId : channelIds) {
+            Long max = channelMessageReadRedisDAO.getReadMaxMessageId(channelId, userId);
+            if (max != null) {
+                result.put(channelId, max);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void readChannelMessages(Long userId, Long channelId, Long messageId) {
+        Assert.notNull(channelId, "频道编号不能为空");
+        Assert.notNull(messageId, "已读消息编号不能为空");
+        // 1. 已读位置未前进，直接返回
+        Long prevMaxMessageId = channelMessageReadRedisDAO.getReadMaxMessageId(channelId, userId);
+        if (prevMaxMessageId != null && prevMaxMessageId >= messageId) {
+            return;
+        }
+
+        // 2. 更新 Redis 频道已读位置
+        channelMessageReadRedisDAO.updateReadMaxMessageId(channelId, userId, messageId);
+
+        // 3. 异步推 READ 事件给自己多端同步
+        getSelf().readChannelMessageEvent(userId, channelId, messageId);
+    }
+
+    /**
+     * 发送频道已读 READ 事件给自己其他终端；频道无「给发送方刷回执」概念，不广播
+     */
+    @Async
+    public void readChannelMessageEvent(Long userId, Long channelId, Long readId) {
+        webSocketService.sendChannelMessageAsync(userId, ImChannelMessageDTO.ofRead(channelId, readId));
+    }
+
+    private ImChannelMessageServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
     // ==================== 管理后台 ====================

@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
-import cn.iocoder.yudao.module.im.dal.redis.message.GroupMessageReadRedisDAO;
+import cn.iocoder.yudao.module.im.dal.redis.message.ImGroupMessageReadRedisDAO;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
@@ -66,7 +66,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     @Resource
     private ImGroupMessageMapper groupMessageMapper;
     @Resource
-    private GroupMessageReadRedisDAO groupMessageReadRedisDAO;
+    private ImGroupMessageReadRedisDAO groupMessageReadRedisDAO;
 
     @Resource
     private ImGroupService groupService;

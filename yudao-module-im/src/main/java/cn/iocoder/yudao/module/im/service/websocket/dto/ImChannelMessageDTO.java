@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.service.websocket.dto;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -51,6 +52,19 @@ public class ImChannelMessageDTO {
      */
     public static ImChannelMessageDTO ofSend(ImChannelMessageDO message) {
         return BeanUtils.toBean(message, ImChannelMessageDTO.class);
+    }
+
+    /**
+     * 构建已读同步 DTO；多端同步：通知自己的其他终端「我已经读了某频道」
+     *
+     * @param channelId 频道编号
+     * @param readId    已读位置（最大已读消息编号）
+     * @return 频道 DTO
+     */
+    public static ImChannelMessageDTO ofRead(Long channelId, Long readId) {
+        return new ImChannelMessageDTO()
+                .setId(readId).setType(ImMessageTypeEnum.READ.getType())
+                .setChannelId(channelId);
     }
 
 }
