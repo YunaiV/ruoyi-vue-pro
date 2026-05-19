@@ -1,0 +1,832 @@
+﻿-- ----------------------------
+-- MES 排班计划
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_cal_plan` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `calendar_type` tinyint DEFAULT NULL,
+    `start_date` timestamp DEFAULT NULL,
+    `end_date` timestamp DEFAULT NULL,
+    `shift_type` tinyint DEFAULT NULL,
+    `shift_method` tinyint DEFAULT NULL,
+    `shift_count` int DEFAULT NULL,
+    `status` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 排班计划班次
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_cal_plan_shift` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `plan_id` bigint DEFAULT NULL,
+    `sort` int DEFAULT NULL,
+    `name` varchar(64) DEFAULT NULL,
+    `start_time` varchar(10) DEFAULT NULL,
+    `end_time` varchar(10) DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 排班计划班组
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_cal_plan_team` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `plan_id` bigint DEFAULT NULL,
+    `team_id` bigint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 班组排班
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_cal_team_shift` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `plan_id` bigint DEFAULT NULL,
+    `team_id` bigint DEFAULT NULL,
+    `shift_id` bigint DEFAULT NULL,
+    `day` timestamp DEFAULT NULL,
+    `sort` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 编码规则表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_md_auto_code_rule` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) NOT NULL,
+    `name` varchar(64) NOT NULL,
+    `description` varchar(255) DEFAULT NULL,
+    `max_length` int DEFAULT NULL,
+    `padded` tinyint(1) NOT NULL DEFAULT 0,
+    `padded_char` varchar(1) DEFAULT NULL,
+    `padded_method` tinyint DEFAULT NULL,
+    `status` tinyint NOT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 编码规则组成表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_md_auto_code_part` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `rule_id` bigint NOT NULL,
+    `sort` int NOT NULL,
+    `type` tinyint NOT NULL,
+    `length` int NOT NULL,
+    `date_format` varchar(20) DEFAULT NULL,
+    `fix_character` varchar(64) DEFAULT NULL,
+    `serial_start_no` int DEFAULT NULL,
+    `serial_step` int DEFAULT NULL,
+    `cycle_flag` tinyint(1) DEFAULT 0,
+    `cycle_method` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 编码生成记录表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_md_auto_code_record` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `rule_id` bigint NOT NULL,
+    `result` varchar(64) DEFAULT NULL,
+    `serial_no` bigint DEFAULT NULL,
+    `input_char` varchar(64) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 到货通知单
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_arrival_notice` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `purchase_order_code` varchar(64) DEFAULT NULL,
+    `vendor_id` bigint DEFAULT NULL,
+    `arrival_date` timestamp DEFAULT NULL,
+    `contact_name` varchar(64) DEFAULT NULL,
+    `contact_telephone` varchar(64) DEFAULT NULL,
+    `status` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 外协入库单
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_outsource_receipt` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `work_order_id` bigint DEFAULT NULL,
+    `vendor_id` bigint DEFAULT NULL,
+    `receipt_date` timestamp DEFAULT NULL,
+    `status` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 来料检验单（IQC）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_qc_iqc` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `template_id` bigint DEFAULT NULL,
+    `source_doc_type` int DEFAULT NULL,
+    `source_doc_id` bigint DEFAULT NULL,
+    `source_line_id` bigint DEFAULT NULL,
+    `source_doc_code` varchar(64) DEFAULT NULL,
+    `vendor_id` bigint DEFAULT NULL,
+    `vendor_batch` varchar(64) DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `received_quantity` decimal(24,6) DEFAULT NULL,
+    `check_quantity` decimal(24,6) DEFAULT NULL,
+    `qualified_quantity` decimal(24,6) DEFAULT NULL,
+    `unqualified_quantity` decimal(24,6) DEFAULT NULL,
+    `critical_rate` decimal(10,2) DEFAULT NULL,
+    `major_rate` decimal(10,2) DEFAULT NULL,
+    `minor_rate` decimal(10,2) DEFAULT NULL,
+    `critical_quantity` int DEFAULT NULL,
+    `major_quantity` int DEFAULT NULL,
+    `minor_quantity` int DEFAULT NULL,
+    `check_result` tinyint DEFAULT NULL,
+    `receive_date` timestamp DEFAULT NULL,
+    `inspect_date` timestamp DEFAULT NULL,
+    `inspector_user_id` bigint DEFAULT NULL,
+    `status` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 过程检验单（IPQC）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_qc_ipqc` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `name` varchar(500) DEFAULT NULL,
+    `type` tinyint DEFAULT NULL,
+    `template_id` bigint DEFAULT NULL,
+    `source_doc_type` int DEFAULT NULL,
+    `source_doc_id` bigint DEFAULT NULL,
+    `source_line_id` bigint DEFAULT NULL,
+    `source_doc_code` varchar(64) DEFAULT NULL,
+    `work_order_id` bigint DEFAULT NULL,
+    `task_id` bigint DEFAULT NULL,
+    `workstation_id` bigint DEFAULT NULL,
+    `process_id` bigint DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `check_quantity` decimal(14,2) DEFAULT NULL,
+    `qualified_quantity` decimal(14,2) DEFAULT NULL,
+    `unqualified_quantity` decimal(14,2) DEFAULT NULL,
+    `labor_scrap_quantity` decimal(14,2) DEFAULT NULL,
+    `material_scrap_quantity` decimal(14,2) DEFAULT NULL,
+    `other_scrap_quantity` decimal(14,2) DEFAULT NULL,
+    `critical_rate` decimal(14,2) DEFAULT NULL,
+    `major_rate` decimal(14,2) DEFAULT NULL,
+    `minor_rate` decimal(14,2) DEFAULT NULL,
+    `critical_quantity` int DEFAULT NULL,
+    `major_quantity` int DEFAULT NULL,
+    `minor_quantity` int DEFAULT NULL,
+    `check_result` tinyint DEFAULT NULL,
+    `inspect_date` timestamp DEFAULT NULL,
+    `inspector_user_id` bigint DEFAULT NULL,
+    `status` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 生产报工
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_pro_feedback` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `type` tinyint DEFAULT NULL,
+    `channel` varchar(64) DEFAULT NULL,
+    `feedback_time` timestamp DEFAULT NULL,
+    `workstation_id` bigint DEFAULT NULL,
+    `route_id` bigint DEFAULT NULL,
+    `process_id` bigint DEFAULT NULL,
+    `work_order_id` bigint DEFAULT NULL,
+    `task_id` bigint DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `expire_date` timestamp DEFAULT NULL,
+    `lot_number` varchar(64) DEFAULT NULL,
+    `scheduled_quantity` decimal(14,2) DEFAULT NULL,
+    `feedback_quantity` decimal(14,2) DEFAULT NULL,
+    `qualified_quantity` decimal(14,2) DEFAULT NULL,
+    `unqualified_quantity` decimal(14,2) DEFAULT NULL,
+    `uncheck_quantity` decimal(14,2) DEFAULT NULL,
+    `labor_scrap_quantity` decimal(14,2) DEFAULT NULL,
+    `material_scrap_quantity` decimal(14,2) DEFAULT NULL,
+    `other_scrap_quantity` decimal(14,2) DEFAULT NULL,
+    `feedback_user_id` bigint DEFAULT NULL,
+    `approve_user_id` bigint DEFAULT NULL,
+    `status` tinyint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 生产入库单主表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_product_produce` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `work_order_id` bigint DEFAULT NULL,
+    `feedback_id` bigint DEFAULT NULL,
+    `task_id` bigint DEFAULT NULL,
+    `workstation_id` bigint DEFAULT NULL,
+    `process_id` bigint DEFAULT NULL,
+    `produce_date` timestamp DEFAULT NULL,
+    `status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 生产入库单行表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_product_produce_line` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `produce_id` bigint DEFAULT NULL,
+    `feedback_id` bigint DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `quantity` decimal(12,2) DEFAULT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `expire_date` timestamp DEFAULT NULL,
+    `lot_number` varchar(128) DEFAULT NULL,
+    `quality_status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 生产入库明细表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_product_produce_detail` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `produce_id` bigint DEFAULT NULL,
+    `line_id` bigint DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `quantity` decimal(12,2) DEFAULT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `warehouse_id` bigint DEFAULT NULL,
+    `location_id` bigint DEFAULT NULL,
+    `area_id` bigint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 出货检验单（OQC）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_qc_oqc` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) NOT NULL,
+    `name` varchar(500) NOT NULL,
+    `template_id` bigint NOT NULL,
+    `source_doc_type` int DEFAULT NULL,
+    `source_doc_id` bigint DEFAULT NULL,
+    `source_line_id` bigint DEFAULT NULL,
+    `source_doc_code` varchar(64) DEFAULT NULL,
+    `client_id` bigint NOT NULL,
+    `batch_code` varchar(64) DEFAULT NULL,
+    `item_id` bigint NOT NULL,
+    `min_check_quantity` int DEFAULT 1,
+    `max_unqualified_quantity` int DEFAULT 0,
+    `out_quantity` decimal(14,2) NOT NULL,
+    `check_quantity` decimal(14,2) DEFAULT NULL,
+    `qualified_quantity` decimal(14,2) DEFAULT 0.00,
+    `unqualified_quantity` decimal(14,2) DEFAULT 0.00,
+    `critical_rate` decimal(14,2) DEFAULT 0.00,
+    `major_rate` decimal(14,2) DEFAULT 0.00,
+    `minor_rate` decimal(14,2) DEFAULT 0.00,
+    `critical_quantity` int DEFAULT 0,
+    `major_quantity` int DEFAULT 0,
+    `minor_quantity` int DEFAULT 0,
+    `check_result` tinyint DEFAULT NULL,
+    `out_date` timestamp DEFAULT NULL,
+    `inspect_date` timestamp DEFAULT NULL,
+    `inspector_user_id` bigint DEFAULT NULL,
+    `status` tinyint NOT NULL DEFAULT 0,
+    `remark` varchar(500) DEFAULT '',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 退货检验单（RQC）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_qc_rqc` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) NOT NULL,
+    `name` varchar(500) NOT NULL,
+    `template_id` bigint NOT NULL,
+    `source_doc_type` int DEFAULT NULL,
+    `source_doc_id` bigint DEFAULT NULL,
+    `source_line_id` bigint DEFAULT NULL,
+    `source_doc_code` varchar(64) DEFAULT NULL,
+    `type` int DEFAULT NULL,
+    `item_id` bigint NOT NULL,
+    `batch_code` varchar(128) DEFAULT NULL,
+    `check_quantity` decimal(14,2) DEFAULT NULL,
+    `qualified_quantity` decimal(14,2) DEFAULT 0.00,
+    `unqualified_quantity` decimal(14,2) DEFAULT 0.00,
+    `critical_rate` decimal(14,2) DEFAULT 0.00,
+    `major_rate` decimal(14,2) DEFAULT 0.00,
+    `minor_rate` decimal(14,2) DEFAULT 0.00,
+    `critical_quantity` int DEFAULT 0,
+    `major_quantity` int DEFAULT 0,
+    `minor_quantity` int DEFAULT 0,
+    `check_result` tinyint DEFAULT NULL,
+    `inspect_date` timestamp DEFAULT NULL,
+    `inspector_user_id` bigint DEFAULT NULL,
+    `status` tinyint NOT NULL DEFAULT 0,
+    `remark` varchar(500) DEFAULT '',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 销售出库单行
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_product_sales_line` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `sales_id` bigint NOT NULL,
+    `notice_line_id` bigint DEFAULT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(20,6) NOT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `material_stock_id` bigint DEFAULT NULL,
+    `oqc_check_flag` tinyint DEFAULT NULL,
+    `oqc_id` bigint DEFAULT NULL,
+    `quality_status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 生产退料单行
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_return_issue_line` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `issue_id` bigint NOT NULL,
+    `material_stock_id` bigint DEFAULT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(12,2) NOT NULL DEFAULT 0.00,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `rqc_id` bigint DEFAULT NULL,
+    `rqc_check_flag` tinyint(1) NOT NULL DEFAULT 0,
+    `quality_status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT '',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 销售退货单行
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_return_sales_line` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `return_id` bigint NOT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(12,2) NOT NULL DEFAULT 0.00,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `rqc_id` bigint DEFAULT NULL,
+    `rqc_check_flag` tinyint(1) NOT NULL DEFAULT 0,
+    `quality_status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT '',
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 采购入库单
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_item_receipt` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) NOT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `iqc_id` bigint DEFAULT NULL,
+    `notice_id` bigint DEFAULT NULL,
+    `vendor_id` bigint DEFAULT NULL,
+    `purchase_order_code` varchar(64) DEFAULT NULL,
+    `receipt_date` timestamp DEFAULT NULL,
+    `status` tinyint NOT NULL DEFAULT 0,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 采购入库单行
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_item_receipt_line` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `receipt_id` bigint NOT NULL,
+    `arrival_notice_line_id` bigint DEFAULT NULL,
+    `item_id` bigint NOT NULL,
+    `received_quantity` decimal(14,2) DEFAULT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `production_date` timestamp DEFAULT NULL,
+    `expire_date` timestamp DEFAULT NULL,
+    `lot_number` varchar(128) DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 采购入库明细
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_item_receipt_detail` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `line_id` bigint NOT NULL,
+    `receipt_id` bigint NOT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(14,2) DEFAULT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `warehouse_id` bigint DEFAULT NULL,
+    `location_id` bigint DEFAULT NULL,
+    `area_id` bigint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 物料消耗记录表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_item_consume` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `work_order_id` bigint NOT NULL,
+    `task_id` bigint NOT NULL,
+    `workstation_id` bigint NOT NULL,
+    `process_id` bigint NOT NULL,
+    `feedback_id` bigint NOT NULL,
+    `consume_date` timestamp NOT NULL,
+    `status` tinyint NOT NULL DEFAULT 0,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 物料消耗记录行表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_item_consume_line` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `consume_id` bigint NOT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(14,2) NOT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(128) DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 物料消耗记录明细表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_item_consume_detail` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `consume_id` bigint NOT NULL,
+    `line_id` bigint NOT NULL,
+    `material_stock_id` bigint DEFAULT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(14,2) NOT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(128) DEFAULT NULL,
+    `warehouse_id` bigint NOT NULL,
+    `location_id` bigint NOT NULL,
+    `area_id` bigint NOT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 批次记录表
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_batch` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(128) DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `produce_date` timestamp DEFAULT NULL,
+    `expire_date` timestamp DEFAULT NULL,
+    `receipt_date` timestamp DEFAULT NULL,
+    `vendor_id` bigint DEFAULT NULL,
+    `client_id` bigint DEFAULT NULL,
+    `sales_order_code` varchar(64) DEFAULT NULL,
+    `purchase_order_code` varchar(64) DEFAULT NULL,
+    `work_order_id` bigint DEFAULT NULL,
+    `task_id` bigint DEFAULT NULL,
+    `workstation_id` bigint DEFAULT NULL,
+    `tool_id` bigint DEFAULT NULL,
+    `mold_id` bigint DEFAULT NULL,
+    `lot_number` varchar(128) DEFAULT NULL,
+    `quality_status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 库存台账
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_material_stock` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `item_type_id` bigint DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `warehouse_id` bigint DEFAULT NULL,
+    `location_id` bigint DEFAULT NULL,
+    `area_id` bigint DEFAULT NULL,
+    `vendor_id` bigint DEFAULT NULL,
+    `quantity` decimal(14,2) DEFAULT NULL,
+    `receipt_time` timestamp DEFAULT NULL,
+    `frozen` tinyint(1) DEFAULT 0,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 生产任务
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_pro_task` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `work_order_id` bigint DEFAULT NULL,
+    `workstation_id` bigint DEFAULT NULL,
+    `route_id` bigint DEFAULT NULL,
+    `process_id` bigint DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `quantity` decimal(14,2) DEFAULT NULL,
+    `produced_quantity` decimal(14,2) DEFAULT NULL,
+    `qualify_quantity` decimal(14,2) DEFAULT NULL,
+    `unqualify_quantity` decimal(14,2) DEFAULT NULL,
+    `changed_quantity` decimal(14,2) DEFAULT NULL,
+    `client_id` bigint DEFAULT NULL,
+    `start_time` timestamp DEFAULT NULL,
+    `duration` int DEFAULT NULL,
+    `end_time` timestamp DEFAULT NULL,
+    `color_code` varchar(20) DEFAULT NULL,
+    `finish_date` timestamp DEFAULT NULL,
+    `cancel_date` timestamp DEFAULT NULL,
+    `status` int DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 工艺路线工序
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_pro_route_process` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `route_id` bigint DEFAULT NULL,
+    `process_id` bigint DEFAULT NULL,
+    `sort` int DEFAULT NULL,
+    `next_process_id` bigint DEFAULT NULL,
+    `link_type` int DEFAULT NULL,
+    `prepare_time` int DEFAULT NULL,
+    `wait_time` int DEFAULT NULL,
+    `color_code` varchar(20) DEFAULT NULL,
+    `key_flag` tinyint(1) DEFAULT 0,
+    `check_flag` tinyint(1) DEFAULT 0,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 销售出库明细
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_wm_product_sales_detail` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `line_id` bigint NOT NULL,
+    `sales_id` bigint NOT NULL,
+    `item_id` bigint NOT NULL,
+    `quantity` decimal(14,2) DEFAULT NULL,
+    `material_stock_id` bigint DEFAULT NULL,
+    `batch_id` bigint DEFAULT NULL,
+    `batch_code` varchar(255) DEFAULT NULL,
+    `warehouse_id` bigint DEFAULT NULL,
+    `location_id` bigint DEFAULT NULL,
+    `area_id` bigint DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- MES 检验结果记录
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mes_qc_indicator_result` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `code` varchar(64) DEFAULT NULL,
+    `qc_id` bigint DEFAULT NULL,
+    `qc_type` int DEFAULT NULL,
+    `item_id` bigint DEFAULT NULL,
+    `sn` varchar(128) DEFAULT NULL,
+    `remark` varchar(500) DEFAULT NULL,
+    `creator` varchar(64) DEFAULT '',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updater` varchar(64) DEFAULT '',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted` tinyint(1) NOT NULL DEFAULT 0,
+    `tenant_id` bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
