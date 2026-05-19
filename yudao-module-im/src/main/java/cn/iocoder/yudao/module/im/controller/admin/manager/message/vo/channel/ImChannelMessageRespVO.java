@@ -25,6 +25,9 @@ public class ImChannelMessageRespVO {
     @Schema(description = "素材标题（关联查询填充）")
     private String materialTitle;
 
+    @Schema(description = "素材封面 URL（关联查询填充）")
+    private String materialCoverUrl;
+
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "125")
     private Integer type; // 参见 ImMessageTypeEnum 枚举类
 
