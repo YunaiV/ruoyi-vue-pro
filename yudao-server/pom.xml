@@ -116,11 +116,11 @@
 <!--        </dependency>-->
 
         <!-- MES 制造执行系统相关模块 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-mes</artifactId>-->
-<!--            <version>${revision}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-mes</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- WMS 仓库管理模块 -->
         <dependency>
