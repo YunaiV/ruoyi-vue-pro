@@ -17,7 +17,7 @@ public class MaterialMessage {
     /**
      * 素材内容类型
      * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.im.enums.channel.ImChannelMaterialContentTypeEnum}
+     * 枚举 {@link cn.iocoder.yudao.module.im.enums.channel.ImChannelMaterialTypeEnum}
      * 客户端按本字段判定点击行为：CONTENT 走站内详情页拉富文本；LINK 跳 url
      */
     private Integer type;

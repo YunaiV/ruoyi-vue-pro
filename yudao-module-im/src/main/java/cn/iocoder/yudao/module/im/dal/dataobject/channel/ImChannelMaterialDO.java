@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.channel;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.im.enums.channel.ImChannelMaterialContentTypeEnum;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
+import cn.iocoder.yudao.module.im.enums.channel.ImChannelMaterialTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -41,7 +42,7 @@ public class ImChannelMaterialDO extends BaseDO {
     /**
      * 素材内容类型
      * <p>
-     * 枚举 {@link ImChannelMaterialContentTypeEnum}
+     * 枚举 {@link ImChannelMaterialTypeEnum}
      */
     private Integer type;
     /**
@@ -57,11 +58,11 @@ public class ImChannelMaterialDO extends BaseDO {
      */
     private String summary;
     /**
-     * 富文本 HTML；在 {@link ImChannelMaterialContentTypeEnum#CONTENT} 使用
+     * 富文本 HTML；在 {@link ImChannelMaterialTypeEnum#CONTENT} 使用
      */
     private String content;
     /**
-     * 跳转链接；在 {@link ImChannelMaterialContentTypeEnum#LINK} 使用
+     * 跳转链接；在 {@link ImChannelMaterialTypeEnum#LINK} 使用
      */
     private String url;
 

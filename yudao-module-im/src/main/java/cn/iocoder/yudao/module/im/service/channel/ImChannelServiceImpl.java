@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.channel.Im
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelDO;
 import cn.iocoder.yudao.module.im.dal.mysql.channel.ImChannelMapper;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -31,6 +32,7 @@ public class ImChannelServiceImpl implements ImChannelService {
     @Resource
     private ImChannelMapper channelMapper;
     @Resource
+    @Lazy // 延迟加载，解决循环依赖
     private ImChannelMaterialService channelMaterialService;
 
     // ==================== 用户端 ====================

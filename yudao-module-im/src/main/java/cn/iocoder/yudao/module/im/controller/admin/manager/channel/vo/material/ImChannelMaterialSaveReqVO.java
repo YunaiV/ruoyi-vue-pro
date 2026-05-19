@@ -19,7 +19,7 @@ public class ImChannelMaterialSaveReqVO {
 
     @Schema(description = "内容类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "内容类型不能为空")
-    private Integer type; // 参见 ImChannelMaterialContentTypeEnum 枚举类
+    private Integer type; // 参见 ImChannelMaterialTypeEnum 枚举类
 
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "双十一活动来啦")
     @NotBlank(message = "标题不能为空")

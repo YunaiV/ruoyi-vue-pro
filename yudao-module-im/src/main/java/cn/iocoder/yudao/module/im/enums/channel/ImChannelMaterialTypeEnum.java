@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum ImChannelMaterialContentTypeEnum implements ArrayValuable<Integer> {
+public enum ImChannelMaterialTypeEnum implements ArrayValuable<Integer> {
 
     /**
      * 站内富文本；点击素材在客户端内置详情页拉 content 渲染
@@ -24,7 +24,7 @@ public enum ImChannelMaterialContentTypeEnum implements ArrayValuable<Integer> {
      */
     LINK(2, "外链");
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImChannelMaterialContentTypeEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImChannelMaterialTypeEnum::getType).toArray(Integer[]::new);
 
     private final Integer type;
     private final String name;

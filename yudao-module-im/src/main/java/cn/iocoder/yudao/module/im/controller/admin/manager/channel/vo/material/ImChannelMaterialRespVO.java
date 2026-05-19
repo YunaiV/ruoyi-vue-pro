@@ -19,7 +19,7 @@ public class ImChannelMaterialRespVO {
     private String channelName;
 
     @Schema(description = "内容类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer type; // 参见 ImChannelMaterialContentTypeEnum 枚举类
+    private Integer type; // 参见 ImChannelMaterialTypeEnum 枚举类
 
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
     private String title;
