@@ -17,7 +17,7 @@ public class IotAlertRecordPageReqVO extends PageParam {
     private Long configId;
 
     @Schema(description = "告警级别", example = "1")
-    private Integer level;
+    private Integer configLevel;
 
     @Schema(description = "产品编号", example = "2050")
     private Long productId;

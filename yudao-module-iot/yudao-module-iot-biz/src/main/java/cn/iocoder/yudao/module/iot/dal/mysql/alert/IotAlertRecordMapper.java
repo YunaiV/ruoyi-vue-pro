@@ -22,7 +22,7 @@ public interface IotAlertRecordMapper extends BaseMapperX<IotAlertRecordDO> {
     default PageResult<IotAlertRecordDO> selectPage(IotAlertRecordPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotAlertRecordDO>()
                 .eqIfPresent(IotAlertRecordDO::getConfigId, reqVO.getConfigId())
-                .eqIfPresent(IotAlertRecordDO::getConfigLevel, reqVO.getLevel())
+                .eqIfPresent(IotAlertRecordDO::getConfigLevel, reqVO.getConfigLevel())
                 .eqIfPresent(IotAlertRecordDO::getProductId, reqVO.getProductId())
                 .eqIfPresent(IotAlertRecordDO::getDeviceId, reqVO.getDeviceId())
                 .eqIfPresent(IotAlertRecordDO::getProcessStatus, reqVO.getProcessStatus())
