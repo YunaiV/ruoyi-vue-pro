@@ -66,6 +66,10 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
     }
 
     private boolean computeIgnoreTable(String tableName) {
+        // MES 和 WMS 模块的表尚未添加 tenant_id 列，暂不进行租户拦截
+        if (tableName.startsWith("mes_") || tableName.startsWith("wms_")) {
+            return true;
+        }
         // 找不到的表，说明不是 yudao 项目里的，不进行拦截（忽略租户）
         TableInfo tableInfo = TableInfoHelper.getTableInfo(tableName);
         if (tableInfo == null) {
