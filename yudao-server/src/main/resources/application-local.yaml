@@ -9,6 +9,7 @@ spring:
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
       - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
       - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
+      - cn.iocoder.yudao.framework.encrypt.config.YudaoApiEncryptAutoConfiguration # 本地环境禁用 API 加解密（JDK 21 + BC 兼容问题）
   # 数据源配置项
   datasource:
     druid: # Druid 【监控】相关的全局配置
@@ -56,18 +57,12 @@ spring:
           #          url: jdbc:kingbase8://127.0.0.1:54321/test  # 人大金仓 KingbaseES 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/postgres # OpenGauss 连接的示例
           username: root
-          password: 123456
-          #          username: sa # SQL Server 连接的示例
-          #          password: Yudao@2024 # SQL Server 连接的示例
-          #          username: SYSDBA # DM 连接的示例
-          #          password: SYSDBA001 # DM 连接的示例
-          #          username: root # OpenGauss 连接的示例
-          #          password: Yudao@2024 # OpenGauss 连接的示例
+          password: ''
         slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
           username: root
-          password: 123456
+          password: ''
 #        tdengine: # IoT 数据库（需要 IoT 物联网再开启噢！）
 #          lazy: true # 开启懒加载，保证启动速度
 #          url: jdbc:TAOS-WS://127.0.0.1:6041/ruoyi_vue_pro?varcharAsString=true
