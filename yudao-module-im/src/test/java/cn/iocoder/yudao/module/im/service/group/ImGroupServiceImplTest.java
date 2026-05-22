@@ -35,6 +35,7 @@ import org.mockito.Spy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -565,9 +566,11 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 目标：两个普通成员
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build(),
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                     ImGroupMemberDO.builder().groupId(10L).userId(3L)
-                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
@@ -600,7 +603,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 目标：另一个管理员
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
-                            .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
@@ -628,7 +632,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().groupId(10L).userId(99L)
-                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build()));
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
@@ -637,6 +642,44 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.removeGroupMember(1L, reqVO));
             assertEquals(GROUP_REMOVE_OWNER_DENIED.getCode(), exception.getCode());
+        }
+    }
+
+    @Test
+    public void testRemoveGroupMember_skipInactiveTargets() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            // 操作者：群主
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
+            // 目标：2L 有效普通成员；3L 已退群（DISABLE）的历史管理员，应被跳过而非拦截整批
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole())
+                            .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                    ImGroupMemberDO.builder().groupId(10L).userId(3L)
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole())
+                            .status(CommonStatusEnum.DISABLE.getStatus()).build()));
+
+            ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
+            reqVO.setGroupId(10L);
+            reqVO.setMemberUserIds(List.of(2L, 3L));
+
+            groupService.removeGroupMember(1L, reqVO);
+
+            // 仅有效成员 2L 进入移除 / 已读清理，已退群的 3L 被跳过
+            ArgumentCaptor<Collection> removeCaptor = ArgumentCaptor.forClass(Collection.class);
+            verify(groupMemberService).removeGroupMembers(eq(10L), removeCaptor.capture());
+            assertEquals(Set.of(2L), Set.copyOf(removeCaptor.getValue()));
+            ArgumentCaptor<Collection> readCaptor = ArgumentCaptor.forClass(Collection.class);
+            verify(groupMessageService).deleteReadMaxMessageIds(eq(10L), readCaptor.capture());
+            assertEquals(Set.of(2L), Set.copyOf(readCaptor.getValue()));
         }
     }
 

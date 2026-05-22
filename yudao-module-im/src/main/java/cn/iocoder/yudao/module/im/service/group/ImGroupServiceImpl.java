@@ -50,8 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.GROUP;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 
@@ -266,8 +265,15 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (targetUserIds.contains(userId)) {
             throw exception(GROUP_CANNOT_REMOVE_SELF);
         }
-        // 1.3 三档权限校验：群主不可被移出；管理员不能移出管理员
-        List<ImGroupMemberDO> targets = groupMemberService.getGroupMembers(groupId, targetUserIds);
+        // 1.3 仅保留仍有效的成员；已退群（DISABLE）/ 查无记录的目标直接跳过，只踢有效成员，不让整批失败
+        List<ImGroupMemberDO> targets = filterList(groupMemberService.getGroupMembers(groupId, targetUserIds),
+                target -> CommonStatusEnum.ENABLE.getStatus().equals(target.getStatus()));
+        Set<Long> validTargetUserIds = convertSet(targets, ImGroupMemberDO::getUserId);
+        // 1.4 目标全部已不在群：无人可踢，直接返回
+        if (CollUtil.isEmpty(validTargetUserIds)) {
+            return;
+        }
+        // 1.5 三档权限校验：群主不可被移出；管理员不能移出管理员
         boolean operatorIsAdmin = ImGroupMemberRoleEnum.isAdmin(operator.getRole());
         for (ImGroupMemberDO target : targets) {
             if (ImGroupMemberRoleEnum.isOwner(target.getRole())) {
@@ -280,12 +286,12 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         // 2. 先发 GROUP_MEMBER_KICK 通知：放在被踢者移除前，sendGroupMessage 才能查到全员（含被踢者）
         groupMessageService.sendGroupMessage(userId,
-                ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, targetUserIds));
+                ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, validTargetUserIds));
 
         // 3.1 批量移除群成员
-        groupMemberService.removeGroupMembers(groupId, targetUserIds);
+        groupMemberService.removeGroupMembers(groupId, validTargetUserIds);
         // 3.2 批量清理已读缓存
-        groupMessageService.deleteReadMaxMessageIds(groupId, targetUserIds);
+        groupMessageService.deleteReadMaxMessageIds(groupId, validTargetUserIds);
     }
 
     @Override
@@ -542,16 +548,24 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     @CacheEvict(cacheNames = GROUP, key = "#banReqVO.id")
     public void banGroup(Long operatorUserId, ImGroupManagerBanReqVO banReqVO) {
-        // 1. 校验群存在
-        if (getSelf().getGroup(banReqVO.getId()) == null) {
+        // 1. 校验群存在且未解散
+        ImGroupDO group = getSelf().getGroup(banReqVO.getId());
+        if (group == null) {
             throw exception(GROUP_NOT_EXISTS);
         }
+        if (CommonStatusEnum.DISABLE.getStatus().equals(group.getStatus())) {
+            throw exception(GROUP_DISSOLVED);
+        }
+        // 2. 幂等：已封禁直接返回，避免重复广播封禁通知
+        if (Boolean.TRUE.equals(group.getBanned())) {
+            return;
+        }
 
-        // 2. 更新封禁状态
+        // 3. 更新封禁状态
         groupMapper.updateById(new ImGroupDO().setId(banReqVO.getId())
                 .setBanned(true).setBannedReason(banReqVO.getReason()).setBannedTime(LocalDateTime.now()));
 
-        // 3. 广播通知
+        // 4. 广播通知
         groupMessageService.sendGroupMessage(operatorUserId,
                 ImGroupMessageSendDTO.ofGroupBanned(banReqVO.getId(), operatorUserId, true));
     }

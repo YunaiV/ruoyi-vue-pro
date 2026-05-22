@@ -152,21 +152,24 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     public ImGroupMessageDO recallGroupMessage(Long userId, Long messageId) {
         // 1.1 校验消息存在
         ImGroupMessageDO message = validateGroupMessageExists(messageId);
-        // 1.2 只能撤回自己发送的消息
-        if (ObjUtil.notEqual(message.getSenderId(), userId)) {
+        // 1.2 校验撤回人仍在群中，并取角色用于权限判断
+        ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(message.getGroupId(), userId);
+        boolean isOwnerOrAdmin = ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole());
+        // 1.3 普通成员只能撤回自己发的消息；群主 / 管理员可撤回他人违规消息
+        if (ObjUtil.notEqual(message.getSenderId(), userId) && !isOwnerOrAdmin) {
             throw exception(MESSAGE_RECALL_DENIED);
         }
-        // 1.3 不能重复撤回
+        // 1.4 不能重复撤回
         if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
             throw exception(MESSAGE_ALREADY_RECALLED);
         }
-        // 1.4 只允许撤回限定时间内的消息
-        int recallTimeoutMinutes = imProperties.getMessage().getRecallTimeoutMinutes();
-        if (message.getSendTime().plusMinutes(recallTimeoutMinutes).isBefore(LocalDateTime.now())) {
-            throw exception(MESSAGE_RECALL_TIMEOUT, recallTimeoutMinutes);
+        // 1.5 撤回时间窗仅约束撤回自己的消息；群主 / 管理员治理他人违规消息不受时间限制
+        if (ObjUtil.equal(message.getSenderId(), userId)) {
+            int recallTimeoutMinutes = imProperties.getMessage().getRecallTimeoutMinutes();
+            if (message.getSendTime().plusMinutes(recallTimeoutMinutes).isBefore(LocalDateTime.now())) {
+                throw exception(MESSAGE_RECALL_TIMEOUT, recallTimeoutMinutes);
+            }
         }
-        // 1.5 校验撤回人仍在群中
-        groupMemberService.validateMemberInGroup(message.getGroupId(), userId);
 
         // 2. 更新原消息状态为撤回
         groupMessageMapper.updateById(new ImGroupMessageDO().setId(messageId)

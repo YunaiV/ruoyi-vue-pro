@@ -44,8 +44,9 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
     /**
      * 查询"退群前"的离线消息（退群成员使用）
      * <p>
-     * 语义：用户已退出某群，但仍需把 {@code minId} 之后、{@code minSendTime} 之后、
-     * 不晚于退群时间的消息补齐到本地，便于前端看到完整上下文。
+     * 语义：用户已退出某群，但仍需把 {@code minId} 之后、{@code minSendTime} 之后、不晚于退群时间的消息补齐到本地，便于前端看到完整上下文。
+     * <p>
+     * 撤回消息（status=RECALL）保留返回，与在群成员的 {@link #selectListByMinId} 行为一致，由前端按撤回信号渲染「消息已撤回」气泡。
      *
      * @param groupId     群编号
      * @param minId       最小消息 id（不含）
@@ -63,7 +64,6 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
                 .gt("id", minId)
                 .gt("send_time", minSendTime)
                 .le("send_time", quitTime)
-                .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .orderByAsc("id");
         wrapper.limitN(size);
         return selectList(wrapper);
