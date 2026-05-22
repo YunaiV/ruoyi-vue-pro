@@ -131,6 +131,11 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
+    public List<SmsTemplateDO> getSmsTemplateList() {
+        return smsTemplateMapper.selectList(SmsTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+    }
+
+    @Override
     public Long getSmsTemplateCountByChannelId(Long channelId) {
         return smsTemplateMapper.selectCountByChannelId(channelId);
     }

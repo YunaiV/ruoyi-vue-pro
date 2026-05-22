@@ -70,6 +70,13 @@ public interface NotifyTemplateService {
     PageResult<NotifyTemplateDO> getNotifyTemplatePage(NotifyTemplatePageReqVO pageReqVO);
 
     /**
+     * 获得启用状态的站内信模版列表
+     *
+     * @return 站内信模版列表
+     */
+    List<NotifyTemplateDO> getNotifyTemplateList();
+
+    /**
      * 格式化站内信内容
      *
      * @param content 站内信模板的内容

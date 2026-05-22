@@ -81,4 +81,22 @@ public class IotAlertConfigDO extends BaseDO {
     @TableField(typeHandler = IntegerListTypeHandler.class)
     private List<Integer> receiveTypes;
 
+    /**
+     * 短信模板编号
+     *
+     * 关联 SmsTemplateDO 的 code 属性
+     */
+    private String smsTemplateCode;
+    /**
+     * 邮件模板编号
+     *
+     * 关联 MailTemplateDO 的 code 属性
+     */
+    private String mailTemplateCode;
+    /**
+     * 站内信模板编号
+     *
+     * 关联 NotifyTemplateDO 的 code 属性
+     */
+    private String notifyTemplateCode;
 }
