@@ -69,7 +69,7 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         LocalDateTime beginTime = LocalDateTime.now();
         // 提前获得参数，避免 XssFilter 过滤处理
         Map<String, String> queryString = ServletUtils.getParamMap(request);
-        String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getBody(request) : null;
+        String requestBody = ServletUtils.getBody(request);
 
         try {
             // 继续过滤器
