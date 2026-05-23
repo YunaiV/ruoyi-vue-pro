@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: ruoyi-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: ruoyi_vue_pro
+      MYSQL_USER: ruoyi
+      MYSQL_PASSWORD: ruoyi123
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/mysql:/docker-entrypoint-initdb.d
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=1000
+    networks:
+      - ruoyi-network
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: ruoyi-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ruoyi-network
+
+  # 后端服务
+  backend:
+    build:
+      context: ./yudao-server
+      dockerfile: Dockerfile
+    container_name: ruoyi-backend
+    restart: always
+    ports:
+      - "48080:48080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=ruoyi_vue_pro
+      - DB_USER=root
+      - DB_PASSWORD=root123456
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - ruoyi-network
+    volumes:
+      - ./logs:/root/logs
+
+  # Jenkins CI/CD
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: ruoyi-jenkins
+    restart: always
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./script/jenkins:/var/jenkins_home/jobs
+    depends_on:
+      - backend
+    networks:
+      - ruoyi-network
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./yudao-ui/yudao-ui-admin-vue3
+      dockerfile: Dockerfile
+    container_name: ruoyi-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - ruoyi-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  jenkins_data:
+    driver: local
+
+networks:
+  ruoyi-network:
+    driver: bridge

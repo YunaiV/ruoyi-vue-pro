@@ -1,0 +1,168 @@
+#!groovy
+pipeline {
+    agent any
+
+    environment {
+        // 项目名称
+        PROJECT_NAME = 'ruoyi-vue-pro'
+        // 后端服务名称
+        BACKEND_SERVICE = 'ruoyi-backend'
+        // Docker Compose 文件
+        COMPOSE_FILE = 'docker-compose.full.yml'
+        // Maven 命令路径（Jenkins 容器内）
+        MAVEN_CMD = 'mvn'
+    }
+
+    stages {
+        stage('1. 代码检出') {
+            steps {
+                echo '📦 开始检出代码...'
+                checkout scm
+                echo '✅ 代码检出完成'
+            }
+        }
+
+        stage('2. 环境检查') {
+            steps {
+                echo '🔍 检查 Docker 环境...'
+                sh 'docker --version'
+                sh 'docker-compose --version'
+                echo '✅ Docker 环境检查完成'
+            }
+        }
+
+        stage('3. Maven 构建') {
+            steps {
+                echo '🔨 开始 Maven 构建...'
+                sh '''
+                    echo "当前目录: $(pwd)"
+                    echo "开始编译后端项目..."
+                    cd yudao-server
+                    ${MAVEN_CMD} clean package -Dmaven.test.skip=true
+                    echo "✅ Maven 构建完成"
+                '''
+            }
+        }
+
+        stage('4. 代码质量检查') {
+            steps {
+                echo '🔎 开始代码质量检查...'
+                sh '''
+                    # 检查编译产物
+                    if [ -f "yudao-server/target/*.jar" ]; then
+                        echo "✅ JAR 包生成成功"
+                        ls -lh yudao-server/target/*.jar
+                    else
+                        echo "❌ JAR 包未生成"
+                        exit 1
+                    fi
+                '''
+            }
+        }
+
+        stage('5. 构建 Docker 镜像') {
+            steps {
+                echo '🐳 开始构建 Docker 镜像...'
+                sh '''
+                    echo "重新构建后端服务镜像..."
+                    docker-compose -f ${COMPOSE_FILE} build backend
+                    echo "✅ Docker 镜像构建完成"
+                '''
+            }
+        }
+
+        stage('6. 部署服务') {
+            steps {
+                echo '🚀 开始部署服务...'
+                sh '''
+                    echo "停止旧服务..."
+                    docker-compose -f ${COMPOSE_FILE} stop backend
+                    
+                    echo "启动新服务..."
+                    docker-compose -f ${COMPOSE_FILE} up -d backend
+                    
+                    echo "等待服务启动..."
+                    sleep 10
+                    
+                    echo "检查服务状态..."
+                    docker-compose -f ${COMPOSE_FILE} ps backend
+                '''
+            }
+        }
+
+        stage('7. 健康检查') {
+            steps {
+                echo '❤️ 开始健康检查...'
+                sh '''
+                    MAX_RETRIES=30
+                    RETRY_COUNT=0
+                    
+                    echo "等待后端服务就绪..."
+                    while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                        RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:48080/actuator/health 2>/dev/null || echo "000")
+                        
+                        if [ "$RESPONSE" = "200" ]; then
+                            echo "✅ 健康检查通过！"
+                            curl -s http://localhost:48080/actuator/health | head -20
+                            exit 0
+                        fi
+                        
+                        RETRY_COUNT=$((RETRY_COUNT + 1))
+                        echo "健康检查尝试 $RETRY_COUNT/$MAX_RETRIES - 状态码: $RESPONSE"
+                        sleep 5
+                    done
+                    
+                    echo "❌ 健康检查失败，服务可能未正常启动"
+                    echo "查看日志："
+                    docker-compose -f ${COMPOSE_FILE} logs --tail=50 backend
+                    exit 1
+                '''
+            }
+        }
+
+        stage('8. 部署验证') {
+            steps {
+                echo '📊 开始部署验证...'
+                sh '''
+                    echo "=== 部署信息 ==="
+                    echo "项目名称: ${PROJECT_NAME}"
+                    echo "后端服务: ${BACKEND_SERVICE}"
+                    echo "访问地址: http://localhost:48080"
+                    echo "前端地址: http://localhost"
+                    echo "Jenkins地址: http://localhost:8080"
+                    echo ""
+                    echo "=== 容器状态 ==="
+                    docker-compose -f ${COMPOSE_FILE} ps
+                    echo ""
+                    echo "=== 数据库连接 ==="
+                    echo "MySQL: localhost:3306"
+                    echo "Redis: localhost:6379"
+                    echo ""
+                    echo "✅ 部署验证完成！"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 流水线执行成功！'
+            echo '📝 部署摘要：'
+            echo '   - 代码已构建并部署'
+            echo '   - 健康检查通过'
+            echo '   - 服务运行正常'
+        }
+        failure {
+            echo '❌ 流水线执行失败！'
+            echo '📝 请检查日志排查问题'
+            sh '''
+                echo "=== 最近日志 ==="
+                docker-compose -f ${COMPOSE_FILE} logs --tail=100 backend
+            '''
+        }
+        always {
+            echo '🧹 清理工作空间...'
+            cleanWs()
+        }
+    }
+}

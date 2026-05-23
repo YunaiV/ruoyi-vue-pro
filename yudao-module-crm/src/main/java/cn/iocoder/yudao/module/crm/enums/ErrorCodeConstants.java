@@ -9,6 +9,11 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface ErrorCodeConstants {
 
+    // ========== 商品分类管理 1-020-010-000 ==========
+    ErrorCode CATEGORY_NOT_EXISTS = new ErrorCode(1_020_010_000, "商品分类不存在");
+    ErrorCode CATEGORY_NAME_EXISTS = new ErrorCode(1_020_010_001, "商品分类名称已存在");
+    ErrorCode CATEGORY_HAS_CHILDREN = new ErrorCode(1_020_010_002, "商品分类下还有子分类，不能删除");
+
     // ========== 合同管理 1-020-000-000 ==========
     ErrorCode CONTRACT_NOT_EXISTS = new ErrorCode(1_020_000_000, "合同不存在");
     ErrorCode CONTRACT_UPDATE_FAIL_NOT_DRAFT = new ErrorCode(1_020_000_001, "合同更新失败，原因：合同不是草稿状态");
