@@ -28,7 +28,7 @@
         <mybatis-plus-join.version>1.5.7</mybatis-plus-join.version>
         <dynamic-datasource.version>4.5.0</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
-        <redisson.version>4.3.1</redisson.version>
+        <redisson.version>4.4.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
         <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
@@ -65,7 +65,7 @@
         <tika-core.version>3.3.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.12.Final</netty.version>
+        <netty.version>4.2.14.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.26</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
@@ -75,11 +75,11 @@
         <awssdk.version>2.44.0</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.3.2</jimureport.version>
+        <jimureport.version>2.3.4</jimureport.version>
         <jimubi.version>2.3.2</jimubi.version>
         <weixin-java.version>4.8.2-20260501.180637</weixin-java.version>
         <bouncycastle.version>1.80</bouncycastle.version>
-        <alipay-sdk-java.version>4.40.771.ALL</alipay-sdk-java.version>
+        <alipay-sdk-java.version>4.40.806.ALL</alipay-sdk-java.version>
     </properties>
 
     <dependencyManagement>
