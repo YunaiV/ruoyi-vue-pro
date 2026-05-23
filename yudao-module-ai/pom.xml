@@ -19,9 +19,10 @@
           国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
     </description>
     <properties>
-        <spring-ai.version>1.1.5</spring-ai.version>
+        <spring-ai.version>2.0.0-M7</spring-ai.version>
+        <spring-ai-legacy-model.version>2.0.0-M4</spring-ai-legacy-model.version>
         <!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba -->
-        <alibaba-ai.version>1.1.2.2</alibaba-ai.version>
+        <alibaba-ai.version>1.1.2.3</alibaba-ai.version>
         <tinyflow.version>1.2.6</tinyflow.version>
     </properties>
 
@@ -89,7 +90,7 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-azure-openai</artifactId>
-            <version>${spring-ai.version}</version>
+            <version>${spring-ai-legacy-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
@@ -115,7 +116,7 @@
             <!-- 智谱 GLM -->
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-zhipuai</artifactId>
-            <version>${spring-ai.version}</version>
+            <version>${spring-ai-legacy-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
@@ -133,13 +134,13 @@
         <dependency>
             <!-- 文心一言 -->
             <groupId>org.springaicommunity</groupId>
-            <artifactId>qianfan-spring-boot-starter</artifactId>
+            <artifactId>qianfan-core</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
             <!-- 月之暗面 -->
             <groupId>org.springaicommunity</groupId>
-            <artifactId>moonshot-spring-boot-starter</artifactId>
+            <artifactId>moonshot-core</artifactId>
             <version>1.0.0</version>
         </dependency>
 
@@ -212,9 +213,19 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-autoconfigure-mcp-server-common</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
             <!-- 客户端 -->
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-client</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-autoconfigure-mcp-client-common</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>
 

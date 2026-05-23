@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.ai.framework.security.config;
 
 import cn.iocoder.yudao.framework.security.config.AuthorizeRequestsCustomizer;
-import jakarta.annotation.Resource;
-import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerSseProperties;
-import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-
-import java.util.Optional;
 
 /**
  * AI 模块的 Security 配置
@@ -17,10 +14,12 @@ import java.util.Optional;
 @Configuration(proxyBeanMethods = false, value = "aiSecurityConfiguration")
 public class SecurityConfiguration {
 
-    @Resource
-    private Optional<McpServerSseProperties> mcpServerSseProperties;
-    @Resource
-    private Optional<McpServerStreamableHttpProperties> mcpServerStreamableHttpProperties;
+    @Value("${spring.ai.mcp.server.sse-endpoint:/sse}")
+    private String mcpSseEndpoint;
+    @Value("${spring.ai.mcp.server.sse-message-endpoint:/mcp/message}")
+    private String mcpSseMessageEndpoint;
+    @Value("${spring.ai.mcp.server.streamable-http-endpoint:/mcp}")
+    private String mcpStreamableHttpEndpoint;
 
     @Bean("aiAuthorizeRequestsCustomizer")
     public AuthorizeRequestsCustomizer authorizeRequestsCustomizer() {
@@ -28,12 +27,15 @@ public class SecurityConfiguration {
 
             @Override
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
-                mcpServerSseProperties.ifPresent(properties -> {
-                    registry.requestMatchers(properties.getSseEndpoint()).permitAll();
-                    registry.requestMatchers(properties.getSseMessageEndpoint()).permitAll();
-                });
-                mcpServerStreamableHttpProperties.ifPresent(properties ->
-                        registry.requestMatchers(properties.getMcpEndpoint()).permitAll());
+                if (StrUtil.isNotBlank(mcpSseEndpoint)) {
+                    registry.requestMatchers(mcpSseEndpoint).permitAll();
+                }
+                if (StrUtil.isNotBlank(mcpSseMessageEndpoint)) {
+                    registry.requestMatchers(mcpSseMessageEndpoint).permitAll();
+                }
+                if (StrUtil.isNotBlank(mcpStreamableHttpEndpoint)) {
+                    registry.requestMatchers(mcpStreamableHttpEndpoint).permitAll();
+                }
             }
 
         };

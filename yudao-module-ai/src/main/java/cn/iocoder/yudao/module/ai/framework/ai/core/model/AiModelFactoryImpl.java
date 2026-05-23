@@ -30,11 +30,14 @@ import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.alibaba.cloud.ai.dashscope.embedding.text.DashScopeEmbeddingModel;
+import com.alibaba.cloud.ai.dashscope.embedding.text.DashScopeEmbeddingOptions;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
+import com.openai.client.OpenAIClient;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.micrometer.observation.ObservationRegistry;
 import io.milvus.client.MilvusServiceClient;
 import io.qdrant.client.QdrantClient;
@@ -43,15 +46,12 @@ import lombok.SneakyThrows;
 import org.springaicommunity.moonshot.MoonshotChatModel;
 import org.springaicommunity.moonshot.MoonshotChatOptions;
 import org.springaicommunity.moonshot.api.MoonshotApi;
-import org.springaicommunity.moonshot.autoconfigure.MoonshotChatAutoConfiguration;
 import org.springaicommunity.qianfan.QianFanChatModel;
 import org.springaicommunity.qianfan.QianFanEmbeddingModel;
 import org.springaicommunity.qianfan.QianFanEmbeddingOptions;
 import org.springaicommunity.qianfan.QianFanImageModel;
 import org.springaicommunity.qianfan.api.QianFanApi;
 import org.springaicommunity.qianfan.api.QianFanImageApi;
-import org.springaicommunity.qianfan.autoconfigure.QianFanChatAutoConfiguration;
-import org.springaicommunity.qianfan.autoconfigure.QianFanEmbeddingAutoConfiguration;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiEmbeddingModel;
 import org.springframework.ai.chat.model.ChatModel;
@@ -92,11 +92,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.ai.openai.api.common.OpenAiApiConstants;
 import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -131,7 +127,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static org.springframework.ai.retry.RetryUtils.DEFAULT_RETRY_TEMPLATE;
 
 /**
  * AI Model 模型工厂的实现类
@@ -372,7 +367,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link QianFanChatAutoConfiguration} 的 qianFanChatModel 方法
+     * 可参考 QianFanChatAutoConfiguration 的 qianFanChatModel 方法
      */
     private static QianFanChatModel buildYiYanChatModel(String key) {
         // TODO spring ai qianfan 有 bug，无法使用 https://github.com/spring-ai-community/qianfan/issues/6
@@ -385,7 +380,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link QianFanEmbeddingAutoConfiguration} 的 qianFanImageModel 方法
+     * 可参考 QianFanEmbeddingAutoConfiguration 的 qianFanImageModel 方法
      */
     private QianFanImageModel buildQianFanImageModel(String key) {
         // TODO spring ai qianfan 有 bug，无法使用 https://github.com/spring-ai-community/qianfan/issues/6
@@ -447,7 +442,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
             zhiPuAiApiBuilder.baseUrl(url);
         }
         ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder().model(ZhiPuAiApi.DEFAULT_CHAT_MODEL).temperature(0.7).build();
-        return new ZhiPuAiChatModel(zhiPuAiApiBuilder.build(), options, getToolCallingManager(), DEFAULT_RETRY_TEMPLATE,
+        return new ZhiPuAiChatModel(zhiPuAiApiBuilder.build(), options, getToolCallingManager(), new org.springframework.core.retry.RetryTemplate(),
                 getObservationRegistry().getIfAvailable());
     }
 
@@ -467,11 +462,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
         MiniMaxApi miniMaxApi = StrUtil.isEmpty(url) ? new MiniMaxApi(apiKey)
                 : new MiniMaxApi(url, apiKey);
         MiniMaxChatOptions options = MiniMaxChatOptions.builder().model(MiniMaxApi.DEFAULT_CHAT_MODEL).temperature(0.7).build();
-        return new MiniMaxChatModel(miniMaxApi, options, getToolCallingManager(), DEFAULT_RETRY_TEMPLATE);
+        return new MiniMaxChatModel(miniMaxApi, options, getToolCallingManager(), new org.springframework.core.retry.RetryTemplate());
     }
 
     /**
-     * 可参考 {@link MoonshotChatAutoConfiguration} 的 moonshotChatModel 方法
+     * 可参考 MoonshotChatAutoConfiguration 的 moonshotChatModel 方法
      */
     private MoonshotChatModel buildMoonshotChatModel(String apiKey, String url) {
         MoonshotApi.Builder moonshotApiBuilder = MoonshotApi.builder()
@@ -511,10 +506,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiChatAutoConfiguration} 的 openAiChatModel 方法
      */
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
-        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
         return OpenAiChatModel.builder()
-                .openAiApi(openAiApi)
+                .openAiClient(buildOpenAiClient(openAiToken, url))
                 .toolCallingManager(getToolCallingManager())
                 .build();
     }
@@ -536,13 +529,12 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link AnthropicChatAutoConfiguration} 的 anthropicApi 方法
      */
     private static AnthropicChatModel buildAnthropicChatModel(String apiKey, String url) {
-        AnthropicApi.Builder builder = AnthropicApi.builder().apiKey(apiKey);
+        AnthropicOkHttpClient.Builder builder = AnthropicOkHttpClient.builder().apiKey(apiKey);
         if (StrUtil.isNotEmpty(url)) {
             builder.baseUrl(url);
         }
-        AnthropicApi anthropicApi = builder.build();
         return AnthropicChatModel.builder()
-                .anthropicApi(anthropicApi)
+                .anthropicClient(builder.build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
     }
@@ -560,9 +552,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiImageAutoConfiguration} 的 openAiImageModel 方法
      */
     private OpenAiImageModel buildOpenAiImageModel(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
-        OpenAiImageApi openAiApi = OpenAiImageApi.builder().baseUrl(url).apiKey(openAiToken).build();
-        return new OpenAiImageModel(openAiApi);
+        return new OpenAiImageModel(buildOpenAiClient(openAiToken, url));
     }
 
     /**
@@ -635,7 +625,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link QianFanEmbeddingAutoConfiguration} 的 qianFanEmbeddingModel 方法
+     * 可参考 {@link QianFanEmbeddingModel} 的 qianFanEmbeddingModel 方法
      */
     private QianFanEmbeddingModel buildYiYanEmbeddingModel(String key, String model) {
         List<String> keys = StrUtil.split(key, '|');
@@ -660,10 +650,16 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiEmbeddingAutoConfiguration} 的 openAiEmbeddingModel 方法
      */
     private OpenAiEmbeddingModel buildOpenAiEmbeddingModel(String openAiToken, String url, String model) {
-        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
-        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
         OpenAiEmbeddingOptions openAiEmbeddingProperties = OpenAiEmbeddingOptions.builder().model(model).build();
-        return new OpenAiEmbeddingModel(openAiApi, MetadataMode.EMBED, openAiEmbeddingProperties);
+        return new OpenAiEmbeddingModel(buildOpenAiClient(openAiToken, url), MetadataMode.EMBED, openAiEmbeddingProperties);
+    }
+
+    private static OpenAIClient buildOpenAiClient(String apiKey, String url) {
+        OpenAIOkHttpClient.Builder builder = OpenAIOkHttpClient.builder().apiKey(apiKey);
+        if (StrUtil.isNotEmpty(url)) {
+            builder.baseUrl(url);
+        }
+        return builder.build();
     }
 
     /**

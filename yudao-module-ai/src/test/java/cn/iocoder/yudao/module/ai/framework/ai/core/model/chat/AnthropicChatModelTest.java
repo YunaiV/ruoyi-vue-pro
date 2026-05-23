@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -23,12 +23,12 @@ import java.util.List;
 public class AnthropicChatModelTest {
 
     private final AnthropicChatModel chatModel = AnthropicChatModel.builder()
-            .anthropicApi(AnthropicApi.builder()
+            .anthropicClient(AnthropicOkHttpClient.builder()
                     .apiKey("sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942")
                     .baseUrl("https://aihubmix.com")
                     .build())
-            .defaultOptions(AnthropicChatOptions.builder()
-                    .model(AnthropicApi.ChatModel.CLAUDE_SONNET_4_5)
+            .options(AnthropicChatOptions.builder()
+                    .model("claude-sonnet-4-5")
                     .temperature(0.7)
                     .maxTokens(4096)
                     .build())
@@ -70,8 +70,7 @@ public class AnthropicChatModelTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("thkinking 下，1+1 为什么等于 2 "));
         AnthropicChatOptions options = AnthropicChatOptions.builder()
-                .model(AnthropicApi.ChatModel.CLAUDE_SONNET_4_5)
-                .thinking(AnthropicApi.ThinkingType.ENABLED, 3096)
+                .model("claude-sonnet-4-5")
                 .temperature(1D)
                 .build();
 

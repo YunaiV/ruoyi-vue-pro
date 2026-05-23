@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -10,7 +11,6 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -24,11 +24,11 @@ import java.util.List;
 public class BaiChuanChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
+            .openAiClient(OpenAIOkHttpClient.builder()
                     .baseUrl(BaiChuanChatModel.BASE_URL)
                     .apiKey("sk-61b6766a94c70786ed02673f5e16af3c") // apiKey
                     .build())
-            .defaultOptions(OpenAiChatOptions.builder()
+            .options(OpenAiChatOptions.builder()
                     .model("Baichuan4-Turbo") // 模型（https://platform.baichuan-ai.com/docs/api）
                     .temperature(0.7)
                     .build())

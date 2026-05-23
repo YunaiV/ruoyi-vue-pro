@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.NoopApiKey;
 import org.springframework.ai.model.SimpleApiKey;
-import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -80,7 +79,7 @@ public class SiliconFlowImageApi {
 		// @formatter:on
 	}
 
-	public ResponseEntity<OpenAiImageApi.OpenAiImageResponse> createImage(SiliconflowImageRequest siliconflowImageRequest) {
+	public ResponseEntity<SiliconFlowImageResponse> createImage(SiliconflowImageRequest siliconflowImageRequest) {
 		Assert.notNull(siliconflowImageRequest, "Image request cannot be null.");
 		Assert.hasLength(siliconflowImageRequest.prompt(), "Prompt cannot be empty.");
 
@@ -88,7 +87,7 @@ public class SiliconFlowImageApi {
 			.uri("v1/images/generations")
 			.body(siliconflowImageRequest)
 			.retrieve()
-			.toEntity(OpenAiImageApi.OpenAiImageResponse.class);
+			.toEntity(SiliconFlowImageResponse.class);
 	}
 
 
@@ -106,6 +105,17 @@ public class SiliconFlowImageApi {
 
 		public SiliconflowImageRequest(String prompt, String model) {
 			this(prompt, model, null, null, null, null, null, null);
+		}
+	}
+
+	public record SiliconFlowImageResponse(
+			@JsonProperty("created") Long created,
+			@JsonProperty("data") java.util.List<Entry> data) {
+
+		public record Entry(
+				@JsonProperty("url") String url,
+				@JsonProperty("b64_json") String b64Json,
+				@JsonProperty("revised_prompt") String revisedPrompt) {
 		}
 	}
 

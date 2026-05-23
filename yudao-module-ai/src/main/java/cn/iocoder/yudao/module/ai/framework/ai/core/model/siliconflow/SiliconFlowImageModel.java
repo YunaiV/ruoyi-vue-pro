@@ -27,7 +27,6 @@ import org.springframework.ai.image.observation.ImageModelObservationConvention;
 import org.springframework.ai.image.observation.ImageModelObservationDocumentation;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.openai.metadata.OpenAiImageGenerationMetadata;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +70,7 @@ public class SiliconFlowImageModel implements ImageModel {
 
 	public SiliconFlowImageModel(SiliconFlowImageApi siliconFlowImageApi, SiliconFlowImageOptions options, RetryTemplate retryTemplate,
                                  ObservationRegistry observationRegistry) {
-		Assert.notNull(siliconFlowImageApi, "OpenAiImageApi must not be null");
+		Assert.notNull(siliconFlowImageApi, "SiliconFlowImageApi must not be null");
 		Assert.notNull(options, "options must not be null");
 		Assert.notNull(retryTemplate, "retryTemplate must not be null");
 		Assert.notNull(observationRegistry, "observationRegistry must not be null");
@@ -96,7 +95,7 @@ public class SiliconFlowImageModel implements ImageModel {
 			.observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
 					this.observationRegistry)
 			.observe(() -> {
-				ResponseEntity<OpenAiImageApi.OpenAiImageResponse> imageResponseEntity = this.retryTemplate
+				ResponseEntity<SiliconFlowImageApi.SiliconFlowImageResponse> imageResponseEntity = this.retryTemplate
 					.execute(ctx -> this.siliconFlowImageApi.createImage(imageRequest));
 
 				ImageResponse imageResponse = convertResponse(imageResponseEntity, imageRequest);
@@ -109,17 +108,22 @@ public class SiliconFlowImageModel implements ImageModel {
 
 	private SiliconFlowImageApi.SiliconflowImageRequest createRequest(ImagePrompt imagePrompt,
                                                                       SiliconFlowImageOptions requestImageOptions) {
-		String instructions = imagePrompt.getInstructions().get(0).getText();
+		String instructions = imagePrompt.getInstructions().getFirst().getText();
 
-		SiliconFlowImageApi.SiliconflowImageRequest imageRequest = new SiliconFlowImageApi.SiliconflowImageRequest(instructions,
-                SiliconFlowApiConstants.DEFAULT_IMAGE_MODEL);
-
-		return ModelOptionsUtils.merge(requestImageOptions, imageRequest, SiliconFlowImageApi.SiliconflowImageRequest.class);
+		return new SiliconFlowImageApi.SiliconflowImageRequest(
+                instructions,
+                ModelOptionsUtils.mergeOption(requestImageOptions.getModel(), SiliconFlowApiConstants.DEFAULT_IMAGE_MODEL),
+                requestImageOptions.getN(),
+                requestImageOptions.getNegativePrompt(),
+                requestImageOptions.getSeed(),
+                requestImageOptions.getNumInferenceSteps(),
+                requestImageOptions.getGuidanceScale(),
+                requestImageOptions.getImage());
 	}
 
-	private ImageResponse convertResponse(ResponseEntity<OpenAiImageApi.OpenAiImageResponse> imageResponseEntity,
+	private ImageResponse convertResponse(ResponseEntity<SiliconFlowImageApi.SiliconFlowImageResponse> imageResponseEntity,
 										  SiliconFlowImageApi.SiliconflowImageRequest siliconflowImageRequest) {
-		OpenAiImageApi.OpenAiImageResponse imageApiResponse = imageResponseEntity.getBody();
+		SiliconFlowImageApi.SiliconFlowImageResponse imageApiResponse = imageResponseEntity.getBody();
 		if (imageApiResponse == null) {
 			logger.warn("No image response returned for request: {}", siliconflowImageRequest);
 			return new ImageResponse(List.of());
@@ -136,12 +140,17 @@ public class SiliconFlowImageModel implements ImageModel {
 	}
 
     private SiliconFlowImageOptions mergeOptions(@Nullable ImageOptions runtimeOptions, SiliconFlowImageOptions defaultOptions) {
-        var runtimeOptionsForProvider = ModelOptionsUtils.copyToTarget(runtimeOptions, ImageOptions.class,
-                SiliconFlowImageOptions.class);
-
-        if (runtimeOptionsForProvider == null) {
+        if (runtimeOptions == null) {
             return defaultOptions;
         }
+        SiliconFlowImageOptions runtimeOptionsForProvider = runtimeOptions instanceof SiliconFlowImageOptions siliconFlowImageOptions
+                ? siliconFlowImageOptions
+                : SiliconFlowImageOptions.builder()
+                    .model(runtimeOptions.getModel())
+                    .batchSize(runtimeOptions.getN())
+                    .width(runtimeOptions.getWidth())
+                    .height(runtimeOptions.getHeight())
+                    .build();
 
         return SiliconFlowImageOptions.builder()
                 // Handle portable image options

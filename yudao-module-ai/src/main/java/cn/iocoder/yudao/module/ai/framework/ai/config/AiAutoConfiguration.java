@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlo
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
 import cn.iocoder.yudao.module.ai.tool.method.PersonService;
@@ -28,7 +29,6 @@ import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
@@ -86,12 +86,11 @@ public class AiAutoConfiguration {
             properties.setModel(GeminiChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+                .openAiClient(OpenAIOkHttpClient.builder()
                         .baseUrl(GeminiChatModel.BASE_URL)
-                        .completionsPath(GeminiChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .options(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -114,12 +113,11 @@ public class AiAutoConfiguration {
             properties.setModel(DouBaoChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+                .openAiClient(OpenAIOkHttpClient.builder()
                         .baseUrl(DouBaoChatModel.BASE_URL)
-                        .completionsPath(DouBaoChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .options(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -203,16 +201,15 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
         }
-        OpenAiApi.Builder builder = OpenAiApi.builder()
+        OpenAIOkHttpClient.Builder builder = OpenAIOkHttpClient.builder()
                 .baseUrl(XingHuoChatModel.BASE_URL_V1)
                 .apiKey(properties.getAppKey() + ":" + properties.getSecretKey());
         if ("x1".equals(properties.getModel())) {
-            builder.baseUrl(XingHuoChatModel.BASE_URL_V2)
-                    .completionsPath(XingHuoChatModel.BASE_COMPLETIONS_PATH_V2);
+            builder.baseUrl(XingHuoChatModel.BASE_URL_V2);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(builder.build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .openAiClient(builder.build())
+                .options(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -236,11 +233,11 @@ public class AiAutoConfiguration {
             properties.setModel(BaiChuanChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+                .openAiClient(OpenAIOkHttpClient.builder()
                         .baseUrl(BaiChuanChatModel.BASE_URL)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .options(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -269,13 +266,12 @@ public class AiAutoConfiguration {
             properties.setModel(GrokChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+                .openAiClient(OpenAIOkHttpClient.builder()
                         .baseUrl(Optional.ofNullable(properties.getBaseUrl())
                                 .orElse(GrokChatModel.BASE_URL))
-                        .completionsPath(GrokChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .options(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())

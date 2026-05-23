@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.mcp;
 
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 
@@ -14,11 +14,11 @@ import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 public class DouBaoMcpTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
+            .openAiClient(OpenAIOkHttpClient.builder()
                     .baseUrl(DouBaoChatModel.BASE_URL)
                     .apiKey("5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272") // apiKey
                     .build())
-            .defaultOptions(OpenAiChatOptions.builder()
+            .options(OpenAiChatOptions.builder()
                     .model("doubao-1-5-lite-32k-250115") // 模型（doubao）
                     .temperature(0.7)
                     .build())
