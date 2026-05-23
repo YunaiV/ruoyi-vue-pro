@@ -6,6 +6,8 @@ spring:
   autoconfigure:
     # noinspection SpringBootApplicationYaml
     exclude:
+      - com.binarywang.spring.starter.wxjava.mp.config.storage.WxMpInRedisTemplateConfigStorageConfiguration
+      - com.binarywang.spring.starter.wxjava.miniapp.config.storage.WxMaInRedisTemplateConfigStorageConfiguration
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
       - org.dromara.trans.config.TransServiceConfig # easy-trans 3.0.6 依赖 Spring Boot 3 的 RestTemplateBuilder，暂时禁用
       - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
