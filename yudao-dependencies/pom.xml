@@ -17,9 +17,9 @@
         <revision>2026.04-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.5.14</spring.boot.version>
+        <spring.boot.version>4.0.6</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.8.17</springdoc.version>
+        <springdoc.version>3.0.3</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
         <!-- DB 相关 -->
         <druid.version>1.2.28</druid.version>
@@ -39,7 +39,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.6.0</skywalking.version>
-        <spring-boot-admin.version>3.5.8</spring-boot-admin.version>
+        <spring-boot-admin.version>4.0.4</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
@@ -135,6 +135,17 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aspectj</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-jackson2</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+
             <!-- Web 相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
@@ -180,7 +191,7 @@
 
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <artifactId>druid-spring-boot-4-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
             <dependency>
@@ -191,7 +202,7 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
@@ -206,7 +217,7 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId> <!-- 多数据源 -->
+                <artifactId>dynamic-datasource-spring-boot4-starter</artifactId> <!-- 多数据源 -->
                 <version>${dynamic-datasource.version}</version>
             </dependency>
             <dependency>

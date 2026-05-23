@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;

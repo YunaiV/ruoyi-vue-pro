@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;

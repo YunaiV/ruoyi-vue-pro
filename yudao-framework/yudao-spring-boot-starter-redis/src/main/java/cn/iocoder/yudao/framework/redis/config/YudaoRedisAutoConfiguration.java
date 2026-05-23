@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.framework.redis.config;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.redisson.spring.starter.RedissonAutoConfigurationV2;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.data.redis.serializer.RedisSerializer;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Redis 配置类
@@ -35,11 +36,25 @@ public class YudaoRedisAutoConfiguration {
     }
 
     public static RedisSerializer<?> buildRedisSerializer() {
-        RedisSerializer<Object> json = RedisSerializer.json();
-        // 解决 LocalDateTime 的序列化
-        ObjectMapper objectMapper = (ObjectMapper) ReflectUtil.getFieldValue(json, "mapper");
-        objectMapper.registerModules(new JavaTimeModule());
-        return json;
+        return new RedisSerializer<Object>() {
+
+            @Override
+            public byte[] serialize(Object value) throws SerializationException {
+                if (value == null) {
+                    return new byte[0];
+                }
+                return JsonUtils.toJsonByte(value);
+            }
+
+            @Override
+            public Object deserialize(byte[] bytes) throws SerializationException {
+                if (bytes == null || bytes.length == 0) {
+                    return null;
+                }
+                return JsonUtils.parseObject(new String(bytes, StandardCharsets.UTF_8), Object.class);
+            }
+
+        };
     }
 
 }
