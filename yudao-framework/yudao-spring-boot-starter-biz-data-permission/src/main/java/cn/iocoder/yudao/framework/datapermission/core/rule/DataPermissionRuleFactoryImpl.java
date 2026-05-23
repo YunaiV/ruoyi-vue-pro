@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.datapermission.core.aop.DataPermissionContextHolder;
-import com.fhs.trans.service.impl.SimpleTransService;
+import org.dromara.trans.service.impl.SimpleTransService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
@@ -65,7 +65,7 @@ public class DataPermissionRuleFactoryImpl implements DataPermissionRuleFactory 
     }
 
     /**
-     * 判断是否为数据翻译 {@link com.fhs.core.trans.anno.Trans} 的调用
+     * 判断是否为数据翻译 {@link org.dromara.core.trans.anno.Trans} 的调用
      *
      * 目前暂时只有这个办法，已经和 easy-trans 做过沟通
      *

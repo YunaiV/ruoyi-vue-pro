@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fhs.core.trans.vo.TransPojo;
+import org.dromara.core.trans.vo.TransPojo;
 import lombok.Data;
 import org.apache.ibatis.type.JdbcType;
 

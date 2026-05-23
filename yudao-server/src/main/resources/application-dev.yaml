@@ -7,7 +7,9 @@ spring:
   autoconfigure:
     # noinspection SpringBootApplicationYaml
     exclude:
-      - com.fhs.trans.config.TransServiceConfig # easy-trans 3.0.6 依赖 Spring Boot 3 的 RestTemplateBuilder，暂时禁用
+      - com.binarywang.spring.starter.wxjava.mp.config.storage.WxMpInRedisTemplateConfigStorageConfiguration
+      - com.binarywang.spring.starter.wxjava.miniapp.config.storage.WxMaInRedisTemplateConfigStorageConfiguration
+      - org.dromara.trans.config.TransServiceConfig # easy-trans 3.0.6 依赖 Spring Boot 3 的 RestTemplateBuilder，暂时禁用
       - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
       - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
   # 数据源配置项

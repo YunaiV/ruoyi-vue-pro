@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task;
 
-import com.fhs.core.trans.vo.VO;
+import org.dromara.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
