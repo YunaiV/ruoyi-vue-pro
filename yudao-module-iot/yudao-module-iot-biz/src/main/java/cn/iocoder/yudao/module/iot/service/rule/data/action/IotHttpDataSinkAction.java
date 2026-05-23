@@ -70,7 +70,7 @@ public class IotHttpDataSinkAction implements IotDataRuleAction {
                     requestBody = new HashMap<>();
                 }
                 requestBody.put("message", message);
-                headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
+                headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
                 requestEntity = new HttpEntity<>(JsonUtils.toJsonString(requestBody), headers);
             }
 

@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -304,7 +304,7 @@ public class TradeOrderDO extends BaseDO {
      *
      * 目的：用于订单支付后赠送优惠券
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private Map<Long, Integer> giveCouponTemplateCounts;
     /**
      * 赠送的优惠劵编号

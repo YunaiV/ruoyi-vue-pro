@@ -166,7 +166,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         segmentMapper.deleteByIds(convertList(segments, AiKnowledgeSegmentDO::getId));
 
         // 3. 删除向量存储中的段落
-        VectorStore vectorStore = getVectorStoreById(segments.get(0).getKnowledgeId());
+        VectorStore vectorStore = getVectorStoreById(segments.getFirst().getKnowledgeId());
         vectorStore.delete(convertList(segments, AiKnowledgeSegmentDO::getVectorId));
     }
 
@@ -299,7 +299,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         // 2. Rerank 重排序
         if (rerankModel != null) {
             RerankResponse rerankResponse = rerankModel.call(new RerankRequest(reqBO.getContent(), documents,
-                    DashScopeRerankOptions.builder().withTopN(topK).build()));
+                    DashScopeRerankOptions.builder().topN(topK).build()));
             documents = convertList(rerankResponse.getResults(),
                     documentWithScore -> documentWithScore.getScore() >= similarityThreshold
                             ? documentWithScore.getOutput() : null);

@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
-import com.baomidou.mybatisplus.core.handlers.IJsonTypeHandler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
@@ -81,7 +80,7 @@ public class YudaoMybatisAutoConfiguration {
         throw new IllegalArgumentException(StrUtil.format("DbType{} 找不到合适的 IKeyGenerator 实现类", dbType));
     }
 
-    @Bean // 特殊：返回结果使用 Object 而不用 JacksonTypeHandler 的原因，避免因为 JacksonTypeHandler 被 mybatis 全局使用！
+    @Bean // 特殊：返回结果使用 Object 而不用 Jackson3TypeHandler 的原因，避免因为 Jackson3TypeHandler 被 mybatis 全局使用！
     public Object jacksonTypeHandler(List<ObjectMapper> objectMappers) {
         // 特殊：设置 Jackson3TypeHandler 的 ObjectMapper！
         ObjectMapper objectMapper = CollUtil.getFirst(objectMappers);

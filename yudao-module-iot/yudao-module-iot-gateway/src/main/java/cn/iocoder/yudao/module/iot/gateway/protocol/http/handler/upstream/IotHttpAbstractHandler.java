@@ -115,7 +115,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
     public static void writeResponse(RoutingContext context, CommonResult<?> data) {
         context.response()
                 .setStatusCode(200)
-                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .end(serializeResponse(data));
     }
 

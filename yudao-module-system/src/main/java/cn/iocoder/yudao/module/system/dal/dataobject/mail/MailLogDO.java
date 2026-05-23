@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.*;
 
 import java.io.Serializable;
@@ -113,7 +113,7 @@ public class MailLogDO extends BaseDO implements Serializable {
      *
      * 基于 {@link MailTemplateDO#getParams()} 输入后的参数
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private Map<String, Object> templateParams;
 
     // ========= 发送相关字段 =========

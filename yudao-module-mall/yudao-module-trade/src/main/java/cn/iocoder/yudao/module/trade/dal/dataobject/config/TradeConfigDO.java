@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.*;
 
 import java.util.List;
@@ -40,12 +40,12 @@ public class TradeConfigDO extends BaseDO {
     /**
      * 售后的退款理由
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> afterSaleRefundReasons;
     /**
      * 售后的退货理由
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> afterSaleReturnReasons;
 
     // ========== 配送相关 ==========
@@ -85,7 +85,7 @@ public class TradeConfigDO extends BaseDO {
     /**
      * 分销海报图地址数组
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> brokeragePosterUrls;
     /**
      * 一级返佣比例

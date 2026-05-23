@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.product.dal.dataobject.sku.ProductSkuDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
@@ -20,7 +20,7 @@ public interface ProductSkuMapper extends BaseMapperX<ProductSkuDO> {
      */
     @Select("SELECT * FROM product_sku WHERE id = #{id}")
     @Results({
-            @Result(column = "properties", property = "properties", typeHandler = JacksonTypeHandler.class),
+            @Result(column = "properties", property = "properties", typeHandler = Jackson3TypeHandler.class),
     })
     ProductSkuDO selectByIdIncludeDeleted(@Param("id") Long id);
 

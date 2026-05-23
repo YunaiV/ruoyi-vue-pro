@@ -41,13 +41,13 @@ public class XssStringJsonDeserializer extends StringDeserializer {
         if (request != null) {
             String uri = ServletUtils.getRequest().getRequestURI();
             if (properties.getExcludeUrls().stream().anyMatch(excludeUrl -> pathMatcher.match(excludeUrl, uri))) {
-                return p.getText();
+                return p.getString();
             }
         }
 
         // 2. 真正使用 xssCleaner 进行过滤
         if (p.hasToken(JsonToken.VALUE_STRING)) {
-            return xssCleaner.clean(p.getText());
+            return xssCleaner.clean(p.getString());
         }
         JsonToken t = p.currentToken();
         // [databind#381]

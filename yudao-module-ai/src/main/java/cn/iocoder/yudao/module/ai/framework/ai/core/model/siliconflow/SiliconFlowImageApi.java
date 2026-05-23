@@ -23,15 +23,12 @@ import org.springframework.ai.model.NoopApiKey;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.retry.RetryUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-
-import java.util.Map;
 
 /**
  * 硅基流动 Image API
@@ -58,15 +55,15 @@ public class SiliconFlowImageApi {
 
 	public SiliconFlowImageApi(String baseUrl, String apiKey, RestClient.Builder restClientBuilder,
                                ResponseErrorHandler responseErrorHandler) {
-		this(baseUrl, apiKey, CollectionUtils.toMultiValueMap(Map.of()), restClientBuilder, responseErrorHandler);
+		this(baseUrl, apiKey, new HttpHeaders(), restClientBuilder, responseErrorHandler);
 	}
 
-	public SiliconFlowImageApi(String baseUrl, String apiKey, MultiValueMap<String, String> headers,
+	public SiliconFlowImageApi(String baseUrl, String apiKey, HttpHeaders headers,
                                RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
 		this(baseUrl, new SimpleApiKey(apiKey), headers, restClientBuilder, responseErrorHandler);
 	}
 
-	public SiliconFlowImageApi(String baseUrl, ApiKey apiKey, MultiValueMap<String, String> headers,
+	public SiliconFlowImageApi(String baseUrl, ApiKey apiKey, HttpHeaders headers,
                                RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
 
 		// @formatter:off

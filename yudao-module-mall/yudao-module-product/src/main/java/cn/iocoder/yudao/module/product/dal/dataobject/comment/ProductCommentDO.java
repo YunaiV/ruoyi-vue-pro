@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -100,7 +100,7 @@ public class ProductCommentDO extends BaseDO {
      *
      * 关联 {@link ProductSkuDO#getProperties()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<ProductSkuDO.Property> skuProperties;
 
     /**
@@ -135,7 +135,7 @@ public class ProductCommentDO extends BaseDO {
     /**
      * 评论图片地址数组
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> picUrls;
 
     /**

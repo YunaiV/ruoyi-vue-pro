@@ -14,17 +14,17 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 
-import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.util.List;
 
@@ -47,11 +47,11 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     @PostConstruct
     public void init() {
         IotGatewayProperties.RpcProperties rpc = gatewayProperties.getRpc();
-        restTemplate = new RestTemplateBuilder()
-                .rootUri(rpc.getUrl())
-                .readTimeout(rpc.getReadTimeout())
-                .connectTimeout(rpc.getConnectTimeout())
-                .build();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(rpc.getConnectTimeout());
+        requestFactory.setReadTimeout(rpc.getReadTimeout());
+        restTemplate = new RestTemplate(requestFactory);
+        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(rpc.getUrl()));
     }
 
     @Override

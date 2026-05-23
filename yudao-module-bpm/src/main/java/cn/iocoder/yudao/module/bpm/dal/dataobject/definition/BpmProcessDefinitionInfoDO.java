@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -105,7 +105,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      *
      * 冗余 {@link BpmFormDO#getFields()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> formFields;
     /**
      * 自定义表单的提交路径，使用 Vue 的路由地址
@@ -180,7 +180,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 流程 ID 规则
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.ProcessIdRule processIdRule;
 
     /**
@@ -193,41 +193,41 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 标题设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.TitleSetting titleSetting;
     /**
      * 摘要设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.SummarySetting summarySetting;
 
     /**
      * 流程前置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting processBeforeTriggerSetting;
     /**
      * 流程后置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting processAfterTriggerSetting;
 
     /**
      * 任务前置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting taskBeforeTriggerSetting;
 
     /**
      * 任务后置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting taskAfterTriggerSetting;
 
     /**
      * 自定义打印模板设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private BpmModelMetaInfoVO.PrintTemplateSetting printTemplateSetting;
 
 }

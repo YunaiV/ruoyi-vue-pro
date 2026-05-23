@@ -348,9 +348,13 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static DashScopeChatModel buildTongYiChatModel(String key) {
         DashScopeApi dashScopeApi = DashScopeApi.builder().apiKey(key).build();
-        DashScopeChatOptions options = DashScopeChatOptions.builder().withModel(DashScopeApi.DEFAULT_CHAT_MODEL)
-                .withTemperature(0.7).build();
-        return DashScopeChatModel.builder()
+        DashScopeChatOptions options = DashScopeChatOptions
+                .builder()
+                .model(DashScopeApi.DEFAULT_CHAT_MODEL)
+                .temperature(0.7)
+                .build();
+        return DashScopeChatModel
+                .builder()
                 .dashScopeApi(dashScopeApi)
                 .defaultOptions(options)
                 .toolCallingManager(getToolCallingManager())
@@ -600,16 +604,16 @@ public class AiModelFactoryImpl implements AiModelFactory {
     // ========== 各种创建 EmbeddingModel 的方法 ==========
 
     /**
-     * 可参考 {@link DashScopeEmbeddingAutoConfiguration} 的 dashscopeEmbeddingModel 方法
+     * 可参考 {@link DashScopeEmbeddingAutoConfiguration} 的 DashScopeEmbeddingModel 方法
      */
     private DashScopeEmbeddingModel buildTongYiEmbeddingModel(String apiKey, String model) {
         DashScopeApi dashScopeApi = DashScopeApi.builder().apiKey(apiKey).build();
-        DashScopeEmbeddingOptions dashScopeEmbeddingOptions = DashScopeEmbeddingOptions.builder().withModel(model).build();
+        DashScopeEmbeddingOptions dashScopeEmbeddingOptions = DashScopeEmbeddingOptions.builder().model(model).build();
         return new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED, dashScopeEmbeddingOptions);
     }
 
     /**
-     * 可参考 {@link ZhiPuAiEmbeddingAutoConfiguration} 的 zhiPuAiEmbeddingModel 方法
+     * 可参考 {@link ZhiPuAiEmbeddingAutoConfiguration} 的 ZhiPuAiEmbeddingModel 方法
      */
     private ZhiPuAiEmbeddingModel buildZhiPuEmbeddingModel(String apiKey, String url, String model) {
         ZhiPuAiApi.Builder zhiPuAiApiBuilder = ZhiPuAiApi.builder().apiKey(apiKey);
@@ -738,7 +742,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private RedisVectorStore buildRedisVectorStore(EmbeddingModel embeddingModel,
                                                    Map<String, Class<?>> metadataFields) {
         // 创建 JedisPooled 对象
-        RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
+        DataRedisProperties redisProperties = SpringUtils.getBean(DataRedisProperties.class);
         JedisPooled jedisPooled = new JedisPooled(redisProperties.getHost(), redisProperties.getPort(),
                 redisProperties.getUsername(), redisProperties.getPassword());
         // 创建 RedisVectorStoreProperties 对象

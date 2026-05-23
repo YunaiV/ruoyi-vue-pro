@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleWayEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -75,7 +75,7 @@ public class AfterSaleDO extends BaseDO {
      *
      * 数组，以逗号分隔
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> applyPicUrls;
 
     // ========== 交易订单相关 ==========
@@ -122,7 +122,7 @@ public class AfterSaleDO extends BaseDO {
      *
      * 冗余 {@link TradeOrderItemDO#getProperties()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<TradeOrderItemDO.Property> properties;
     /**
      * 商品图片

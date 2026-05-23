@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.mp.controller.admin.message.vo.message;
 
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import me.chanjar.weixin.common.api.WxConsts;
