@@ -82,6 +82,7 @@
         <jimureport.version>2.3.2</jimureport.version>
         <jimubi.version>2.3.2</jimubi.version>
         <weixin-java.version>4.8.2-20260501.180637</weixin-java.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
         <alipay-sdk-java.version>4.40.771.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
@@ -680,6 +681,24 @@
                         <artifactId>bcprov-jdk15on</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- 锁定 weixin-java 传递依赖，避免 Maven 版本范围自动升级到 1.80.2 后 Fat Jar 启动失败。
+                 反馈：https://t.zsxq.com/pCVBo -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <dependency>

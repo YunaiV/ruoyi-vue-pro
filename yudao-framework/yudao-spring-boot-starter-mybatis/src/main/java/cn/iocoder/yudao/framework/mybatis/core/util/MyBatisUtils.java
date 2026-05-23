@@ -23,6 +23,7 @@ import net.sf.jsqlparser.schema.Table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * MyBatis 工具类
@@ -30,6 +31,8 @@ import java.util.List;
 public class MyBatisUtils {
 
     private static final String MYSQL_ESCAPE_CHARACTER = "`";
+
+    private static final Pattern SAFE_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+(\\.[a-zA-Z0-9_]+)*$");
 
     public static <T> Page<T> buildPage(PageParam pageParam) {
         return buildPage(pageParam, null);
@@ -42,8 +45,11 @@ public class MyBatisUtils {
         // 排序字段
         if (CollUtil.isNotEmpty(sortingFields)) {
             for (SortingField sortingField : sortingFields) {
-                page.addOrder(new OrderItem().setAsc(SortingField.ORDER_ASC.equals(sortingField.getOrder()))
-                        .setColumn(StrUtil.toUnderlineCase(sortingField.getField())));
+                String columnName = buildSafeOrderColumn(sortingField.getField());
+                if (columnName == null) {
+                    continue;
+                }
+                page.addOrder(new OrderItem().setAsc(isAscOrder(sortingField.getOrder())).setColumn(columnName));
             }
         }
         return page;
@@ -57,28 +63,50 @@ public class MyBatisUtils {
         if (wrapper instanceof QueryWrapper) {
             QueryWrapper<T> query = (QueryWrapper<T>) wrapper;
             for (SortingField sortingField : sortingFields) {
-                query.orderBy(true,
-                        SortingField.ORDER_ASC.equals(sortingField.getOrder()),
-                        StrUtil.toUnderlineCase(sortingField.getField()));
+                String columnName = buildSafeOrderColumn(sortingField.getField());
+                if (columnName == null) {
+                    continue;
+                }
+                query.orderBy(true, isAscOrder(sortingField.getOrder()), columnName);
             }
         } else if (wrapper instanceof LambdaQueryWrapper) {
             // LambdaQueryWrapper 不直接支持字符串字段排序，使用 last 方法拼接 ORDER BY
             LambdaQueryWrapper<T> lambdaQuery = (LambdaQueryWrapper<T>) wrapper;
             StringBuilder orderBy = new StringBuilder();
             for (SortingField sortingField : sortingFields) {
+                String columnName = buildSafeOrderColumn(sortingField.getField());
+                if (columnName == null) {
+                    continue;
+                }
                 if (StrUtil.isNotEmpty(orderBy)) {
                     orderBy.append(", ");
                 }
-                orderBy.append(StrUtil.toUnderlineCase(sortingField.getField()))
-                       .append(" ")
-                       .append(SortingField.ORDER_ASC.equals(sortingField.getOrder()) ? "ASC" : "DESC");
+                orderBy.append(columnName).append(" ").append(getOrderDirection(sortingField.getOrder()));
             }
-            lambdaQuery.last("ORDER BY " + orderBy);
+            if (StrUtil.isNotEmpty(orderBy)) {
+                lambdaQuery.last("ORDER BY " + orderBy);
+            }
             // 另外个思路：https://blog.csdn.net/m0_59084856/article/details/138450913
         } else {
             throw new IllegalArgumentException("Unsupported wrapper type: " + wrapper.getClass().getName());
         }
 
+    }
+
+    public static boolean isAscOrder(String order) {
+        return SortingField.ORDER_ASC.equals(order);
+    }
+
+    public static String getOrderDirection(String order) {
+        return isAscOrder(order) ? "ASC" : "DESC";
+    }
+
+    private static String buildSafeOrderColumn(String field) {
+        String columnName = StrUtil.toUnderlineCase(field);
+        if (StrUtil.isEmpty(columnName) || !SAFE_COLUMN_NAME_PATTERN.matcher(columnName).matches()) {
+            return null;
+        }
+        return columnName;
     }
 
     /**
