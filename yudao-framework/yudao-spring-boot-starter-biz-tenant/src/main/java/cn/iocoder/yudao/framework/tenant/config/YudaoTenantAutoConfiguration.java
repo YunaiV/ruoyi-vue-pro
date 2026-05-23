@@ -42,11 +42,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.util.pattern.PathPattern;
 
 import java.util.*;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true) // 允许使用 yudao.tenant.enable=false 禁用多租户
@@ -142,13 +139,7 @@ public class YudaoTenantAutoConfiguration {
                 continue;
             }
             // 添加到忽略的 URL 中
-            if (entry.getKey().getPatternsCondition() != null) {
-                ignoreUrls.addAll(entry.getKey().getPatternsCondition().getPatterns());
-            }
-            if (entry.getKey().getPathPatternsCondition() != null) {
-                ignoreUrls.addAll(
-                        convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
-            }
+            ignoreUrls.addAll(entry.getKey().getPatternValues());
         }
         return ignoreUrls;
     }

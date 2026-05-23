@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.trade.framework.delivery.core.client.dto.kd100;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import lombok.Data;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
 
 import java.time.LocalDateTime;
 import java.util.List;

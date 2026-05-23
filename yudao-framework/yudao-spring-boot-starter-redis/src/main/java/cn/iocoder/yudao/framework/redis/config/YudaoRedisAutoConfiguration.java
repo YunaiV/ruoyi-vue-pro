@@ -1,18 +1,18 @@
 package cn.iocoder.yudao.framework.redis.config;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import org.redisson.spring.starter.RedissonAutoConfigurationV2;
+import org.redisson.spring.starter.RedissonAutoConfigurationV4;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
  * Redis 配置类
  */
-@AutoConfiguration(before = RedissonAutoConfigurationV2.class) // 目的：使用自己定义的 RedisTemplate Bean
+@AutoConfiguration(before = RedissonAutoConfigurationV4.class) // 目的：使用自己定义的 RedisTemplate Bean
 public class YudaoRedisAutoConfiguration {
 
     /**
@@ -27,14 +27,15 @@ public class YudaoRedisAutoConfiguration {
         // 使用 String 序列化方式，序列化 KEY 。
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
-        // 使用 JSON 序列化方式（库是 Jackson ），序列化 VALUE 。
-        template.setValueSerializer(buildRedisSerializer());
-        template.setHashValueSerializer(buildRedisSerializer());
+        // 使用 JSON 序列化方式，序列化 VALUE
+        RedisSerializer<?> redisSerializer = buildRedisSerializer();
+        template.setValueSerializer(redisSerializer);
+        template.setHashValueSerializer(redisSerializer);
         return template;
     }
 
     public static RedisSerializer<?> buildRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer(JsonUtils.getObjectMapper());
+        return new GenericJacksonJsonRedisSerializer(JsonUtils.getObjectMapper());
     }
 
 }

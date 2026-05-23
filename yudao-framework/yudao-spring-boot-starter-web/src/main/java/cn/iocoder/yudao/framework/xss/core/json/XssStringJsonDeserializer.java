@@ -3,16 +3,15 @@ package cn.iocoder.yudao.framework.xss.core.json;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.xss.config.XssProperties;
 import cn.iocoder.yudao.framework.xss.core.clean.XssCleaner;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.PathMatcher;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.jdk.StringDeserializer;
 
 /**
  * XSS 过滤 jackson 反序列化器。
@@ -36,7 +35,7 @@ public class XssStringJsonDeserializer extends StringDeserializer {
     private final XssCleaner xssCleaner;
 
     @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public String deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         // 1. 白名单 URL 的处理
         HttpServletRequest request = ServletUtils.getRequest();
         if (request != null) {

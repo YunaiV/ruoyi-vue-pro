@@ -4,24 +4,24 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.json.databind.NumberSerializer;
 import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeDeserializer;
 import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalTimeDeserializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalTimeSerializer;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@AutoConfiguration(after = Jackson2AutoConfiguration.class)
+@AutoConfiguration(after = JacksonAutoConfiguration.class)
 @Slf4j
 public class YudaoJacksonAutoConfiguration {
 
@@ -29,26 +29,15 @@ public class YudaoJacksonAutoConfiguration {
      * 从 Builder 源头定制（关键：使用 *ByType，避免 handledType 要求）
      */
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer ldtEpochMillisCustomizer() {
-        return builder -> builder
-                // Long -> Number
-                .serializerByType(Long.class, NumberSerializer.INSTANCE)
-                .serializerByType(Long.TYPE, NumberSerializer.INSTANCE)
-                // LocalDate / LocalTime
-                .serializerByType(LocalDate.class, LocalDateSerializer.INSTANCE)
-                .deserializerByType(LocalDate.class, LocalDateDeserializer.INSTANCE)
-                .serializerByType(LocalTime.class, LocalTimeSerializer.INSTANCE)
-                .deserializerByType(LocalTime.class, LocalTimeDeserializer.INSTANCE)
-                // LocalDateTime < - > EpochMillis
-                .serializerByType(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
-                .deserializerByType(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
+    public JsonMapperBuilderCustomizer ldtEpochMillisCustomizer(JacksonModule timestampSupportModuleBean) {
+        return builder -> builder.addModule(timestampSupportModuleBean);
     }
 
     /**
      * 以 Bean 形式暴露 Module（Boot 会自动注册到所有 ObjectMapper）
      */
     @Bean
-    public Module timestampSupportModuleBean() {
+    public JacksonModule timestampSupportModuleBean() {
         SimpleModule m = new SimpleModule("TimestampSupportModule");
         // Long -> Number，避免前端精度丢失
         m.addSerializer(Long.class, NumberSerializer.INSTANCE);

@@ -9,13 +9,12 @@ import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.IJsonTypeHandler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserGlobal;
 import com.baomidou.mybatisplus.extension.parser.cache.JdkSerialCaffeineJsqlParseCache;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -25,6 +24,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * MyBaits 配置类
@@ -83,13 +83,13 @@ public class YudaoMybatisAutoConfiguration {
 
     @Bean // 特殊：返回结果使用 Object 而不用 JacksonTypeHandler 的原因，避免因为 JacksonTypeHandler 被 mybatis 全局使用！
     public Object jacksonTypeHandler(List<ObjectMapper> objectMappers) {
-        // 特殊：设置 JacksonTypeHandler 的 ObjectMapper！
+        // 特殊：设置 Jackson3TypeHandler 的 ObjectMapper！
         ObjectMapper objectMapper = CollUtil.getFirst(objectMappers);
         if (objectMapper == null) {
             objectMapper = JsonUtils.getObjectMapper();
         }
-        JacksonTypeHandler.setObjectMapper(objectMapper);
-        return new JacksonTypeHandler(Object.class);
+        Jackson3TypeHandler.setObjectMapper(objectMapper);
+        return new Jackson3TypeHandler(Object.class);
     }
 
 }

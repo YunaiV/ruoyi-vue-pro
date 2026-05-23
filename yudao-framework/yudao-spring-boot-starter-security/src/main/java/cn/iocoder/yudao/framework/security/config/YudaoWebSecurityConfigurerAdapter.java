@@ -29,14 +29,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.util.pattern.PathPattern;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 自定义的 Spring Security 配置适配器实现
@@ -170,12 +167,7 @@ public class YudaoWebSecurityConfigurerAdapter {
                 continue;
             }
             Set<String> urls = new HashSet<>();
-            if (entry.getKey().getPatternsCondition() != null) {
-                urls.addAll(entry.getKey().getPatternsCondition().getPatterns());
-            }
-            if (entry.getKey().getPathPatternsCondition() != null) {
-                urls.addAll(convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
-            }
+            urls.addAll(entry.getKey().getPatternValues());
             if (urls.isEmpty()) {
                 continue;
             }

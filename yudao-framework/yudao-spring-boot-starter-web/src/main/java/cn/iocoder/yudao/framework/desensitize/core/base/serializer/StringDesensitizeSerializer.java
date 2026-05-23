@@ -7,16 +7,15 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.desensitize.core.base.annotation.DesensitizeBy;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.ser.std.StdSerializer;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
@@ -28,7 +27,7 @@ import java.lang.reflect.Field;
  * @author gaibu
  */
 @SuppressWarnings("rawtypes")
-public class StringDesensitizeSerializer extends StdSerializer<String> implements ContextualSerializer {
+public class StringDesensitizeSerializer extends StdSerializer<String> {
 
     @Getter
     @Setter
@@ -39,7 +38,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
     }
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider serializerProvider, BeanProperty beanProperty) {
+    public ValueSerializer<?> createContextual(SerializationContext serializerProvider, BeanProperty beanProperty) {
         DesensitizeBy annotation = beanProperty.getAnnotation(DesensitizeBy.class);
         if (annotation == null) {
             return this;
@@ -52,7 +51,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
 
     @Override
     @SuppressWarnings("unchecked")
-    public void serialize(String value, JsonGenerator gen, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(String value, JsonGenerator gen, SerializationContext serializerProvider) throws JacksonException {
         if (StrUtil.isBlank(value)) {
             gen.writeNull();
             return;
@@ -83,7 +82,7 @@ public class StringDesensitizeSerializer extends StdSerializer<String> implement
      * @return 字段
      */
     private Field getField(JsonGenerator generator) {
-        String currentName = generator.getOutputContext().getCurrentName();
+        String currentName = generator.streamWriteContext().currentName();
         Object currentValue = generator.currentValue();
         Class<?> currentValueClass = currentValue.getClass();
         return ReflectUtil.getField(currentValueClass, currentName);

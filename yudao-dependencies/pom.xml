@@ -142,7 +142,7 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-jackson2</artifactId>
+                <artifactId>spring-boot-jackson</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
 

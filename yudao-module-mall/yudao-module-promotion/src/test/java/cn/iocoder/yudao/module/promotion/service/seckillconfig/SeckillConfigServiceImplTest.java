@@ -6,11 +6,11 @@ import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.config.Seck
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillconfig.SeckillConfigMapper;
 import cn.iocoder.yudao.module.promotion.service.seckill.SeckillConfigServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.Resource;
 
@@ -50,7 +50,7 @@ public class SeckillConfigServiceImplTest extends BaseDbUnitTest {
         try {
             String string = objectMapper.writeValueAsString(reqVO);
             System.out.println(string);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
 

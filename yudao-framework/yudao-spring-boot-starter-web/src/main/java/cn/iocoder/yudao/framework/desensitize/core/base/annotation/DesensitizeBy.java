@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.desensitize.core.base.annotation;
 import cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler;
 import cn.iocoder.yudao.framework.desensitize.core.base.serializer.StringDesensitizeSerializer;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

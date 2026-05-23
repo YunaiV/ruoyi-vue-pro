@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.framework.common.util.json.databind;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,12 +14,12 @@ import java.time.ZoneId;
  *
  * @author 老五
  */
-public class TimestampLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
+public class TimestampLocalDateTimeDeserializer extends ValueDeserializer<LocalDateTime> {
 
     public static final TimestampLocalDateTimeDeserializer INSTANCE = new TimestampLocalDateTimeDeserializer();
 
     @Override
-    public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         // 将 Long 时间戳，转换为 LocalDateTime 对象
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(p.getValueAsLong()), ZoneId.systemDefault());
     }
