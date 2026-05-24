@@ -812,6 +812,9 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         Set<Long> initial = new LinkedHashSet<>(reqVO.getInviteeIds());
         // 发起人本人不进被邀请池
         initial.remove(inviterId);
+        if (CollUtil.isEmpty(initial)) {
+            throw exception(RTC_GROUP_INVITEE_REQUIRED);
+        }
         int max = imProperties.getRtc().getGroupMaxParticipants();
         if (initial.size() + 1 > max) {
             throw exception(RTC_GROUP_INVITEE_OVER_LIMIT);

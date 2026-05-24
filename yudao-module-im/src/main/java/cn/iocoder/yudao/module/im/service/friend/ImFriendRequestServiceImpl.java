@@ -143,10 +143,12 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void agreeFriendRequest(Long userId, Long requestId) {
-        // 1. 校验申请存在 + 未处理 + 操作人是接收方（fail-fast；并发场景仍由下面的乐观锁兜底）
+        // 1.1 校验申请存在、未处理、操作人是接收方
         ImFriendRequestDO request = validateRequestForHandle(userId, requestId);
+        // 1.2 复验双方用户有效
+        adminUserApi.validateUserList(List.of(request.getFromUserId(), request.getToUserId()));
 
-        // 2. 乐观锁更新申请：handleResult=AGREED + handleTime；并发同意会有一方 affectedRows=0
+        // 2. 乐观锁更新申请处理结果
         ImFriendRequestDO updateObj = new ImFriendRequestDO()
                 .setHandleResult(ImFriendRequestHandleResultEnum.AGREED.getResult()).setHandleTime(LocalDateTime.now());
         int affected = friendRequestMapper.updateByIdAndHandleResult(request.getId(),

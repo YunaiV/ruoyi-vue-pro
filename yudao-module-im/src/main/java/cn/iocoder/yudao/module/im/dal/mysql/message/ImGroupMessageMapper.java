@@ -81,7 +81,6 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
     default List<ImGroupMessageDO> selectHistoryList(Long groupId, Long maxId, Integer limit, LocalDateTime joinTime) {
         QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
         wrapper.eq("group_id", groupId)
-                .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .lt(maxId != null, "id", maxId)
                 .ge(joinTime != null, "send_time", joinTime)
                 .orderByDesc("id");

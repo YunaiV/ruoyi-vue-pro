@@ -35,8 +35,8 @@ public class AdminUserProfileUpdateConsumer {
     public void onMessage(AdminUserProfileUpdateMessage message) {
         log.info("[onMessage][消息内容({})]", message);
         Long userId = message.getUserId();
-        // 1. SQL 层过滤 ENABLE 好友
-        List<ImFriendDO> friends = friendService.getEnableFriendList(userId);
+        // 1. 过滤双向有效好友
+        List<ImFriendDO> friends = friendService.getMutualEnableFriendList(userId);
         if (friends.isEmpty()) {
             return;
         }

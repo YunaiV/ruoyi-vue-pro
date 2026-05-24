@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.privates.ImPrivateMessageManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -56,7 +55,6 @@ public interface ImPrivateMessageMapper extends BaseMapperX<ImPrivateMessageDO> 
         wrapper.and(w -> w.eq("sender_id", userId).eq("receiver_id", receiverId)
                         .or()
                         .eq("sender_id", receiverId).eq("receiver_id", userId))
-                .ne("status", ImMessageStatusEnum.RECALL.getStatus())
                 .lt(maxId != null, "id", maxId)
                 .orderByDesc("id");
         wrapper.limitN(limit);

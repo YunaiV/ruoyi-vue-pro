@@ -14,6 +14,8 @@ import org.mockito.MockedStatic;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -134,6 +136,29 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             verify(webSocketMessageSender).sendObject(anyInt(), eq(2L), anyString(), any());
             verify(webSocketMessageSender).sendObject(anyInt(), eq(3L), anyString(), any());
         }
+    }
+
+    @Test
+    public void testDoSendGroupMessage_emptyUserIds_noSend() {
+        ImGroupMessageDTO dto = new ImGroupMessageDTO().setGroupId(10L);
+
+        imWebSocketService.doSendGroupMessage(Collections.emptyList(), dto);
+        imWebSocketService.doSendGroupMessage(null, dto);
+
+        verifyNoInteractions(webSocketMessageSender);
+    }
+
+    @Test
+    public void testDoSendGroupMessage_distinctUserIds() {
+        ImGroupMessageDTO dto = new ImGroupMessageDTO().setGroupId(10L);
+
+        imWebSocketService.doSendGroupMessage(Arrays.asList(1L, 2L, 1L, null), dto);
+
+        verify(webSocketMessageSender).sendObject(
+                eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+        verify(webSocketMessageSender).sendObject(
+                eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+        verifyNoMoreInteractions(webSocketMessageSender);
     }
 
     @Test

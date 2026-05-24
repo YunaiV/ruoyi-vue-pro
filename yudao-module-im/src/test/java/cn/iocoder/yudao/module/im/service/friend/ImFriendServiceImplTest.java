@@ -222,4 +222,23 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         verify(imFriendMapper, never()).selectListByUserIdAndFriendUserIdsAndStatus(anyLong(), anyCollection(), anyInt());
     }
 
+    @Test
+    public void testGetMutualEnableFriendList_filterSingleSideDeleted() {
+        ImFriendDO friend2 = ImFriendDO.builder().id(1L).userId(1L).friendUserId(2L)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        ImFriendDO friend3 = ImFriendDO.builder().id(2L).userId(1L).friendUserId(3L)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(imFriendMapper.selectListByUserIdAndStatus(1L, CommonStatusEnum.ENABLE.getStatus()))
+                .thenReturn(List.of(friend2, friend3));
+        when(imFriendMapper.selectListByUserIdsAndFriendUserIdAndStatus(anyCollection(), eq(1L),
+                eq(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(List.of(
+                        ImFriendDO.builder().userId(2L).friendUserId(1L)
+                                .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+
+        List<ImFriendDO> result = friendService.getMutualEnableFriendList(1L);
+
+        assertEquals(1, result.size());
+        assertEquals(2L, result.get(0).getFriendUserId());
+    }
+
 }

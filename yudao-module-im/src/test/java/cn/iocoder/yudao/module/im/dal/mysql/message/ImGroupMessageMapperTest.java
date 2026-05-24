@@ -165,7 +165,7 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testSelectHistoryList_excludeRecall() {
+    public void testSelectHistoryList_includeRecall() {
         ImGroupMessageDO normal = buildMessage(10L, 1L, ImMessageStatusEnum.UNREAD);
         mapper.insert(normal);
         ImGroupMessageDO recalled = buildMessage(10L, 1L, ImMessageStatusEnum.RECALL);
@@ -173,8 +173,9 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
 
         List<ImGroupMessageDO> result = mapper.selectHistoryList(10L, null, 100, null);
 
-        assertEquals(1, result.size());
-        assertEquals(normal.getId(), result.get(0).getId());
+        assertEquals(2, result.size());
+        assertEquals(recalled.getId(), result.get(0).getId());
+        assertEquals(normal.getId(), result.get(1).getId());
     }
 
     @Test

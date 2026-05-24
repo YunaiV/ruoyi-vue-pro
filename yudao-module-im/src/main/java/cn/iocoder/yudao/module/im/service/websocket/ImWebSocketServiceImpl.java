@@ -15,6 +15,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertLinkedSet;
 
 /**
  * IM WebSocket 推送 Service 实现类
@@ -59,7 +62,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
      */
     @Async
     public void doSendPrivateMessage(Collection<Long> userIds, ImPrivateMessageDTO dto) {
-        for (Long userId : userIds) {
+        for (Long userId : getDistinctUserIds(userIds)) {
             try {
                 webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                         ImPrivateMessageDTO.TYPE, dto);
@@ -74,7 +77,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
      */
     @Async
     public void doSendGroupMessage(Collection<Long> userIds, ImGroupMessageDTO dto) {
-        for (Long userId : userIds) {
+        for (Long userId : getDistinctUserIds(userIds)) {
             try {
                 webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                         ImGroupMessageDTO.TYPE, dto);
@@ -89,7 +92,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
      */
     @Async
     public void doSendChannelMessage(Collection<Long> userIds, ImChannelMessageDTO dto) {
-        for (Long userId : userIds) {
+        for (Long userId : getDistinctUserIds(userIds)) {
             try {
                 webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                         ImChannelMessageDTO.TYPE, dto);
@@ -111,6 +114,10 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
         } catch (Exception e) {
             log.error("[doBroadcastChannelMessage][dto({}) 广播失败]", dto, e);
         }
+    }
+
+    private static Set<Long> getDistinctUserIds(Collection<Long> userIds) {
+        return convertLinkedSet(userIds, userId -> userId);
     }
 
     /**

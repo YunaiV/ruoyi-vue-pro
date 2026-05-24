@@ -48,6 +48,11 @@ public interface ImFriendService {
     List<ImFriendDO> getEnableFriendList(Long userId);
 
     /**
+     * 获得当前用户的双向有效好友列表（双方均 ENABLE 状态）
+     */
+    List<ImFriendDO> getMutualEnableFriendList(Long userId);
+
+    /**
      * 获得当前用户与指定用户之间的有效好友列表（仅 ENABLE 状态）
      */
     List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds);

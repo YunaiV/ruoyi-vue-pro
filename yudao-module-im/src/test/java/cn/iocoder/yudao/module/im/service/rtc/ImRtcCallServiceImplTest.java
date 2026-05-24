@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.im.service.rtc;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallCreateReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
 import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcCallMapper;
 import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcParticipantMapper;
+import cn.iocoder.yudao.module.im.dal.redis.rtc.ImRtcCallLockRedisDAO;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantRoleEnum;
@@ -27,7 +29,10 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_GROUP_INVITEE_REQUIRED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_SELF_BUSY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -42,6 +47,8 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
     private ImRtcParticipantMapper rtcParticipantMapper;
     @Mock
     private ImRtcCallMapper rtcCallMapper;
+    @Mock
+    private ImRtcCallLockRedisDAO rtcCallLockRedisDAO;
     @Mock
     private AdminUserApi adminUserApi;
     @Mock
@@ -226,6 +233,28 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         // 断言：NO_ANSWER 信令推到主叫 200L；不触发 endSession
         verify(webSocketService).sendPrivateMessageAsync(eq(200L), any(ImPrivateMessageDTO.class));
         verify(rtcCallMapper, never()).updateByIdAndStatusIn(any(), anyCollection(), any());
+    }
+
+    // ========== createCall ==========
+
+    @Test
+    public void testCreateCall_groupOnlyInviteSelf_throwInviteeRequired() throws Exception {
+        when(imProperties.getRtc()).thenReturn(new ImProperties.Rtc());
+        when(rtcCallLockRedisDAO.lockGroup(eq(10L), any())).thenAnswer(invocation -> {
+            @SuppressWarnings("unchecked")
+            Callable<ImRtcCallDO> callable = invocation.getArgument(1);
+            return callable.call();
+        });
+        ImRtcCallCreateReqVO reqVO = new ImRtcCallCreateReqVO();
+        reqVO.setConversationType(ImConversationTypeEnum.GROUP.getType());
+        reqVO.setGroupId(10L);
+        reqVO.setInviteeIds(Set.of(100L));
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> rtcCallService.createCall(100L, reqVO));
+
+        assertEquals(RTC_GROUP_INVITEE_REQUIRED.getCode(), exception.getCode());
+        verify(rtcParticipantMapper, never()).insertBatch(anyList());
     }
 
     // ========== acceptCall / joinCall 忙线校验 ==========

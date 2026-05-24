@@ -47,6 +47,15 @@ public interface ImFriendMapper extends BaseMapperX<ImFriendDO> {
                 .eq(ImFriendDO::getStatus, status));
     }
 
+    default List<ImFriendDO> selectListByUserIdsAndFriendUserIdAndStatus(Collection<Long> userIds,
+                                                                        Long friendUserId,
+                                                                        Integer status) {
+        return selectList(new LambdaQueryWrapperX<ImFriendDO>()
+                .in(ImFriendDO::getUserId, userIds)
+                .eq(ImFriendDO::getFriendUserId, friendUserId)
+                .eq(ImFriendDO::getStatus, status));
+    }
+
     default PageResult<ImFriendDO> selectPage(ImFriendManagerPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImFriendDO>()
                 .eqIfPresent(ImFriendDO::getUserId, reqVO.getUserId())

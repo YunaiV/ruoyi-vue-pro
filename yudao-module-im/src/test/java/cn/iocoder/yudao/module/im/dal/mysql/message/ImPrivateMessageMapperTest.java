@@ -120,7 +120,7 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testSelectHistoryList_excludeRecall() {
+    public void testSelectHistoryList_includeRecall() {
         // 准备
         ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
         mapper.insert(msg1);
@@ -130,9 +130,10 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
         // 调用
         List<ImPrivateMessageDO> result = mapper.selectHistoryList(1L, 2L, null, 100);
 
-        // 断言：撤回的不返回
-        assertEquals(1, result.size());
-        assertEquals(msg1.getId(), result.get(0).getId());
+        // 断言：撤回消息一并返回
+        assertEquals(2, result.size());
+        assertEquals(msg2.getId(), result.get(0).getId());
+        assertEquals(msg1.getId(), result.get(1).getId());
     }
 
     @Test

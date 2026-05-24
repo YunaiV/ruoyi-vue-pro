@@ -31,8 +31,11 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.FRIEND_STATE;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_BLOCKED_BY_PEER;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_BLOCKED;
@@ -98,6 +101,24 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Override
     public List<ImFriendDO> getEnableFriendList(Long userId) {
         return friendMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
+    }
+
+    @Override
+    public List<ImFriendDO> getMutualEnableFriendList(Long userId) {
+        // 1. 查询本端启用好友
+        List<ImFriendDO> friends = getEnableFriendList(userId);
+        if (CollUtil.isEmpty(friends)) {
+            return Collections.emptyList();
+        }
+
+        // 2. 查询对端启用好友关系
+        Set<Long> friendUserIds = convertSet(friends, ImFriendDO::getFriendUserId);
+        List<ImFriendDO> mutualFriends = friendMapper.selectListByUserIdsAndFriendUserIdAndStatus(friendUserIds, userId,
+                CommonStatusEnum.ENABLE.getStatus());
+        Set<Long> mutualUserIds = convertSet(mutualFriends, ImFriendDO::getUserId);
+
+        // 3. 过滤双向启用好友
+        return filterList(friends, friend -> mutualUserIds.contains(friend.getFriendUserId()));
     }
 
     @Override

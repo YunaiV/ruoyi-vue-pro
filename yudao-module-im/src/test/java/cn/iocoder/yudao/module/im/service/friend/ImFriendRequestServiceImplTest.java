@@ -19,6 +19,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -198,6 +200,7 @@ public class ImFriendRequestServiceImplTest extends BaseMockitoUnitTest {
         friendRequestService.agreeFriendRequest(2L, 100L);
 
         // 断言：双向建立好友 + 推 APPROVED 给发起方
+        verify(adminUserApi).validateUserList(List.of(1L, 2L));
         verify(friendService).becomeFriends(request);
         verify(websocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
     }
