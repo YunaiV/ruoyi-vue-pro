@@ -123,8 +123,15 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void agreeGroupRequest(Long userId, Long requestId) {
-        // 1. 校验申请存在 + 未处理 + 操作人是 owner / admin
+        // 1.1 校验申请存在 + 未处理 + 操作人是 owner / admin
         ImGroupRequestDO request = validateRequestForHandle(userId, requestId);
+        // 1.2 复核群当前状态：拒绝在封禁 / 解散的群继续放人
+        groupService.validateGroupExists(request.getGroupId());
+        // 1.3 复核申请人是否已在群中；幂等避免重复广播 1509 / 1510 入群事件
+        ImGroupMemberDO applicant = groupMemberService.getGroupMember(request.getGroupId(), request.getUserId());
+        if (applicant != null && CommonStatusEnum.ENABLE.getStatus().equals(applicant.getStatus())) {
+            throw exception(GROUP_REQUEST_ALREADY_MEMBER);
+        }
         // 2. 入群前校验人数上限；群已满抛错让操作人选择拒绝
         groupService.validateMemberCountLimit(request.getGroupId(), 1);
 

@@ -87,13 +87,16 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
 
                 @Override
                 public ListenableFuture<SensitiveWordBsCache> reload(Long tenantId, SensitiveWordBsCache oldValue) {
-                    // 先比对 max(update_time)；没变 → 复用旧实例，避免无谓地重建 trie
-                    LocalDateTime currentMax = sensitiveWordMapper.selectMaxUpdateTime(tenantId);
-                    if (Objects.equals(oldValue.getMaxUpdateTime(), currentMax)) {
-                        return Futures.immediateFuture(oldValue);
-                    }
-                    // 变了 → 重新读词库并重建 trie
-                    return Futures.immediateFuture(loadFresh(tenantId));
+                    // 异步刷新线程独立于业务线程，没有租户上下文；必须显式 TenantUtils.execute 设置，否则租户拦截器会按当前线程的空上下文拼 SQL
+                    return Futures.immediateFuture(TenantUtils.execute(tenantId, () -> {
+                        LocalDateTime currentMax = sensitiveWordMapper.selectMaxUpdateTime(tenantId);
+                        // 没变 → 复用旧实例，避免无谓地重建 trie
+                        if (Objects.equals(oldValue.getMaxUpdateTime(), currentMax)) {
+                            return oldValue;
+                        }
+                        // 变了 → 重新读词库并重建 trie
+                        return loadFresh(tenantId);
+                    }));
                 }
 
             });

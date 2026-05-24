@@ -249,8 +249,9 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     /**
      * 单向绑定好友关系（内部方法，被 {@link #becomeFriends} / {@link #silentReAddFriend} 调用）：
-     * - 情况一：已存在记录（含 ENABLE / DISABLE）→ 复用并恢复 ENABLE，silent / pinned / blocked 一并重置为 false
-     * - 情况二：不存在记录 → 直接插入新记录
+     * - 情况一：已存在 ENABLE 记录 → 已是好友，幂等跳过；不重置 silent / pinned / blocked，避免历史未处理申请再被同意时清掉用户的拉黑 / 置顶 / 免打扰设置
+     * - 情况二：已存在 DISABLE 记录 → 复用并恢复 ENABLE，silent / pinned / blocked 一并重置为 false，对齐"重新加好友"语义
+     * - 情况三：不存在记录 → 直接插入新记录
      * <p>
      * 并发安全：agree 路径由 {@code friend_request.handle_result} 的乐观锁单边推进；
      *         极端并发下若插入唯一键冲突，让 DuplicateKeyException 向外抛出，外层事务回滚。
@@ -259,7 +260,11 @@ public class ImFriendServiceImpl implements ImFriendService {
      */
     public void addFriend0(Long userId, Long friendUserId, String displayName, Integer addSource) {
         ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
-        // 情况一：复用旧记录 → 恢复 ENABLE + 重置 silent / pinned / blocked 与首次新增对齐
+        // 情况一：已是 ENABLE 好友，幂等跳过；防御历史未处理申请被二次同意时把 blocked / silent / pinned 清回 false
+        if (exists != null && CommonStatusEnum.isEnable(exists.getStatus())) {
+            return;
+        }
+        // 情况二：复用 DISABLE 旧记录 → 恢复 ENABLE + 重置 silent / pinned / blocked，对齐"重新加好友"语义
         if (exists != null) {
             ImFriendDO update = new ImFriendDO().setId(exists.getId())
                     .setStatus(CommonStatusEnum.ENABLE.getStatus()).setAddTime(LocalDateTime.now())
@@ -273,7 +278,7 @@ public class ImFriendServiceImpl implements ImFriendService {
             friendMapper.updateById(update);
             return;
         }
-        // 情况二：不存在记录 → 直接插入新记录
+        // 情况三：不存在记录 → 直接插入新记录
         ImFriendDO friend = ImFriendDO.builder().userId(userId).friendUserId(friendUserId)
                 .silent(false).pinned(false).blocked(false)
                 .displayName(displayName).addSource(addSource)

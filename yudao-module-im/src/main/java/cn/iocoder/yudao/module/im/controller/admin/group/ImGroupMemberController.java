@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.controller.admin.group;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -58,6 +59,7 @@ public class ImGroupMemberController {
     public CommonResult<ImGroupMemberRespVO> getGroupMember(@RequestParam(value = "id", required = false) Long id,
                                                             @RequestParam(value = "groupId", required = false) Long groupId,
                                                             @RequestParam(value = "userId", required = false) Long userId) {
+        // 1. 查询群成员
         ImGroupMemberDO member;
         if (id != null) {
             member = groupMemberService.getGroupMember(id);
@@ -67,7 +69,18 @@ public class ImGroupMemberController {
             // 避免 selectByGroupIdAndUserId 收到 null 参数走全表扫 / 抛 SQL 异常
             throw new IllegalArgumentException("参数缺失：需传 id 或 (groupId, userId)");
         }
-        return success(BeanUtils.toBean(member, ImGroupMemberRespVO.class));
+        if (member == null) {
+            return success(null);
+        }
+
+        // 2. 校验当前登录用户是该成员所在群的有效成员
+        Long loginUserId = getLoginUserId();
+        groupMemberService.validateMemberInGroup(member.getGroupId(), loginUserId);
+
+        // 3. 转化 VO
+        ImGroupMemberRespVO memberVO = BeanUtils.toBean(member, ImGroupMemberRespVO.class);
+        hidePrivateFieldsIfNotSelf(memberVO, member.getUserId(), loginUserId);
+        return success(memberVO);
     }
 
     @GetMapping("/list")
@@ -91,8 +104,18 @@ public class ImGroupMemberController {
             ImGroupMemberRespVO vo = BeanUtils.toBean(m, ImGroupMemberRespVO.class);
             MapUtils.findAndThen(userMap, m.getUserId(), user ->
                     vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
+            hidePrivateFieldsIfNotSelf(vo, m.getUserId(), loginUserId);
             return vo;
         }));
+    }
+
+    /**
+     * 非本人查看时，置空成员的私人设置字段（groupRemark / silent）
+     */
+    private void hidePrivateFieldsIfNotSelf(ImGroupMemberRespVO vo, Long memberUserId, Long loginUserId) {
+        if (ObjUtil.notEqual(loginUserId, memberUserId)) {
+            vo.setGroupRemark(null).setSilent(null);
+        }
     }
 
 }

@@ -250,6 +250,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (!ImConversationTypeEnum.isGroup(call.getConversationType())) {
             throw exception(RTC_GROUP_REQUIRED);
         }
+        // 1.3 校验当前用户是该群有效成员；防止仅凭 room 就拿到 LiveKit token 越权入会
+        groupMemberService.validateMemberInGroup(call.getGroupId(), userId);
 
         // 2. 入参与表：已有记录切回 JOINED；不在记录则以 ACTIVE_JOIN 角色 INSERT
         LocalDateTime now = LocalDateTime.now();

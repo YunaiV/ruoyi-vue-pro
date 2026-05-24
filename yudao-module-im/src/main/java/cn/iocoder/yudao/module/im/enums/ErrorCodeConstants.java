@@ -20,6 +20,7 @@ public interface ErrorCodeConstants {
     ErrorCode MESSAGE_NOT_IN_GROUP = new ErrorCode(1_040_300_009, "消息不属于该群");
     ErrorCode MESSAGE_PRIVATE_READ_DISABLED = new ErrorCode(1_040_300_010, "私聊已读功能已关闭");
     ErrorCode MESSAGE_GROUP_READ_DISABLED = new ErrorCode(1_040_300_011, "群聊已读功能已关闭");
+    ErrorCode MESSAGE_GROUP_READ_USERS_DENIED = new ErrorCode(1_040_300_012, "仅消息发送者可查看已读列表");
 
     // ========== 群 (1-040-400-000) ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");
@@ -31,6 +32,7 @@ public interface ErrorCodeConstants {
     ErrorCode GROUP_MESSAGE_PIN_MAX_LIMIT = new ErrorCode(1_040_400_006, "群置顶消息数量不能超过 {} 条");
     ErrorCode GROUP_MESSAGE_ALREADY_PINNED = new ErrorCode(1_040_400_007, "该消息已置顶");
     ErrorCode GROUP_MESSAGE_NOT_PINNED = new ErrorCode(1_040_400_008, "该消息未置顶");
+    ErrorCode GROUP_MESSAGE_PIN_DIRECTED_DENIED = new ErrorCode(1_040_400_009, "定向消息不支持置顶");
 
     // ========== 群成员 (1-040-500-000) ==========
     ErrorCode GROUP_MEMBER_NOT_IN_GROUP = new ErrorCode(1_040_500_001, "您已不在该群中");

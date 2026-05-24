@@ -192,6 +192,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     // ==================== 群成员的写操作 ====================
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void inviteGroupMember(Long userId, ImGroupMemberInviteReqVO inviteReqVO) {
         Long groupId = inviteReqVO.getGroupId();
         // 1.1 校验群存在 + 当前用户是群成员；同时拿到 role 供下面审批分支判断
@@ -238,24 +239,28 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void quitGroup(Long groupId, Long userId) {
-        // 1. 校验群存在
+        // 1.1 校验群存在
         ImGroupDO group = validateGroupExists(groupId);
-        // 2. 群主不可退群
+        // 1.2 群主不可退群
         if (ObjUtil.equal(group.getOwnerUserId(), userId)) {
             throw exception(GROUP_OWNER_CANNOT_QUIT);
         }
+        // 1.3 校验当前用户是有效群成员；防止非成员触发广播 + 后续 remove 失败时无法回滚已推送的事件
+        groupMemberService.validateMemberInGroup(groupId, userId);
 
-        // 3. 先发广播，后移成员（见类 javadoc）
+        // 2. 先发广播，后移成员（见类 javadoc）
         groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberQuit(groupId, userId));
 
-        // 4.1 移除群成员
+        // 3.1 移除群成员
         groupMemberService.removeGroupMember(groupId, userId);
-        // 4.2 清理已读缓存
+        // 3.2 清理已读缓存
         groupMessageService.deleteReadMaxMessageId(groupId, userId);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void removeGroupMember(Long userId, ImGroupMemberRemoveReqVO removeReqVO) {
         Long groupId = removeReqVO.getGroupId();
         Set<Long> targetUserIds = new HashSet<>(removeReqVO.getMemberUserIds());
@@ -400,9 +405,9 @@ public class ImGroupServiceImpl implements ImGroupService {
     @CacheEvict(cacheNames = GROUP, key = "#groupId")
     @Transactional(rollbackFor = Exception.class)
     public void pinGroupMessage(Long userId, Long groupId, Long messageId) {
-        // 1. 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
+        // 1.1 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
         ImGroupDO group = validateOwnerOrAdminAndGetGroup(groupId, userId);
-        // 2. 校验消息属于该群、是普通聊天消息（绕过前端菜单不允许置顶群事件 / 撤回事件）、且未被撤回
+        // 1.2 校验消息属于该群、是普通聊天消息（绕过前端菜单不允许置顶群事件 / 撤回事件）、且未被撤回
         ImGroupMessageDO message = groupMessageService.getGroupMessage(messageId);
         if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
             throw exception(MESSAGE_NOT_IN_GROUP);
@@ -411,7 +416,12 @@ public class ImGroupServiceImpl implements ImGroupService {
                 || ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }
-        // 3. 幂等 + 上限校验
+        // 1.3 定向消息（receiverUserIds 非空）不允许置顶：置顶会向全群广播，泄露原本仅部分人可见的内容
+        if (CollUtil.isNotEmpty(message.getReceiverUserIds())) {
+            throw exception(GROUP_MESSAGE_PIN_DIRECTED_DENIED);
+        }
+
+        // 2. 幂等 + 上限校验
         List<Long> pinned = new ArrayList<>(CollUtil.emptyIfNull(group.getPinnedMessageIds()));
         if (pinned.contains(messageId)) {
             throw exception(GROUP_MESSAGE_ALREADY_PINNED);
@@ -423,7 +433,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         pinned.add(messageId);
         groupMapper.updateById(new ImGroupDO().setId(groupId).setPinnedMessageIds(pinned));
 
-        // 4. 推送 GROUP_MESSAGE_PIN 通知给全员；payload 直接带消息对象，前端不用回查群详情绕开 @CacheEvict 时序
+        // 3. 推送 GROUP_MESSAGE_PIN 通知给全员；payload 直接带消息对象，前端不用回查群详情绕开 @CacheEvict 时序
         groupMessageService.sendGroupMessage(userId,
                 ImGroupMessageSendDTO.ofGroupMessagePin(groupId, userId, message));
     }
@@ -590,6 +600,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
     @Override
     @CacheEvict(cacheNames = GROUP, key = "#reqVO.groupId")
+    @Transactional(rollbackFor = Exception.class)
     public void muteAll(Long userId, ImGroupMuteAllReqVO reqVO) {
         // 1. 校验群主或管理员
         validateGroupOwnerOrAdmin(reqVO.getGroupId(), userId);
@@ -605,6 +616,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void muteMember(Long userId, ImGroupMuteMemberReqVO reqVO) {
         // 1.1 不能禁言自己
         if (ObjUtil.equal(userId, reqVO.getUserId())) {
@@ -629,6 +641,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void cancelMuteMember(Long userId, ImGroupCancelMuteMemberReqVO reqVO) {
         // 1.1 校验群存在且未封禁
         validateGroupExists(reqVO.getGroupId());

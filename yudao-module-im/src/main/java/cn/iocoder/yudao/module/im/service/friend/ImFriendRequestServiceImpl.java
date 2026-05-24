@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -82,6 +83,11 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         // 1.4 单向好友（我已删 + 对方仍把我当好友）：静默重新启用我侧关系，避免对方感知我曾删除
         ImFriendDO peerFriend = friendService.getFriend(toUserId, fromUserId);
         if (peerFriend != null && CommonStatusEnum.isEnable(peerFriend.getStatus())) {
+            // 对方已拉黑：静默恢复等于绕过拉黑回到好友列表，必须先拒掉；
+            // getFriendState 在我侧 DISABLE 时直接返回 NONE，拿不到 BLOCKED 信号，这里显式补一次校验
+            if (BooleanUtil.isTrue(peerFriend.getBlocked())) {
+                throw exception(FRIEND_REQUEST_BLOCKED_BY_PEER);
+            }
             friendService.silentReAddFriend(fromUserId, toUserId, reqVO.getDisplayName(), reqVO.getAddSource());
             return null;
         }

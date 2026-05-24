@@ -177,7 +177,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
         // 3. 发送撤回事件
         return sendGroupMessage(userId, new ImGroupMessageSendDTO().setGroupId(message.getGroupId())
-                .setType(ImMessageTypeEnum.RECALL.getType()).setContent(new RecallMessage().setMessageId(messageId)));
+                .setType(ImMessageTypeEnum.RECALL.getType())
+                .setReceiverUserIds(message.getReceiverUserIds())
+                .setContent(new RecallMessage().setMessageId(messageId)));
     }
 
     @Override
@@ -374,10 +376,17 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             throw exception(MESSAGE_GROUP_READ_DISABLED);
         }
         // 1.1 校验用户在群中（权限校验）
-        groupMemberService.validateMemberInGroup(groupId, userId);
-        // 1.2 获取消息
+        ImGroupMemberDO operator = groupMemberService.validateMemberInGroup(groupId, userId);
+        // 1.2 获取消息；并校验消息归属于该群、对调用者可见、调用者是发送方
         ImGroupMessageDO message = groupMessageMapper.selectById(messageId);
-        if (message == null) {
+        if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
+            return Collections.emptyList();
+        }
+        if (!isMessageVisible(message, operator, userId)) {
+            return Collections.emptyList();
+        }
+        // 1.3 仅消息发送方关心已读人数；非发送方查询直接返回空
+        if (ObjUtil.notEqual(message.getSenderId(), userId)) {
             return Collections.emptyList();
         }
 
@@ -405,8 +414,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         ImGroupMemberDO member = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), userId);
 
         // 2. 查询历史消息（仅入群之后）
-        return groupMessageMapper.selectHistoryList(
+        List<ImGroupMessageDO> messages = groupMessageMapper.selectHistoryList(
                 reqVO.getGroupId(), reqVO.getMaxId(), reqVO.getLimit(), member.getJoinTime());
+
+        // 3. 过滤定向消息：仅保留当前用户可见的（receiverUserIds 为空 / 含当前用户 / 本人发送）
+        return filterList(messages, message -> isMessageVisible(message, member, userId));
     }
 
     // ========== 异步 WebSocket 推送 ==========

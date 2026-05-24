@@ -112,6 +112,24 @@ public class ImFriendRequestServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testApplyFriend_blockedByPeerWhenMyselfDeleted() {
+        // 准备：我侧已删除（getFriendState=NONE），对方仍把我当好友但已拉黑
+        ImFriendRequestApplyReqVO reqVO = new ImFriendRequestApplyReqVO();
+        reqVO.setToUserId(2L).setDisplayName("老张").setAddSource(1);
+        when(friendService.getFriendState(1L, 2L)).thenReturn(ImFriendStateEnum.NONE.getState());
+        ImFriendDO peerFriend = ImFriendDO.builder().userId(2L).friendUserId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus()).blocked(true).build();
+        when(friendService.getFriend(2L, 1L)).thenReturn(peerFriend);
+
+        // 调用 + 断言：必须拒掉，不能走 silentReAddFriend 绕过拉黑
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> friendRequestService.applyFriend(1L, reqVO));
+        assertEquals(FRIEND_REQUEST_BLOCKED_BY_PEER.getCode(), exception.getCode());
+        verify(friendService, never()).silentReAddFriend(anyLong(), anyLong(), anyString(), anyInt());
+        verify(friendRequestMapper, never()).insert(any(ImFriendRequestDO.class));
+    }
+
+    @Test
     public void testApplyFriend_insertNew() {
         // 准备：双方都无关系，且无历史申请
         ImFriendRequestApplyReqVO reqVO = new ImFriendRequestApplyReqVO();
