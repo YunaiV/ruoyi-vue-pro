@@ -1,6 +1,15 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
 import cn.hutool.core.collection.CollUtil;
+#set ($hasSubJoinMany = false)
+#foreach ($subTable in $subTables)
+#if ( $subTable.subJoinMany )
+#set ($hasSubJoinMany = true)
+#end
+#end
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 && $hasSubJoinMany )
+import cn.hutool.core.util.ObjectUtil;
+#end
 import org.springframework.stereotype.Service;
 import ${jakartaPackage}.annotation.Resource;
 import org.springframework.validation.annotation.Validated;

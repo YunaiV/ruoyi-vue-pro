@@ -241,6 +241,46 @@ public class CodegenEngine {
                     vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_EP_GENERAL.getType(), vue3Vben5EpGeneralTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
                     vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+            // VUE3_VBEN5_ANTDV_NEXT_SCHEMA
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/data.ts"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/index.vue"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/form.vue"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/import.vue"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/import-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("api/api.ts"),
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_SCHEMA.getType(), vue3Vben5AntdvNextSchemaTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+            // VUE3_VBEN5_ANTDV_NEXT_GENERAL
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/index.vue"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/form.vue"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/import.vue"),
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/import-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("api/api.ts"),
+                    vue3VbenFilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTDV_NEXT_GENERAL.getType(), vue3Vben5AntdvNextGeneralTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
+                    vue3VbenFilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .build();
 
     @Resource
@@ -680,6 +720,14 @@ public class CodegenEngine {
 
     private static String vue3Vben5EpGeneralTemplatePath(String path) {
         return "codegen/vue3_vben5_ele/general/" + path + ".vm";
+    }
+
+    private static String vue3Vben5AntdvNextSchemaTemplatePath(String path) {
+        return "codegen/vue3_vben5_antdv_next/schema/" + path + ".vm";
+    }
+
+    private static String vue3Vben5AntdvNextGeneralTemplatePath(String path) {
+        return "codegen/vue3_vben5_antdv_next/general/" + path + ".vm";
     }
 
     private static boolean isSubTemplate(String path) {
