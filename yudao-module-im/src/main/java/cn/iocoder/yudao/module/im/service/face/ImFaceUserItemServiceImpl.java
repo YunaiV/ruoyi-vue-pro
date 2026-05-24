@@ -7,7 +7,9 @@ import cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem.ImFaceUserIt
 import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.useritem.ImFaceUserItemManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFaceUserItemDO;
 import cn.iocoder.yudao.module.im.dal.mysql.face.ImFaceUserItemMapper;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import jakarta.annotation.Resource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,6 +17,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_DUPLICATED;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_MAX_LIMIT;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_NOT_EXISTS;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_NOT_OWN;
 
@@ -29,6 +32,8 @@ public class ImFaceUserItemServiceImpl implements ImFaceUserItemService {
 
     @Resource
     private ImFaceUserItemMapper faceUserItemMapper;
+    @Resource
+    private ImProperties imProperties;
 
     @Override
     public List<ImFaceUserItemDO> getFaceUserItemList(Long userId) {
@@ -37,14 +42,23 @@ public class ImFaceUserItemServiceImpl implements ImFaceUserItemService {
 
     @Override
     public Long createFaceUserItem(Long userId, ImFaceUserItemSaveReqVO reqVO) {
-        // 1. 同 URL 已存在则报错；前端 catch 后 toast「已添加过」
+        // 1.1 同 URL 已存在则报错
         if (faceUserItemMapper.selectByUserIdAndUrl(userId, reqVO.getUrl()) != null) {
             throw exception(FACE_USER_ITEM_DUPLICATED);
+        }
+        // 1.2 超过最大数量限制则报错
+        int maxCount = imProperties.getFace().getUserItemMaxCount();
+        if (faceUserItemMapper.selectCountByUserId(userId) >= maxCount) {
+            throw exception(FACE_USER_ITEM_MAX_LIMIT, maxCount);
         }
 
         // 2. 入库
         ImFaceUserItemDO item = BeanUtils.toBean(reqVO, ImFaceUserItemDO.class).setUserId(userId);
-        faceUserItemMapper.insert(item);
+        try {
+            faceUserItemMapper.insert(item);
+        } catch (DuplicateKeyException ex) {
+            throw exception(FACE_USER_ITEM_DUPLICATED);
+        }
         return item.getId();
     }
 

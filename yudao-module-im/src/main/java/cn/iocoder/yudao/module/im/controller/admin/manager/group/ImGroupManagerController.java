@@ -90,4 +90,13 @@ public class ImGroupManagerController {
         return success(true);
     }
 
+    @DeleteMapping("/dissolve")
+    @Operation(summary = "解散群")
+    @Parameter(name = "id", description = "群编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('im:manager:group:dissolve')")
+    public CommonResult<Boolean> dissolveGroup(@RequestParam("id") Long id) {
+        groupService.dissolveGroupByManager(getLoginUserId(), id);
+        return success(true);
+    }
+
 }

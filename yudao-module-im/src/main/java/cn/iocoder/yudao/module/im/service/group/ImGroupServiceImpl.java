@@ -175,17 +175,25 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional(rollbackFor = Exception.class)
     public void dissolveGroup(Long id, Long userId) {
         // 1. 校验群存在 + 当前用户是群主
-        validateGroupOwner(id, userId);
+        ImGroupDO group = validateGroupNotDissolved(id);
+        if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
+            throw exception(GROUP_NOT_OWNER);
+        }
 
-        // 2. 先发 GROUP_DISSOLVE 通知：放在成员移除前，sendGroupMessage 才能查到全员
+        // 2. 解散群
+        dissolveGroup0(id, userId);
+    }
+
+    private void dissolveGroup0(Long id, Long userId) {
+        // 1. 先发 GROUP_DISSOLVE 通知：放在成员移除前，sendGroupMessage 才能查到全员
         groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupDissolve(id, userId));
 
-        // 3.1 更新群状态为已解散
+        // 2.1 更新群状态为已解散
         groupMapper.updateById(new ImGroupDO().setId(id)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDissolvedTime(LocalDateTime.now()));
-        // 3.2 移除全部群成员
+        // 2.2 移除全部群成员
         groupMemberService.removeGroupMembersByGroupId(id);
-        // 3.3 清理已读缓存
+        // 2.3 清理已读缓存
         groupMessageService.deleteReadMaxMessageIdMap(id);
     }
 
@@ -512,6 +520,17 @@ public class ImGroupServiceImpl implements ImGroupService {
         return group;
     }
 
+    private ImGroupDO validateGroupNotDissolved(Long id) {
+        ImGroupDO group = getSelf().getGroup(id);
+        if (group == null) {
+            throw exception(GROUP_NOT_EXISTS);
+        }
+        if (CommonStatusEnum.DISABLE.getStatus().equals(group.getStatus())) {
+            throw exception(GROUP_DISSOLVED);
+        }
+        return group;
+    }
+
     /**
      * 校验当前用户是群主或管理员，否则抛 GROUP_NOT_OWNER_OR_ADMIN
      */
@@ -600,6 +619,17 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 3. 广播通知
         groupMessageService.sendGroupMessage(operatorUserId,
                 ImGroupMessageSendDTO.ofGroupBanned(id, operatorUserId, false));
+    }
+
+    @Override
+    @CacheEvict(cacheNames = GROUP, key = "#id")
+    @Transactional(rollbackFor = Exception.class)
+    public void dissolveGroupByManager(Long operatorUserId, Long id) {
+        // 1. 校验群存在且未解散
+        validateGroupNotDissolved(id);
+
+        // 2. 解散群
+        dissolveGroup0(id, operatorUserId);
     }
 
     // ==================== 群禁言 ====================

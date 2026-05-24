@@ -252,6 +252,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
         // 1.3 校验当前用户是该群有效成员；防止仅凭 room 就拿到 LiveKit token 越权入会
         groupMemberService.validateMemberInGroup(call.getGroupId(), userId);
+        validateUserNotJoinedOtherCall(userId, call.getRoom());
 
         // 2. 入参与表：已有记录切回 JOINED；不在记录则以 ACTIVE_JOIN 角色 INSERT
         LocalDateTime now = LocalDateTime.now();
@@ -322,6 +323,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (ImRtcParticipantStatusEnum.isJoined(participant.getStatus())) {
             return call;
         }
+        validateUserNotJoinedOtherCall(userId, call.getRoom());
         // 2.2 仅 INVITING → JOINED；其它状态拒
         if (!ImRtcParticipantStatusEnum.isInviting(participant.getStatus())) {
             throw exception(RTC_SESSION_NOT_EXISTS);
@@ -730,6 +732,14 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
             throw exception(RTC_NOT_PARTICIPANT);
         }
         return participant;
+    }
+
+    private void validateUserNotJoinedOtherCall(Long userId, String room) {
+        ImRtcParticipantDO joined = rtcParticipantMapper.selectLastOneByUserIdAndStatusInAndRoomNot(
+                userId, Collections.singleton(ImRtcParticipantStatusEnum.JOINED.getStatus()), room);
+        if (joined != null) {
+            throw exception(RTC_SELF_BUSY);
+        }
     }
 
     /**

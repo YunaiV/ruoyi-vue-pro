@@ -51,6 +51,13 @@ public interface ImRtcParticipantMapper extends BaseMapperX<ImRtcParticipantDO> 
                 .in(ImRtcParticipantDO::getStatus, statuses));
     }
 
+    default ImRtcParticipantDO selectLastOneByUserIdAndStatusInAndRoomNot(Long userId, Collection<Integer> statuses, String room) {
+        return selectLastOne(new LambdaQueryWrapperX<ImRtcParticipantDO>()
+                .eq(ImRtcParticipantDO::getUserId, userId)
+                .in(ImRtcParticipantDO::getStatus, statuses)
+                .ne(ImRtcParticipantDO::getRoom, room));
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     default int updateByIdAndStatus(Long id, Integer oldStatus, ImRtcParticipantDO updateObj) {
         return update(updateObj, Wrappers.<ImRtcParticipantDO>lambdaUpdate()

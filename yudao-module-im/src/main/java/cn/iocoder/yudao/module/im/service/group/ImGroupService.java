@@ -240,4 +240,12 @@ public interface ImGroupService {
      */
     void unbanGroup(Long operatorUserId, Long id);
 
+    /**
+     * 【管理后台】解散群
+     *
+     * @param operatorUserId 操作人用户编号
+     * @param id 群编号
+     */
+    void dissolveGroupByManager(Long operatorUserId, Long id);
+
 }

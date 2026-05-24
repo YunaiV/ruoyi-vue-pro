@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 /**
  * IM 模块全局配置
  * <p>
- * 各子模块用嵌套 inner class 区分（friend / group / message / 后续 sensitive 等），
+ * 各子模块用嵌套 inner class 区分（friend / group / face / message / rtc 等），
  * yaml 路径保持 yudao.im.{module}.{key} 与原有部署保持兼容
  *
  * @author 芋道源码
@@ -25,6 +25,8 @@ public class ImProperties {
     private Friend friend = new Friend();
 
     private Group group = new Group();
+
+    private Face face = new Face();
 
     private Message message = new Message();
 
@@ -67,6 +69,19 @@ public class ImProperties {
          * 单群置顶消息条数上限
          */
         private int pinMaxCount = 5;
+
+    }
+
+    /**
+     * 表情模块配置
+     */
+    @Data
+    public static class Face {
+
+        /**
+         * 个人表情数量上限
+         */
+        private int userItemMaxCount = 200;
 
     }
 

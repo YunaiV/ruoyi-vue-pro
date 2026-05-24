@@ -236,7 +236,8 @@ CREATE TABLE IF NOT EXISTS "im_face_user_item" (
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "uk_im_face_user_item_user_url_deleted" UNIQUE ("user_id", "url", "deleted")
 ) COMMENT 'IM 用户私有表情表';
 
 CREATE TABLE IF NOT EXISTS "im_channel" (

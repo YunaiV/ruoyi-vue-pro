@@ -30,6 +30,10 @@ public interface ImFaceUserItemMapper extends BaseMapperX<ImFaceUserItemDO> {
                 .eq(ImFaceUserItemDO::getUrl, url));
     }
 
+    default Long selectCountByUserId(Long userId) {
+        return selectCount(ImFaceUserItemDO::getUserId, userId);
+    }
+
     default PageResult<ImFaceUserItemDO> selectPage(ImFaceUserItemManagerPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImFaceUserItemDO>()
                 .eqIfPresent(ImFaceUserItemDO::getUserId, reqVO.getUserId())

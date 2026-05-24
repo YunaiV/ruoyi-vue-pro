@@ -240,6 +240,50 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testDissolveGroup_banned_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备：已封禁但未解散的群，群主仍可解散
+            ImGroupDO group = ImGroupDO.builder().id(10L).name("群").ownerUserId(1L)
+                    .banned(true).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            // 调用
+            groupService.dissolveGroup(10L, 1L);
+
+            // 断言：封禁状态不阻止解散
+            verify(groupMapper).updateById(argThat((ImGroupDO update) ->
+                    CommonStatusEnum.DISABLE.getStatus().equals(update.getStatus())));
+            verify(groupMemberService).removeGroupMembersByGroupId(10L);
+        }
+    }
+
+    @Test
+    public void testDissolveGroupByManager_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备：管理员解散封禁群，不要求管理员是群主
+            ImGroupDO group = ImGroupDO.builder().id(10L).name("群").ownerUserId(1L)
+                    .banned(true).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            // 调用
+            groupService.dissolveGroupByManager(99L, 10L);
+
+            // 断言：使用管理员编号发通知并完成清理
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(99L), dtoCaptor.capture());
+            assertEquals(ImMessageTypeEnum.GROUP_DISSOLVE.getType(), dtoCaptor.getValue().getType());
+            verify(groupMemberService).removeGroupMembersByGroupId(10L);
+            verify(groupMessageService).deleteReadMaxMessageIdMap(10L);
+        }
+    }
+
+    @Test
     public void testDissolveGroup_notOwner() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))

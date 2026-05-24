@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.im.service.rtc;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
 import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcCallMapper;
@@ -10,6 +12,7 @@ import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantRoleEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantStatusEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
+import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -25,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_SELF_BUSY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -44,6 +48,8 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
     private ImWebSocketService webSocketService;
     @Mock
     private ImProperties imProperties;
+    @Mock
+    private ImGroupMemberService groupMemberService;
 
     // ========== timeoutInvitingParticipants（Job 入口）==========
 
@@ -220,6 +226,44 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         // 断言：NO_ANSWER 信令推到主叫 200L；不触发 endSession
         verify(webSocketService).sendPrivateMessageAsync(eq(200L), any(ImPrivateMessageDTO.class));
         verify(rtcCallMapper, never()).updateByIdAndStatusIn(any(), anyCollection(), any());
+    }
+
+    // ========== acceptCall / joinCall 忙线校验 ==========
+
+    @Test
+    public void testAcceptCall_joinedOtherRoom_throwSelfBusy() {
+        // 准备：当前通话仍在邀请中，但用户已加入另一个房间
+        when(imProperties.getRtc()).thenReturn(new ImProperties.Rtc());
+        ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.PRIVATE, null);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        when(rtcParticipantMapper.selectByRoomAndUserId("r1", 100L))
+                .thenReturn(buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING));
+        when(rtcParticipantMapper.selectLastOneByUserIdAndStatusInAndRoomNot(eq(100L), anyCollection(), eq("r1")))
+                .thenReturn(buildParticipant(11L, "r2", 100L, ImRtcParticipantStatusEnum.JOINED));
+
+        // 调用 + 断言：拒绝接听，不覆盖其它房间状态
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> rtcCallService.acceptCall(100L, "r1"));
+        assertEquals(RTC_SELF_BUSY.getCode(), exception.getCode());
+        verify(rtcParticipantMapper, never()).updateByIdAndStatus(eq(10L), any(), any());
+    }
+
+    @Test
+    public void testJoinCall_joinedOtherRoom_throwSelfBusy() {
+        // 准备：群通话活跃，用户已加入另一个房间
+        when(imProperties.getRtc()).thenReturn(new ImProperties.Rtc());
+        ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        when(groupMemberService.validateMemberInGroup(999L, 100L)).thenReturn(new ImGroupMemberDO());
+        when(rtcParticipantMapper.selectLastOneByUserIdAndStatusInAndRoomNot(eq(100L), anyCollection(), eq("r1")))
+                .thenReturn(buildParticipant(11L, "r2", 100L, ImRtcParticipantStatusEnum.JOINED));
+
+        // 调用 + 断言：拒绝加入，不写参与者状态
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> rtcCallService.joinCall(100L, "r1"));
+        assertEquals(RTC_SELF_BUSY.getCode(), exception.getCode());
+        verify(rtcParticipantMapper, never()).insert(any(ImRtcParticipantDO.class));
+        verify(rtcParticipantMapper, never()).updateById(any(ImRtcParticipantDO.class));
     }
 
     // ========== 测试数据构造 ==========

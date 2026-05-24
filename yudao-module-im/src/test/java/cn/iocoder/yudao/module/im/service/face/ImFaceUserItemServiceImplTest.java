@@ -5,12 +5,16 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem.ImFaceUserItemSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFaceUserItemDO;
 import cn.iocoder.yudao.module.im.dal.mysql.face.ImFaceUserItemMapper;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
+import org.springframework.dao.DuplicateKeyException;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_DUPLICATED;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_MAX_LIMIT;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_NOT_EXISTS;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FACE_USER_ITEM_NOT_OWN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,6 +37,8 @@ public class ImFaceUserItemServiceImplTest extends BaseMockitoUnitTest {
 
     @Mock
     private ImFaceUserItemMapper faceUserItemMapper;
+    @Spy
+    private ImProperties imProperties = new ImProperties();
 
     // ========== createFaceUserItem ==========
 
@@ -42,6 +48,7 @@ public class ImFaceUserItemServiceImplTest extends BaseMockitoUnitTest {
         ImFaceUserItemSaveReqVO reqVO = new ImFaceUserItemSaveReqVO();
         reqVO.setUrl("a.png").setName("doge").setWidth(100).setHeight(100);
         when(faceUserItemMapper.selectByUserIdAndUrl(1L, "a.png")).thenReturn(null);
+        when(faceUserItemMapper.selectCountByUserId(1L)).thenReturn(10L);
 
         // 调用
         service.createFaceUserItem(1L, reqVO);
@@ -66,6 +73,37 @@ public class ImFaceUserItemServiceImplTest extends BaseMockitoUnitTest {
                 () -> service.createFaceUserItem(1L, reqVO));
         assertEquals(FACE_USER_ITEM_DUPLICATED.getCode(), exception.getCode());
         verify(faceUserItemMapper, never()).insert(any(ImFaceUserItemDO.class));
+    }
+
+    @Test
+    public void testCreateFaceUserItem_maxLimit() {
+        // 准备：个人表情已达上限
+        ImFaceUserItemSaveReqVO reqVO = new ImFaceUserItemSaveReqVO();
+        reqVO.setUrl("a.png").setWidth(100).setHeight(100);
+        imProperties.getFace().setUserItemMaxCount(20);
+        when(faceUserItemMapper.selectByUserIdAndUrl(1L, "a.png")).thenReturn(null);
+        when(faceUserItemMapper.selectCountByUserId(1L)).thenReturn(20L);
+
+        // 调用 + 断言：抛上限异常，不落库
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> service.createFaceUserItem(1L, reqVO));
+        assertEquals(FACE_USER_ITEM_MAX_LIMIT.getCode(), exception.getCode());
+        verify(faceUserItemMapper, never()).insert(any(ImFaceUserItemDO.class));
+    }
+
+    @Test
+    public void testCreateFaceUserItem_duplicateKey() {
+        // 准备：并发插入触发唯一约束
+        ImFaceUserItemSaveReqVO reqVO = new ImFaceUserItemSaveReqVO();
+        reqVO.setUrl("a.png").setWidth(100).setHeight(100);
+        when(faceUserItemMapper.selectByUserIdAndUrl(1L, "a.png")).thenReturn(null);
+        when(faceUserItemMapper.selectCountByUserId(1L)).thenReturn(10L);
+        when(faceUserItemMapper.insert(any(ImFaceUserItemDO.class))).thenThrow(new DuplicateKeyException("duplicate"));
+
+        // 调用 + 断言：数据库唯一约束冲突转业务重复异常
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> service.createFaceUserItem(1L, reqVO));
+        assertEquals(FACE_USER_ITEM_DUPLICATED.getCode(), exception.getCode());
     }
 
     // ========== deleteFaceUserItem（用户端） ==========

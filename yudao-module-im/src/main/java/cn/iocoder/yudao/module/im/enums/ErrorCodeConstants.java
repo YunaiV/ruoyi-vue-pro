@@ -81,6 +81,7 @@ public interface ErrorCodeConstants {
     ErrorCode FACE_USER_ITEM_NOT_EXISTS = new ErrorCode(1_040_800_010, "个人表情不存在");
     ErrorCode FACE_USER_ITEM_NOT_OWN = new ErrorCode(1_040_800_011, "不能操作他人的表情");
     ErrorCode FACE_USER_ITEM_DUPLICATED = new ErrorCode(1_040_800_013, "该表情已添加到个人表情");
+    ErrorCode FACE_USER_ITEM_MAX_LIMIT = new ErrorCode(1_040_800_014, "个人表情数量不能超过 {} 个");
 
     // ========== 频道 (1-040-810-000) ==========
     ErrorCode IM_CHANNEL_NOT_EXISTS = new ErrorCode(1_040_810_000, "频道不存在");
