@@ -83,7 +83,7 @@ public class ImGroupMessageDTO {
      * @return 群聊 DTO
      */
     public static ImGroupMessageDTO ofSend(ImGroupMessageDO message) {
-        return BeanUtils.toBean(message, ImGroupMessageDTO.class);
+        return BeanUtils.toBean(message, ImGroupMessageDTO.class).setReceiverUserIds(null);
     }
 
     /**

@@ -17,10 +17,9 @@ public class ImGroupMuteMemberReqVO {
     @NotNull(message = "用户编号不能为空")
     private Long userId;
 
-    // TODO @AI：是不是改成禁言结束时间更好？因为禁言时长可能会比较大，单位秒不太好理解。
-    @Schema(description = "禁言时长（秒）", requiredMode = Schema.RequiredMode.REQUIRED, example = "600")
+    @Schema(description = "禁言时长（秒），0 表示永久禁言", requiredMode = Schema.RequiredMode.REQUIRED, example = "600")
     @NotNull(message = "禁言时长不能为空")
-    @Min(value = 1, message = "禁言时长至少 1 秒")
+    @Min(value = 0, message = "禁言时长不能小于 0 秒")
     private Integer mutedSeconds;
 
 }

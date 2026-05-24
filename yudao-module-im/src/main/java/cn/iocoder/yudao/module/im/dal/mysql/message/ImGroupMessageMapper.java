@@ -119,6 +119,7 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
                 .eqIfPresent(ImGroupMessageDO::getGroupId, reqVO.getGroupId())
                 .eqIfPresent(ImGroupMessageDO::getSenderId, reqVO.getSenderId())
                 .eqIfPresent(ImGroupMessageDO::getType, reqVO.getType())
+                .likeIfPresent(ImGroupMessageDO::getContent, reqVO.getContent())
                 .eqIfPresent(ImGroupMessageDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ImGroupMessageDO::getSendTime, reqVO.getSendTime())
                 .orderByDesc(ImGroupMessageDO::getId));

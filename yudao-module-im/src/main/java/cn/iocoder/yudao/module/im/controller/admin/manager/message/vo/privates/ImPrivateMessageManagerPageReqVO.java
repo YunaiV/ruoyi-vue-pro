@@ -24,6 +24,9 @@ public class ImPrivateMessageManagerPageReqVO extends PageParam {
     @Schema(description = "消息类型", example = "1")
     private Integer type; // 参见 ImMessageTypeEnum 枚举类
 
+    @Schema(description = "消息内容", example = "你好")
+    private String content;
+
     @Schema(description = "消息状态", example = "0")
     private Integer status; // 参见 ImMessageStatusEnum 枚举类
 

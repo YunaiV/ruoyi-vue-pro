@@ -87,10 +87,20 @@ public interface ImPrivateMessageMapper extends BaseMapperX<ImPrivateMessageDO> 
     }
 
     default PageResult<ImPrivateMessageDO> selectPage(ImPrivateMessageManagerPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<ImPrivateMessageDO>()
-                .eqIfPresent(ImPrivateMessageDO::getSenderId, reqVO.getSenderId())
-                .eqIfPresent(ImPrivateMessageDO::getReceiverId, reqVO.getReceiverId())
+        LambdaQueryWrapperX<ImPrivateMessageDO> query = new LambdaQueryWrapperX<>();
+        if (reqVO.getSenderId() != null && reqVO.getReceiverId() != null) {
+            query.and(w -> w.eq(ImPrivateMessageDO::getSenderId, reqVO.getSenderId())
+                            .eq(ImPrivateMessageDO::getReceiverId, reqVO.getReceiverId())
+                            .or()
+                            .eq(ImPrivateMessageDO::getSenderId, reqVO.getReceiverId())
+                            .eq(ImPrivateMessageDO::getReceiverId, reqVO.getSenderId()));
+        } else {
+            query.eqIfPresent(ImPrivateMessageDO::getSenderId, reqVO.getSenderId())
+                    .eqIfPresent(ImPrivateMessageDO::getReceiverId, reqVO.getReceiverId());
+        }
+        return selectPage(reqVO, query
                 .eqIfPresent(ImPrivateMessageDO::getType, reqVO.getType())
+                .likeIfPresent(ImPrivateMessageDO::getContent, reqVO.getContent())
                 .eqIfPresent(ImPrivateMessageDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ImPrivateMessageDO::getSendTime, reqVO.getSendTime())
                 .orderByDesc(ImPrivateMessageDO::getId));

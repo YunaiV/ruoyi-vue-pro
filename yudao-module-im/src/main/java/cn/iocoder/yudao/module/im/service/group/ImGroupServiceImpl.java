@@ -667,7 +667,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         validateMutePermission(operatorMember, targetMember);
 
         // 2. 设置 muteEndTime
-        LocalDateTime muteEndTime = LocalDateTime.now().plusSeconds(reqVO.getMutedSeconds());
+        LocalDateTime muteEndTime = reqVO.getMutedSeconds() == 0
+                ? ImGroupMemberDO.PERMANENT_MUTE_END_TIME : LocalDateTime.now().plusSeconds(reqVO.getMutedSeconds());
         groupMemberService.updateGroupMemberMuteEndTime(reqVO.getGroupId(), reqVO.getUserId(), muteEndTime);
 
         // 3. 广播通知
