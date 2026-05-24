@@ -7,10 +7,12 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminAddReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupAdminRemoveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupMuteMemberReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupTransferOwnerReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.ImGroupUpdateReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberInviteReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMemberRemoveReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -929,6 +931,76 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.transferGroupOwner(1L, reqVO));
             assertEquals(GROUP_NOT_OWNER.getCode(), exception.getCode());
+        }
+    }
+
+    // ========== banGroup ==========
+
+    @Test
+    public void testBanGroup_dissolved() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).status(CommonStatusEnum.DISABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            ImGroupManagerBanReqVO reqVO = new ImGroupManagerBanReqVO();
+            reqVO.setId(10L).setReason("违规");
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.banGroup(1L, reqVO));
+            assertEquals(GROUP_DISSOLVED.getCode(), exception.getCode());
+            verify(groupMapper, never()).updateById(any(ImGroupDO.class));
+            verify(groupMessageService, never()).sendGroupMessage(anyLong(), any(ImGroupMessageSendDTO.class));
+        }
+    }
+
+    @Test
+    public void testBanGroup_alreadyBannedSkip() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).banned(true)
+                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            ImGroupManagerBanReqVO reqVO = new ImGroupManagerBanReqVO();
+            reqVO.setId(10L).setReason("违规");
+
+            groupService.banGroup(1L, reqVO);
+
+            verify(groupMapper, never()).updateById(any(ImGroupDO.class));
+            verify(groupMessageService, never()).sendGroupMessage(anyLong(), any(ImGroupMessageSendDTO.class));
+        }
+    }
+
+    // ========== muteMember ==========
+
+    @Test
+    public void testMuteMember_normalCannotMuteAdmin() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                            .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
+            when(groupMemberService.validateMemberInGroup(10L, 2L)).thenReturn(
+                    ImGroupMemberDO.builder().groupId(10L).userId(2L)
+                            .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build());
+
+            ImGroupMuteMemberReqVO reqVO = new ImGroupMuteMemberReqVO();
+            reqVO.setGroupId(10L).setUserId(2L).setMutedSeconds(60);
+
+            ServiceException exception = assertThrows(ServiceException.class,
+                    () -> groupService.muteMember(1L, reqVO));
+            assertEquals(GROUP_NOT_OWNER_OR_ADMIN.getCode(), exception.getCode());
+            verify(groupMemberService, never()).updateGroupMemberMuteEndTime(anyLong(), anyLong(), any());
+            verify(groupMessageService, never()).sendGroupMessage(anyLong(), any(ImGroupMessageSendDTO.class));
         }
     }
 

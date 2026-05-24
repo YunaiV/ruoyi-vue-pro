@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,8 @@ public class ImFacePackItemManagerController {
     @Operation(summary = "批量删除表情")
     @Parameter(name = "ids", description = "编号列表", required = true)
     @PreAuthorize("@ss.hasPermission('im:manager:face-pack-item:delete')")
-    public CommonResult<Boolean> deleteFacePackItemList(@RequestParam("ids") List<Long> ids) {
+    public CommonResult<Boolean> deleteFacePackItemList(@RequestParam("ids")
+                                                        @Size(max = 100, message = "批量删除最多 100 条") List<Long> ids) {
         facePackItemService.deleteFacePackItemList(ids);
         return success(true);
     }

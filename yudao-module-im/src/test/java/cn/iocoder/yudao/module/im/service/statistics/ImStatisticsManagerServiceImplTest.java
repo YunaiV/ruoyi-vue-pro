@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -75,10 +76,10 @@ public class ImStatisticsManagerServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetNewUserDailyCountMap_dateConvert() {
-        // 准备：date 字段以 SQL Date / String 混入，count 为 Long
+        // 准备：date 字段以 SQL Date / String 混入，count 混入多种 Number
         when(statisticsMapper.selectNewUserDailyCount(eq(BEGIN), eq(END))).thenReturn(Arrays.asList(
-                row("date", java.sql.Date.valueOf("2026-01-10"), "count", 5L),
-                row("date", "2026-01-11", "count", 8L)));
+                row("date", java.sql.Date.valueOf("2026-01-10"), "count", BigInteger.valueOf(5)),
+                row("date", "2026-01-11", "count", 8)));
 
         // 调用
         Map<LocalDateTime, Long> result = service.getNewUserDailyCountMap(BEGIN, END);
@@ -119,8 +120,8 @@ public class ImStatisticsManagerServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetGroupSizeCountMap() {
         when(statisticsMapper.selectGroupSizeDistribution()).thenReturn(Arrays.asList(
-                row("range", "1-9 人", "count", 3L),
-                row("range", "10-49 人", "count", 2L)));
+                row("range", "1-9 人", "count", BigInteger.valueOf(3)),
+                row("range", "10-49 人", "count", 2)));
 
         Map<String, Long> result = service.getGroupSizeCountMap();
         assertEquals(3L, result.get("1-9 人"));
@@ -130,8 +131,8 @@ public class ImStatisticsManagerServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetMessageTypeCountMap() {
         when(statisticsMapper.selectMessageTypeDistribution(BEGIN, END)).thenReturn(Arrays.asList(
-                row("type", 101, "count", 8L),
-                row("type", 102, "count", 1L)));
+                row("type", 101L, "count", BigInteger.valueOf(8)),
+                row("type", 102, "count", 1)));
 
         Map<Integer, Long> result = service.getMessageTypeCountMap(BEGIN, END);
         assertEquals(8L, result.get(101));
@@ -141,8 +142,8 @@ public class ImStatisticsManagerServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetTopSenderCountMap_passesLimit() {
         when(statisticsMapper.selectTopSenders(BEGIN, END, 3)).thenReturn(Arrays.asList(
-                row("userId", 1L, "messageCount", 10L),
-                row("userId", 2L, "messageCount", 5L)));
+                row("userId", 1, "messageCount", BigInteger.valueOf(10)),
+                row("userId", 2L, "messageCount", 5)));
 
         Map<Long, Long> result = service.getTopSenderCountMap(BEGIN, END, 3);
         assertEquals(10L, result.get(1L));

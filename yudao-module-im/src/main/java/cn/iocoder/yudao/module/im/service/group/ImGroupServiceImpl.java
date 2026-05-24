@@ -669,6 +669,10 @@ public class ImGroupServiceImpl implements ImGroupService {
      * 三档分层禁言权限校验
      */
     private void validateMutePermission(ImGroupMemberDO operator, ImGroupMemberDO target) {
+        // 普通成员不能禁言任何人
+        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole())) {
+            throw exception(GROUP_NOT_OWNER_OR_ADMIN);
+        }
         // 群主不可被禁言
         if (ImGroupMemberRoleEnum.isOwner(target.getRole())) {
             throw exception(GROUP_MUTE_OWNER_DENIED);
@@ -676,10 +680,6 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 管理员不能禁言其他管理员
         if (ImGroupMemberRoleEnum.isAdmin(target.getRole()) && !ImGroupMemberRoleEnum.isOwner(operator.getRole())) {
             throw exception(GROUP_MUTE_ADMIN_DENIED);
-        }
-        // 普通成员不能禁言任何人
-        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(operator.getRole())) {
-            throw exception(GROUP_NOT_OWNER_OR_ADMIN);
         }
     }
 

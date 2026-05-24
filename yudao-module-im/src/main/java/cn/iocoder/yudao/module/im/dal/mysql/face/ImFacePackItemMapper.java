@@ -20,7 +20,7 @@ public interface ImFacePackItemMapper extends BaseMapperX<ImFacePackItemDO> {
 
     default List<ImFacePackItemDO> selectListByPackIdsAndStatus(Collection<Long> packIds, Integer status) {
         return selectList(new LambdaQueryWrapperX<ImFacePackItemDO>()
-                .inIfPresent(ImFacePackItemDO::getPackId, packIds)
+                .in(ImFacePackItemDO::getPackId, packIds)
                 .eq(ImFacePackItemDO::getStatus, status)
                 .orderByAsc(ImFacePackItemDO::getPackId)
                 .orderByAsc(ImFacePackItemDO::getSort)

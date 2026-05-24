@@ -90,7 +90,7 @@ public class LiveKitClient {
                 .setNotBefore(new Date(nowSec * 1000))
                 .setExpiresAt(new Date((nowSec + ttlSec) * 1000))
                 .setPayload("video", video)
-                .setSigner(JWTSignerUtil.hs256(cfg.getApiSecret().getBytes()));
+                .setSigner(JWTSignerUtil.hs256(cfg.getApiSecret().getBytes(StandardCharsets.UTF_8)));
         if (StrUtil.isNotEmpty(displayName)) {
             jwt.setPayload("name", displayName);
         }
@@ -219,7 +219,7 @@ public class LiveKitClient {
                 .setNotBefore(new Date(nowSec * 1000))
                 .setExpiresAt(new Date((nowSec + ADMIN_TOKEN_TTL.getSeconds()) * 1000))
                 .setPayload("video", MapUtil.of("roomAdmin", true))
-                .setSigner(JWTSignerUtil.hs256(cfg.getApiSecret().getBytes()))
+                .setSigner(JWTSignerUtil.hs256(cfg.getApiSecret().getBytes(StandardCharsets.UTF_8)))
                 .sign();
     }
 

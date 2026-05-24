@@ -73,7 +73,7 @@ public interface ImStatisticsManagerMapper {
     // ==================== 群 ====================
 
     /**
-     * 群总数（im_group）
+     * 当前有效群总数
      */
     @Select("SELECT COUNT(*) FROM im_group WHERE deleted = 0 AND status = 0")
     Long selectTotalGroupCount();

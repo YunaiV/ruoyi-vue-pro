@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,8 +41,9 @@ public class ImGroupMessageController {
     @Operation(summary = "拉取群聊消息（增量）")
     @Parameter(name = "minId", description = "最小消息 id", required = true, example = "0")
     @Parameter(name = "size", description = "拉取数量", required = true, example = "100")
-    public CommonResult<List<ImGroupMessageRespVO>> pullGroupMessageList(@RequestParam("minId") Long minId,
-                                                                         @RequestParam("size") Integer size) {
+    public CommonResult<List<ImGroupMessageRespVO>> pullGroupMessageList(
+            @RequestParam("minId") Long minId,
+            @RequestParam("size") @Min(value = 1, message = "拉取数量最小值为 1") Integer size) {
         List<ImGroupMessageDO> messages = groupMessageService.pullGroupMessageList(getLoginUserId(), minId, size);
         return success(BeanUtils.toBean(messages, ImGroupMessageRespVO.class));
     }

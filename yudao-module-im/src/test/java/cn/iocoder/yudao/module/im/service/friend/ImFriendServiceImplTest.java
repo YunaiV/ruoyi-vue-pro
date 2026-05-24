@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
@@ -211,6 +212,14 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
         List<ImFriendDO> result = friendService.getFriendList(1L);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    public void testGetActiveFriendList_emptySkip() {
+        List<ImFriendDO> result = friendService.getActiveFriendList(1L, Collections.emptyList());
+
+        assertTrue(result.isEmpty());
+        verify(imFriendMapper, never()).selectListByUserIdAndFriendUserIdsAndStatus(anyLong(), anyCollection(), anyInt());
     }
 
 }

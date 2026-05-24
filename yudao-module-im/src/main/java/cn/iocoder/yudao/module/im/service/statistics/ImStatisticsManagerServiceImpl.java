@@ -71,7 +71,7 @@ public class ImStatisticsManagerServiceImpl implements ImStatisticsManagerServic
         List<Map<String, Object>> rows = statisticsMapper.selectGroupSizeDistribution();
         return convertMap(rows,
                 row -> (String) row.get("range"),
-                row -> (Long) row.get("count"));
+                row -> Convert.toLong(row.get("count")));
     }
 
     // ==================== 消息 ====================
@@ -102,16 +102,16 @@ public class ImStatisticsManagerServiceImpl implements ImStatisticsManagerServic
     public Map<Integer, Long> getMessageTypeCountMap(LocalDateTime beginTime, LocalDateTime endTime) {
         List<Map<String, Object>> rows = statisticsMapper.selectMessageTypeDistribution(beginTime, endTime);
         return convertMap(rows,
-                row -> (Integer) row.get("type"),
-                row -> (Long) row.get("count"));
+                row -> Convert.toInt(row.get("type")),
+                row -> Convert.toLong(row.get("count")));
     }
 
     @Override
     public Map<Long, Long> getTopSenderCountMap(LocalDateTime beginTime, LocalDateTime endTime, int limit) {
         List<Map<String, Object>> rows = statisticsMapper.selectTopSenders(beginTime, endTime, limit);
         return convertMap(rows,
-                row -> (Long) row.get("userId"),
-                row -> (Long) row.get("messageCount"));
+                row -> Convert.toLong(row.get("userId")),
+                row -> Convert.toLong(row.get("messageCount")));
     }
 
     /**
@@ -120,7 +120,7 @@ public class ImStatisticsManagerServiceImpl implements ImStatisticsManagerServic
     private static Map<LocalDateTime, Long> toDailyCountMap(List<Map<String, Object>> rows) {
         return convertMap(rows,
                 row -> Convert.convert(LocalDate.class, row.get("date")).atStartOfDay(),
-                row -> (Long) row.get("count"));
+                row -> Convert.toLong(row.get("count")));
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -28,6 +29,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -100,6 +102,9 @@ public class ImFriendServiceImpl implements ImFriendService {
 
     @Override
     public List<ImFriendDO> getActiveFriendList(Long userId, Collection<Long> friendUserIds) {
+        if (CollUtil.isEmpty(friendUserIds)) {
+            return Collections.emptyList();
+        }
         return friendMapper.selectListByUserIdAndFriendUserIdsAndStatus(userId, friendUserIds,
                 CommonStatusEnum.ENABLE.getStatus());
     }
