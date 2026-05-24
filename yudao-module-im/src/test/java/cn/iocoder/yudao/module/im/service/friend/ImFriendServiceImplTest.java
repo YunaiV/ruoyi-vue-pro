@@ -21,9 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -126,8 +124,8 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
     // ========== addFriend0（内部方法，被 becomeFriends / silentReAddFriend 调用） ==========
 
     @Test
-    public void testAddFriend0_existingEnabledResetsFields() {
-        // 准备：已存在且启用 —— 走复用旧记录路径，重置 silent / pinned / blocked
+    public void testAddFriend0_existingEnabledSkip() {
+        // 准备：已存在且启用
         ImFriendDO exists = ImFriendDO.builder().id(10L).userId(1L).friendUserId(2L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).silent(true).pinned(true).blocked(true).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
@@ -135,16 +133,11 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         // 调用
         friendService.addFriend0(1L, 2L, null, null);
 
-        // 断言：不插入；走 update 重置 silent / pinned / blocked 为 false，并刷新 addTime
+        // 断言：不插入也不更新
         verify(imFriendMapper, never()).insert(any(ImFriendDO.class));
-        ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
-        verify(imFriendMapper).updateById(captor.capture());
-        assertEquals(10L, captor.getValue().getId());
-        assertEquals(CommonStatusEnum.ENABLE.getStatus(), captor.getValue().getStatus());
-        assertFalse(captor.getValue().getSilent());
-        assertFalse(captor.getValue().getPinned());
-        assertFalse(captor.getValue().getBlocked());
-        assertNotNull(captor.getValue().getAddTime());
+        verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
+        verify(imFriendMapper, never()).updateReAddFields(anyLong(), anyInt(), any(LocalDateTime.class),
+                anyBoolean(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -157,11 +150,9 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         // 调用
         friendService.addFriend0(1L, 2L, null, null);
 
-        // 断言：更新 status 为 ENABLE
-        ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
-        verify(imFriendMapper).updateById(captor.capture());
-        assertEquals(10L, captor.getValue().getId());
-        assertEquals(CommonStatusEnum.ENABLE.getStatus(), captor.getValue().getStatus());
+        // 断言：恢复 ENABLE，并清空 deleteTime
+        verify(imFriendMapper).updateReAddFields(eq(10L), eq(CommonStatusEnum.ENABLE.getStatus()),
+                any(LocalDateTime.class), eq(false), eq(false), eq(false), isNull(), isNull());
         verify(imFriendMapper, never()).insert(any(ImFriendDO.class));
     }
 

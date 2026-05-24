@@ -525,6 +525,24 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
+    @Test
+    public void testQuitGroup_bannedGroupAllowed() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                    .banned(true).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            groupService.quitGroup(10L, 1L);
+
+            verify(groupMemberService).removeGroupMember(10L, 1L);
+            verify(groupMessageService).deleteReadMaxMessageId(10L, 1L);
+            verify(groupMessageService).sendGroupMessage(eq(1L), any(ImGroupMessageSendDTO.class));
+        }
+    }
+
     // ========== removeGroupMember ==========
 
     @Test

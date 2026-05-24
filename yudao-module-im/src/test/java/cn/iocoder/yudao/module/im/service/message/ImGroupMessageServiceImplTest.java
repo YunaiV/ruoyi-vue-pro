@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.redis.message.ImGroupMessageReadRedisDAO;
+import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
@@ -588,6 +589,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .status(ImMessageStatusEnum.UNREAD.getStatus())
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(50L)).thenReturn(message);
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -603,6 +607,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .status(ImMessageStatusEnum.RECALL.getStatus())
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(50L)).thenReturn(message);
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -618,6 +625,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .status(ImMessageStatusEnum.UNREAD.getStatus())
                 .sendTime(LocalDateTime.now().minusMinutes(10)).build();
         when(groupMessageMapper.selectById(50L)).thenReturn(message);
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -641,12 +651,12 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetReadUserIds_withVisibleScope() {
-        // 准备：用户 1 是群成员
+        // 准备：发送者用户 5 是群成员
         ImGroupMemberDO currentMember = ImGroupMemberDO.builder()
-                .groupId(10L).userId(1L)
+                .groupId(10L).userId(5L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build();
-        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(currentMember);
+        when(groupMemberService.validateMemberInGroup(10L, 5L)).thenReturn(currentMember);
 
         // 准备：消息由用户 5 发，发送时间在 2026-04-12 10:00
         ImGroupMessageDO message = ImGroupMessageDO.builder()
@@ -661,6 +671,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 用户 5: 发送者，不计入回执
         List<ImGroupMemberDO> allMembers = List.of(
                 currentMember,
+                ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                        .status(CommonStatusEnum.ENABLE.getStatus())
+                        .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build(),
                 ImGroupMemberDO.builder().groupId(10L).userId(2L)
                         .status(CommonStatusEnum.ENABLE.getStatus())
                         .joinTime(LocalDateTime.of(2026, 1, 1, 0, 0, 0)).build(),
@@ -681,7 +694,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMessageReadRedisDAO.getReadMaxMessageIdMap(10L)).thenReturn(positions);
 
         // 调用：查询 messageId=80 的已读用户
-        List<Long> readUsers = groupMessageService.getGroupReadUserIds(1L, 10L, 80L);
+        List<Long> readUsers = groupMessageService.getGroupReadUserIds(5L, 10L, 80L);
 
         // 断言：
         // 用户 1: 可见 + readMaxId=100>=80 → 已读 ✓
@@ -804,6 +817,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                     .groupId(10L).userId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+            when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                    .id(100L).groupId(10L).senderId(2L).sendTime(LocalDateTime.now()).build());
             when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(5L);
             // readGroupMessageEvent 内部会调 selectListByGroupIdAndPendingReceipt → 返回空简化流程
             when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 5L, 100L)).thenReturn(List.of());
@@ -876,6 +891,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+        when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(2L).sendTime(LocalDateTime.now()).build());
         when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(200L);
 
         // 调用
@@ -884,6 +901,23 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 断言：不更新、不推送
         verify(groupMessageReadRedisDAO, never()).updateReadMaxMessageId(anyLong(), anyLong(), anyLong());
         verify(imWebSocketService, never()).sendGroupMessageAsync(anyLong(), any(ImGroupMessageDTO.class));
+    }
+
+    @Test
+    public void testReadGroupMessages_messageNotInGroup() {
+        // 准备：用户在群，但 messageId 属于其它群
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+        when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                .id(100L).groupId(20L).senderId(2L).sendTime(LocalDateTime.now()).build());
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
+        assertEquals(MESSAGE_NOT_IN_GROUP.getCode(), exception.getCode());
+        verify(groupMessageReadRedisDAO, never()).updateReadMaxMessageId(anyLong(), anyLong(), anyLong());
     }
 
     // ========== 回执：DONE 状态迁移 ==========
@@ -1105,7 +1139,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         reqVO.setLimit(20);
 
         List<ImGroupMessageDO> mockList = List.of(
-                ImGroupMessageDO.builder().id(99L).groupId(10L).senderId(2L).build()
+                ImGroupMessageDO.builder().id(99L).groupId(10L).senderId(2L)
+                        .sendTime(joinTime.plusMinutes(1)).build()
         );
         when(groupMessageMapper.selectHistoryList(10L, 100L, 20, joinTime)).thenReturn(mockList);
 

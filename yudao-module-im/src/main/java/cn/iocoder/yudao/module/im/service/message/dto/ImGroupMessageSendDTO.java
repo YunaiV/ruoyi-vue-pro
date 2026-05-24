@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.message.dto;
 
+import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.*;
 import jakarta.validation.constraints.NotNull;
@@ -166,11 +167,14 @@ public class ImGroupMessageSendDTO {
                 .setType(ImMessageTypeEnum.GROUP_MEMBER_SETTING_UPDATE.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupMessagePin(Long groupId, Long operatorUserId,
-                                                          cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO message) {
+    public static ImGroupMessageSendDTO ofGroupMessagePin(Long groupId, Long operatorUserId, ImGroupMessageDO message) {
         GroupMessagePinNotification notification = new GroupMessagePinNotification();
+        GroupMessagePinNotification.PinnedMessage pinnedMessage = new GroupMessagePinNotification.PinnedMessage()
+                .setId(message.getId()).setSenderId(message.getSenderId()).setGroupId(message.getGroupId())
+                .setType(message.getType()).setContent(message.getContent()).setSendTime(message.getSendTime())
+                .setAtUserIds(message.getAtUserIds()).setReceiverUserIds(message.getReceiverUserIds());
         notification.setOperatorUserId(operatorUserId);
-        notification.setMessageId(message.getId()).setMessage(message);
+        notification.setMessageId(message.getId()).setMessage(pinnedMessage);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImMessageTypeEnum.GROUP_MESSAGE_PIN.getType()).setContent(notification);
     }

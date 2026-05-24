@@ -5,8 +5,10 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.controller.admin.manager.friend.vo.ImFriendManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -53,6 +55,22 @@ public interface ImFriendMapper extends BaseMapperX<ImFriendDO> {
                 .eqIfPresent(ImFriendDO::getSilent, reqVO.getSilent())
                 .betweenIfPresent(ImFriendDO::getAddTime, reqVO.getAddTime())
                 .orderByDesc(ImFriendDO::getId));
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    default int updateReAddFields(Long id, Integer status, LocalDateTime addTime,
+                                  Boolean silent, Boolean pinned, Boolean blocked,
+                                  String displayName, Integer addSource) {
+        return update(null, Wrappers.<ImFriendDO>lambdaUpdate()
+                .eq(ImFriendDO::getId, id)
+                .set(ImFriendDO::getStatus, status)
+                .set(ImFriendDO::getAddTime, addTime)
+                .set(ImFriendDO::getSilent, silent)
+                .set(ImFriendDO::getPinned, pinned)
+                .set(ImFriendDO::getBlocked, blocked)
+                .set(ImFriendDO::getDisplayName, displayName)
+                .set(ImFriendDO::getAddSource, addSource)
+                .set(ImFriendDO::getDeleteTime, null));
     }
 
 }

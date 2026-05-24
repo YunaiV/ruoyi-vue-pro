@@ -128,7 +128,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
      * 并发安全：依靠 im_group_member 表的唯一索引 uk_im_group_member_group_user(group_id, user_id) 保证幂等，
      * 当并发 insert 触发 {@link DuplicateKeyException} 时降级为 select + update。
      * <p>
-     * 重置旧成员行时强制重置 role / addSource / inviterUserId，确保留痕反映「本次入群」事件
+     * 重置旧成员行时强制重置 role / addSource / inviterUserId / quitTime / muteEndTime
      */
     @Override
     @CacheEvict(cacheNames = GROUP_MEMBER_IDS, key = "#groupId")
@@ -139,11 +139,11 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         ImGroupMemberDO exists = groupMemberMapper.selectByGroupIdAndUserId(groupId, userId);
         if (exists != null) {
             if (CommonStatusEnum.isDisable(exists.getStatus())) {
-                groupMemberMapper.updateById(new ImGroupMemberDO().setId(exists.getId())
-                        .setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now)
-                        .setRole(role).setAddSource(addSource).setInviterUserId(inviterUserId));
+                groupMemberMapper.updateRejoinFields(exists.getId(), CommonStatusEnum.ENABLE.getStatus(), now,
+                        role, addSource, inviterUserId);
                 exists.setStatus(CommonStatusEnum.ENABLE.getStatus()).setJoinTime(now).setRole(role)
-                        .setAddSource(addSource).setInviterUserId(inviterUserId);
+                        .setAddSource(addSource).setInviterUserId(inviterUserId)
+                        .setQuitTime(null).setMuteEndTime(null);
             }
             return exists;
         }
@@ -193,7 +193,10 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         // 2.1 先做 update，update 没有并发冲突风险
         if (CollUtil.isNotEmpty(updates)) {
-            groupMemberMapper.updateBatch(updates);
+            for (ImGroupMemberDO update : updates) {
+                groupMemberMapper.updateRejoinFields(update.getId(), update.getStatus(), update.getJoinTime(),
+                        update.getRole(), update.getAddSource(), update.getInviterUserId());
+            }
         }
         // 2.2 批量 insert。并发场景下若其它请求已先一步插入同一 (groupId, userId)，
         //     会触发唯一索引冲突，此时降级为逐个 addGroupMember（利用其兜底逻辑幂等处理）。

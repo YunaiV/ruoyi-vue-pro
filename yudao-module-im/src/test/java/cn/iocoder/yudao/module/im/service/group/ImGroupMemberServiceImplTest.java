@@ -82,14 +82,12 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
         ImGroupMemberDO result = groupMemberService.addGroupMember(10L, 1L);
 
-        ArgumentCaptor<ImGroupMemberDO> captor = ArgumentCaptor.forClass(ImGroupMemberDO.class);
-        verify(groupMemberMapper).updateById(captor.capture());
-        assertEquals(50L, captor.getValue().getId());
-        assertEquals(CommonStatusEnum.ENABLE.getStatus(), captor.getValue().getStatus());
-        assertEquals(ImGroupMemberRoleEnum.NORMAL.getRole(), captor.getValue().getRole());
-        assertNotNull(captor.getValue().getJoinTime());
+        verify(groupMemberMapper).updateRejoinFields(eq(50L), eq(CommonStatusEnum.ENABLE.getStatus()),
+                any(), eq(ImGroupMemberRoleEnum.NORMAL.getRole()), isNull(), isNull());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), result.getStatus());
         assertEquals(ImGroupMemberRoleEnum.NORMAL.getRole(), result.getRole());
+        assertNull(result.getQuitTime());
+        assertNull(result.getMuteEndTime());
     }
 
     @Test
@@ -124,9 +122,8 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         groupMemberService.addGroupMembers(10L, List.of(2L, 3L, 4L));
 
         // 断言：updates 只有用户 3；inserts 只有用户 2
-        verify(groupMemberMapper).updateBatch(argThat((List<ImGroupMemberDO> list) ->
-                list.size() == 1 && list.get(0).getId().equals(30L)
-                        && CommonStatusEnum.ENABLE.getStatus().equals(list.get(0).getStatus())));
+        verify(groupMemberMapper).updateRejoinFields(eq(30L), eq(CommonStatusEnum.ENABLE.getStatus()),
+                any(), eq(ImGroupMemberRoleEnum.NORMAL.getRole()), isNull(), isNull());
         verify(groupMemberMapper).insertBatch(argThat((List<ImGroupMemberDO> list) ->
                 list.size() == 1 && list.get(0).getUserId().equals(2L)));
     }
@@ -145,7 +142,8 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
         groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
 
-        verify(groupMemberMapper).updateBatch(anyList());
+        verify(groupMemberMapper, times(2)).updateRejoinFields(anyLong(), eq(CommonStatusEnum.ENABLE.getStatus()),
+                any(), eq(ImGroupMemberRoleEnum.NORMAL.getRole()), isNull(), isNull());
         verify(groupMemberMapper, never()).insertBatch(anyList());
     }
 
@@ -157,7 +155,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
         groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
 
-        verify(groupMemberMapper, never()).updateBatch(anyList());
+        verify(groupMemberMapper, never()).updateRejoinFields(anyLong(), anyInt(), any(), anyInt(), any(), any());
         verify(groupMemberMapper).insertBatch(anyList());
     }
 
@@ -173,7 +171,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
         groupMemberService.addGroupMembers(10L, List.of(2L));
 
-        verify(groupMemberMapper, never()).updateBatch(anyList());
+        verify(groupMemberMapper, never()).updateRejoinFields(anyLong(), anyInt(), any(), anyInt(), any(), any());
         verify(groupMemberMapper, never()).insertBatch(anyList());
     }
 

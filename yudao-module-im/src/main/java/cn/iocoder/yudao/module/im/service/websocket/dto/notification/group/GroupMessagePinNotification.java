@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.im.service.websocket.dto.notification.group;
 
-import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 群消息置顶事件通知
- * <p>
- * payload 直接携带被置顶的完整消息对象，前端按 message 直接 push 到 pinnedMessages，避免 GET /im/group/get 命中 @CacheEvict 触发前的旧 cache
  */
 @Data
 public class GroupMessagePinNotification extends BaseGroupNotification {
@@ -16,8 +16,49 @@ public class GroupMessagePinNotification extends BaseGroupNotification {
      */
     private Long messageId;
     /**
-     * 被置顶的完整消息对象（避免前端回查群详情）
+     * 被置顶的消息展示数据
      */
-    private ImGroupMessageDO message;
+    private PinnedMessage message;
+
+    /**
+     * 被置顶的消息展示数据
+     */
+    @Data
+    public static class PinnedMessage {
+
+        /**
+         * 消息编号
+         */
+        private Long id;
+        /**
+         * 发送人编号
+         */
+        private Long senderId;
+        /**
+         * 群编号
+         */
+        private Long groupId;
+        /**
+         * 消息类型
+         */
+        private Integer type;
+        /**
+         * 消息内容
+         */
+        private String content;
+        /**
+         * 发送时间
+         */
+        private LocalDateTime sendTime;
+        /**
+         * @ 目标用户编号列表
+         */
+        private List<Long> atUserIds;
+        /**
+         * 定向接收用户编号列表
+         */
+        private List<Long> receiverUserIds;
+
+    }
 
 }

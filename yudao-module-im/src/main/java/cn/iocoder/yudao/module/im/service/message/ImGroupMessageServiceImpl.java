@@ -354,8 +354,15 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             throw exception(MESSAGE_GROUP_READ_DISABLED);
         }
         Assert.notNull(messageId, "已读消息编号不能为空");
-        // 1. 校验用户在群中（权限校验）
-        groupMemberService.validateMemberInGroup(groupId, userId);
+        // 1.1 校验用户在群中（权限校验）
+        ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
+        // 1.2 校验消息属于当前群，且对当前用户可见
+        ImGroupMessageDO message = groupMessageMapper.selectById(messageId);
+        if (message == null
+                || ObjUtil.notEqual(message.getGroupId(), groupId)
+                || !isMessageVisible(message, member, userId)) {
+            throw exception(MESSAGE_NOT_IN_GROUP);
+        }
 
         // 2. 已读位置未前进，直接返回
         Long prevMaxMessageId = groupMessageReadRedisDAO.getReadMaxMessageId(groupId, userId);

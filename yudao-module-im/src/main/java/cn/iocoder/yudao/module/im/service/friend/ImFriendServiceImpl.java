@@ -266,16 +266,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         }
         // 情况二：复用 DISABLE 旧记录 → 恢复 ENABLE + 重置 silent / pinned / blocked，对齐"重新加好友"语义
         if (exists != null) {
-            ImFriendDO update = new ImFriendDO().setId(exists.getId())
-                    .setStatus(CommonStatusEnum.ENABLE.getStatus()).setAddTime(LocalDateTime.now())
-                    .setSilent(false).setPinned(false).setBlocked(false);
-            if (displayName != null) {
-                update.setDisplayName(displayName);
-            }
-            if (addSource != null) {
-                update.setAddSource(addSource);
-            }
-            friendMapper.updateById(update);
+            friendMapper.updateReAddFields(exists.getId(), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now(),
+                    false, false, false, displayName, addSource);
             return;
         }
         // 情况三：不存在记录 → 直接插入新记录

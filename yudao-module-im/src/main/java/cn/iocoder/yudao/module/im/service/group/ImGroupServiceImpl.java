@@ -241,8 +241,14 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void quitGroup(Long groupId, Long userId) {
-        // 1.1 校验群存在
-        ImGroupDO group = validateGroupExists(groupId);
+        // 1.1 校验群存在且未解散
+        ImGroupDO group = getSelf().getGroup(groupId);
+        if (group == null) {
+            throw exception(GROUP_NOT_EXISTS);
+        }
+        if (CommonStatusEnum.DISABLE.getStatus().equals(group.getStatus())) {
+            throw exception(GROUP_DISSOLVED);
+        }
         // 1.2 群主不可退群
         if (ObjUtil.equal(group.getOwnerUserId(), userId)) {
             throw exception(GROUP_OWNER_CANNOT_QUIT);
@@ -433,7 +439,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         pinned.add(messageId);
         groupMapper.updateById(new ImGroupDO().setId(groupId).setPinnedMessageIds(pinned));
 
-        // 3. 推送 GROUP_MESSAGE_PIN 通知给全员；payload 直接带消息对象，前端不用回查群详情绕开 @CacheEvict 时序
+        // 3. 推送 GROUP_MESSAGE_PIN 通知给全员
         groupMessageService.sendGroupMessage(userId,
                 ImGroupMessageSendDTO.ofGroupMessagePin(groupId, userId, message));
     }

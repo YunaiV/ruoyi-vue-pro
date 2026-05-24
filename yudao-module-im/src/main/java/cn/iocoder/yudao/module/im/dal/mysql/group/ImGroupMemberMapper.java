@@ -124,4 +124,18 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .set(ImGroupMemberDO::getMuteEndTime, null));
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    default int updateRejoinFields(Long id, Integer status, LocalDateTime joinTime,
+                                   Integer role, Integer addSource, Long inviterUserId) {
+        return update(null, Wrappers.<ImGroupMemberDO>lambdaUpdate()
+                .eq(ImGroupMemberDO::getId, id)
+                .set(ImGroupMemberDO::getStatus, status)
+                .set(ImGroupMemberDO::getJoinTime, joinTime)
+                .set(ImGroupMemberDO::getRole, role)
+                .set(ImGroupMemberDO::getAddSource, addSource)
+                .set(ImGroupMemberDO::getInviterUserId, inviterUserId)
+                .set(ImGroupMemberDO::getQuitTime, null)
+                .set(ImGroupMemberDO::getMuteEndTime, null));
+    }
+
 }
