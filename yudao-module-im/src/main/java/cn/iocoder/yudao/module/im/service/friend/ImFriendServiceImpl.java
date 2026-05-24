@@ -141,9 +141,9 @@ public class ImFriendServiceImpl implements ImFriendService {
         if (reqVO.getDisplayName() == null && reqVO.getSilent() == null && reqVO.getPinned() == null) {
             return;
         }
-        // 1.2 校验好友关系存在
+        // 1.2 校验好友关系启用
         ImFriendDO friend = friendMapper.selectByUserIdAndFriendUserId(userId, reqVO.getFriendUserId());
-        if (friend == null) {
+        if (friend == null || !CommonStatusEnum.isEnable(friend.getStatus())) {
             throw exception(FRIEND_NOT_FRIEND);
         }
 
@@ -209,7 +209,9 @@ public class ImFriendServiceImpl implements ImFriendService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteFriend(Long userId, Long friendUserId, Boolean clear) {
         // 1. 单边软删：仅 userId 视角的关系置 DISABLE；friendUserId 视角不动
-        deleteFriend0(userId, friendUserId);
+        if (!deleteFriend0(userId, friendUserId)) {
+            return;
+        }
 
         // 2. 走 sendPrivateMessage + persistent=false：不入库 + 仅推 userId 多端（friendUserId 不感知）；clear 透传让多端清理动作一致
         //    clear=false 时前端按 type=FRIEND_DELETE 渲染「你已删除好友」会话气泡（瞬时）；
@@ -311,13 +313,14 @@ public class ImFriendServiceImpl implements ImFriendService {
      * <p>
      * FRIEND_STATE 缓存失效由调用方的 @Caching 注解统一处理，本方法不主动 evict
      */
-    public void deleteFriend0(Long userId, Long friendUserId) {
+    public boolean deleteFriend0(Long userId, Long friendUserId) {
         ImFriendDO exists = friendMapper.selectByUserIdAndFriendUserId(userId, friendUserId);
         if (exists == null || CommonStatusEnum.isDisable(exists.getStatus())) {
-            return;
+            return false;
         }
         friendMapper.updateById(new ImFriendDO().setId(exists.getId())
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDeleteTime(LocalDateTime.now()));
+        return true;
     }
 
     // ==================== 管理后台 ====================

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.im.controller.admin.friend.vo.ImFriendUpdateReqVO
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
+import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -82,6 +83,24 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> friendService.updateFriend(1L, reqVO));
         assertEquals(FRIEND_NOT_FRIEND.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testUpdateFriend_disabledFriend() {
+        // 准备
+        ImFriendUpdateReqVO reqVO = new ImFriendUpdateReqVO();
+        reqVO.setFriendUserId(2L);
+        reqVO.setSilent(true);
+        ImFriendDO friend = ImFriendDO.builder().id(100L).userId(1L).friendUserId(2L)
+                .status(CommonStatusEnum.DISABLE.getStatus()).build();
+        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(friend);
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> friendService.updateFriend(1L, reqVO));
+        assertEquals(FRIEND_NOT_FRIEND.getCode(), exception.getCode());
+        verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
+        verify(imWebSocketService, never()).sendPrivateMessageAsync(any(Long.class), any(ImPrivateMessageDTO.class));
     }
 
     @Test
@@ -178,8 +197,9 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
                 .status(CommonStatusEnum.DISABLE.getStatus()).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
 
-        friendService.deleteFriend0(1L, 2L);
+        boolean result = friendService.deleteFriend0(1L, 2L);
 
+        assertFalse(result);
         verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
     }
 
@@ -189,12 +209,39 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
 
-        friendService.deleteFriend0(1L, 2L);
+        boolean result = friendService.deleteFriend0(1L, 2L);
 
+        assertTrue(result);
         ArgumentCaptor<ImFriendDO> captor = ArgumentCaptor.forClass(ImFriendDO.class);
         verify(imFriendMapper).updateById(captor.capture());
         assertEquals(CommonStatusEnum.DISABLE.getStatus(), captor.getValue().getStatus());
         assertNotNull(captor.getValue().getDeleteTime());
+    }
+
+    @Test
+    public void testDeleteFriend_alreadyDisabledSkipNotification() {
+        // 准备：已经是 DISABLE，不再推本端删除通知
+        ImFriendDO exists = ImFriendDO.builder().id(10L).userId(1L).friendUserId(2L)
+                .status(CommonStatusEnum.DISABLE.getStatus()).build();
+        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
+
+        friendService.deleteFriend(1L, 2L, true);
+
+        verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
+        verify(privateMessageService, never()).sendPrivateMessage(anyLong(), any(ImPrivateMessageSendDTO.class));
+    }
+
+    @Test
+    public void testDeleteFriend_enabledSendNotification() {
+        // 准备
+        ImFriendDO exists = ImFriendDO.builder().id(10L).userId(1L).friendUserId(2L)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(imFriendMapper.selectByUserIdAndFriendUserId(1L, 2L)).thenReturn(exists);
+
+        friendService.deleteFriend(1L, 2L, true);
+
+        verify(imFriendMapper).updateById(any(ImFriendDO.class));
+        verify(privateMessageService).sendPrivateMessage(eq(1L), any(ImPrivateMessageSendDTO.class));
     }
 
     // ========== 其它读方法 ==========

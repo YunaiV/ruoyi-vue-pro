@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.controller.admin.rtc.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Set;
@@ -17,6 +18,6 @@ public class ImRtcCallInviteReqVO {
 
     @Schema(description = "新邀请的用户编号集合", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "请至少选择一位成员")
-    private Set<Long> inviteeIds;
+    private Set<@NotNull(message = "被邀请用户编号不能为空") Long> inviteeIds;
 
 }
