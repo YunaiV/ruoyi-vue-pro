@@ -17,6 +17,8 @@ public enum TradeOrderOperateTypeEnum {
     ADMIN_UPDATE_PRICE(2, "订单价格 {oldPayPrice} 修改，调整价格 {adjustPrice}，实际支付金额为 {newPayPrice} 元"),
     MEMBER_PAY(10, "用户付款成功"),
     ADMIN_UPDATE_ADDRESS(11, "收货地址修改"),
+    ADMIN_MARK_PICKED(12, "订单已拣货"),
+    ADMIN_SOURCE_ORDER(13, "源站已下单，平台：{sourcePlatform}，订单号：{sourceOrderNo}"),
     ADMIN_DELIVERY(20, "已发货，快递公司：{expressName}，快递单号：{logisticsNo}"),
     MEMBER_RECEIVE(30, "用户已收货"),
     SYSTEM_RECEIVE(31, "到期未收货，系统自动确认收货"),

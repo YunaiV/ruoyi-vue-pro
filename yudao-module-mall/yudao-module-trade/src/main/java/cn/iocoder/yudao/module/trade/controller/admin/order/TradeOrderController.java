@@ -139,6 +139,23 @@ public class TradeOrderController {
         return success(true);
     }
 
+    @PutMapping("/mark-picked")
+    @Operation(summary = "标记订单已拣货")
+    @Parameter(name = "id", description = "交易订单编号")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> markOrderPicked(@RequestParam("id") Long id) {
+        tradeOrderUpdateService.markOrderPicked(id);
+        return success(true);
+    }
+
+    @PutMapping("/source-order")
+    @Operation(summary = "记录源站下单信息")
+    @PreAuthorize("@ss.hasPermission('trade:order:update')")
+    public CommonResult<Boolean> updateOrderSourceOrder(@RequestBody TradeOrderSourceOrderReqVO reqVO) {
+        tradeOrderUpdateService.updateOrderSourceOrder(reqVO);
+        return success(true);
+    }
+
     @PutMapping("/pick-up-by-id")
     @Operation(summary = "订单核销")
     @Parameter(name = "id", description = "交易订单编号")

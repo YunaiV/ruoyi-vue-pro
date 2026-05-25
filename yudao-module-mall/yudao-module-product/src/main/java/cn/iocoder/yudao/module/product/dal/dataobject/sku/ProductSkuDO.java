@@ -94,6 +94,24 @@ public class ProductSkuDO extends BaseDO {
      */
     private Integer salesCount;
 
+    // ========== 代发相关字段 =========
+    /**
+     * 源 SKU 编号
+     */
+    private String sourceSkuId;
+    /**
+     * 源 SKU 规格名称
+     */
+    private String sourceSkuName;
+    /**
+     * 源 SKU 链接
+     */
+    private String sourceSkuUrl;
+    /**
+     * 源采购价，单位：分
+     */
+    private Integer sourcePrice;
+
     /**
      * 商品属性
      */
@@ -131,4 +149,3 @@ public class ProductSkuDO extends BaseDO {
     }
 
 }
-

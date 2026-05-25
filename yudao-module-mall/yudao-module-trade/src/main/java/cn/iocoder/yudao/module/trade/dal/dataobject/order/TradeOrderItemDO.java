@@ -89,6 +89,36 @@ public class TradeOrderItemDO extends BaseDO {
      */
     private Boolean commentStatus;
 
+    // ========== 代发采购信息 ==========
+    /**
+     * 源商品链接
+     */
+    private String sourceLink;
+    /**
+     * 来源平台
+     */
+    private String sourcePlatform;
+    /**
+     * 源商品编号
+     */
+    private String sourceProductId;
+    /**
+     * 源 SKU 编号
+     */
+    private String sourceSkuId;
+    /**
+     * 源 SKU 规格名称
+     */
+    private String sourceSkuName;
+    /**
+     * 源 SKU 链接
+     */
+    private String sourceSkuUrl;
+    /**
+     * 源采购价，单位：分
+     */
+    private Integer sourcePrice;
+
     // ========== 价格 + 支付基本信息 ==========
 
     /**
@@ -208,4 +238,3 @@ public class TradeOrderItemDO extends BaseDO {
     }
 
 }
-

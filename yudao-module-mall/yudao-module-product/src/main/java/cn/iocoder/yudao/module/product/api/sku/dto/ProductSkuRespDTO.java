@@ -68,4 +68,21 @@ public class ProductSkuRespDTO {
      */
     private Integer secondBrokeragePrice;
 
+    /**
+     * 源 SKU 编号
+     */
+    private String sourceSkuId;
+    /**
+     * 源 SKU 规格名称
+     */
+    private String sourceSkuName;
+    /**
+     * 源 SKU 链接
+     */
+    private String sourceSkuUrl;
+    /**
+     * 源采购价，单位：分
+     */
+    private Integer sourcePrice;
+
 }

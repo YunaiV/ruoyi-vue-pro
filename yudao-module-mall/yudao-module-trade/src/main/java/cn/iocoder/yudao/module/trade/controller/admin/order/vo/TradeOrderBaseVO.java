@@ -56,6 +56,23 @@ public class TradeOrderBaseVO {
     @Schema(description = "商家备注", example = "你猜一下")
     private String remark;
 
+    // ========== 代发采购信息 ==========
+
+    @Schema(description = "采购状态", example = "0")
+    private Integer purchaseStatus;
+
+    @Schema(description = "来源平台", example = "1688")
+    private String sourcePlatform;
+
+    @Schema(description = "源站订单号", example = "168812345678")
+    private String sourceOrderNo;
+
+    @Schema(description = "源站下单时间")
+    private LocalDateTime sourceOrderTime;
+
+    @Schema(description = "采购备注", example = "已在 1688 下单")
+    private String purchaseRemark;
+
     // ========== 价格 + 支付基本信息 ==========
 
     @Schema(description = "支付订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

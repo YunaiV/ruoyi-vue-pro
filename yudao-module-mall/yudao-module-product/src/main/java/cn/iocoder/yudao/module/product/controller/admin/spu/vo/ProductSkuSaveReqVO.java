@@ -53,6 +53,18 @@ public class ProductSkuSaveReqVO {
     @Schema(description = "属性数组")
     private List<Property> properties;
 
+    @Schema(description = "源 SKU 编号", example = "sku-123")
+    private String sourceSkuId;
+
+    @Schema(description = "源 SKU 规格名称", example = "黑色 XL")
+    private String sourceSkuName;
+
+    @Schema(description = "源 SKU 链接", example = "https://detail.1688.com/offer/123.html")
+    private String sourceSkuUrl;
+
+    @Schema(description = "源采购价，单位：分", example = "1999")
+    private Integer sourcePrice;
+
     @Schema(description = "商品属性")
     @Data
     @NoArgsConstructor

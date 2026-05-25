@@ -32,6 +32,7 @@ import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderSourceOrderReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -209,6 +210,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         order.setType(calculateRespBO.getType());
         order.setNo(tradeNoRedisDAO.generate(TradeNoRedisDAO.TRADE_ORDER_NO_PREFIX));
         order.setStatus(TradeOrderStatusEnum.UNPAID.getStatus());
+        order.setPurchaseStatus(TradeOrderPurchaseStatusEnum.NONE.getStatus());
         order.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
         order.setProductCount(getSumValue(calculateRespBO.getItems(), TradePriceCalculateRespBO.OrderItem::getCount, Integer::sum));
         order.setUserIp(getClientIP()).setTerminal(getTerminal());
@@ -753,6 +755,53 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 记录订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
+    }
+
+    @Override
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_MARK_PICKED)
+    public void markOrderPicked(Long id) {
+        TradeOrderDO order = validateOrderExists(id);
+        validatePurchaseOrderStatus(order);
+        Integer purchaseStatus = order.getPurchaseStatus() != null ? order.getPurchaseStatus()
+                : TradeOrderPurchaseStatusEnum.NONE.getStatus();
+        if (!TradeOrderPurchaseStatusEnum.canMarkPicked(purchaseStatus)) {
+            throw exception(ORDER_PURCHASE_FAIL_STATUS_ERROR);
+        }
+
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(id)
+                .setPurchaseStatus(TradeOrderPurchaseStatusEnum.PICKED.getStatus()));
+
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus());
+    }
+
+    @Override
+    @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.ADMIN_SOURCE_ORDER)
+    public void updateOrderSourceOrder(TradeOrderSourceOrderReqVO reqVO) {
+        TradeOrderDO order = validateOrderExists(reqVO.getId());
+        validatePurchaseOrderStatus(order);
+        Integer purchaseStatus = order.getPurchaseStatus() != null ? order.getPurchaseStatus()
+                : TradeOrderPurchaseStatusEnum.NONE.getStatus();
+        if (!TradeOrderPurchaseStatusEnum.canMarkOrdered(purchaseStatus)) {
+            throw exception(ORDER_PURCHASE_FAIL_STATUS_ERROR);
+        }
+
+        tradeOrderMapper.updateById(new TradeOrderDO().setId(reqVO.getId())
+                .setPurchaseStatus(TradeOrderPurchaseStatusEnum.ORDERED.getStatus())
+                .setSourcePlatform(StrUtil.blankToDefault(reqVO.getSourcePlatform(), "1688"))
+                .setSourceOrderNo(reqVO.getSourceOrderNo())
+                .setSourceOrderTime(reqVO.getSourceOrderTime() != null ? reqVO.getSourceOrderTime() : LocalDateTime.now())
+                .setPurchaseRemark(reqVO.getPurchaseRemark()));
+
+        TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), order.getStatus(),
+                MapUtil.<String, Object>builder()
+                        .put("sourcePlatform", StrUtil.blankToDefault(reqVO.getSourcePlatform(), "1688"))
+                        .put("sourceOrderNo", reqVO.getSourceOrderNo()).build());
+    }
+
+    private void validatePurchaseOrderStatus(TradeOrderDO order) {
+        if (!TradeOrderStatusEnum.isUndelivered(order.getStatus())) {
+            throw exception(ORDER_PURCHASE_FAIL_STATUS_NOT_UNDELIVERED);
+        }
     }
 
     @Override

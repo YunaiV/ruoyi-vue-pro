@@ -38,6 +38,29 @@ public class TradeOrderItemBaseVO {
     @Schema(description = "购买数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer count;
 
+    // ========== 代发采购信息 ==========
+
+    @Schema(description = "源商品链接", example = "https://detail.1688.com/offer/123.html")
+    private String sourceLink;
+
+    @Schema(description = "来源平台", example = "1688")
+    private String sourcePlatform;
+
+    @Schema(description = "源商品编号", example = "123")
+    private String sourceProductId;
+
+    @Schema(description = "源 SKU 编号", example = "sku-123")
+    private String sourceSkuId;
+
+    @Schema(description = "源 SKU 规格名称", example = "黑色 XL")
+    private String sourceSkuName;
+
+    @Schema(description = "源 SKU 链接", example = "https://detail.1688.com/offer/123.html")
+    private String sourceSkuUrl;
+
+    @Schema(description = "源采购价，单位：分", example = "1999")
+    private Integer sourcePrice;
+
     // ========== 价格 + 支付基本信息 ==========
 
     @Schema(description = "商品原价（单）", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")

@@ -233,6 +233,18 @@ public class TradePriceCalculateRespBO {
          * 分类编号
          */
         private Long categoryId;
+        /**
+         * 源商品链接
+         */
+        private String sourceLink;
+        /**
+         * 来源平台
+         */
+        private String sourcePlatform;
+        /**
+         * 源商品编号
+         */
+        private String sourceProductId;
 
         // ========== 物流相关字段 =========
 
@@ -264,6 +276,22 @@ public class TradePriceCalculateRespBO {
          * 商品属性数组
          */
         private List<ProductPropertyValueDetailRespDTO> properties;
+        /**
+         * 源 SKU 编号
+         */
+        private String sourceSkuId;
+        /**
+         * 源 SKU 规格名称
+         */
+        private String sourceSkuName;
+        /**
+         * 源 SKU 链接
+         */
+        private String sourceSkuUrl;
+        /**
+         * 源采购价，单位：分
+         */
+        private Integer sourcePrice;
 
         /**
          * 赠送的积分

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.trade.service.order;
 
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderDeliveryReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderRemarkReqVO;
+import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderSourceOrderReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdateAddressReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderUpdatePriceReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderCreateReqVO;
@@ -125,6 +126,20 @@ public interface TradeOrderUpdateService {
      * @param reqVO 请求
      */
     void updateOrderAddress(TradeOrderUpdateAddressReqVO reqVO);
+
+    /**
+     * 【管理员】标记订单已拣货
+     *
+     * @param id 订单编号
+     */
+    void markOrderPicked(Long id);
+
+    /**
+     * 【管理员】记录源站下单信息
+     *
+     * @param reqVO 请求
+     */
+    void updateOrderSourceOrder(TradeOrderSourceOrderReqVO reqVO);
 
     /**
      * 【管理员】核销订单

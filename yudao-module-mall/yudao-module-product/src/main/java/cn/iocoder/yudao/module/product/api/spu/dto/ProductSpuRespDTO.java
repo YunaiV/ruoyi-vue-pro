@@ -101,4 +101,22 @@ public class ProductSpuRespDTO {
      */
     private Boolean subCommissionType;
 
+    // ========== 代发相关字段 =========
+    /**
+     * 源商品链接
+     */
+    private String sourceLink;
+    /**
+     * 来源平台
+     */
+    private String sourcePlatform;
+    /**
+     * 源商品编号
+     */
+    private String sourceProductId;
+    /**
+     * 源店铺名称
+     */
+    private String sourceShopName;
+
 }

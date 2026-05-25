@@ -115,6 +115,30 @@ public class TradeOrderDO extends BaseDO {
      */
     private Boolean commentStatus;
 
+    // ========== 代发采购信息 ==========
+    /**
+     * 采购状态
+     *
+     * 枚举 TradeOrderPurchaseStatusEnum
+     */
+    private Integer purchaseStatus;
+    /**
+     * 来源平台
+     */
+    private String sourcePlatform;
+    /**
+     * 源站订单号
+     */
+    private String sourceOrderNo;
+    /**
+     * 源站下单时间
+     */
+    private LocalDateTime sourceOrderTime;
+    /**
+     * 采购备注
+     */
+    private String purchaseRemark;
+
     /**
      * 推广人编号
      *

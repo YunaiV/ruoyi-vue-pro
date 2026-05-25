@@ -128,4 +128,13 @@ public class ProductSpuRespVO {
     @Schema(description = "源商品链接", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "https://www.pdd.com/goods/123456")
     private String sourceLink;
 
+    @Schema(description = "来源平台", example = "1688")
+    private String sourcePlatform;
+
+    @Schema(description = "源商品编号", example = "123456")
+    private String sourceProductId;
+
+    @Schema(description = "源店铺名称", example = "某某工厂店")
+    private String sourceShopName;
+
 }
