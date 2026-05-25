@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
@@ -176,7 +177,8 @@ public class ImFriendRequestServiceImplTest extends BaseMockitoUnitTest {
         ImFriendRequestDO result = friendRequestService.applyFriend(1L, reqVO);
 
         // 断言：复用旧记录，未触发 insert
-        verify(friendRequestMapper).updateByIdReset(eq(100L), eq("再来一次"), eq("老张"), eq(2));
+        verify(friendRequestMapper).updateByIdReset(eq(100L), eq("再来一次"), eq("老张"), eq(2),
+                any(java.time.LocalDateTime.class));
         verify(friendRequestMapper, never()).insert(any(ImFriendRequestDO.class));
         assertEquals(100L, result.getId());
         assertEquals("再来一次", result.getApplyContent());
@@ -300,12 +302,29 @@ public class ImFriendRequestServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetMyFriendRequestList_delegate() {
         // 准备：mapper 返回 mock 数据
-        ImFriendRequestDO one = new ImFriendRequestDO().setId(1L);
-        when(friendRequestMapper.selectMyList(1L, 99L, 20)).thenReturn(java.util.Collections.singletonList(one));
+        LocalDateTime updateTime = LocalDateTime.now();
+        ImFriendRequestDO cursor = new ImFriendRequestDO();
+        cursor.setId(99L);
+        cursor.setUpdateTime(updateTime);
+        ImFriendRequestDO one = new ImFriendRequestDO();
+        one.setId(1L);
+        when(friendRequestMapper.selectById(99L)).thenReturn(cursor);
+        when(friendRequestMapper.selectMyList(1L, updateTime, 99L, 20))
+                .thenReturn(java.util.Collections.singletonList(one));
 
-        // 调用 + 断言：参数透传、结果原样返回
+        // 调用 + 断言：cursor 由 Service 查询后传给 Mapper
         assertEquals(1, friendRequestService.getMyFriendRequestList(1L, 99L, 20).size());
-        verify(friendRequestMapper).selectMyList(1L, 99L, 20);
+        verify(friendRequestMapper).selectMyList(1L, updateTime, 99L, 20);
+    }
+
+    @Test
+    public void testGetMyFriendRequestList_cursorNotExists() {
+        // 准备：cursor 不存在
+        when(friendRequestMapper.selectById(99L)).thenReturn(null);
+
+        // 调用 + 断言：返回空列表
+        assertTrue(friendRequestService.getMyFriendRequestList(1L, 99L, 20).isEmpty());
+        verify(friendRequestMapper, never()).selectMyList(anyLong(), any(), anyLong(), anyInt());
     }
 
 }

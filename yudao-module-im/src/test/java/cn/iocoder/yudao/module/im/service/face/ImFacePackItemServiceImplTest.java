@@ -156,9 +156,22 @@ public class ImFacePackItemServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testDeleteFacePackItemList_success() {
-        service.deleteFacePackItemList(Arrays.asList(1L, 2L));
+        List<Long> ids = Arrays.asList(1L, 2L);
+        when(facePackItemMapper.deleteByIds(ids)).thenReturn(2);
 
-        verify(facePackItemMapper).deleteByIds(Arrays.asList(1L, 2L));
+        service.deleteFacePackItemList(ids);
+
+        verify(facePackItemMapper).deleteByIds(ids);
+    }
+
+    @Test
+    public void testDeleteFacePackItemList_ignoreMissingIds() {
+        List<Long> ids = Arrays.asList(1L, 2L);
+        when(facePackItemMapper.deleteByIds(ids)).thenReturn(1);
+
+        service.deleteFacePackItemList(ids);
+
+        verify(facePackItemMapper).deleteByIds(ids);
     }
 
 }

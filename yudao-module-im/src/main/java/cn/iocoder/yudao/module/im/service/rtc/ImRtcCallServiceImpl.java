@@ -38,6 +38,7 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
@@ -100,6 +101,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
 
     @Override
     @SneakyThrows
+    @Transactional(rollbackFor = Exception.class)
     public ImRtcCallDO createCall(Long userId, ImRtcCallCreateReqVO reqVO) {
         validateEnabled();
         // 1. 校验入参与场景
@@ -176,6 +178,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
 
     @Override
     @SneakyThrows
+    @Transactional(rollbackFor = Exception.class)
     public void inviteCall(Long userId, ImRtcCallInviteReqVO reqVO) {
         validateEnabled();
         // 1.1 校验通话存在且活跃
@@ -242,6 +245,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ImRtcCallDO joinCall(Long userId, String room) {
         validateEnabled();
         // 1.1 校验通话存在且活跃
@@ -312,6 +316,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ImRtcCallDO acceptCall(Long userId, String room) {
         validateEnabled();
         // 1.1 校验通话存在且活跃
@@ -341,6 +346,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void rejectCall(Long userId, String room) {
         validateEnabled();
         // 1.1 校验通话存在且活跃
@@ -370,6 +376,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void cancelCall(Long userId, String room) {
         validateEnabled();
         // 1.1 校验通话存在且活跃
@@ -388,6 +395,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void leaveCall(Long userId, String room) {
         validateEnabled();
         // 1.1 校验通话存在且活跃
@@ -397,11 +405,19 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
 
         // 2. 当前状态 → LEFT；条件 UPDATE 防并发反复改
         LocalDateTime now = LocalDateTime.now();
-        rtcParticipantMapper.updateByIdAndStatus(participant.getId(), participant.getStatus(),
+        int updated = rtcParticipantMapper.updateByIdAndStatus(participant.getId(), participant.getStatus(),
                 new ImRtcParticipantDO().setId(participant.getId()).setStatus(ImRtcParticipantStatusEnum.LEFT.getStatus()).setLeaveTime(now));
+        if (updated == 0) {
+            return;
+        }
 
-        // 3. 触发关房判定：私聊任一方离开必关；群通话仅在「无人在房 + 无人响铃」时关
-        // 群通话单人离开：LiveKit `ParticipantDisconnected` 自动通知房内成员；业务后端不另外推
+        // 3. 群通话已入会参与者离开时推送离线通知
+        if (ImConversationTypeEnum.isGroup(call.getConversationType())
+                && ImRtcParticipantStatusEnum.isJoined(participant.getStatus())) {
+            pushParticipantDisconnectedNotification(call, userId);
+        }
+
+        // 4. 触发关房判定：私聊任一方离开必关；群通话仅在「无人在房 + 无人响铃」时关
         endSessionIfTerminal(call, userId);
     }
 
@@ -474,10 +490,17 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
 
     @Override
     public String signCallToken(Long userId, String room) {
+        validateEnabled();
+        ImRtcCallDO call = validateCallActive(room);
+        ImRtcParticipantDO participant = validateParticipant(call, userId);
+        if (!ImRtcParticipantStatusEnum.isJoined(participant.getStatus())) {
+            throw exception(RTC_NOT_PARTICIPANT);
+        }
         return signToken(userId, resolveDisplayName(adminUserApi.getUser(userId), userId), room);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void handleLiveKitEvent(LiveKitWebhookEventDTO event) {
         if (event == null || event.getEvent() == null) {
             return;
@@ -580,6 +603,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int cleanupZombieCalls(int thresholdMinutes) {
         // 阈值由调用方（Job）保证 > 0；低于 1 分钟会误杀刚发起的合理零人态
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(thresholdMinutes);
@@ -610,6 +634,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int timeoutInvitingParticipants(int thresholdMinutes) {
         // 阈值由调用方（Job）保证 > 0；低于 1 分钟可能误杀刚发起还在响铃的合理 INVITING 态
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(thresholdMinutes);
@@ -618,6 +643,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void noAnswerCallCheck(Long userId, String room) {
         // 鉴权：仅该 room 参与者可触发；失败静默，不暴露错误
         ImRtcParticipantDO operator = rtcParticipantMapper.selectByRoomAndUserId(room, userId);

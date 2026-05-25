@@ -319,7 +319,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         Long groupId = reqVO.getGroupId();
         Set<Long> targetUserIds = new HashSet<>(reqVO.getUserIds());
         // 1.1 仅群主可操作
-        validateGroupOwner(groupId, userId);
+        validateGroupOwnerForUpdate(groupId, userId);
         // 1.2 校验目标都是有效成员且非群主
         Map<Long, ImGroupMemberDO> targetMap = convertMap(
                 groupMemberService.getGroupMembers(groupId, targetUserIds), ImGroupMemberDO::getUserId);
@@ -340,7 +340,11 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         // 2. 批量更新角色
-        groupMemberService.updateGroupMemberRole(groupId, changedUserIds, ImGroupMemberRoleEnum.ADMIN.getRole());
+        int affected = groupMemberService.updateGroupMemberRole(groupId, changedUserIds,
+                ImGroupMemberRoleEnum.ADMIN.getRole());
+        if (affected != changedUserIds.size()) {
+            throw exception(GROUP_ADMIN_TARGET_NOT_IN_GROUP);
+        }
 
         // 3. 推送 GROUP_ADMIN_ADD 通知给全员
         groupMessageService.sendGroupMessage(userId,
@@ -353,7 +357,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         Long groupId = reqVO.getGroupId();
         Set<Long> targetUserIds = new HashSet<>(reqVO.getUserIds());
         // 1.1 仅群主可操作
-        validateGroupOwner(groupId, userId);
+        validateGroupOwnerForUpdate(groupId, userId);
         // 1.2 校验目标都是有效成员且非群主
         Map<Long, ImGroupMemberDO> targetMap = convertMap(
                 groupMemberService.getGroupMembers(groupId, targetUserIds), ImGroupMemberDO::getUserId);
@@ -367,7 +371,11 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         // 2. 批量更新角色
-        groupMemberService.updateGroupMemberRole(groupId, changedUserIds, ImGroupMemberRoleEnum.NORMAL.getRole());
+        int affected = groupMemberService.updateGroupMemberRole(groupId, changedUserIds,
+                ImGroupMemberRoleEnum.NORMAL.getRole());
+        if (affected != changedUserIds.size()) {
+            throw exception(GROUP_ADMIN_TARGET_NOT_IN_GROUP);
+        }
 
         // 3. 推送 GROUP_ADMIN_REMOVE 通知给全员
         groupMessageService.sendGroupMessage(userId,
@@ -396,7 +404,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         Long groupId = transferReqVO.getGroupId();
         Long newOwnerUserId = transferReqVO.getNewOwnerUserId();
         // 1.1 仅老群主可执行
-        validateGroupOwner(groupId, userId);
+        validateGroupOwnerForUpdate(groupId, userId);
         // 1.2 不能转让给自己
         if (ObjUtil.equal(userId, newOwnerUserId)) {
             throw exception(GROUP_TRANSFER_OWNER_TO_SELF);
@@ -404,11 +412,19 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 1.3 新群主必须是群的有效成员
         ImGroupMemberDO newOwner = groupMemberService.validateMemberInGroup(groupId, newOwnerUserId);
 
-        // 2.1 更新群表 owner_user_id
+        // 2.1 更新成员角色
+        int newOwnerAffected = groupMemberService.updateGroupMemberRole(groupId, Set.of(newOwner.getUserId()),
+                ImGroupMemberRoleEnum.OWNER.getRole());
+        if (newOwnerAffected != 1) {
+            throw exception(GROUP_MEMBER_NOT_IN_GROUP);
+        }
+        int oldOwnerAffected = groupMemberService.updateGroupMemberRole(groupId, Set.of(userId),
+                ImGroupMemberRoleEnum.NORMAL.getRole());
+        if (oldOwnerAffected != 1) {
+            throw exception(GROUP_MEMBER_NOT_IN_GROUP);
+        }
+        // 2.2 更新群主编号
         groupMapper.updateById(new ImGroupDO().setId(groupId).setOwnerUserId(newOwnerUserId));
-        // 2.2 旧群主 role → MEMBER；新群主 role → OWNER
-        groupMemberService.updateGroupMemberRole(groupId, Set.of(userId), ImGroupMemberRoleEnum.NORMAL.getRole());
-        groupMemberService.updateGroupMemberRole(groupId, Set.of(newOwner.getUserId()), ImGroupMemberRoleEnum.OWNER.getRole());
 
         // 3. 推送 GROUP_OWNER_TRANSFER 通知给全员
         groupMessageService.sendGroupMessage(userId,
@@ -420,7 +436,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional(rollbackFor = Exception.class)
     public void pinGroupMessage(Long userId, Long groupId, Long messageId) {
         // 1.1 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
-        ImGroupDO group = validateOwnerOrAdminAndGetGroup(groupId, userId);
+        ImGroupDO group = validateOwnerOrAdminAndGetGroupForUpdate(groupId, userId);
         // 1.2 校验消息属于该群、是普通聊天消息（绕过前端菜单不允许置顶群事件 / 撤回事件）、且未被撤回
         ImGroupMessageDO message = groupMessageService.getGroupMessage(messageId);
         if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
@@ -457,7 +473,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional(rollbackFor = Exception.class)
     public void unpinGroupMessage(Long userId, Long groupId, Long messageId) {
         // 1. 校验群主 / 管理员；同时拿到 group 复用，避免再走一次 @Cacheable
-        ImGroupDO group = validateOwnerOrAdminAndGetGroup(groupId, userId);
+        ImGroupDO group = validateOwnerOrAdminAndGetGroupForUpdate(groupId, userId);
         // 2. 幂等校验
         List<Long> pinned = new ArrayList<>(CollUtil.emptyIfNull(group.getPinnedMessageIds()));
         if (!pinned.contains(messageId)) {
@@ -471,9 +487,23 @@ public class ImGroupServiceImpl implements ImGroupService {
                 ImGroupMessageSendDTO.ofGroupMessageUnpin(groupId, userId, messageId));
     }
 
-    /** 校验登录用户是群主 / 管理员，同时返回 group（复用 validateGroupExists 的查询，避免调用方再查一次） */
+    /**
+     * 校验登录用户是群主或管理员，同时返回群信息
+     */
     private ImGroupDO validateOwnerOrAdminAndGetGroup(Long groupId, Long userId) {
         ImGroupDO group = validateGroupExists(groupId);
+        ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
+        if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole())) {
+            throw exception(GROUP_NOT_OWNER_OR_ADMIN);
+        }
+        return group;
+    }
+
+    /**
+     * 校验登录用户是群主或管理员，同时锁定群信息
+     */
+    private ImGroupDO validateOwnerOrAdminAndGetGroupForUpdate(Long groupId, Long userId) {
+        ImGroupDO group = validateGroupExistsForUpdate(groupId);
         ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
         if (!ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole())) {
             throw exception(GROUP_NOT_OWNER_OR_ADMIN);
@@ -498,9 +528,11 @@ public class ImGroupServiceImpl implements ImGroupService {
         return group;
     }
 
-    // todo @AI：这个是不是可以放到 groupmemberservice 里面？
     @Override
     public void validateMemberCountLimit(Long groupId, int addCount) {
+        // 1. 锁定群记录
+        validateGroupExistsForUpdate(groupId);
+        // 2. 校验成员数量上限
         int activeCount = groupMemberService.getActiveGroupMemberUserIdsByGroupId(groupId).size();
         int maxMember = imProperties.getGroup().getMaxMember();
         if (activeCount + addCount > maxMember) {
@@ -508,14 +540,24 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
     }
 
-    /**
-     * 校验当前用户是群主，否则抛 GROUP_NOT_OWNER
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    private ImGroupDO validateGroupOwner(Long groupId, Long userId) {
-        ImGroupDO group = validateGroupExists(groupId);
+    private ImGroupDO validateGroupOwnerForUpdate(Long groupId, Long userId) {
+        ImGroupDO group = validateGroupExistsForUpdate(groupId);
         if (ObjUtil.notEqual(group.getOwnerUserId(), userId)) {
             throw exception(GROUP_NOT_OWNER);
+        }
+        return group;
+    }
+
+    private ImGroupDO validateGroupExistsForUpdate(Long groupId) {
+        ImGroupDO group = groupMapper.selectByIdForUpdate(groupId);
+        if (group == null) {
+            throw exception(GROUP_NOT_EXISTS);
+        }
+        if (Boolean.TRUE.equals(group.getBanned())) {
+            throw exception(GROUP_BANNED);
+        }
+        if (CommonStatusEnum.DISABLE.getStatus().equals(group.getStatus())) {
+            throw exception(GROUP_DISSOLVED);
         }
         return group;
     }

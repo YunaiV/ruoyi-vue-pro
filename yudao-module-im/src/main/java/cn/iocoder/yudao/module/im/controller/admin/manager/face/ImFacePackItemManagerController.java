@@ -59,8 +59,8 @@ public class ImFacePackItemManagerController {
     @Operation(summary = "批量删除表情")
     @Parameter(name = "ids", description = "编号列表", required = true)
     @PreAuthorize("@ss.hasPermission('im:manager:face-pack-item:delete')")
-    public CommonResult<Boolean> deleteFacePackItemList(@RequestParam("ids")
-                                                        @Size(max = 100, message = "批量删除最多 100 条") List<Long> ids) {
+    public CommonResult<Boolean> deleteFacePackItemList(
+            @RequestParam("ids") @Size(max = 100, message = "批量删除最多 100 条") List<Long> ids) {
         facePackItemService.deleteFacePackItemList(ids);
         return success(true);
     }

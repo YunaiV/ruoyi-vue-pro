@@ -18,6 +18,8 @@ import java.util.Map;
 @Mapper
 public interface ImStatisticsManagerMapper {
 
+    String NORMAL_MESSAGE_CONDITION = "type IN (101,102,103,104,105,107,108,115,125) AND status <> 2";
+
     // ==================== 用户 ====================
 
     /**
@@ -39,10 +41,12 @@ public interface ImStatisticsManagerMapper {
      */
     @Select("SELECT COUNT(DISTINCT user_id) FROM (" +
             "  SELECT sender_id AS user_id FROM im_private_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             "  UNION ALL " +
             "  SELECT sender_id AS user_id FROM im_group_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t")
     Long selectActiveUserCount(@Param("beginTime") LocalDateTime beginTime,
                                @Param("endTime") LocalDateTime endTime);
@@ -63,10 +67,12 @@ public interface ImStatisticsManagerMapper {
      */
     @Select("SELECT day AS date, COUNT(DISTINCT user_id) AS count FROM (" +
             "  SELECT DATE(send_time) AS day, sender_id AS user_id FROM im_private_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             "  UNION ALL " +
             "  SELECT DATE(send_time) AS day, sender_id AS user_id FROM im_group_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY day")
     List<Map<String, Object>> selectActiveUserDailyCount(@Param("beginTime") LocalDateTime beginTime, @Param("endTime") LocalDateTime endTime);
 
@@ -113,7 +119,8 @@ public interface ImStatisticsManagerMapper {
      * 区间内私聊消息数
      */
     @Select("SELECT COUNT(*) FROM im_private_message " +
-            "WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}")
+            "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            " AND send_time >= #{beginTime} AND send_time < #{endTime}")
     Long selectPrivateMessageCount(@Param("beginTime") LocalDateTime beginTime,
                                    @Param("endTime") LocalDateTime endTime);
 
@@ -121,7 +128,8 @@ public interface ImStatisticsManagerMapper {
      * 区间内群聊消息数
      */
     @Select("SELECT COUNT(*) FROM im_group_message " +
-            "WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}")
+            "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            " AND send_time >= #{beginTime} AND send_time < #{endTime}")
     Long selectGroupMessageCount(@Param("beginTime") LocalDateTime beginTime,
                                  @Param("endTime") LocalDateTime endTime);
 
@@ -129,7 +137,8 @@ public interface ImStatisticsManagerMapper {
      * 区间内每日私聊消息数（按天分组）
      */
     @Select("SELECT DATE(send_time) AS date, COUNT(*) AS count FROM im_private_message " +
-            "WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime} " +
+            "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            " AND send_time >= #{beginTime} AND send_time < #{endTime} " +
             "GROUP BY DATE(send_time)")
     List<Map<String, Object>> selectPrivateMessageDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                              @Param("endTime") LocalDateTime endTime);
@@ -138,7 +147,8 @@ public interface ImStatisticsManagerMapper {
      * 区间内每日群聊消息数（按天分组）
      */
     @Select("SELECT DATE(send_time) AS date, COUNT(*) AS count FROM im_group_message " +
-            "WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime} " +
+            "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            " AND send_time >= #{beginTime} AND send_time < #{endTime} " +
             "GROUP BY DATE(send_time)")
     List<Map<String, Object>> selectGroupMessageDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                            @Param("endTime") LocalDateTime endTime);
@@ -150,10 +160,12 @@ public interface ImStatisticsManagerMapper {
      */
     @Select("SELECT type, COUNT(*) AS count FROM (" +
             "  SELECT type FROM im_private_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             "  UNION ALL " +
             "  SELECT type FROM im_group_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY type")
     List<Map<String, Object>> selectMessageTypeDistribution(@Param("beginTime") LocalDateTime beginTime,
                                                             @Param("endTime") LocalDateTime endTime);
@@ -165,10 +177,12 @@ public interface ImStatisticsManagerMapper {
      */
     @Select("SELECT user_id AS userId, COUNT(*) AS messageCount FROM (" +
             "  SELECT sender_id AS user_id FROM im_private_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             "  UNION ALL " +
             "  SELECT sender_id AS user_id FROM im_group_message " +
-            "  WHERE deleted = 0 AND send_time >= #{beginTime} AND send_time < #{endTime}" +
+            "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
+            "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY user_id ORDER BY messageCount DESC LIMIT #{limit}")
     List<Map<String, Object>> selectTopSenders(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime,

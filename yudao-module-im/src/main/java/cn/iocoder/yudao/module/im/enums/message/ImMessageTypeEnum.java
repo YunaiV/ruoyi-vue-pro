@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * IM 消息类型枚举
@@ -339,6 +340,27 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 
+    private static final Set<Integer> FRIEND_NOTIFICATION_TYPES = Set.of(
+            FRIEND_REQUEST_APPROVED.type,
+            FRIEND_REQUEST_REJECTED.type,
+            FRIEND_REQUEST_RECEIVED.type,
+            FRIEND_ADD.type,
+            FRIEND_DELETE.type,
+            FRIEND_BLOCK.type,
+            FRIEND_UNBLOCK.type,
+            FRIEND_INFO_UPDATED.type,
+            FRIEND_UPDATE.type);
+
+    private static final Set<Integer> GROUP_REQUEST_NOTIFICATION_TYPES = Set.of(
+            GROUP_REQUEST_RECEIVED.type,
+            GROUP_REQUEST_APPROVED.type,
+            GROUP_REQUEST_REJECTED.type);
+
+    private static final Set<Integer> RTC_NOTIFICATION_TYPES = Set.of(
+            RTC_CALL.type,
+            RTC_PARTICIPANT_CONNECTED.type,
+            RTC_PARTICIPANT_DISCONNECTED.type);
+
     /**
      * 类型
      */
@@ -377,6 +399,27 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
         ImMessageTypeEnum result = ArrayUtil.firstMatch(item -> item.type.equals(type), values());
         Assert.notNull(result, "未注册的消息类型 type={}", type);
         return result;
+    }
+
+    /**
+     * 判断是否为好友通知
+     */
+    public static boolean isFriendNotification(Integer type) {
+        return type != null && FRIEND_NOTIFICATION_TYPES.contains(type);
+    }
+
+    /**
+     * 判断是否为群申请定向通知
+     */
+    public static boolean isGroupRequestNotification(Integer type) {
+        return type != null && GROUP_REQUEST_NOTIFICATION_TYPES.contains(type);
+    }
+
+    /**
+     * 判断是否为通话信令通知
+     */
+    public static boolean isRtcNotification(Integer type) {
+        return type != null && RTC_NOTIFICATION_TYPES.contains(type);
     }
 
 }

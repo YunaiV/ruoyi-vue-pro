@@ -757,7 +757,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             // 目标 3 是普通成员
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().userId(3L).status(CommonStatusEnum.ENABLE.getStatus())
@@ -765,6 +765,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 群里已有 1 个 ADMIN，1 + 1 ≤ 3 不超上限
             when(groupMemberService.getGroupMemberCountByRole(10L, ImGroupMemberRoleEnum.ADMIN.getRole()))
                     .thenReturn(1L);
+            when(groupMemberService.updateGroupMemberRole(eq(10L), anyCollection(),
+                    eq(ImGroupMemberRoleEnum.ADMIN.getRole()))).thenReturn(1);
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
             reqVO.setGroupId(10L);
@@ -786,7 +788,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().userId(5L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
@@ -813,7 +815,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().userId(1L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build()));
@@ -836,7 +838,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             // 目标已是 ADMIN：再加无需操作
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
@@ -863,10 +865,12 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
+            when(groupMemberService.updateGroupMemberRole(eq(10L), anyCollection(),
+                    eq(ImGroupMemberRoleEnum.NORMAL.getRole()))).thenReturn(1);
 
             ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
             reqVO.setGroupId(10L);
@@ -888,7 +892,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             // 目标已是 MEMBER：撤销无需操作
             when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
                     ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
@@ -914,10 +918,14 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             when(groupMemberService.validateMemberInGroup(10L, 2L)).thenReturn(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
+            when(groupMemberService.updateGroupMemberRole(eq(10L), eq(Set.of(2L)),
+                    eq(ImGroupMemberRoleEnum.OWNER.getRole()))).thenReturn(1);
+            when(groupMemberService.updateGroupMemberRole(eq(10L), eq(Set.of(1L)),
+                    eq(ImGroupMemberRoleEnum.NORMAL.getRole()))).thenReturn(1);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
             reqVO.setGroupId(10L);
@@ -945,7 +953,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
             reqVO.setGroupId(10L);
@@ -966,7 +974,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMapper.selectById(10L)).thenReturn(group);
+            when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
             reqVO.setGroupId(10L);

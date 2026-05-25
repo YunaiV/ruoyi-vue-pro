@@ -37,7 +37,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
 
     @Override
     public void sendPrivateMessageAsync(Collection<Long> userIds, ImPrivateMessageDTO dto) {
-        // 说明：通过 executeAfterCommitOrNow 保证事务提交后再推送，避免客户端收到消息后查询数据库时事务尚未提交
+        // 说明：通过 executeAfterTransaction 保证事务提交后再推送，避免客户端收到消息后查询数据库时事务尚未提交
         // 通过 getSelf() 获取 Spring 代理对象调用 @Async 方法，确保异步 AOP 生效（直接 this 调用会绕过代理）
         executeAfterTransaction(() -> getSelf().doSendPrivateMessage(userIds, dto));
     }

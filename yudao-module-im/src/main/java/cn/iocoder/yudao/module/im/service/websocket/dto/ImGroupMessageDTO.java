@@ -73,6 +73,10 @@ public class ImGroupMessageDTO {
      * 群回执已读人数
      */
     private Integer readCount;
+    /**
+     * 已读位置
+     */
+    private Long readId;
 
     // ========== 静态工厂方法 ==========
 
@@ -96,7 +100,7 @@ public class ImGroupMessageDTO {
      */
     public static ImGroupMessageDTO ofRead(Long senderId, Long groupId, Long readId) {
         return new ImGroupMessageDTO()
-                .setId(readId).setType(ImMessageTypeEnum.READ.getType())
+                .setId(readId).setReadId(readId).setType(ImMessageTypeEnum.READ.getType())
                 .setSenderId(senderId).setGroupId(groupId);
     }
 

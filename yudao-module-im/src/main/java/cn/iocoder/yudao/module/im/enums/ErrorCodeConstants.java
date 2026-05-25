@@ -20,7 +20,7 @@ public interface ErrorCodeConstants {
     ErrorCode MESSAGE_NOT_IN_GROUP = new ErrorCode(1_040_300_009, "消息不属于该群");
     ErrorCode MESSAGE_PRIVATE_READ_DISABLED = new ErrorCode(1_040_300_010, "私聊已读功能已关闭");
     ErrorCode MESSAGE_GROUP_READ_DISABLED = new ErrorCode(1_040_300_011, "群聊已读功能已关闭");
-    ErrorCode MESSAGE_GROUP_READ_USERS_DENIED = new ErrorCode(1_040_300_012, "仅消息发送者可查看已读列表");
+    ErrorCode MESSAGE_CONTENT_INVALID = new ErrorCode(1_040_300_013, "消息内容格式不正确");
 
     // ========== 群 (1-040-400-000) ==========
     ErrorCode GROUP_NOT_EXISTS = new ErrorCode(1_040_400_000, "群不存在");

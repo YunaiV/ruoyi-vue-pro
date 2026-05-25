@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.websocket.dto;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
@@ -116,6 +117,7 @@ public class ImPrivateMessageDTO {
      */
     public static ImPrivateMessageDTO ofFriendNotification(Integer type, Long operatorUserId,
                                                            Long receiverUserId, BaseFriendNotification payload) {
+        validateNotification(type, payload, ImMessageTypeEnum.isFriendNotification(type));
         return new ImPrivateMessageDTO().setType(type)
                 .setSenderId(operatorUserId).setReceiverId(receiverUserId)
                 .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
@@ -123,7 +125,7 @@ public class ImPrivateMessageDTO {
 
     // ==================== 群定向私聊通知 ====================
 
-    // TODO @AI：能不能走群聊的通道？？？？只是接收人不同。【统一优化的】
+    // TODO DONE @AI：群申请定向通知继续走私聊通道
     /**
      * 构建群通知推送 DTO（走私聊通道定向推送，不入群消息流）
      * <p>
@@ -138,6 +140,7 @@ public class ImPrivateMessageDTO {
      */
     public static ImPrivateMessageDTO ofGroupNotification(Integer type, Long operatorUserId,
                                                           Long receiverUserId, BaseGroupNotification payload) {
+        validateNotification(type, payload, ImMessageTypeEnum.isGroupRequestNotification(type));
         return new ImPrivateMessageDTO().setType(type)
                 .setSenderId(operatorUserId).setReceiverId(receiverUserId)
                 .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
@@ -145,7 +148,6 @@ public class ImPrivateMessageDTO {
 
     // ==================== 实时通话信令 ====================
 
-    // TODO @AI：能不能走群聊的通道？？？？只是接收人不同。【统一优化的】
     /**
      * 构建通话信令推送 DTO（走私聊通道仅推参与方，不入消息流）
      * <p>
@@ -159,9 +161,16 @@ public class ImPrivateMessageDTO {
      */
     public static ImPrivateMessageDTO ofRtcNotification(Integer type, Long senderId,
                                                         Long receiverUserId, Object payload) {
+        validateNotification(type, payload, ImMessageTypeEnum.isRtcNotification(type));
         return new ImPrivateMessageDTO().setType(type)
                 .setSenderId(senderId).setReceiverId(receiverUserId)
                 .setContent(JsonUtils.toJsonString(payload)).setSendTime(LocalDateTime.now());
+    }
+
+    private static void validateNotification(Integer type, Object payload, boolean supported) {
+        Assert.notNull(type, "消息类型不能为空");
+        Assert.notNull(payload, "消息内容不能为空");
+        Assert.isTrue(supported, "消息类型不匹配 type={}", type);
     }
 
 }

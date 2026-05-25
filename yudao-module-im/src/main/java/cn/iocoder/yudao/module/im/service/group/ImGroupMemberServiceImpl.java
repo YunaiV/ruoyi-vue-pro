@@ -76,14 +76,9 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Override
     public List<ImGroupMemberDO> getGroupMemberListByOwnerAndAdmin(Long groupId) {
-        // TODO @AI：把条件往下传；这样减少加载数据量！
-        List<ImGroupMemberDO> members = getActiveGroupMemberListByGroupId(groupId);
-        if (CollUtil.isEmpty(members)) {
-            return Collections.emptyList();
-        }
-        return members.stream()
-                .filter(member -> ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole()))
-                .toList();
+        // TODO DONE @AI：把条件往下传；这样减少加载数据量！
+        return groupMemberMapper.selectListByGroupIdAndStatusAndRoles(groupId, CommonStatusEnum.ENABLE.getStatus(),
+                List.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole()));
     }
 
     /**
@@ -239,11 +234,11 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
-    public void updateGroupMemberRole(Long groupId, Collection<Long> userIds, Integer role) {
+    public int updateGroupMemberRole(Long groupId, Collection<Long> userIds, Integer role) {
         if (CollUtil.isEmpty(userIds)) {
-            return;
+            return 0;
         }
-        groupMemberMapper.updateListByGroupIdAndUserIds(groupId, userIds, new ImGroupMemberDO().setRole(role));
+        return groupMemberMapper.updateListByGroupIdAndUserIds(groupId, userIds, new ImGroupMemberDO().setRole(role));
     }
 
     @Override

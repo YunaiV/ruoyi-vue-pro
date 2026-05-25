@@ -78,13 +78,13 @@ public class ImFriendRequestController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "查询「我相关」的好友申请列表（游标分页：传 lastRequestId 加载更多）")
+    @Operation(summary = "查询「我相关」的好友申请列表（游标分页：传 maxId 加载更多）")
     public CommonResult<List<ImFriendRequestRespVO>> getMyFriendRequestList(
             @Parameter(description = "当前列表最旧记录的 id；首页不传")
-            @RequestParam(value = "lastRequestId", required = false) Long lastRequestId,
+            @RequestParam(value = "maxId", required = false) Long maxId,
             @Parameter(description = "单次拉取条数", required = true)
             @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
-        List<ImFriendRequestDO> list = friendRequestService.getMyFriendRequestList(getLoginUserId(), lastRequestId, limit);
+        List<ImFriendRequestDO> list = friendRequestService.getMyFriendRequestList(getLoginUserId(), maxId, limit);
         return success(buildList(list));
     }
 

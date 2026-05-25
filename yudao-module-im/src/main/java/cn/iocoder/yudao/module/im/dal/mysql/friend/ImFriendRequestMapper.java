@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.im.enums.friend.ImFriendRequestHandleResultEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,14 +27,19 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
     }
 
     /**
-     * 拉取「我相关」的好友申请列表；游标分页：lastRequestId 为 null 拉首页，非 null 拉 id 严格小于它的下一页
+     * 拉取「我相关」的好友申请列表
      */
-    default List<ImFriendRequestDO> selectMyList(Long userId, Long lastRequestId, int limit) {
-        // 先放扩展过滤再放双向 OR；否则 .and() 返回 LambdaQueryWrapper 基类，丢失 ltIfPresent 等扩展方法
+    default List<ImFriendRequestDO> selectMyList(Long userId, LocalDateTime maxRequestUpdateTime,
+                                                 Long maxId, int limit) {
         LambdaQueryWrapperX<ImFriendRequestDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.ltIfPresent(ImFriendRequestDO::getId, lastRequestId)
-                .and(w -> w.eq(ImFriendRequestDO::getFromUserId, userId)
-                        .or().eq(ImFriendRequestDO::getToUserId, userId))
+        wrapper.and(w -> w.eq(ImFriendRequestDO::getFromUserId, userId)
+                        .or().eq(ImFriendRequestDO::getToUserId, userId));
+        if (maxRequestUpdateTime != null && maxId != null) {
+            wrapper.and(w -> w.lt(ImFriendRequestDO::getUpdateTime, maxRequestUpdateTime)
+                    .or(n -> n.eq(ImFriendRequestDO::getUpdateTime, maxRequestUpdateTime)
+                            .lt(ImFriendRequestDO::getId, maxId)));
+        }
+        wrapper.orderByDesc(ImFriendRequestDO::getUpdateTime)
                 .orderByDesc(ImFriendRequestDO::getId)
                 .last("LIMIT " + limit);
         return selectList(wrapper);
@@ -49,7 +55,8 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
      * <p>
      * handleContent / handleTime 走 LambdaUpdateWrapper.set 显式置 null，updateById 默认会忽略 null 字段
      */
-    default int updateByIdReset(Long id, String applyContent, String displayName, Integer addSource) {
+    default int updateByIdReset(Long id, String applyContent, String displayName, Integer addSource,
+                                LocalDateTime updateTime) {
         return update(null, new LambdaUpdateWrapper<ImFriendRequestDO>()
                 .eq(ImFriendRequestDO::getId, id)
                 .set(ImFriendRequestDO::getApplyContent, applyContent)
@@ -57,7 +64,8 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
                 .set(ImFriendRequestDO::getAddSource, addSource)
                 .set(ImFriendRequestDO::getHandleResult, ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
                 .set(ImFriendRequestDO::getHandleContent, null)
-                .set(ImFriendRequestDO::getHandleTime, null));
+                .set(ImFriendRequestDO::getHandleTime, null)
+                .set(ImFriendRequestDO::getUpdateTime, updateTime));
     }
 
     default PageResult<ImFriendRequestDO> selectPage(ImFriendRequestManagerPageReqVO reqVO) {

@@ -15,6 +15,12 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ImGroupMapper extends BaseMapperX<ImGroupDO> {
 
+    default ImGroupDO selectByIdForUpdate(Long id) {
+        return selectOne(new LambdaQueryWrapperX<ImGroupDO>()
+                .eq(ImGroupDO::getId, id)
+                .last("FOR UPDATE"));
+    }
+
     default PageResult<ImGroupDO> selectPage(ImGroupManagerPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImGroupDO>()
                 .likeIfPresent(ImGroupDO::getName, reqVO.getName())

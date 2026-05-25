@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.mq.consumer.friend;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
@@ -33,22 +34,36 @@ public class AdminUserProfileUpdateConsumer {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     @Async // Spring Event 默认在 Producer 发送的线程，通过 @Async 实现异步；事务提交后触发，避免回滚误推幽灵通知 / Consumer 抢在 commit 前读旧值
     public void onMessage(AdminUserProfileUpdateMessage message) {
-        log.info("[onMessage][消息内容({})]", message);
-        Long userId = message.getUserId();
-        // 1. 过滤双向有效好友
-        List<ImFriendDO> friends = friendService.getMutualEnableFriendList(userId);
-        if (friends.isEmpty()) {
-            return;
-        }
+        try {
+            log.info("[onMessage][消息内容({})]", message);
+            // 1. 过滤双向有效好友
+            if (message == null || message.getUserId() == null) {
+                return;
+            }
+            Long userId = message.getUserId();
+            List<ImFriendDO> friends = friendService.getMutualEnableFriendList(userId);
+            if (CollUtil.isEmpty(friends)) {
+                return;
+            }
 
-        // 2. 给每个好友的多端推 FRIEND_INFO_UPDATED；payload 里 operatorUserId / friendUserId 都是「资料被改的人」
-        for (ImFriendDO friend : friends) {
-            FriendInfoUpdatedNotification payload = (FriendInfoUpdatedNotification) new FriendInfoUpdatedNotification()
-                    .setOperatorUserId(userId).setFriendUserId(userId);
-            websocketService.sendPrivateMessageAsync(friend.getFriendUserId(), ImPrivateMessageDTO.ofFriendNotification(
-                    ImMessageTypeEnum.FRIEND_INFO_UPDATED.getType(), userId, friend.getFriendUserId(), payload));
+            // 2. 给每个好友的多端推 FRIEND_INFO_UPDATED；payload 里 operatorUserId / friendUserId 都是「资料被改的人」
+            int successCount = 0;
+            for (ImFriendDO friend : friends) {
+                try {
+                    FriendInfoUpdatedNotification payload = (FriendInfoUpdatedNotification) new FriendInfoUpdatedNotification()
+                            .setOperatorUserId(userId).setFriendUserId(userId);
+                    websocketService.sendPrivateMessageAsync(friend.getFriendUserId(), ImPrivateMessageDTO.ofFriendNotification(
+                            ImMessageTypeEnum.FRIEND_INFO_UPDATED.getType(), userId, friend.getFriendUserId(), payload));
+                    successCount++;
+                } catch (Exception e) {
+                    log.warn("[onMessage][userId({}) friendUserId({}) 推送失败]",
+                            userId, friend.getFriendUserId(), e);
+                }
+            }
+            log.info("[onMessage][userId({}) 推送 FRIEND_INFO_UPDATED 给 {} 位好友]", userId, successCount);
+        } catch (Exception e) {
+            log.error("[onMessage][消息内容({}) 处理失败]", message, e);
         }
-        log.info("[onMessage][userId({}) 推送 FRIEND_INFO_UPDATED 给 {} 位好友]", userId, friends.size());
     }
 
 }

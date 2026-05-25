@@ -45,6 +45,14 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .eq(ImGroupMemberDO::getStatus, status));
     }
 
+    default List<ImGroupMemberDO> selectListByGroupIdAndStatusAndRoles(Long groupId, Integer status,
+                                                                        Collection<Integer> roles) {
+        return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
+                .eq(ImGroupMemberDO::getGroupId, groupId)
+                .eq(ImGroupMemberDO::getStatus, status)
+                .in(ImGroupMemberDO::getRole, roles));
+    }
+
     default List<ImGroupMemberDO> selectListByUserIdAndStatus(Long userId, Integer status) {
         return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
                 .eq(ImGroupMemberDO::getUserId, userId)

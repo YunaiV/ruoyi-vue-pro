@@ -95,12 +95,13 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         // 2. 落库：upsert 语义；同一对 (from, to) 唯一，已有记录覆盖申请理由 / 备注 / 来源 + 重置为未处理 + 清空旧处理痕迹
         ImFriendRequestDO request = friendRequestMapper.selectByFromUserIdAndToUserId(fromUserId, toUserId);
         if (request != null) {
+            LocalDateTime now = LocalDateTime.now();
             friendRequestMapper.updateByIdReset(request.getId(),
-                    reqVO.getApplyContent(), reqVO.getDisplayName(), reqVO.getAddSource());
+                    reqVO.getApplyContent(), reqVO.getDisplayName(), reqVO.getAddSource(), now);
             request.setApplyContent(reqVO.getApplyContent()).setDisplayName(reqVO.getDisplayName())
                     .setAddSource(reqVO.getAddSource())
                     .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
-                    .setHandleContent(null).setHandleTime(null);
+                    .setHandleContent(null).setHandleTime(null).setUpdateTime(now);
         } else {
             request = BeanUtils.toBean(reqVO, ImFriendRequestDO.class)
                     .setFromUserId(fromUserId).setToUserId(toUserId)
@@ -195,8 +196,15 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     }
 
     @Override
-    public List<ImFriendRequestDO> getMyFriendRequestList(Long userId, Long lastRequestId, Integer limit) {
-        return friendRequestMapper.selectMyList(userId, lastRequestId, limit);
+    public List<ImFriendRequestDO> getMyFriendRequestList(Long userId, Long maxId, Integer limit) {
+        ImFriendRequestDO maxRequest = maxId != null ? friendRequestMapper.selectById(maxId) : null;
+        if (maxId != null && maxRequest == null) {
+            return List.of();
+        }
+        return friendRequestMapper.selectMyList(userId,
+                maxRequest != null ? maxRequest.getUpdateTime() : null,
+                maxRequest != null ? maxRequest.getId() : null,
+                limit);
     }
 
     @Override

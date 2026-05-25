@@ -10,7 +10,7 @@ import java.util.Collections;
 /**
  * IM WebSocket 推送 Service 接口
  * <p>
- * 统一封装 WebSocket 消息推送，所有方法默认异步执行。
+ * 统一封装 WebSocket 消息推送，事务内调用时提交后异步执行。
  *
  * @author 芋道源码
  */
@@ -27,9 +27,9 @@ public interface ImWebSocketService {
     }
 
     /**
-     * 异步批量推送私聊消息给多个用户；用于一条 payload 扇出到多个收件人
+     * 异步批量推送私聊消息给多个用户；用于同一份 DTO 扇出到多个收件人
      * <p>
-     * 相比逐个 sendPrivateMessageAsync，仅注册一个 afterCommit 回调 + 一个 @Async 任务，大群参与者事件（1602 / 1603）下避免 N 次线程池调度
+     * 相比逐个发送，仅注册一次 afterCommit 回调和异步任务。
      *
      * @param userIds 目标用户编号列表
      * @param dto     私聊消息 DTO

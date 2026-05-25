@@ -185,7 +185,7 @@ public interface ImGroupMemberService {
      * @param userIds 用户编号集合
      * @param role    新角色，见 {@link cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum}
      */
-    void updateGroupMemberRole(Long groupId, Collection<Long> userIds, Integer role);
+    int updateGroupMemberRole(Long groupId, Collection<Long> userIds, Integer role);
 
     /**
      * 统计群内指定 role 的活跃成员数量

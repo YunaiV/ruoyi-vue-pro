@@ -29,8 +29,8 @@ public class ImFriendRequestMapperTest extends BaseDbUnitTest {
         mapper.insert(buildRequest(2L, 1L));
         mapper.insert(buildRequest(3L, 4L));
 
-        // 调用：lastRequestId=null 拉首页
-        List<ImFriendRequestDO> list = mapper.selectMyList(1L, null, 10);
+        // 调用：cursor 为空，拉首页
+        List<ImFriendRequestDO> list = mapper.selectMyList(1L, null, null, 10);
 
         // 断言：双向 OR 命中两条，无关用户被排除
         assertEquals(2, list.size());
@@ -47,8 +47,9 @@ public class ImFriendRequestMapperTest extends BaseDbUnitTest {
         mapper.insert(r2);
         mapper.insert(r3);
 
-        // 调用：lastRequestId = r3.id，拉 id < r3.id 的下一页
-        List<ImFriendRequestDO> next = mapper.selectMyList(1L, r3.getId(), 10);
+        // 调用：cursor = r3，拉比 r3 更早的下一页
+        ImFriendRequestDO cursor = mapper.selectById(r3.getId());
+        List<ImFriendRequestDO> next = mapper.selectMyList(1L, cursor.getUpdateTime(), cursor.getId(), 10);
 
         // 断言：仅含 r1 / r2，按 id 倒序
         assertEquals(2, next.size());
@@ -64,7 +65,7 @@ public class ImFriendRequestMapperTest extends BaseDbUnitTest {
         }
 
         // 调用：limit = 2
-        List<ImFriendRequestDO> list = mapper.selectMyList(1L, null, 2);
+        List<ImFriendRequestDO> list = mapper.selectMyList(1L, null, null, 2);
 
         // 断言：手写 LIMIT 真生效
         assertEquals(2, list.size());

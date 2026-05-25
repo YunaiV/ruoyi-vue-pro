@@ -91,12 +91,14 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                     senderId, reqVO.getClientMessageId(), existing.getId());
             return existing;
         }
-        // 1.2 校验群存在、发送人仍在群中
+        // 1.2 消息内容校验
+        ImMessageUtils.validateUserMessageContent(reqVO.getType(), reqVO.getContent());
+        // 1.3 校验群存在、发送人仍在群中
         ImGroupDO group = groupService.validateGroupExists(reqVO.getGroupId());
         ImGroupMemberDO senderMember = groupMemberService.validateMemberInGroup(reqVO.getGroupId(), senderId);
-        // 1.3 禁言校验
+        // 1.4 禁言校验
         validateMuteStatus(group, senderMember);
-        // 1.4 文本消息敏感词过滤
+        // 1.5 文本消息敏感词过滤
         if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }

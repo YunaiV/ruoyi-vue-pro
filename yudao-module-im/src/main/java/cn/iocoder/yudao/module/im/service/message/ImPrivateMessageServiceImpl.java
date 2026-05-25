@@ -69,9 +69,11 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
                     senderId, reqVO.getClientMessageId(), existing.getId());
             return existing;
         }
-        // 1.2 好友校验
+        // 1.2 消息内容校验
+        ImMessageUtils.validateUserMessageContent(reqVO.getType(), reqVO.getContent());
+        // 1.3 好友校验
         friendService.validateFriend(senderId, reqVO.getReceiverId());
-        // 1.3 文本消息敏感词过滤
+        // 1.4 文本消息敏感词过滤
         if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }

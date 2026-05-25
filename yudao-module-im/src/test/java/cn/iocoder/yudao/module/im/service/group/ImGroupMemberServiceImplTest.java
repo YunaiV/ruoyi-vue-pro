@@ -331,4 +331,18 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         assertTrue(userIds.isEmpty());
     }
 
+    @Test
+    public void testGetGroupMemberListByOwnerAndAdmin_passesRoles() {
+        List<Integer> roles = List.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole());
+        List<ImGroupMemberDO> members = List.of(ImGroupMemberDO.builder().groupId(10L).userId(1L).build());
+        when(groupMemberMapper.selectListByGroupIdAndStatusAndRoles(10L, CommonStatusEnum.ENABLE.getStatus(), roles))
+                .thenReturn(members);
+
+        List<ImGroupMemberDO> result = groupMemberService.getGroupMemberListByOwnerAndAdmin(10L);
+
+        assertEquals(members, result);
+        verify(groupMemberMapper).selectListByGroupIdAndStatusAndRoles(
+                10L, CommonStatusEnum.ENABLE.getStatus(), roles);
+    }
+
 }
