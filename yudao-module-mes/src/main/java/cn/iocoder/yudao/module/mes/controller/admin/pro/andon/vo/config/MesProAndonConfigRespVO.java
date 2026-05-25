@@ -21,6 +21,9 @@ public class MesProAndonConfigRespVO {
     @Schema(description = "处置人角色编号", example = "10")
     private Long handlerRoleId;
 
+    @Schema(description = "处置人角色名称", example = "生产经理")
+    private String handlerRoleName;
+
     @Schema(description = "处置人编号", example = "100")
     private Long handlerUserId;
 
