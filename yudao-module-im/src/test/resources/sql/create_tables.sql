@@ -219,7 +219,8 @@ CREATE TABLE IF NOT EXISTS "im_rtc_participant" (
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "uk_im_rtc_participant_room_user" UNIQUE ("room", "user_id", "tenant_id")
 ) COMMENT 'IM 通话参与者表';
 
 CREATE TABLE IF NOT EXISTS "im_face_user_item" (

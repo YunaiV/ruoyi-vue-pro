@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -92,22 +93,8 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
             return null;
         }
 
-        // 2. 落库：upsert 语义；同一对 (from, to) 唯一，已有记录覆盖申请理由 / 备注 / 来源 + 重置为未处理 + 清空旧处理痕迹
-        ImFriendRequestDO request = friendRequestMapper.selectByFromUserIdAndToUserId(fromUserId, toUserId);
-        if (request != null) {
-            LocalDateTime now = LocalDateTime.now();
-            friendRequestMapper.updateByIdReset(request.getId(),
-                    reqVO.getApplyContent(), reqVO.getDisplayName(), reqVO.getAddSource(), now);
-            request.setApplyContent(reqVO.getApplyContent()).setDisplayName(reqVO.getDisplayName())
-                    .setAddSource(reqVO.getAddSource())
-                    .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
-                    .setHandleContent(null).setHandleTime(null).setUpdateTime(now);
-        } else {
-            request = BeanUtils.toBean(reqVO, ImFriendRequestDO.class)
-                    .setFromUserId(fromUserId).setToUserId(toUserId)
-                    .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult());
-            friendRequestMapper.insert(request);
-        }
+        // 2. 落库：同一申请人和接收人唯一，已有记录覆盖申请内容并重置为未处理
+        ImFriendRequestDO request = createOrResetRequest(fromUserId, reqVO);
 
         // 3. 推送 FRIEND_REQUEST_RECEIVED 给 toUser 多端；payload 携带申请方昵称 / 头像，前端按 requestId 直推 push 进列表
         AdminUserRespDTO fromUser = adminUserApi.getUser(fromUserId);
@@ -138,6 +125,44 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
 
             });
         }
+        return request;
+    }
+
+    /**
+     * 创建或重置好友申请
+     *
+     * @param fromUserId 申请人用户编号
+     * @param reqVO      申请请求
+     * @return 申请记录
+     */
+    private ImFriendRequestDO createOrResetRequest(Long fromUserId, ImFriendRequestApplyReqVO reqVO) {
+        Long toUserId = reqVO.getToUserId();
+        ImFriendRequestDO request = friendRequestMapper.selectByFromUserIdAndToUserId(fromUserId, toUserId);
+        if (request == null) {
+            // 1. 无旧申请：创建新申请；唯一键冲突时回查并复用并发写入的记录
+            request = BeanUtils.toBean(reqVO, ImFriendRequestDO.class)
+                    .setFromUserId(fromUserId).setToUserId(toUserId)
+                    .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult());
+            try {
+                friendRequestMapper.insert(request);
+                return request;
+            } catch (DuplicateKeyException ex) {
+                request = friendRequestMapper.selectByFromUserIdAndToUserId(fromUserId, toUserId);
+                if (request == null) {
+                    throw ex;
+                }
+            }
+        }
+
+        // 2. 复用旧申请：覆盖本次申请内容，并重置为未处理
+        LocalDateTime now = LocalDateTime.now();
+        friendRequestMapper.updateByIdReset(request.getId(),
+                reqVO.getApplyContent(), reqVO.getDisplayName(), reqVO.getAddSource(), now);
+        // 同步内存对象，后续通知和自动通过直接复用
+        request.setApplyContent(reqVO.getApplyContent()).setDisplayName(reqVO.getDisplayName())
+                .setAddSource(reqVO.getAddSource())
+                .setHandleResult(ImFriendRequestHandleResultEnum.UNHANDLED.getResult())
+                .setHandleContent(null).setHandleTime(null).setUpdateTime(now);
         return request;
     }
 

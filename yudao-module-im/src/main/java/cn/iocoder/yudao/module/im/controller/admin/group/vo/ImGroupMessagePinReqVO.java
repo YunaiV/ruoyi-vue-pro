@@ -13,7 +13,7 @@ public class ImGroupMessagePinReqVO {
 
     @Schema(description = "群编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13279")
     @NotNull(message = "群编号不能为空")
-    private Long groupId;
+    private Long id;
 
     @Schema(description = "消息编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "9527")
     @NotNull(message = "消息编号不能为空")

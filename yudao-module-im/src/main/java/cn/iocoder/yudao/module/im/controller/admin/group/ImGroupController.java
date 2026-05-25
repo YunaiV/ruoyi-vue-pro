@@ -134,14 +134,14 @@ public class ImGroupController {
     @PutMapping("/pin-message")
     @Operation(summary = "置顶群消息（群主 / 管理员）")
     public CommonResult<Boolean> pinGroupMessage(@Valid @RequestBody ImGroupMessagePinReqVO reqVO) {
-        groupService.pinGroupMessage(getLoginUserId(), reqVO.getGroupId(), reqVO.getMessageId());
+        groupService.pinGroupMessage(getLoginUserId(), reqVO.getId(), reqVO.getMessageId());
         return success(true);
     }
 
     @PutMapping("/unpin-message")
     @Operation(summary = "取消置顶群消息（群主 / 管理员）")
     public CommonResult<Boolean> unpinGroupMessage(@Valid @RequestBody ImGroupMessagePinReqVO reqVO) {
-        groupService.unpinGroupMessage(getLoginUserId(), reqVO.getGroupId(), reqVO.getMessageId());
+        groupService.unpinGroupMessage(getLoginUserId(), reqVO.getId(), reqVO.getMessageId());
         return success(true);
     }
 

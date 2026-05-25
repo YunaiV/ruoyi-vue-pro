@@ -34,7 +34,7 @@ public interface ImRtcCallService {
     void inviteCall(Long userId, ImRtcCallInviteReqVO reqVO);
 
     /**
-     * 加入已有群通话：用于群胶囊条「加入」按钮；旁观者作为 ACTIVE_JOIN 加入，邀请池内成员转 JOINED
+     * 加入已有群通话：用于群胶囊条「加入」按钮；旁观者作为 JOINER 加入，邀请池内成员转 JOINED
      *
      * @param userId 加入者用户编号
      * @param room   业务通话编号；从胶囊条 activeCall 拿

@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -93,22 +94,8 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
             return null;
         }
 
-        // 3. 情况二：群开启了审批；upsert 一条主动申请记录（inviterUserId=null）
-        ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
-        if (request != null) {
-            LocalDateTime now = LocalDateTime.now();
-            groupRequestMapper.updateApplyByIdReset(request.getId(),
-                    reqVO.getApplyContent(), reqVO.getAddSource(), now);
-            request.setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
-                    .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
-                    .setInviterUserId(null).setHandleUserId(null)
-                    .setHandleContent(null).setHandleTime(null).setUpdateTime(now);
-        } else {
-            request = BeanUtils.toBean(reqVO, ImGroupRequestDO.class)
-                    .setUserId(userId).setInviterUserId(null)
-                    .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
-            groupRequestMapper.insert(request);
-        }
+        // 3. 情况二：群开启了审批，创建或复用一条主动申请记录
+        ImGroupRequestDO request = createOrResetApplyRequest(groupId, userId, reqVO);
 
         // 4. 1503 私聊定向推群主 + 全部管理员（多端同步）；payload 携带申请方昵称 / 头像
         AdminUserRespDTO applyUser = adminUserApi.getUser(userId);
@@ -203,39 +190,13 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         }
         ImGroupDO group = groupService.validateGroupExists(groupId);
         Integer inviteSource = ImGroupAddSourceEnum.INVITE.getSource();
-        Integer unhandled = ImGroupRequestHandleResultEnum.UNHANDLED.getResult();
-        LocalDateTime now = LocalDateTime.now();
+        // 1. 逐条创建或复用邀请申请
+        List<ImGroupRequestDO> requests = convertList(invitedUserIds, userId ->
+                createOrResetInviteRequest(groupId, inviterUserId, userId, inviteSource));
 
-        // 1. 批量查现有记录，分流为「复用旧记录」+「新增」
-        List<ImGroupRequestDO> existingList = groupRequestMapper.selectListByGroupIdAndUserIds(groupId, invitedUserIds);
-        Set<Long> existingUserIds = convertSet(existingList, ImGroupRequestDO::getUserId);
-        Collection<Long> newUserIds = CollUtil.subtract(invitedUserIds, existingUserIds);
-
-        // 2. 复用旧记录：一条 update WHERE IN 完成
-        if (CollUtil.isNotEmpty(existingList)) {
-            groupRequestMapper.updateInviteByGroupIdAndUserIdsReset(groupId, existingUserIds,
-                    inviterUserId, inviteSource, now);
-            // 同步内存对象，下面 buildRequestNotification 要读 inviterUserId / addSource
-            existingList.forEach(r -> r.setInviterUserId(inviterUserId).setAddSource(inviteSource)
-                    .setHandleResult(unhandled)
-                    .setHandleUserId(null).setHandleContent(null).setHandleTime(null)
-                    .setUpdateTime(now));
-        }
-
-        // 3. 新增：批量 insert
-        List<ImGroupRequestDO> newList = convertList(newUserIds, userId -> new ImGroupRequestDO()
-                .setGroupId(groupId).setUserId(userId).setInviterUserId(inviterUserId)
-                .setAddSource(inviteSource).setHandleResult(unhandled));
-        if (CollUtil.isNotEmpty(newList)) {
-            groupRequestMapper.insertBatch(newList);
-        }
-
-        // 4. 推 1503 给群主 + 全部管理员；多端同步；每条申请单独推一帧
+        // 2. 推 1503 给群主 + 全部管理员；多端同步；每条申请单独推一帧
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(invitedUserIds);
         List<Long> ownerAndAdmins = getGroupMemberListByOwnerAndAdminUserIds(group);
-        List<ImGroupRequestDO> requests = new ArrayList<>(existingList.size() + newList.size());
-        requests.addAll(existingList);
-        requests.addAll(newList);
         for (ImGroupRequestDO request : requests) {
             AdminUserRespDTO applyUser = userMap.get(request.getUserId());
             GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);
@@ -281,6 +242,109 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     @Override
     public PageResult<ImGroupRequestDO> getGroupRequestPage(ImGroupRequestManagerPageReqVO reqVO) {
         return groupRequestMapper.selectPage(reqVO);
+    }
+
+    /**
+     * 创建或重置主动加群申请
+     *
+     * @param groupId 群编号
+     * @param userId  申请人用户编号
+     * @param reqVO   申请请求
+     * @return 申请记录
+     */
+    private ImGroupRequestDO createOrResetApplyRequest(Long groupId, Long userId, ImGroupRequestApplyReqVO reqVO) {
+        // 1. 已有申请：覆盖本次申请内容，并重置为未处理
+        ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
+        if (request != null) {
+            resetApplyRequest(request, reqVO);
+            return request;
+        }
+        // 2. 无旧申请：创建主动申请记录
+        request = BeanUtils.toBean(reqVO, ImGroupRequestDO.class)
+                .setUserId(userId).setInviterUserId(null)
+                .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
+        try {
+            groupRequestMapper.insert(request);
+            return request;
+        } catch (DuplicateKeyException ex) {
+            // 3. 唯一键冲突：回查并复用并发写入的记录
+            request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
+            if (request == null) {
+                throw ex;
+            }
+            resetApplyRequest(request, reqVO);
+            return request;
+        }
+    }
+
+    /**
+     * 创建或重置邀请加群申请
+     *
+     * @param groupId       群编号
+     * @param inviterUserId 邀请人用户编号
+     * @param userId        被邀请人用户编号
+     * @param inviteSource  邀请来源
+     * @return 申请记录
+     */
+    private ImGroupRequestDO createOrResetInviteRequest(Long groupId, Long inviterUserId,
+                                                        Long userId, Integer inviteSource) {
+        // 1. 已有申请：覆盖邀请人和来源，并重置为未处理
+        ImGroupRequestDO request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
+        if (request != null) {
+            resetInviteRequest(request, inviterUserId, inviteSource);
+            return request;
+        }
+        // 2. 无旧申请：创建邀请申请记录
+        request = new ImGroupRequestDO().setGroupId(groupId).setUserId(userId).setInviterUserId(inviterUserId)
+                .setAddSource(inviteSource).setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
+        try {
+            groupRequestMapper.insert(request);
+            return request;
+        } catch (DuplicateKeyException ex) {
+            // 3. 唯一键冲突：回查并复用并发写入的记录
+            request = groupRequestMapper.selectByGroupIdAndUserId(groupId, userId);
+            if (request == null) {
+                throw ex;
+            }
+            resetInviteRequest(request, inviterUserId, inviteSource);
+            return request;
+        }
+    }
+
+    /**
+     * 重置主动加群申请
+     *
+     * @param request 申请记录
+     * @param reqVO   申请请求
+     */
+    private void resetApplyRequest(ImGroupRequestDO request, ImGroupRequestApplyReqVO reqVO) {
+        // 1. 更新申请内容、来源和处理状态
+        LocalDateTime now = LocalDateTime.now();
+        groupRequestMapper.updateApplyByIdReset(request.getId(),
+                reqVO.getApplyContent(), reqVO.getAddSource(), now);
+        // 2. 同步内存对象，后续通知构建直接复用
+        request.setApplyContent(reqVO.getApplyContent()).setAddSource(reqVO.getAddSource())
+                .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                .setInviterUserId(null).setHandleUserId(null)
+                .setHandleContent(null).setHandleTime(null).setUpdateTime(now);
+    }
+
+    /**
+     * 重置邀请加群申请
+     *
+     * @param request       申请记录
+     * @param inviterUserId 邀请人用户编号
+     * @param inviteSource  邀请来源
+     */
+    private void resetInviteRequest(ImGroupRequestDO request, Long inviterUserId, Integer inviteSource) {
+        // 1. 更新邀请人、来源和处理状态
+        LocalDateTime now = LocalDateTime.now();
+        groupRequestMapper.updateInviteByIdReset(request.getId(), inviterUserId, inviteSource, now);
+        // 2. 同步内存对象，后续通知构建直接复用
+        request.setInviterUserId(inviterUserId).setAddSource(inviteSource)
+                .setHandleResult(ImGroupRequestHandleResultEnum.UNHANDLED.getResult())
+                .setHandleUserId(null).setHandleContent(null).setHandleTime(null)
+                .setUpdateTime(now);
     }
 
     /**

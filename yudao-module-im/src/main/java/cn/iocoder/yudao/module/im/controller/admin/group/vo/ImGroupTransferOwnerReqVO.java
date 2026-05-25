@@ -10,7 +10,7 @@ public class ImGroupTransferOwnerReqVO {
 
     @Schema(description = "群编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13279")
     @NotNull(message = "群编号不能为空")
-    private Long groupId;
+    private Long id;
 
     @Schema(description = "新群主用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "202")
     @NotNull(message = "新群主用户编号不能为空")

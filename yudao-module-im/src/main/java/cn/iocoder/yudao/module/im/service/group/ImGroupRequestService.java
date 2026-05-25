@@ -19,7 +19,7 @@ public interface ImGroupRequestService {
     /**
      * 用户主动申请加群
      * <p>
-     * 群未开启审批时直接入群 + 1510 全员广播；开启审批则 upsert 一条 inviterUserId=null 的待审批记录 + 1503 推送
+     * 群未开启审批时直接入群 + 1510 全员广播；开启审批则创建或复用一条待审批记录 + 1503 推送
      *
      * @param userId 申请人用户编号
      * @param reqVO  申请请求
@@ -45,7 +45,7 @@ public interface ImGroupRequestService {
     void refuseGroupRequest(Long userId, Long requestId, String handleContent);
 
     /**
-     * 邀请创建审批申请；inviteGroupMember 在群开启审批时调用，每个被邀请人 upsert 一条 inviterUserId=操作人 的记录
+     * 邀请创建审批申请；inviteGroupMember 在群开启审批时调用，每个被邀请人创建或复用一条待审批记录
      *
      * @param groupId         群编号
      * @param inviterUserId   邀请人用户编号

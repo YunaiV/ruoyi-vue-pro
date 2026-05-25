@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.Collection;
 import java.util.List;
@@ -115,6 +116,39 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         verify(groupRequestMapper).insert(any(ImGroupRequestDO.class));
         // 1503 推送给 owner(99) + admin(98)，去重后两条
         verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+    }
+
+    @Test
+    public void testApplyJoinGroup_insertDuplicateKey_reuseOldRequest() {
+        // 准备：群是 APPLY 模式，首次查询不存在，插入时命中唯一键
+        ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                .joinApproval(true)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(groupService.validateGroupExists(10L)).thenReturn(group);
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+                ImGroupMemberDO.builder().groupId(10L).userId(99L)
+                        .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+        when(adminUserApi.getUser(1L)).thenReturn(buildUser(1L, "申请人"));
+        ImGroupRequestDO old = new ImGroupRequestDO().setId(50L).setGroupId(10L).setUserId(1L)
+                .setHandleResult(ImGroupRequestHandleResultEnum.REFUSED.getResult());
+        when(groupRequestMapper.selectByGroupIdAndUserId(10L, 1L)).thenReturn(null, old);
+        when(groupRequestMapper.insert(any(ImGroupRequestDO.class))).thenThrow(new DuplicateKeyException("dup"));
+
+        ImGroupRequestApplyReqVO reqVO = new ImGroupRequestApplyReqVO();
+        reqVO.setGroupId(10L);
+        reqVO.setApplyContent("我想进群");
+        reqVO.setAddSource(ImGroupAddSourceEnum.SEARCH.getSource());
+
+        // 调用
+        ImGroupRequestDO result = groupRequestService.applyJoinGroup(1L, reqVO);
+
+        // 断言：复用并重置旧申请
+        verify(groupRequestMapper).updateApplyByIdReset(eq(50L), eq("我想进群"),
+                eq(ImGroupAddSourceEnum.SEARCH.getSource()), any());
+        assertEquals(50L, result.getId());
+        assertEquals(ImGroupRequestHandleResultEnum.UNHANDLED.getResult(), result.getHandleResult());
+        verify(websocketService).sendPrivateMessageAsync(eq(99L), any(ImPrivateMessageDTO.class));
     }
 
     @Test
@@ -254,8 +288,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 .joinApproval(true)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
-        when(groupRequestMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
-                .thenReturn(List.of());
+        when(groupRequestMapper.selectByGroupIdAndUserId(eq(10L), anyLong())).thenReturn(null);
         when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
@@ -267,18 +300,42 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         // 调用：邀请人 1L 邀请 2L、3L（都没有旧记录）
         groupRequestService.createInviteRequestList(10L, 1L, List.of(2L, 3L));
 
-        // 断言：批量插入 2 条 + 推 1503 给 owner（每条 1 帧）共 2 帧
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Collection<ImGroupRequestDO>> captor = ArgumentCaptor.forClass(Collection.class);
-        verify(groupRequestMapper).insertBatch(captor.capture());
+        // 断言：插入 2 条 + 推 1503 给 owner（每条 1 帧）共 2 帧
+        ArgumentCaptor<ImGroupRequestDO> captor = ArgumentCaptor.forClass(ImGroupRequestDO.class);
+        verify(groupRequestMapper, times(2)).insert(captor.capture());
         verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
         // 断言：每条记录 inviterUserId=1 + addSource=INVITE，避免审批通过后回写群成员留痕的来源为空 / 脏带旧值
-        Collection<ImGroupRequestDO> inserted = captor.getValue();
+        Collection<ImGroupRequestDO> inserted = captor.getAllValues();
         assertEquals(2, inserted.size());
         inserted.forEach(insert -> {
             assertEquals(1L, insert.getInviterUserId());
             assertEquals(ImGroupAddSourceEnum.INVITE.getSource(), insert.getAddSource());
         });
+    }
+
+    @Test
+    public void testCreateInviteRequestList_insertDuplicateKey_reuseOldRequest() {
+        ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
+                .joinApproval(true)
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        when(groupService.validateGroupExists(10L)).thenReturn(group);
+        ImGroupRequestDO old = new ImGroupRequestDO().setId(50L).setGroupId(10L).setUserId(2L)
+                .setHandleResult(ImGroupRequestHandleResultEnum.REFUSED.getResult());
+        when(groupRequestMapper.selectByGroupIdAndUserId(10L, 2L)).thenReturn(null, old);
+        when(groupRequestMapper.insert(any(ImGroupRequestDO.class))).thenThrow(new DuplicateKeyException("dup"));
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+                ImGroupMemberDO.builder().groupId(10L).userId(99L)
+                        .role(ImGroupMemberRoleEnum.OWNER.getRole())
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build()));
+        when(adminUserApi.getUserMap(anyCollection())).thenReturn(java.util.Map.of(2L, buildUser(2L, "用户A")));
+
+        // 调用
+        groupRequestService.createInviteRequestList(10L, 1L, List.of(2L));
+
+        // 断言：复用并重置旧邀请申请
+        verify(groupRequestMapper).updateInviteByIdReset(eq(50L), eq(1L),
+                eq(ImGroupAddSourceEnum.INVITE.getSource()), any());
+        verify(websocketService).sendPrivateMessageAsync(eq(99L), any(ImPrivateMessageDTO.class));
     }
 
     private AdminUserRespDTO buildUser(Long id, String nickname) {

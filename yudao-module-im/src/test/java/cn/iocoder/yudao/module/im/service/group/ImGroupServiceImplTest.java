@@ -769,7 +769,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     eq(ImGroupMemberRoleEnum.ADMIN.getRole()))).thenReturn(1);
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setUserIds(List.of(3L));
 
             groupService.addGroupAdmin(1L, reqVO);
@@ -797,7 +797,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     .thenReturn(3L);
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setUserIds(List.of(5L));
 
             ServiceException exception = assertThrows(ServiceException.class,
@@ -821,7 +821,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build()));
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setUserIds(List.of(1L));
 
             ServiceException exception = assertThrows(ServiceException.class,
@@ -845,7 +845,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setUserIds(List.of(2L));
 
             groupService.addGroupAdmin(1L, reqVO);
@@ -873,7 +873,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     eq(ImGroupMemberRoleEnum.NORMAL.getRole()))).thenReturn(1);
 
             ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setUserIds(List.of(2L));
 
             groupService.removeGroupAdmin(1L, reqVO);
@@ -899,7 +899,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
 
             ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setUserIds(List.of(2L));
 
             groupService.removeGroupAdmin(1L, reqVO);
@@ -928,7 +928,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     eq(ImGroupMemberRoleEnum.NORMAL.getRole()))).thenReturn(1);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setNewOwnerUserId(2L);
 
             groupService.transferGroupOwner(1L, reqVO);
@@ -956,7 +956,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setNewOwnerUserId(1L);
 
             ServiceException exception = assertThrows(ServiceException.class,
@@ -977,7 +977,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
-            reqVO.setGroupId(10L);
+            reqVO.setId(10L);
             reqVO.setNewOwnerUserId(2L);
 
             ServiceException exception = assertThrows(ServiceException.class,
@@ -1046,7 +1046,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build());
 
             ImGroupMuteMemberReqVO reqVO = new ImGroupMuteMemberReqVO();
-            reqVO.setGroupId(10L).setUserId(2L).setMutedSeconds(60);
+            reqVO.setId(10L).setUserId(2L).setMutedSeconds(60);
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.muteMember(1L, reqVO));

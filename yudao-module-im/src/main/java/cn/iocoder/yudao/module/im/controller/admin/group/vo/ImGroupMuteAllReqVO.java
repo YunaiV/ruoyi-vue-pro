@@ -8,10 +8,9 @@ import lombok.Data;
 @Data
 public class ImGroupMuteAllReqVO {
 
-    // TODO @AI：改成 id 是不是更好？
     @Schema(description = "群编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "群编号不能为空")
-    private Long groupId;
+    private Long id;
 
     @Schema(description = "是否全群禁言", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否全群禁言不能为空")

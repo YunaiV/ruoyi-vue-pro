@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -185,6 +186,31 @@ public class ImFriendRequestServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(ImFriendRequestHandleResultEnum.UNHANDLED.getResult(), result.getHandleResult());
         assertNull(result.getHandleContent());
         assertNull(result.getHandleTime());
+    }
+
+    @Test
+    public void testApplyFriend_insertDuplicateKey_reuseOldRequest() {
+        // 准备：首次查询不存在，插入时命中唯一键，回查到并发写入的旧申请
+        ImFriendRequestApplyReqVO reqVO = new ImFriendRequestApplyReqVO();
+        reqVO.setToUserId(2L).setApplyContent("并发申请").setDisplayName("老张").setAddSource(2);
+        when(friendService.getFriendState(1L, 2L)).thenReturn(ImFriendStateEnum.NONE.getState());
+        when(friendService.getFriend(2L, 1L)).thenReturn(null);
+        ImFriendRequestDO old = new ImFriendRequestDO().setId(100L).setFromUserId(1L).setToUserId(2L)
+                .setHandleResult(ImFriendRequestHandleResultEnum.REFUSED.getResult());
+        when(friendRequestMapper.selectByFromUserIdAndToUserId(1L, 2L)).thenReturn(null, old);
+        when(friendRequestMapper.insert(any(ImFriendRequestDO.class))).thenThrow(new DuplicateKeyException("dup"));
+        when(adminUserApi.getUser(1L)).thenReturn(null);
+        when(imProperties.getFriend()).thenReturn(new ImProperties.Friend());
+
+        // 调用
+        ImFriendRequestDO result = friendRequestService.applyFriend(1L, reqVO);
+
+        // 断言：复用并重置旧申请，不向上抛数据库异常
+        verify(friendRequestMapper).updateByIdReset(eq(100L), eq("并发申请"), eq("老张"), eq(2),
+                any(LocalDateTime.class));
+        assertEquals(100L, result.getId());
+        assertEquals(ImFriendRequestHandleResultEnum.UNHANDLED.getResult(), result.getHandleResult());
+        verify(websocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
     }
 
     // ========== agreeFriendRequest ==========

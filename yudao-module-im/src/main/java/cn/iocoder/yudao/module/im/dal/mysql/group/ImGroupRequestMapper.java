@@ -27,12 +27,6 @@ public interface ImGroupRequestMapper extends BaseMapperX<ImGroupRequestDO> {
                 .eq(ImGroupRequestDO::getUserId, userId));
     }
 
-    default List<ImGroupRequestDO> selectListByGroupIdAndUserIds(Long groupId, Collection<Long> userIds) {
-        return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
-                .eq(ImGroupRequestDO::getGroupId, groupId)
-                .in(ImGroupRequestDO::getUserId, userIds));
-    }
-
     default List<ImGroupRequestDO> selectListByGroupIdsAndHandleResult(Collection<Long> groupIds, Integer handleResult) {
         return selectList(new LambdaQueryWrapperX<ImGroupRequestDO>()
                 .in(ImGroupRequestDO::getGroupId, groupIds)
@@ -73,14 +67,9 @@ public interface ImGroupRequestMapper extends BaseMapperX<ImGroupRequestDO> {
                 .set(ImGroupRequestDO::getUpdateTime, updateTime));
     }
 
-    /**
-     * 复用邀请审批的旧记录（批量）：盖写 inviterUserId / addSource，重置为未处理 + 清空旧处理痕迹 + 刷 update_time
-     */
-    default int updateInviteByGroupIdAndUserIdsReset(Long groupId, Collection<Long> userIds,
-                                                     Long inviterUserId, Integer addSource, LocalDateTime updateTime) {
+    default int updateInviteByIdReset(Long id, Long inviterUserId, Integer addSource, LocalDateTime updateTime) {
         return update(null, new LambdaUpdateWrapper<ImGroupRequestDO>()
-                .eq(ImGroupRequestDO::getGroupId, groupId)
-                .in(ImGroupRequestDO::getUserId, userIds)
+                .eq(ImGroupRequestDO::getId, id)
                 .set(ImGroupRequestDO::getInviterUserId, inviterUserId)
                 .set(ImGroupRequestDO::getAddSource, addSource)
                 .set(ImGroupRequestDO::getHandleResult, ImGroupRequestHandleResultEnum.UNHANDLED.getResult())

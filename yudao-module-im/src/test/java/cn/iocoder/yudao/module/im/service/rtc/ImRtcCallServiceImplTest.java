@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.service.rtc;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallCreateReqVO;
+import cn.iocoder.yudao.module.im.controller.admin.rtc.vo.ImRtcCallInviteReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcCallDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.rtc.ImRtcParticipantDO;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -33,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_GROUP_INVITEE_REQUIRED;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_GROUP_INVITEE_OVER_LIMIT;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_SELF_BUSY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -125,6 +128,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
                 .thenReturn(1);
         ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
         when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(999L)).thenReturn(List.of(200L, 201L));
         // 房内 2 个 JOINED + 1 个 INVITING → shouldCloseGroupRoom 返 false
         when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
                 buildParticipant(20L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
@@ -221,6 +225,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
                 .thenReturn(1);
         ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
         when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(999L)).thenReturn(List.of(200L, 201L));
         // 让 shouldCloseGroupRoom 返 false
         when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
                 buildParticipant(20L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
@@ -293,6 +298,57 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(RTC_SELF_BUSY.getCode(), exception.getCode());
         verify(rtcParticipantMapper, never()).insert(any(ImRtcParticipantDO.class));
         verify(rtcParticipantMapper, never()).updateById(any(ImRtcParticipantDO.class));
+    }
+
+    @Test
+    public void testJoinCall_insertDuplicateKey_reuseExistingParticipant() {
+        // 准备：群通话活跃，首次查询无参与者，插入时命中唯一键
+        when(imProperties.getRtc()).thenReturn(new ImProperties.Rtc());
+        ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        when(groupMemberService.validateMemberInGroup(999L, 100L)).thenReturn(new ImGroupMemberDO());
+        when(rtcParticipantMapper.selectLastOneByUserIdAndStatusInAndRoomNot(eq(100L), anyCollection(), eq("r1")))
+                .thenReturn(null);
+        when(rtcParticipantMapper.selectByRoomAndUserId("r1", 100L))
+                .thenReturn(null, buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.JOINED));
+        when(rtcParticipantMapper.insert(any(ImRtcParticipantDO.class))).thenThrow(new DuplicateKeyException("dup"));
+
+        // 调用
+        ImRtcCallDO result = rtcCallService.joinCall(100L, "r1");
+
+        // 断言：不向上抛数据库异常
+        assertSame(call, result);
+        verify(rtcParticipantMapper, never()).updateById(any(ImRtcParticipantDO.class));
+    }
+
+    @Test
+    public void testInviteCall_overLimit_throws() throws Exception {
+        ImProperties.Rtc rtcConfig = new ImProperties.Rtc();
+        rtcConfig.setGroupMaxParticipants(3);
+        when(imProperties.getRtc()).thenReturn(rtcConfig);
+        ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
+        when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
+        when(rtcParticipantMapper.selectByRoomAndUserId("r1", 200L))
+                .thenReturn(buildParticipant(10L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED));
+        when(rtcCallLockRedisDAO.lockGroup(eq(999L), any())).thenAnswer(invocation -> {
+            @SuppressWarnings("unchecked")
+            Callable<Void> callable = invocation.getArgument(1);
+            return callable.call();
+        });
+        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
+                buildParticipant(10L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
+                buildParticipant(11L, "r1", 201L, ImRtcParticipantStatusEnum.JOINED),
+                buildParticipant(12L, "r1", 202L, ImRtcParticipantStatusEnum.INVITING)
+        ));
+        ImRtcCallInviteReqVO reqVO = new ImRtcCallInviteReqVO();
+        reqVO.setRoom("r1");
+        reqVO.setInviteeIds(Set.of(203L));
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> rtcCallService.inviteCall(200L, reqVO));
+
+        assertEquals(RTC_GROUP_INVITEE_OVER_LIMIT.getCode(), exception.getCode());
+        verify(rtcParticipantMapper, never()).insertBatch(anyList());
     }
 
     // ========== 测试数据构造 ==========

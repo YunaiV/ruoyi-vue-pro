@@ -13,7 +13,7 @@ public class ImGroupAdminAddReqVO {
 
     @Schema(description = "群编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "13279")
     @NotNull(message = "群编号不能为空")
-    private Long groupId;
+    private Long id;
 
     @Schema(description = "目标用户编号列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "[101, 102]")
     @NotEmpty(message = "目标用户编号列表不能为空")
