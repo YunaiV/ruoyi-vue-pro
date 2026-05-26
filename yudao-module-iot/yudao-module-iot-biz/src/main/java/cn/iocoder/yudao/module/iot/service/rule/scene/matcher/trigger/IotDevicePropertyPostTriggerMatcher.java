@@ -36,7 +36,13 @@ public class IotDevicePropertyPostTriggerMatcher implements IotSceneRuleTriggerM
             return false;
         }
 
-        // 1.3 检查消息中是否包含触发器指定的属性标识符
+        // 1.3 修复触发器中忽略了产品和设备的一致性验证，2025.05.25 by panda
+        if (IotSceneRuleMatcherHelper.productAndDeviceNotMatched(message, trigger.getProductId(),trigger.getDeviceId())){
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message,trigger,"触发器中产品或设备不匹配");
+            return false;
+        }
+
+        // 1.4 检查消息中是否包含触发器指定的属性标识符
         // 注意：属性上报可能同时上报多个属性，所以需要判断 trigger.getIdentifier() 是否在 message 的 params 中
         if (IotDeviceMessageUtils.notContainsIdentifier(message, trigger.getIdentifier())) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "消息中不包含属性: " +
