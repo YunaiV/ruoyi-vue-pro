@@ -16,6 +16,8 @@ public interface YayaContentService {
 
     Long createTopic(YayaTopicCreateReq req);
 
+    void updateTopic(Long id, YayaTopicCreateReq req);
+
     void replaceQuestions(Long topicId, List<YayaQuestionSaveReq> questions);
 
     PageResult<YayaTopicListItemResp> getTopicPage(YayaTopicPageReqVO req);

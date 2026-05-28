@@ -16,10 +16,12 @@ Branch: yaya/platform-a
 - Admin UI login smoke passed against the local RuoYi backend.
 - Yaya PostgreSQL schema baseline is applied locally with 17 `yaya_%` tables.
 - Yaya content domain DO, mapper, service, and service tests are implemented.
+- Yaya admin content API controllers, request/response VOs, and import endpoint placeholders are implemented.
+- `PATCH /admin-api/yaya/topics/{id}` preserves omitted fields for partial admin edits.
 
 ## Active Phase
 
-Phase 2 - Admin content APIs.
+Phase 2 - Content import pipeline.
 
 ## Known Issues
 
@@ -28,6 +30,8 @@ Phase 2 - Admin content APIs.
 - `pnpm ts:check` fails in the upstream admin UI checkout with existing type debt. `build:local` and browser login smoke pass.
 - The logged-in dashboard has one non-blocking external demo avatar image error from `test.yudao.iocoder.cn` returning HTTP 502.
 - Vector and embedding tables are deferred until the local PostgreSQL runtime includes pgvector.
+- Yaya admin menu/permission seed data is not added yet; Task 7 will wire the admin UI menu and permission integration.
+- `POST /admin-api/yaya/import-batches/{season}:run` is intentionally guarded with `NOT_IMPLEMENTED` until Task 6 wires the real import pipeline.
 
 ## Runtime Snapshot
 
@@ -38,6 +42,10 @@ Phase 2 - Admin content APIs.
 
 ## Latest Verification
 
-- `YayaContentServiceImplTest`: 5 tests, 0 failures, 0 errors.
-- Backend package: `mvn -Dmaven.repo.local=/m2/repository -DskipTests package` returned `BUILD SUCCESS`.
-- Backend health after schema and Java content changes: `{"code":0,"msg":"","data":"ok"}`.
+- `YayaContentServiceImplTest`, `YayaImportServiceImplTest`, `YayaTopicControllerTest`, `YayaImportControllerTest`: 16 tests, 0 failures, 0 errors.
+- Backend package: `mvn -Dmaven.repo.local=/m2/repository -DskipTests clean package` returned `BUILD SUCCESS`.
+- Backend health after admin content API changes: `{"code":0,"msg":"","data":"ok"}`.
+- Runtime admin API smoke after jar restart:
+  - `GET /admin-api/yaya/topics?pageNo=1&pageSize=10` returns `{"code":401,"msg":"账号未登录","data":null}` without login.
+  - `POST /admin-api/yaya/import-batches/26Q1:preview` returns `{"code":401,"msg":"账号未登录","data":null}` without login.
+  - `POST /admin-api/yaya/import-batches/26Q1:run` returns `{"code":401,"msg":"账号未登录","data":null}` without login.

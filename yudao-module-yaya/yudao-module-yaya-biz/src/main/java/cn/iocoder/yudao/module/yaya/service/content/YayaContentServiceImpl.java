@@ -58,6 +58,27 @@ public class YayaContentServiceImpl implements YayaContentService {
         validateTopicStableKeyUnique(null, req.getSeasonId(), req.getPart(), req.getStableKey());
 
         YayaPracticeTopicDO topic = new YayaPracticeTopicDO();
+        copyTopicFields(req, topic);
+        topicMapper.insert(topic);
+        return topic.getId();
+    }
+
+    @Override
+    public void updateTopic(Long id, YayaTopicCreateReq req) {
+        YayaPracticeTopicDO existing = validateTopicExists(id);
+        Long seasonId = valueOr(req.getSeasonId(), existing.getSeasonId());
+        Integer part = valueOr(req.getPart(), existing.getPart());
+        String stableKey = valueOr(req.getStableKey(), existing.getStableKey());
+        validateSeasonExists(seasonId);
+        validateTopicStableKeyUnique(id, seasonId, part, stableKey);
+
+        YayaPracticeTopicDO topic = new YayaPracticeTopicDO();
+        topic.setId(id);
+        mergeTopicFields(req, existing, topic);
+        topicMapper.updateById(topic);
+    }
+
+    private void copyTopicFields(YayaTopicCreateReq req, YayaPracticeTopicDO topic) {
         topic.setLegacyUuid(req.getLegacyUuid());
         topic.setSeasonId(req.getSeasonId());
         topic.setSourceSnapshotId(req.getSourceSnapshotId());
@@ -74,8 +95,25 @@ public class YayaContentServiceImpl implements YayaContentService {
         topic.setReviewStatus(defaultString(req.getReviewStatus(), "draft"));
         topic.setPublishStatus(defaultString(req.getPublishStatus(), "draft"));
         topic.setMetadata(defaultMap(req.getMetadata()));
-        topicMapper.insert(topic);
-        return topic.getId();
+    }
+
+    private void mergeTopicFields(YayaTopicCreateReq req, YayaPracticeTopicDO existing, YayaPracticeTopicDO topic) {
+        topic.setLegacyUuid(valueOr(req.getLegacyUuid(), existing.getLegacyUuid()));
+        topic.setSeasonId(valueOr(req.getSeasonId(), existing.getSeasonId()));
+        topic.setSourceSnapshotId(valueOr(req.getSourceSnapshotId(), existing.getSourceSnapshotId()));
+        topic.setPart(valueOr(req.getPart(), existing.getPart()));
+        topic.setStableKey(valueOr(req.getStableKey(), existing.getStableKey()));
+        topic.setTopicNo(valueOr(req.getTopicNo(), existing.getTopicNo()));
+        topic.setTitleEn(valueOr(req.getTitleEn(), existing.getTitleEn()));
+        topic.setTitleZh(valueOr(req.getTitleZh(), existing.getTitleZh()));
+        topic.setTopicType(valueOr(req.getTopicType(), existing.getTopicType()));
+        topic.setCategory(valueOr(req.getCategory(), existing.getCategory()));
+        topic.setPromptEn(valueOr(req.getPromptEn(), existing.getPromptEn()));
+        topic.setPromptZh(valueOr(req.getPromptZh(), existing.getPromptZh()));
+        topic.setDisplayOrder(valueOr(req.getDisplayOrder(), existing.getDisplayOrder()));
+        topic.setReviewStatus(valueOr(req.getReviewStatus(), existing.getReviewStatus()));
+        topic.setPublishStatus(valueOr(req.getPublishStatus(), existing.getPublishStatus()));
+        topic.setMetadata(valueOr(req.getMetadata(), existing.getMetadata()));
     }
 
     @Override
@@ -222,6 +260,10 @@ public class YayaContentServiceImpl implements YayaContentService {
 
     private static Map<String, Object> defaultMap(Map<String, Object> value) {
         return value == null ? Collections.emptyMap() : value;
+    }
+
+    private static <T> T valueOr(T value, T fallback) {
+        return value == null ? fallback : value;
     }
 
 }

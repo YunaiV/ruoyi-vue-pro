@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.yaya.enums.YayaErrorCodeConstants.YAYA_TOPIC_STABLE_KEY_DUPLICATE;
@@ -104,6 +105,26 @@ class YayaContentServiceImplTest extends BaseDbUnitTest {
         assertServiceException(
                 () -> contentService.createTopic(topicReq(seasonId, 1, "part1-work", "Work duplicate")),
                 YAYA_TOPIC_STABLE_KEY_DUPLICATE);
+    }
+
+    @Test
+    void updateTopicShouldPreserveOmittedFieldsForPatch() {
+        Long seasonId = createSeason("26Q1");
+        Long topicId = contentService.createTopic(topicReq(seasonId, 1, "part1-work", "Work")
+                .setPromptEn("Original prompt")
+                .setPublishStatus("published")
+                .setMetadata(Map.of("source", "legacy")));
+
+        contentService.updateTopic(topicId, new YayaTopicCreateReq().setTitleEn("Updated Work"));
+
+        YayaPracticeTopicDO topic = topicMapper.selectById(topicId);
+        assertEquals("Updated Work", topic.getTitleEn());
+        assertEquals(seasonId, topic.getSeasonId());
+        assertEquals(1, topic.getPart());
+        assertEquals("part1-work", topic.getStableKey());
+        assertEquals("Original prompt", topic.getPromptEn());
+        assertEquals("published", topic.getPublishStatus());
+        assertEquals(Map.of("source", "legacy"), topic.getMetadata());
     }
 
     @Test
