@@ -26,6 +26,7 @@
 <!--        <module>yudao-module-iot</module>-->
 <!--        <module>yudao-module-mes</module>-->
         <module>yudao-module-wms</module>
+        <module>yudao-module-yaya</module>
 <!-- 请参考 https://doc.iocoder.cn/ai/build/ 文档，完成 AI 模块的启动！！！ -->
 <!--        <module>yudao-module-ai</module>-->
     </modules>
