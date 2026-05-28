@@ -35,10 +35,15 @@ Branch: yaya/platform-a
 - Yaya app evaluation APIs are implemented under `/app-api/yaya/evaluations`, creating `yaya_evaluation` and `yaya_ai_task` records before dispatching to the Python AI service.
 - Evaluation option flags from the app request are normalized to Python service snake_case keys in `yaya_ai_task.request_payload`.
 - The Task 11 runtime 500 from PostgreSQL `yaya_ai_task.task_key` NOT NULL enforcement is fixed by assigning a temporary task key before insert and replacing it with the Java-owned task id before dispatch.
+- Yaya member plan and entitlement services are implemented with default plans `free-trial`, `monthly-pro`, and `quarterly-pro`.
+- Yaya member plan admin APIs are implemented under `/admin-api/yaya/member-plans`.
+- Yaya app entitlement API is implemented under `/app-api/yaya/entitlements/me`.
+- Paid app evaluation APIs now require an active entitlement; free app practice topic APIs remain ungated.
+- The member plan catalog is treated as global RuoYi data with `@TenantIgnore`, while member entitlements remain tenant-scoped.
 
 ## Active Phase
 
-Phase 8 - Member plans and entitlements.
+Phase 9 - RuoYi Pay membership order integration.
 
 ## Known Issues
 
@@ -50,6 +55,8 @@ Phase 8 - Member plans and entitlements.
 - The local legacy Yaya PostgreSQL database is on `127.0.0.1:5433`, not the example `5432` in the original plan.
 - Task 7 uses RuoYi dynamic `system_menu` seed data instead of static router module entries, because the admin shell builds business routes from backend menus.
 - When the backend runs inside Docker and the Python AI service runs on the host, `--yaya.ai.base-url=http://host.docker.internal:18080` is required; `127.0.0.1:18080` points at the backend container itself.
+- Compatibility-route entitlement enforcement is deferred to Task 14 because the compatibility controller does not exist yet.
+- Member-plan admin API permissions are present on the controller, but no dedicated admin UI page or menu seed has been added yet.
 
 ## Runtime Snapshot
 
@@ -115,3 +122,17 @@ Phase 8 - Member plans and entitlements.
   - PostgreSQL confirmed `yaya_evaluation id=4 member_user_id=10003 recording_id=4 topic_id=146 ai_task_id=4 status=PENDING`.
   - PostgreSQL confirmed `yaya_ai_task id=4 member_user_id=10003 recording_id=4 topic_id=146 task_key=4 status=PENDING`.
   - PostgreSQL confirmed `request_payload.options` preserved `run_text_route=false`, `run_audio_route=false`, `run_pronunciation_route=true`, and `run_improvement=false`.
+- Task 12 PostgreSQL migration reapplied idempotently; `yaya_member_plan` contains `free-trial`, `monthly-pro`, and `quarterly-pro`.
+- Task 12 focused Java tests: `YayaEntitlementServiceImplTest`, `YayaMemberPlanControllerTest`, `YayaAppEntitlementControllerTest`, `YayaEvaluationServiceImplTest`: 14 tests, 0 failures, 0 errors.
+- Task 12 Yaya backend slice: content, import, practice, AI, recording, evaluation, and entitlement tests: 52 tests, 0 failures, 0 errors.
+- Task 12 backend package via Docker Maven returned `BUILD SUCCESS`.
+- Backend restart smoke after Task 12 returned `GET /admin-api/yaya/health` as `{"code":0,"msg":"","data":"ok"}`.
+- Authenticated Task 12 smoke with `Authorization: Bearer test10004` and `tenant-id: 1`:
+  - `GET /app-api/yaya/entitlements/me` returned `active=false` before manual entitlement grant.
+  - `POST /app-api/yaya/recordings` returned `recordingId=6`, `status=stored`.
+  - `POST /app-api/yaya/evaluations` before entitlement returned controlled error `code=1050006003`.
+  - Manual tenant-1 `monthly-pro` entitlement grant made `GET /app-api/yaya/entitlements/me` return `active=true`, `planKey=monthly-pro`.
+  - `POST /app-api/yaya/evaluations` after entitlement returned `evaluationId=5`, `aiTaskId=5`, `status=PENDING`.
+  - PostgreSQL confirmed `yaya_evaluation id=5 member_user_id=10004 recording_id=6 ai_task_id=5 status=PENDING`.
+  - PostgreSQL confirmed `yaya_ai_task id=5` preserved `request_payload.options` with `run_text_route=false`, `run_audio_route=false`, `run_pronunciation_route=true`, and `run_improvement=false`.
+  - Temporary recording files and manual smoke entitlements were cleaned after verification.

@@ -66,3 +66,22 @@ CREATE TABLE IF NOT EXISTS yaya_member_entitlement (
 CREATE INDEX IF NOT EXISTS idx_yaya_legacy_user_member ON yaya_legacy_user_map (member_user_id);
 CREATE INDEX IF NOT EXISTS idx_yaya_entitlement_user_status ON yaya_member_entitlement (member_user_id, status, ends_at);
 CREATE INDEX IF NOT EXISTS idx_yaya_entitlement_plan ON yaya_member_entitlement (plan_id);
+
+INSERT INTO yaya_member_plan (
+  id, plan_key, name, description, price_cent, currency, duration_days, active, benefits
+) VALUES
+  (nextval('yaya_member_plan_seq'), 'free-trial', 'Free Trial', '7-day limited trial', 0, 'CNY', 7, 1,
+   '{"evaluationLimit":3,"fullAccess":false}'::jsonb),
+  (nextval('yaya_member_plan_seq'), 'monthly-pro', 'Monthly Pro', '30-day full access', 3900, 'CNY', 30, 1,
+   '{"fullAccess":true}'::jsonb),
+  (nextval('yaya_member_plan_seq'), 'quarterly-pro', 'Quarterly Pro', '90-day full access', 9900, 'CNY', 90, 1,
+   '{"fullAccess":true}'::jsonb)
+ON CONFLICT (plan_key) DO UPDATE SET
+  name = EXCLUDED.name,
+  description = EXCLUDED.description,
+  price_cent = EXCLUDED.price_cent,
+  currency = EXCLUDED.currency,
+  duration_days = EXCLUDED.duration_days,
+  active = EXCLUDED.active,
+  benefits = EXCLUDED.benefits,
+  update_time = CURRENT_TIMESTAMP;

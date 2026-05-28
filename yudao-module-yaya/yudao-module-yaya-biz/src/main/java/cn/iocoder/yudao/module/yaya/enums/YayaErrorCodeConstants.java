@@ -24,4 +24,8 @@ public interface YayaErrorCodeConstants {
 
     ErrorCode YAYA_EVALUATION_NOT_EXISTS = new ErrorCode(1_050_005_001, "Yaya 测评不存在");
 
+    ErrorCode YAYA_MEMBER_PLAN_NOT_EXISTS = new ErrorCode(1_050_006_001, "Yaya 会员套餐不存在");
+    ErrorCode YAYA_MEMBER_PLAN_KEY_DUPLICATE = new ErrorCode(1_050_006_002, "Yaya 会员套餐 key 已存在");
+    ErrorCode YAYA_ENTITLEMENT_REQUIRED = new ErrorCode(1_050_006_003, "Yaya 会员权益不足");
+
 }

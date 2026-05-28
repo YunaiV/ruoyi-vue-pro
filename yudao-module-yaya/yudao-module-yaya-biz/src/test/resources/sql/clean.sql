@@ -1,3 +1,5 @@
+DELETE FROM "yaya_member_entitlement";
+DELETE FROM "yaya_member_plan";
 DELETE FROM "yaya_evaluation";
 DELETE FROM "yaya_ai_task";
 DELETE FROM "yaya_recording";

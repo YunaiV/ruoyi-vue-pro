@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.yaya.dal.dataobject.recording.YayaRecordingDO;
 import cn.iocoder.yudao.module.yaya.dal.mysql.evaluation.YayaEvaluationMapper;
 import cn.iocoder.yudao.module.yaya.dal.mysql.recording.YayaRecordingMapper;
 import cn.iocoder.yudao.module.yaya.service.ai.YayaAiTaskService;
+import cn.iocoder.yudao.module.yaya.service.member.YayaEntitlementService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -32,6 +33,8 @@ class YayaEvaluationServiceImplTest extends BaseDbUnitTest {
     private YayaRecordingMapper recordingMapper;
     @MockitoBean
     private YayaAiTaskService aiTaskService;
+    @MockitoBean
+    private YayaEntitlementService entitlementService;
 
     @Test
     void createEvaluationShouldPersistEvaluationAndCreateAiTask() {
@@ -52,6 +55,7 @@ class YayaEvaluationServiceImplTest extends BaseDbUnitTest {
         assertEquals(40001L, evaluation.getAiTaskId());
         assertEquals("PENDING", evaluation.getStatus());
         assertEquals(40001L, response.getAiTaskId());
+        verify(entitlementService).requireActiveEntitlement(10001L);
         verify(aiTaskService).createEvaluationTask(10001L, recordingId, 146L, response.getId(),
                 Map.of("runTextRoute", true));
     }
@@ -83,6 +87,23 @@ class YayaEvaluationServiceImplTest extends BaseDbUnitTest {
                         .setTopicId(146L)));
 
         assertEquals(YAYA_MEMBER_NOT_LOGIN.getCode(), exception.getCode());
+        verifyNoInteractions(aiTaskService);
+        verifyNoInteractions(entitlementService);
+    }
+
+    @Test
+    void createEvaluationShouldStopWhenEntitlementIsMissing() {
+        Long recordingId = insertRecording(10001L, 146L);
+        doThrow(new ServiceException(1_050_006_003, "Yaya 会员权益不足")).when(entitlementService)
+                .requireActiveEntitlement(10001L);
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> evaluationService.createEvaluation(10001L, new YayaAppEvaluationCreateReqVO()
+                        .setRecordingId(recordingId)
+                        .setTopicId(146L)));
+
+        assertEquals(1_050_006_003, exception.getCode());
+        verify(entitlementService).requireActiveEntitlement(10001L);
         verifyNoInteractions(aiTaskService);
     }
 

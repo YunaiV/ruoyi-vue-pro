@@ -1282,7 +1282,7 @@ git commit -m "feat: add Yaya recording and evaluation APIs"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/service/member/*`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/service/member/*Test.java`
 
-- [ ] **Step 1: Define default plans**
+- [x] **Step 1: Define default plans**
 
 Seed plans:
 
@@ -1292,7 +1292,7 @@ monthly-pro: 39 CNY, 30 days, full practice and evaluation access
 quarterly-pro: 99 CNY, 90 days, full practice and evaluation access
 ```
 
-- [ ] **Step 2: Implement admin plan CRUD**
+- [x] **Step 2: Implement admin plan CRUD**
 
 Admin endpoints:
 
@@ -1303,7 +1303,7 @@ PATCH /admin-api/yaya/member-plans/{id}
 PATCH /admin-api/yaya/member-plans/{id}/status
 ```
 
-- [ ] **Step 3: Implement entitlement check**
+- [x] **Step 3: Implement entitlement check**
 
 App endpoint:
 
@@ -1321,7 +1321,7 @@ Response fields:
 }
 ```
 
-- [ ] **Step 4: Enforce entitlement in paid APIs**
+- [x] **Step 4: Enforce entitlement in paid APIs**
 
 Paid-gated APIs:
 
@@ -1338,7 +1338,11 @@ GET /app-api/yaya/practice/topics
 GET /app-api/yaya/practice/topics/{id}
 ```
 
-- [ ] **Step 5: Verify**
+Note: the app evaluation endpoints are gated now. The compatibility route is
+still deferred to Task 14 because the compatibility controller is not present
+yet.
+
+- [x] **Step 5: Verify**
 
 Run:
 
@@ -1357,7 +1361,7 @@ docker run --rm -u "$(id -u):$(id -g)" \
 
 Expected: tests pass.
 
-- [ ] **Step 6: Commit entitlement system**
+- [x] **Step 6: Commit entitlement system**
 
 Run:
 

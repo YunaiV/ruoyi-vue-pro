@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.yaya.dal.dataobject.recording.YayaRecordingDO;
 import cn.iocoder.yudao.module.yaya.dal.mysql.evaluation.YayaEvaluationMapper;
 import cn.iocoder.yudao.module.yaya.dal.mysql.recording.YayaRecordingMapper;
 import cn.iocoder.yudao.module.yaya.service.ai.YayaAiTaskService;
+import cn.iocoder.yudao.module.yaya.service.member.YayaEntitlementService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -31,10 +32,13 @@ public class YayaEvaluationServiceImpl implements YayaEvaluationService {
     private YayaRecordingMapper recordingMapper;
     @Resource
     private YayaAiTaskService aiTaskService;
+    @Resource
+    private YayaEntitlementService entitlementService;
 
     @Override
     public YayaAppEvaluationRespVO createEvaluation(Long memberUserId, YayaAppEvaluationCreateReqVO reqVO) {
         requireMember(memberUserId);
+        entitlementService.requireActiveEntitlement(memberUserId);
         YayaRecordingDO recording = validateRecording(memberUserId, reqVO.getRecordingId());
         Long topicId = reqVO.getTopicId() == null ? recording.getTopicId() : reqVO.getTopicId();
 
@@ -68,6 +72,7 @@ public class YayaEvaluationServiceImpl implements YayaEvaluationService {
     @Override
     public YayaAppEvaluationRespVO createPolishPack(Long memberUserId, Long evaluationId) {
         requireMember(memberUserId);
+        entitlementService.requireActiveEntitlement(memberUserId);
         return toResp(validateEvaluation(memberUserId, evaluationId)).setPolishPackStatus(STATUS_PENDING);
     }
 
