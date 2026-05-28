@@ -1,3 +1,6 @@
+DELETE FROM "yaya_practice_attempt";
+DELETE FROM "yaya_user_topic_state";
+DELETE FROM "yaya_favorite";
 DELETE FROM "yaya_topic_tag";
 DELETE FROM "yaya_tag";
 DELETE FROM "yaya_topic_relation";

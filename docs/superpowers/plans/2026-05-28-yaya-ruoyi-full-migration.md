@@ -949,7 +949,7 @@ git commit -m "feat: add Yaya admin content pages"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/service/practice/*`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/controller/app/practice/YayaAppPracticeControllerTest.java`
 
-- [ ] **Step 1: Write app API tests**
+- [x] **Step 1: Write app API tests**
 
 Test:
 
@@ -962,7 +962,7 @@ POST /app-api/yaya/practice/attempts
 
 Expected before implementation: compilation fails.
 
-- [ ] **Step 2: Implement published-only topic list**
+- [x] **Step 2: Implement published-only topic list**
 
 The list endpoint must:
 
@@ -971,7 +971,7 @@ The list endpoint must:
 - include `favorite` and `practiced` flags when a logged-in member exists
 - return unauthenticated results without user overlays
 
-- [ ] **Step 3: Implement favorite and attempt writes**
+- [x] **Step 3: Implement favorite and attempt writes**
 
 Create tables if not already present:
 
@@ -983,7 +983,7 @@ yaya_practice_attempt
 
 Use `member_user_id` for user ownership.
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run:
 
@@ -1002,7 +1002,7 @@ docker run --rm -u "$(id -u):$(id -g)" \
 
 Expected: tests pass.
 
-- [ ] **Step 5: Runtime smoke**
+- [x] **Step 5: Runtime smoke**
 
 Run:
 
@@ -1012,7 +1012,7 @@ curl -fsS "http://127.0.0.1:48080/app-api/yaya/practice/topics?part=1&season=26Q
 
 Expected: JSON response with a `list` and `total`.
 
-- [ ] **Step 6: Commit app practice APIs**
+- [x] **Step 6: Commit app practice APIs**
 
 Run:
 

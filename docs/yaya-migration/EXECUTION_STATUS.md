@@ -24,10 +24,13 @@ Branch: yaya/platform-a
 - Yaya admin content topic and import batch pages are implemented in the RuoYi Vue3 admin UI.
 - Yaya dynamic menu and permission seed data is implemented in `sql/postgresql/yaya/20260528_yaya_admin_menu.sql`.
 - Task 7 quality review fixes are applied: topic detail responses preserve question `legacyUuid`, and Yaya role-menu seed idempotency is scoped to `tenant_id = 1`.
+- Yaya app practice APIs are implemented under `/app-api/yaya/practice/*`.
+- App practice persistence tables are implemented in `sql/postgresql/yaya/20260528_yaya_practice_app.sql`: `yaya_favorite`, `yaya_user_topic_state`, and `yaya_practice_attempt`.
+- App practice topic state updates now use atomic `attempt_count = attempt_count + 1` updates for repeated member attempts.
 
 ## Active Phase
 
-Phase 4 - App practice APIs.
+Phase 5 - Python AI service extraction.
 
 ## Known Issues
 
@@ -67,3 +70,15 @@ Phase 4 - App practice APIs.
   - `POST /admin-api/yaya/import-batches/26Q1:run` returned `{"seasonKey":"26Q1","topics":146,"questions":606,"errors":[]}`.
   - PostgreSQL counts after repeated run: `yaya_practice_topic=146`, `yaya_practice_question=606`, active `yaya_practice_question=606`, `yaya_import_batch=5`.
   - Latest import batch summary: `id=5`, `season_key=26Q1`, `status=completed`, `writtenQuestions=606`, `updatedTopics=146`.
+- Task 8 focused backend tests: `YayaAppPracticeControllerTest`, `YayaPracticeServiceImplTest`: 7 tests, 0 failures, 0 errors.
+- Task 8 Yaya backend slice: `YayaContentServiceImplTest`, `YayaImportServiceImplTest`, `YayaTopicControllerTest`, `YayaImportControllerTest`, `YayaAppPracticeControllerTest`, `YayaPracticeServiceImplTest`: 26 tests, 0 failures, 0 errors.
+- Task 8 SQL migration reapplied idempotently against local PostgreSQL.
+- Task 8 backend package: `mvn -Dmaven.repo.local=/m2/repository -DskipTests clean package` returned `BUILD SUCCESS`.
+- Anonymous app practice smoke without `tenant-id`:
+  - `GET /app-api/yaya/practice/topics?part=3&season=26Q1&pageNo=1&pageSize=1` returned `total=53`, first topic `id=146`, `favorite=false`, `practiced=false`.
+  - `GET /app-api/yaya/practice/topics/146` returned `questionCount=6`, `favorite=false`, `practiced=false`.
+- Member app practice smoke with `Authorization: Bearer test10003` and `tenant-id: 1`:
+  - `POST /app-api/yaya/practice/favorites` returned `favoriteId=3`.
+  - Two `POST /app-api/yaya/practice/attempts` calls returned `attemptId=3` and `attemptId=4`.
+  - Authenticated detail returned `favorite=true`, `practiced=true`, `questionCount=6`.
+  - PostgreSQL counts for `member_user_id=10003`, `topic_id=146`: `favorite=1`, `attempt=2`, `state=1`, `attempt_count=2`.
