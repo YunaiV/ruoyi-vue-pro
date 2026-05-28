@@ -14,10 +14,11 @@ Branch: yaya/platform-a
 - Official `yudao-ui-admin-vue3` is pinned as a Git submodule.
 - Admin UI dependency install and `build:local` completed successfully.
 - Admin UI login smoke passed against the local RuoYi backend.
+- Yaya PostgreSQL schema baseline is applied locally with 17 `yaya_%` tables.
 
 ## Active Phase
 
-Phase 2 - Yaya PostgreSQL schema.
+Phase 2 - Java content domain.
 
 ## Known Issues
 
@@ -25,6 +26,7 @@ Phase 2 - Yaya PostgreSQL schema.
 - Port `8080` is occupied by another local Docker service, so the admin UI dev server is running on `127.0.0.1:18081`.
 - `pnpm ts:check` fails in the upstream admin UI checkout with existing type debt. `build:local` and browser login smoke pass.
 - The logged-in dashboard has one non-blocking external demo avatar image error from `test.yudao.iocoder.cn` returning HTTP 502.
+- Vector and embedding tables are deferred until the local PostgreSQL runtime includes pgvector.
 
 ## Runtime Snapshot
 
