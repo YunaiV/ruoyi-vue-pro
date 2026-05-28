@@ -28,6 +28,12 @@
             <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
         </dependency>
 
+        <!-- DB 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
+        </dependency>
+
         <!-- Web 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

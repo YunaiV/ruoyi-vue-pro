@@ -1,3 +1,5 @@
+CREATE SEQUENCE IF NOT EXISTS yaya_content_module_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_content_module (
   id int8 NOT NULL,
   module_key varchar(80) NOT NULL,
@@ -12,6 +14,8 @@ CREATE TABLE IF NOT EXISTS yaya_content_module (
   CONSTRAINT pk_yaya_content_module PRIMARY KEY (id),
   CONSTRAINT uk_yaya_content_module_key UNIQUE (module_key)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_content_season_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_content_season (
   id int8 NOT NULL,
@@ -29,6 +33,8 @@ CREATE TABLE IF NOT EXISTS yaya_content_season (
   CONSTRAINT uk_yaya_content_season_key UNIQUE (season_key)
 );
 
+CREATE SEQUENCE IF NOT EXISTS yaya_import_batch_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_import_batch (
   id int8 NOT NULL,
   season_key varchar(40) NOT NULL,
@@ -45,6 +51,8 @@ CREATE TABLE IF NOT EXISTS yaya_import_batch (
   CONSTRAINT pk_yaya_import_batch PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE IF NOT EXISTS yaya_source_document_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_source_document (
   id int8 NOT NULL,
   import_batch_id int8 NOT NULL,
@@ -60,6 +68,8 @@ CREATE TABLE IF NOT EXISTS yaya_source_document (
   tenant_id int8 NOT NULL DEFAULT 0,
   CONSTRAINT pk_yaya_source_document PRIMARY KEY (id)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_source_topic_snapshot_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_source_topic_snapshot (
   id int8 NOT NULL,
@@ -78,6 +88,8 @@ CREATE TABLE IF NOT EXISTS yaya_source_topic_snapshot (
   CONSTRAINT pk_yaya_source_topic_snapshot PRIMARY KEY (id),
   CONSTRAINT uk_yaya_source_topic_hash UNIQUE (source_hash)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_practice_topic_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_practice_topic (
   id int8 NOT NULL,
@@ -107,6 +119,8 @@ CREATE TABLE IF NOT EXISTS yaya_practice_topic (
   CONSTRAINT uk_yaya_topic_stable_key UNIQUE (season_id, part, stable_key)
 );
 
+CREATE SEQUENCE IF NOT EXISTS yaya_practice_question_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_practice_question (
   id int8 NOT NULL,
   legacy_uuid varchar(64) NULL,
@@ -128,6 +142,8 @@ CREATE TABLE IF NOT EXISTS yaya_practice_question (
   CONSTRAINT pk_yaya_practice_question PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE IF NOT EXISTS yaya_topic_relation_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_topic_relation (
   id int8 NOT NULL,
   source_topic_id int8 NOT NULL,
@@ -144,6 +160,8 @@ CREATE TABLE IF NOT EXISTS yaya_topic_relation (
   CONSTRAINT pk_yaya_topic_relation PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE IF NOT EXISTS yaya_tag_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_tag (
   id int8 NOT NULL,
   tag_key varchar(80) NOT NULL,
@@ -157,6 +175,8 @@ CREATE TABLE IF NOT EXISTS yaya_tag (
   CONSTRAINT pk_yaya_tag PRIMARY KEY (id),
   CONSTRAINT uk_yaya_tag_key UNIQUE (tag_key)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_topic_tag_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_topic_tag (
   id int8 NOT NULL,

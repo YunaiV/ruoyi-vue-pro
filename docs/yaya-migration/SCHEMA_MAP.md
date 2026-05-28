@@ -46,6 +46,8 @@ separate owners.
 - Yaya user-owned rows reference RuoYi `member_user.id` by `member_user_id`.
 - The schema avoids physical foreign keys in the first baseline, matching
   common RuoYi operational practice and keeping imports/replays simple.
+- Every `yaya_*` table has a matching `yaya_*_seq` sequence for RuoYi
+  `@KeySequence` based PostgreSQL ID allocation.
 - Vector tables are intentionally deferred until the runtime image includes
   pgvector; the current local acceptance database is `postgres:14.2`.
 
@@ -105,4 +107,14 @@ curl -fsS http://127.0.0.1:48080/admin-api/yaya/health
 
 ```json
 {"code":0,"msg":"","data":"ok"}
+```
+
+Sequence verification after the Java content domain added RuoYi DO classes:
+
+```bash
+docker exec yaya-ruoyi-pg-phase0 psql -U root -d ruoyi-vue-pro -Atc "select count(*) from information_schema.sequences where sequence_schema='public' and sequence_name like 'yaya_%_seq';"
+```
+
+```text
+17
 ```

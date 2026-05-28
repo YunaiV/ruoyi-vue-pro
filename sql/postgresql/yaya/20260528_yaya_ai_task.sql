@@ -1,3 +1,5 @@
+CREATE SEQUENCE IF NOT EXISTS yaya_recording_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_recording (
   id int8 NOT NULL,
   member_user_id int8 NOT NULL,
@@ -20,6 +22,8 @@ CREATE TABLE IF NOT EXISTS yaya_recording (
   CONSTRAINT pk_yaya_recording PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE IF NOT EXISTS yaya_transcript_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_transcript (
   id int8 NOT NULL,
   recording_id int8 NOT NULL,
@@ -34,6 +38,8 @@ CREATE TABLE IF NOT EXISTS yaya_transcript (
   tenant_id int8 NOT NULL DEFAULT 0,
   CONSTRAINT pk_yaya_transcript PRIMARY KEY (id)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_ai_task_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_ai_task (
   id int8 NOT NULL,
@@ -54,6 +60,8 @@ CREATE TABLE IF NOT EXISTS yaya_ai_task (
   CONSTRAINT pk_yaya_ai_task PRIMARY KEY (id),
   CONSTRAINT uk_yaya_ai_task_key UNIQUE (task_key)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_evaluation_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_evaluation (
   id int8 NOT NULL,

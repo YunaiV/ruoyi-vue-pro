@@ -15,10 +15,11 @@ Branch: yaya/platform-a
 - Admin UI dependency install and `build:local` completed successfully.
 - Admin UI login smoke passed against the local RuoYi backend.
 - Yaya PostgreSQL schema baseline is applied locally with 17 `yaya_%` tables.
+- Yaya content domain DO, mapper, service, and service tests are implemented.
 
 ## Active Phase
 
-Phase 2 - Java content domain.
+Phase 2 - Admin content APIs.
 
 ## Known Issues
 
@@ -34,3 +35,9 @@ Phase 2 - Java content domain.
 - Admin UI: `yaya-ruoyi-admin-ui` screen session on `127.0.0.1:18081`
 - PostgreSQL: `yaya-ruoyi-pg-phase0` on `127.0.0.1:55432`
 - Redis: `yaya-ruoyi-redis-phase0` on `127.0.0.1:56379`
+
+## Latest Verification
+
+- `YayaContentServiceImplTest`: 5 tests, 0 failures, 0 errors.
+- Backend package: `mvn -Dmaven.repo.local=/m2/repository -DskipTests package` returned `BUILD SUCCESS`.
+- Backend health after schema and Java content changes: `{"code":0,"msg":"","data":"ok"}`.

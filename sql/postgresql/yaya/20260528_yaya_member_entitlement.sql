@@ -1,3 +1,5 @@
+CREATE SEQUENCE IF NOT EXISTS yaya_legacy_user_map_seq;
+
 CREATE TABLE IF NOT EXISTS yaya_legacy_user_map (
   id int8 NOT NULL,
   legacy_uuid varchar(64) NOT NULL,
@@ -15,6 +17,8 @@ CREATE TABLE IF NOT EXISTS yaya_legacy_user_map (
   CONSTRAINT uk_yaya_legacy_uuid UNIQUE (legacy_uuid),
   CONSTRAINT uk_yaya_legacy_external_id UNIQUE (legacy_external_id)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_member_plan_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_member_plan (
   id int8 NOT NULL,
@@ -35,6 +39,8 @@ CREATE TABLE IF NOT EXISTS yaya_member_plan (
   CONSTRAINT pk_yaya_member_plan PRIMARY KEY (id),
   CONSTRAINT uk_yaya_member_plan_key UNIQUE (plan_key)
 );
+
+CREATE SEQUENCE IF NOT EXISTS yaya_member_entitlement_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_member_entitlement (
   id int8 NOT NULL,
