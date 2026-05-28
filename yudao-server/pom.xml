@@ -31,6 +31,10 @@
             <artifactId>yudao-module-infra</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
 
         <!-- 会员中心。默认注释，保证编译速度 -->
 <!--        <dependency>-->
