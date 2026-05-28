@@ -18,10 +18,13 @@ Branch: yaya/platform-a
 - Yaya content domain DO, mapper, service, and service tests are implemented.
 - Yaya admin content API controllers, request/response VOs, and import endpoint placeholders are implemented.
 - `PATCH /admin-api/yaya/topics/{id}` preserves omitted fields for partial admin edits.
+- Yaya content import pipeline is implemented and verified with the legacy 26Q1 snapshot.
+- The import pipeline validates required snapshot files, manifest counts, and question-topic references before writing database state.
+- Legacy content snapshot exported to `docs/yaya-migration/content-import-snapshots/20260528-192813`.
 
 ## Active Phase
 
-Phase 2 - Content import pipeline.
+Phase 3 - Admin UI pages for content operations.
 
 ## Known Issues
 
@@ -31,7 +34,7 @@ Phase 2 - Content import pipeline.
 - The logged-in dashboard has one non-blocking external demo avatar image error from `test.yudao.iocoder.cn` returning HTTP 502.
 - Vector and embedding tables are deferred until the local PostgreSQL runtime includes pgvector.
 - Yaya admin menu/permission seed data is not added yet; Task 7 will wire the admin UI menu and permission integration.
-- `POST /admin-api/yaya/import-batches/{season}:run` is intentionally guarded with `NOT_IMPLEMENTED` until Task 6 wires the real import pipeline.
+- The local legacy Yaya PostgreSQL database is on `127.0.0.1:5433`, not the example `5432` in the original plan.
 
 ## Runtime Snapshot
 
@@ -39,13 +42,16 @@ Phase 2 - Content import pipeline.
 - Admin UI: `yaya-ruoyi-admin-ui` screen session on `127.0.0.1:18081`
 - PostgreSQL: `yaya-ruoyi-pg-phase0` on `127.0.0.1:55432`
 - Redis: `yaya-ruoyi-redis-phase0` on `127.0.0.1:56379`
+- Import snapshot root mounted in backend container at `/app/content-import-snapshots`.
 
 ## Latest Verification
 
-- `YayaContentServiceImplTest`, `YayaImportServiceImplTest`, `YayaTopicControllerTest`, `YayaImportControllerTest`: 16 tests, 0 failures, 0 errors.
+- Python exporter syntax check: `/tmp/yaya-migration-venv/bin/python -m py_compile tools/yaya-migration/export_legacy_content.py` returned success.
+- `YayaContentServiceImplTest`, `YayaImportServiceImplTest`, `YayaTopicControllerTest`, `YayaImportControllerTest`: 19 tests, 0 failures, 0 errors.
 - Backend package: `mvn -Dmaven.repo.local=/m2/repository -DskipTests clean package` returned `BUILD SUCCESS`.
-- Backend health after admin content API changes: `{"code":0,"msg":"","data":"ok"}`.
-- Runtime admin API smoke after jar restart:
-  - `GET /admin-api/yaya/topics?pageNo=1&pageSize=10` returns `{"code":401,"msg":"账号未登录","data":null}` without login.
-  - `POST /admin-api/yaya/import-batches/26Q1:preview` returns `{"code":401,"msg":"账号未登录","data":null}` without login.
-  - `POST /admin-api/yaya/import-batches/26Q1:run` returns `{"code":401,"msg":"账号未登录","data":null}` without login.
+- Backend responded after import pipeline restart; `/admin-api/actuator/health` is auth-gated and returned `{"code":401,"msg":"账号未登录","data":null}`.
+- Authenticated import smoke with `admin/admin123` and `tenant-id: 1`:
+  - `POST /admin-api/yaya/import-batches/26Q1:preview` returned `{"seasonKey":"26Q1","topics":146,"questions":606,"errors":[]}`.
+  - `POST /admin-api/yaya/import-batches/26Q1:run` returned `{"seasonKey":"26Q1","topics":146,"questions":606,"errors":[]}`.
+  - PostgreSQL counts after repeated run: `yaya_practice_topic=146`, `yaya_practice_question=606`, active `yaya_practice_question=606`, `yaya_import_batch=3`.
+  - Latest import batch summary: `season_key=26Q1`, `status=completed`, `topics=146`, `questions=606`, `writtenQuestions=606`, `updatedTopics=146`.

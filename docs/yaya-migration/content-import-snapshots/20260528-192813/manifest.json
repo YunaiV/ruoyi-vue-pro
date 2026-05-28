@@ -1,0 +1,56 @@
+{
+  "files": {
+    "content_modules.json": {
+      "bytes": 301,
+      "sha256": "5d96ac756314b0bbba2f56c8c79a87ef386731aa967e824e386878f3575f17a0"
+    },
+    "content_seasons.json": {
+      "bytes": 563,
+      "sha256": "a4aaa0d7f150c2fc1cdb9d07f550074c045777458e5f26ba77efaebbcb918c8b"
+    },
+    "practice_questions.json": {
+      "bytes": 707467,
+      "sha256": "b707428bd98ec4d6f9e1bbd93babd4c5f4c067a7ca3d21ba2e0ed1a5d8ef1f64"
+    },
+    "practice_topics.json": {
+      "bytes": 218719,
+      "sha256": "cd0caffe5e124d47709849c9c0fc1e69aef606cae05a79a19ab0b604c27e976c"
+    },
+    "tags.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "topic_relations.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "topic_tags.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    }
+  },
+  "format": "yaya-legacy-content-snapshot-v1",
+  "generated_at": "2026-05-28T11:28:14Z",
+  "season_counts": {
+    "26Q1": {
+      "questions": 606,
+      "topics": 146
+    },
+    "26Q2": {
+      "questions": 399,
+      "topics": 122
+    }
+  },
+  "source": {
+    "database_url": "postgresql+psycopg://yaya:***@127.0.0.1:5433/yaya"
+  },
+  "table_counts": {
+    "content_modules": 1,
+    "content_seasons": 2,
+    "practice_questions": 1005,
+    "practice_topics": 268,
+    "tags": 0,
+    "topic_relations": 0,
+    "topic_tags": 0
+  }
+}

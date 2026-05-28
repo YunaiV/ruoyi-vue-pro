@@ -1,0 +1,20 @@
+[
+  {
+    "active": true,
+    "created_at": "2026-05-26T18:03:51.554253+00:00",
+    "defaulted": false,
+    "legacy_uuid": "e5f79b63-9247-4d6f-bb00-166d1453078d",
+    "name": "26Q1 IELTS Speaking",
+    "season_key": "26Q1",
+    "updated_at": "2026-05-26T18:03:51.554253+00:00"
+  },
+  {
+    "active": true,
+    "created_at": "2026-05-26T18:03:52.197589+00:00",
+    "defaulted": false,
+    "legacy_uuid": "6b35f4bb-f209-450d-bea8-c9351785b8ce",
+    "name": "26Q2 IELTS Speaking",
+    "season_key": "26Q2",
+    "updated_at": "2026-05-26T18:03:52.197589+00:00"
+  }
+]
