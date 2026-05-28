@@ -141,6 +141,7 @@ class YayaContentServiceImplTest extends BaseDbUnitTest {
         assertEquals(topicId, detail.getId());
         assertEquals("part1-work", detail.getStableKey());
         assertEquals(2, detail.getQuestions().size());
+        assertEquals("question-1", detail.getQuestions().get(0).getLegacyUuid());
     }
 
     private Long createSeason(String seasonKey) {
@@ -170,6 +171,7 @@ class YayaContentServiceImplTest extends BaseDbUnitTest {
 
     private static YayaQuestionSaveReq questionReq(String promptEn, Integer displayOrder) {
         return new YayaQuestionSaveReq()
+                .setLegacyUuid("question-" + displayOrder)
                 .setQuestionRole("question")
                 .setPromptEn(promptEn)
                 .setPromptZh("")

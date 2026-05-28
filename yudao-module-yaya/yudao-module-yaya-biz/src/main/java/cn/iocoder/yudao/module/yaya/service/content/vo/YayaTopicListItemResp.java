@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.yaya.service.content.vo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
+
 @Data
 @Accessors(chain = true)
 public class YayaTopicListItemResp {
@@ -19,5 +21,6 @@ public class YayaTopicListItemResp {
     private Integer displayOrder;
     private String reviewStatus;
     private String publishStatus;
+    private LocalDateTime updateTime;
 
 }

@@ -226,11 +226,13 @@ public class YayaContentServiceImpl implements YayaContentService {
         resp.setDisplayOrder(topic.getDisplayOrder());
         resp.setReviewStatus(topic.getReviewStatus());
         resp.setPublishStatus(topic.getPublishStatus());
+        resp.setUpdateTime(topic.getUpdateTime());
     }
 
     private YayaQuestionResp buildQuestionResp(YayaPracticeQuestionDO question) {
         return new YayaQuestionResp()
                 .setId(question.getId())
+                .setLegacyUuid(question.getLegacyUuid())
                 .setTopicId(question.getTopicId())
                 .setQuestionRole(question.getQuestionRole())
                 .setPromptEn(question.getPromptEn())

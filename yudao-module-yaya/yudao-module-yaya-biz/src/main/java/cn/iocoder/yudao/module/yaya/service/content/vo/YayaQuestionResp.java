@@ -11,6 +11,7 @@ import java.util.Map;
 public class YayaQuestionResp {
 
     private Long id;
+    private String legacyUuid;
     private Long topicId;
     private String questionRole;
     private String promptEn;
