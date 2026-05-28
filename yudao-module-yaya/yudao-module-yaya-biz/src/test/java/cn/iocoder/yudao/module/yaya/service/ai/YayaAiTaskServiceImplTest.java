@@ -57,6 +57,30 @@ class YayaAiTaskServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    void createEvaluationTaskShouldForwardEvaluationIdAndRequestedOptions() {
+        when(aiClient.createEvaluation(any(YayaAiClient.EvaluationCreateRequest.class), isNull()))
+                .thenReturn(new YayaAiClient.EvaluationAcceptedResponse()
+                        .setTaskId("1")
+                        .setStatus("PENDING")
+                        .setAccepted(true));
+
+        Long taskId = taskService.createEvaluationTask(10001L, 20001L, 146L, 30001L,
+                Map.of("runTextRoute", false,
+                        "run_audio_route", false,
+                        "runPronunciationRoute", true,
+                        "runImprovement", false));
+
+        assertNotNull(taskMapper.selectById(taskId));
+        verify(aiClient).createEvaluation(argThat(request ->
+                "30001".equals(request.getEvaluationId())
+                        && Boolean.FALSE.equals(request.getOptions().get("run_text_route"))
+                        && Boolean.FALSE.equals(request.getOptions().get("run_audio_route"))
+                        && Boolean.TRUE.equals(request.getOptions().get("run_pronunciation_route"))
+                        && Boolean.FALSE.equals(request.getOptions().get("run_improvement"))
+        ), isNull());
+    }
+
+    @Test
     void pollTaskResultShouldPersistTerminalResult() {
         Long taskId = insertTask("task-succeeded", "PENDING");
         when(aiClient.getEvaluation("task-succeeded", null))

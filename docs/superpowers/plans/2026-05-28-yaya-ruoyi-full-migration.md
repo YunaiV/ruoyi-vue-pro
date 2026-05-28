@@ -1217,7 +1217,7 @@ git commit -m "feat: add Yaya AI task orchestration"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/service/recording/*`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/service/evaluation/*`
 
-- [ ] **Step 1: Add endpoints**
+- [x] **Step 1: Add endpoints**
 
 Implement:
 
@@ -1228,7 +1228,7 @@ GET  /app-api/yaya/evaluations/{evaluationId}
 POST /app-api/yaya/evaluations/{evaluationId}/polish-pack
 ```
 
-- [ ] **Step 2: Store uploaded recording metadata**
+- [x] **Step 2: Store uploaded recording metadata**
 
 For the first local version, store files under:
 
@@ -1238,7 +1238,7 @@ For the first local version, store files under:
 
 Persist metadata in `yaya_recording`.
 
-- [ ] **Step 3: Create evaluation task**
+- [x] **Step 3: Create evaluation task**
 
 `POST /app-api/yaya/evaluations` must:
 
@@ -1248,7 +1248,10 @@ Persist metadata in `yaya_recording`.
 - call `POST /internal/evaluations`
 - return evaluation id and task status
 
-- [ ] **Step 4: Verify with service running**
+Task 11 now validates logged-in member ownership and creates the evaluation + AI task.
+Paid-feature entitlement enforcement is completed in Task 12 before production payment gating.
+
+- [x] **Step 4: Verify with service running**
 
 Run Python AI service on `127.0.0.1:18080`, backend on `127.0.0.1:48080`, then:
 
@@ -1260,7 +1263,7 @@ curl -fsS -X POST http://127.0.0.1:48080/app-api/yaya/evaluations \
 
 Expected: accepted task JSON or a controlled entitlement/login error. It must not return a server exception.
 
-- [ ] **Step 5: Commit recording/evaluation APIs**
+- [x] **Step 5: Commit recording/evaluation APIs**
 
 Run:
 

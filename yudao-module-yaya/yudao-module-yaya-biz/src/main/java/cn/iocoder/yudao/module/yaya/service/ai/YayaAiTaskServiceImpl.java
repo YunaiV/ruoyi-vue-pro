@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.yaya.enums.YayaErrorCodeConstants.YAYA_AI_TASK_NOT_EXISTS;
@@ -30,17 +31,31 @@ public class YayaAiTaskServiceImpl implements YayaAiTaskService {
 
     @Override
     public Long createEvaluationTask(Long memberUserId, Long recordingId, Long topicId) {
+        return createEvaluationTask(memberUserId, recordingId, topicId, null);
+    }
+
+    @Override
+    public Long createEvaluationTask(Long memberUserId, Long recordingId, Long topicId, Long evaluationId) {
+        return createEvaluationTask(memberUserId, recordingId, topicId, evaluationId, null);
+    }
+
+    @Override
+    public Long createEvaluationTask(Long memberUserId, Long recordingId, Long topicId, Long evaluationId,
+                                     Map<String, Object> options) {
         YayaAiTaskDO task = new YayaAiTaskDO();
         task.setMemberUserId(memberUserId);
         task.setRecordingId(recordingId);
         task.setTopicId(topicId);
+        task.setTaskKey("pending-" + UUID.randomUUID());
         task.setTaskType(TASK_TYPE_EVALUATION);
         task.setStatus(STATUS_PENDING);
         task.setRequest(Collections.emptyMap());
         taskMapper.insert(task);
 
         String taskKey = String.valueOf(task.getId());
-        YayaAiClient.EvaluationCreateRequest request = buildEvaluationRequest(taskKey, memberUserId, recordingId, topicId);
+        String evaluationKey = evaluationId == null ? taskKey : String.valueOf(evaluationId);
+        YayaAiClient.EvaluationCreateRequest request = buildEvaluationRequest(taskKey, evaluationKey,
+                memberUserId, recordingId, topicId, options);
         task.setTaskKey(taskKey);
         task.setRequest(toMap(request));
         taskMapper.updateById(task);
@@ -90,19 +105,35 @@ public class YayaAiTaskServiceImpl implements YayaAiTaskService {
         return task;
     }
 
-    private YayaAiClient.EvaluationCreateRequest buildEvaluationRequest(String taskKey, Long memberUserId,
-                                                                        Long recordingId, Long topicId) {
+    private YayaAiClient.EvaluationCreateRequest buildEvaluationRequest(String taskKey, String evaluationKey,
+                                                                        Long memberUserId,
+                                                                        Long recordingId, Long topicId,
+                                                                        Map<String, Object> options) {
         return new YayaAiClient.EvaluationCreateRequest()
                 .setTaskId(taskKey)
-                .setEvaluationId(taskKey)
+                .setEvaluationId(evaluationKey)
                 .setRecordingId(String.valueOf(recordingId))
                 .setUserId(String.valueOf(memberUserId))
                 .setTopicId(String.valueOf(topicId))
-                .setOptions(Map.of(
-                        "run_text_route", true,
-                        "run_audio_route", true,
-                        "run_pronunciation_route", true,
-                        "run_improvement", true));
+                .setOptions(normalizeOptions(options));
+    }
+
+    private static Map<String, Object> normalizeOptions(Map<String, Object> options) {
+        return Map.of(
+                "run_text_route", optionValue(options, "runTextRoute", "run_text_route"),
+                "run_audio_route", optionValue(options, "runAudioRoute", "run_audio_route"),
+                "run_pronunciation_route", optionValue(options, "runPronunciationRoute", "run_pronunciation_route"),
+                "run_improvement", optionValue(options, "runImprovement", "run_improvement"));
+    }
+
+    private static Object optionValue(Map<String, Object> options, String camelKey, String snakeKey) {
+        if (options == null) {
+            return true;
+        }
+        if (options.containsKey(camelKey)) {
+            return options.get(camelKey);
+        }
+        return options.getOrDefault(snakeKey, true);
     }
 
     @SuppressWarnings("unchecked")

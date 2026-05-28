@@ -6,6 +6,8 @@ yaya:
     base-url: http://127.0.0.1:18080
     internal-key: local-internal-key
     timeout-seconds: 60
+  recording:
+    storage-root: /Volumes/LamarHD/Yaya/yaya-ruoyi-platform/storage/recordings
 
 --- #################### 数据库相关配置 ####################
 spring:

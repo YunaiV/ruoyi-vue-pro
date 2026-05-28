@@ -19,4 +19,9 @@ public interface YayaErrorCodeConstants {
     ErrorCode YAYA_AI_REQUEST_FAILED = new ErrorCode(1_050_003_002, "Yaya AI 服务请求失败");
     ErrorCode YAYA_AI_TASK_NOT_EXISTS = new ErrorCode(1_050_003_003, "Yaya AI 任务不存在");
 
+    ErrorCode YAYA_RECORDING_FILE_REQUIRED = new ErrorCode(1_050_004_001, "Yaya 录音文件不能为空");
+    ErrorCode YAYA_RECORDING_NOT_EXISTS = new ErrorCode(1_050_004_002, "Yaya 录音不存在");
+
+    ErrorCode YAYA_EVALUATION_NOT_EXISTS = new ErrorCode(1_050_005_001, "Yaya 测评不存在");
+
 }

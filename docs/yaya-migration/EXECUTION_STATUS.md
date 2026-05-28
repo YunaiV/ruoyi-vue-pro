@@ -31,10 +31,14 @@ Branch: yaya/platform-a
 - Legacy `yaya_ai` source package is copied into `yaya-ai-service`; provider SDK dependencies are optional under the `ai` extra.
 - Java AI client and task orchestration are implemented under `yudao-module-yaya`.
 - `yaya_ai_task` persistence is wired for member, recording, topic, request, response, result, error, accepted, and completed state.
+- Yaya app recording upload APIs are implemented under `/app-api/yaya/recordings`, storing files under `storage/recordings`.
+- Yaya app evaluation APIs are implemented under `/app-api/yaya/evaluations`, creating `yaya_evaluation` and `yaya_ai_task` records before dispatching to the Python AI service.
+- Evaluation option flags from the app request are normalized to Python service snake_case keys in `yaya_ai_task.request_payload`.
+- The Task 11 runtime 500 from PostgreSQL `yaya_ai_task.task_key` NOT NULL enforcement is fixed by assigning a temporary task key before insert and replacing it with the Java-owned task id before dispatch.
 
 ## Active Phase
 
-Phase 7 - Recording and evaluation app APIs.
+Phase 8 - Member plans and entitlements.
 
 ## Known Issues
 
@@ -45,14 +49,17 @@ Phase 7 - Recording and evaluation app APIs.
 - Vector and embedding tables are deferred until the local PostgreSQL runtime includes pgvector.
 - The local legacy Yaya PostgreSQL database is on `127.0.0.1:5433`, not the example `5432` in the original plan.
 - Task 7 uses RuoYi dynamic `system_menu` seed data instead of static router module entries, because the admin shell builds business routes from backend menus.
+- When the backend runs inside Docker and the Python AI service runs on the host, `--yaya.ai.base-url=http://host.docker.internal:18080` is required; `127.0.0.1:18080` points at the backend container itself.
 
 ## Runtime Snapshot
 
 - Backend: `yaya-ruoyi-server-phase0` on `127.0.0.1:48080`
 - Admin UI: `yaya-ruoyi-admin-ui` screen session on `127.0.0.1:18081`
+- Python AI service: `yaya-ai-service` screen session on `127.0.0.1:18080`
 - PostgreSQL: `yaya-ruoyi-pg-phase0` on `127.0.0.1:55432`
 - Redis: `yaya-ruoyi-redis-phase0` on `127.0.0.1:56379`
 - Import snapshot root mounted in backend container at `/app/content-import-snapshots`.
+- Recording storage root mounted in backend container at `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/storage`.
 
 ## Latest Verification
 
@@ -97,3 +104,14 @@ Phase 7 - Recording and evaluation app APIs.
 - Python AI service runtime is running in screen session `yaya-ai-service` on `127.0.0.1:18080`.
 - Task 10 focused Java tests: `YayaAiClientTest`, `YayaAiTaskServiceImplTest`: 5 tests, 0 failures, 0 errors; Maven reactor returned `BUILD SUCCESS`.
 - Task 10 PostgreSQL migration reapplied idempotently; `yaya_ai_task` now has `member_user_id`, `recording_id`, `topic_id`, `response_payload`, `accepted_at`, and `completed_at`.
+- Task 11 focused Java tests: `YayaAppRecordingControllerTest`, `YayaAppEvaluationControllerTest`, `YayaRecordingServiceImplTest`, `YayaEvaluationServiceImplTest`: 9 tests, 0 failures, 0 errors.
+- Task 11 Yaya backend slice: content, import, practice, AI, recording, and evaluation tests: 40 tests, 0 failures, 0 errors.
+- Task 11 regression slice after `task_key` and evaluation-options fixes: `YayaAiTaskServiceImplTest`, `YayaAppRecordingControllerTest`, `YayaAppEvaluationControllerTest`, `YayaRecordingServiceImplTest`, `YayaEvaluationServiceImplTest`: 13 tests, 0 failures, 0 errors.
+- Task 11 backend package via Docker Maven: `docker run --rm -u "$(id -u):$(id -g)" -v "$PWD":/workspace -v "$HOME/.m2":/m2 -w /workspace maven:3.9.9-eclipse-temurin-17 mvn -Dmaven.repo.local=/m2/repository -DskipTests clean package` returned `BUILD SUCCESS`.
+- Backend restart smoke: `GET /admin-api/yaya/health` returned `{"code":0,"msg":"","data":"ok"}`.
+- Authenticated Task 11 smoke with `Authorization: Bearer test10003` and `tenant-id: 1`:
+  - `POST /app-api/yaya/recordings` returned `recordingId=4`, `status=stored`.
+  - `POST /app-api/yaya/evaluations` returned `evaluationId=4`, `aiTaskId=4`, `status=PENDING`.
+  - PostgreSQL confirmed `yaya_evaluation id=4 member_user_id=10003 recording_id=4 topic_id=146 ai_task_id=4 status=PENDING`.
+  - PostgreSQL confirmed `yaya_ai_task id=4 member_user_id=10003 recording_id=4 topic_id=146 task_key=4 status=PENDING`.
+  - PostgreSQL confirmed `request_payload.options` preserved `run_text_route=false`, `run_audio_route=false`, `run_pronunciation_route=true`, and `run_improvement=false`.
