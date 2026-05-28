@@ -1034,7 +1034,7 @@ git commit -m "feat: add Yaya app practice APIs"
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yaya-ai-service/app/evaluations.py`
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yaya-ai-service/tests/test_internal_contract.py`
 
-- [ ] **Step 1: Create service package**
+- [x] **Step 1: Create service package**
 
 Run:
 
@@ -1043,7 +1043,7 @@ cd /Volumes/LamarHD/Yaya/yaya-ruoyi-platform
 mkdir -p yaya-ai-service/app yaya-ai-service/tests
 ```
 
-- [ ] **Step 2: Add internal health endpoint**
+- [x] **Step 2: Add internal health endpoint**
 
 Implement:
 
@@ -1057,7 +1057,7 @@ Response:
 {"ok":true,"service":"yaya-ai-service"}
 ```
 
-- [ ] **Step 3: Add internal auth middleware**
+- [x] **Step 3: Add internal auth middleware**
 
 All endpoints except `/internal/health` require:
 
@@ -1069,7 +1069,7 @@ X-Yaya-Request-Id
 Invalid key returns HTTP `401`.
 Missing request id returns HTTP `400`.
 
-- [ ] **Step 4: Add evaluation endpoints**
+- [x] **Step 4: Add evaluation endpoints**
 
 Implement:
 
@@ -1090,7 +1090,7 @@ CANCELLED
 
 `POST /internal/evaluations` is idempotent by `task_id`.
 
-- [ ] **Step 5: Run Python tests**
+- [x] **Step 5: Run Python tests**
 
 Run:
 
@@ -1104,7 +1104,7 @@ pytest -q
 
 Expected: all Python service tests pass.
 
-- [ ] **Step 6: Run service smoke**
+- [x] **Step 6: Run service smoke**
 
 Run:
 
@@ -1126,7 +1126,7 @@ Expected:
 {"ok":true,"service":"yaya-ai-service"}
 ```
 
-- [ ] **Step 7: Commit AI service extraction**
+- [x] **Step 7: Commit AI service extraction**
 
 Run:
 

@@ -27,10 +27,12 @@ Branch: yaya/platform-a
 - Yaya app practice APIs are implemented under `/app-api/yaya/practice/*`.
 - App practice persistence tables are implemented in `sql/postgresql/yaya/20260528_yaya_practice_app.sql`: `yaya_favorite`, `yaya_user_topic_state`, and `yaya_practice_attempt`.
 - App practice topic state updates now use atomic `attempt_count = attempt_count + 1` updates for repeated member attempts.
+- Standalone `yaya-ai-service` FastAPI package is implemented with internal health, signed internal auth, and evaluation task accept/get endpoints.
+- Legacy `yaya_ai` source package is copied into `yaya-ai-service`; provider SDK dependencies are optional under the `ai` extra.
 
 ## Active Phase
 
-Phase 5 - Python AI service extraction.
+Phase 6 - Java AI client and task orchestration.
 
 ## Known Issues
 
@@ -82,3 +84,12 @@ Phase 5 - Python AI service extraction.
   - Two `POST /app-api/yaya/practice/attempts` calls returned `attemptId=3` and `attemptId=4`.
   - Authenticated detail returned `favorite=true`, `practiced=true`, `questionCount=6`.
   - PostgreSQL counts for `member_user_id=10003`, `topic_id=146`: `favorite=1`, `attempt=2`, `state=1`, `attempt_count=2`.
+- Task 9 Python service install/test: `. .venv/bin/activate && pip install -e . && pytest -q` returned `5 passed, 1 warning`.
+- Task 9 Python compile check: `python -m compileall -q app yaya_ai` returned success.
+- Task 9 service smoke:
+  - `GET /internal/health` on `127.0.0.1:18080` returned `{"ok":true,"service":"yaya-ai-service"}`.
+  - Protected `POST /internal/evaluations` returned HTTP `400` without `X-Yaya-Request-Id` and HTTP `401` with an invalid key.
+  - Valid `POST /internal/evaluations` returned `{"task_id":"smoke-task-1","status":"PENDING","accepted":true}`.
+  - Retrying the same `task_id` with the same payload returned the existing accepted task.
+  - `GET /internal/evaluations/smoke-task-1` returned `status=PENDING`, `progress.stage=accepted`, `result=null`, and `error=null`.
+- Python AI service runtime is running in screen session `yaya-ai-service` on `127.0.0.1:18080`.

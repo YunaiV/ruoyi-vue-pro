@@ -165,3 +165,16 @@ Inspected source files:
 - `/Volumes/LamarHD/Yaya/YAYA-pages-for-Windows-version-dev/apps/api/yaya_api/services/scoring_service.py`
 - `/Volumes/LamarHD/Yaya/YAYA-pages-for-Windows-version-dev/apps/api/yaya_api/services/topic_transfer.py`
 - `/Volumes/LamarHD/Yaya/YAYA-pages-for-Windows-version-dev/packages/yaya-ai/README.md`
+
+## Local Implementation
+
+- Service package: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yaya-ai-service`
+- FastAPI entrypoint: `app.main:app`
+- Internal auth dependency: `app.auth.require_internal_auth`
+- Evaluation task router: `app.evaluations.router`
+- Legacy AI source package copied into the service as `yaya_ai`; provider SDK
+  dependencies remain under the optional `ai` extra so the internal contract can
+  be tested without model credentials.
+- Current Task 9 implementation accepts evaluation tasks and stores their
+  `PENDING` state in memory. Java orchestration will own durable task rows and
+  result polling in the next migration task.

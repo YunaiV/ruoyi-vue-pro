@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yaya-ai-service"
+version = "0.1.0"
+description = "Standalone internal FastAPI boundary for Yaya AI evaluation tasks"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.124",
+    "httpx>=0.28",
+    "pytest>=8.0",
+    "pydantic>=2.12",
+    "uvicorn[standard]>=0.38",
+]
+
+[project.optional-dependencies]
+dev = [
+]
+ai = [
+    "anthropic>=0.40",
+    "openai>=1.50",
+    "tenacity>=9.0",
+    "structlog>=24.4",
+    "azure-cognitiveservices-speech>=1.40",
+    "requests>=2.32",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*", "yaya_ai*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
