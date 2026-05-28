@@ -1,6 +1,12 @@
 server:
   port: 48080
 
+yaya:
+  ai:
+    base-url: http://127.0.0.1:18080
+    internal-key: local-internal-key
+    timeout-seconds: 60
+
 --- #################### 数据库相关配置 ####################
 spring:
   autoconfigure:

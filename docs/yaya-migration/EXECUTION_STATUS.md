@@ -29,10 +29,12 @@ Branch: yaya/platform-a
 - App practice topic state updates now use atomic `attempt_count = attempt_count + 1` updates for repeated member attempts.
 - Standalone `yaya-ai-service` FastAPI package is implemented with internal health, signed internal auth, and evaluation task accept/get endpoints.
 - Legacy `yaya_ai` source package is copied into `yaya-ai-service`; provider SDK dependencies are optional under the `ai` extra.
+- Java AI client and task orchestration are implemented under `yudao-module-yaya`.
+- `yaya_ai_task` persistence is wired for member, recording, topic, request, response, result, error, accepted, and completed state.
 
 ## Active Phase
 
-Phase 6 - Java AI client and task orchestration.
+Phase 7 - Recording and evaluation app APIs.
 
 ## Known Issues
 
@@ -93,3 +95,5 @@ Phase 6 - Java AI client and task orchestration.
   - Retrying the same `task_id` with the same payload returned the existing accepted task.
   - `GET /internal/evaluations/smoke-task-1` returned `status=PENDING`, `progress.stage=accepted`, `result=null`, and `error=null`.
 - Python AI service runtime is running in screen session `yaya-ai-service` on `127.0.0.1:18080`.
+- Task 10 focused Java tests: `YayaAiClientTest`, `YayaAiTaskServiceImplTest`: 5 tests, 0 failures, 0 errors; Maven reactor returned `BUILD SUCCESS`.
+- Task 10 PostgreSQL migration reapplied idempotently; `yaya_ai_task` now has `member_user_id`, `recording_id`, `topic_id`, `response_payload`, `accepted_at`, and `completed_at`.

@@ -43,14 +43,18 @@ CREATE SEQUENCE IF NOT EXISTS yaya_ai_task_seq;
 
 CREATE TABLE IF NOT EXISTS yaya_ai_task (
   id int8 NOT NULL,
+  member_user_id int8 NULL,
+  recording_id int8 NULL,
+  topic_id int8 NULL,
   task_key varchar(64) NOT NULL,
-  task_type varchar(40) NOT NULL,
+  task_type varchar(40) NOT NULL DEFAULT 'evaluation',
   status varchar(40) NOT NULL DEFAULT 'PENDING',
   request_payload jsonb NOT NULL DEFAULT '{}'::jsonb,
+  response_payload jsonb NOT NULL DEFAULT '{}'::jsonb,
   result_payload jsonb NULL,
   error_payload jsonb NULL,
-  started_at timestamp NULL,
-  finished_at timestamp NULL,
+  accepted_at timestamp NULL,
+  completed_at timestamp NULL,
   creator varchar(64) NULL DEFAULT '',
   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updater varchar(64) NULL DEFAULT '',
@@ -60,6 +64,14 @@ CREATE TABLE IF NOT EXISTS yaya_ai_task (
   CONSTRAINT pk_yaya_ai_task PRIMARY KEY (id),
   CONSTRAINT uk_yaya_ai_task_key UNIQUE (task_key)
 );
+
+ALTER TABLE yaya_ai_task ADD COLUMN IF NOT EXISTS member_user_id int8 NULL;
+ALTER TABLE yaya_ai_task ADD COLUMN IF NOT EXISTS recording_id int8 NULL;
+ALTER TABLE yaya_ai_task ADD COLUMN IF NOT EXISTS topic_id int8 NULL;
+ALTER TABLE yaya_ai_task ALTER COLUMN task_type SET DEFAULT 'evaluation';
+ALTER TABLE yaya_ai_task ADD COLUMN IF NOT EXISTS response_payload jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE yaya_ai_task ADD COLUMN IF NOT EXISTS accepted_at timestamp NULL;
+ALTER TABLE yaya_ai_task ADD COLUMN IF NOT EXISTS completed_at timestamp NULL;
 
 CREATE SEQUENCE IF NOT EXISTS yaya_evaluation_seq;
 

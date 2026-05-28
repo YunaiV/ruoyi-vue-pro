@@ -1,3 +1,4 @@
+DELETE FROM "yaya_ai_task";
 DELETE FROM "yaya_practice_attempt";
 DELETE FROM "yaya_user_topic_state";
 DELETE FROM "yaya_favorite";

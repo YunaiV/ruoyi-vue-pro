@@ -15,4 +15,8 @@ public interface YayaErrorCodeConstants {
 
     ErrorCode YAYA_MEMBER_NOT_LOGIN = new ErrorCode(1_050_002_001, "Yaya 会员未登录");
 
+    ErrorCode YAYA_AI_UNAUTHORIZED = new ErrorCode(1_050_003_001, "Yaya AI 服务鉴权失败");
+    ErrorCode YAYA_AI_REQUEST_FAILED = new ErrorCode(1_050_003_002, "Yaya AI 服务请求失败");
+    ErrorCode YAYA_AI_TASK_NOT_EXISTS = new ErrorCode(1_050_003_003, "Yaya AI 任务不存在");
+
 }

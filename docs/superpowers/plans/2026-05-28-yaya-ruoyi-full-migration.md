@@ -1146,7 +1146,7 @@ git commit -m "feat: add Yaya AI service"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/dal/dataobject/ai/*DO.java`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/framework/ai/YayaAiClientTest.java`
 
-- [ ] **Step 1: Write client contract tests**
+- [x] **Step 1: Write client contract tests**
 
 Use a local mock HTTP server. Verify:
 
@@ -1155,7 +1155,7 @@ Use a local mock HTTP server. Verify:
 - 401 from Python maps to `YAYA_AI_UNAUTHORIZED`
 - accepted evaluation response maps to Java DTO
 
-- [ ] **Step 2: Implement AI properties**
+- [x] **Step 2: Implement AI properties**
 
 Properties:
 
@@ -1167,7 +1167,7 @@ yaya:
     timeout-seconds: 60
 ```
 
-- [ ] **Step 3: Implement task service**
+- [x] **Step 3: Implement task service**
 
 Service methods:
 
@@ -1179,7 +1179,7 @@ void cancelTask(Long taskId);
 
 Do not perform model calls inside a database transaction.
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run:
 
@@ -1198,7 +1198,7 @@ docker run --rm -u "$(id -u):$(id -g)" \
 
 Expected: tests pass.
 
-- [ ] **Step 5: Commit Java AI orchestration**
+- [x] **Step 5: Commit Java AI orchestration**
 
 Run:
 
