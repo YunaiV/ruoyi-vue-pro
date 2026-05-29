@@ -1,0 +1,128 @@
+name: yaya-ruoyi
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ruoyi-vue-pro}
+      POSTGRES_USER: ${POSTGRES_USER:-root}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+    ports:
+      - "${POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../../sql/postgresql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/01-ruoyi-vue-pro.sql:ro
+      - ../../sql/postgresql/quartz.sql:/docker-entrypoint-initdb.d/02-quartz.sql:ro
+      - ../../sql/postgresql/yaya/20260528_yaya_content.sql:/docker-entrypoint-initdb.d/10-yaya-content.sql:ro
+      - ../../sql/postgresql/yaya/20260528_yaya_ai_task.sql:/docker-entrypoint-initdb.d/11-yaya-ai-task.sql:ro
+      - ../../sql/postgresql/yaya/20260528_yaya_practice_app.sql:/docker-entrypoint-initdb.d/12-yaya-practice-app.sql:ro
+      - ../../sql/postgresql/yaya/20260528_yaya_member_entitlement.sql:/docker-entrypoint-initdb.d/13-yaya-member-entitlement.sql:ro
+      - ../../sql/postgresql/yaya/20260528_yaya_member_order.sql:/docker-entrypoint-initdb.d/14-yaya-member-order.sql:ro
+      - ../../sql/postgresql/yaya/20260528_yaya_admin_menu.sql:/docker-entrypoint-initdb.d/15-yaya-admin-menu.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command: >
+      sh -c 'if [ -n "$${REDIS_PASSWORD}" ]; then
+      redis-server --appendonly yes --requirepass "$${REDIS_PASSWORD}";
+      else redis-server --appendonly yes; fi'
+    ports:
+      - "${REDIS_PORT:-16379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "if [ -n \"$${REDIS_PASSWORD}\" ]; then redis-cli -a \"$${REDIS_PASSWORD}\" ping; else redis-cli ping; fi"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  yaya-ai-service:
+    build:
+      context: ../../yaya-ai-service
+      dockerfile: Dockerfile
+    image: yaya-ai-service:local
+    restart: unless-stopped
+    environment:
+      YAYA_INTERNAL_KEY: ${YAYA_INTERNAL_KEY:-local-internal-key}
+    ports:
+      - "${YAYA_AI_PORT:-18080}:18080"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import json, urllib.request; print(json.load(urllib.request.urlopen('http://127.0.0.1:18080/internal/health', timeout=5))['service'])"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  yudao-server:
+    build:
+      context: ../../yudao-server
+      dockerfile: Dockerfile
+    image: yaya-ruoyi-server:local
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx512m -Djava.security.egd=file:/dev/./urandom}
+      ARGS: >-
+        --spring.profiles.active=local
+        --spring.datasource.dynamic.datasource.master.name=${POSTGRES_DB:-ruoyi-vue-pro}
+        --spring.datasource.dynamic.datasource.master.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ruoyi-vue-pro}
+        --spring.datasource.dynamic.datasource.master.username=${POSTGRES_USER:-root}
+        --spring.datasource.dynamic.datasource.master.password=${POSTGRES_PASSWORD:-123456}
+        --spring.datasource.dynamic.datasource.master.driver-class-name=org.postgresql.Driver
+        --spring.datasource.dynamic.datasource.slave.lazy=true
+        --spring.datasource.dynamic.datasource.slave.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ruoyi-vue-pro}
+        --spring.datasource.dynamic.datasource.slave.username=${POSTGRES_USER:-root}
+        --spring.datasource.dynamic.datasource.slave.password=${POSTGRES_PASSWORD:-123456}
+        --spring.datasource.dynamic.datasource.slave.driver-class-name=org.postgresql.Driver
+        --spring.data.redis.host=redis
+        --spring.data.redis.port=6379
+        --yaya.ai.base-url=${YAYA_AI_BASE_URL:-http://yaya-ai-service:18080}
+        --yaya.ai.internal-key=${YAYA_INTERNAL_KEY:-local-internal-key}
+        --yaya.recording.storage-root=/yaya-storage/recordings
+    command: >
+      sh -c 'REDIS_PASSWORD_ARG="";
+      if [ -n "$${REDIS_PASSWORD}" ]; then
+      REDIS_PASSWORD_ARG="--spring.data.redis.password=$${REDIS_PASSWORD}";
+      fi;
+      exec java $${JAVA_OPTS} -jar app.jar $${ARGS} $${REDIS_PASSWORD_ARG}'
+    ports:
+      - "${YUDAO_SERVER_PORT:-48080}:48080"
+    volumes:
+      - yaya-storage:/yaya-storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      yaya-ai-service:
+        condition: service_healthy
+
+  yudao-ui-admin:
+    build:
+      context: ../../yudao-ui-admin-vue3
+      dockerfile: ../deploy/yaya-ruoyi/yudao-ui-admin.Dockerfile
+    image: yaya-ruoyi-admin:local
+    restart: unless-stopped
+    ports:
+      - "${YUDAO_UI_ADMIN_PORT:-8080}:80"
+    depends_on:
+      - yudao-server
+
+volumes:
+  postgres-data:
+  redis-data:
+  yaya-storage:

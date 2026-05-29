@@ -1649,7 +1649,7 @@ Status: complete. Frontend repo commit:
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yaya-ai-service/Dockerfile`
 - Modify: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yudao-server/Dockerfile` if upstream file is missing or incompatible
 
-- [ ] **Step 1: Define services**
+- [x] **Step 1: Define services**
 
 Compose services:
 
@@ -1671,7 +1671,11 @@ yudao-ui-admin: 8080 -> 80
 yaya-ai-service: 18080 -> 18080
 ```
 
-- [ ] **Step 2: Add environment file**
+Status: complete. The Compose baseline defines `postgres`, `redis`, `yudao-server`,
+`yudao-ui-admin`, and `yaya-ai-service`. Default host ports match the plan, and
+host ports are configurable through `.env` for local conflict-free verification.
+
+- [x] **Step 2: Add environment file**
 
 `.env.example` keys:
 
@@ -1684,7 +1688,10 @@ YAYA_INTERNAL_KEY=local-internal-key
 YAYA_AI_BASE_URL=http://yaya-ai-service:18080
 ```
 
-- [ ] **Step 3: Verify compose boot**
+Status: complete. `.env.example` includes the required keys plus optional host-port
+overrides.
+
+- [x] **Step 3: Verify compose boot**
 
 Run:
 
@@ -1704,13 +1711,37 @@ Expected:
 {"ok":true,"service":"yaya-ai-service"}
 ```
 
-- [ ] **Step 4: Commit deployment baseline**
+Actual verification:
+
+- `docker compose config` returned valid normalized Compose config.
+- Default host ports `48080` and `8080` were occupied by existing local services, so
+  boot verification used `.env` overrides `YUDAO_SERVER_PORT=48081` and
+  `YUDAO_UI_ADMIN_PORT=18081`; the Compose file defaults remain the planned ports.
+- `docker compose up -d --build` built `yaya-ai-service`, `yaya-ruoyi-server`, and
+  `yaya-ruoyi-admin` successfully after pinning Admin UI Docker build to pnpm 9.15.9
+  and a 3 GB Vite build heap.
+- `docker compose ps` showed Postgres, Redis, and Yaya AI service healthy; backend
+  and Admin UI were running.
+- `curl -fsS http://127.0.0.1:48081/admin-api/yaya/health` returned
+  `{"code":0,"msg":"","data":"ok"}`.
+- `curl -fsS http://127.0.0.1:18080/internal/health` returned
+  `{"ok":true,"service":"yaya-ai-service"}`.
+- `curl -fsSI http://127.0.0.1:18081/` returned HTTP 200.
+
+- [x] **Step 4: Commit deployment baseline**
 
 Run:
 
 ```bash
 git add deploy/yaya-ruoyi yaya-ai-service/Dockerfile yudao-server/Dockerfile
 git commit -m "build: add Yaya RuoYi docker compose baseline"
+```
+
+Status: complete. Admin UI is a git submodule; its Docker build ignore file was
+committed in the submodule first:
+
+```text
+499f2866bc1b build: ignore admin docker build artifacts
 ```
 
 ---
