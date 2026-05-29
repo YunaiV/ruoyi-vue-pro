@@ -1562,7 +1562,7 @@ git commit -m "feat: add Yaya legacy API compatibility layer"
 - Read/modify: `/Volumes/LamarHD/Yaya/YAYA-pages-for-Windows-version-dev/apps/web/*.html`
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/FRONTEND_COMPAT_TESTS.md`
 
-- [ ] **Step 1: Inventory current API calls**
+- [x] **Step 1: Inventory current API calls**
 
 Run:
 
@@ -1573,7 +1573,11 @@ rg -n "127\\.0\\.0\\.1:8000|/api/" apps/web/*.html
 
 Write all discovered route families to `FRONTEND_COMPAT_TESTS.md`.
 
-- [ ] **Step 2: Add configurable API base**
+Status: complete. The listed HTML files do not hardcode API calls directly; they load
+`shared/app-loader.js`, which loads `shared/api-client.js`. Route-family inventory and
+covered/deferred compatibility status are documented in `FRONTEND_COMPAT_TESTS.md`.
+
+- [x] **Step 2: Add configurable API base**
 
 For each HTML page that hardcodes `http://127.0.0.1:8000`, change it to:
 
@@ -1581,7 +1585,13 @@ For each HTML page that hardcodes `http://127.0.0.1:8000`, change it to:
 const API_BASE = window.YAYA_API_BASE || 'http://127.0.0.1:48080/app-api';
 ```
 
-- [ ] **Step 3: Run browser checks**
+Status: complete. The shared API client now defaults local/static pages to
+`http://127.0.0.1:48080/app-api`, prefers `window.YAYA_API_BASE`, preserves
+`window.__YAYA_API_BASE__`, and treats stale local `yaya_api_base` values pointing
+at port `8000` as the new default. The six Task 15 HTML entries and shared loader
+asset query versions were bumped to avoid stale browser cache.
+
+- [x] **Step 3: Run browser checks**
 
 Serve the current static pages and verify:
 
@@ -1596,7 +1606,21 @@ settings.html
 
 Each page must either load data from RuoYi or show a controlled empty state. No page may fail with a JavaScript syntax error.
 
-- [ ] **Step 4: Commit frontend compatibility changes**
+Verification:
+
+- Static syntax checks passed for `shared/api-client.js`, `shared/app-loader.js`,
+  `speak-at-length-practice/script.js`, and compiled `18-relay-page.js`.
+- `python3 apps/web/tools/compile_modules.py 18-relay-page` passed with only the
+  existing localstorage-file warning.
+- `GET http://127.0.0.1:48080/admin-api/yaya/health` returned
+  `{"code":0,"msg":"","data":"ok"}`.
+- Browser smoke through the Codex in-app Browser passed for
+  `practice-part2.html`, `practice-part3.html`, `mock.html`, `relay.html`,
+  `memory-flashcards.html`, and `settings.html`: each page rendered nonblank,
+  showed no framework error overlay, reported 0 console warn/error entries, and
+  completed a basic visible interaction.
+
+- [x] **Step 4: Commit frontend compatibility changes**
 
 Run in the legacy product repo:
 
@@ -1607,6 +1631,12 @@ git commit -m "feat: point Yaya pages to RuoYi compatibility API"
 ```
 
 Record the commit in `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/FRONTEND_COMPAT_TESTS.md`, then commit that doc in the platform repo.
+
+Status: complete. Frontend repo commit:
+
+```text
+6ee6a66f82ba feat: point Yaya pages to RuoYi compatibility API
+```
 
 ---
 
