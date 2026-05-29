@@ -28,4 +28,7 @@ public interface YayaErrorCodeConstants {
     ErrorCode YAYA_MEMBER_PLAN_KEY_DUPLICATE = new ErrorCode(1_050_006_002, "Yaya 会员套餐 key 已存在");
     ErrorCode YAYA_ENTITLEMENT_REQUIRED = new ErrorCode(1_050_006_003, "Yaya 会员权益不足");
 
+    ErrorCode YAYA_MEMBER_ORDER_NOT_EXISTS = new ErrorCode(1_050_007_001, "Yaya 会员订单不存在");
+    ErrorCode YAYA_MEMBER_ORDER_PAY_MISMATCH = new ErrorCode(1_050_007_002, "Yaya 会员订单支付信息不匹配");
+
 }

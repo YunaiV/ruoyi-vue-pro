@@ -1380,19 +1380,21 @@ git commit -m "feat: add Yaya member plans and entitlements"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/controller/app/pay/YayaAppPayController.java`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/service/pay/YayaMemberOrderServiceImplTest.java`
 
-- [ ] **Step 1: Add pay module dependency**
+- [x] **Step 1: Add pay module dependency**
 
-Add dependency to `yudao-module-yaya/yudao-module-yaya-biz/pom.xml`:
+Added the real upstream dependency to `yudao-module-yaya/yudao-module-yaya-biz/pom.xml`.
+This RuoYi checkout exposes `PayOrderApi` from `yudao-module-pay`; there is no separate
+`yudao-module-pay-api` module in this repository.
 
 ```xml
 <dependency>
     <groupId>cn.iocoder.boot</groupId>
-    <artifactId>yudao-module-pay-api</artifactId>
+    <artifactId>yudao-module-pay</artifactId>
     <version>${revision}</version>
 </dependency>
 ```
 
-- [ ] **Step 2: Create membership order endpoint**
+- [x] **Step 2: Create membership order endpoint**
 
 App endpoint:
 
@@ -1412,21 +1414,23 @@ Response:
 {"orderId":123,"payOrderId":456,"status":"WAITING_PAYMENT"}
 ```
 
-- [ ] **Step 3: Handle pay callback idempotently**
+- [x] **Step 3: Handle pay callback idempotently**
 
 Implement service method:
 
 ```java
-void activateEntitlementByPayOrder(Long payOrderId);
+void activateEntitlementByPayOrder(Long memberOrderId, Long payOrderId);
 ```
 
 Rules:
 
+- callback uses RuoYi Pay `merchantOrderId` as the local Yaya member order id
+- callback rejects mismatched local order and Pay order ids before granting entitlement
 - duplicate callback does not create duplicate entitlement
 - failed payment does not activate entitlement
 - callback writes `idempotency_key = "pay_order:" + payOrderId`
 
-- [ ] **Step 4: Verify mock payment flow**
+- [x] **Step 4: Verify mock payment flow**
 
 Run service tests for:
 
@@ -1437,7 +1441,21 @@ Run service tests for:
 
 Expected: all pass.
 
-- [ ] **Step 5: Commit pay integration**
+Actual verification:
+
+- Focused pay tests: `YayaAppPayControllerTest`, `YayaMemberOrderServiceImplTest`: 8 tests, 0 failures.
+- Review follow-up tests cover forged `merchantOrderId` rejection and explicit tenant-scoped member order DO intent.
+- PostgreSQL migration replay was verified in a scratch schema with existing `pay_app.id = 1`,
+  `pay_order.id = 99`, and `yaya_member_order.id = 88`; replay created the Yaya Pay app at `id = 2`
+  and advanced sequences to the next safe ids.
+- Yaya backend slice including pay: 60 tests, 0 failures.
+- Full backend package with `yudao-module-pay` enabled returned `BUILD SUCCESS`.
+- Runtime smoke created a member order, simulated Pay success, invoked `/app-api/yaya/pay/notify/order`,
+  activated entitlement idempotently, and cleaned smoke rows.
+
+- [x] **Step 5: Commit pay integration**
+
+Status: audit follow-ups applied and included in the Task 13 checkpoint.
 
 Run:
 

@@ -40,10 +40,16 @@ Branch: yaya/platform-a
 - Yaya app entitlement API is implemented under `/app-api/yaya/entitlements/me`.
 - Paid app evaluation APIs now require an active entitlement; free app practice topic APIs remain ungated.
 - The member plan catalog is treated as global RuoYi data with `@TenantIgnore`, while member entitlements remain tenant-scoped.
+- RuoYi Pay is enabled in the backend reactor and wired into `yudao-module-yaya-biz`.
+- Yaya member order APIs are implemented under `/app-api/yaya/pay/member-orders`.
+- Pay order callback activation is implemented under `/app-api/yaya/pay/notify/order` with `@PermitAll`, following RuoYi Pay notify-job conventions.
+- Pay callbacks now validate the RuoYi `merchantOrderId` against the local Yaya member order id before activating entitlement.
+- Yaya payment order persistence is implemented in `yaya_member_order`, with Pay runtime support for `pay_app` and `pay_order` seeded for tenant `1`.
+- Successful Pay callbacks activate member entitlements with idempotency key `pay_order:{payOrderId}`.
 
 ## Active Phase
 
-Phase 9 - RuoYi Pay membership order integration.
+Audit hold - Task 13 implemented and verified; Task 14 has not started.
 
 ## Known Issues
 
@@ -57,6 +63,7 @@ Phase 9 - RuoYi Pay membership order integration.
 - When the backend runs inside Docker and the Python AI service runs on the host, `--yaya.ai.base-url=http://host.docker.internal:18080` is required; `127.0.0.1:18080` points at the backend container itself.
 - Compatibility-route entitlement enforcement is deferred to Task 14 because the compatibility controller does not exist yet.
 - Member-plan admin API permissions are present on the controller, but no dedicated admin UI page or menu seed has been added yet.
+- Real payment provider credentials and the frontend payment-submit flow are still deployment/UI work; Task 13 covers RuoYi Pay order creation, Pay notify callback handling, and entitlement activation.
 
 ## Runtime Snapshot
 
@@ -136,3 +143,16 @@ Phase 9 - RuoYi Pay membership order integration.
   - PostgreSQL confirmed `yaya_evaluation id=5 member_user_id=10004 recording_id=6 ai_task_id=5 status=PENDING`.
   - PostgreSQL confirmed `yaya_ai_task id=5` preserved `request_payload.options` with `run_text_route=false`, `run_audio_route=false`, `run_pronunciation_route=true`, and `run_improvement=false`.
   - Temporary recording files and manual smoke entitlements were cleaned after verification.
+- Task 13 SQL migration reapplied idempotently; local PostgreSQL has `pay_app`, `pay_order`, and `yaya_member_order`, with tenant-1 `pay_app.app_key = 'yaya'`.
+- Task 13 SQL review replay in scratch schema covered existing `pay_app.id=1`, `pay_order.id=99`, and `yaya_member_order.id=88`; replay created tenant-1 Yaya Pay app at `id=2`, with next sequence values `3`, `100`, and `89`.
+- Task 13 focused Java tests: `YayaAppPayControllerTest`, `YayaMemberOrderServiceImplTest`: 8 tests, 0 failures, 0 errors.
+- Task 13 review follow-up tests cover forged `merchantOrderId` rejection and explicit tenant-scoped `YayaMemberOrderDO`.
+- Task 13 Yaya backend slice: content, import, practice, AI, recording, evaluation, entitlement, member plan, and pay tests: 60 tests, 0 failures, 0 errors.
+- Task 13 backend package via Docker Maven returned `BUILD SUCCESS` with `yudao-module-pay` enabled.
+- Backend restart smoke after Task 13 review fixes returned `GET /admin-api/yaya/health` as `{"code":0,"msg":"","data":"ok"}`.
+- Authenticated Task 13 payment smoke with `Authorization: Bearer test10004` and `tenant-id: 1`:
+  - `POST /app-api/yaya/pay/member-orders` returned `orderId=1`, `payOrderId=1`, `status=WAITING_PAYMENT`.
+  - Manual Pay status simulation updated `pay_order id=1` to success status `10`.
+  - `POST /app-api/yaya/pay/notify/order` without login, with `tenant-id: 1`, `merchantOrderId=1`, and `payOrderId=1` returned `{"code":0,"msg":"","data":true}`.
+  - PostgreSQL confirmed `yaya_member_order id=1` moved to `PAID` and `yaya_member_entitlement source_type=pay_order source_id=1` was `active`.
+  - Temporary smoke rows in `yaya_member_entitlement`, `yaya_member_order`, and `pay_order` were cleaned after verification.
