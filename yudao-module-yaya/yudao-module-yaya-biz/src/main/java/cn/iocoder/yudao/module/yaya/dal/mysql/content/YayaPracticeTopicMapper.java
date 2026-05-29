@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.yaya.dal.dataobject.content.YayaPracticeTopicDO;
 import cn.iocoder.yudao.module.yaya.service.content.vo.YayaTopicPageReqVO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface YayaPracticeTopicMapper extends BaseMapperX<YayaPracticeTopicDO> {
 
@@ -32,6 +34,15 @@ public interface YayaPracticeTopicMapper extends BaseMapperX<YayaPracticeTopicDO
                 .eqIfPresent(YayaPracticeTopicDO::getPart, reqVO.getPart())
                 .eq(YayaPracticeTopicDO::getPublishStatus, "published")
                 .orderByDesc(YayaPracticeTopicDO::getId));
+    }
+
+    default List<YayaPracticeTopicDO> selectAppPublishedList(YayaAppPracticeTopicPageReqVO reqVO, Long seasonId) {
+        return selectList(new LambdaQueryWrapperX<YayaPracticeTopicDO>()
+                .eq(YayaPracticeTopicDO::getSeasonId, seasonId)
+                .eqIfPresent(YayaPracticeTopicDO::getPart, reqVO.getPart())
+                .eq(YayaPracticeTopicDO::getPublishStatus, "published")
+                .orderByAsc(YayaPracticeTopicDO::getDisplayOrder, YayaPracticeTopicDO::getTopicNo,
+                        YayaPracticeTopicDO::getId));
     }
 
 }

@@ -25,8 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -63,10 +67,18 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
             return PageResult.empty();
         }
 
-        PageResult<YayaPracticeTopicDO> page = topicMapper.selectAppPublishedPage(reqVO, seasonId);
-        List<YayaAppPracticeTopicRespVO> list = convertList(page.getList(), this::buildTopicResp);
+        // Legacy filters must be applied before pagination; the IELTS season corpus is intentionally bounded.
+        List<YayaAppPracticeTopicRespVO> list = convertList(topicMapper.selectAppPublishedList(reqVO, seasonId)
+                        .stream()
+                        .filter(topic -> topicTypeMatches(topic, reqVO.getTopicType()))
+                        .filter(topic -> keywordMatches(topic, reqVO.getQ()))
+                        .toList(),
+                this::buildTopicResp);
         applyMemberOverlays(list, memberUserId);
-        return new PageResult<>(list, page.getTotal());
+        List<YayaAppPracticeTopicRespVO> filtered = list.stream()
+                .filter(topic -> progressMatches(topic, reqVO.getProgressFilter()))
+                .toList();
+        return page(filtered, reqVO.getPageNo(), reqVO.getPageSize());
     }
 
     @Override
@@ -79,14 +91,27 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
         resp.setMetadata(topic.getMetadata());
         resp.setQuestions(convertList(questionMapper.selectListByTopicId(topicId), this::buildQuestionResp));
         applyMemberOverlays(List.of(resp), memberUserId);
+        resp.setCompletedQuestionIds(completedQuestionIds(memberUserId, topicId));
         return resp;
     }
 
     @Override
     public Long createFavorite(Long memberUserId, Long topicId) {
+        return setFavorite(memberUserId, topicId, true);
+    }
+
+    @Override
+    public Long setFavorite(Long memberUserId, Long topicId, Boolean active) {
         requireMember(memberUserId);
         validatePublishedTopic(topicId);
         YayaFavoriteDO existing = favoriteMapper.selectByMemberAndTopic(memberUserId, topicId);
+        if (!Boolean.TRUE.equals(active)) {
+            if (existing != null) {
+                favoriteMapper.deleteByMemberAndTopic(memberUserId, topicId);
+                return existing.getId();
+            }
+            return null;
+        }
         if (existing != null) {
             return existing.getId();
         }
@@ -106,6 +131,7 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
     public Long createAttempt(Long memberUserId, YayaAppPracticeAttemptCreateReqVO reqVO) {
         requireMember(memberUserId);
         validatePublishedTopic(reqVO.getTopicId());
+        validateQuestion(reqVO.getTopicId(), reqVO.getQuestionId());
 
         YayaPracticeAttemptDO attempt = new YayaPracticeAttemptDO();
         attempt.setMemberUserId(memberUserId);
@@ -113,7 +139,7 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
         attempt.setStatus("submitted");
         attempt.setAnswerText(defaultString(reqVO.getAnswerText()));
         attempt.setDurationSeconds(reqVO.getDurationSeconds());
-        attempt.setMetadata(defaultMap(reqVO.getMetadata()));
+        attempt.setMetadata(attemptMetadata(reqVO));
         attemptMapper.insert(attempt);
 
         upsertTopicState(memberUserId, reqVO.getTopicId(), attempt.getId(), attempt.getMetadata());
@@ -136,9 +162,20 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
         return topic;
     }
 
+    private void validateQuestion(Long topicId, Long questionId) {
+        if (questionId == null) {
+            return;
+        }
+        YayaPracticeQuestionDO question = questionMapper.selectById(questionId);
+        if (question == null || !topicId.equals(question.getTopicId())) {
+            throw exception(YAYA_TOPIC_NOT_EXISTS);
+        }
+    }
+
     private void upsertTopicState(Long memberUserId, Long topicId, Long attemptId, Map<String, Object> metadata) {
         LocalDateTime now = LocalDateTime.now();
         YayaUserTopicStateDO existing = stateMapper.selectByMemberAndTopic(memberUserId, topicId);
+        Map<String, Object> mergedMetadata = stateMetadata(existing == null ? null : existing.getMetadata(), metadata);
         if (existing == null) {
             YayaUserTopicStateDO state = new YayaUserTopicStateDO();
             state.setMemberUserId(memberUserId);
@@ -147,16 +184,24 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
             state.setAttemptCount(1);
             state.setLastAttemptId(attemptId);
             state.setLastPracticedAt(now);
-            state.setMetadata(metadata);
+            state.setMetadata(mergedMetadata);
             try {
                 stateMapper.insert(state);
             } catch (DuplicateKeyException ignored) {
-                stateMapper.incrementByMemberAndTopic(memberUserId, topicId, attemptId, now, metadata);
+                stateMapper.incrementByMemberAndTopic(memberUserId, topicId, attemptId, now, mergedMetadata);
             }
             return;
         }
 
-        stateMapper.incrementByMemberAndTopic(memberUserId, topicId, attemptId, now, metadata);
+        stateMapper.incrementByMemberAndTopic(memberUserId, topicId, attemptId, now, mergedMetadata);
+    }
+
+    private List<Long> completedQuestionIds(Long memberUserId, Long topicId) {
+        if (memberUserId == null) {
+            return List.of();
+        }
+        YayaUserTopicStateDO state = stateMapper.selectByMemberAndTopic(memberUserId, topicId);
+        return state == null ? List.of() : completedQuestionIds(state.getMetadata());
     }
 
     private void applyMemberOverlays(List<? extends YayaAppPracticeTopicRespVO> topics, Long memberUserId) {
@@ -180,6 +225,126 @@ public class YayaPracticeServiceImpl implements YayaPracticeService {
             YayaUserTopicStateDO state = stateByTopicId.get(topic.getId());
             topic.setPracticed(state != null && Boolean.TRUE.equals(state.getPracticed()));
         });
+    }
+
+    private static PageResult<YayaAppPracticeTopicRespVO> page(List<YayaAppPracticeTopicRespVO> list, Integer pageNo,
+                                                               Integer pageSize) {
+        int total = list.size();
+        int size = pageSize == null ? 10 : Math.max(1, pageSize);
+        int page = Math.max(1, pageNo == null ? 1 : pageNo);
+        long requestedOffset = (long) (page - 1) * size;
+        if (requestedOffset >= total) {
+            return new PageResult<>(Collections.emptyList(), (long) total);
+        }
+        int fromIndex = (int) requestedOffset;
+        int toIndex = Math.min(fromIndex + size, total);
+        return new PageResult<>(list.subList(fromIndex, toIndex), (long) total);
+    }
+
+    private static boolean topicTypeMatches(YayaPracticeTopicDO topic, String topicType) {
+        String value = normalize(topicType);
+        if (value.isEmpty()) {
+            return true;
+        }
+        String raw = normalize(topic.getTopicType());
+        if ("new".equals(value) || value.contains("新题")) {
+            return raw.contains("新题");
+        }
+        if ("retained".equals(value) || "old".equals(value) || value.contains("保留") || value.contains("旧题")) {
+            return raw.contains("保留") || raw.contains("旧题");
+        }
+        return raw.contains(value);
+    }
+
+    private static boolean keywordMatches(YayaPracticeTopicDO topic, String query) {
+        String value = normalize(query);
+        if (value.isEmpty()) {
+            return true;
+        }
+        return normalize(topic.getTitleEn()).contains(value)
+                || normalize(topic.getTitleZh()).contains(value)
+                || normalize(topic.getPromptEn()).contains(value)
+                || normalize(topic.getPromptZh()).contains(value)
+                || normalize(topic.getTopicType()).contains(value)
+                || normalize(topic.getCategory()).contains(value);
+    }
+
+    private static boolean progressMatches(YayaAppPracticeTopicRespVO topic, String progressFilter) {
+        String value = normalize(progressFilter);
+        if (value.isEmpty()) {
+            return true;
+        }
+        boolean favorite = Boolean.TRUE.equals(topic.getFavorite());
+        boolean practiced = Boolean.TRUE.equals(topic.getPracticed());
+        if ("favorite".equals(value) || "favorites".equals(value) || value.contains("收藏")) {
+            return favorite;
+        }
+        if ("practiced".equals(value) || "done".equals(value) || "completed".equals(value) || value.contains("已练习")) {
+            return practiced;
+        }
+        if ("unpracticed".equals(value) || "unstarted".equals(value) || value.contains("未练习")) {
+            return !practiced;
+        }
+        return true;
+    }
+
+    private static String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static Map<String, Object> attemptMetadata(YayaAppPracticeAttemptCreateReqVO reqVO) {
+        Map<String, Object> metadata = new LinkedHashMap<>(defaultMap(reqVO.getMetadata()));
+        if (reqVO.getQuestionId() != null) {
+            metadata.put("question_id", reqVO.getQuestionId());
+            metadata.put("completed_question_ids", List.of(reqVO.getQuestionId()));
+        }
+        return metadata;
+    }
+
+    private static Map<String, Object> stateMetadata(Map<String, Object> existingMetadata,
+                                                     Map<String, Object> attemptMetadata) {
+        Map<String, Object> metadata = new LinkedHashMap<>(defaultMap(existingMetadata));
+        metadata.putAll(defaultMap(attemptMetadata));
+        List<Long> completedQuestionIds = mergeCompletedQuestionIds(existingMetadata, attemptMetadata);
+        if (!completedQuestionIds.isEmpty()) {
+            metadata.put("completed_question_ids", completedQuestionIds);
+        }
+        return metadata;
+    }
+
+    private static List<Long> mergeCompletedQuestionIds(Map<String, Object> existingMetadata,
+                                                        Map<String, Object> attemptMetadata) {
+        LinkedHashSet<Long> ids = new LinkedHashSet<>(completedQuestionIds(existingMetadata));
+        ids.addAll(completedQuestionIds(attemptMetadata));
+        return new ArrayList<>(ids);
+    }
+
+    private static List<Long> completedQuestionIds(Map<String, Object> metadata) {
+        Object completed = defaultMap(metadata).get("completed_question_ids");
+        LinkedHashSet<Long> ids = new LinkedHashSet<>();
+        if (completed instanceof Iterable<?> iterable) {
+            for (Object value : iterable) {
+                Long id = longValue(value);
+                if (id != null) {
+                    ids.add(id);
+                }
+            }
+        }
+        Long questionId = longValue(defaultMap(metadata).get("question_id"));
+        if (questionId != null) {
+            ids.add(questionId);
+        }
+        return new ArrayList<>(ids);
+    }
+
+    private static Long longValue(Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        if (value instanceof String string && !string.isBlank()) {
+            return Long.valueOf(string);
+        }
+        return null;
     }
 
     private YayaAppPracticeTopicRespVO buildTopicResp(YayaPracticeTopicDO topic) {

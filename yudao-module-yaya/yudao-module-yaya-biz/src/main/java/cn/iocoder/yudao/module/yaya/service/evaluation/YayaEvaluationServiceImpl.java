@@ -103,7 +103,15 @@ public class YayaEvaluationServiceImpl implements YayaEvaluationService {
                 .setModel(evaluation.getModel())
                 .setScoreOverall(evaluation.getScoreOverall())
                 .setScores(evaluation.getScores())
-                .setReport(evaluation.getReport());
+                .setReport(evaluation.getReport())
+                .setTextRouteScores(evaluation.getTextRouteScores())
+                .setAudioRouteScores(evaluation.getAudioRouteScores())
+                .setPronRouteScores(evaluation.getPronRouteScores())
+                .setFluencyMetrics(evaluation.getFluencyMetrics())
+                .setBandLower(evaluation.getBandLower())
+                .setBandUpper(evaluation.getBandUpper())
+                .setCreateTime(evaluation.getCreateTime())
+                .setUpdateTime(evaluation.getUpdateTime());
     }
 
     private static void requireMember(Long memberUserId) {

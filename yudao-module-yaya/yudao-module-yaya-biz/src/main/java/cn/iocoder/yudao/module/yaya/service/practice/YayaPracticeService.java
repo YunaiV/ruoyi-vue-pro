@@ -14,6 +14,8 @@ public interface YayaPracticeService {
 
     Long createFavorite(Long memberUserId, Long topicId);
 
+    Long setFavorite(Long memberUserId, Long topicId, Boolean active);
+
     Long createAttempt(Long memberUserId, YayaAppPracticeAttemptCreateReqVO reqVO);
 
 }

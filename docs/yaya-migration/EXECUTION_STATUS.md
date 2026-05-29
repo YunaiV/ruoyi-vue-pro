@@ -1,6 +1,6 @@
 # Yaya RuoYi Execution Status
 
-Date: 2026-05-28
+Date: 2026-05-30
 Branch: yaya/platform-a
 
 ## Completed
@@ -46,10 +46,17 @@ Branch: yaya/platform-a
 - Pay callbacks now validate the RuoYi `merchantOrderId` against the local Yaya member order id before activating entitlement.
 - Yaya payment order persistence is implemented in `yaya_member_order`, with Pay runtime support for `pay_app` and `pay_order` seeded for tenant `1`.
 - Successful Pay callbacks activate member entitlements with idempotency key `pay_order:{payOrderId}`.
+- Yaya legacy compatibility routes are implemented under `/app-api/api/*`.
+- Legacy topic routes return direct JSON with `topics`/`part` and public practice `items`/`user_state` shapes.
+- Legacy practice topic routes preserve `page`, `page_size`, and `total_pages`, and support `topic_type`,
+  `progress_filter`, and `q` filters before pagination.
+- Legacy favorites support both `item_id` and `topic_id`, including `active=false` removal.
+- Legacy evaluation routes preserve queued/running/done/failed status names and expose route scores, band range, attempt/question ids, and timestamps.
+- Legacy polish-pack compatibility returns the old frontend `polish_pack_v4` object shape.
 
 ## Active Phase
 
-Audit hold - Task 13 implemented and verified; Task 14 has not started.
+Task 14 compatibility layer implemented and verified; next phase is Task 15 frontend API-base migration.
 
 ## Known Issues
 
@@ -61,9 +68,11 @@ Audit hold - Task 13 implemented and verified; Task 14 has not started.
 - The local legacy Yaya PostgreSQL database is on `127.0.0.1:5433`, not the example `5432` in the original plan.
 - Task 7 uses RuoYi dynamic `system_menu` seed data instead of static router module entries, because the admin shell builds business routes from backend menus.
 - When the backend runs inside Docker and the Python AI service runs on the host, `--yaya.ai.base-url=http://host.docker.internal:18080` is required; `127.0.0.1:18080` points at the backend container itself.
-- Compatibility-route entitlement enforcement is deferred to Task 14 because the compatibility controller does not exist yet.
 - Member-plan admin API permissions are present on the controller, but no dedicated admin UI page or menu seed has been added yet.
 - Real payment provider credentials and the frontend payment-submit flow are still deployment/UI work; Task 13 covers RuoYi Pay order creation, Pay notify callback handling, and entitlement activation.
+- A full unscoped backend reactor `test` run currently fails in upstream `QiniuSmsClientTest.testParseSmsReceiveStatus`
+  because of a timezone assertion (`expected 2024-08-25T21:14:26`, actual `2024-08-25T13:14:26`); Yaya-scoped
+  tests pass and this is outside the Task 14 compatibility path.
 
 ## Runtime Snapshot
 
@@ -156,3 +165,20 @@ Audit hold - Task 13 implemented and verified; Task 14 has not started.
   - `POST /app-api/yaya/pay/notify/order` without login, with `tenant-id: 1`, `merchantOrderId=1`, and `payOrderId=1` returned `{"code":0,"msg":"","data":true}`.
   - PostgreSQL confirmed `yaya_member_order id=1` moved to `PAID` and `yaya_member_entitlement source_type=pay_order source_id=1` was `active`.
   - Temporary smoke rows in `yaya_member_entitlement`, `yaya_member_order`, and `pay_order` were cleaned after verification.
+- Task 14 focused Java tests: `YayaCompatControllerTest`, `YayaPracticeServiceImplTest`: 16 tests, 0 failures, 0 errors.
+- Task 14 Yaya backend slice including compatibility routes: `Yaya*Test`: 75 tests, 0 failures, 0 errors.
+- Task 14 backend package via Docker Maven `-DskipTests clean package` returned `BUILD SUCCESS`.
+- Backend restart smoke after Task 14 returned `GET /admin-api/yaya/health` as `{"code":0,"msg":"","data":"ok"}`.
+- Anonymous Task 14 compatibility smoke:
+  - `GET /app-api/api/health` returned `{"ok":true,"service":"yaya-ruoyi"}`.
+  - `GET /app-api/api/topics?part=1&season=26Q1&page=1&page_size=1` returned direct JSON with `topics`, `part=1`, `items`, `count=39`, `page=1`, `page_size=1`, and `total_pages=39`.
+  - `GET /app-api/api/practice/topics?part=1&season=26Q1&page=2&page_size=5` returned public practice `items`, `user_state`, `count=39`, `season=26Q1`, `part=1`, `page=2`, `page_size=5`, and `total_pages=8`.
+  - `GET /app-api/api/practice/topics?part=1&season=26Q1&page=1&page_size=5&topic_type=retained&q=Smile` returned one retained item: `id=39`, `title_en=Smile（微笑）`, with `total_pages=1`.
+  - `GET /app-api/api/practice/topics?part=1&season=26Q1&page=999&page_size=5` returned `items=[]`, `count=39`, `page=999`, `page_size=5`, and `total_pages=8`.
+- Authenticated Task 14 attempt smoke with `Authorization: Bearer test10004`:
+  - `POST /app-api/api/practice/attempts` with `topic_id=39` and `question_id=2648` returned `attemptId=5`, `status=submitted`.
+  - `GET /app-api/api/practice/topics/39` returned `practiced=1` and `completed_question_ids=["2648"]`.
+  - Temporary smoke attempt and topic-state rows were cleaned; follow-up count for the smoke attempt was `0`.
+- Authenticated Task 14 polish-pack smoke with temporary tenant-1 rows and `Authorization: Bearer test10004`:
+  - `POST /app-api/api/evaluations/{id}/polish-pack` returned `schema_version=polish_pack_v4`, `original_zh`, `ai_fixed_en`, `ai_fixed_zh`, `topic_summary_zh`, `answer_quality`, `polish`, `related_topics`, and `status=queued`.
+  - Temporary smoke entitlement and evaluation rows were cleaned; follow-up count for the smoke evaluation was `0`.

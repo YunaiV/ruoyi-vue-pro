@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.yaya.dal.mysql.practice;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.yaya.dal.dataobject.practice.YayaFavoriteDO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,5 +22,8 @@ public interface YayaFavoriteMapper extends BaseMapperX<YayaFavoriteDO> {
                 .eq(YayaFavoriteDO::getMemberUserId, memberUserId)
                 .in(YayaFavoriteDO::getTopicId, topicIds));
     }
+
+    @Delete("DELETE FROM yaya_favorite WHERE member_user_id = #{memberUserId} AND topic_id = #{topicId}")
+    int deleteByMemberAndTopic(@Param("memberUserId") Long memberUserId, @Param("topicId") Long topicId);
 
 }

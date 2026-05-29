@@ -14,5 +14,8 @@ public class YayaAppPracticeTopicPageReqVO extends PageParam {
 
     private String season;
     private Integer part;
+    private String topicType;
+    private String progressFilter;
+    private String q;
 
 }

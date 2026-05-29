@@ -18,6 +18,7 @@ public class YayaAppPracticeTopicDetailRespVO extends YayaAppPracticeTopicRespVO
     private String promptEn;
     private String promptZh;
     private Map<String, Object> metadata;
+    private List<Long> completedQuestionIds = new ArrayList<>();
     private List<YayaAppPracticeQuestionRespVO> questions = new ArrayList<>();
 
 }

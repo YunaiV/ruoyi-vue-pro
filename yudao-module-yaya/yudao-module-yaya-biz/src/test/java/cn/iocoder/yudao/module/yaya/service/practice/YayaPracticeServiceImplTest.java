@@ -100,21 +100,87 @@ class YayaPracticeServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    void getTopicPageShouldApplyLegacyFiltersBeforePagination() {
+        Long seasonId = createSeason("26Q1");
+        createTopic(seasonId, 1, "part1-old", "Old Smile", "published", "旧题/保留题", "people",
+                "Talk about someone who smiles.");
+        createTopic(seasonId, 1, "part1-work", "Work Person", "published", "新题", "work",
+                "Describe a person at work.");
+        Long travelTopicId = createTopic(seasonId, 1, "part1-travel", "Travel Person", "published", "新题",
+                "travel", "Describe a person you met while travelling.");
+        Long memberUserId = 10001L;
+        practiceService.setFavorite(memberUserId, travelTopicId, true);
+
+        YayaAppPracticeTopicPageReqVO reqVO = new YayaAppPracticeTopicPageReqVO()
+                .setSeason("26Q1")
+                .setPart(1)
+                .setTopicType("new")
+                .setProgressFilter("favorite")
+                .setQ("travel");
+        reqVO.setPageNo(1);
+        reqVO.setPageSize(1);
+        PageResult<YayaAppPracticeTopicRespVO> page = practiceService.getTopicPage(reqVO, memberUserId);
+
+        assertEquals(1L, page.getTotal());
+        assertEquals(travelTopicId, page.getList().get(0).getId());
+        assertTrue(page.getList().get(0).getFavorite());
+    }
+
+    @Test
+    void getTopicPageShouldReturnEmptyListForOutOfRangePage() {
+        Long seasonId = createSeason("26Q1");
+        createTopic(seasonId, 1, "part1-work", "Work", "published");
+
+        YayaAppPracticeTopicPageReqVO reqVO = new YayaAppPracticeTopicPageReqVO()
+                .setSeason("26Q1")
+                .setPart(1);
+        reqVO.setPageNo(999);
+        reqVO.setPageSize(20);
+        PageResult<YayaAppPracticeTopicRespVO> page = practiceService.getTopicPage(reqVO, null);
+
+        assertEquals(1L, page.getTotal());
+        assertTrue(page.getList().isEmpty());
+    }
+
+    @Test
     void getTopicDetailShouldIncludeQuestionsAndMemberOverlays() {
         Long seasonId = createSeason("26Q1");
         Long topicId = createTopic(seasonId, 1, "part1-work", "Work", "published");
         replaceQuestions(topicId);
         Long memberUserId = 10001L;
         practiceService.createFavorite(memberUserId, topicId);
+        Long questionId = practiceService.getTopicDetail(topicId, null).getQuestions().get(0).getId();
+        practiceService.createAttempt(memberUserId, new YayaAppPracticeAttemptCreateReqVO()
+                .setTopicId(topicId)
+                .setQuestionId(questionId)
+                .setAnswerText("I work in technology."));
 
         YayaAppPracticeTopicDetailRespVO detail = practiceService.getTopicDetail(topicId, memberUserId);
 
         assertEquals(topicId, detail.getId());
         assertEquals("part1-work", detail.getStableKey());
         assertTrue(detail.getFavorite());
-        assertFalse(detail.getPracticed());
+        assertTrue(detail.getPracticed());
         assertEquals(2, detail.getQuestions().size());
         assertEquals("What do you do?", detail.getQuestions().get(0).getPromptEn());
+        assertEquals(List.of(questionId), detail.getCompletedQuestionIds());
+        YayaUserTopicStateDO state = stateMapper.selectByMemberAndTopic(memberUserId, topicId);
+        assertEquals(List.of(questionId), state.getMetadata().get("completed_question_ids"));
+    }
+
+    @Test
+    void setFavoriteShouldRemoveExistingFavoriteWhenInactive() {
+        Long seasonId = createSeason("26Q1");
+        Long topicId = createTopic(seasonId, 1, "part1-work", "Work", "published");
+        Long memberUserId = 10001L;
+        Long favoriteId = practiceService.setFavorite(memberUserId, topicId, true);
+
+        Long removedFavoriteId = practiceService.setFavorite(memberUserId, topicId, false);
+        Long repeatedRemoveId = practiceService.setFavorite(memberUserId, topicId, false);
+
+        assertEquals(favoriteId, removedFavoriteId);
+        assertNull(repeatedRemoveId);
+        assertNull(favoriteMapper.selectByMemberAndTopic(memberUserId, topicId));
     }
 
     @Test
@@ -137,6 +203,11 @@ class YayaPracticeServiceImplTest extends BaseDbUnitTest {
     }
 
     private Long createTopic(Long seasonId, Integer part, String stableKey, String titleEn, String publishStatus) {
+        return createTopic(seasonId, part, stableKey, titleEn, publishStatus, "必考话题", "work", "");
+    }
+
+    private Long createTopic(Long seasonId, Integer part, String stableKey, String titleEn, String publishStatus,
+                             String topicType, String category, String promptEn) {
         return contentService.createTopic(new YayaTopicCreateReq()
                 .setSeasonId(seasonId)
                 .setPart(part)
@@ -144,9 +215,9 @@ class YayaPracticeServiceImplTest extends BaseDbUnitTest {
                 .setTopicNo(1)
                 .setTitleEn(titleEn)
                 .setTitleZh("")
-                .setTopicType("必考话题")
-                .setCategory("work")
-                .setPromptEn("")
+                .setTopicType(topicType)
+                .setCategory(category)
+                .setPromptEn(promptEn)
                 .setPromptZh("")
                 .setDisplayOrder(1)
                 .setReviewStatus("draft")

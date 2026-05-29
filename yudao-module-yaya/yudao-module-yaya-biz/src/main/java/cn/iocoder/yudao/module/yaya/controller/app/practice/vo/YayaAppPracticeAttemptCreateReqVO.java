@@ -12,6 +12,7 @@ public class YayaAppPracticeAttemptCreateReqVO {
 
     @NotNull
     private Long topicId;
+    private Long questionId;
     private String answerText;
     private Integer durationSeconds;
     private Map<String, Object> metadata;

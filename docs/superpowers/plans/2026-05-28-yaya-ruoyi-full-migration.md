@@ -1469,11 +1469,11 @@ git commit -m "feat: integrate RuoYi pay for Yaya membership"
 ## Task 14: Implement Legacy Compatibility Layer
 
 **Files:**
-- Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/controller/compat/YayaCompatController.java`
+- Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/controller/app/compat/YayaCompatController.java`
 - Create: `docs/yaya-migration/LEGACY_API_MAP.md`
-- Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/controller/compat/YayaCompatControllerTest.java`
+- Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/controller/app/compat/YayaCompatControllerTest.java`
 
-- [ ] **Step 1: Document legacy route map**
+- [x] **Step 1: Document legacy route map**
 
 Create `docs/yaya-migration/LEGACY_API_MAP.md` with:
 
@@ -1490,11 +1490,15 @@ Create `docs/yaya-migration/LEGACY_API_MAP.md` with:
 | GET /api/evaluations/{evaluation_id} | GET /app-api/yaya/evaluations/{id} | adapter |
 | POST /api/evaluations/{evaluation_id}/polish-pack | POST /app-api/yaya/evaluations/{id}/polish-pack | adapter |
 | GET /api/practice/topics | GET /app-api/yaya/practice/topics | adapter |
+| GET /api/practice/topics/{topic_id} | GET /app-api/yaya/practice/topics/{id} | adapter |
 | POST /api/practice/favorites | POST /app-api/yaya/practice/favorites | adapter |
 | POST /api/practice/attempts | POST /app-api/yaya/practice/attempts | adapter |
 ```
 
-- [ ] **Step 2: Implement adapters**
+Status: complete. `LEGACY_API_MAP.md` also documents the public legacy detail route
+`GET /api/practice/topics/{topic_id}` because the current legacy frontend calls it.
+
+- [x] **Step 2: Implement adapters**
 
 Expose compatibility routes under:
 
@@ -1504,7 +1508,10 @@ Expose compatibility routes under:
 
 This keeps old browser paths usable when the frontend API base is changed from `http://127.0.0.1:8000` to the RuoYi app API host.
 
-- [ ] **Step 3: Verify legacy response shape**
+Status: complete. The controller lives under `controller.app.compat`, so RuoYi prefixes
+`@RequestMapping("/api")` with `/app-api`, exposing `/app-api/api/*`.
+
+- [x] **Step 3: Verify legacy response shape**
 
 For `GET /app-api/api/topics?part=1`, response must preserve:
 
@@ -1517,7 +1524,28 @@ For `GET /app-api/api/topics?part=1`, response must preserve:
 
 For evaluation routes, preserve legacy status field names while storing canonical Java states internally.
 
-- [ ] **Step 4: Commit compatibility layer**
+Status: complete. Additional compatibility review fixes included:
+- `POST /app-api/api/evaluations/{evaluation_id}/polish-pack` returns the legacy `polish_pack_v4`
+  object shape instead of the Java evaluation envelope.
+- `GET /app-api/api/practice/topics/{topic_id}` returns the public practice detail shape.
+- `GET /app-api/api/practice/topics` preserves `page`, `page_size`, and `total_pages`, and forwards
+  `topic_type`, `progress_filter`, and `q` before pagination.
+- `POST /app-api/api/practice/favorites` supports the legacy `active=false` favorite removal flow.
+- `POST /app-api/api/practice/attempts` preserves legacy `question_id` in attempt metadata and
+  `GET /app-api/api/practice/topics/{topic_id}` returns `completed_question_ids` for authenticated users.
+- Evaluation detail exposes legacy route-score, band-range, attempt/question id, and timestamp fields.
+
+Verification:
+- Focused compatibility/practice tests: `YayaCompatControllerTest`, `YayaPracticeServiceImplTest`: 16 tests, 0 failures.
+- Yaya backend slice including compatibility: 75 tests, 0 failures.
+- Full backend package with `-DskipTests clean package` returned `BUILD SUCCESS`.
+- Runtime smoke confirmed `/app-api/api/health`, `/app-api/api/topics?part=1`, `/app-api/api/practice/topics`,
+  `/app-api/api/practice/topics` pagination, retained-topic filtering, high-page empty-list behavior, and
+  authenticated `question_id` attempt completion plus `polish-pack` legacy object shape.
+- A full unscoped reactor `test` run still fails in upstream `QiniuSmsClientTest` because of an existing
+  timezone assertion unrelated to Yaya; Yaya-scoped tests pass.
+
+- [x] **Step 4: Commit compatibility layer**
 
 Run:
 
