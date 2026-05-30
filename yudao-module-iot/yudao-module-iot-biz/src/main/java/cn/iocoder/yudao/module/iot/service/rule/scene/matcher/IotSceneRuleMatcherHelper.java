@@ -2,13 +2,17 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -248,4 +252,16 @@ public final class IotSceneRuleMatcherHelper {
         return StrUtil.isNotBlank(expectedIdentifier) && expectedIdentifier.equals(actualIdentifier);
     }
 
+    /**
+     * 校验匹配器中的产品和设备是否一致
+     * @param message 消息
+     * @param productId 产品ID
+     * @param deviceId 设备id
+     * @return 校验结果
+     */
+    public static boolean productAndDeviceNotMatched(IotDeviceMessage message, Long productId, Long deviceId) {
+        IotDeviceDO device = SpringUtils.getBean(IotDeviceService.class).getDeviceFromCache(message.getDeviceId());
+
+        return IotDeviceDO.DEVICE_ID_ALL.equals(deviceId) ? ObjectUtil.notEqual(device.getProductId(), productId) : ObjectUtil.notEqual(message.getDeviceId(), deviceId);
+    }
 }

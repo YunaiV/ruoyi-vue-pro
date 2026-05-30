@@ -43,7 +43,13 @@ public class IotDeviceEventPostTriggerMatcher implements IotSceneRuleTriggerMatc
             return false;
         }
 
-        // 1.3 检查标识符是否匹配
+        // 1.3 修复触发器中忽略了产品和设备的一致性验证，2025.05.25 by panda
+        if (IotSceneRuleMatcherHelper.productAndDeviceNotMatched(message, trigger.getProductId(),trigger.getDeviceId())){
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message,trigger,"触发器中产品或设备不匹配");
+            return false;
+        }
+
+        // 1.4 检查标识符是否匹配
         String messageIdentifier = IotDeviceMessageUtils.getIdentifier(message);
         if (!IotSceneRuleMatcherHelper.isIdentifierMatched(trigger.getIdentifier(), messageIdentifier)) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "标识符不匹配，期望: " +

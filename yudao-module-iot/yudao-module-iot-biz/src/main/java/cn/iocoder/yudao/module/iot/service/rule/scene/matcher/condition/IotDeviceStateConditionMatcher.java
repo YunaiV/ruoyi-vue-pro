@@ -27,8 +27,13 @@ public class IotDeviceStateConditionMatcher implements IotSceneRuleConditionMatc
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "条件基础参数无效");
             return false;
         }
+        // 1.2 修复条件匹配中忽略了产品和设备的一致性验证，2025.05.25 by panda
+        if (IotSceneRuleMatcherHelper.productAndDeviceNotMatched(message, condition.getProductId(),condition.getDeviceId())){
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message,condition,"条件匹配器中产品或设备不匹配");
+            return false;
+        }
 
-        // 1.2 检查操作符和参数是否有效
+        // 1.3 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;
