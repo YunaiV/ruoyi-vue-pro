@@ -43,7 +43,7 @@ public class IotCurrentTimeConditionMatcher implements IotSceneRuleConditionMatc
             return false;
         }
 
-        // 1.3 验证操作符是否为支持的时间操作符
+        // 1.4 验证操作符是否为支持的时间操作符
         String operator = condition.getOperator();
         IotSceneRuleConditionOperatorEnum operatorEnum = IotSceneRuleConditionOperatorEnum.operatorOf(operator);
         if (operatorEnum == null) {
@@ -51,6 +51,7 @@ public class IotCurrentTimeConditionMatcher implements IotSceneRuleConditionMatc
             return false;
         }
 
+        // 1.5 验证操作符是否为时间相关的操作符
         if (IotSceneRuleTimeHelper.isTimeOperator(operatorEnum)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "不支持的时间操作符: " + operator);
             return false;

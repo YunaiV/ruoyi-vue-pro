@@ -43,7 +43,7 @@ public class IotDevicePropertyConditionMatcher implements IotSceneRuleConditionM
             return false;
         }
 
-        // 1.3 检查操作符和参数是否有效
+        // 1.4 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;
