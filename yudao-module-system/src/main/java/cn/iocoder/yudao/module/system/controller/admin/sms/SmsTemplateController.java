@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSendReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
 import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
@@ -86,6 +87,13 @@ public class SmsTemplateController {
     public CommonResult<PageResult<SmsTemplateRespVO>> getSmsTemplatePage(@Valid SmsTemplatePageReqVO pageVO) {
         PageResult<SmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(pageVO);
         return success(BeanUtils.toBean(pageResult, SmsTemplateRespVO.class));
+    }
+
+    @GetMapping({"/list-all-simple", "/simple-list"})
+    @Operation(summary = "获得短信模板精简列表")
+    public CommonResult<List<SmsTemplateSimpleRespVO>> getSimpleTemplateList() {
+        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList();
+        return success(BeanUtils.toBean(list, SmsTemplateSimpleRespVO.class));
     }
 
     @GetMapping("/export-excel")

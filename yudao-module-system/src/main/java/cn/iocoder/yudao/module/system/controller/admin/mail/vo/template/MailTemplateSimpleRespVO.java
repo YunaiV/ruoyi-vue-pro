@@ -13,4 +13,7 @@ public class MailTemplateSimpleRespVO {
     @Schema(description = "模版名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "哒哒哒")
     private String name;
 
+    @Schema(description = "模版编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "mail_001")
+    private String code;
+
 }

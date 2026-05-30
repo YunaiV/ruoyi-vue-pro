@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.notify;
 
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.NotifyTemplatePageReqVO;
@@ -113,6 +114,11 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     @Override
     public PageResult<NotifyTemplateDO> getNotifyTemplatePage(NotifyTemplatePageReqVO pageReqVO) {
         return notifyTemplateMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<NotifyTemplateDO> getNotifyTemplateList() {
+        return notifyTemplateMapper.selectList(NotifyTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
     }
 
     @VisibleForTesting

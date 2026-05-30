@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -79,36 +80,53 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
         }
         Map<String, Object> templateParams = buildTemplateParams(config, deviceMessage, device);
         config.getReceiveUserIds().forEach(userId ->
-                config.getReceiveTypes().forEach(receiveType -> sendAlertMessageToUser(userId, receiveType, templateParams)));
+                config.getReceiveTypes().forEach(receiveType ->
+                        sendAlertMessageToUser(userId, receiveType, config, templateParams)));
     }
 
     /**
      * 按指定接收方式，给单个用户发送告警消息
      */
-    private void sendAlertMessageToUser(Long userId, Integer receiveType, Map<String, Object> templateParams) {
+    private void sendAlertMessageToUser(Long userId, Integer receiveType, IotAlertConfigDO config,
+                                        Map<String, Object> templateParams) {
         IotAlertReceiveTypeEnum typeEnum = IotAlertReceiveTypeEnum.of(receiveType);
         if (typeEnum == null) {
             return;
+        }
+        String templateCode = resolveTemplateCode(config, typeEnum);
+        if (StrUtil.isBlank(templateCode)) {//为了兼容老的结构
+            templateCode=typeEnum.getTemplateCode();
+            log.warn("[sendAlertMessageToUser][配置({}) 用户({}) 接收方式({}) 未配置模板，使用默认模板（{}）]",
+                    config.getId(), userId, typeEnum,templateCode);
         }
         try {
             switch (typeEnum) {
                 case SMS:
                     smsSendApi.sendSingleSmsToAdmin(new SmsSendSingleToUserReqDTO().setUserId(userId)
-                            .setTemplateCode(typeEnum.getTemplateCode()).setTemplateParams(templateParams));
+                            .setTemplateCode(templateCode).setTemplateParams(templateParams));
                     break;
                 case MAIL:
                     mailSendApi.sendSingleMailToAdmin(new MailSendSingleToUserReqDTO().setUserId(userId)
-                            .setTemplateCode(typeEnum.getTemplateCode()).setTemplateParams(templateParams));
+                            .setTemplateCode(templateCode).setTemplateParams(templateParams));
                     break;
                 case NOTIFY:
                     notifyMessageSendApi.sendSingleMessageToAdmin(new NotifySendSingleToUserReqDTO().setUserId(userId)
-                            .setTemplateCode(typeEnum.getTemplateCode()).setTemplateParams(templateParams));
+                            .setTemplateCode(templateCode).setTemplateParams(templateParams));
                     break;
             }
         } catch (Exception ex) {
             log.error("[sendAlertMessageToUser][用户({}) 模板参数({}) 发送 {} 告警失败]",
                     userId, templateParams, typeEnum, ex);
         }
+    }
+
+    private String resolveTemplateCode(IotAlertConfigDO config, IotAlertReceiveTypeEnum typeEnum) {
+        String templateCode = switch (typeEnum) {
+            case SMS -> config.getSmsTemplateCode();
+            case MAIL -> config.getMailTemplateCode();
+            case NOTIFY -> config.getNotifyTemplateCode();
+        };
+        return StrUtil.blankToDefault(templateCode, typeEnum.getTemplateCode());
     }
 
     private Map<String, Object> buildTemplateParams(IotAlertConfigDO config,
