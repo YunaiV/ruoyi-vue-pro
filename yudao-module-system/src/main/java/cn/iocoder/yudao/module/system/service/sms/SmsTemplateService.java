@@ -71,11 +71,12 @@ public interface SmsTemplateService {
     PageResult<SmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO);
 
     /**
-     * 获得启用状态的短信模板列表
+     * 获得指定状态的短信模板列表
      *
+     * @param status 状态
      * @return 短信模板列表
      */
-    List<SmsTemplateDO> getSmsTemplateList();
+    List<SmsTemplateDO> getSmsTemplateListByStatus(Integer status);
 
     /**
      * 获得指定短信渠道下的短信模板数量

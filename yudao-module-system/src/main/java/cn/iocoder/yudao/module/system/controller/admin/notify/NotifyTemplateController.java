@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.notify;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -88,9 +89,10 @@ public class NotifyTemplateController {
     }
 
     @GetMapping({"/list-all-simple", "/simple-list"})
-    @Operation(summary = "获得站内信模版精简列表")
-    public CommonResult<List<NotifyTemplateSimpleRespVO>> getSimpleTemplateList() {
-        List<NotifyTemplateDO> list = notifyTemplateService.getNotifyTemplateList();
+    @Operation(summary = "获得站内信模版精简列表", description = "只包含被开启的站内信模版，主要用于前端的下拉选项")
+    public CommonResult<List<NotifyTemplateSimpleRespVO>> getSimpleNotifyTemplateList() {
+        List<NotifyTemplateDO> list = notifyTemplateService.getNotifyTemplateListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
         return success(BeanUtils.toBean(list, NotifyTemplateSimpleRespVO.class));
     }
 

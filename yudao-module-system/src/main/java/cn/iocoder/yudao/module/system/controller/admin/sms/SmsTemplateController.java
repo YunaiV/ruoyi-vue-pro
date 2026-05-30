@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -90,9 +91,10 @@ public class SmsTemplateController {
     }
 
     @GetMapping({"/list-all-simple", "/simple-list"})
-    @Operation(summary = "获得短信模板精简列表")
-    public CommonResult<List<SmsTemplateSimpleRespVO>> getSimpleTemplateList() {
-        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList();
+    @Operation(summary = "获得短信模板精简列表", description = "只包含被开启的短信模板，主要用于前端的下拉选项")
+    public CommonResult<List<SmsTemplateSimpleRespVO>> getSimpleSmsTemplateList() {
+        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
         return success(BeanUtils.toBean(list, SmsTemplateSimpleRespVO.class));
     }
 

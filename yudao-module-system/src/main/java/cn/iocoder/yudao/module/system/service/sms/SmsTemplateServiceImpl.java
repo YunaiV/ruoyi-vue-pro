@@ -131,8 +131,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public List<SmsTemplateDO> getSmsTemplateList() {
-        return smsTemplateMapper.selectList(SmsTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+    public List<SmsTemplateDO> getSmsTemplateListByStatus(Integer status) {
+        return smsTemplateMapper.selectListByStatus(status);
     }
 
     @Override

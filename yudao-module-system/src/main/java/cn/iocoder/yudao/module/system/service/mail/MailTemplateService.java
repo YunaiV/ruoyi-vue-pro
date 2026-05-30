@@ -70,6 +70,14 @@ public interface MailTemplateService {
     List<MailTemplateDO> getMailTemplateList();
 
     /**
+     * 获取指定状态的邮件模版数组
+     *
+     * @param status 状态
+     * @return 邮件模版数组
+     */
+    List<MailTemplateDO> getMailTemplateListByStatus(Integer status);
+
+    /**
      * 从缓存中获取邮件模版
      *
      * @param code 模板编码
