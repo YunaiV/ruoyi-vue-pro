@@ -93,6 +93,7 @@ services:
         --yaya.ai.base-url=${YAYA_AI_BASE_URL:-http://yaya-ai-service:18080}
         --yaya.ai.internal-key=${YAYA_INTERNAL_KEY:-local-internal-key}
         --yaya.recording.storage-root=/yaya-storage/recordings
+        --yaya.import.snapshot-root=/yaya-import-snapshots
     command: >
       sh -c 'REDIS_PASSWORD_ARG="";
       if [ -n "$${REDIS_PASSWORD}" ]; then
@@ -103,6 +104,7 @@ services:
       - "${YUDAO_SERVER_PORT:-48080}:48080"
     volumes:
       - yaya-storage:/yaya-storage
+      - ../../docs/yaya-migration/content-import-snapshots:/yaya-import-snapshots:ro
     depends_on:
       postgres:
         condition: service_healthy
