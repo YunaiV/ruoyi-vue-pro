@@ -77,7 +77,7 @@
 - Read: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/DATABASE_DECISION.md`
 - Modify: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/EXECUTION_STATUS.md`
 
-- [ ] **Step 1: Confirm platform repo is clean**
+- [x] **Step 1: Confirm platform repo is clean**
 
 Run:
 
@@ -101,7 +101,7 @@ d14987a576 docs: define Yaya RuoYi module boundary
 b07f9233a1 docs: pin RuoYi upstream for Yaya platform
 ```
 
-- [ ] **Step 2: Confirm backend runtime still responds**
+- [x] **Step 2: Confirm backend runtime still responds**
 
 Run:
 
@@ -115,7 +115,7 @@ Expected:
 {"code":0,"msg":"","data":"ok"}
 ```
 
-- [ ] **Step 3: Create execution status document**
+- [x] **Step 3: Create execution status document**
 
 Create `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/EXECUTION_STATUS.md`:
 
@@ -142,7 +142,7 @@ Phase 1 - Admin frontend checkout and local login smoke.
 - No runnable admin UI exists in the selected backend repo. The official `yudao-ui-admin-vue3` checkout must be added before browser-based admin testing.
 ```
 
-- [ ] **Step 4: Commit status document**
+- [x] **Step 4: Commit status document**
 
 Run:
 
@@ -164,7 +164,7 @@ Expected: one documentation commit.
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/UI_UPSTREAM.md`
 - Modify: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/EXECUTION_STATUS.md`
 
-- [ ] **Step 1: Add official admin UI as a submodule**
+- [x] **Step 1: Add official admin UI as a submodule**
 
 Run:
 
@@ -180,7 +180,7 @@ Expected:
 One submodule status line ending with `yudao-ui-admin-vue3`.
 ```
 
-- [ ] **Step 2: Record UI pin**
+- [x] **Step 2: Record UI pin**
 
 Run:
 
@@ -205,7 +205,7 @@ Purpose:
 - Allow Yaya menu, API client, and admin pages to evolve alongside the RuoYi backend.
 ```
 
-- [ ] **Step 3: Install frontend dependencies**
+- [x] **Step 3: Install frontend dependencies**
 
 Run:
 
@@ -217,7 +217,7 @@ pnpm install --frozen-lockfile
 
 Expected: install exits `0`.
 
-- [ ] **Step 4: Configure local admin API base URL**
+- [x] **Step 4: Configure local admin API base URL**
 
 Inspect the UI env files:
 
@@ -235,7 +235,7 @@ http://127.0.0.1:48080
 
 Do not hardcode production credentials. If the upstream env file uses a different variable name, update the local development env file only and record the exact key in `docs/yaya-migration/UI_UPSTREAM.md`.
 
-- [ ] **Step 5: Start admin UI**
+- [x] **Step 5: Start admin UI**
 
 Run:
 
@@ -246,7 +246,7 @@ pnpm dev --host 127.0.0.1 --port 8080
 
 Expected: dev server listens on `http://127.0.0.1:8080`.
 
-- [ ] **Step 6: Browser smoke**
+- [x] **Step 6: Browser smoke**
 
 Open:
 
@@ -261,7 +261,7 @@ Verify:
 - After login, RuoYi dashboard renders.
 - `GET /admin-api/yaya/health` still returns `{"code":0,"msg":"","data":"ok"}`.
 
-- [ ] **Step 7: Commit UI baseline**
+- [x] **Step 7: Commit UI baseline**
 
 Run:
 
@@ -283,7 +283,7 @@ Expected: one commit with `.gitmodules`, submodule pointer, and UI pin doc.
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/sql/postgresql/yaya/20260528_yaya_ai_task.sql`
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/SCHEMA_MAP.md`
 
-- [ ] **Step 1: Create schema directory**
+- [x] **Step 1: Create schema directory**
 
 Run:
 
@@ -292,7 +292,7 @@ cd /Volumes/LamarHD/Yaya/yaya-ruoyi-platform
 mkdir -p sql/postgresql/yaya
 ```
 
-- [ ] **Step 2: Add content schema**
+- [x] **Step 2: Add content schema**
 
 Create `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/sql/postgresql/yaya/20260528_yaya_content.sql` with these table groups:
 
@@ -398,7 +398,7 @@ CREATE INDEX IF NOT EXISTS idx_yaya_question_topic ON yaya_practice_question (to
 
 Add `yaya_source_document`, `yaya_source_topic_snapshot`, `yaya_topic_relation`, `yaya_tag`, and `yaya_topic_tag` in the same file using the same audit columns.
 
-- [ ] **Step 3: Add member and entitlement schema**
+- [x] **Step 3: Add member and entitlement schema**
 
 Create `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/sql/postgresql/yaya/20260528_yaya_member_entitlement.sql` with:
 
@@ -465,7 +465,7 @@ CREATE TABLE IF NOT EXISTS yaya_member_entitlement (
 CREATE INDEX IF NOT EXISTS idx_yaya_entitlement_user_status ON yaya_member_entitlement (member_user_id, status, ends_at);
 ```
 
-- [ ] **Step 4: Add AI task schema**
+- [x] **Step 4: Add AI task schema**
 
 Create `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/sql/postgresql/yaya/20260528_yaya_ai_task.sql` with:
 
@@ -529,7 +529,7 @@ CREATE INDEX IF NOT EXISTS idx_yaya_ai_task_status ON yaya_ai_task (status, crea
 CREATE INDEX IF NOT EXISTS idx_yaya_evaluation_user ON yaya_evaluation (member_user_id, create_time);
 ```
 
-- [ ] **Step 5: Apply schema to local PostgreSQL**
+- [x] **Step 5: Apply schema to local PostgreSQL**
 
 Run:
 
@@ -542,7 +542,7 @@ docker exec -i yaya-ruoyi-pg-phase0 psql -U root -d ruoyi-vue-pro < sql/postgres
 
 Expected: no SQL errors.
 
-- [ ] **Step 6: Verify schema**
+- [x] **Step 6: Verify schema**
 
 Run:
 
@@ -552,7 +552,7 @@ docker exec yaya-ruoyi-pg-phase0 psql -U root -d ruoyi-vue-pro -Atc "select coun
 
 Expected: at least `12`.
 
-- [ ] **Step 7: Commit schema**
+- [x] **Step 7: Commit schema**
 
 Run:
 
@@ -572,7 +572,7 @@ git commit -m "feat: add Yaya PostgreSQL schema"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/service/content/*Service.java`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/service/content/*ServiceImplTest.java`
 
-- [ ] **Step 1: Write failing mapper/service tests**
+- [x] **Step 1: Write failing mapper/service tests**
 
 Create tests for:
 
@@ -598,7 +598,7 @@ docker run --rm -u "$(id -u):$(id -g)" \
 
 Expected before implementation: compilation fails because the service and DO classes do not exist.
 
-- [ ] **Step 2: Implement content DO and mapper classes**
+- [x] **Step 2: Implement content DO and mapper classes**
 
 Create DO classes for:
 
@@ -612,7 +612,7 @@ Create DO classes for:
 
 Each DO must extend RuoYi `BaseDO`, use `@TableName("yaya_*")`, and use `Long id`.
 
-- [ ] **Step 3: Implement services**
+- [x] **Step 3: Implement services**
 
 Create service methods:
 
@@ -633,7 +633,7 @@ published
 archived
 ```
 
-- [ ] **Step 4: Run targeted tests**
+- [x] **Step 4: Run targeted tests**
 
 Run the same Maven test command from Step 1.
 
@@ -644,7 +644,7 @@ Tests run: at least 1, Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 5: Commit Java content domain**
+- [x] **Step 5: Commit Java content domain**
 
 Run:
 
@@ -663,7 +663,7 @@ git commit -m "feat: add Yaya content domain"
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/main/java/cn/iocoder/yudao/module/yaya/controller/admin/content/vo/*`
 - Create: `yudao-module-yaya/yudao-module-yaya-biz/src/test/java/cn/iocoder/yudao/module/yaya/controller/admin/content/*Test.java`
 
-- [ ] **Step 1: Write controller tests**
+- [x] **Step 1: Write controller tests**
 
 Test these admin endpoints:
 
@@ -680,7 +680,7 @@ POST  /admin-api/yaya/import-batches/{season}:run
 
 Expected before implementation: compilation fails because controllers and VO classes do not exist.
 
-- [ ] **Step 2: Implement controllers using RuoYi response conventions**
+- [x] **Step 2: Implement controllers using RuoYi response conventions**
 
 Return `CommonResult<T>` from every endpoint. Use `PageResult<T>` for list endpoints. Admin routes must sit under:
 
@@ -690,7 +690,7 @@ Return `CommonResult<T>` from every endpoint. Use `PageResult<T>` for list endpo
 
 Controller method paths must match the endpoint list from Step 1.
 
-- [ ] **Step 3: Add permission strings**
+- [x] **Step 3: Add permission strings**
 
 Use permission identifiers:
 
@@ -703,7 +703,7 @@ yaya:import:preview
 yaya:import:run
 ```
 
-- [ ] **Step 4: Run controller tests and package**
+- [x] **Step 4: Run controller tests and package**
 
 Run:
 
@@ -730,7 +730,7 @@ docker run --rm -u "$(id -u):$(id -g)" \
 
 Expected: both commands exit `0`.
 
-- [ ] **Step 5: Runtime smoke**
+- [x] **Step 5: Runtime smoke**
 
 Restart backend jar and run:
 
@@ -746,7 +746,7 @@ Expected without login:
 
 This proves the endpoint is registered and secured.
 
-- [ ] **Step 6: Commit admin APIs**
+- [x] **Step 6: Commit admin APIs**
 
 Run:
 
@@ -767,7 +767,7 @@ git commit -m "feat: add Yaya admin content APIs"
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/content-import-snapshots/`
 - Modify: Java import service in `yudao-module-yaya`
 
-- [ ] **Step 1: Export legacy content snapshot**
+- [x] **Step 1: Export legacy content snapshot**
 
 Create `tools/yaya-migration/export_legacy_content.py` that connects to the legacy database using:
 
@@ -790,7 +790,7 @@ manifest.json
 
 Each record must include `legacy_uuid`, `created_at`, and `updated_at` when present.
 
-- [ ] **Step 2: Run export against current legacy database**
+- [x] **Step 2: Run export against current legacy database**
 
 Run:
 
@@ -809,7 +809,7 @@ practice_topics: non-zero count
 practice_questions: non-zero count
 ```
 
-- [ ] **Step 3: Implement Java preview import**
+- [x] **Step 3: Implement Java preview import**
 
 `POST /admin-api/yaya/import-batches/{season}:preview` must read the newest snapshot directory and return:
 
@@ -824,7 +824,7 @@ practice_questions: non-zero count
 
 Use the actual counts from `manifest.json`; do not hardcode them.
 
-- [ ] **Step 4: Implement Java run import**
+- [x] **Step 4: Implement Java run import**
 
 `POST /admin-api/yaya/import-batches/{season}:run` must:
 
@@ -834,7 +834,7 @@ Use the actual counts from `manifest.json`; do not hardcode them.
 - store `legacy_uuid` for traceability
 - write one `yaya_import_batch` row with summary JSON
 
-- [ ] **Step 5: Verify import**
+- [x] **Step 5: Verify import**
 
 Run:
 
@@ -847,7 +847,7 @@ docker exec yaya-ruoyi-pg-phase0 psql -U root -d ruoyi-vue-pro -Atc "select coun
 
 Expected: counts match the legacy snapshot manifest.
 
-- [ ] **Step 6: Commit import pipeline**
+- [x] **Step 6: Commit import pipeline**
 
 Run:
 
@@ -867,7 +867,7 @@ git commit -m "feat: add Yaya content import pipeline"
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yudao-ui-admin-vue3/src/views/yaya/topic/index.vue`
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/yudao-ui-admin-vue3/src/views/yaya/import/index.vue`
 
-- [ ] **Step 1: Add API clients**
+- [x] **Step 1: Add API clients**
 
 Implement API methods:
 
@@ -882,7 +882,7 @@ previewImport(season)
 runImport(season)
 ```
 
-- [ ] **Step 2: Add topic list view**
+- [x] **Step 2: Add topic list view**
 
 The topic view must include:
 
@@ -891,7 +891,7 @@ The topic view must include:
 - actions: view, edit, publish, archive
 - question editor in a dialog or drawer
 
-- [ ] **Step 3: Add import view**
+- [x] **Step 3: Add import view**
 
 The import view must include:
 
@@ -901,7 +901,7 @@ The import view must include:
 - result summary panel
 - errors table
 
-- [ ] **Step 4: Add menu route**
+- [x] **Step 4: Add menu route**
 
 Add Yaya menu entries:
 
@@ -911,7 +911,7 @@ Yaya
   Import Batches
 ```
 
-- [ ] **Step 5: Verify UI**
+- [x] **Step 5: Verify UI**
 
 Run:
 
@@ -929,7 +929,7 @@ Expected:
 - browser renders topic list
 - import preview and run buttons call the backend
 
-- [ ] **Step 6: Commit content UI**
+- [x] **Step 6: Commit content UI**
 
 Run:
 
