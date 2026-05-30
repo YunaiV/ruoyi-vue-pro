@@ -293,7 +293,7 @@ public class WmsInventoryServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言
         assertServiceException(() -> inventoryService.changeInventory(reqDTO), INVENTORY_QUANTITY_NOT_ENOUGH,
-                item.getName(), sku.getName(), 100L, new BigDecimal("2.000000"), new BigDecimal("-3.00"));
+                item.getName(), sku.getName(), 100L, new BigDecimal("2.00"), new BigDecimal("-3.00"));
         WmsInventoryDO inventory = inventoryMapper.selectBySkuIdAndWarehouseId(sku.getId(), 100L);
         assertNotNull(inventory);
         assertEquals(0, new BigDecimal("2.00").compareTo(inventory.getQuantity()));
@@ -310,7 +310,7 @@ public class WmsInventoryServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言
         assertServiceException(() -> inventoryService.changeInventory(reqDTO), INVENTORY_QUANTITY_NOT_ENOUGH,
-                item.getName(), sku.getName(), 100L, BigDecimal.ZERO.setScale(6), new BigDecimal("-3.00"));
+                item.getName(), sku.getName(), 100L, new BigDecimal("0.00"), new BigDecimal("-3.00"));
         assertEquals(0L, inventoryMapper.selectCount());
         assertEquals(0L, inventoryHistoryMapper.selectCount());
     }
@@ -334,7 +334,7 @@ public class WmsInventoryServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言：第二条明细库存不足，事务回滚前面补齐的库存行
         assertServiceException(() -> inventoryService.changeInventory(reqDTO), INVENTORY_QUANTITY_NOT_ENOUGH,
-                item.getName(), sku.getName(), 200L, BigDecimal.ZERO.setScale(6), new BigDecimal("-1.00"));
+                item.getName(), sku.getName(), 200L, new BigDecimal("0.00"), new BigDecimal("-1.00"));
         assertNull(inventoryMapper.selectBySkuIdAndWarehouseId(sku.getId(), 100L));
         assertNull(inventoryMapper.selectBySkuIdAndWarehouseId(sku.getId(), 200L));
         assertEquals(0L, inventoryHistoryMapper.selectCount());
