@@ -93,14 +93,15 @@ docker exec -i yaya-ruoyi-postgres-1 \
 
 ## Submodule Notes
 
-The admin UI submodule pointer in this branch references local submodule commit
-`08613cdb feat: add Yaya member plan admin view`, after:
+The admin UI submodule pointer in this branch references pushed submodule commit
+`08613cdb feat: add Yaya member plan admin view` in
+`https://github.com/wcboy/yudao-ui-admin-vue3`, after:
 
 - `20e654fb feat: add Yaya content admin pages`
 - `499f2866 build: ignore admin docker build artifacts`
 
-Push the submodule commits before or together with the platform branch so remote
-checkouts can resolve the gitlink.
+The platform branch updates `.gitmodules` to this fork URL so remote checkouts
+can resolve the gitlink.
 
 ## Production Gates
 
