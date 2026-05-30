@@ -1751,7 +1751,7 @@ committed in the submodule first:
 **Files:**
 - Create: `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/ACCEPTANCE_FULL_MIGRATION.md`
 
-- [ ] **Step 1: Backend verification**
+- [x] **Step 1: Backend verification**
 
 Run:
 
@@ -1776,7 +1776,11 @@ docker run --rm -u "$(id -u):$(id -g)" \
 
 Expected: both commands exit `0`.
 
-- [ ] **Step 2: Python AI verification**
+Status: complete. Docker Maven `test` returned `BUILD SUCCESS` in `01:48 min`.
+Docker Maven `-DskipTests clean package` returned `BUILD SUCCESS` in `34.893 s`
+and produced `yudao-server/target/yudao-server.jar`.
+
+- [x] **Step 2: Python AI verification**
 
 Run:
 
@@ -1788,7 +1792,10 @@ pytest -q
 
 Expected: all tests pass.
 
-- [ ] **Step 3: Admin UI verification**
+Status: complete. `./.venv/bin/python -m pytest -q` returned 5 passed and
+1 upstream Starlette/httpx deprecation warning.
+
+- [x] **Step 3: Admin UI verification**
 
 Run:
 
@@ -1800,7 +1807,10 @@ pnpm build
 
 Expected: both commands exit `0`.
 
-- [ ] **Step 4: Runtime route verification**
+Status: complete. Docker Node 22/Corepack pnpm lint exited `0` with one
+existing generated-type warning, and admin build reported `Build successful`.
+
+- [x] **Step 4: Runtime route verification**
 
 Run:
 
@@ -1812,7 +1822,13 @@ curl -fsS http://127.0.0.1:18080/internal/health
 
 Expected: all routes return controlled JSON.
 
-- [ ] **Step 5: Browser verification**
+Status: complete. Local Compose uses `.env` port overrides because the default
+ports are occupied on this machine: backend `48081`, admin UI `18081`, AI
+service `18080`. Health routes, import preview/run, app practice topics,
+member plans, publish-status, reversible topic edit, and anonymous evaluation
+401 were all verified against the running stack.
+
+- [x] **Step 5: Browser verification**
 
 Verify in browser:
 
@@ -1831,7 +1847,13 @@ Flows:
 - evaluation request creates an AI task or returns controlled entitlement/login error
 - membership plan page renders
 
-- [ ] **Step 6: Write acceptance document**
+Status: complete with Playwright CLI. Browser login, content list, import
+preview/run, topic edit, published topic visibility, app practice route,
+controlled evaluation login error, and membership plan page all rendered or
+returned controlled responses. The only console error observed was a non-Yaya
+upstream demo avatar returning 502 from `test.yudao.iocoder.cn`.
+
+- [x] **Step 6: Write acceptance document**
 
 Create `/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/ACCEPTANCE_FULL_MIGRATION.md` with:
 
@@ -1874,7 +1896,10 @@ Branch: yaya/platform-a
 - Domain, TLS, and backup policy.
 ```
 
-- [ ] **Step 7: Commit final acceptance**
+Status: complete. See
+`/Volumes/LamarHD/Yaya/yaya-ruoyi-platform/docs/yaya-migration/ACCEPTANCE_FULL_MIGRATION.md`.
+
+- [x] **Step 7: Commit final acceptance**
 
 Run:
 
