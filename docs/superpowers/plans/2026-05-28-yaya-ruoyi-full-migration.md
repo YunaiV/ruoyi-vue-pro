@@ -1916,7 +1916,7 @@ git commit -m "docs: record full Yaya migration acceptance"
 - Read: full `git status`
 - Read: full `git log`
 
-- [ ] **Step 1: Final repository audit**
+- [x] **Step 1: Final repository audit**
 
 Run:
 
@@ -1928,6 +1928,9 @@ git log --oneline --decorate --graph --max-count=30
 
 Expected: clean worktree on `yaya/platform-a`.
 
+Status: complete locally. Platform worktree is clean on `yaya/platform-a`, and
+the log shows the acceptance and release-notes commits through `6375a2af40`.
+
 - [ ] **Step 2: Push feature branch**
 
 Run:
@@ -1938,6 +1941,11 @@ git push -u origin yaya/platform-a
 
 Expected: remote branch created or updated.
 
+Status: blocked by remote permissions. `git push -u origin yaya/platform-a`
+failed with `Permission to YunaiV/ruoyi-vue-pro.git denied to wcboy`. The admin
+UI submodule push also failed with `Permission to yudaocode/yudao-ui-admin-vue3.git denied to wcboy`.
+`gh auth status` reports the local `wcboy` token is invalid.
+
 - [ ] **Step 3: Decide integration target**
 
 Use this rule:
@@ -1946,7 +1954,11 @@ Use this rule:
 - create a pull request to `main` when `develop` does not exist or the remote enforces PR review
 - do not force-push `main`
 
-- [ ] **Step 4: Final deployment handoff**
+Status: decision is known but cannot be executed yet. `origin/develop` exists
+on the platform remote, so the plan's rule selects `develop` as the integration
+target after push credentials/remotes are fixed.
+
+- [x] **Step 4: Final deployment handoff**
 
 Write release notes in:
 
@@ -1974,6 +1986,10 @@ Push:
 ```bash
 git push
 ```
+
+Status: complete locally. Release notes were written and committed in
+`6375a2af40 docs: add Platform A release notes`; remote push is still blocked by
+the permissions issue above.
 
 ---
 
