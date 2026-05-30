@@ -2,7 +2,8 @@
 
 Date: 2026-05-30
 Branch: yaya/platform-a
-Commit range: `74b73e4c77..c593ad6079`
+Commit range: `74b73e4c77..HEAD` on branch `yaya/platform-a`
+Pull request: `https://github.com/YunaiV/ruoyi-vue-pro/pull/1148`
 
 ## Summary
 
@@ -102,6 +103,15 @@ The admin UI submodule pointer in this branch references pushed submodule commit
 
 The platform branch updates `.gitmodules` to this fork URL so remote checkouts
 can resolve the gitlink.
+
+## Remote Publication
+
+- Platform fork branch:
+  `https://github.com/wcboy/ruoyi-vue-pro/tree/yaya/platform-a`
+- Upstream draft PR to `develop`:
+  `https://github.com/YunaiV/ruoyi-vue-pro/pull/1148`
+- Direct push to upstream `YunaiV/ruoyi-vue-pro` was not available for the
+  current GitHub account, so the release path uses fork branch plus PR.
 
 ## Production Gates
 
