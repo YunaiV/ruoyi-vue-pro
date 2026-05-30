@@ -12,10 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * IoT Modbus TCP Server 配置缓存：认证时按需加载，断连时清理，定时刷新已连接设备
@@ -94,6 +97,27 @@ public class IotModbusTcpServerConfigCacheService {
             log.error("[refreshConnectedDeviceConfigList][刷新配置失败]", e);
             return null;
         }
+    }
+
+    /**
+     * 清理本轮刷新后不再有效的设备配置
+     *
+     * @param refreshedDeviceIds 本轮参与刷新的设备编号
+     * @param currentConfigs     本轮远端返回的有效配置
+     * @return 本轮已不再有效的设备编号
+     */
+    public Set<Long> cleanupMissingConfigs(Set<Long> refreshedDeviceIds,
+                                           List<IotModbusDeviceConfigRespDTO> currentConfigs) {
+        if (CollUtil.isEmpty(refreshedDeviceIds)) {
+            return Collections.emptySet();
+        }
+        Set<Long> currentDeviceIds = convertSet(currentConfigs, IotModbusDeviceConfigRespDTO::getDeviceId);
+        Set<Long> missingDeviceIds = new HashSet<>(refreshedDeviceIds);
+        missingDeviceIds.removeAll(currentDeviceIds);
+        for (Long deviceId : missingDeviceIds) {
+            configCache.remove(deviceId);
+        }
+        return missingDeviceIds;
     }
 
     /**
