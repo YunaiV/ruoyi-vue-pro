@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
 
@@ -28,6 +30,10 @@ public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
 
     default Long selectCountByChannelId(Long channelId) {
         return selectCount(SmsTemplateDO::getChannelId, channelId);
+    }
+
+    default List<SmsTemplateDO> selectListByStatus(Integer status) {
+        return selectList(SmsTemplateDO::getStatus, status);
     }
 
 }

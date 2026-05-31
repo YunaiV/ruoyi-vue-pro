@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.mes.controller.admin.pro.andon.vo.config.MesProAn
 import cn.iocoder.yudao.module.mes.controller.admin.pro.andon.vo.config.MesProAndonConfigSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.andon.MesProAndonConfigDO;
 import cn.iocoder.yudao.module.mes.service.pro.andon.MesProAndonConfigService;
+import cn.iocoder.yudao.module.system.api.permission.RoleApi;
+import cn.iocoder.yudao.module.system.api.permission.dto.RoleRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +42,8 @@ public class MesProAndonConfigController {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private RoleApi roleApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建安灯呼叫配置")
@@ -102,10 +106,15 @@ public class MesProAndonConfigController {
         // 1. 批量获取关联数据
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(list, MesProAndonConfigDO::getHandlerUserId));
+        Map<Long, RoleRespDTO> roleMap = roleApi.getRoleMap(
+                convertSet(list, MesProAndonConfigDO::getHandlerRoleId));
         // 2. 拼接 VO
-        return BeanUtils.toBean(list, MesProAndonConfigRespVO.class, vo ->
-                MapUtils.findAndThen(userMap, vo.getHandlerUserId(),
-                        user -> vo.setHandlerUserNickname(user.getNickname())));
+        return BeanUtils.toBean(list, MesProAndonConfigRespVO.class, vo -> {
+            MapUtils.findAndThen(userMap, vo.getHandlerUserId(),
+                    user -> vo.setHandlerUserNickname(user.getNickname()));
+            MapUtils.findAndThen(roleMap, vo.getHandlerRoleId(),
+                    role -> vo.setHandlerRoleName(role.getName()));
+        });
     }
 
 }

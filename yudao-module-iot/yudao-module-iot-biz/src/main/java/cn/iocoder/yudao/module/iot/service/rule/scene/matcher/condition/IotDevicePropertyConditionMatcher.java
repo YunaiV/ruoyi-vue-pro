@@ -30,14 +30,20 @@ public class IotDevicePropertyConditionMatcher implements IotSceneRuleConditionM
             return false;
         }
 
-        // 1.2 检查消息中是否包含条件指定的属性标识符
+        // 1.2 修复条件匹配中忽略了产品和设备的一致性验证，2025.05.25 by panda
+        if (IotSceneRuleMatcherHelper.productAndDeviceNotMatched(message, condition.getProductId(),condition.getDeviceId())){
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message,condition,"条件匹配器中产品或设备不匹配");
+            return false;
+        }
+
+        // 1.3 检查消息中是否包含条件指定的属性标识符
         // 注意：属性上报可能同时上报多个属性，所以需要判断 condition.getIdentifier() 是否在 message 的 params 中
         if (IotDeviceMessageUtils.notContainsIdentifier(message, condition.getIdentifier())) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "消息中不包含属性: " + condition.getIdentifier());
             return false;
         }
 
-        // 1.3 检查操作符和参数是否有效
+        // 1.4 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;

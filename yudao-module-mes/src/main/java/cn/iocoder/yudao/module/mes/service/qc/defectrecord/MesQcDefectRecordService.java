@@ -37,6 +37,14 @@ public interface MesQcDefectRecordService {
     void deleteDefectRecord(Long id);
 
     /**
+     * 获得质检缺陷记录
+     *
+     * @param id 编号
+     * @return 质检缺陷记录
+     */
+    MesQcDefectRecordDO getDefectRecord(Long id);
+
+    /**
      * 获得质检缺陷记录分页
      *
      * @param pageReqVO 分页查询

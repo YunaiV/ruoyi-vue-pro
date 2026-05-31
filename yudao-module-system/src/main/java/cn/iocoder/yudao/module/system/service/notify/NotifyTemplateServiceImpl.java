@@ -115,6 +115,11 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
         return notifyTemplateMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public List<NotifyTemplateDO> getNotifyTemplateListByStatus(Integer status) {
+        return notifyTemplateMapper.selectListByStatus(status);
+    }
+
     @VisibleForTesting
     void validateNotifyTemplateCodeDuplicate(Long id, String code) {
         NotifyTemplateDO template = notifyTemplateMapper.selectByCode(code);

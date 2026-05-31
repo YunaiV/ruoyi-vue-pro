@@ -94,6 +94,9 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
         // 2. 组装返回结果
         Set<Long> deviceIds = convertSet(configList, IotDeviceModbusConfigDO::getDeviceId);
         Map<Long, IotDeviceDO> deviceMap = deviceService.getDeviceMap(deviceIds);
+        if (CollUtil.isEmpty(deviceMap)) {
+            return success(new ArrayList<>());
+        }
         Map<Long, List<IotDeviceModbusPointDO>> pointMap = modbusPointService.getEnabledDeviceModbusPointMapByDeviceIds(deviceIds);
         Map<Long, IotProductDO> productMap = productService.getProductMap(convertSet(deviceMap.values(), IotDeviceDO::getProductId));
         List<IotModbusDeviceConfigRespDTO> result = new ArrayList<>(configList.size());

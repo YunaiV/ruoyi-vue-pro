@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -21,6 +23,9 @@ import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -43,7 +48,22 @@ import static org.mockito.Mockito.*;
  *
  * @author HUIHUI
  */
+@SpringJUnitConfig(classes = IotSceneRuleTimerConditionIntegrationTest.TestConfig.class)
 public class IotSceneRuleTimerConditionIntegrationTest extends BaseMockitoUnitTest {
+
+    /**
+     * 注入一下 SpringUtil，解析 EL 表达式时需要
+     * {@link SpringExpressionUtils#parseExpression}
+     */
+    @Configuration
+    static class TestConfig {
+
+        @Bean
+        public SpringUtil springUtil() {
+            return new SpringUtil();
+        }
+
+    }
 
     @InjectMocks
     private IotSceneRuleServiceImpl sceneRuleService;

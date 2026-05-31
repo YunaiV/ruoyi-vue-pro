@@ -142,6 +142,12 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Override
     public void updateUser(Long userId, AppMemberUserUpdateReqVO reqVO) {
+        // 1.1 检测用户是否存在
+        validateUserExists(userId);
+        // 1.2 校验手机是否已经被绑定
+        validateEmailUnique(userId, reqVO.getEmail());
+
+        // 2. 更新用户
         MemberUserDO updateObj = BeanUtils.toBean(reqVO, MemberUserDO.class).setId(userId);
         memberUserMapper.updateById(updateObj);
     }
@@ -238,6 +244,8 @@ public class MemberUserServiceImpl implements MemberUserService {
         validateUserExists(updateReqVO.getId());
         // 校验手机唯一
         validateMobileUnique(updateReqVO.getId(), updateReqVO.getMobile());
+        // 校验邮箱唯一
+        validateEmailUnique(updateReqVO.getId(), updateReqVO.getEmail());
 
         // 更新
         MemberUserDO updateObj = MemberUserConvert.INSTANCE.convert(updateReqVO);
@@ -271,6 +279,24 @@ public class MemberUserServiceImpl implements MemberUserService {
         }
         if (!user.getId().equals(id)) {
             throw exception(USER_MOBILE_USED, mobile);
+        }
+    }
+
+    @VisibleForTesting
+    void validateEmailUnique(Long id, String email) {
+        if (StrUtil.isBlank(email)) {
+            return;
+        }
+        MemberUserDO user = memberUserMapper.selectByEmail(email);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw exception(USER_EMAIL_USED, email);
+        }
+        if (!user.getId().equals(id)) {
+            throw exception(USER_EMAIL_USED, email);
         }
     }
 

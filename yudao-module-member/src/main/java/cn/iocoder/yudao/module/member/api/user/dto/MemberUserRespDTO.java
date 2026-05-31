@@ -36,6 +36,10 @@ public class MemberUserRespDTO {
      */
     private String mobile;
     /**
+     * 邮箱
+     */
+    private String email;
+    /**
      * 创建时间（注册时间）
      */
     private LocalDateTime createTime;

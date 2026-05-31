@@ -53,6 +53,15 @@ public class MesQcDefectRecordController {
         return success(true);
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得质检缺陷记录")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('mes:qc-defect:query')")
+    public CommonResult<MesQcDefectRecordRespVO> getDefectRecord(@RequestParam("id") Long id) {
+        MesQcDefectRecordDO record = defectRecordService.getDefectRecord(id);
+        return success(BeanUtils.toBean(record, MesQcDefectRecordRespVO.class));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得质检缺陷记录分页")
     @PreAuthorize("@ss.hasPermission('mes:qc-defect:query')")

@@ -37,7 +37,7 @@ public class AppFileController {
     @Parameter(name = "file", description = "文件附件", required = true,
             schema = @Schema(type = "string", format = "binary"))
     @PermitAll
-    public CommonResult<String> uploadFile(AppFileUploadReqVO uploadReqVO) throws Exception {
+    public CommonResult<String> uploadFile(@Valid AppFileUploadReqVO uploadReqVO) throws Exception {
         MultipartFile file = uploadReqVO.getFile();
         byte[] content = IoUtil.readBytes(file.getInputStream());
         return success(fileService.createFile(content, file.getOriginalFilename(),

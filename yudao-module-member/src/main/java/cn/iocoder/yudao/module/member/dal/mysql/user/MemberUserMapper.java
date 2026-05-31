@@ -26,6 +26,10 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         return selectOne(MemberUserDO::getMobile, mobile);
     }
 
+    default MemberUserDO selectByEmail(String email) {
+        return selectOne(MemberUserDO::getEmail, email);
+    }
+
     default List<MemberUserDO> selectListByNicknameLike(String nickname) {
         return selectList(new LambdaQueryWrapperX<MemberUserDO>()
                 .likeIfPresent(MemberUserDO::getNickname, nickname));
@@ -42,6 +46,7 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberUserDO>()
                 .likeIfPresent(MemberUserDO::getMobile, reqVO.getMobile())
+                .likeIfPresent(MemberUserDO::getEmail, reqVO.getEmail())
                 .betweenIfPresent(MemberUserDO::getLoginDate, reqVO.getLoginDate())
                 .likeIfPresent(MemberUserDO::getNickname, reqVO.getNickname())
                 .betweenIfPresent(MemberUserDO::getCreateTime, reqVO.getCreateTime())

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.file.vo.file;
 
-import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.infra.framework.file.core.utils.FilePathUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -27,10 +27,7 @@ public class FileUploadReqVO {
     }
 
     public static boolean isDirectoryValid(String directory) {
-        // 1. 不能包含 .. 防止目录穿越
-        // 2. 不能以 / 或 \ 开头，防止上传到根目录
-        return !StrUtil.contains(directory, "..")
-                && !StrUtil.startWithAny(directory, "/", "\\");
+        return FilePathUtils.isDirectoryValid(directory);
     }
 
 }

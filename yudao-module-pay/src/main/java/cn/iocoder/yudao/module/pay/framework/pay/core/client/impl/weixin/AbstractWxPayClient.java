@@ -74,6 +74,9 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             }
             // 特殊：强制使用微信公钥模式，避免灰度期间的问题！！！
             payConfig.setStrictlyNeedWechatPaySerial(true);
+            // 特殊：weixin-java-pay 只有配置 publicKeyPath 后，再开启 fullPublicKeyModel，才会使用 PublicCertificateVerifier
+            // 对应 https://t.zsxq.com/5Q9lO 帖子
+            payConfig.setFullPublicKeyModel(true);
         }
 
         // 创建 client 客户端

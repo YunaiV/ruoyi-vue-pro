@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,7 +110,7 @@ public class IotModbusTcpServerConnectionManager {
      * 获取所有已连接设备的 ID 集合
      */
     public Set<Long> getConnectedDeviceIds() {
-        return deviceSocketMap.keySet();
+        return new HashSet<>(deviceSocketMap.keySet());
     }
 
     /**
@@ -128,6 +129,24 @@ public class IotModbusTcpServerConnectionManager {
             }
         }
         return info;
+    }
+
+    /**
+     * 关闭指定设备连接，并先移除映射，避免 closeHandler 再按正常断连发送下线消息
+     */
+    public void closeConnection(Long deviceId) {
+        NetSocket socket = deviceSocketMap.remove(deviceId);
+        if (socket == null) {
+            return;
+        }
+        connectionMap.remove(socket);
+        try {
+            socket.close();
+            log.info("[closeConnection][设备 {} 连接已关闭]", deviceId);
+        } catch (Exception e) {
+            log.warn("[closeConnection][关闭设备连接失败, deviceId={}, remoteAddress={}]",
+                    deviceId, socket.remoteAddress(), e);
+        }
     }
 
     /**

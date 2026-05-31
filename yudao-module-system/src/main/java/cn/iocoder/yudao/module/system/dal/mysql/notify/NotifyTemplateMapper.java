@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.system.controller.admin.notify.vo.template.Notify
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface NotifyTemplateMapper extends BaseMapperX<NotifyTemplateDO> {
 
@@ -21,6 +23,10 @@ public interface NotifyTemplateMapper extends BaseMapperX<NotifyTemplateDO> {
                 .eqIfPresent(NotifyTemplateDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(NotifyTemplateDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(NotifyTemplateDO::getId));
+    }
+
+    default List<NotifyTemplateDO> selectListByStatus(Integer status) {
+        return selectList(NotifyTemplateDO::getStatus, status);
     }
 
 }

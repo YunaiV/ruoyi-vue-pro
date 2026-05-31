@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessag
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.local.IotLocalMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.rabbitmq.IotRabbitMQMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.redis.IotRedisMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.rocketmq.IotRocketMQMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
@@ -14,8 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -122,6 +126,27 @@ public class IotMessageBusAutoConfiguration {
                             throw new UnsupportedOperationException("不应该调用！！！");
                         }
                     });
+        }
+
+    }
+
+    // ==================== RabbitMQ 实现 ====================
+
+    @Configuration
+    @ConditionalOnProperty(prefix = "yudao.iot.message-bus", name = "type", havingValue = "rabbitmq")
+    @ConditionalOnClass(RabbitTemplate.class)
+    public static class IotRabbitMQMessageBusConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public RabbitAdmin rabbitAdmin(RabbitTemplate rabbitTemplate) {
+            return new RabbitAdmin(rabbitTemplate);
+        }
+
+        @Bean
+        public IotRabbitMQMessageBus iotRabbitMQMessageBus(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin) {
+            log.info("[iotRabbitMQMessageBus][创建 IoT RabbitMQ 消息总线]");
+            return new IotRabbitMQMessageBus(rabbitTemplate, rabbitAdmin);
         }
 
     }

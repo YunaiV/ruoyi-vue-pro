@@ -326,8 +326,26 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
                     log.error("[refreshConfig][处理设备配置失败, deviceId={}]", config.getDeviceId(), e);
                 }
             }
+
+            // 3. 清理本轮不再返回配置的已连接设备，避免继续轮询已删除设备的旧点位
+            Set<Long> missingDeviceIds = configCacheService.cleanupMissingConfigs(connectedDeviceIds, configs);
+            for (Long deviceId : missingDeviceIds) {
+                cleanupMissingDevice(deviceId);
+            }
         } catch (Exception e) {
             log.error("[refreshConfig][刷新配置失败]", e);
+        }
+    }
+
+    private void cleanupMissingDevice(Long deviceId) {
+        try {
+            pollScheduler.stopPolling(deviceId);
+            pendingRequestManager.removeDevice(deviceId);
+            configCacheService.removeConfig(deviceId);
+            connectionManager.closeConnection(deviceId);
+            log.info("[cleanupMissingDevice][设备 {} 配置已失效，已停止轮询并清理连接]", deviceId);
+        } catch (Exception e) {
+            log.error("[cleanupMissingDevice][清理设备失败, deviceId={}]", deviceId, e);
         }
     }
 

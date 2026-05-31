@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemp
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
 
@@ -26,6 +28,10 @@ public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
 
     default MailTemplateDO selectByCode(String code) {
         return selectOne(MailTemplateDO::getCode, code);
+    }
+
+    default List<MailTemplateDO> selectListByStatus(Integer status) {
+        return selectList(MailTemplateDO::getStatus, status);
     }
 
 }

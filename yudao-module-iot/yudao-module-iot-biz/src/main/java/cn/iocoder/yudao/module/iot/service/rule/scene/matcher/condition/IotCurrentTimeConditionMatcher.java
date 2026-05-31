@@ -31,13 +31,19 @@ public class IotCurrentTimeConditionMatcher implements IotSceneRuleConditionMatc
             return false;
         }
 
-        // 1.2 检查操作符和参数是否有效
+        // 1.2 修复条件匹配中忽略了产品和设备的一致性验证，2025.05.25 by panda
+        if (IotSceneRuleMatcherHelper.productAndDeviceNotMatched(message, condition.getProductId(),condition.getDeviceId())){
+            IotSceneRuleMatcherHelper.logConditionMatchFailure(message,condition,"条件匹配器中产品或设备不匹配");
+            return false;
+        }
+
+        // 1.3 检查操作符和参数是否有效
         if (!IotSceneRuleMatcherHelper.isConditionOperatorAndParamValid(condition)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "操作符或参数无效");
             return false;
         }
 
-        // 1.3 验证操作符是否为支持的时间操作符
+        // 1.4 验证操作符是否为支持的时间操作符
         String operator = condition.getOperator();
         IotSceneRuleConditionOperatorEnum operatorEnum = IotSceneRuleConditionOperatorEnum.operatorOf(operator);
         if (operatorEnum == null) {
@@ -45,6 +51,7 @@ public class IotCurrentTimeConditionMatcher implements IotSceneRuleConditionMatc
             return false;
         }
 
+        // 1.5 验证操作符是否为时间相关的操作符
         if (IotSceneRuleTimeHelper.isTimeOperator(operatorEnum)) {
             IotSceneRuleMatcherHelper.logConditionMatchFailure(message, condition, "不支持的时间操作符: " + operator);
             return false;

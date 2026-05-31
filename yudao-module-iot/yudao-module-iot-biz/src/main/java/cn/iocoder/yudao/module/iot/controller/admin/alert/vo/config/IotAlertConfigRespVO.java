@@ -37,6 +37,15 @@ public class IotAlertConfigRespVO {
     @Schema(description = "接收的类型数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
     private List<Integer> receiveTypes;
 
+    @Schema(description = "短信模板编号", example = "iot_alert_sms")
+    private String smsTemplateCode;
+
+    @Schema(description = "邮件模板编号", example = "iot_alert_mail")
+    private String mailTemplateCode;
+
+    @Schema(description = "站内信模板编号", example = "iot_alert_notify")
+    private String notifyTemplateCode;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

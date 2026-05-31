@@ -113,7 +113,9 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     }
 
     @Override
-    public MailTemplateDO getMailTemplate(Long id) {return mailTemplateMapper.selectById(id);}
+    public MailTemplateDO getMailTemplate(Long id) {
+        return mailTemplateMapper.selectById(id);
+    }
 
     @Override
     @Cacheable(value = RedisKeyConstants.MAIL_TEMPLATE, key = "#code", unless = "#result == null")
@@ -127,7 +129,14 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     }
 
     @Override
-    public List<MailTemplateDO> getMailTemplateList() {return mailTemplateMapper.selectList();}
+    public List<MailTemplateDO> getMailTemplateList() {
+        return mailTemplateMapper.selectList();
+    }
+
+    @Override
+    public List<MailTemplateDO> getMailTemplateListByStatus(Integer status) {
+        return mailTemplateMapper.selectListByStatus(status);
+    }
 
     @Override
     public String formatMailTemplateContent(String content, Map<String, Object> params) {

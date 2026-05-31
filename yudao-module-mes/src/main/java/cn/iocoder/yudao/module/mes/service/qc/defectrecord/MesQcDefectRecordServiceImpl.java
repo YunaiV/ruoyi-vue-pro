@@ -107,6 +107,11 @@ public class MesQcDefectRecordServiceImpl implements MesQcDefectRecordService {
     }
 
     @Override
+    public MesQcDefectRecordDO getDefectRecord(Long id) {
+        return defectRecordMapper.selectById(id);
+    }
+
+    @Override
     public PageResult<MesQcDefectRecordDO> getDefectRecordPage(MesQcDefectRecordPageReqVO pageReqVO) {
         return defectRecordMapper.selectPage(pageReqVO);
     }

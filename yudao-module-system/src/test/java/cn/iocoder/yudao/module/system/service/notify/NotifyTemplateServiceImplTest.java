@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -134,6 +135,23 @@ public class NotifyTemplateServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbNotifyTemplate, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testGetNotifyTemplateListByStatus() {
+        // mock 数据
+        NotifyTemplateDO dbNotifyTemplate = randomPojo(NotifyTemplateDO.class,
+                o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        notifyTemplateMapper.insert(dbNotifyTemplate);
+        notifyTemplateMapper.insert(cloneIgnoreId(dbNotifyTemplate,
+                o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+
+        // 调用
+        List<NotifyTemplateDO> list = notifyTemplateService.getNotifyTemplateListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbNotifyTemplate, list.get(0));
     }
 
     @Test
