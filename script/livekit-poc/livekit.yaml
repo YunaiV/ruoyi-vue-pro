@@ -1,0 +1,30 @@
+# LiveKit Server 本地开发配置（PoC 用，勿用于生产）
+# 替代 docker --dev 模式；为支持 webhook 必须用 config 文件而非 env
+
+keys:
+  devkey: secret-poc-key-min-32-chars-required-here
+
+# 端口
+port: 7880
+rtc:
+  tcp_port: 7881
+  udp_port: 7882
+  use_external_ip: false
+
+# Webhook：成员离开 / 房间结束等事件回调到 yudao 后端做业务态兜底清理
+# host.docker.internal 让容器访问宿主机 macOS / Windows 上的 yudao 后端
+# Linux 上 docker compose 可改 network_mode: host，这里同步改成 127.0.0.1
+# api_key 用于签发 JWT，yudao 后端用相同 secret 验证签名
+webhook:
+  api_key: devkey
+  urls:
+    - http://host.docker.internal:48080/admin-api/im/livekit/webhook
+
+# 房间无人时多久销毁；秒；之前 PoC 默认 300，给低些方便排查
+room:
+  empty_timeout: 300
+  departure_timeout: 20
+
+# 开发模式：放宽 secret 长度限制 + 内置 TURN 服务
+development: true
+log_level: info

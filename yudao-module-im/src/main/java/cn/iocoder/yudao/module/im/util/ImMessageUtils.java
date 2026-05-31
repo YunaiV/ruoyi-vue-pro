@@ -87,6 +87,7 @@ public class ImMessageUtils {
         validateNotBlank(getString(map, "name"));
     }
 
+    @SuppressWarnings("PatternVariableCanBeUsed")
     private static void validateMergeContent(Map<String, Object> map) {
         validateNotBlank(getString(map, "title"));
         Object messages = map.get("messages");

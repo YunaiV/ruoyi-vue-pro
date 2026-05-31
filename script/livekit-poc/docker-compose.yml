@@ -1,0 +1,20 @@
+services:
+  livekit:
+    image: docker.m.daocloud.io/livekit/livekit-server:latest
+    container_name: yudao-livekit-dev
+    restart: unless-stopped
+    # 端口映射模式
+    # macOS / Windows 必走这种方式：Docker Desktop 4.34 以下没有 host network
+    # Linux 可以改 network_mode: host 省去映射，并把 livekit.yaml 的 webhook url 换成 127.0.0.1
+    ports:
+      - "7880:7880"          # HTTP / WebSocket 信令
+      - "7881:7881"          # WebRTC TCP fallback
+      - "7882:7882/udp"      # WebRTC UDP (dev 模式 UDP mux 单端口)
+    volumes:
+      # 挂载 config 文件；webhook 配置在 livekit.yaml 里
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+    command:
+      - --config
+      - /etc/livekit.yaml
+      - --bind
+      - 0.0.0.0
