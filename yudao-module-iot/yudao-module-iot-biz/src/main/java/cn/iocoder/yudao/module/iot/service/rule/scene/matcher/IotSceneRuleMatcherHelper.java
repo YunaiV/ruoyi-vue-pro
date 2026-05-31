@@ -261,9 +261,17 @@ public final class IotSceneRuleMatcherHelper {
      * @return 校验结果
      */
     public static boolean productAndDeviceNotMatched(IotDeviceMessage message, Long productId, Long deviceId) {
+        if (message == null || message.getDeviceId() == null) {
+            return false;
+        }
+        if (deviceId != null && !IotDeviceDO.DEVICE_ID_ALL.equals(deviceId)) {
+            return ObjectUtil.notEqual(message.getDeviceId(), deviceId);
+        }
+        if (productId == null) {
+            return false;
+        }
         IotDeviceDO device = SpringUtils.getBean(IotDeviceService.class).getDeviceFromCache(message.getDeviceId());
-        return IotDeviceDO.DEVICE_ID_ALL.equals(deviceId) ? ObjectUtil.notEqual(device.getProductId(), productId)
-                : ObjectUtil.notEqual(message.getDeviceId(), deviceId);
+        return device == null || ObjectUtil.notEqual(device.getProductId(), productId);
     }
 
 }
