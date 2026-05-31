@@ -18,11 +18,11 @@ import cn.iocoder.yudao.module.promotion.enums.combination.CombinationRecordStat
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.trade.api.order.TradeOrderApi;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderCancelTypeEnum;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
@@ -54,17 +54,17 @@ public class CombinationRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private CombinationRecordMapper combinationRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private CombinationActivityService combinationActivityService;
-    @MockitoBean
+    @MockBean
     private MemberUserApi memberUserApi;
-    @MockitoBean
+    @MockBean
     private ProductSpuApi productSpuApi;
-    @MockitoBean
+    @MockBean
     private ProductSkuApi productSkuApi;
-    @MockitoBean
+    @MockBean
     private TradeOrderApi tradeOrderApi;
-    @MockitoBean
+    @MockBean
     private SocialClientApi socialClientApi;
 
     @Test

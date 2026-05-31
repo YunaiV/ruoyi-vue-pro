@@ -16,11 +16,11 @@ import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.util.List;
 
@@ -46,13 +46,13 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BrokerageRecordMapper brokerageRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private TradeConfigService tradeConfigService;
-    @MockitoBean
+    @MockBean
     private BrokerageUserService brokerageUserService;
-    @MockitoBean
+    @MockBean
     private ProductSpuApi productSpuApi;
-    @MockitoBean
+    @MockBean
     private ProductSkuApi productSkuApi;
 
     @Test
