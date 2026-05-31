@@ -77,6 +77,9 @@ def load_and_clean(sql_file: str) -> str:
 
 
 class Convertor(ABC):
+    # 不同数据库的关键字不完全一致；子类按需声明需要转义的列名。
+    reserved_column_names = set()
+
     def __init__(self, src: str, db_type) -> None:
         self.src = src
         self.db_type = db_type
@@ -179,6 +182,31 @@ class Convertor(ABC):
         """
         return ""
 
+    def escape_column_name(self, name: str) -> str:
+        """转义目标库保留字列名，例如 Oracle / Kingbase 的 level。"""
+
+        column_name = name.lower()
+        if column_name in self.reserved_column_names:
+            return f'"{column_name}"'
+        return column_name
+
+    def escape_insert_columns(self, insert_script: str) -> str:
+        """INSERT 显式列清单需要和 CREATE / COMMENT 使用同一套列名转义。"""
+
+        match = re.match(
+            r"(INSERT INTO\s+\S+\s*\()([^)]+)(\)\s+VALUES\s+[\s\S]*)",
+            insert_script,
+            flags=re.IGNORECASE,
+        )
+        if not match:
+            return insert_script
+
+        columns = [
+            self.escape_column_name(column.strip())
+            for column in match.group(2).split(",")
+        ]
+        return f"{match.group(1)}{', '.join(columns)}{match.group(3)}"
+
     @staticmethod
     def inserts(table_name: str, script_content: str) -> Generator:
         PREFIX = f"INSERT INTO `{table_name}`"
@@ -204,17 +232,54 @@ class Convertor(ABC):
             Generator[str]: create index 语句
         """
 
-        def generate_columns(columns):
-            keys = [
-                f"{col['name'].lower()}{' ' + col['order'].lower() if col['order'] != 'ASC' else ''}"
-                for col in columns[0]
-            ]
-            return ", ".join(keys)
-
-        for no, index in enumerate(ddl["index"], 1):
-            columns = generate_columns(index["columns"])
+        for no, index in enumerate(ddl.get("index", []), 1):
+            columns = ", ".join(Convertor.index_columns(index.get("columns", [])))
+            if not columns:
+                continue
             table_name = ddl["table_name"].lower()
             yield f"CREATE INDEX idx_{table_name}_{no:02d} ON {table_name} ({columns})"
+
+    @staticmethod
+    def index_columns(columns) -> list:
+        """兼容 simple-ddl-parser 不同版本的索引列结构。"""
+
+        keys = []
+
+        def append(name, order="ASC"):
+            if not name:
+                return
+            column_name = str(name).strip("`").lower()
+            column_order = str(order or "ASC").upper()
+            if column_order == "DESC":
+                keys.append(f"{column_name} desc")
+            else:
+                keys.append(column_name)
+
+        def visit(value):
+            # 普通索引常见结构：[[{'name': 'user_id', 'order': 'ASC'}]]
+            if isinstance(value, (list, tuple)):
+                for item in value:
+                    visit(item)
+                return
+            if isinstance(value, dict):
+                name = value.get("name")
+                if isinstance(name, (dict, list, tuple)):
+                    visit(name)
+                    return
+                append(name, value.get("order", "ASC"))
+                return
+            # 唯一索引在部分版本中会被解析成 ['mobile', 'ASC', 'tenant_id', 'ASC']。
+            if isinstance(value, str):
+                token = value.strip("`")
+                order = token.upper()
+                if order in ("ASC", "DESC"):
+                    if order == "DESC" and keys and not keys[-1].endswith(" desc"):
+                        keys[-1] = f"{keys[-1]} desc"
+                    return
+                append(token)
+
+        visit(columns)
+        return keys
 
     @staticmethod
     def unique_index(ddl: Dict) -> Generator:
@@ -223,7 +288,9 @@ class Convertor(ABC):
             for uk in uk_list:
                 table_name = ddl["table_name"]
                 uk_name = uk["constraint_name"]
-                uk_columns = uk["columns"]
+                uk_columns = Convertor.index_columns(uk["columns"])
+                if not uk_columns:
+                    continue
                 yield table_name, uk_name, uk_columns
 
     @staticmethod
@@ -381,7 +448,7 @@ class PostgreSQLConvertor(Convertor):
                 )
             nullable = "NULL" if col["nullable"] else "NOT NULL"
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
-            return f"{name} {full_type} {nullable} {default}"
+            return f"{self.escape_column_name(name)} {full_type} {nullable} {default}"
 
         table_name = ddl["table_name"].lower()
         columns = [f"{_generate_column(col).strip()}" for col in ddl["columns"]]
@@ -406,7 +473,7 @@ CREATE TABLE {table_name} (
         for column in table_ddl["columns"]:
             table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{self.escape_column_name(column['name'])} IS '{table_comment}';"
                 + "\n"
             )
 
@@ -435,6 +502,7 @@ CREATE TABLE {table_name} (
         """生成 insert 语句，以及根据最后的 insert id+1 生成 Sequence"""
 
         inserts = list(Convertor.inserts(table_name, self.content))
+        inserts = [self.escape_insert_columns(s) for s in inserts]
         # 转换 MySQL 字符串转义为 PostgreSQL 格式：\\ -> \，\' -> ''
         inserts = [re.sub(r"\\\\|\\'", lambda m: "\\" if m.group() == "\\\\" else "''", s) for s in inserts]
         ## 生成 insert 脚本
@@ -482,6 +550,8 @@ INSERT INTO dual VALUES (1);
 
 
 class OracleConvertor(Convertor):
+    reserved_column_names = {"level", "size"}
+
     def __init__(self, src):
         super().__init__(src, "Oracle")
 
@@ -526,10 +596,8 @@ class OracleConvertor(Convertor):
             # Oracle的 INSERT '' 不能通过NOT NULL校验，因此对文字类型字段覆写为 NULL
             nullable = "NULL" if type in ("varchar", "text", "longtext") else nullable
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
-            # Oracle 中 size 不能作为字段名
-            field_name = '"size"' if name == "size" else name
             # Oracle DEFAULT 定义在 NULLABLE 之前
-            return f"{field_name} {full_type} {default} {nullable}"
+            return f"{self.escape_column_name(name)} {full_type} {default} {nullable}"
 
         table_name = ddl["table_name"].lower()
         columns = [f"{generate_column(col).strip()}" for col in ddl["columns"]]
@@ -554,7 +622,7 @@ CREATE TABLE {table_name} (
         for column in table_ddl["columns"]:
             table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{self.escape_column_name(column['name'])} IS '{table_comment}';"
                 + "\n"
             )
 
@@ -586,6 +654,7 @@ CREATE TABLE {table_name} (
         """拷贝 INSERT 语句"""
         inserts = []
         for insert_script in Convertor.inserts(table_name, self.content):
+            insert_script = self.escape_insert_columns(insert_script)
             # 对日期数据添加 TO_DATE 转换
             insert_script = re.sub(
                 r"('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}')",
@@ -907,6 +976,8 @@ SET IDENTITY_INSERT {table_name.lower()} OFF;
 
 
 class KingbaseConvertor(PostgreSQLConvertor):
+    reserved_column_names = {"level"}
+
     def __init__(self, src):
         super().__init__(src)
         self.db_type = "Kingbase"
@@ -925,7 +996,7 @@ class KingbaseConvertor(PostgreSQLConvertor):
             if full_type == "text":
                 nullable = "NULL"
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
-            return f"{name} {full_type} {nullable} {default}"
+            return f"{self.escape_column_name(name)} {full_type} {nullable} {default}"
 
         table_name = ddl["table_name"].lower()
         columns = [f"{_generate_column(col).strip()}" for col in ddl["columns"]]
@@ -945,6 +1016,8 @@ CREATE TABLE {table_name} (
 
 
 class OpengaussConvertor(KingbaseConvertor):
+    reserved_column_names = set()
+
     def __init__(self, src):
         super().__init__(src)
         self.db_type = "OpenGauss"
