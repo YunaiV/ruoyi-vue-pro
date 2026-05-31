@@ -76,7 +76,7 @@ public class JsonWebSocketMessageHandler extends TextWebSocketHandler {
             Long tenantId = WebSocketFrameworkUtils.getTenantId(session);
             TenantUtils.execute(tenantId, () -> messageListener.onMessage(session, messageObj));
         } catch (Throwable ex) {
-            log.error("[handleTextMessage][session({}) message({}) 处理异常]", session.getId(), message.getPayload());
+            log.error("[handleTextMessage][session({}) message({}) 处理异常]", session.getId(), message.getPayload(), ex);
         }
     }
 

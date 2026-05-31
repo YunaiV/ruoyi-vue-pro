@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -130,8 +131,16 @@ public class UserController {
 
     @GetMapping({"/list-all-simple", "/simple-list"})
     @Operation(summary = "获取用户精简信息列表", description = "只包含被开启的用户，主要用于前端的下拉选项")
-    public CommonResult<List<UserSimpleRespVO>> getSimpleUserList() {
-        List<AdminUserDO> list = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus());
+    public CommonResult<List<UserSimpleRespVO>> getSimpleUserList(
+            @RequestParam(value = "deptId", required = false) Long deptId) {
+        List<AdminUserDO> list;
+        if (deptId != null) {
+            List<Long> deptIds = Collections.singletonList(deptId);
+            list = userService.getDeptUsers(deptIds);
+        } else {
+            list = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        }
+
         // 拼接数据
         Map<Long, DeptDO> deptMap = deptService.getDeptMap(
                 convertList(list, AdminUserDO::getDeptId));
@@ -192,6 +201,36 @@ public class UserController {
                                                       @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
         List<UserImportExcelVO> list = ExcelUtils.read(file, UserImportExcelVO.class);
         return success(userService.importUserList(list, updateSupport));
+    }
+
+    // ==================== 免鉴权接口（用于 IM 点头像弹名片、加好友搜索等场景） ====================
+
+    @GetMapping("/get-simple")
+    @Operation(summary = "获得用户精简信息", description = "用于点头像弹名片等场景；免鉴权")
+    @Parameter(name = "id", description = "用户编号", required = true, example = "1024")
+    public CommonResult<UserSimpleRespVO> getSimpleUser(@RequestParam("id") Long id) {
+        AdminUserDO user = userService.getUser(id);
+        if (user == null) {
+            return success(null);
+        }
+        // 拼接数据
+        DeptDO dept = user.getDeptId() != null ? deptService.getDept(user.getDeptId()) : null;
+        Map<Long, DeptDO> deptMap = dept != null ? Collections.singletonMap(dept.getId(), dept) : Collections.emptyMap();
+        return success(CollUtil.getFirst(UserConvert.INSTANCE.convertSimpleList(
+                Collections.singletonList(user), deptMap)));
+    }
+
+    @GetMapping("/list-by-nickname")
+    @Operation(summary = "按昵称模糊搜索用户精简信息", description = "用于加好友等场景；免鉴权；当前仅按昵称匹配")
+    @Parameter(name = "nickname", description = "昵称关键词", required = true, example = "芋道")
+    public CommonResult<List<UserSimpleRespVO>> getSimpleUserListByNickname(@RequestParam("nickname") String nickname) {
+        if (StrUtil.isBlank(nickname)) {
+            return success(Collections.emptyList());
+        }
+        // 拼接数据
+        List<AdminUserDO> list = userService.getUserListByNickname(nickname.trim());
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(convertList(list, AdminUserDO::getDeptId));
+        return success(UserConvert.INSTANCE.convertSimpleList(list, deptMap));
     }
 
 }

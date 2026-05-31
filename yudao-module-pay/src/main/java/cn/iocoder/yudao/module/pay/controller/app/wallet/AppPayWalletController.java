@@ -19,9 +19,6 @@ import javax.annotation.Resource;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-/**
- * @author jason
- */
 @Tag(name = "用户 APP - 钱包")
 @RestController
 @RequestMapping("/pay/wallet")

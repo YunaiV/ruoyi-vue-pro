@@ -56,6 +56,14 @@ public interface AdminUserApi {
     List<AdminUserRespDTO> getUserListByPostIds(Collection<Long> postIds);
 
     /**
+     * 根据昵称模糊搜索用户
+     *
+     * @param nickname 昵称关键词
+     * @return 用户列表
+     */
+    List<AdminUserRespDTO> getUserListByNickname(String nickname);
+
+    /**
      * 获得用户 Map
      *
      * @param ids 用户编号数组
