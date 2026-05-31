@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.im.service.websocket;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -33,7 +33,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class ImWebSocketServiceImpl implements ImWebSocketService {
 
     @Resource
-    private WebSocketMessageSender webSocketMessageSender;
+    private WebSocketSenderApi webSocketSenderApi;
 
     @Override
     public void sendPrivateMessageAsync(Collection<Long> userIds, ImPrivateMessageDTO dto) {
@@ -64,7 +64,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
     public void doSendPrivateMessage(Collection<Long> userIds, ImPrivateMessageDTO dto) {
         for (Long userId : getDistinctUserIds(userIds)) {
             try {
-                webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+                webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                         ImPrivateMessageDTO.TYPE, dto);
             } catch (Exception e) {
                 log.error("[doSendPrivateMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
@@ -79,7 +79,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
     public void doSendGroupMessage(Collection<Long> userIds, ImGroupMessageDTO dto) {
         for (Long userId : getDistinctUserIds(userIds)) {
             try {
-                webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+                webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                         ImGroupMessageDTO.TYPE, dto);
             } catch (Exception e) {
                 log.error("[doSendGroupMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
@@ -94,7 +94,7 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
     public void doSendChannelMessage(Collection<Long> userIds, ImChannelMessageDTO dto) {
         for (Long userId : getDistinctUserIds(userIds)) {
             try {
-                webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
+                webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
                         ImChannelMessageDTO.TYPE, dto);
             } catch (Exception e) {
                 log.error("[doSendChannelMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
@@ -104,12 +104,12 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
 
     /**
      * 异步广播频道 WebSocket 消息给当前所有在线管理端用户；
-     * 依赖 WebSocketMessageSender 按 UserType 广播能力，离线用户由客户端上线 pull 兜底
+     * 依赖 infra WebSocketSenderApi 按 UserType 广播能力，离线用户由客户端上线 pull 兜底
      */
     @Async
     public void doBroadcastChannelMessage(ImChannelMessageDTO dto) {
         try {
-            webSocketMessageSender.sendObject(UserTypeEnum.ADMIN.getValue(),
+            webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(),
                     ImChannelMessageDTO.TYPE, dto);
         } catch (Exception e) {
             log.error("[doBroadcastChannelMessage][dto({}) 广播失败]", dto, e);
