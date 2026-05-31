@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.websocket;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -18,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.im.util.ImTestCollectionUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -108,7 +108,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             dto.setGroupId(10L);
             dto.setSenderId(1L);
 
-            imWebSocketService.sendGroupMessageAsync(listOf(1L, 2L, 3L), dto);
+            imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
 
             verify(webSocketMessageSender).sendObject(
                     eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
@@ -131,7 +131,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             doThrow(new RuntimeException("user offline"))
                     .when(webSocketMessageSender).sendObject(anyInt(), eq(1L), anyString(), any());
 
-            imWebSocketService.sendGroupMessageAsync(listOf(1L, 2L, 3L), dto);
+            imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
 
             // 2L 和 3L 也都被推送
             verify(webSocketMessageSender).sendObject(anyInt(), eq(2L), anyString(), any());

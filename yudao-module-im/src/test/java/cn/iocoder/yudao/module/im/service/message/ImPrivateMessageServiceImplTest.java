@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.message;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageListReqVO;
@@ -25,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.im.util.ImTestCollectionUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -136,7 +136,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testPullMessages_success() {
         // 准备
-        List<ImPrivateMessageDO> mockMessages = listOf(
+        List<ImPrivateMessageDO> mockMessages = ListUtil.of(
                 ImPrivateMessageDO.builder().id(1L).senderId(1L).receiverId(2L).build(),
                 ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L).build()
         );
@@ -416,7 +416,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         reqVO.setReceiverId(2L);
         reqVO.setMaxId(100L);
         reqVO.setLimit(20);
-        List<ImPrivateMessageDO> mockList = listOf(
+        List<ImPrivateMessageDO> mockList = ListUtil.of(
                 ImPrivateMessageDO.builder().id(99L).senderId(1L).receiverId(2L).build(),
                 ImPrivateMessageDO.builder().id(98L).senderId(2L).receiverId(1L).build()
         );

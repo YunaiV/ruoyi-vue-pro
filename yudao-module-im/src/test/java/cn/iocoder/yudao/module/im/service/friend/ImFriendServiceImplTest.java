@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -22,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.FRIEND_NOT_FRIEND;
-import static cn.iocoder.yudao.module.im.util.ImTestCollectionUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
@@ -249,7 +249,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetFriendList() {
-        List<ImFriendDO> list = listOf(
+        List<ImFriendDO> list = ListUtil.of(
                 ImFriendDO.builder().id(1L).userId(1L).friendUserId(2L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImFriendDO.builder().id(2L).userId(1L).friendUserId(3L)
@@ -277,9 +277,9 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         ImFriendDO friend3 = ImFriendDO.builder().id(2L).userId(1L).friendUserId(3L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(imFriendMapper.selectListByUserIdAndStatus(1L, CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(listOf(friend2, friend3));
+                .thenReturn(ListUtil.of(friend2, friend3));
         when(imFriendMapper.selectListByUserIdsAndFriendUserIdAndStatus(anyCollection(), eq(1L),
-                eq(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(listOf(
+                eq(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(ListUtil.of(
                         ImFriendDO.builder().userId(2L).friendUserId(1L)
                                 .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
