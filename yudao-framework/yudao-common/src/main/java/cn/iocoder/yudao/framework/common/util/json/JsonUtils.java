@@ -235,6 +235,14 @@ public class JsonUtils {
         }
     }
 
+    public static String getText(JsonNode node, String fieldName) {
+        if (node == null) {
+            return null;
+        }
+        JsonNode value = node.get(fieldName);
+        return value != null && !value.isNull() ? value.asText() : null;
+    }
+
     public static boolean isJson(String text) {
         return JSONUtil.isTypeJSON(text);
     }
