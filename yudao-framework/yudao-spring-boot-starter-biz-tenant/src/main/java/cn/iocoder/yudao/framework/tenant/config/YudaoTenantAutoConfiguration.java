@@ -192,7 +192,12 @@ public class YudaoTenantAutoConfiguration {
         RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory,
                 BatchStrategies.scan(yudaoCacheProperties.getRedisScanBatchSize()));
         // 创建 TenantRedisCacheManager 对象
-        return new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration, tenantProperties.getIgnoreCaches());
+        TenantRedisCacheManager cacheManager = new TenantRedisCacheManager(cacheWriter, redisCacheConfiguration,
+                tenantProperties.getIgnoreCaches());
+        // 开启事务感知：@Transactional 方法内的 @CacheEvict / @CachePut 自动延迟到 afterCommit，
+        //             避免事务未提交就清缓存被并发读穿写脏值；无事务时立即生效，行为不变
+        cacheManager.setTransactionAware(true);
+        return cacheManager;
     }
 
 }

@@ -50,6 +50,8 @@
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.22.2</jsoup.version>
+        <sensitive-word.version>0.29.5</sensitive-word.version>
+        <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.44</hutool-5.version>
@@ -557,6 +559,18 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.houbb</groupId>
+                <artifactId>sensitive-word</artifactId> <!-- 敏感词检测：trie 树高效匹配 -->
+                <version>${sensitive-word.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.belerweb</groupId>
+                <artifactId>pinyin4j</artifactId> <!-- 汉字转拼音：作为 hutool PinyinUtil 的底层引擎 -->
+                <version>${pinyin4j.version}</version>
             </dependency>
 
             <!-- Vert.x -->

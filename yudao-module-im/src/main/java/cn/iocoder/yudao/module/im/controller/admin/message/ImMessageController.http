@@ -1,0 +1,18 @@
+### 请求 /send 接口 => 成功
+POST {{baseUrl}}/im/message/send
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+
+{
+      "clientMessageId": "123",
+        "receiverId": 1,
+        "conversationType": 1,
+        "contentType": 101,
+        "content": "你好1"
+}
+
+### 请求 /pull 接口 => 成功
+GET {{baseUrl}}/im/message/pull?sequence=0&size=2
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}
