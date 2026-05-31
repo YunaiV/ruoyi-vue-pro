@@ -202,6 +202,37 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCalculateProductBrokeragePrice_subCommissionNullFixed() {
+        // mock：分销功能已开启，比例 10%，当前用户有分销资格
+        TradeConfigDO tradeConfig = new TradeConfigDO();
+        tradeConfig.setBrokerageEnabled(true);
+        tradeConfig.setBrokerageFirstPercent(10);
+        when(tradeConfigService.getTradeConfig()).thenReturn(tradeConfig);
+        when(brokerageUserService.getUserBrokerageEnabled(100L)).thenReturn(true);
+
+        // mock：商品开启独立分销，其中一个 SKU 固定佣金未配置
+        ProductSpuRespDTO spu = new ProductSpuRespDTO();
+        spu.setSubCommissionType(true);
+        when(productSpuApi.getSpu(3L)).thenReturn(spu);
+
+        ProductSkuRespDTO nullBrokerageSku = new ProductSkuRespDTO();
+        nullBrokerageSku.setPrice(1000);
+        nullBrokerageSku.setFirstBrokeragePrice(null);
+        ProductSkuRespDTO fixedBrokerageSku = new ProductSkuRespDTO();
+        fixedBrokerageSku.setPrice(2000);
+        fixedBrokerageSku.setFirstBrokeragePrice(200);
+        when(productSkuApi.getSkuListBySpuId(ListUtil.of(3L))).thenReturn(List.of(nullBrokerageSku, fixedBrokerageSku));
+
+        // 调用
+        AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 3L);
+
+        // 断言：独立分销固定佣金为空时按 0 处理，避免比较最小/最大佣金时报错
+        assertTrue(result.getEnabled());
+        assertEquals(0, result.getBrokerageMinPrice());
+        assertEquals(200, result.getBrokerageMaxPrice());
+    }
+
+    @Test
     public void testCalculateProductBrokeragePrice_subCommissionEmptySkuList() {
         // mock：分销功能已开启，比例 10%，当前用户有分销资格
         TradeConfigDO tradeConfig = new TradeConfigDO();
@@ -213,11 +244,11 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
         // mock：商品开启独立分销，但查询不到 SKU 固定佣金
         ProductSpuRespDTO spu = new ProductSpuRespDTO();
         spu.setSubCommissionType(true);
-        when(productSpuApi.getSpu(3L)).thenReturn(spu);
-        when(productSkuApi.getSkuListBySpuId(ListUtil.of(3L))).thenReturn(List.of());
+        when(productSpuApi.getSpu(4L)).thenReturn(spu);
+        when(productSkuApi.getSkuListBySpuId(ListUtil.of(4L))).thenReturn(List.of());
 
         // 调用
-        AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 3L);
+        AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 4L);
 
         // 断言：独立分销没有固定佣金时，不回退到全局比例
         assertTrue(result.getEnabled());

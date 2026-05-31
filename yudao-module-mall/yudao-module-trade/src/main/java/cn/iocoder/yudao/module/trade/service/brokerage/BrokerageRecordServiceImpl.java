@@ -342,9 +342,11 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         List<ProductSkuRespDTO> skuList = productSkuApi.getSkuListBySpuId(ListUtil.of(spuId));
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
             // 3.2.1 商品独立分销模式：直接取 SKU 固定佣金
-            // 注意：固定佣金允许为 0，表示商家主动设为零佣金
-            Integer fixedMinPrice = getMinValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
-            Integer fixedMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
+            // 注意：固定佣金允许为 0，表示商家主动设为零佣金；为空时，也按 0 处理
+            Integer fixedMinPrice = getMinValue(skuList,
+                    sku -> ObjectUtil.defaultIfNull(sku.getFirstBrokeragePrice(), 0));
+            Integer fixedMaxPrice = getMaxValue(skuList,
+                    sku -> ObjectUtil.defaultIfNull(sku.getFirstBrokeragePrice(), 0));
             respVO.setBrokerageMinPrice(calculatePrice(null, tradeConfig.getBrokerageFirstPercent(), fixedMinPrice))
                     .setBrokerageMaxPrice(calculatePrice(null, tradeConfig.getBrokerageFirstPercent(), fixedMaxPrice));
         } else {
