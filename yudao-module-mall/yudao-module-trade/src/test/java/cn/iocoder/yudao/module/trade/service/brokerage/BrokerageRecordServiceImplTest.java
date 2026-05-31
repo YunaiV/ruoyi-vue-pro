@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.RoundingMode;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -162,7 +161,7 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
 
         ProductSkuRespDTO sku = new ProductSkuRespDTO();
         sku.setPrice(1000);
-        when(productSkuApi.getSkuListBySpuId(ListUtil.of(1L))).thenReturn(List.of(sku));
+        when(productSkuApi.getSkuListBySpuId(ListUtil.of(1L))).thenReturn(ListUtil.of(sku));
 
         // 调用
         AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 1L);
@@ -190,7 +189,7 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
         ProductSkuRespDTO sku = new ProductSkuRespDTO();
         sku.setPrice(1000);
         sku.setFirstBrokeragePrice(0);
-        when(productSkuApi.getSkuListBySpuId(ListUtil.of(2L))).thenReturn(List.of(sku));
+        when(productSkuApi.getSkuListBySpuId(ListUtil.of(2L))).thenReturn(ListUtil.of(sku));
 
         // 调用
         AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 2L);
@@ -221,7 +220,7 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
         ProductSkuRespDTO fixedBrokerageSku = new ProductSkuRespDTO();
         fixedBrokerageSku.setPrice(2000);
         fixedBrokerageSku.setFirstBrokeragePrice(200);
-        when(productSkuApi.getSkuListBySpuId(ListUtil.of(3L))).thenReturn(List.of(nullBrokerageSku, fixedBrokerageSku));
+        when(productSkuApi.getSkuListBySpuId(ListUtil.of(3L))).thenReturn(ListUtil.of(nullBrokerageSku, fixedBrokerageSku));
 
         // 调用
         AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 3L);
@@ -245,7 +244,7 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
         ProductSpuRespDTO spu = new ProductSpuRespDTO();
         spu.setSubCommissionType(true);
         when(productSpuApi.getSpu(4L)).thenReturn(spu);
-        when(productSkuApi.getSkuListBySpuId(ListUtil.of(4L))).thenReturn(List.of());
+        when(productSkuApi.getSkuListBySpuId(ListUtil.of(4L))).thenReturn(ListUtil.of());
 
         // 调用
         AppBrokerageProductPriceRespVO result = brokerageRecordService.calculateProductBrokeragePrice(100L, 4L);
