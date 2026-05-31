@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClie
 import cn.iocoder.yudao.module.infra.framework.file.core.utils.FilePathUtils;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_PATH_INVALID;
@@ -55,7 +56,7 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
 
     private String getFilePath(String path) {
         FilePathUtils.validatePath(path);
-        Path basePath = Path.of(config.getBasePath()).toAbsolutePath().normalize();
+        Path basePath = Paths.get(config.getBasePath()).toAbsolutePath().normalize();
         Path filePath = basePath.resolve(path).normalize();
         if (!filePath.startsWith(basePath)) {
             throw exception(FILE_PATH_INVALID);

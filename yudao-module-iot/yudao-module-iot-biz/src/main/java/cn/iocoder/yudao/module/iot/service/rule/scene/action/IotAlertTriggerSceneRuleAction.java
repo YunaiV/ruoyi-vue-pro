@@ -121,11 +121,20 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
     }
 
     private String resolveTemplateCode(IotAlertConfigDO config, IotAlertReceiveTypeEnum typeEnum) {
-        String templateCode = switch (typeEnum) {
-            case SMS -> config.getSmsTemplateCode();
-            case MAIL -> config.getMailTemplateCode();
-            case NOTIFY -> config.getNotifyTemplateCode();
-        };
+        String templateCode = null;
+        switch (typeEnum) {
+            case SMS:
+                templateCode = config.getSmsTemplateCode();
+                break;
+            case MAIL:
+                templateCode = config.getMailTemplateCode();
+                break;
+            case NOTIFY:
+                templateCode = config.getNotifyTemplateCode();
+                break;
+            default:
+                break;
+        }
         return StrUtil.blankToDefault(templateCode, typeEnum.getTemplateCode());
     }
 

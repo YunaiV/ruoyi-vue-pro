@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_PATH_INVALID;
@@ -88,7 +88,7 @@ public class FilePathUtils {
         }
         try {
             // 使用 JDK Path 再兜底判断一次绝对路径
-            if (Path.of(path).isAbsolute()) {
+            if (Paths.get(path).isAbsolute()) {
                 return false;
             }
         } catch (InvalidPathException ex) {
