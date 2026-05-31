@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.enums.message;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
@@ -340,7 +341,7 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(ImMessageTypeEnum::getType).toArray(Integer[]::new);
 
-    private static final Set<Integer> FRIEND_NOTIFICATION_TYPES = Set.of(
+    private static final Set<Integer> FRIEND_NOTIFICATION_TYPES = CollUtil.newHashSet(
             FRIEND_REQUEST_APPROVED.type,
             FRIEND_REQUEST_REJECTED.type,
             FRIEND_REQUEST_RECEIVED.type,
@@ -351,12 +352,12 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
             FRIEND_INFO_UPDATED.type,
             FRIEND_UPDATE.type);
 
-    private static final Set<Integer> GROUP_REQUEST_NOTIFICATION_TYPES = Set.of(
+    private static final Set<Integer> GROUP_REQUEST_NOTIFICATION_TYPES = CollUtil.newHashSet(
             GROUP_REQUEST_RECEIVED.type,
             GROUP_REQUEST_APPROVED.type,
             GROUP_REQUEST_REJECTED.type);
 
-    private static final Set<Integer> RTC_NOTIFICATION_TYPES = Set.of(
+    private static final Set<Integer> RTC_NOTIFICATION_TYPES = CollUtil.newHashSet(
             RTC_CALL.type,
             RTC_PARTICIPANT_CONNECTED.type,
             RTC_PARTICIPANT_DISCONNECTED.type);

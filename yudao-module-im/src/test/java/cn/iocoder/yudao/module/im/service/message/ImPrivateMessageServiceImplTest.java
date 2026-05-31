@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.im.util.ImTestCollectionUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -135,7 +136,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testPullMessages_success() {
         // 准备
-        List<ImPrivateMessageDO> mockMessages = List.of(
+        List<ImPrivateMessageDO> mockMessages = listOf(
                 ImPrivateMessageDO.builder().id(1L).senderId(1L).receiverId(2L).build(),
                 ImPrivateMessageDO.builder().id(2L).senderId(2L).receiverId(1L).build()
         );
@@ -415,7 +416,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         reqVO.setReceiverId(2L);
         reqVO.setMaxId(100L);
         reqVO.setLimit(20);
-        List<ImPrivateMessageDO> mockList = List.of(
+        List<ImPrivateMessageDO> mockList = listOf(
                 ImPrivateMessageDO.builder().id(99L).senderId(1L).receiverId(2L).build(),
                 ImPrivateMessageDO.builder().id(98L).senderId(2L).receiverId(1L).build()
         );

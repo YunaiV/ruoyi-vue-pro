@@ -28,10 +28,10 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
-import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
@@ -413,12 +413,12 @@ public class ImGroupServiceImpl implements ImGroupService {
         ImGroupMemberDO newOwner = groupMemberService.validateMemberInGroup(groupId, newOwnerUserId);
 
         // 2.1 更新成员角色
-        int newOwnerAffected = groupMemberService.updateGroupMemberRole(groupId, Set.of(newOwner.getUserId()),
+        int newOwnerAffected = groupMemberService.updateGroupMemberRole(groupId, CollUtil.newHashSet(newOwner.getUserId()),
                 ImGroupMemberRoleEnum.OWNER.getRole());
         if (newOwnerAffected != 1) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
-        int oldOwnerAffected = groupMemberService.updateGroupMemberRole(groupId, Set.of(userId),
+        int oldOwnerAffected = groupMemberService.updateGroupMemberRole(groupId, CollUtil.newHashSet(userId),
                 ImGroupMemberRoleEnum.NORMAL.getRole());
         if (oldOwnerAffected != 1) {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);

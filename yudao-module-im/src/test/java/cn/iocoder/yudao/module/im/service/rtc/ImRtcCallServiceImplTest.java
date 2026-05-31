@@ -34,9 +34,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_GROUP_INVITEE_REQUIRED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_GROUP_INVITEE_OVER_LIMIT;
+import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_GROUP_INVITEE_REQUIRED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.RTC_SELF_BUSY;
+import static cn.iocoder.yudao.module.im.util.ImTestCollectionUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -103,8 +104,8 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         // 准备：候选非空但每个 CAS 都失败（并发已变状态）
         ImRtcParticipantDO p = buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING);
         when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any()))
-                .thenReturn(List.of(p));
-        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(100L, buildUser(100L)));
+                .thenReturn(listOf(p));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(mapOf(100L, buildUser(100L)));
         when(rtcParticipantMapper.updateByIdAndStatus(eq(10L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
                 .thenReturn(0);
 
@@ -122,15 +123,15 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         // 准备：群通话单候选 CAS 成功；shouldCloseGroupRoom 通过 selectListByRoom 多 JOINED 让其返 false，跳过 endSession
         ImRtcParticipantDO p = buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING);
         when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any()))
-                .thenReturn(List.of(p));
-        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(100L, buildUser(100L)));
+                .thenReturn(listOf(p));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(mapOf(100L, buildUser(100L)));
         when(rtcParticipantMapper.updateByIdAndStatus(eq(10L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
                 .thenReturn(1);
         ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
         when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
-        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(999L)).thenReturn(List.of(200L, 201L));
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(999L)).thenReturn(listOf(200L, 201L));
         // 房内 2 个 JOINED + 1 个 INVITING → shouldCloseGroupRoom 返 false
-        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
+        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(listOf(
                 buildParticipant(20L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
                 buildParticipant(21L, "r1", 201L, ImRtcParticipantStatusEnum.JOINED),
                 buildParticipant(22L, "r1", 202L, ImRtcParticipantStatusEnum.INVITING)
@@ -150,8 +151,8 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         // 准备：CAS 成功后通话主表缺失（异常兜底场景）
         ImRtcParticipantDO p = buildParticipant(10L, "r1", 100L, ImRtcParticipantStatusEnum.INVITING);
         when(rtcParticipantMapper.selectListByStatusAndInviteTimeBefore(any(), any()))
-                .thenReturn(List.of(p));
-        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(100L, buildUser(100L)));
+                .thenReturn(listOf(p));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(mapOf(100L, buildUser(100L)));
         when(rtcParticipantMapper.updateByIdAndStatus(eq(10L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
                 .thenReturn(1);
         when(rtcCallMapper.selectByRoom("r1")).thenReturn(null);
@@ -219,15 +220,15 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         ImRtcParticipantDO timeoutTarget = buildParticipant(11L, "r1", 101L, ImRtcParticipantStatusEnum.INVITING);
         when(rtcParticipantMapper.selectListByRoomAndStatusAndInviteTimeBefore(
                 eq("r1"), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
-                .thenReturn(List.of(timeoutTarget));
-        when(adminUserApi.getUserMap(anySet())).thenReturn(Map.of(101L, buildUser(101L)));
+                .thenReturn(listOf(timeoutTarget));
+        when(adminUserApi.getUserMap(anySet())).thenReturn(mapOf(101L, buildUser(101L)));
         when(rtcParticipantMapper.updateByIdAndStatus(eq(11L), eq(ImRtcParticipantStatusEnum.INVITING.getStatus()), any()))
                 .thenReturn(1);
         ImRtcCallDO call = buildCall("r1", 200L, ImConversationTypeEnum.GROUP, 999L);
         when(rtcCallMapper.selectByRoom("r1")).thenReturn(call);
-        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(999L)).thenReturn(List.of(200L, 201L));
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(999L)).thenReturn(listOf(200L, 201L));
         // 让 shouldCloseGroupRoom 返 false
-        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
+        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(listOf(
                 buildParticipant(20L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
                 buildParticipant(21L, "r1", 201L, ImRtcParticipantStatusEnum.JOINED)
         ));
@@ -253,7 +254,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         ImRtcCallCreateReqVO reqVO = new ImRtcCallCreateReqVO();
         reqVO.setConversationType(ImConversationTypeEnum.GROUP.getType());
         reqVO.setGroupId(10L);
-        reqVO.setInviteeIds(Set.of(100L));
+        reqVO.setInviteeIds(setOf(100L));
 
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> rtcCallService.createCall(100L, reqVO));
@@ -335,14 +336,14 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
             Callable<Void> callable = invocation.getArgument(1);
             return callable.call();
         });
-        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(List.of(
+        when(rtcParticipantMapper.selectListByRoom("r1")).thenReturn(listOf(
                 buildParticipant(10L, "r1", 200L, ImRtcParticipantStatusEnum.JOINED),
                 buildParticipant(11L, "r1", 201L, ImRtcParticipantStatusEnum.JOINED),
                 buildParticipant(12L, "r1", 202L, ImRtcParticipantStatusEnum.INVITING)
         ));
         ImRtcCallInviteReqVO reqVO = new ImRtcCallInviteReqVO();
         reqVO.setRoom("r1");
-        reqVO.setInviteeIds(Set.of(203L));
+        reqVO.setInviteeIds(setOf(203L));
 
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> rtcCallService.inviteCall(200L, reqVO));

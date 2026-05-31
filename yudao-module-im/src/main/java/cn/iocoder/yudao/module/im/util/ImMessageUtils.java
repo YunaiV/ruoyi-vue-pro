@@ -87,12 +87,15 @@ public class ImMessageUtils {
         validateNotBlank(getString(map, "name"));
     }
 
+    @SuppressWarnings("PatternVariableCanBeUsed")
     private static void validateMergeContent(Map<String, Object> map) {
         validateNotBlank(getString(map, "title"));
         Object messages = map.get("messages");
-        if (!(messages instanceof Collection<?> messageList)
-                || CollUtil.isEmpty(messageList)
-                || messageList.size() > MERGE_MESSAGE_MAX_COUNT) {
+        if (!(messages instanceof Collection)) {
+            throw exception(MESSAGE_CONTENT_INVALID);
+        }
+        Collection<?> messageList = (Collection<?>) messages;
+        if (CollUtil.isEmpty(messageList) || messageList.size() > MERGE_MESSAGE_MAX_COUNT) {
             throw exception(MESSAGE_CONTENT_INVALID);
         }
     }

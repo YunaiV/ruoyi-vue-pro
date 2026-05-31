@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.controller.admin.face;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.face.vo.pack.ImFacePackUserRespVO;
@@ -39,7 +40,7 @@ public class ImFacePackController {
         // 1.1 拉所有启用表情包
         List<ImFacePackDO> packs = facePackService.getEnabledFacePackList();
         if (packs.isEmpty()) {
-            return success(List.of());
+            return success(ListUtil.of());
         }
         // 1.2 拉这些包下所有启用表情，按 packId 分组
         List<ImFacePackItemDO> items = facePackItemService.getEnabledItemListByPackIds(
@@ -49,7 +50,7 @@ public class ImFacePackController {
         // 2. 拼装：BeanUtils 把 pack 字段映射 + 自己塞 items
         List<ImFacePackUserRespVO> result = convertList(packs, pack -> {
             ImFacePackUserRespVO vo = BeanUtils.toBean(pack, ImFacePackUserRespVO.class);
-            vo.setItems(BeanUtils.toBean(itemsByPackId.getOrDefault(pack.getId(), List.of()), ImFacePackUserRespVO.Item.class));
+            vo.setItems(BeanUtils.toBean(itemsByPackId.getOrDefault(pack.getId(), ListUtil.of()), ImFacePackUserRespVO.Item.class));
             return vo;
         });
         return success(result);
