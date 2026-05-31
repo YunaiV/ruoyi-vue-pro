@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.im.controller.admin.face.vo.useritem.ImFaceUserItemSaveReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.useritem.ImFaceUserItemManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFaceUserItemDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**

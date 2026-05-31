@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.im.service.statistics;
 
 import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.module.im.dal.mysql.statistics.ImStatisticsManagerMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

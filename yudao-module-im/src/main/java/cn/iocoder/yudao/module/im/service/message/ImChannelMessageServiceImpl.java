@@ -17,12 +17,12 @@ import cn.iocoder.yudao.module.im.service.channel.ImChannelMaterialService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.MaterialMessage;
-import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;

@@ -14,8 +14,8 @@ import cn.iocoder.yudao.module.im.controller.admin.group.vo.member.ImGroupMember
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerBanReqVO;
 import cn.iocoder.yudao.module.im.controller.admin.manager.group.vo.ImGroupManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

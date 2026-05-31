@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.im.controller.admin.group.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Schema(description = "管理后台 - 群创建 Request VO")

@@ -86,7 +86,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     private ConfigApi configApi;
     @MockBean
     private OAuth2TokenService oauth2TokenService;
-    @MockitoBean
+    @MockBean
     private AdminUserProducer adminUserProducer;
 
     @BeforeEach

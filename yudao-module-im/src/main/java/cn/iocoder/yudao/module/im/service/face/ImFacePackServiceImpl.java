@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.pack.ImFacePa
 import cn.iocoder.yudao.module.im.controller.admin.manager.face.vo.pack.ImFacePackSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.face.ImFacePackDO;
 import cn.iocoder.yudao.module.im.dal.mysql.face.ImFacePackMapper;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

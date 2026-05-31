@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.im.dal.redis.message;
 
 import cn.hutool.core.convert.Convert;
-import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.module.im.dal.redis.RedisKeyConstants.CHANNEL_MESSAGE_READ;
 

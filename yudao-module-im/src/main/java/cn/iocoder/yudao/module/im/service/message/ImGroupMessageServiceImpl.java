@@ -32,15 +32,16 @@ import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
 import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
 import cn.iocoder.yudao.module.im.util.ImMessageUtils;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -295,7 +296,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .filter(msg -> isMessageVisible(msg, memberMap.get(msg.getGroupId()), userId))
                 .sorted(Comparator.comparing(ImGroupMessageDO::getId))
                 .limit(size)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -10,7 +11,6 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +19,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -78,7 +79,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     public List<ImGroupMemberDO> getGroupMemberListByOwnerAndAdmin(Long groupId) {
         // TODO DONE @AI：把条件往下传；这样减少加载数据量！
         return groupMemberMapper.selectListByGroupIdAndStatusAndRoles(groupId, CommonStatusEnum.ENABLE.getStatus(),
-                List.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole()));
+                ListUtil.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole()));
     }
 
     /**
@@ -270,7 +271,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         boolean groupRemarkChanged = updateReqVO.getGroupRemark() != null
                 && ObjUtil.notEqual(updateReqVO.getGroupRemark(), member.getGroupRemark());
         if (silentChanged || groupRemarkChanged) {
-            groupMessageService.sendGroupMessage(userId, List.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
+            groupMessageService.sendGroupMessage(userId, ListUtil.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
                     groupId, userId, updateReqVO.getSilent(), updateReqVO.getGroupRemark()));
         }
     }

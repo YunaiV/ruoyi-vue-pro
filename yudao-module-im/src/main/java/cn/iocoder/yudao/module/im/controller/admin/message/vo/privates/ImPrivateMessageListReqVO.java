@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.im.controller.admin.message.vo.privates;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 私聊历史消息列表 Request VO")
 @Data

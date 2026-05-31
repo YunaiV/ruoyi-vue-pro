@@ -6,9 +6,10 @@ import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.rtc.ImRtcCallService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 振铃超时 Job：扫 INVITING 超过阈值的参与者，单人粒度标 NO_ANSWER + 推 RTC_CALL(REJECT) 让前端 banner 收敛

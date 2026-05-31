@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.sensitiveword;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
@@ -44,7 +45,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
         // mock 启用敏感词列表；LoadingCache 在首次 validateText 时懒加载，无需主动 init
         // 用 lenient 避免 null / empty 等不触发 cache load 的用例报 UnnecessaryStubbing
         lenient().when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(List.of(
+                .thenReturn(ListUtil.of(
                         ImSensitiveWordDO.builder().id(1L).word("badword")
                                 .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                         ImSensitiveWordDO.builder().id(2L).word("违禁词")
@@ -118,7 +119,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
 
         // 准备：mapper 返回新词库（额外多一个 newbad），并让 createSensitiveWord 走通
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(List.of(
+                .thenReturn(ListUtil.of(
                         ImSensitiveWordDO.builder().id(1L).word("badword")
                                 .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                         ImSensitiveWordDO.builder().id(2L).word("违禁词")
@@ -178,7 +179,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
         when(imSensitiveWordMapper.selectByWord("updatedbad")).thenReturn(null);
         // 准备：reload 时返回新词库
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(List.of(
+                .thenReturn(ListUtil.of(
                         ImSensitiveWordDO.builder().id(1L).word("updatedbad")
                                 .status(CommonStatusEnum.ENABLE.getStatus()).build()
                 ));
@@ -211,7 +212,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
                         .status(CommonStatusEnum.ENABLE.getStatus()).build());
         // 准备：reload 时返回剩余词库（只剩中文那条）
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(List.of(
+                .thenReturn(ListUtil.of(
                         ImSensitiveWordDO.builder().id(2L).word("违禁词")
                                 .status(CommonStatusEnum.ENABLE.getStatus()).build()
                 ));
@@ -251,24 +252,24 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
 
         // 准备：reload 时返回空词库
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(List.of());
+                .thenReturn(ListUtil.of());
 
         // 调用：批量删除，触发 invalidate
-        sensitiveWordService.deleteSensitiveWordList(List.of(1L, 2L));
+        sensitiveWordService.deleteSensitiveWordList(ListUtil.of(1L, 2L));
 
         // 调用 + 断言：所有词都不再命中
         assertDoesNotThrow(() -> sensitiveWordService.validateText("contains badword here"));
         assertDoesNotThrow(() -> sensitiveWordService.validateText("这条消息里有违禁词哦"));
 
         // 断言：deleteByIds 被调用 1 次；selectListByStatus 共 2 次
-        verify(imSensitiveWordMapper, times(1)).deleteByIds(List.of(1L, 2L));
+        verify(imSensitiveWordMapper, times(1)).deleteByIds(ListUtil.of(1L, 2L));
         verify(imSensitiveWordMapper, times(2)).selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
     }
 
     @Test
     public void testDeleteSensitiveWordList_emptyIds_skip() {
         // 调用：空列表直接返回
-        sensitiveWordService.deleteSensitiveWordList(List.of());
+        sensitiveWordService.deleteSensitiveWordList(ListUtil.of());
 
         // 断言：mapper 不被调用
         verify(imSensitiveWordMapper, never()).deleteByIds(anyList());

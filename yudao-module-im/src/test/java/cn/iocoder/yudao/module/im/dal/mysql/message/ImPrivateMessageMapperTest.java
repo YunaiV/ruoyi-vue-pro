@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.im.dal.mysql.message;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

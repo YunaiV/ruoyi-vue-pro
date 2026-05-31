@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.system.mq.producer.user;
 
 import cn.iocoder.yudao.module.system.api.message.user.AdminUserProfileUpdateMessage;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 管理员用户 Producer

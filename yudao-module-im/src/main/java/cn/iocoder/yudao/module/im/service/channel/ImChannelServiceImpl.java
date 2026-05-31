@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.channel.Im
 import cn.iocoder.yudao.module.im.controller.admin.manager.channel.vo.channel.ImChannelSaveReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelDO;
 import cn.iocoder.yudao.module.im.dal.mysql.channel.ImChannelMapper;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
