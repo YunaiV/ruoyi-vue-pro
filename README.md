@@ -102,7 +102,7 @@
 
 团队包含专业的项目经理、架构师、前端工程师、后端工程师、测试工程师、运维工程师，可以提供全流程的外包服务。
 
-项目可以是商城、SCRM 系统、OA 系统、物流系统、ERP 系统、CMS 系统、HIS 系统、支付系统、IM 聊天、微信公众号、微信小程序等等。
+项目可以是商城、SCRM 系统、OA 系统、物流系统、ERP 系统、CMS 系统、HIS 系统、支付系统、IM 即时通讯、微信公众号、微信小程序等等。
 
 ## 🐼 内置功能
 
@@ -308,6 +308,18 @@
 
 ![预览图](/.image/common/iot-preview.png)
 
+### IM 即时通讯
+
+演示地址（Boot）：<https://doc.iocoder.cn/im-preview/>
+
+演示地址（Vue3 + Element Plus）：<http://dashboard-vue3.yudao.iocoder.cn>
+
+![功能图](/.image/common/im-feature.png)
+
+| 聊天界面 | 聊天管理 |
+| --- | --- |
+| ![聊天界面](/.image/common/im-preview-home.png) | ![聊天管理](/.image/common/im-preview-manager.png) |
+
 ## 🐨 技术栈
 
 ### 模块
@@ -327,6 +339,7 @@
 | `yudao-module-crm`    | CRM 系统的 Module 模块  |
 | `yudao-module-mes`    | MES 系统的 Module 模块  |
 | `yudao-module-wms`    | WMS 系统的 Module 模块  |
+| `yudao-module-im`     | IM 即时通讯的 Module 模块 |
 | `yudao-module-ai`     | AI 大模型的 Module 模块  |
 | `yudao-module-iot`    | IoT 物联网的 Module 模块 |
 | `yudao-module-mp`     | 微信公众号的 Module 模块   |
