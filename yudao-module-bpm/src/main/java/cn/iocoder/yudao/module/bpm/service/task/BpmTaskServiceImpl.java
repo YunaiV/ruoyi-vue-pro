@@ -618,7 +618,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             runtimeService.setVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskIdsByReturn);
         }
 
-        // 6. 调用 BPM complete 去完成任务
+        // 6. 清理退回设置的不自动通过的变量。
+        runtimeService.removeVariable(task.getProcessInstanceId(), String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()));
+
+        // 7. 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
@@ -955,9 +958,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, reqVO.getTargetTaskDefinitionKey())
                 // 设置需要预测的任务 ids 的流程变量，用于辅助预测
                 .processVariable(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskDefinitionKeys)
-                // 设置流程变量（local）节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
-                .localVariable(reqVO.getTargetTaskDefinitionKey(),
-                        String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE)
+                // 设置流程变量节点退回标记, 用于退回到节点，不执行 BpmUserTaskAssignStartUserHandlerTypeEnum 策略，导致自动通过
+                .processVariable(String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, reqVO.getTargetTaskDefinitionKey()), Boolean.TRUE)
                 .changeState();
     }
 
@@ -1506,8 +1508,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     return;
                 }
                 FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
-                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略（使用 local variable）
-                Boolean returnTaskFlag = runtimeService.getVariableLocal(task.getExecutionId(),
+                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略
+                Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
                         String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
                 Boolean skipStartUserNodeFlag = Convert.toBool(runtimeService.getVariable(processInstance.getProcessInstanceId(),
                         BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
