@@ -23,7 +23,16 @@ import java.util.List;
 @AllArgsConstructor
 public class RedisStreamMessageCleanupJob {
 
-    private static final String LOCK_KEY = "redis:stream:message-cleanup:lock";
+    /**
+     * 业务 MQ（Spring 容器内 AbstractRedisStreamMessageListener）清理任务使用的分布式锁
+     */
+    public static final String DEFAULT_CLEANUP_LOCK_KEY = "redis:stream:message-cleanup:lock";
+
+    /**
+     * IoT Redis 总线清理任务使用的分布式锁（须与 {@link #DEFAULT_CLEANUP_LOCK_KEY} 区分，否则会共抢一把锁，
+     * 同一时刻只有一侧能执行 XTRIM，另一侧 Stream 可能无限积压）
+     */
+    public static final String IOT_CLEANUP_LOCK_KEY = "redis:stream:message-cleanup:lock:iot";
 
     /**
      * 保留的消息数量，默认保留最近 10000 条消息
@@ -33,22 +42,29 @@ public class RedisStreamMessageCleanupJob {
     private final List<AbstractRedisStreamMessageListener<?>> listeners;
     private final RedisMQTemplate redisTemplate;
     private final RedissonClient redissonClient;
+    /**
+     * Redisson 锁键（多 Bean 注册清理任务时必须各不相同）
+     */
+    private final String cleanupLockKey;
 
     /**
      * 每小时执行一次清理任务
      */
     @Scheduled(cron = "0 0 * * * ?")
     public void cleanup() {
-        RLock lock = redissonClient.getLock(LOCK_KEY);
-        // 尝试加锁
+        RLock lock = redissonClient.getLock(cleanupLockKey);
         if (lock.tryLock()) {
             try {
                 execute();
             } catch (Exception ex) {
-                log.error("[cleanup][执行异常]", ex);
+                log.error("[cleanup][执行异常][lockKey={}]", cleanupLockKey, ex);
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
+        } else {
+            log.debug("[cleanup][未获取到锁，跳过本轮][lockKey={}]", cleanupLockKey);
         }
     }
 
@@ -59,8 +75,8 @@ public class RedisStreamMessageCleanupJob {
         StreamOperations<String, Object, Object> ops = redisTemplate.getRedisTemplate().opsForStream();
         listeners.forEach(listener -> {
             try {
-                // 使用 XTRIM 命令清理消息，只保留最近的 MAX_LEN 条消息
-                Long trimCount = ops.trim(listener.getStreamKey(), MAX_COUNT, true);
+                // 使用 XTRIM MAXLEN 精确裁剪（approximate=false），避免 ~ 模式下长期明显高于上限
+                Long trimCount = ops.trim(listener.getStreamKey(), MAX_COUNT, false);
                 if (trimCount != null && trimCount > 0) {
                     log.info("[execute][Stream({}) 清理消息数量({})]", listener.getStreamKey(), trimCount);
                 }

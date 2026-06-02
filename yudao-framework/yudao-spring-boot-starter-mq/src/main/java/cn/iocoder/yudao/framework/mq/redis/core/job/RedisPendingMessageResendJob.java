@@ -23,7 +23,9 @@ import java.util.Objects;
 @AllArgsConstructor
 public class RedisPendingMessageResendJob {
 
-    private static final String LOCK_KEY = "redis:stream:pending-message-resend:lock";
+    public static final String DEFAULT_RESEND_LOCK_KEY = "redis:stream:pending-message-resend:lock";
+
+    public static final String IOT_RESEND_LOCK_KEY = "redis:stream:pending-message-resend:lock:iot";
 
     /**
      * 消息超时时间，默认 5 分钟
@@ -36,22 +38,26 @@ public class RedisPendingMessageResendJob {
     private final List<AbstractRedisStreamMessageListener<?>> listeners;
     private final RedisMQTemplate redisTemplate;
     private final RedissonClient redissonClient;
+    private final String resendLockKey;
 
     /**
      * 一分钟执行一次,这里选择每分钟的 35 秒执行，是为了避免整点任务过多的问题
      */
     @Scheduled(cron = "35 * * * * ?")
     public void messageResend() {
-        RLock lock = redissonClient.getLock(LOCK_KEY);
-        // 尝试加锁
+        RLock lock = redissonClient.getLock(resendLockKey);
         if (lock.tryLock()) {
             try {
                 execute();
             } catch (Exception ex) {
-                log.error("[messageResend][执行异常]", ex);
+                log.error("[messageResend][执行异常][lockKey={}]", resendLockKey, ex);
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
+        } else {
+            log.debug("[messageResend][未获取到锁，跳过本轮][lockKey={}]", resendLockKey);
         }
     }
 

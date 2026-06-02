@@ -99,7 +99,8 @@ public class IotMessageBusAutoConfiguration {
                                                                             RedisMQTemplate redisTemplate,
                                                                             RedissonClient redissonClient) {
             List<AbstractRedisStreamMessageListener<?>> listeners = getListeners(messageBus);
-            return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient);
+            return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient,
+                    RedisPendingMessageResendJob.IOT_RESEND_LOCK_KEY);
         }
 
         /**
@@ -110,7 +111,8 @@ public class IotMessageBusAutoConfiguration {
                                                                             RedisMQTemplate redisTemplate,
                                                                             RedissonClient redissonClient) {
             List<AbstractRedisStreamMessageListener<?>> listeners = getListeners(messageBus);
-            return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient);
+            return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient,
+                    RedisStreamMessageCleanupJob.IOT_CLEANUP_LOCK_KEY);
         }
 
         private List<AbstractRedisStreamMessageListener<?>> getListeners(IotRedisMessageBus messageBus) {
