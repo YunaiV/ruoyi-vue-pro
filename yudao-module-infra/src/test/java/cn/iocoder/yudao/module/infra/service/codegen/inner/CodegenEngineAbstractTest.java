@@ -108,12 +108,14 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String expected = ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath)
-                    .replace("\r\n", "\n");
+            String expected = normalizeLineEndings(ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath));
             String actual = result.get(filePath);
-            assertEquals(expected, actual == null ? null : actual.replace("\r\n", "\n"),
-                    filePath + "：不匹配");
+            assertEquals(expected, normalizeLineEndings(actual), filePath + "：不匹配");
         });
+    }
+
+    private static String normalizeLineEndings(String content) {
+        return content == null ? null : content.replace("\r\n", "\n").replace("\r", "\n");
     }
 
     // ==================== 调试专用 ====================
@@ -149,10 +151,10 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
                     + '/' + StrUtil.subBefore(lastFilePath, '.', true);
             asserts.add(MapUtil.<String, String>builder().put("filePath", filePath)
                     .put("contentPath", contentPath).build());
-            FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);
+            FileUtil.writeUtf8String(normalizeLineEndings(fileContent), basePath + "/" + contentPath);
         });
         // 写入 assert.json 文件
-        FileUtil.writeUtf8String(JsonUtils.toJsonPrettyString(asserts), basePath + "/assert.json");
+        FileUtil.writeUtf8String(normalizeLineEndings(JsonUtils.toJsonPrettyString(asserts)), basePath + "/assert.json");
     }
 
 }
