@@ -18,12 +18,7 @@ import org.mockito.Spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -104,15 +99,14 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
                 .map(m -> (String) m.get("filePath"))
                 .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         assertEquals(expectedFiles, result.keySet(), "生成文件集合不匹配");
-        // 校验每个文件；归一化 \r\n 为 \n，让断言不依赖文件落盘的换行风格
+        // 校验每个文件；归一化换行符，让断言不依赖文件落盘的换行风格
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String expected = ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath)
-                    .replace("\r\n", "\n");
-            String actual = result.get(filePath);
-            assertEquals(expected, actual == null ? null : actual.replace("\r\n", "\n"),
-                    filePath + "：不匹配");
+            String expected = CodegenFormatUtils.normalizeForAssert(
+                    ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath));
+            String actual = CodegenFormatUtils.normalizeForAssert(result.get(filePath));
+            assertEquals(expected, actual, filePath + "：不匹配");
         });
     }
 
