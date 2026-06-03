@@ -1475,25 +1475,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 if (processDefinitionInfo.getAutoApprovalType() != null) {
                     HistoricTaskInstanceQuery sameAssigneeQuery = historyService.createHistoricTaskInstanceQuery()
                             .processInstanceId(task.getProcessInstanceId())
-                            .taskAssignee(task.getAssignee()) // 相同审批人
                             .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.APPROVE.getStatus())
                             .finished();
                     if (BpmAutoApproveTypeEnum.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())
-                            && sameAssigneeQuery.count() > 0) {
+                            && sameAssigneeQuery.taskAssignee(task.getAssignee()).count() > 0) {
                         getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                 .setReason(BpmAutoApproveTypeEnum.APPROVE_ALL.getName()));
                         return;
                     }
+                    // 连续审批的节点自动通过
                     if (BpmAutoApproveTypeEnum.APPROVE_SEQUENT.getType().equals(processDefinitionInfo.getAutoApprovalType())) {
                         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
                         if (bpmnModel == null) {
                             log.error("[processTaskAssigned][taskId({}) 没有找到流程模型({})]", task.getId(), task.getProcessDefinitionId());
                             return;
                         }
-                        List<String> sourceTaskIds = convertList(BpmnModelUtils.getElementIncomingFlows( // 获取所有上一个节点
+                        List<String> sourceTaskIds = convertList(BpmnModelUtils.getElementIncomingUserTaskFlows( // 获取所有的上一个 UserTask 节点连线
                                         BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey())),
                                 SequenceFlow::getSourceRef);
-                        if (sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds).count() > 0) {
+                        // 设置 taskIds, 并按创建时间倒序排序
+                        sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds)
+                                .orderByTaskCreateTime()
+                                .desc();
+                        HistoricTaskInstance firstHisTask  = CollUtil.getFirst(sameAssigneeQuery.list());
+                        if (firstHisTask != null && StrUtil.equals(firstHisTask.getAssignee(), task.getAssignee())) {
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                     .setReason(BpmAutoApproveTypeEnum.APPROVE_SEQUENT.getName()));
                             return;
