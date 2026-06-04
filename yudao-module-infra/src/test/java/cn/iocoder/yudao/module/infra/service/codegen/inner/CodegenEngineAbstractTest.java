@@ -115,7 +115,10 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
     }
 
     private static String normalizeLineEndings(String content) {
-        return content == null ? null : content.replace("\r\n", "\n").replace("\r", "\n").stripTrailing();
+        if (content == null) {
+            return null;
+        }
+        return StrUtil.trimEnd(content.replace("\r\n", "\n").replace('\r', '\n'));
     }
 
     // ==================== 调试专用 ====================
