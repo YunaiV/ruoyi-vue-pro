@@ -18,7 +18,12 @@ import org.mockito.Spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -99,15 +104,18 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
                 .map(m -> (String) m.get("filePath"))
                 .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         assertEquals(expectedFiles, result.keySet(), "生成文件集合不匹配");
-        // 校验每个文件；归一化换行符，让断言不依赖文件落盘的换行风格
+        // 校验每个文件；归一化 \r\n 为 \n，让断言不依赖文件落盘的换行风格
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String expected = CodegenFormatUtils.normalizeForAssert(
-                    ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath));
-            String actual = CodegenFormatUtils.normalizeForAssert(result.get(filePath));
-            assertEquals(expected, actual, filePath + "：不匹配");
+            String expected = normalizeLineEndings(ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath));
+            String actual = result.get(filePath);
+            assertEquals(expected, normalizeLineEndings(actual), filePath + "：不匹配");
         });
+    }
+
+    private static String normalizeLineEndings(String content) {
+        return content == null ? null : content.replace("\r\n", "\n").replace("\r", "\n").stripTrailing();
     }
 
     // ==================== 调试专用 ====================
@@ -143,10 +151,10 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
                     + '/' + StrUtil.subBefore(lastFilePath, '.', true);
             asserts.add(MapUtil.<String, String>builder().put("filePath", filePath)
                     .put("contentPath", contentPath).build());
-            FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);
+            FileUtil.writeUtf8String(normalizeLineEndings(fileContent), basePath + "/" + contentPath);
         });
         // 写入 assert.json 文件
-        FileUtil.writeUtf8String(JsonUtils.toJsonPrettyString(asserts), basePath + "/assert.json");
+        FileUtil.writeUtf8String(normalizeLineEndings(JsonUtils.toJsonPrettyString(asserts)), basePath + "/assert.json");
     }
 
 }
