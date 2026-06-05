@@ -114,11 +114,15 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
         });
     }
 
+    /**
+     * 统一换行符并忽略文件末尾换行，避免 Windows/Unix 落盘差异导致快照断言失败
+     */
     private static String normalizeLineEndings(String content) {
         if (content == null) {
             return null;
         }
-        return StrUtil.trimEnd(content.replace("\r\n", "\n").replace('\r', '\n'));
+        content = content.replace("\r\n", "\n").replace('\r', '\n');
+        return content.replaceAll("\\n+\\z", "");
     }
 
     // ==================== 调试专用 ====================
@@ -154,10 +158,10 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
                     + '/' + StrUtil.subBefore(lastFilePath, '.', true);
             asserts.add(MapUtil.<String, String>builder().put("filePath", filePath)
                     .put("contentPath", contentPath).build());
-            FileUtil.writeUtf8String(normalizeLineEndings(fileContent), basePath + "/" + contentPath);
+            FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);
         });
         // 写入 assert.json 文件
-        FileUtil.writeUtf8String(normalizeLineEndings(JsonUtils.toJsonPrettyString(asserts)), basePath + "/assert.json");
+        FileUtil.writeUtf8String(JsonUtils.toJsonPrettyString(asserts), basePath + "/assert.json");
     }
 
 }

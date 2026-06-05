@@ -459,7 +459,7 @@ public class CodegenEngine {
     private String prettyCode(String content, String vmPath) {
         // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错（需要排除 vben5、vue3_admin_uniapp）
         if (!StrUtil.containsAny(vmPath, "vben5", "vue3_admin_uniapp")) {
-            content = content.replaceAll(",\\r?\\n(\\s*)}", "\n$1}");
+            content = content.replaceAll(",\\r?\\n}", "\n}").replaceAll(",\\r?\\n  }", "\n  }");
         }
         // Vue 界面：去除多的 dateFormatter，只有一个的情况下，说明没使用到
         if (StrUtil.count(content, "dateFormatter") == 1) {
@@ -482,8 +482,7 @@ public class CodegenEngine {
         if (StrUtil.count(content, "DICT_TYPE.") == 0) {
             content = StrUtils.removeLineContains(content, "DICT_TYPE");
         }
-        // 统一换行符为 LF，避免 Windows 下模板引擎输出 CRLF 导致前端 ESLint/Prettier 报错
-        return content.replace("\r\n", "\n");
+        return content;
     }
 
     private Map<String, Object> initBindingMap(DbType dbType, CodegenTableDO table, List<CodegenColumnDO> columns,
