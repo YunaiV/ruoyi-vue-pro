@@ -87,8 +87,8 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
-const formData = ref<${simpleClassName}>()
-const deleting = ref(false)
+const formData = ref<${simpleClassName}>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 /** 返回上一页 */
 function handleBack() {

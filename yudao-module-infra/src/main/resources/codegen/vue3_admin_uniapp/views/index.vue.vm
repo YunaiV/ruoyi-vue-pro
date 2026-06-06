@@ -130,13 +130,13 @@ definePage({
 })
 
 const { hasAccessByCodes } = useAccess()
-const total = ref(0)
-const list = ref<${simpleClassName}[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
+const total = ref(0) // 列表总数
+const list = ref<${simpleClassName}[]>([]) // 列表数据
+const loadMoreState = ref<LoadMoreState>('loading') // 分页加载状态
 const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-})
+}) // 查询参数
 
 /** 返回上一页 */
 function handleBack() {
