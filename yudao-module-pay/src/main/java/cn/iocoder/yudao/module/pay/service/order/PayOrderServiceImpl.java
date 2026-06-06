@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.pay.dal.redis.order.PayOrderLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
@@ -66,6 +67,8 @@ public class PayOrderServiceImpl implements PayOrderService {
     private PayOrderExtensionMapper orderExtensionMapper;
     @Resource
     private PayNoRedisDAO noRedisDAO;
+    @Resource
+    private PayOrderLockRedisDAO orderLockRedisDAO;
 
     @Resource
     private PayAppService appService;
@@ -140,6 +143,14 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override // 注意，这里不能添加事务注解，避免调用支付渠道失败时，将 PayOrderExtensionDO 回滚了
     public PayOrderSubmitRespVO submitOrder(PayOrderSubmitReqVO reqVO, String userIp) {
+        try {
+            return orderLockRedisDAO.lock(reqVO.getId(), 60 * 1000L, () -> doSubmitOrder(reqVO, userIp));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private PayOrderSubmitRespVO doSubmitOrder(PayOrderSubmitReqVO reqVO, String userIp) {
         // 1.1 获得 PayOrderDO ，并校验其是否存在
         PayOrderDO order = validateOrderCanSubmit(reqVO.getId());
         // 1.32 校验支付渠道是否有效
@@ -348,9 +359,9 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (order == null) {
             throw exception(PAY_ORDER_NOT_FOUND);
         }
-        if (PayOrderStatusEnum.isSuccess(order.getStatus()) // 如果已经是成功，直接返回，不用重复更新
-                && Objects.equals(order.getExtensionId(), orderExtension.getId())) {
-            log.info("[updateOrderExtensionSuccess][order({}) 已经是已支付，无需更新]", order.getId());
+        if (PayOrderStatusEnum.isSuccess(order.getStatus())) { // 如果已经是成功，直接返回，不用重复更新（可能是并发回调或支付平台重复通知）
+            log.info("[updateOrderExtensionSuccess][order({}) 已经是已支付，无需重复更新，当前 extension({})]",
+                    order.getId(), orderExtension.getId());
             return true;
         }
         if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
@@ -366,8 +377,9 @@ public class PayOrderServiceImpl implements PayOrderService {
                         .channelFeeRate(channel.getFeeRate())
                         .channelFeePrice(MoneyUtils.calculateRatePrice(order.getPrice(), channel.getFeeRate()))
                         .build());
-        if (updateCounts == 0) { // 校验状态，必须是待支付
-            throw exception(PAY_ORDER_STATUS_IS_NOT_WAITING);
+        if (updateCounts == 0) { // 并发场景下，另一个回调已将订单更新为成功，视为重复回调
+            log.info("[updateOrderExtensionSuccess][order({}) 更新失败，可能已被其他回调更新为已支付]", order.getId());
+            return true;
         }
         log.info("[updateOrderExtensionSuccess][order({}) 更新为已支付]", order.getId());
         return false;

@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.pay.dal.redis.order.PayOrderLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -54,7 +55,7 @@ import static org.mockito.Mockito.*;
  *
  * @author 芋艿
  */
-@Import({PayOrderServiceImpl.class, PayNoRedisDAO.class})
+@Import({PayOrderServiceImpl.class, PayNoRedisDAO.class, PayOrderLockRedisDAO.class})
 public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
     @Resource
@@ -1103,6 +1104,53 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         order.setStatus(PayOrderStatusEnum.CLOSED.getStatus());
         assertPojoEquals(order, orderMapper.selectOne(null),
                 "updateTime", "updater");
+    }
+
+    @Test
+    public void testNotifyOrderSuccess_concurrentDuplicateCallback() {
+        // 场景：同一订单有两个 extension（微信+支付宝），两个回调同时到达
+        // 第一个回调成功更新订单为 SUCCESS，第二个回调应被优雅处理（不抛异常）
+
+        // mock 数据（PayOrderDO）- 初始状态为 WAITING
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setPrice(10));
+        orderMapper.insert(order);
+        // mock 数据（extension A - 微信）
+        PayOrderExtensionDO extensionA = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setNo("WX_P110")
+                        .setOrderId(order.getId()));
+        orderExtensionMapper.insert(extensionA);
+        // mock 数据（extension B - 支付宝）
+        PayOrderExtensionDO extensionB = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setNo("ALI_P110")
+                        .setOrderId(order.getId()));
+        orderExtensionMapper.insert(extensionB);
+
+        // 模拟第一个回调（微信）成功
+        PayChannelDO channelWx = randomPojo(PayChannelDO.class, o -> o.setId(10L).setFeeRate(10D));
+        PayOrderRespDTO notifyWx = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .setOutTradeNo("WX_P110"));
+        orderService.notifyOrder(channelWx, notifyWx);
+
+        // 验证订单已更新为 SUCCESS
+        PayOrderDO updatedOrder = orderMapper.selectById(order.getId());
+        assertEquals(PayOrderStatusEnum.SUCCESS.getStatus(), updatedOrder.getStatus());
+
+        // 模拟第二个回调（支付宝）到达，此时订单已是 SUCCESS
+        PayChannelDO channelAli = randomPojo(PayChannelDO.class, o -> o.setId(20L).setFeeRate(10D));
+        PayOrderRespDTO notifyAli = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .setOutTradeNo("ALI_P110"));
+        // 关键：第二个回调不应抛异常，应被优雅处理
+        orderService.notifyOrder(channelAli, notifyAli);
+
+        // 验证 extension B 也被更新为 SUCCESS
+        PayOrderExtensionDO updatedExtensionB = orderExtensionMapper.selectByNo("ALI_P110");
+        assertEquals(PayOrderStatusEnum.SUCCESS.getStatus(), updatedExtensionB.getStatus());
     }
 
 }
