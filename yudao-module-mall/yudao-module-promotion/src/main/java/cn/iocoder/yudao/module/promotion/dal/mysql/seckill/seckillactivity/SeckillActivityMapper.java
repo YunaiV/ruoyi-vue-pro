@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.seckill.vo.activity.SeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.seckill.vo.activity.AppSeckillActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillActivityDO;
@@ -27,7 +28,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .likeIfPresent(SeckillActivityDO::getName, reqVO.getName())
                 .eqIfPresent(SeckillActivityDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(SeckillActivityDO::getCreateTime, reqVO.getCreateTime())
-                .apply(ObjectUtil.isNotNull(reqVO.getConfigId()), "FIND_IN_SET(" + reqVO.getConfigId() + ", config_ids) > 0")
+                .apply(ObjectUtil.isNotNull(reqVO.getConfigId()), MyBatisUtils.findInSet("config_ids"), reqVO.getConfigId())
                 .orderByDesc(SeckillActivityDO::getId));
     }
 
@@ -70,7 +71,7 @@ public interface SeckillActivityMapper extends BaseMapperX<SeckillActivityDO> {
                 .eqIfPresent(SeckillActivityDO::getStatus, status)
                 .lt(SeckillActivityDO::getStartTime, dateTime)
                 .gt(SeckillActivityDO::getEndTime, dateTime)// 开始时间 < 指定时间 < 结束时间，也就是说获取指定时间段的活动
-                .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), "FIND_IN_SET(" + pageReqVO.getConfigId() + ",config_ids) > 0"));
+                .apply(ObjectUtil.isNotNull(pageReqVO.getConfigId()), MyBatisUtils.findInSet("config_ids"), pageReqVO.getConfigId()));
     }
 
     default SeckillActivityDO selectBySpuIdAndStatusAndNow(Long spuId, Integer status) {

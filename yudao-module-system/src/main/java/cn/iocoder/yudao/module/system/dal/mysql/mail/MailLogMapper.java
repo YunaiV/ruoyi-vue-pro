@@ -21,7 +21,7 @@ public interface MailLogMapper extends BaseMapperX<MailLogDO> {
                 .eqIfPresent(MailLogDO::getSendStatus, reqVO.getSendStatus())
                 .betweenIfPresent(MailLogDO::getSendTime, reqVO.getSendTime())
                 .apply(StrUtil.isNotBlank(reqVO.getToMail()),
-                        MyBatisUtils.findInSet("to_mails", reqVO.getToMail()))
+                        MyBatisUtils.findInSet("to_mails"), reqVO.getToMail())
                 .orderByDesc(MailLogDO::getId));
     }
 

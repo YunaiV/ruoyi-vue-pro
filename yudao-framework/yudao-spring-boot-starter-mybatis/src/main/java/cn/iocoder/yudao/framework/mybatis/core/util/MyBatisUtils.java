@@ -34,6 +34,10 @@ public class MyBatisUtils {
 
     private static final Pattern SAFE_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+(\\.[a-zA-Z0-9_]+)*$");
 
+    private static final String FIND_IN_SET_VALUE_PLACEHOLDER = "#{value}";
+
+    private static final String FIND_IN_SET_COLUMN_PLACEHOLDER = "#{column}";
+
     public static <T> Page<T> buildPage(PageParam pageParam) {
         return buildPage(pageParam, null);
     }
@@ -157,15 +161,43 @@ public class MyBatisUtils {
     /**
      * 跨数据库的 find_in_set 实现
      *
-     * @param column 字段名称
-     * @param value  查询值(不带单引号)
+     * @param columnName 字段名称
      * @return sql
      */
-    public static String findInSet(String column, Object value) {
+    public static String findInSet(String columnName) {
+        return findInSet(columnName, 0);
+    }
+
+    /**
+     * 跨数据库的 find_in_set 实现，适用于同一个 apply 语句中有多个参数的场景
+     *
+     * @param columnName 字段名称
+     * @param paramIndex apply 参数序号
+     * @return sql
+     */
+    public static String findInSetWithParamIndex(String columnName, int paramIndex) {
+        return findInSet(columnName, paramIndex);
+    }
+
+    private static String findInSet(String columnName, int paramIndex) {
         DbType dbType = JdbcUtils.getDbType();
+        return findInSet(dbType, columnName, paramIndex);
+    }
+
+    static String findInSet(DbType dbType, String columnName, int paramIndex) {
+        if (!isSafeColumnName(columnName)) {
+            throw new IllegalArgumentException("Invalid column name: " + columnName);
+        }
+        if (paramIndex < 0) {
+            throw new IllegalArgumentException("Invalid param index: " + paramIndex);
+        }
         return DbTypeEnum.getFindInSetTemplate(dbType)
-                .replace("#{column}", column)
-                .replace("#{value}", StrUtil.toString(value));
+                .replace(FIND_IN_SET_COLUMN_PLACEHOLDER, columnName)
+                .replace(FIND_IN_SET_VALUE_PLACEHOLDER, "{" + paramIndex + "}");
+    }
+
+    private static boolean isSafeColumnName(String columnName) {
+        return StrUtil.isNotEmpty(columnName) && SAFE_COLUMN_NAME_PATTERN.matcher(columnName).matches();
     }
 
     /**
