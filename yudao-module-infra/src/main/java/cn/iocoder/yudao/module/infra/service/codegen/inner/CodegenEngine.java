@@ -459,7 +459,7 @@ public class CodegenEngine {
     private String prettyCode(String content, String vmPath) {
         // Vue 界面：去除字段后面多余的 , 逗号，解决前端的 Pretty 代码格式检查的报错（需要排除 vben5、vue3_admin_uniapp）
         if (!StrUtil.containsAny(vmPath, "vben5", "vue3_admin_uniapp")) {
-            content = content.replaceAll(",\n}", "\n}").replaceAll(",\n  }", "\n  }");
+            content = content.replaceAll(",\\r?\\n}", "\n}").replaceAll(",\\r?\\n  }", "\n  }");
         }
         // Vue 界面：去除多的 dateFormatter，只有一个的情况下，说明没使用到
         if (StrUtil.count(content, "dateFormatter") == 1) {

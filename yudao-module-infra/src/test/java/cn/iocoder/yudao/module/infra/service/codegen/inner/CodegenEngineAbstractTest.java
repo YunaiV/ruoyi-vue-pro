@@ -108,12 +108,21 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String expected = ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath)
-                    .replace("\r\n", "\n");
+            String expected = normalizeLineEndings(ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath));
             String actual = result.get(filePath);
-            assertEquals(expected, actual == null ? null : actual.replace("\r\n", "\n"),
-                    filePath + "：不匹配");
+            assertEquals(expected, normalizeLineEndings(actual), filePath + "：不匹配");
         });
+    }
+
+    /**
+     * 统一换行符并忽略文件末尾换行，避免 Windows/Unix 落盘差异导致快照断言失败
+     */
+    private static String normalizeLineEndings(String content) {
+        if (content == null) {
+            return null;
+        }
+        content = content.replace("\r\n", "\n").replace('\r', '\n');
+        return content.replaceAll("\\n+\\z", "");
     }
 
     // ==================== 调试专用 ====================
