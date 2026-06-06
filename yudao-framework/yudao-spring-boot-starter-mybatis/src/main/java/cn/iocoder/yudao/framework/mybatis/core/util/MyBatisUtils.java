@@ -165,7 +165,23 @@ public class MyBatisUtils {
         DbType dbType = JdbcUtils.getDbType();
         return DbTypeEnum.getFindInSetTemplate(dbType)
                 .replace("#{column}", column)
-                .replace("#{value}", StrUtil.toString(value));
+                .replace("#{value}", escapeSqlValue(StrUtil.toString(value)));
+    }
+
+    /**
+     * 转义 SQL 值中的单引号，防止 SQL 注入
+     *
+     * 标准 SQL 转义方式：单引号替换为两个单引号（' → ''）
+     * 适用于 MySQL、PostgreSQL、Oracle、SQL Server 等所有主流数据库
+     *
+     * @param value 原始值
+     * @return 转义后的值
+     */
+    static String escapeSqlValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("'", "''");
     }
 
     /**

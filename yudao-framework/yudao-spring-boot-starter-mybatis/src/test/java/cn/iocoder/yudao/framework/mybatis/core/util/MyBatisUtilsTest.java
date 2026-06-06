@@ -98,6 +98,28 @@ public class MyBatisUtilsTest {
         assertEquals("DESC", MyBatisUtils.getOrderDirection(null));
     }
 
+    @Test
+    public void testEscapeSqlValue() {
+        // 正常值不改变
+        assertEquals("hello", MyBatisUtils.escapeSqlValue("hello"));
+        assertEquals("test@example.com", MyBatisUtils.escapeSqlValue("test@example.com"));
+
+        // 单引号被转义
+        assertEquals("''", MyBatisUtils.escapeSqlValue("'"));
+        assertEquals("it''s", MyBatisUtils.escapeSqlValue("it's"));
+        assertEquals("a''b''c", MyBatisUtils.escapeSqlValue("a'b'c"));
+
+        // null 返回 null
+        assertEquals(null, MyBatisUtils.escapeSqlValue(null));
+
+        // 空字符串
+        assertEquals("", MyBatisUtils.escapeSqlValue(""));
+
+        // SQL 注入尝试被转义
+        assertEquals("''); DROP TABLE users; --", MyBatisUtils.escapeSqlValue("'); DROP TABLE users; --"));
+        assertEquals("admin''--", MyBatisUtils.escapeSqlValue("admin'--"));
+    }
+
     private void assertOrderItem(OrderItem orderItem, String column, boolean asc) {
         assertEquals(column, orderItem.getColumn());
         assertEquals(asc, orderItem.isAsc());
