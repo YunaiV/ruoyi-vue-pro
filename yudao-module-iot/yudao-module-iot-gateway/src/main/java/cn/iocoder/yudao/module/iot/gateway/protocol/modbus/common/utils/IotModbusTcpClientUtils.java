@@ -39,11 +39,38 @@ public class IotModbusTcpClientUtils {
     public static Future<int[]> read(IotModbusTcpClientConnectionManager.ModbusConnection connection,
                                      Integer slaveId,
                                      IotModbusPointRespDTO point) {
+        return read(connection, slaveId, point.getFunctionCode(),
+                point.getRegisterAddress(), point.getRegisterCount(), point.getIdentifier());
+    }
+
+    /**
+     * 读取 Modbus 数据
+     *
+     * @param connection      Modbus 连接
+     * @param slaveId         从站地址
+     * @param functionCode    功能码
+     * @param registerAddress 寄存器起始地址
+     * @param registerCount   寄存器数量
+     * @return 原始值（int 数组）
+     */
+    public static Future<int[]> read(IotModbusTcpClientConnectionManager.ModbusConnection connection,
+                                     Integer slaveId,
+                                     Integer functionCode,
+                                     Integer registerAddress,
+                                     Integer registerCount) {
+        return read(connection, slaveId, functionCode, registerAddress, registerCount, null);
+    }
+
+    private static Future<int[]> read(IotModbusTcpClientConnectionManager.ModbusConnection connection,
+                                      Integer slaveId,
+                                      Integer functionCode,
+                                      Integer registerAddress,
+                                      Integer registerCount,
+                                      String identifier) {
         return connection.executeBlocking(tcpConnection -> {
             try {
                 // 1. 创建请求
-                ModbusRequest request = createReadRequest(point.getFunctionCode(),
-                        point.getRegisterAddress(), point.getRegisterCount());
+                ModbusRequest request = createReadRequest(functionCode, registerAddress, registerCount);
                 request.setUnitID(slaveId);
 
                 // 2. 执行事务（请求）
@@ -53,10 +80,10 @@ public class IotModbusTcpClientUtils {
 
                 // 3. 解析响应
                 ModbusResponse response = transaction.getResponse();
-                return extractValues(response, point.getFunctionCode());
+                return extractValues(response, functionCode);
             } catch (Exception e) {
-                throw new RuntimeException(String.format("Modbus 读取失败 [slaveId=%d, identifier=%s, address=%d]",
-                        slaveId, point.getIdentifier(), point.getRegisterAddress()), e);
+                throw new RuntimeException(String.format("Modbus 读取失败 [slaveId=%d, identifier=%s, functionCode=%d, address=%d, count=%d]",
+                        slaveId, identifier, functionCode, registerAddress, registerCount), e);
             }
         });
     }
