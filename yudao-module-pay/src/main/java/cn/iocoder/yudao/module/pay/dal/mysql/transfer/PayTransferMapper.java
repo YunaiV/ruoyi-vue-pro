@@ -26,6 +26,14 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 .eq(PayTransferDO::getStatus, whereStatus));
     }
 
+    default int updateChannelPackageInfoIfAbsent(Long id, String channelPackageInfo) {
+        return update(new PayTransferDO().setChannelPackageInfo(channelPackageInfo),
+                new LambdaQueryWrapper<PayTransferDO>()
+                        .eq(PayTransferDO::getId, id)
+                        .and(wrapper -> wrapper.isNull(PayTransferDO::getChannelPackageInfo)
+                                .or().eq(PayTransferDO::getChannelPackageInfo, "")));
+    }
+
     default PayTransferDO selectByAppIdAndMerchantOrderId(Long appId, String merchantOrderId) {
         return selectOne(PayTransferDO::getAppId, appId,
                     PayTransferDO::getMerchantTransferId, merchantOrderId);
@@ -59,7 +67,3 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
     }
 
 }
-
-
-
-
