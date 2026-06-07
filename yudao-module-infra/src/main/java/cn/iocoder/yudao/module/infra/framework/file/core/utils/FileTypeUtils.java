@@ -85,9 +85,9 @@ public class FileTypeUtils {
         // 设置内容显示、下载文件名：https://www.cnblogs.com/wq-9/articles/12165056.html
         if (isImage(mineType)) {
             // 参见 https://github.com/YunaiV/ruoyi-vue-pro/issues/692 讨论
-            response.setHeader("Content-Disposition", "inline;filename=" + HttpUtils.encodeUtf8(filename));
+            response.setHeader("Content-Disposition", buildContentDisposition("inline", filename));
         } else {
-            response.setHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
+            response.setHeader("Content-Disposition", buildContentDisposition("attachment", filename));
         }
         // 针对 video 的特殊处理，解决视频地址在移动端播放的兼容性问题
         if (StrUtil.containsIgnoreCase(mineType, "video")) {
@@ -96,6 +96,29 @@ public class FileTypeUtils {
         }
         // 输出附件
         IoUtil.write(response.getOutputStream(), false, content);
+    }
+
+    private static String buildContentDisposition(String dispositionType, String filename) {
+        return StrUtil.format("{};filename=\"{}\";filename*=UTF-8''{}",
+                dispositionType, buildFallbackFilename(filename), HttpUtils.encodeUrlPathSegment(filename));
+    }
+
+    private static String buildFallbackFilename(String filename) {
+        if (StrUtil.isEmpty(filename)) {
+            return "download";
+        }
+        StringBuilder result = new StringBuilder(filename.length());
+        for (int i = 0; i < filename.length(); i++) {
+            char ch = filename.charAt(i);
+            if (ch == '"' || ch == '\\') {
+                result.append('\\').append(ch);
+            } else if (ch >= 0x20 && ch <= 0x7E) {
+                result.append(ch);
+            } else {
+                result.append('_');
+            }
+        }
+        return result.toString();
     }
 
     /**

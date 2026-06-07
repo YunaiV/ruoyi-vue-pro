@@ -42,6 +42,21 @@ public class LocalFileClientTest {
     }
 
     @Test
+    public void testUpload_encodeUrlPath() {
+        // 准备参数
+        LocalFileClient client = createClient();
+        byte[] content = "test".getBytes(StandardCharsets.UTF_8);
+        String path = "avatar/中文 100%+文件.txt";
+
+        // 调用
+        String url = client.upload(content, path, "text/plain");
+
+        // 断言
+        assertEquals("http://127.0.0.1:48080/admin-api/infra/file/0/get/avatar/%E4%B8%AD%E6%96%87%20100%25+%E6%96%87%E4%BB%B6.txt", url);
+        assertArrayEquals(content, FileUtil.readBytes(new File(tempDir, path)));
+    }
+
+    @Test
     public void testUpload_pathInvalid() {
         // 准备参数
         LocalFileClient client = createClient();
