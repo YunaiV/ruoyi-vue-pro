@@ -236,6 +236,7 @@ async function handleSubmit() {
       await create${simpleClassName}(formData.value)
       toast.success('新增成功')
     }
+    uni.$emit('${table.moduleName}:${table.businessName}:reload')
     setTimeout(() => {
       handleBack()
     }, 500)

@@ -259,7 +259,7 @@ function handle${AttrName}1Confirm() {
 #end
 #end
 
-/** 搜索 */
+/** 搜索按钮操作 */
 function handleSearch() {
   visible.value = false
   emit('search', {
@@ -276,7 +276,7 @@ function handleSearch() {
   })
 }
 
-/** 重置 */
+/** 重置按钮操作 */
 function handleReset() {
 #foreach($column in $columns)
   #if ($column.listOperation)
