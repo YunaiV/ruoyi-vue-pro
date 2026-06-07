@@ -478,17 +478,19 @@ public class BpmnModelUtils {
         if (source == null || source instanceof StartEvent || source instanceof SubProcess) {
             return;
         }
-
+        // 获取入口连线
         List<SequenceFlow> incomingFlows = getElementIncomingFlows(source);
         if (CollUtil.isEmpty(incomingFlows)) {
             return;
         }
 
+        // 循环找到目标元素
         for (SequenceFlow incomingFlow : incomingFlows) {
             // 如果发现连线重复，说明连线已经走过。跳过
             if (incomingFlow == null || !visitedSequenceFlowIds.add(incomingFlow.getId())) {
                 continue;
             }
+            // 如果 source 是 UserTask，则添加到结果中
             FlowElement sourceFlowElement = incomingFlow.getSourceFlowElement();
             if (sourceFlowElement instanceof UserTask) {
                 if (resultSequenceFlowIds.add(incomingFlow.getId())) {

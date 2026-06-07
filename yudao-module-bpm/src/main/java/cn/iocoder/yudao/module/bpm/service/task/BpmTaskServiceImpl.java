@@ -1470,6 +1470,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程实例]", task.getId());
                     return;
                 }
+
                 // 需要基于 instance 设置租户编号，避免 Flowable 内部异步执行时【例如：超时自动通过】 丢失租户编号
                 FlowableUtils.execute(processInstance.getTenantId(), () -> {
                     // 自动去重，通过自动审批的方式
@@ -1499,10 +1500,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             List<String> sourceTaskIds = convertList(BpmnModelUtils.getElementIncomingUserTaskFlows( // 获取所有的上一个 UserTask 节点连线
                                             BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey())),
                                     SequenceFlow::getSourceRef);
-                            // 设置 taskIds, 并按创建时间倒序排序
-                            sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds)
-                                    .orderByTaskCreateTime()
-                                    .desc();
+                            sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds).orderByTaskCreateTime().desc(); // 设置 taskIds, 并按创建时间倒序排序
                             HistoricTaskInstance firstHisTask = CollUtil.getFirst(sameAssigneeQuery.list());
                             if (firstHisTask != null && StrUtil.equals(firstHisTask.getAssignee(), task.getAssignee())) {
                                 getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
@@ -1571,6 +1569,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         }
                     }
 
+                    // 发送消息
                     AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
                     messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
                 });
