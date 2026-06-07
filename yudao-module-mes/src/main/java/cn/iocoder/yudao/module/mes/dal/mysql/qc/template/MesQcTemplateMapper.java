@@ -24,7 +24,7 @@ public interface MesQcTemplateMapper extends BaseMapperX<MesQcTemplateDO> {
                 .likeIfPresent(MesQcTemplateDO::getName, reqVO.getName())
                 .orderByDesc(MesQcTemplateDO::getId);
         if (reqVO.getType() != null) {
-            query.apply(MyBatisUtils.findInSet("types", reqVO.getType()));
+            query.apply(MyBatisUtils.findInSet("types"), reqVO.getType());
         }
         query.eqIfPresent(MesQcTemplateDO::getStatus, reqVO.getStatus());
         return selectPage(reqVO, query);

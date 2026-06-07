@@ -1,0 +1,30 @@
+package cn.iocoder.yudao.module.infra.dal.mysql.demo;
+
+import java.util.*;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.InfraStudentDO;
+import org.apache.ibatis.annotations.Mapper;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.vo.*;
+
+/**
+ * 学生 Mapper
+ *
+ * @author 芋道源码
+ */
+@Mapper
+public interface InfraStudentMapper extends BaseMapperX<InfraStudentDO> {
+
+    default PageResult<InfraStudentDO> selectPage(InfraStudentPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<InfraStudentDO>()
+                .likeIfPresent(InfraStudentDO::getName, reqVO.getName())
+                .eqIfPresent(InfraStudentDO::getBirthday, reqVO.getBirthday())
+                .eqIfPresent(InfraStudentDO::getSex, reqVO.getSex())
+                .eqIfPresent(InfraStudentDO::getEnabled, reqVO.getEnabled())
+                .betweenIfPresent(InfraStudentDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(InfraStudentDO::getId));
+    }
+
+}

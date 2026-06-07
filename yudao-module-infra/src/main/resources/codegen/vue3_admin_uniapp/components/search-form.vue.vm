@@ -177,7 +177,7 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const visible = ref(false)
+const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
 #foreach($column in $columns)
   #if ($column.listOperation)
@@ -201,7 +201,7 @@ const formData = reactive({
     #end
   #end
 #end
-})
+}) // 搜索表单数据
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {
@@ -237,21 +237,20 @@ const placeholder = computed(() => {
 })
 
 #if ($hasDateTimeBetween == 1)
-// 时间范围选择器状态
 #foreach($column in $columns)
   #if ($column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
     #set ($javaField = $column.javaField)
     #set ($AttrName = $javaField.substring(0,1).toUpperCase() + ${javaField.substring(1)})
-const visible${AttrName} = ref<[boolean, boolean]>([false, false])
-const temp${AttrName} = ref<[number, number]>([Date.now(), Date.now()])
+const visible${AttrName} = ref<[boolean, boolean]>([false, false]) // ${column.columnComment}选择器状态
+const temp${AttrName} = ref<[number, number]>([Date.now(), Date.now()]) // ${column.columnComment}临时值
 
-/** ${column.columnComment}[0]确认 */
+/** 确认${column.columnComment}开始日期 */
 function handle${AttrName}0Confirm() {
   formData.${javaField} = [temp${AttrName}.value[0], formData.${javaField}?.[1]]
   visible${AttrName}.value[0] = false
 }
 
-/** ${column.columnComment}[1]确认 */
+/** 确认${column.columnComment}结束日期 */
 function handle${AttrName}1Confirm() {
   formData.${javaField} = [formData.${javaField}?.[0], temp${AttrName}.value[1]]
   visible${AttrName}.value[1] = false
@@ -260,7 +259,7 @@ function handle${AttrName}1Confirm() {
 #end
 #end
 
-/** 搜索 */
+/** 搜索按钮操作 */
 function handleSearch() {
   visible.value = false
   emit('search', {
@@ -277,7 +276,7 @@ function handleSearch() {
   })
 }
 
-/** 重置 */
+/** 重置按钮操作 */
 function handleReset() {
 #foreach($column in $columns)
   #if ($column.listOperation)

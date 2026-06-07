@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mq.redis.core.job.RedisStreamMessageCleanupJob
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessage;
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.kafka.IotKafkaMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.local.IotLocalMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.rabbitmq.IotRabbitMQMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.redis.IotRedisMessageBus;
@@ -18,6 +19,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.List;
 
@@ -77,6 +80,21 @@ public class IotMessageBusAutoConfiguration {
 
     }
 
+    // ==================== Kafka 实现 ====================
+
+    @Configuration
+    @ConditionalOnProperty(prefix = "yudao.iot.message-bus", name = "type", havingValue = "kafka")
+    @ConditionalOnClass(KafkaTemplate.class)
+    public static class IotKafkaMessageBusConfiguration {
+
+        @Bean
+        public IotKafkaMessageBus iotKafkaMessageBus(KafkaProperties kafkaProperties) {
+            log.info("[iotKafkaMessageBus][创建 IoT Kafka 消息总线]");
+            return new IotKafkaMessageBus(kafkaProperties);
+        }
+
+    }
+
     // ==================== Redis 实现 ====================
 
     /**
@@ -103,7 +121,8 @@ public class IotMessageBusAutoConfiguration {
                                                                             RedisMQTemplate redisTemplate,
                                                                             RedissonClient redissonClient) {
             List<AbstractRedisStreamMessageListener<?>> listeners = getListeners(messageBus);
-            return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient);
+            return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient,
+                    RedisPendingMessageResendJob.IOT_RESEND_LOCK_KEY);
         }
 
         /**
@@ -114,7 +133,8 @@ public class IotMessageBusAutoConfiguration {
                                                                             RedisMQTemplate redisTemplate,
                                                                             RedissonClient redissonClient) {
             List<AbstractRedisStreamMessageListener<?>> listeners = getListeners(messageBus);
-            return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient);
+            return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient,
+                    RedisStreamMessageCleanupJob.IOT_CLEANUP_LOCK_KEY);
         }
 
         private List<AbstractRedisStreamMessageListener<?>> getListeners(IotRedisMessageBus messageBus) {

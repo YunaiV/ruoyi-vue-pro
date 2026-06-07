@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
@@ -34,7 +35,7 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .likeIfPresent(IotDeviceDO::getNickname, reqVO.getNickname())
                 .eqIfPresent(IotDeviceDO::getState, reqVO.getStatus())
                 .eqIfPresent(IotDeviceDO::getGatewayId, reqVO.getGatewayId())
-                .apply(ObjectUtil.isNotNull(reqVO.getGroupId()), "FIND_IN_SET(" + reqVO.getGroupId() + ",group_ids) > 0")
+                .apply(ObjectUtil.isNotNull(reqVO.getGroupId()), MyBatisUtils.findInSet("group_ids"), reqVO.getGroupId())
                 .orderByDesc(IotDeviceDO::getId));
     }
 
@@ -72,7 +73,7 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
 
     default Long selectCountByGroupId(Long groupId) {
         return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
-                .apply("FIND_IN_SET(" + groupId + ",group_ids) > 0"));
+                .apply(MyBatisUtils.findInSet("group_ids"), groupId));
     }
 
     default Long selectCountByCreateTime(@Nullable LocalDateTime createTime) {

@@ -1,0 +1,194 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      :title="getTitle"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 表单区域 -->
+    <view>
+      <wd-form ref="formRef" :model="formData" :rules="formRules">
+        <wd-cell-group border>
+              <wd-input
+            v-model="formData.name"
+            label="名字"
+            label-width="180rpx"
+            prop="name"
+            clearable
+            placeholder="请输入名字"
+          />
+              <wd-textarea
+            v-model="formData.description"
+            label="简介"
+            label-width="180rpx"
+            placeholder="请输入简介"
+            :maxlength="200"
+            show-word-limit
+            clearable
+          />
+                  <wd-datetime-picker
+            v-model="formData.birthday"
+            type="datetime"
+            label="出生日期"
+            label-width="180rpx"
+            prop="birthday"
+          />
+                  <wd-cell title="性别" title-width="180rpx" prop="sex" center>
+            <wd-radio-group v-model="formData.sex" shape="button">
+              <wd-radio
+                v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_USER_SEX)"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-cell>
+                  <wd-cell title="是否有效" title-width="180rpx" prop="enabled" center>
+            <wd-radio-group v-model="formData.enabled" shape="button">
+              <wd-radio
+                v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-cell>
+                  <wd-input
+            v-model="formData.avatar"
+            label="头像"
+            label-width="180rpx"
+            prop="avatar"
+            clearable
+            placeholder="请输入头像"
+          />
+              <wd-input
+            v-model="formData.video"
+            label="附件"
+            label-width="180rpx"
+            prop="video"
+            clearable
+            placeholder="请输入附件"
+          />
+              <wd-input
+            v-model="formData.memo"
+            label="备注"
+            label-width="180rpx"
+            prop="memo"
+            clearable
+            placeholder="请输入备注"
+          />
+        </wd-cell-group>
+      </wd-form>
+    </view>
+
+    <!-- 底部保存按钮 -->
+    <view class="yd-detail-footer">
+      <wd-button
+        type="primary"
+        block
+        :loading="formLoading"
+        @click="handleSubmit"
+      >
+        保存
+      </wd-button>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
+import type { Student } from '@/api/infra/demo'
+import { computed, onMounted, ref } from 'vue'
+import { useToast } from 'wot-design-uni'
+import { createStudent, getStudent, updateStudent } from '@/api/infra/demo'
+import { getIntDictOptions, getBoolDictOptions } from '@/hooks/useDict'
+import { navigateBackPlus } from '@/utils'
+import { DICT_TYPE } from '@/utils/constants'
+
+const props = defineProps<{
+  id?: number | any
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const toast = useToast()
+const getTitle = computed(() => props.id ? '编辑学生' : '新增学生')
+const formLoading = ref(false) // 表单提交状态
+const formData = ref<Student>({
+  id: undefined,
+  name: '',
+  description: '',
+  birthday: undefined,
+  sex: 0,
+  enabled: false,
+  avatar: '',
+  video: '',
+  memo: '',
+}) // 表单数据
+const formRules = {
+  name: [{ required: true, message: '名字不能为空' }],
+  description: [{ required: true, message: '简介不能为空' }],
+  birthday: [{ required: true, message: '出生日期不能为空' }],
+  sex: [{ required: true, message: '性别不能为空' }],
+  enabled: [{ required: true, message: '是否有效不能为空' }],
+  avatar: [{ required: true, message: '头像不能为空' }],
+  video: [{ required: true, message: '附件不能为空' }],
+  memo: [{ required: true, message: '备注不能为空' }],
+} // 表单校验规则
+const formRef = ref<FormInstance>() // 表单组件引用
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载学生详情 */
+async function getDetail() {
+  if (!props.id) {
+    return
+  }
+  formData.value = await getStudent(props.id)
+}
+
+/** 提交表单 */
+async function handleSubmit() {
+  const { valid } = await formRef.value.validate()
+  if (!valid) {
+    return
+  }
+
+  formLoading.value = true
+  try {
+    if (props.id) {
+      await updateStudent(formData.value)
+      toast.success('修改成功')
+    } else {
+      await createStudent(formData.value)
+      toast.success('新增成功')
+    }
+    uni.$emit('infra:demo:reload')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/** 初始化 */
+onMounted(() => {
+  getDetail()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

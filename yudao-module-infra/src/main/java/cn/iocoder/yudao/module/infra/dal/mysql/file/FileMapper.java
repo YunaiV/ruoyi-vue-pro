@@ -23,4 +23,11 @@ public interface FileMapper extends BaseMapperX<FileDO> {
                 .orderByDesc(FileDO::getId));
     }
 
+    default FileDO selectLatestByConfigIdAndPath(Long configId, String path) {
+        return selectLastOne(new LambdaQueryWrapperX<FileDO>()
+                .eq(FileDO::getConfigId, configId)
+                .eq(FileDO::getPath, path)
+                .orderByAsc(FileDO::getId));
+    }
+
 }

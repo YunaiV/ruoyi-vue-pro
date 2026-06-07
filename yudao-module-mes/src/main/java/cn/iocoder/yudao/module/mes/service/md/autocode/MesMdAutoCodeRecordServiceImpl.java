@@ -32,6 +32,8 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 @Validated
 public class MesMdAutoCodeRecordServiceImpl implements MesMdAutoCodeRecordService {
 
+    private static final int GENERATE_MAX_RETRY_COUNT = 10;
+
     @Resource
     private MesMdAutoCodeRecordMapper recordMapper;
 
@@ -63,10 +65,34 @@ public class MesMdAutoCodeRecordServiceImpl implements MesMdAutoCodeRecordServic
             throw exception(AUTO_CODE_GENERATE_FAILED);
         }
 
-        // 2.1 构建上下文
-        MesMdAutoCodeContext context = new MesMdAutoCodeContext()
-                .setRule(rule).setParts(parts).setInputChar(inputChar);
-        // 2.2 遍历分段，生成编码
+        // 2. 循环生成编码，跳过因 Redis 流水号落后导致的历史重复编码
+        for (int i = 0; i < GENERATE_MAX_RETRY_COUNT; i++) {
+            // 2.1 生成编码
+            MesMdAutoCodeContext context = new MesMdAutoCodeContext()
+                    .setRule(rule).setParts(parts).setInputChar(inputChar);
+            String result = generateCode(rule, parts, context);
+            // 2.2 二次校验（防止重复）
+            MesMdAutoCodeRecordDO existRecord = recordMapper.selectByResult(result);
+            if (existRecord != null) {
+                continue;
+            }
+            // 2.3 保存生成记录
+            MesMdAutoCodeRecordDO record = new MesMdAutoCodeRecordDO()
+                    .setRuleId(rule.getId()).setResult(result)
+                    .setSerialNo(context.getSerialNo()).setInputChar(inputChar);
+            recordMapper.insert(record);
+            return result;
+        }
+
+        // 3. 重试多次后仍然失败，抛出异常
+        throw exception(AUTO_CODE_GENERATE_FAILED);
+    }
+
+    /**
+     * 生成编码
+     */
+    private String generateCode(MesMdAutoCodeRuleDO rule, List<MesMdAutoCodePartDO> parts,
+                                MesMdAutoCodeContext context) {
         StringBuilder codeBuilder = new StringBuilder();
         for (MesMdAutoCodePartDO part : parts) {
             MesMdAutoCodePartStrategy strategy = strategyMap.get(part.getType());
@@ -78,22 +104,11 @@ public class MesMdAutoCodeRecordServiceImpl implements MesMdAutoCodeRecordServic
             // 拼接分段编码
             codeBuilder.append(partCode);
         }
-        // 2.3 补齐处理
+        // 补齐处理
         String result = codeBuilder.toString();
         if (Boolean.TRUE.equals(rule.getPadded()) && rule.getMaxLength() != null) {
             result = padCode(result, rule);
         }
-
-        // 3.1 二次校验（防止重复）
-        MesMdAutoCodeRecordDO existRecord = recordMapper.selectByResult(result);
-        if (existRecord != null) {
-            throw exception(AUTO_CODE_GENERATE_FAILED);
-        }
-        // 3.2 保存生成记录
-        MesMdAutoCodeRecordDO record = new MesMdAutoCodeRecordDO()
-                .setRuleId(rule.getId()).setResult(result)
-                .setSerialNo(context.getSerialNo()).setInputChar(inputChar);
-        recordMapper.insert(record);
         return result;
     }
 

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.promotion.dal.mysql.reward;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityPageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 满减送活动 Mapper
@@ -34,18 +35,18 @@ public interface RewardActivityMapper extends BaseMapperX<RewardActivityDO> {
                                                                     Collection<Long> categoryIds,
                                                                     Integer status) {
         LocalDateTime now = LocalDateTime.now();
-        Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> ids.stream()
-                .map(id -> StrUtil.format("FIND_IN_SET({}, product_scope_values) ", id))
+        Function<Collection<Long>, String> productScopeValuesFindInSetFunc = ids -> IntStream.range(0, ids.size())
+                .mapToObj(index -> MyBatisUtils.findInSetWithParamIndex("product_scope_values", index))
                 .collect(Collectors.joining(" OR "));
         return selectList(new LambdaQueryWrapperX<RewardActivityDO>()
                 .eq(RewardActivityDO::getStatus, status)
                 .lt(RewardActivityDO::getStartTime, now)
                 .gt(RewardActivityDO::getEndTime, now)
                 .and(i -> i.eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.SPU.getScope())
-                            .and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(spuIds)))
+                            .and(i1 -> i1.apply(productScopeValuesFindInSetFunc.apply(spuIds), spuIds.toArray()))
                         .or(i1 -> i1.eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.ALL.getScope()))
                         .or(i1 -> i1.eq(RewardActivityDO::getProductScope, PromotionProductScopeEnum.CATEGORY.getScope())
-                                .and(i2 -> i2.apply(productScopeValuesFindInSetFunc.apply(categoryIds)))))
+                                .and(i2 -> i2.apply(productScopeValuesFindInSetFunc.apply(categoryIds), categoryIds.toArray()))))
                 .orderByDesc(RewardActivityDO::getId)
         );
     }

@@ -212,6 +212,23 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetFileByConfigIdAndPath() {
+        // mock 数据
+        FileDO dbFile = randomPojo(FileDO.class, o -> o.setConfigId(10L).setPath("avatar/中文 100%+文件.jpg"));
+        fileMapper.insert(dbFile);
+        FileDO latestFile = ObjectUtils.cloneIgnoreId(dbFile, o -> o.setName("最新文件名.jpg"));
+        fileMapper.insert(latestFile);
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setPath("avatar/other.jpg")));
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setConfigId(20L)));
+
+        // 调用
+        FileDO result = fileService.getFileByConfigIdAndPath(10L, "avatar/中文 100%+文件.jpg");
+
+        // 断言
+        AssertUtils.assertPojoEquals(latestFile, result);
+    }
+
+    @Test
     public void testCreateFileByPresignedPath_success() {
         // 准备参数
         FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {

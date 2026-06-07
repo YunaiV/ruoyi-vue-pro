@@ -29,6 +29,9 @@ public class IotSceneRuleRespVO {
     @Schema(description = "执行器数组", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<IotSceneRuleDO.Action> actions;
 
+    @Schema(description = "最后触发时间")
+    private LocalDateTime lastTriggerTime;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

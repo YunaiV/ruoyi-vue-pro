@@ -29,7 +29,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
 
     default List<TenantDO> selectListByWebsite(String website) {
         return selectList(new LambdaQueryWrapperX<TenantDO>()
-                .apply(MyBatisUtils.findInSet("websites", website)));
+                .apply(MyBatisUtils.findInSet("websites"), website));
     }
 
     default Long selectCountByPackageId(Long packageId) {

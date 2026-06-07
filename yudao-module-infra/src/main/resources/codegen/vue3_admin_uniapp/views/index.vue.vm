@@ -1,5 +1,5 @@
 <template>
-  <view class="yd-page-container">
+  <view class="yd-page-container yd-page-container-paging">
     <!-- 顶部导航栏 -->
     <wd-navbar
       title="${table.classComment}管理"
@@ -11,14 +11,26 @@
     <SearchForm @search="handleQuery" @reset="handleReset" />
 
     <!-- ${table.classComment}列表 -->
-    <view class="p-24rpx">
-      <view
-        v-for="item in list"
-        :key="item.${primaryColumn.javaField}"
-        class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
-        @click="handleDetail(item)"
-      >
-        <view class="p-24rpx">
+    <z-paging
+      ref="pagingRef"
+      v-model="list"
+      :fixed="false"
+      class="min-h-0 flex-1"
+      :default-page-size="10"
+      :refresher-enabled="true"
+      :inside-more="true"
+      :loading-more-default-as-loading="true"
+      empty-view-text="暂无${table.classComment}数据"
+      @query="queryList"
+    >
+      <view class="p-24rpx">
+        <view
+          v-for="item in list"
+          :key="item.${primaryColumn.javaField}"
+          class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
+          @click="handleDetail(item)"
+        >
+          <view class="p-24rpx">
 #set ($titleField = "")
 #set ($statusField = "")
 #set ($statusDictType = "")
@@ -35,14 +47,14 @@
  #if ($titleField == "")
    #set ($titleField = $primaryColumn.javaField)
  #end
-          <view class="mb-16rpx flex items-center justify-between">
-            <view class="text-32rpx text-[#333] font-semibold">
-              {{ item.${titleField} }}
-            </view>
+            <view class="mb-16rpx flex items-center justify-between">
+              <view class="text-32rpx text-[#333] font-semibold">
+                {{ item.${titleField} }}
+              </view>
 #if($statusField != "")
-            <dict-tag :type="DICT_TYPE.${statusDictType.toUpperCase()}" :value="item.${statusField}" />
+              <dict-tag :type="DICT_TYPE.${statusDictType.toUpperCase()}" :value="item.${statusField}" />
 #end
-          </view>
+            </view>
 #foreach($column in $columns)
   #if ($column.listOperationResult && !$column.primaryKey && $column.javaField != $titleField && $column.javaField != $statusField)
     #set ($javaField = $column.javaField)
@@ -50,36 +62,27 @@
     #set ($dictType = $column.dictType)
     #set ($javaType = $column.javaType)
     #if ($dictType && "" != $dictType)
-          <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
-            <text class="mr-8rpx text-[#999]">${comment}：</text>
-            <dict-tag :type="DICT_TYPE.${dictType.toUpperCase()}" :value="item.${javaField}" />
-          </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">${comment}：</text>
+              <dict-tag :type="DICT_TYPE.${dictType.toUpperCase()}" :value="item.${javaField}" />
+            </view>
     #elseif ($javaType == "LocalDateTime")
-          <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
-            <text class="mr-8rpx text-[#999]">${comment}：</text>
-            <text class="line-clamp-1">{{ formatDateTime(item.${javaField}) || '-' }}</text>
-          </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">${comment}：</text>
+              <text class="line-clamp-1">{{ formatDateTime(item.${javaField}) || '-' }}</text>
+            </view>
     #else
-          <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
-            <text class="mr-8rpx text-[#999]">${comment}：</text>
-            <text class="line-clamp-1">{{ item.${javaField} }}</text>
-          </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">${comment}：</text>
+              <text class="line-clamp-1">{{ item.${javaField} }}</text>
+            </view>
     #end
   #end
 #end
+          </view>
         </view>
       </view>
-
-      <!-- 加载更多 -->
-      <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无${table.classComment}数据" />
-      </view>
-      <wd-loadmore
-        v-if="list.length > 0"
-        :state="loadMoreState"
-        @reload="loadMore"
-      />
-    </view>
+    </z-paging>
 
     <!-- 新增按钮 -->
     <wd-fab
@@ -108,8 +111,7 @@
   #end
 #end
 import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
-import type { LoadMoreState } from '@/http/types'
-import { onReachBottom } from '@dcloudio/uni-app'
+import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
 import { get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
 import { useAccess } from '@/hooks/useAccess'
@@ -130,13 +132,9 @@ definePage({
 })
 
 const { hasAccessByCodes } = useAccess()
-const total = ref(0)
-const list = ref<${simpleClassName}[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
-const queryParams = ref({
-  pageNo: 1,
-  pageSize: 10,
-})
+const list = ref<${simpleClassName}[]>([]) // 列表数据
+const pagingRef = ref<any>() // 分页组件引用
+const queryParams = ref<Record<string, any>>({}) // 查询参数
 
 /** 返回上一页 */
 function handleBack() {
@@ -144,28 +142,24 @@ function handleBack() {
 }
 
 /** 查询${table.classComment}列表 */
-async function getList() {
-  loadMoreState.value = 'loading'
+async function queryList(pageNo: number, pageSize: number) {
   try {
-    const data = await get${simpleClassName}Page(queryParams.value)
-    list.value = [...list.value, ...data.list]
-    total.value = data.total
-    loadMoreState.value = list.value.length >= total.value ? 'finished' : 'loading'
+    const params = {
+      ...queryParams.value,
+      pageNo,
+      pageSize,
+    }
+    const data = await get${simpleClassName}Page(params)
+    pagingRef.value?.completeByTotal(data.list, data.total)
   } catch {
-    queryParams.value.pageNo = queryParams.value.pageNo > 1 ? queryParams.value.pageNo - 1 : 1
-    loadMoreState.value = 'error'
+    pagingRef.value?.complete(false)
   }
 }
 
 /** 搜索按钮操作 */
 function handleQuery(data?: Record<string, any>) {
-  queryParams.value = {
-    ...data,
-    pageNo: 1,
-    pageSize: queryParams.value.pageSize,
-  }
-  list.value = []
-  getList()
+  queryParams.value = { ...data }
+  reload()
 }
 
 /** 重置按钮操作 */
@@ -173,13 +167,9 @@ function handleReset() {
   handleQuery()
 }
 
-/** 加载更多 */
-function loadMore() {
-  if (loadMoreState.value === 'finished') {
-    return
-  }
-  queryParams.value.pageNo++
-  getList()
+/** 重新加载 */
+function reload() {
+  pagingRef.value?.reload()
 }
 
 /** 新增${table.classComment} */
@@ -196,14 +186,14 @@ function handleDetail(item: ${simpleClassName}) {
   })
 }
 
-/** 触底加载更多 */
-onReachBottom(() => {
-  loadMore()
-})
-
 /** 初始化 */
 onMounted(() => {
-  getList()
+  uni.$on('${table.moduleName}:${table.businessName}:reload', reload)
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('${table.moduleName}:${table.businessName}:reload', reload)
 })
 </script>
 
