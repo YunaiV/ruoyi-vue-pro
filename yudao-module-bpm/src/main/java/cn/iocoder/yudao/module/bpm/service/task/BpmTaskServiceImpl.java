@@ -618,8 +618,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             runtimeService.setVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskIdsByReturn);
         }
 
-        // 6. 清理退回设置的不自动通过的变量。
-        runtimeService.removeVariable(task.getProcessInstanceId(), String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()));
+        // 6. 清理退回设置的不自动通过的变量。仅在该标记存在时才删除，避免每次完成任务都产生无谓的 DB delete
+        String returnFlagKey = String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey());
+        if (runtimeService.hasVariable(task.getProcessInstanceId(), returnFlagKey)) {
+            log.info("[approveTask][taskId({}) 清理退回标记变量({})]", task.getId(), returnFlagKey);
+            runtimeService.removeVariable(task.getProcessInstanceId(), returnFlagKey);
+        }
 
         // 7. 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
@@ -951,6 +955,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Set<String> needSimulateTaskDefinitionKeys = getNeedSimulateTaskDefinitionKeys(bpmnModel, currentTask, targetElement);
 
         // 4. 执行驳回
+        // 4.1 校验是否有可回撤的 execution，避免 moveExecutionsToSingleActivityId 传入空集合时 Flowable 内部报错
+        if (CollUtil.isEmpty(runExecutionIds)) {
+            throw exception(TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
+        }
+        // 4.2 执行驳回
         // ① 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId。原因：当多实例任务回退的时候有问题。
         //    相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         // ② flowable 7.2.0 版本后，继续使用 moveActivityIdsToSingleActivityId 方法。原因：flowable 7.2.0 版本修复了该问题。
@@ -1480,12 +1489,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         return;
                     }
                     if (processDefinitionInfo.getAutoApprovalType() != null) {
-                        HistoricTaskInstanceQuery sameAssigneeQuery = historyService.createHistoricTaskInstanceQuery()
+                        HistoricTaskInstanceQuery approvedTaskQuery = historyService.createHistoricTaskInstanceQuery()
                                 .processInstanceId(task.getProcessInstanceId())
                                 .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.APPROVE.getStatus())
                                 .finished();
                         if (BpmAutoApproveTypeEnum.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())
-                                && sameAssigneeQuery.taskAssignee(task.getAssignee()).count() > 0) {
+                                && approvedTaskQuery.taskAssignee(task.getAssignee()).count() > 0) {
                             getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                     .setReason(BpmAutoApproveTypeEnum.APPROVE_ALL.getName()));
                             return;
@@ -1500,8 +1509,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             List<String> sourceTaskIds = convertList(BpmnModelUtils.getElementIncomingUserTaskFlows( // 获取所有的上一个 UserTask 节点连线
                                             BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey())),
                                     SequenceFlow::getSourceRef);
-                            sameAssigneeQuery.taskDefinitionKeys(sourceTaskIds).orderByTaskCreateTime().desc(); // 设置 taskIds, 并按创建时间倒序排序
-                            HistoricTaskInstance firstHisTask = CollUtil.getFirst(sameAssigneeQuery.list());
+                            approvedTaskQuery.taskDefinitionKeys(sourceTaskIds).orderByTaskCreateTime().desc(); // 设置 taskIds, 并按创建时间倒序排序
+                            HistoricTaskInstance firstHisTask = CollUtil.getFirst(approvedTaskQuery.list());
                             if (firstHisTask != null && StrUtil.equals(firstHisTask.getAssignee(), task.getAssignee())) {
                                 getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                         .setReason(BpmAutoApproveTypeEnum.APPROVE_SEQUENT.getName()));
