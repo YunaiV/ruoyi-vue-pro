@@ -11,10 +11,11 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.transfer.PayTra
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,13 +34,13 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private PayTransferMapper transferMapper;
 
-    @MockitoBean
+    @MockBean
     private PayProperties payProperties;
-    @MockitoBean
+    @MockBean
     private PayAppService appService;
-    @MockitoBean
+    @MockBean
     private PayChannelService channelService;
-    @MockitoBean
+    @MockBean
     private PayNotifyService notifyService;
 
     @Test
