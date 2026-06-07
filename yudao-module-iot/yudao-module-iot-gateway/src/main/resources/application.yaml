@@ -12,6 +12,9 @@ spring:
       database: 0 # Redis 数据库索引
       # password: # Redis 密码，如果有的话
       timeout: 30000ms # 连接超时时间
+  # Kafka 配置项，对应 KafkaProperties 配置类
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092 # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
 
 --- #################### 消息队列相关 ####################
 
