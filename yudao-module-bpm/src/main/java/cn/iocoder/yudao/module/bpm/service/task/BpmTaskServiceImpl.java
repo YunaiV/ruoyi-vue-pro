@@ -605,10 +605,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 2.3 添加附件
         if (CollUtil.isNotEmpty(reqVO.getAttachments())) {
-            reqVO.getAttachments().forEach(attachment -> {
-                taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(), task.getId(), task.getProcessInstanceId(),
-                        FileUtil.getName(URLUtil.getPath(attachment)), null, attachment);
-            });
+            reqVO.getAttachments().forEach(attachment -> taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(),
+                    task.getId(), task.getProcessInstanceId(), FileUtil.getName(URLUtil.getPath(attachment)), null, attachment));
         }
 
         // 3. 设置流程变量。如果流程变量前端传空，需要从历史实例中获取，原因：前端表单如果在当前节点无可编辑的字段时 variables 一定会为空
@@ -837,10 +835,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
         // 2.3 添加附件
         if (CollUtil.isNotEmpty(reqVO.getAttachments())) {
-            reqVO.getAttachments().forEach(attachment -> {
-                taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(), task.getId(), task.getProcessInstanceId(),
-                        FileUtil.getName(URLUtil.getPath(attachment)), null, attachment);
-            });
+            reqVO.getAttachments().forEach(attachment -> taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(),
+                    task.getId(), task.getProcessInstanceId(), FileUtil.getName(URLUtil.getPath(attachment)), null, attachment));
         }
 
         // 2.4 如果当前任务时被加签的，则加它的根任务也标记成未通过
