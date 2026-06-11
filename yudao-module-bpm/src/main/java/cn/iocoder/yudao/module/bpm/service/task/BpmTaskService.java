@@ -4,9 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmAttachmentTypeEnum;
 import jakarta.validation.Valid;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -14,6 +16,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程任务实例 Service 接口
@@ -183,6 +186,17 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<HistoricTaskInstance> getFinishedTaskListByProcessInstanceIdWithoutCancel(String processInstanceId);
+
+
+    /**
+     * 根据条件获取附件
+     *
+     * @param processInstanceId 流程 id
+     * @param taskIds 任务 id 集合
+     * @param attachmentType 附件类型
+     * @return 附件集合
+     */
+    List<Attachment> getAttachments(String processInstanceId, Set<String> taskIds, BpmAttachmentTypeEnum attachmentType);
 
     // ========== Update 写入相关方法 ==========
 

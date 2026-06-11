@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -21,7 +22,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmProcessDefinitionConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
@@ -34,6 +34,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.mapstruct.Mapper;
@@ -82,7 +83,7 @@ public interface BpmProcessInstanceConvert {
                 if (CollUtil.isNotEmpty(respVO.getTasks())) {
                     respVO.getTasks().forEach(task -> {
                         AdminUserRespDTO assigneeUser = userMap.get(task.getAssignee());
-                        if (assigneeUser!= null) {
+                        if (assigneeUser != null) {
                             task.setAssigneeUser(BeanUtils.toBean(assigneeUser, UserSimpleBaseVO.class));
                             MapUtils.findAndThen(deptMap, assigneeUser.getDeptId(), dept -> task.getAssigneeUser().setDeptName(dept.getName()));
                         }
@@ -137,10 +138,10 @@ public interface BpmProcessInstanceConvert {
 
     default BpmMessageSendWhenProcessInstanceRejectReqDTO buildProcessInstanceRejectMessage(ProcessInstance instance, String reason) {
         return new BpmMessageSendWhenProcessInstanceRejectReqDTO()
-            .setProcessInstanceName(instance.getName())
-            .setProcessInstanceId(instance.getId())
-            .setReason(reason)
-            .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()));
+                .setProcessInstanceName(instance.getName())
+                .setProcessInstanceId(instance.getId())
+                .setReason(reason)
+                .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()));
     }
 
     default BpmProcessInstanceBpmnModelViewRespVO buildProcessInstanceBpmnModelView(HistoricProcessInstance processInstance,
@@ -183,8 +184,8 @@ public interface BpmProcessInstanceConvert {
     }
 
     default UserSimpleBaseVO buildUser(Long userId,
-                                                    Map<Long, AdminUserRespDTO> userMap,
-                                                    Map<Long, DeptRespDTO> deptMap) {
+                                       Map<Long, AdminUserRespDTO> userMap,
+                                       Map<Long, DeptRespDTO> deptMap) {
         if (userId == null) {
             return null;
         }
@@ -200,13 +201,14 @@ public interface BpmProcessInstanceConvert {
         return userVO;
     }
 
-    default BpmApprovalDetailRespVO.ActivityNodeTask buildApprovalTaskInfo(HistoricTaskInstance task) {
+    default BpmApprovalDetailRespVO.ActivityNodeTask buildApprovalTaskInfo(HistoricTaskInstance task, List<Attachment> attachments) {
         if (task == null) {
             return null;
         }
         return BeanUtils.toBean(task, BpmApprovalDetailRespVO.ActivityNodeTask.class)
                 .setStatus(FlowableUtils.getTaskStatus(task)).setReason(FlowableUtils.getTaskReason(task))
-                .setSignPicUrl(FlowableUtils.getTaskSignPicUrl(task));
+                .setSignPicUrl(FlowableUtils.getTaskSignPicUrl(task))
+                .setAttachments(convertList(attachments, Attachment::getUrl));
     }
 
     default Set<Long> parseUserIds(HistoricProcessInstance processInstance,

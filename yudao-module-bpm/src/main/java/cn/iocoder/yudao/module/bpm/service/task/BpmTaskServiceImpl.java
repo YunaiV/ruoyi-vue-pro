@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
@@ -19,10 +20,7 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
@@ -49,6 +47,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
@@ -510,6 +509,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .orderByHistoricTaskInstanceStartTime().asc().list();
     }
 
+    @Override
+    public List<Attachment> getAttachments(String processInstanceId, Set<String> taskIds, BpmAttachmentTypeEnum attachmentType) {
+        List<Attachment> result = taskService.getProcessInstanceAttachments(processInstanceId);
+        if (CollUtil.isNotEmpty(taskIds)) {
+            result = filterList(result, attachment -> taskIds.contains(attachment.getTaskId()));
+        }
+        if (attachmentType != null) {
+            result = filterList(result, attachment -> attachmentType.getType().equals(attachment.getType()));
+        }
+        return result;
+    }
+
     /**
      * 判断指定用户，是否是当前任务的审批人
      *
@@ -592,6 +603,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
+        // 2.3 添加附件
+        if (CollUtil.isNotEmpty(reqVO.getAttachments())) {
+            reqVO.getAttachments().forEach(attachment -> {
+                taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(), task.getId(), task.getProcessInstanceId(),
+                        FileUtil.getName(URLUtil.getPath(attachment)), null, attachment);
+            });
+        }
 
         // 3. 设置流程变量。如果流程变量前端传空，需要从历史实例中获取，原因：前端表单如果在当前节点无可编辑的字段时 variables 一定会为空
         // 场景一：A 节点发起，B 节点表单无可编辑字段，审批通过时，C 节点需要流程变量获取下一个执行节点，但因为 B 节点无可编辑的字段，variables 为空，流程可能出现问题。
@@ -817,7 +835,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加流程评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT.getType(),
                 BpmCommentTypeEnum.REJECT.formatComment(reqVO.getReason()));
-        // 2.3 如果当前任务时被加签的，则加它的根任务也标记成未通过
+        // 2.3 添加附件
+        if (CollUtil.isNotEmpty(reqVO.getAttachments())) {
+            reqVO.getAttachments().forEach(attachment -> {
+                taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(), task.getId(), task.getProcessInstanceId(),
+                        FileUtil.getName(URLUtil.getPath(attachment)), null, attachment);
+            });
+        }
+
+        // 2.4 如果当前任务时被加签的，则加它的根任务也标记成未通过
         // 疑问：为什么要标记未通过呢？
         // 回答：例如说 A 任务被向前加签除 B 任务时，B 任务被审批不通过，此时 A 会被取消。而 yudao-ui-admin-vue3 不展示“已取消”的任务，导致展示不出审批不通过的细节。
         if (task.getParentTaskId() != null) {
