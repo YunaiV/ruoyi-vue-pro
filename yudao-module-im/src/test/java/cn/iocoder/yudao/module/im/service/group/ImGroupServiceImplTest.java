@@ -1100,9 +1100,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetMyGroupList_noMembers() {
-        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>());
-        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
-                .thenReturn(new ArrayList<>());
+        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>());
 
         List<ImGroupDO> result = groupService.getMyGroupList(1L);
         assertTrue(result.isEmpty());
@@ -1111,19 +1109,15 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetMyGroupList_success() {
-        // 活跃群成员
-        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>(List.of(
+        // 曾经加入的所有群（含退群）
+        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>(List.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(20L).userId(1L)
-                        .status(CommonStatusEnum.ENABLE.getStatus()).build()
+                        .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                ImGroupMemberDO.builder().groupId(30L).userId(1L)
+                        .status(CommonStatusEnum.DISABLE.getStatus()).build()
         )));
-        // 最近退群成员（最近 30 天内）
-        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
-                .thenReturn(new ArrayList<>(List.of(
-                        ImGroupMemberDO.builder().groupId(30L).userId(1L)
-                                .status(CommonStatusEnum.DISABLE.getStatus()).build()
-                )));
         List<ImGroupDO> groups = List.of(
                 ImGroupDO.builder().id(10L).status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupDO.builder().id(20L).status(CommonStatusEnum.ENABLE.getStatus()).build(),

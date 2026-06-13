@@ -105,8 +105,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     }
 
     @Override
-    public List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime) {
-        return groupMemberMapper.selectQuitListByUserId(userId, minQuitTime);
+    public List<ImGroupMemberDO> getGroupMemberListByUserId(Long userId) {
+        return groupMemberMapper.selectListByUserId(userId);
     }
 
     @Override

@@ -320,17 +320,15 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testReadMessages_noUnread() {
-        // 准备：mapper 返回 0 表示 id <= messageId 范围内没有未读消息
-        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
-                eq(2L), eq(1L), eq(5L),
-                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
-                .thenReturn(0);
+    public void testReadMessages_notAdvanced() {
+        // 准备：读位置未前进（已读过 / CAS 失败），不下发事件
+        when(conversationReadService.updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong()))
+                .thenReturn(false);
 
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L, 5L);
 
-        // 断言：不推送 READ / RECEIPT
+        // 断言：读位置没前进，不推送 READ / RECEIPT
         verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }
 

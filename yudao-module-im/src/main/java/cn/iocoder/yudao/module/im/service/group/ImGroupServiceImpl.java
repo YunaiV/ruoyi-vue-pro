@@ -593,14 +593,10 @@ public class ImGroupServiceImpl implements ImGroupService {
         return convertMap(groupMapper.selectByIds(ids), ImGroupDO::getId);
     }
 
-    // TODO @AI：是不是可以拉退出的也可以哈？前端自己按需过滤！
     @Override
     public List<ImGroupDO> getMyGroupList(Long userId) {
-        // 1.1 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
-        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByUserId(userId);
-        // 1.2 再查最近 N 天（与群消息离线拉取窗口一致）内退群的成员记录（退群前可能有离线消息需要展示，一并返回作为前端缓存）
-        LocalDateTime minQuitTime = LocalDateTime.now().minusDays(imProperties.getMessage().getGroupPullMaxDays());
-        members.addAll(groupMemberService.getQuitGroupMemberListByUserId(userId, minQuitTime));
+        // 1. 查用户曾经加入的所有群（含退群，前端按需过滤）；退群前的离线消息也要能展示
+        List<ImGroupMemberDO> members = groupMemberService.getGroupMemberListByUserId(userId);
         if (CollUtil.isEmpty(members)) {
             return Collections.emptyList();
         }

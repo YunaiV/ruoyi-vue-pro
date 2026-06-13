@@ -122,6 +122,42 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testSendMessage_senderAlwaysVisible() {
+        // 边界：成员缓存漏掉发送者（理论上 validateMemberInGroup 已挡，这里纯防御）；发送者仍必须固化进 receiver_user_ids
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
+                    .thenReturn(groupMessageService);
+
+            ImGroupMessageSendReqVO reqVO = buildSendReqVO();
+            when(groupMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-group-001"))
+                    .thenReturn(null);
+            ImGroupDO group = new ImGroupDO();
+            group.setId(10L);
+            group.setName("测试群");
+            when(groupService.validateGroupExists(10L)).thenReturn(group);
+            ImGroupMemberDO member = ImGroupMemberDO.builder()
+                    .groupId(10L).userId(1L).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+            // 成员缓存只返回 {2,3}，漏掉发送者 1
+            when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
+                    .thenReturn(List.of(2L, 3L));
+            when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenAnswer(invocation -> {
+                ImGroupMessageDO msg = invocation.getArgument(0);
+                msg.setId(99L);
+                return 1;
+            });
+
+            ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
+
+            // 断言：固化快照必含发送者，推送目标补回发送者 = {1,2,3}
+            assertTrue(result.getReceiverUserIds().contains(1L), "发送者必须在 receiver_user_ids 快照内");
+            verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+                    ids.size() == 3 && ids.contains(1L) && ids.contains(2L) && ids.contains(3L)),
+                    any(ImGroupMessageDTO.class));
+        }
+    }
+
+    @Test
     public void testSendMessage_clientMessageIdIdempotent() {
         // 准备
         ImGroupMessageSendReqVO reqVO = buildSendReqVO();
@@ -224,9 +260,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(now.minusDays(10)).build();
-        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
-        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
-                .thenReturn(List.of());
+        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(List.of(member));
 
         ImGroupMessageDO low = ImGroupMessageDO.builder()
                 .id(5L).groupId(10L).senderId(2L).receiverUserIds(List.of(1L))
@@ -259,9 +293,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .groupId(10L).userId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus())
                 .joinTime(now.minusDays(10)).build();
-        when(groupMemberService.getActiveGroupMemberListByUserId(1L)).thenReturn(List.of(member));
-        when(groupMemberService.getQuitGroupMemberListByUserId(eq(1L), any(LocalDateTime.class)))
-                .thenReturn(List.of());
+        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(List.of(member));
 
         ImGroupMessageDO receiptMsg = ImGroupMessageDO.builder()
                 .id(100L).groupId(10L).senderId(1L)
@@ -298,6 +330,37 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 断言：分母 {2,3}，仅用户 2 读到 >=100 → readCount==1
         assertEquals(1, result.size());
         assertEquals(1, result.get(0).getReadCount());
+    }
+
+    @Test
+    public void testPullMessages_noReceiptMessageSkipsReadCount() {
+        // 准备：本人发送但不需要回执（NO_RECEIPT）的消息——只补已读位置，不补 readCount
+        LocalDateTime now = LocalDateTime.now();
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(now.minusDays(10)).build();
+        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(List.of(member));
+
+        ImGroupMessageDO noReceiptMsg = ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(1L)
+                .receiverUserIds(List.of(1L, 2L, 3L))
+                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .receiptStatus(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus())
+                .sendTime(now.minusHours(1)).build();
+        when(groupMessageMapper.selectListByMinId(eq(1L), anyCollection(), eq(0L),
+                any(LocalDateTime.class), eq(100)))
+                .thenReturn(List.of(noReceiptMsg));
+        when(conversationReadService.getConversationReadMessageId(eq(1L), eq(ImConversationTypeEnum.GROUP.getType()), eq(10L)))
+                .thenReturn(100L);
+
+        List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
+
+        // 断言：读位置照常补（status=READ），但 NO_RECEIPT 不补 readCount，也不查 readCount 相关的读位置映射
+        assertEquals(1, result.size());
+        assertEquals(ImMessageStatusEnum.READ.getStatus(), result.get(0).getStatus());
+        assertNull(result.get(0).getReadCount());
+        verify(conversationReadService, never()).getUserReadMessageIdMap(anyInt(), anyLong());
     }
 
     // ========== 撤回测试 ==========

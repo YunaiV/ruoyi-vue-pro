@@ -87,13 +87,12 @@ public interface ImGroupMemberService {
     List<ImGroupMemberDO> getActiveGroupMemberListByUserId(Long userId);
 
     /**
-     * 查询用户已退群的群成员记录（DISABLE 状态）
+     * 查询用户曾经加入的所有群成员记录（含已退群）
      *
-     * @param userId      用户编号，必传
-     * @param minQuitTime 最早退群时间（含），可空
-     * @return 已退群成员记录列表
+     * @param userId 用户编号
+     * @return 群成员记录列表
      */
-    List<ImGroupMemberDO> getQuitGroupMemberListByUserId(Long userId, LocalDateTime minQuitTime);
+    List<ImGroupMemberDO> getGroupMemberListByUserId(Long userId);
 
     /**
      * 添加群成员（入群），角色默认 MEMBER

@@ -97,9 +97,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             sensitiveWordService.validateText(reqVO.getContent());
         }
 
-        // 2.1 固化发送当时可见成员快照（含发送者），新群消息 receiver_user_ids 不能为空；用户发送均为全员广播
+        // 2.1 固化发送当时可见成员快照：用户发送均为全员广播；getReceiverUserIds 兜底纳入发送者，钉死发送者必可见
         List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(reqVO.getGroupId());
-        // TODO @AI：这里是不是没必要过滤？？？因为发送者，肯定是群成员呀！！！
         Set<Long> receiverUserIds = getReceiverUserIds(null, senderId, memberUserIds);
         // 2.2 引用 quote 消息规范化（含可见性子集校验，防止定向消息内容被广播引用泄漏）
         reqVO.setContent(normalizeQuoteContent(reqVO, senderMember, receiverUserIds));
@@ -135,8 +134,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         String contentString = payload == null || payload instanceof String
                 ? (String) payload
                 : JsonUtils.toJsonString(payload);
-        // TODO @AI：；receiver_user_ids 固化为推送目标（发送当时可见成员快照） 这种注释，没必要写哇？
-        // 1.2 构建并保存消息；receiver_user_ids 固化为推送目标（发送当时可见成员快照）
+        // 1.2 构建并保存消息
         ImGroupMessageDO message = new ImGroupMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
                 .setSenderId(senderId).setGroupId(dto.getGroupId())
                 .setType(dto.getType()).setContent(contentString)
@@ -198,19 +196,14 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         // 0. 拉取时间窗；超过窗口的老消息不再通过离线通道推送
         LocalDateTime minSendTime = LocalDateTime.now().minusDays(imProperties.getMessage().getGroupPullMaxDays());
 
-        // 1. 候选群 = 当前在群 ∪ 窗口内退群；退群用户仍可拉到退群前已写入自己 ID 的历史消息
-        // TODO @AI：直接查询所有的群（一次性，这样性能也好点呀）；然后这里不用过滤 minSendTime 吧；
-        Set<Long> groupIds = new HashSet<>();
-        groupIds.addAll(convertList(groupMemberService.getActiveGroupMemberListByUserId(userId),
-                ImGroupMemberDO::getGroupId));
-        groupIds.addAll(convertList(groupMemberService.getQuitGroupMemberListByUserId(userId, minSendTime),
-                ImGroupMemberDO::getGroupId));
+        // 1. 候选群 = 用户曾经加入的所有群（含退群）；可见性与时间窗都交给 SQL，退群群最多贡献 0 条
+        Set<Long> groupIds = convertSet(groupMemberService.getGroupMemberListByUserId(userId),
+                ImGroupMemberDO::getGroupId);
         if (CollUtil.isEmpty(groupIds)) {
             return Collections.emptyList();
         }
 
-        // TODO @AI：注释是不是优化下，不用按照“单次 SQL 按 receiver_user_ids 快照过滤可见性，结果天然按 id 升序、无需内存再过滤”
-        // 2. 单次 SQL 按 receiver_user_ids 快照过滤可见性，结果天然按 id 升序、无需内存再过滤
+        // 2. 按 receiver_user_ids 快照过滤可见性，结果按 id 升序
         List<ImGroupMessageDO> messages = groupMessageMapper.selectListByMinId(userId, groupIds, minId, minSendTime, size);
 
         // 3. 按当前用户补齐：消息已读态、本人发送的回执消息的已读人数
@@ -219,12 +212,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         return messages;
     }
 
-    // TODO @AI：要不要改下，把“回执已读人数（readCount）：仅对本人发送的回执消息，计算可见成员中的已读人数”都计算？！
     /**
      * 补全消息已读态和回执已读人数
      * <p>
-     * 1. 消息已读态（status）：根据 im_conversation_read 读位置判断 READ / UNREAD
-     * 2. 回执已读人数（readCount）：仅对本人发送的回执消息，计算可见成员中的已读人数
+     * 1. 消息已读态（status）：根据 im_conversation_read 读位置判断 READ / UNREAD，所有消息都补
+     * 2. 回执已读人数（readCount）：仅对本人发送、且需要回执（非 NO_RECEIPT）的消息，计算可见成员中的已读人数
      */
     @SuppressWarnings({"StatementWithEmptyBody", "DataFlowIssue"})
     private void appendMessageStatusAndReceipt(Long userId, List<ImGroupMessageDO> messages) {
@@ -254,9 +246,10 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 message.setStatus(ImMessageStatusEnum.UNREAD.getStatus());
             }
 
-            // 回执消息的已读人数（readCount）：仅补齐本人发送的，其他消息不处理（回执消息才关心已读人数，且只对发送者可见）
+            // 回执已读人数（readCount）：仅补本人发送、且需要回执（非 NO_RECEIPT）的消息
+            // 读位置（status）所有消息都补；readCount 只服务「需要回执」的消息，不把已读位置和消息回执混为一谈
             if (ObjUtil.notEqual(message.getSenderId(), userId)
-                || ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus().equals(message.getReceiptStatus())) {
+                    || ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus().equals(message.getReceiptStatus())) {
                 continue;
             }
             Map<Long, Long> positions = readPositionsByGroup.computeIfAbsent(groupId,
@@ -286,7 +279,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         ImGroupMessageDO message = groupMessageMapper.selectById(messageId);
         if (message == null
                 || ObjUtil.notEqual(message.getGroupId(), groupId)
-                || !isMessageVisible(message, userId)) {
+                || !isMessageReceived(message, userId)) {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }
 
@@ -316,7 +309,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
             return Collections.emptyList();
         }
-        if (!isMessageVisible(message, userId)) {
+        if (!isMessageReceived(message, userId)) {
             return Collections.emptyList();
         }
         // 1.3 仅消息发送方关心已读人数；非发送方查询直接返回空
@@ -436,7 +429,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             throw exception(MESSAGE_QUOTE_INVALID);
         }
         // 校验对发送人可见（按快照）
-        if (!isMessageVisible(original, senderMember.getUserId())) {
+        if (!isMessageReceived(original, senderMember.getUserId())) {
             throw exception(MESSAGE_QUOTE_INVALID);
         }
         // 防泄漏：新消息可见集合必须是被引用消息可见集合的子集，否则禁止引用；
@@ -464,24 +457,22 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         return message;
     }
 
-    // TODO @AI：方法名，是不是可以优化下，对齐 ReceiverUserIds；
     /**
-     * 判断一条群消息对某个用户是否可见
+     * 判断一条群消息是否被某个用户接收到
      * <p>
-     * 可见性以发送当时固化的 receiver_user_ids 快照为准；发送者也在快照内。
+     * 接收范围以发送当时固化的 receiver_user_ids 快照为准；发送者也在快照内。
      *
      * @param message 消息
      * @param userId 当前用户编号
-     * @return 是否可见
+     * @return 是否接收到
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean isMessageVisible(ImGroupMessageDO message, Long userId) {
+    private boolean isMessageReceived(ImGroupMessageDO message, Long userId) {
         return CollUtil.contains(message.getReceiverUserIds(), userId);
     }
 
-    // TODO @AI: ∩ 是啥意思，有点奇怪。
     /**
-     * 计算一条群消息的可见成员集合（快照 ∩ 传入成员，含发送者）
+     * 计算一条群消息的可见成员集合（快照与传入成员的交集，含发送者）
      */
     private Set<Long> getReceiverUserIds(ImGroupMessageDO message, List<ImGroupMemberDO> members) {
         if (CollUtil.isEmpty(message.getReceiverUserIds())) {
@@ -497,20 +488,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
      * 仅适用于「新消息」发送场景：无定向接收列表则全员可见，否则取定向用户与当前成员的交集；
      * 发送者始终纳入快照，保证 receiver_user_ids 非空且发送方可见。
      */
-    private Set<Long> getReceiverUserIds(List<Long> receiverUserIds, Long senderId, Collection<Long> memberUserIds) {
-        Set<Long> result = new HashSet<>();
-        // 无定向接收列表 → 全员可见
-        if (CollUtil.isEmpty(receiverUserIds)) {
-            result.addAll(memberUserIds);
-        } else {
-            // 有定向接收列表 → 仅定向用户且仍为成员可见
-            Set<Long> allowed = new HashSet<>(receiverUserIds);
-            for (Long userId : memberUserIds) {
-                if (allowed.contains(userId)) {
-                    result.add(userId);
-                }
-            }
-        }
+    private Set<Long> getReceiverUserIds(List<Long> directedUserIds, Long senderId, Collection<Long> memberUserIds) {
+        // 无定向接收列表 → 全员可见；否则取定向用户与当前成员的交集
+        Set<Long> result = CollUtil.isEmpty(directedUserIds)
+                ? new HashSet<>(memberUserIds)
+                : new HashSet<>(CollUtil.intersection(memberUserIds, directedUserIds));
         // 发送者始终可见（多端同步），即便成员缓存暂未包含
         if (senderId != null) {
             result.add(senderId);
